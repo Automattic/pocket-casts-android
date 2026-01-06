@@ -11,6 +11,7 @@ interface FeatureProvider {
     val priority: Int
     val currentReleaseVersion: ReleaseVersion
         get() = ReleaseVersion.currentReleaseVersion
+    suspend fun awaitInitialization(): Boolean
     fun hasFeature(feature: Feature): Boolean
     fun isEnabled(feature: Feature): Boolean
 }

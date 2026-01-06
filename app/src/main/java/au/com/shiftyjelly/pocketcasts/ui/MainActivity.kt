@@ -455,8 +455,11 @@ class MainActivity :
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            checkForNotificationPermission()
+
+        lifecycleScope.launch {
+            if (!FeatureFlag.isEnabledWithRemote(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                checkForNotificationPermission()
+            }
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->

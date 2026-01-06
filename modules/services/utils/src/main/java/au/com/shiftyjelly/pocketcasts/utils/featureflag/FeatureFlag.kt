@@ -4,8 +4,14 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Manages feature flags in the application with a list of different feature providers.
@@ -44,6 +50,29 @@ object FeatureFlag {
                 ?.isEnabled(feature)
                 ?: feature.defaultValue
         }
+    }
+
+    /**
+     * Suspends until the remote config has been fetched, then returns whether the [feature] is enabled.
+     * This ensures you get the latest remote value rather than a cached or default value.
+     *
+     * @param feature The feature to check
+     * @param timeout Maximum time to wait for remote config. Defaults to 5 seconds.
+     *                If timeout is reached, returns the current value (which may be cached or default)
+     * @return true if the feature is enabled, false otherwise
+     */
+    suspend fun isEnabledWithRemote(
+        feature: Feature,
+        timeout: Duration = 5.seconds,
+    ): Boolean {
+        withTimeoutOrNull(timeout) {
+            coroutineScope {
+                providers.map { async { it.awaitInitialization() } }.awaitAll()
+            }
+        }
+        updateFeatureFlowValues()
+
+        return isEnabled(feature)
     }
 
     fun isEnabledFlow(
