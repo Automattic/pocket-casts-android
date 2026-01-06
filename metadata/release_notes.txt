@@ -1,7 +1,23 @@
+*   New Features
+    *   Allow Wear OS playback through the watch speaker
+        ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
+    *   Add the starred episodes screen on Wear OS
+        ([#4838](https://github.com/Automattic/pocket-casts-android/pull/4838))
+*   Updates
+    *   Improve Wear OS downloads page with a loading spinner and empty message
+        ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
+    *   Improve starred page to include episodes for unfollowed podcasts and fix sort order
+        ([#4839](https://github.com/Automattic/pocket-casts-android/pull/4839))
+    *   When following a podcast cache the smaller podcast images
+        ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
+    *   On Wear OS show archived or played episodes as greyed out
+        ([#4842](https://github.com/Automattic/pocket-casts-android/pull/4842))
 *   Bug Fixes
-    *   Fix Android 10 full screen player appearing under the status and navigation bars
-        ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
-    *   Fix the mini player Up Next count overflow
-        ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
-    *   Fix 3-button navigation obstructing the sharing buttons
-        ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
+    *   Fix volume boost displaying as off when it's on
+        ([#4864](https://github.com/Automattic/pocket-casts-android/pull/4864))
+    *   Improve help & feedback page padding
+        ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
+    *   On Wear OS hide archived or played episodes
+        ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
+    *   Fix podcast image crash
+        ([#4880](https://github.com/Automattic/pocket-casts-android/pull/4880))
