@@ -35,7 +35,6 @@ import com.pocketcasts.service.api.upNextEpisodeRequest
 import com.pocketcasts.service.api.upNextSyncRequest
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
@@ -180,7 +179,6 @@ class UpNextSync @Inject constructor(
         val request = buildProtobufRequest(changes)
         try {
             val response = syncManager.upNextSyncProtobuf(request)
-            delay(5000)
 
             // don't process response if the user has rearranged the Up Next during a sync
             if (shouldProcessResponse(changes)) {
