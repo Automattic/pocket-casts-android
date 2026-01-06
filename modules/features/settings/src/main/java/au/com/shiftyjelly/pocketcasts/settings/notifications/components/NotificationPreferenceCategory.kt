@@ -188,6 +188,7 @@ internal fun NotificationPreferenceCategory(
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
+                            @Suppress("LocalContextGetResourceValueCall")
                             context.getString(it.summary)
                         },
                         onSave = { value ->
@@ -206,6 +207,7 @@ internal fun NotificationPreferenceCategory(
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
+                            @Suppress("LocalContextGetResourceValueCall")
                             context.getString(it.titleRes)
                         },
                         onSave = { value ->
