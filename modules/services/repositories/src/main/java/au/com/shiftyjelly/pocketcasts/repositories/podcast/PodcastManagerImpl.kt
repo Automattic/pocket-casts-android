@@ -445,6 +445,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.countBlocking()
     }
 
+    override suspend fun countPodcasts(): Int {
+        return podcastDao.count()
+    }
+
     override suspend fun countSubscribed(): Int {
         return podcastDao.countSubscribed()
     }

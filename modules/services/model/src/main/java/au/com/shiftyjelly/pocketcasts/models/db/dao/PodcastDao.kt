@@ -320,6 +320,9 @@ abstract class PodcastDao {
     @Query("SELECT COUNT(*) FROM podcasts")
     abstract fun countBlocking(): Int
 
+    @Query("SELECT COUNT(*) FROM podcasts")
+    abstract suspend fun count(): Int
+
     @Query("SELECT COUNT(*) FROM podcasts WHERE uuid = :uuid")
     abstract fun countByUuidBlocking(uuid: String): Int
 

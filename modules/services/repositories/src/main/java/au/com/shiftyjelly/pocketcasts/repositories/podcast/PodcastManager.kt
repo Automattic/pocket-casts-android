@@ -112,6 +112,7 @@ interface PodcastManager {
 
     /** Utility methods  */
     fun countPodcastsBlocking(): Int
+    suspend fun countPodcasts(): Int
     suspend fun countSubscribed(): Int
     fun countSubscribedFlow(): Flow<Int>
     suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
