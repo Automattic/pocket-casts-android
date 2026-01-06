@@ -39,7 +39,7 @@ class UpNextQueueImplTest {
     @Test
     fun `isUserDragging returns true when within grace period`() {
         upNextQueue.setDragStartTimeForTesting(1_000L)
-        // checking 4 seconds later (within 10 second grace period)
+        // checking 4 seconds later (within 1 minute grace period)
         assertTrue(upNextQueue.isUserDragging(now = 1_000L + 3_000L))
     }
 
