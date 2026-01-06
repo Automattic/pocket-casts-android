@@ -133,6 +133,7 @@ fun ReferralsClaimGuestPassPage(
 
         LaunchedEffect(Unit) {
             viewModel.snackBarEvent.collect { snackBarEvent ->
+                @Suppress("LocalContextGetResourceValueCall")
                 val text = when (snackBarEvent) {
                     SnackbarEvent.NoNetwork -> context.getString(LR.string.error_no_network)
                     SnackbarEvent.PurchaseFailed -> context.getString(LR.string.referrals_create_subscription_failed)

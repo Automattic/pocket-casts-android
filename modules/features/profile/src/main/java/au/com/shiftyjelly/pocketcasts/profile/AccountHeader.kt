@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -209,65 +210,63 @@ internal sealed interface SubscriptionHeaderState {
 @Composable
 private fun SubscriptionHeaderState.labels(): Labels {
     val context = LocalContext.current
-    return remember(this) {
-        if (isChampion) {
-            Labels(
-                start = Label(
-                    text = context.getString(LR.string.plus_thanks_for_your_support_bang),
-                ),
-                end = Label(
-                    text = context.getString(LR.string.pocket_casts_champion),
-                    color = { support02 },
-                ),
-            )
-        } else {
-            when (this) {
-                is SubscriptionHeaderState.Free -> {
-                    Labels(
-                        start = Label(
-                            text = context.getString(LR.string.profile_free_account),
-                        ),
-                    )
-                }
+    return if (isChampion) {
+        Labels(
+            start = Label(
+                text = stringResource(LR.string.plus_thanks_for_your_support_bang),
+            ),
+            end = Label(
+                text = stringResource(LR.string.pocket_casts_champion),
+                color = { support02 },
+            ),
+        )
+    } else {
+        when (this) {
+            is SubscriptionHeaderState.Free -> {
+                Labels(
+                    start = Label(
+                        text = stringResource(LR.string.profile_free_account),
+                    ),
+                )
+            }
 
-                is SubscriptionHeaderState.PaidRenew -> {
-                    val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
-                    Labels(
-                        start = Label(
-                            text = context.getString(LR.string.profile_next_payment, expiryDate.toLocalizedFormatLongStyle()),
-                        ),
-                        end = Label(
-                            text = when (billingCycle) {
-                                BillingCycle.Monthly -> context.getString(LR.string.profile_monthly)
-                                BillingCycle.Yearly -> context.getString(LR.string.profile_yearly)
-                                null -> ""
-                            },
-                        ),
-                    )
-                }
+            is SubscriptionHeaderState.PaidRenew -> {
+                val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
+                Labels(
+                    start = Label(
+                        text = stringResource(LR.string.profile_next_payment, expiryDate.toLocalizedFormatLongStyle()),
+                    ),
+                    end = Label(
+                        text = when (billingCycle) {
+                            BillingCycle.Monthly -> stringResource(LR.string.profile_monthly)
+                            BillingCycle.Yearly -> stringResource(LR.string.profile_yearly)
+                            null -> ""
+                        },
+                    ),
+                )
+            }
 
-                is SubscriptionHeaderState.PaidCancel -> {
-                    Labels(
-                        start = Label(
-                            text = when {
-                                platform == SubscriptionPlatform.Gift -> {
-                                    val daysString = context.resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
-                                    context.getString(LR.string.profile_time_free, daysString)
-                                }
+            is SubscriptionHeaderState.PaidCancel -> {
+                Labels(
+                    start = Label(
+                        text = when {
+                            platform == SubscriptionPlatform.Gift -> {
+                                val daysString = context.resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
+                                stringResource(LR.string.profile_time_free, daysString)
+                            }
 
-                                else -> {
-                                    context.getString(LR.string.profile_payment_cancelled)
-                                }
-                            },
-                        ),
-                        end = Label(
-                            text = run {
-                                val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
-                                context.getString(LR.string.profile_plus_expires, expiryDate.toLocalizedFormatLongStyle())
-                            },
-                        ),
-                    )
-                }
+                            else -> {
+                                stringResource(LR.string.profile_payment_cancelled)
+                            }
+                        },
+                    ),
+                    end = Label(
+                        text = run {
+                            val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
+                            stringResource(LR.string.profile_plus_expires, expiryDate.toLocalizedFormatLongStyle())
+                        },
+                    ),
+                )
             }
         }
     }
