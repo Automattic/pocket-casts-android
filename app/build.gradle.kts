@@ -9,6 +9,15 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+fun isFileEncrypted(file: File): Boolean {
+    val gitConcealHeader = byteArrayOf(0x00, 0x61, 0x38, 0x63, 0x63, 0x72, 0x79, 0x70, 0x74)
+    return file.inputStream().use { stream ->
+        val header = ByteArray(gitConcealHeader.size)
+        val read = stream.read(header)
+        read == gitConcealHeader.size && header.contentEquals(gitConcealHeader)
+    }
+}
+
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
@@ -46,8 +55,9 @@ android {
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
-            if (!file("${project.rootDir}/sentry.properties").exists()) {
-                println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")
+            val sentryPropsFile = file("${project.rootDir}/sentry.properties")
+            if (!sentryPropsFile.exists() || isFileEncrypted(sentryPropsFile)) {
+                println("WARNING: Sentry configuration file 'sentry.properties' not found or encrypted. The ProGuard mapping files won't be uploaded. If encrypted, use 'git-conceal unlock' to decrypt your working copy.")
             }
         }
     }

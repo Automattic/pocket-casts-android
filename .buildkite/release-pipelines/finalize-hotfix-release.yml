@@ -11,11 +11,11 @@ steps:
 
       .buildkite/commands/checkout-release-branch.sh "${RELEASE_VERSION}"
 
+      echo '--- 🔐 Access Secrets'
+      git-conceal-unlock
+
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
-
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
 
       echo '--- 🚀 Finalize Hotfix Release'
       bundle exec fastlane finalize_hotfix_release skip_confirm:true

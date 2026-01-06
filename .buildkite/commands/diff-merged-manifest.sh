@@ -8,11 +8,11 @@ fi
 
 BUILD_VARIANT=$1
 
+echo "--- :closed_lock_with_key: Installing Secrets"
+git-conceal-unlock
+
 echo "--- :rubygems: Setting up Gems"
 install_gems
-
-echo "--- :closed_lock_with_key: Installing Secrets"
-bundle exec fastlane run configure_apply
 
 echo "--- 💾 Diff Merged Manifest (Module: app, Build Variant: ${BUILD_VARIANT})"
 comment_with_manifest_diff "app" ${BUILD_VARIANT}

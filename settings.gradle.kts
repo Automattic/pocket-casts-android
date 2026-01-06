@@ -132,9 +132,21 @@ private fun checkForRemoteBuildCacheOptimizedExperience() {
     assertJava21Amazon()
 }
 
+private fun isFileEncrypted(file: File): Boolean {
+    val gitConcealHeader = byteArrayOf(0x00, 0x61, 0x38, 0x63, 0x63, 0x72, 0x79, 0x70, 0x74)
+    return file.inputStream().use { stream ->
+        val header = ByteArray(gitConcealHeader.size)
+        val read = stream.read(header)
+        read == gitConcealHeader.size && header.contentEquals(gitConcealHeader)
+    }
+}
+
 private fun assertSecretsApplied() {
     if (!secretsFile.exists()) {
-        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `bundle exec fastlane run configure_apply` to apply secrets.")
+        throw GradleException("The build requested remote build cache, but secrets file is not found.")
+    }
+    if (isFileEncrypted(secretsFile)) {
+        throw GradleException("The build requested remote build cache, but secrets file is encrypted. Use 'git-conceal unlock' to decrypt your working copy and try again.")
     }
 }
 
@@ -152,6 +164,9 @@ private fun assertJava21Amazon() {
 private fun loadPropertiesFromFile(file: File): Properties {
     val properties = Properties()
     if (file.exists()) {
+        if (isFileEncrypted(file)) {
+            logger.warn("File '${file.name}' is encrypted and will thus be ignored. If you are an automattician, use 'git-conceal unlock' to decrypt your working copy.")
+        }
         file.inputStream().use { stream ->
             properties.load(stream)
         }

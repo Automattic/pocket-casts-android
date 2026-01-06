@@ -8,11 +8,11 @@
 steps:
   - label: "🚂 Update Rollouts"
     command: |
+      echo '--- 🔐 Access Secrets'
+      git-conceal-unlock
+
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
-
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
 
       echo '--- 🚀 Update Rollouts'
       bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"

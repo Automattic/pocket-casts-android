@@ -18,10 +18,6 @@ build/
 *.iws
 *.ipr
 
-# Android
-google-services.json
-google-upload-credentials.json
-
 ### fastlane ###
 # fastlane - A streamlined workflow tool for Cocoa deployment
 
@@ -44,21 +40,18 @@ fastlane/README.md
 /vendor
 
 # secrets
-secret.properties
 .configure-files/firebase.secrets.json
-firebase.secrets.json
-*.keystore
 *.jks
+# debug.keystore is not secret
 !debug.keystore
+# release.keystore is secret, but encrypted with git-conceal (see .gitattributes)
+!release.keystore
 
 # Silver Searcher ignore file
 .agignore
 
 # ripgrep ignore file
 .rgignore
-
-# Sentry
-sentry.properties
 
 # Backup Files
 *.bak
