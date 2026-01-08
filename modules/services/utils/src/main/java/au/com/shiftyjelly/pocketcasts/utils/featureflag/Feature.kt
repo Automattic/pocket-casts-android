@@ -36,6 +36,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NEW_INSTALLMENT_PLAN(
+        key = "new_installment_plan",
+        title = "New Installment Plan",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     SLUMBER_STUDIOS_YEARLY_PROMO(
         key = "slumber_studios_yearly_promo_code",
         title = "Slumber Studios Yearly Promo",
