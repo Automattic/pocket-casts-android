@@ -91,7 +91,18 @@ class FakePaymentDataSource : PaymentDataSource {
                         ),
                     )
                 }
-            }
+            } + Product(
+                SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+                "Plus Yearly Installment (Fake)",
+                PricingPlans(
+                    PricingPlan.Base(
+                        "p1y-installment",
+                        listOf(PlusYearlyInstallmentPricingPhase),
+                        emptyList(),
+                    ),
+                    emptyList(),
+                ),
+            )
 
         val DefaultLoadedPurchase
             get() = Purchase(
@@ -122,6 +133,11 @@ private val PlusYearlyPricingPhase
     get() = PricingPhase(
         Price(39.99.toBigDecimal(), "USD", "$39.99"),
         PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
+    )
+private val PlusYearlyInstallmentPricingPhase
+    get() = PricingPhase(
+        Price(3.33.toBigDecimal(), "USD", "$3.33"),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
     )
 private val PatronMonthlyPricingPhase
     get() = PricingPhase(

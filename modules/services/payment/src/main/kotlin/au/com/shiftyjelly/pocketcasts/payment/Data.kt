@@ -225,6 +225,7 @@ sealed interface SubscriptionPlan {
     companion object {
         const val PLUS_MONTHLY_PRODUCT_ID = "com.pocketcasts.plus.monthly"
         const val PLUS_YEARLY_PRODUCT_ID = "com.pocketcasts.plus.yearly"
+        const val PLUS_YEARLY_INSTALLMENT_PRODUCT_ID = "com.pocketcasts.plus.yearly.installment"
         const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
 
