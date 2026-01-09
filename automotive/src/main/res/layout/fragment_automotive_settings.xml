@@ -19,7 +19,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/preferenceFragment"
             android:name="au.com.shiftyjelly.pocketcasts.AutomotiveSettingsPreferenceFragment"
             android:layout_width="match_parent"

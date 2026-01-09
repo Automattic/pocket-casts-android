@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameMillis
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PlaybackProgressAnimation.PLAYBACK_PROGRESS_ANIMATION_SPEC
@@ -28,13 +28,13 @@ class ProgressStateHolderStyled(
     initial: Float,
     private val timestampProvider: TimestampProvider,
 ) {
-    private val actual = mutableStateOf(initial)
+    private val actual = mutableFloatStateOf(initial)
     private val animatable = Animatable(0f)
-    val state = derivedStateOf { actual.value + animatable.value - animatable.targetValue }
+    val state = derivedStateOf { actual.floatValue + animatable.value - animatable.targetValue }
 
     suspend fun setProgress(percent: Float, canAnimate: Boolean) = coroutineScope {
-        val offset = percent - actual.value
-        actual.value = percent
+        val offset = percent - actual.floatValue
+        actual.floatValue = percent
         if (!canAnimate || animatable.isRunning || abs(offset) < ANIMATION_THRESHOLD) {
             return@coroutineScope
         }
@@ -50,7 +50,7 @@ class ProgressStateHolderStyled(
         do {
             withFrameMillis {
                 val frameTimeOffset = it - initialFrameTime
-                actual.value = predictor(timestamp + frameTimeOffset)
+                actual.floatValue = predictor(timestamp + frameTimeOffset)
             }
         } while (isActive)
     }
