@@ -126,6 +126,10 @@ private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParam
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID)
+                .setProductType(BillingClient.ProductType.SUBS)
+                .build(),
+            QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
