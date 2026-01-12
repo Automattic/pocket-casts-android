@@ -287,7 +287,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblEpisodeArtworkConfiguration" />
 
             <View
-                android:id="@+id/dividerViewUpNext"
+                android:id="@+id/dividerViewEpisodeDescription"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
                 android:background="?attr/primary_ui_05"
@@ -296,6 +296,80 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
+
+            <TextView
+                android:id="@+id/lblEpisodeDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_episode_description"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerViewEpisodeDescription" />
+
+            <View
+                android:id="@+id/btnShowGeneratedTranscripts"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblShowGeneratedTranscripts"
+                app:layout_constraintBottom_toBottomOf="@+id/lblShowGeneratedTranscriptsDetails"/>
+
+            <TextView
+                android:id="@+id/lblShowGeneratedTranscripts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:text="@string/settings_show_generated_transcripts"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowGeneratedTranscripts"
+                app:layout_constraintStart_toStartOf="@+id/lblEpisodeDescription"
+                app:layout_constraintTop_toBottomOf="@+id/lblEpisodeDescription" />
+
+            <Switch
+                android:id="@+id/swtShowGeneratedTranscripts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/settings_show_generated_transcripts"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblShowGeneratedTranscripts" />
+
+            <TextView
+                android:id="@+id/lblShowGeneratedTranscriptsDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_show_generated_transcripts_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowGeneratedTranscripts"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblShowGeneratedTranscripts"
+                app:layout_constraintTop_toBottomOf="@+id/lblShowGeneratedTranscripts" />
+
+            <View
+                android:id="@+id/dividerViewUpNext"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblShowGeneratedTranscriptsDetails" />
 
             <TextView
                 android:id="@+id/lblUpNext"

@@ -45,6 +45,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
     val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
     val artworkConfiguration = settings.artworkConfiguration.flow
+    val showGeneratedTranscripts = settings.showGeneratedTranscripts.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -126,6 +127,10 @@ class SettingsAppearanceViewModel @Inject constructor(
                 enabled = value,
             ),
         )
+    }
+
+    fun updateShowGeneratedTranscripts(value: Boolean) {
+        settings.showGeneratedTranscripts.set(value, updateModifiedAt = true)
     }
 
     fun updateChangeThemeType(value: Pair<Theme.ThemeType?, Theme.ThemeType?>) {

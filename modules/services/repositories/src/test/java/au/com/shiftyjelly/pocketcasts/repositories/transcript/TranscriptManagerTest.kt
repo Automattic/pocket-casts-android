@@ -4,6 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import java.util.Date
@@ -12,6 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
@@ -22,10 +25,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,12 +38,20 @@ class TranscriptManagerTest {
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
+    private val showGeneratedTranscriptsSetting = MutableStateFlow(true)
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
     private val subripDbTranscript = createDbTranscript("application/x-subrip")
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
+
+    private val settings: Settings = mock {
+        val showGeneratedTranscripts: UserSetting<Boolean> = mock()
+        whenever(showGeneratedTranscripts.value).thenAnswer { showGeneratedTranscriptsSetting.value }
+        whenever(showGeneratedTranscripts.flow).thenReturn(showGeneratedTranscriptsSetting)
+        on { this.showGeneratedTranscripts } doReturn showGeneratedTranscripts
+    }
 
     private val transcriptManager = TranscriptManagerImpl(
         transcriptDao = mock {
@@ -53,6 +66,7 @@ class TranscriptManagerTest {
             )
         },
         parsers = parsers,
+        settings = settings,
     )
 
     @Test
@@ -350,6 +364,86 @@ class TranscriptManagerTest {
         val transcript = transcriptManager.loadTranscript("episode-id")
 
         assertNotNull(transcript)
+    }
+
+    @Test
+    fun `filter generated transcripts when setting is off`() = runTest {
+        showGeneratedTranscriptsSetting.value = false
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = true))
+
+        val transcript = transcriptManager.loadTranscript("episode-id")
+
+        assertNull(transcript)
+    }
+
+    @Test
+    fun `include generated transcripts when setting is on`() = runTest {
+        showGeneratedTranscriptsSetting.value = true
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = true))
+
+        val transcript = transcriptManager.loadTranscript("episode-id")
+
+        assertNotNull(transcript)
+        assertTrue(transcript!!.isGenerated)
+    }
+
+    @Test
+    fun `load non-generated transcript when setting is off`() = runTest {
+        showGeneratedTranscriptsSetting.value = false
+        localTranscriptsFlow.value = listOf(
+            vttDbTranscript.copy(isGenerated = true),
+            htmlDbTranscript.copy(isGenerated = false),
+        )
+
+        val transcript = transcriptManager.loadTranscript("episode-id")
+
+        assertNotNull(transcript)
+        assertFalse(transcript!!.isGenerated)
+    }
+
+    @Test
+    fun `hide transcript availability for generated-only when setting is off`() = runTest {
+        showGeneratedTranscriptsSetting.value = false
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = true))
+
+        val isAvailable = transcriptManager.observeIsTranscriptAvailable("episode-id").first()
+
+        assertFalse(isAvailable)
+    }
+
+    @Test
+    fun `show transcript availability for non-generated regardless of setting`() = runTest {
+        showGeneratedTranscriptsSetting.value = false
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = false))
+
+        val isAvailable = transcriptManager.observeIsTranscriptAvailable("episode-id").first()
+
+        assertTrue(isAvailable)
+    }
+
+    @Test
+    fun `show transcript availability for generated when setting is on`() = runTest {
+        showGeneratedTranscriptsSetting.value = true
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = true))
+
+        val isAvailable = transcriptManager.observeIsTranscriptAvailable("episode-id").first()
+
+        assertTrue(isAvailable)
+    }
+
+    @Test
+    fun `bypass cache when setting changes from on to off for generated transcript`() = runTest {
+        showGeneratedTranscriptsSetting.value = true
+        localTranscriptsFlow.value = listOf(vttDbTranscript.copy(isGenerated = true))
+
+        val transcript1 = transcriptManager.loadTranscript("episode-id")
+        assertNotNull(transcript1)
+        assertTrue(transcript1!!.isGenerated)
+
+        showGeneratedTranscriptsSetting.value = false
+        val transcript2 = transcriptManager.loadTranscript("episode-id")
+
+        assertNull(transcript2)
     }
 }
 

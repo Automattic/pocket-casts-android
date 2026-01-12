@@ -80,6 +80,10 @@ class SettingsAppearanceViewModelTest {
         whenever(artworkConfiguration.flow).thenReturn(MutableStateFlow(ArtworkConfiguration(false)))
         whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
 
+        val showGeneratedTranscripts: UserSetting<Boolean> = mock()
+        whenever(showGeneratedTranscripts.flow).thenReturn(MutableStateFlow(true))
+        whenever(settings.showGeneratedTranscripts).thenReturn(showGeneratedTranscripts)
+
         viewModel = SettingsAppearanceViewModel(
             userManager = userManager,
             settings = settings,
@@ -96,5 +100,12 @@ class SettingsAppearanceViewModelTest {
         viewModel.onThemeChanged(ThemeType.DARK)
 
         verify(notificationManager).updateUserFeatureInteraction(OnboardingNotificationType.Themes)
+    }
+
+    @Test
+    fun `when show generated transcripts is updated, should update setting`() = runTest {
+        viewModel.updateShowGeneratedTranscripts(false)
+
+        verify(settings.showGeneratedTranscripts).set(false, updateModifiedAt = true)
     }
 }

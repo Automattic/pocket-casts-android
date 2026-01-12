@@ -232,6 +232,14 @@ class AppearanceSettingsFragment : BaseFragment() {
             refreshArtwork()
         }
 
+        binding.swtShowGeneratedTranscripts.isChecked = viewModel.showGeneratedTranscripts.value
+        binding.swtShowGeneratedTranscripts.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateShowGeneratedTranscripts(isChecked)
+        }
+        binding.btnShowGeneratedTranscripts.setOnClickListener {
+            binding.swtShowGeneratedTranscripts.isChecked = !binding.swtShowGeneratedTranscripts.isChecked
+        }
+
         binding.upgradeBannerBackground.setOnClickListener {
             openOnboardingFlow()
         }
