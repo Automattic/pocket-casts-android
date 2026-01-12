@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 
 /**
  * Get the appropriate yearly plan based on the NEW_INSTALLMENT_PLAN feature flag.
