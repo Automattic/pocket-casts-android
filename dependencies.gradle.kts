@@ -3,18 +3,31 @@ import java.util.Properties
 val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
 
-val secretProperties = loadPropertiesFromFile(file("secret.properties"))
-val versionProperties = loadPropertiesFromFile(file("version.properties"))
+fun isFileEncrypted(file: File): Boolean {
+    val gitConcealHeader = byteArrayOf(0x00, 0x61, 0x38, 0x63, 0x63, 0x72, 0x79, 0x70, 0x74)
+    return file.inputStream().use { stream ->
+        val header = ByteArray(gitConcealHeader.size)
+        val read = stream.read(header)
+        read == gitConcealHeader.size && header.contentEquals(gitConcealHeader)
+    }
+}
 
 fun loadPropertiesFromFile(file: File): Properties {
     val properties = Properties()
     if (file.exists()) {
-        file.inputStream().use { stream ->
-            properties.load(stream)
+        if (isFileEncrypted(file)) {
+            logger.warn("File '${file.name}' is encrypted and will thus be ignored. If you are an automattician, use 'git-conceal unlock' to decrypt your working copy.")
+        } else {
+            file.inputStream().use { stream ->
+                properties.load(stream)
+            }
         }
     }
     return properties
 }
+
+val secretProperties = loadPropertiesFromFile(file("secret.properties"))
+val versionProperties = loadPropertiesFromFile(file("version.properties"))
 
 // Unfortunately we currently need to rely on a property to separate the version code between app & automotive builds.
 // This is mainly because the library modules use the version code information from BuildConfig directly instead
@@ -76,7 +89,7 @@ project.apply {
         val storeFilePath = secretProperties.getProperty("signingKeyStoreFile", null)
         if (!storeFilePath.isNullOrBlank()) {
             val storeFile = file(storeFilePath)
-            canSignRelease = storeFile.exists()
+            canSignRelease = storeFile.exists() && !isFileEncrypted(storeFile)
             set("storeFile", storeFile)
             set("storePassword", secretProperties.getProperty("signingKeyStorePassword", null))
             set("keyAlias", secretProperties.getProperty("signingKeyAlias", null))

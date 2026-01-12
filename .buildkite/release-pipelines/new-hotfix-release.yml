@@ -9,11 +9,11 @@ steps:
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
 
+      echo '--- 🔐 Access Secrets'
+      git-conceal-unlock
+
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
-
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
 
       echo '--- 🚀 New Hotfix Release'
       bundle exec fastlane new_hotfix_release version_name:"$RELEASE_VERSION" version_code:"$VERSION_CODE" skip_confirm:true
