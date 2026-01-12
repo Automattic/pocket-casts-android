@@ -227,7 +227,7 @@ enum class Feature(
         title = "Up Next sync with Protocol Buffers",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 }
