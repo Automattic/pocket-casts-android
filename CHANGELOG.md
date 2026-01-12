@@ -1,6 +1,8 @@
 8.4
 -----
-
+*   Updates
+    *   Improved the performance of the Up Next syncing
+        ([#4883](https://github.com/Automattic/pocket-casts-android/pull/4883))
 
 8.3
 -----
