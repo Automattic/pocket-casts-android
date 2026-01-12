@@ -1325,6 +1325,12 @@
     <string name="plus_offer_duration">%s offer</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
+    <!-- %1$s is formatted price, %2$d is number of months -->
+    <string name="price_per_month_for_months">%1$s/month for %2$d months</string>
+    <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
+    <string name="plus_per_year_usd">\u0024%1$.2f/yr</string>
+    <!-- %1$.2f is price with 2 decimal points precision, %2$s is the currency -->
+    <string name="plus_per_year_amount">%1$.2f %2$s/yr</string>
     <string name="plus_slash_month">%s / month</string>
     <string name="plus_slash_year">%s / year</string>
     <string name="plus_then_slash_month">then %s / month</string>

@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -74,13 +75,20 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
+    // Don't show savings percent for installment plans
+    val calculatedSavingPercent = if (plan is SubscriptionPlan.Base && plan.isInstallmentPlan) {
+        null
+    } else {
+        priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) }
+    }
+
     SubscriptionPlanRow(
         plan = plan,
         isSelected = isSelected,
         onClick = onClick,
         modifier = modifier,
         rowConfig = RowConfig.upgradePlansConfig(
-            calculatedSavingPercent = priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) },
+            calculatedSavingPercent = calculatedSavingPercent,
         ),
     )
 }
@@ -300,8 +308,27 @@ private val SubscriptionPlan.pricePerWeek: Float
 private val monthsInYear = 12.toBigDecimal()
 private val weeksInYear = 52.toBigDecimal()
 
+// Extension property to detect installment plans
+private val SubscriptionPlan.Base.isInstallmentPlan: Boolean
+    get() = billingCycle == BillingCycle.Yearly &&
+        pricingPhase.schedule.period == PricingSchedule.Period.Monthly
+
+// Total yearly price for installment plans
+private val SubscriptionPlan.Base.totalYearlyPrice: Float
+    get() = (recurringPrice.amount * monthsInYear).toFloat()
+
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
+    // For installment plans, show total yearly price instead
+    if (this is SubscriptionPlan.Base && isInstallmentPlan) {
+        val currencyCode = recurringPrice.currencyCode
+        return if (currencyCode == "USD") {
+            stringResource(LR.string.plus_per_year_usd, totalYearlyPrice)
+        } else {
+            stringResource(LR.string.plus_per_year_amount, totalYearlyPrice, currencyCode)
+        }
+    }
+
     return if (this.billingCycle == BillingCycle.Yearly) {
         when (config.pricePerPeriod) {
             PricePerPeriod.PRICE_PER_MONTH -> {
@@ -333,6 +360,11 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
     val formattedPrice = recurringPrice.formattedPrice
+
+    // For installment plans, show price per month with duration
+    if (this is SubscriptionPlan.Base && isInstallmentPlan) {
+        return stringResource(LR.string.price_per_month_for_months, formattedPrice, 12)
+    }
 
     return when (billingCycle) {
         BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)
