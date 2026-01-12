@@ -72,6 +72,7 @@ data class PricingSchedule(
 @ConsistentCopyVisibility
 data class SubscriptionPlans private constructor(
     private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
+    private val installmentPlan: SubscriptionPlan.Base?,
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
@@ -81,6 +82,8 @@ data class SubscriptionPlans private constructor(
         // This is a safe cast because constructor is private and we validate data in the create function
         return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
     }
+
+    fun getInstallmentPlan(): SubscriptionPlan.Base? = installmentPlan
 
     fun findOfferPlan(
         tier: SubscriptionTier,
@@ -120,7 +123,17 @@ data class SubscriptionPlans private constructor(
             }
             val offerPlans = offerPlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
 
-            return PaymentResult.Success(SubscriptionPlans(basePlans + offerPlans))
+            // Try to find the installment plan product (may not be available in all countries)
+            val installmentPlan = products.find { it.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }?.let { product ->
+                SubscriptionPlan.Base(
+                    name = product.name,
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = BillingCycle.Yearly,
+                    pricingPhase = product.pricingPlans.basePlan.pricingPhases[0],
+                )
+            }
+
+            return PaymentResult.Success(SubscriptionPlans(basePlans + offerPlans, installmentPlan))
         }
 
         private fun List<Product>.findMatchingSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan> {

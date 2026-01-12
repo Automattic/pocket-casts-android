@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -149,6 +147,11 @@ class PaymentClient @Inject constructor(
     }
 
     private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
+        // Handle installment plan separately
+        if (productId == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
+            return SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null)
+        }
+
         val keys = SubscriptionTier.entries.flatMap { tier ->
             BillingCycle.entries.map { cycle ->
                 SubscriptionPlan.Key(tier, cycle, offer = null)
@@ -208,37 +211,4 @@ private fun PaymentResult<*>.toPurchaseResult() = when (this) {
         PaymentResultCode.UserCancelled -> PurchaseResult.Cancelled
         else -> PurchaseResult.Failure(code)
     }
-}
-
-/**
- * Get the appropriate yearly plan based on the NEW_INSTALLMENT_PLAN feature flag.
- *
- * When feature flag is ON and installment plan is available (user in supported country),
- * returns the installment plan. Otherwise returns the upfront yearly plan.
- *
- * Note: Installment plans are only available in Brazil, France, Italy, and Spain.
- * Google Play automatically filters out installment plans for users in other countries.
- */
-fun SubscriptionPlans.getYearlyPlanWithFeatureFlag(
-    tier: SubscriptionTier,
-): SubscriptionPlan.Base {
-    val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
-
-    // For Plus tier only, check if installment plan should be shown
-    if (tier == SubscriptionTier.Plus && isInstallmentEnabled) {
-        // Try to find installment plan (may not exist if user not in supported country)
-        val installmentKey = SubscriptionPlan.Key(
-            tier = tier,
-            billingCycle = BillingCycle.Yearly,
-            offer = null
-        )
-
-        // Check if the loaded products include an installment plan
-        // This is a simplified check - in real implementation this would look at the actual product
-        // For now, we'll fall back to the regular yearly plan
-        // TODO: Implement proper installment plan lookup when Google Play integration is ready
-    }
-
-    // Default: return upfront yearly plan
-    return getBasePlan(tier, BillingCycle.Yearly)
 }
