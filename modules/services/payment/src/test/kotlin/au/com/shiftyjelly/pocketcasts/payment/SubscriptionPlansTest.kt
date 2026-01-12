@@ -366,4 +366,77 @@ class SubscriptionPlansTest {
             assertEquals(plan.recurringPrice, infinitePricingPhase.price)
         }
     }
+
+    @Test
+    fun `create plans with installment product`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val installmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInstallment = products + installmentProduct
+
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()
+
+        assertNotNull(plans)
+        assertNotNull(plans?.getInstallmentPlan())
+    }
+
+    @Test
+    fun `get installment plan when available`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val installmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInstallment = products + installmentProduct
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
+
+        val installmentPlan = plans.getInstallmentPlan()
+
+        assertNotNull(installmentPlan)
+        assertEquals("Plus Yearly Installment", installmentPlan?.name)
+        assertEquals(SubscriptionTier.Plus, installmentPlan?.tier)
+        assertEquals(BillingCycle.Yearly, installmentPlan?.billingCycle)
+        assertEquals(3.33.toBigDecimal(), installmentPlan?.pricingPhase?.price?.amount)
+    }
+
+    @Test
+    fun `get null installment plan when not available`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val installmentPlan = plans.getInstallmentPlan()
+
+        assertNull(installmentPlan)
+    }
+
+    @Test
+    fun `create plans succeeds even without installment product`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()
+
+        assertNotNull(plans)
+        assertNull(plans?.getInstallmentPlan())
+    }
 }
