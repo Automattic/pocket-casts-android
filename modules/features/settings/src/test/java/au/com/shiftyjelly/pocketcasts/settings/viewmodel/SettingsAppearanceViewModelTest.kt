@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -82,6 +83,10 @@ class SettingsAppearanceViewModelTest {
         whenever(artworkConfiguration.flow).thenReturn(MutableStateFlow(ArtworkConfiguration(false)))
         whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
 
+        val showGeneratedTranscripts: UserSetting<Boolean> = mock()
+        whenever(showGeneratedTranscripts.flow).thenReturn(MutableStateFlow(true))
+        whenever(settings.showGeneratedTranscripts).thenReturn(showGeneratedTranscripts)
+
         viewModel = SettingsAppearanceViewModel(
             userManager = userManager,
             settings = settings,
@@ -98,5 +103,16 @@ class SettingsAppearanceViewModelTest {
         viewModel.onThemeChanged(ThemeType.DARK)
 
         verify(notificationManager).updateUserFeatureInteraction(OnboardingNotificationType.Themes)
+    }
+
+    @Test
+    fun `when show generated transcripts is updated, should update setting and track analytics`() = runTest {
+        viewModel.updateShowGeneratedTranscripts(false)
+
+        verify(settings.showGeneratedTranscripts).set(false, updateModifiedAt = true)
+        verify(analyticsTracker).track(
+            AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_GENERATED_TRANSCRIPTS_TOGGLED,
+            mapOf("enabled" to false),
+        )
     }
 }

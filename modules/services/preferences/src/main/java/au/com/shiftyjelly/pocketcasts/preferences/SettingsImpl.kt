@@ -857,6 +857,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val showGeneratedTranscripts = UserSetting.BoolPref(
+        sharedPrefKey = "showGeneratedTranscripts",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun setSelectedTab(selected: Int?) {
         if (selected != null) {
             setInt("selected_tab", selected)
