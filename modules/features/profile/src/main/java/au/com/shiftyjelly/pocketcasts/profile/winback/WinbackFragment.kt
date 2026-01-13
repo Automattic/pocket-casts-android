@@ -186,6 +186,7 @@ class WinbackFragment : BaseDialogFragment() {
                 composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {
                     CancelConfirmationPage(
                         expirationDate = state.currentSubscriptionExpirationDate,
+                        isInstallment = state.isInstallment,
                         onKeepSubscription = {
                             viewModel.trackKeepSubscriptionTapped()
                             dismiss()
