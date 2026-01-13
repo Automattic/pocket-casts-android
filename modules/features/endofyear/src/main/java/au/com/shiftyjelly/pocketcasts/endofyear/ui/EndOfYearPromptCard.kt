@@ -59,17 +59,11 @@ fun EndOfYearPromptCard(
             .widthIn(max = MaxImageWidth)
             .aspectRatio(ratio = AspectRatio),
     ) {
-        val textColor = when (MaterialTheme.theme.type) {
-            Theme.ThemeType.RADIOACTIVE -> MaterialTheme.theme.colors.primaryText01
-            else -> Color.White
-        }
-
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(IR.drawable.playback_banner),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            colorFilter = MaterialTheme.theme.imageColorFilter,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -81,7 +75,7 @@ fun EndOfYearPromptCard(
             ) {
                 TextH30(
                     text = stringResource(LR.string.end_of_year_prompt_card_title),
-                    color = textColor,
+                    color = Color.White,
                     disableAutoScale = true,
                     modifier = Modifier.fillMaxWidth(0.7f),
                 )
@@ -90,7 +84,7 @@ fun EndOfYearPromptCard(
                 )
                 TextH70(
                     text = stringResource(LR.string.end_of_year_prompt_card_summary),
-                    color = textColor,
+                    color = Color.White,
                     fontWeight = FontWeight.W600,
                     disableAutoScale = true,
                     modifier = Modifier.fillMaxWidth(0.5f),

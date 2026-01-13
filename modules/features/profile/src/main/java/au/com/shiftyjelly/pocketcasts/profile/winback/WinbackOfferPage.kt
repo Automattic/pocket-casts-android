@@ -220,14 +220,12 @@ private val ThemeType.heartColors
         ThemeType.INDIGO -> indigoHeart
         ThemeType.DARK_CONTRAST -> grayHeart
         ThemeType.LIGHT_CONTRAST -> blackHeart
-        ThemeType.RADIOACTIVE -> greenHeart
     }
 
 private val blackHeart = Color.Black to Color(0xFF6B7273)
 private val blueHeart = Color(0xFF03A9F4) to Color(0xFF50D0F1)
 private val redHeart = Color(0xFFF43769) to Color(0xFFFB5246)
 private val indigoHeart = Color(0xFF5C8BCC) to Color(0xFF95B0E6)
-private val greenHeart = Color(0xFF78D549) to Color(0xFF9BE45E)
 private val grayHeart = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 
 @Preview(device = Devices.PORTRAIT_REGULAR)

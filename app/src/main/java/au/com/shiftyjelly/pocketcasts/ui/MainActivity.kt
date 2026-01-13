@@ -665,23 +665,7 @@ class MainActivity :
         super.onResume()
 
         refreshApp()
-        addLineView()
         BumpStatsTask.scheduleToRun(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        removeLineView()
-    }
-
-    private fun addLineView() {
-        removeLineView()
-        if (theme.activeTheme != Theme.ThemeType.RADIOACTIVE) return
-        binding.radioactiveLineView.isVisible = true
-    }
-
-    private fun removeLineView() {
-        binding.radioactiveLineView.isVisible = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

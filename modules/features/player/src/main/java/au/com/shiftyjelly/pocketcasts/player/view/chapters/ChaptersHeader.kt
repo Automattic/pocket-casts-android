@@ -183,10 +183,6 @@ private fun ChaptersHeaderElectricPreview() = ChaptersHeaderPreview(Theme.ThemeT
 @Composable
 private fun ChaptersHeaderClassicPreview() = ChaptersHeaderPreview(Theme.ThemeType.CLASSIC_LIGHT)
 
-@Preview(name = "Radioactive")
-@Composable
-private fun ChaptersHeaderRadioactivePreview() = ChaptersHeaderPreview(Theme.ThemeType.RADIOACTIVE)
-
 @Composable
 private fun ChaptersHeaderPreview(theme: Theme.ThemeType) {
     AppThemeWithBackground(theme) {

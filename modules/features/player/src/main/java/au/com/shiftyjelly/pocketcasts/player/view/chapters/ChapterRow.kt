@@ -224,10 +224,6 @@ private fun ChapterRowElectricPreview() = ChapterRowPreview(Theme.ThemeType.ELEC
 @Composable
 private fun ChapterRowClassicPreview() = ChapterRowPreview(Theme.ThemeType.CLASSIC_LIGHT)
 
-@Preview(name = "Radioactive")
-@Composable
-private fun ChapterRowRadioactivePreview() = ChapterRowPreview(Theme.ThemeType.RADIOACTIVE)
-
 @Composable
 private fun ChapterRowPreview(theme: Theme.ThemeType) {
     val chapter = Chapter(
