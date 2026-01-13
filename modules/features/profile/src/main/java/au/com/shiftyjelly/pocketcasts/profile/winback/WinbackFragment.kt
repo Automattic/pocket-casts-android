@@ -108,6 +108,7 @@ class WinbackFragment : BaseDialogFragment() {
             ) {
                 composable(WinbackNavRoutes.MAIN) {
                     CancelOfferPage(
+                        isInstallment = state.isInstallment,
                         onSeeAvailablePlans = {
                             viewModel.trackAvailablePlansTapped()
                             navController.navigate(WinbackNavRoutes.AVAILABLE_PLANS)

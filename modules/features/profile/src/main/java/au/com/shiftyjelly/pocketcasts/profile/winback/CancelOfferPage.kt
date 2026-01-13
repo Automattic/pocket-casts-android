@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun CancelOfferPage(
+    isInstallment: Boolean,
     onSeeAvailablePlans: () -> Unit,
     onSeeHelpAndFeedback: () -> Unit,
     onContinueToCancellation: () -> Unit,
@@ -71,11 +72,13 @@ internal fun CancelOfferPage(
             modifier = Modifier.height(16.dp),
         )
 
-        AvailablePlans(
-            onClick = onSeeAvailablePlans,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Divider()
+        if (!isInstallment) {
+            AvailablePlans(
+                onClick = onSeeAvailablePlans,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Divider()
+        }
         HelpAndFeedback(
             onClick = onSeeHelpAndFeedback,
             modifier = Modifier.fillMaxWidth(),
@@ -246,6 +249,24 @@ private fun CancelOfferpageThemePreview(
         themeType = theme,
     ) {
         CancelOfferPage(
+            isInstallment = false,
+            onSeeAvailablePlans = {},
+            onSeeHelpAndFeedback = {},
+            onContinueToCancellation = {},
+        )
+    }
+}
+
+@Preview(device = Devices.PORTRAIT_REGULAR)
+@Composable
+private fun CancelInstallmentOfferpageThemePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(
+        themeType = theme,
+    ) {
+        CancelOfferPage(
+            isInstallment = true,
             onSeeAvailablePlans = {},
             onSeeHelpAndFeedback = {},
             onContinueToCancellation = {},
