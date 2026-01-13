@@ -45,7 +45,10 @@ class WinbackViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
-                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = subscription?.expiryDate)
+                _uiState.value = _uiState.value.copy(
+                    currentSubscriptionExpirationDate = subscription?.expiryDate,
+                    isInstallment = subscription?.isInstallment ?: false,
+                )
             }
         }
     }
@@ -412,12 +415,14 @@ class WinbackViewModel @Inject constructor(
         val currentSubscriptionExpirationDate: Instant?,
         val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
+        val isInstallment: Boolean,
     ) {
         companion object {
             val Empty = UiState(
                 currentSubscriptionExpirationDate = null,
                 winbackOfferState = null,
                 subscriptionPlansState = SubscriptionPlansState.Loading,
+                isInstallment = false,
             )
         }
     }
