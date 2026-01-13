@@ -245,6 +245,21 @@ private fun PerkRow(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
+private fun CancelInstallmentConfirmationPagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(theme) {
+        CancelConfirmationPage(
+            expirationDate = Instant.ofEpochSecond(1700000000),
+            isInstallment = true,
+            onKeepSubscription = {},
+            onCancelSubscription = {},
+        )
+    }
+}
+
+@Preview(device = Devices.PORTRAIT_REGULAR)
+@Composable
 private fun CancelConfirmationPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
