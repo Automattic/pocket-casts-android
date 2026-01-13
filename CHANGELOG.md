@@ -4,7 +4,7 @@
     *   Improved the performance of the Up Next syncing
         ([#4883](https://github.com/Automattic/pocket-casts-android/pull/4883))
     *   Removed Radioactivity UI theme
-        ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
+        ([#4888](https://github.com/Automattic/pocket-casts-android/pull/4888))
 
 8.3
 -----
