@@ -256,3 +256,20 @@ private fun CancelOfferpageThemePreview(
         )
     }
 }
+
+@Preview(device = Devices.PORTRAIT_REGULAR)
+@Composable
+private fun CancelInstallmentOfferpageThemePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(
+        themeType = theme,
+    ) {
+        CancelOfferPage(
+            isInstallment = true,
+            onSeeAvailablePlans = {},
+            onSeeHelpAndFeedback = {},
+            onContinueToCancellation = {},
+        )
+    }
+}
