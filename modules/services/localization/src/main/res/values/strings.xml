@@ -2531,6 +2531,7 @@
     <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
     <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
+    <string name="winback_cancel_subscription_perk_history">Your podcasts and listening history will continue to be accessible.</string>
     <string name="winback_cancel_subscription_header_description_installment">Cancelling ends your Pocket Casts subscription.\nYour Google Play payment plan will continue.</string>
     <string name="winback_cancel_subscription_perk_installment">You\'re on a 12-month installment plan. Cancelling ends your access, but Google Play will continue charging the remaining months.</string>
     <string name="winback_cancel_subscription_stay_button_label">Keep my subscription</string>

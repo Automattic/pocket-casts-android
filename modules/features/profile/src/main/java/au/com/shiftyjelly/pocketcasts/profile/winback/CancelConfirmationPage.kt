@@ -161,6 +161,12 @@ private fun Perks(
             image = painterResource(IR.drawable.ic_remove_from_cloud),
             text = stringResource(LR.string.winback_cancel_subscription_perk_files),
         )
+        if (isInstallment) {
+            PerkRow(
+                image = painterResource(IR.drawable.ic_filters_clock),
+                text = stringResource(LR.string.winback_cancel_subscription_perk_history),
+            )
+        }
     }
 }
 
