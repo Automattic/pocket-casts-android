@@ -72,18 +72,24 @@ data class PricingSchedule(
 @ConsistentCopyVisibility
 data class SubscriptionPlans private constructor(
     private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
-    private val installmentPlan: SubscriptionPlan.Base?,
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
+        isInstallment: Boolean = false,
     ): SubscriptionPlan.Base {
-        val key = SubscriptionPlan.Key(tier, billingCycle, offer = null)
-        // This is a safe cast because constructor is private and we validate data in the create function
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment)
         return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
     }
 
-    fun getInstallmentPlan(): SubscriptionPlan.Base? = installmentPlan
+    fun getBasePlanOrNull(
+        tier: SubscriptionTier,
+        billingCycle: BillingCycle,
+        isInstallment: Boolean = false,
+    ): SubscriptionPlan.Base? {
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment)
+        return plans[key]?.getOrNull() as? SubscriptionPlan.Base
+    }
 
     fun findOfferPlan(
         tier: SubscriptionTier,
@@ -91,7 +97,6 @@ data class SubscriptionPlans private constructor(
         offer: SubscriptionOffer,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer)
-        // This is a safe cast because constructor is private and we validate data in the create function
         @Suppress("UNCHECKED_CAST")
         return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
     }
@@ -100,8 +105,15 @@ data class SubscriptionPlans private constructor(
         val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
 
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            BillingCycle.entries.map { billingCycle ->
-                SubscriptionPlan.Key(tier, billingCycle, offer = null)
+            BillingCycle.entries.flatMap { billingCycle ->
+                listOfNotNull(
+                    SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = false),
+                    if (tier == SubscriptionTier.Plus && billingCycle == BillingCycle.Yearly) {
+                        SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = true)
+                    } else {
+                        null
+                    },
+                )
             }
         }
 
@@ -114,26 +126,23 @@ data class SubscriptionPlans private constructor(
         }
 
         fun create(products: List<Product>): PaymentResult<SubscriptionPlans> {
-            val basePlans = basePlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
+            val requiredBasePlanKeys = basePlanKeys.filter { !it.isInstallment }
+            val basePlans = requiredBasePlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
             val basePlanFailure = basePlans.values
                 .filterIsInstance<PaymentResult.Failure>()
                 .firstOrNull()
             if (basePlanFailure != null) {
                 return basePlanFailure
             }
+
+            val installmentPlanKeys = basePlanKeys.filter { it.isInstallment }
+            val installmentPlans = installmentPlanKeys.associateWith { key ->
+                products.findMatchingSubscriptionPlan(key)
+            }.filterValues { it is PaymentResult.Success }
+
             val offerPlans = offerPlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
 
-            // Try to find the installment plan product (may not be available in all countries)
-            val installmentPlan = products.find { it.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }?.let { product ->
-                SubscriptionPlan.Base(
-                    name = product.name,
-                    tier = SubscriptionTier.Plus,
-                    billingCycle = BillingCycle.Yearly,
-                    pricingPhase = product.pricingPlans.basePlan.pricingPhases[0],
-                )
-            }
-
-            return PaymentResult.Success(SubscriptionPlans(basePlans + offerPlans, installmentPlan))
+            return PaymentResult.Success(SubscriptionPlans(basePlans + installmentPlans + offerPlans))
         }
 
         private fun List<Product>.findMatchingSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan> {
@@ -173,6 +182,7 @@ data class SubscriptionPlans private constructor(
                 key.tier,
                 key.billingCycle,
                 pricingPlans.basePlan.pricingPhases[0],
+                key.isInstallment,
             )
         }
 
@@ -210,9 +220,10 @@ sealed interface SubscriptionPlan {
         override val tier: SubscriptionTier,
         override val billingCycle: BillingCycle,
         val pricingPhase: PricingPhase,
+        val isInstallment: Boolean = false,
     ) : SubscriptionPlan {
         override val offer get() = null
-        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer = null)
+        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment)
     }
 
     data class WithOffer(
@@ -229,9 +240,10 @@ sealed interface SubscriptionPlan {
         val tier: SubscriptionTier,
         val billingCycle: BillingCycle,
         val offer: SubscriptionOffer?,
+        val isInstallment: Boolean = false,
     ) {
-        val productId = SubscriptionPlan.productId(tier, billingCycle)
-        val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle)
+        val productId = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
+        val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle, isInstallment)
         val offerId = offer?.offerId(tier, billingCycle)
     }
 
@@ -250,31 +262,43 @@ sealed interface SubscriptionPlan {
         fun productId(
             tier: SubscriptionTier,
             billingCycle: BillingCycle,
-        ) = when (tier) {
-            SubscriptionTier.Plus -> when (billingCycle) {
+            isInstallment: Boolean = false,
+        ) = when {
+            tier == SubscriptionTier.Plus && billingCycle == BillingCycle.Yearly && isInstallment ->
+                PLUS_YEARLY_INSTALLMENT_PRODUCT_ID
+
+            tier == SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> PLUS_MONTHLY_PRODUCT_ID
                 BillingCycle.Yearly -> PLUS_YEARLY_PRODUCT_ID
             }
 
-            SubscriptionTier.Patron -> when (billingCycle) {
+            tier == SubscriptionTier.Patron -> when (billingCycle) {
                 BillingCycle.Monthly -> PATRON_MONTHLY_PRODUCT_ID
                 BillingCycle.Yearly -> PATRON_YEARLY_PRODUCT_ID
             }
+
+            else -> error("Unsupported tier: $tier")
         }
 
         fun basePlanId(
             tier: SubscriptionTier,
             billingCycle: BillingCycle,
-        ) = when (tier) {
-            SubscriptionTier.Plus -> when (billingCycle) {
+            isInstallment: Boolean = false,
+        ) = when {
+            tier == SubscriptionTier.Plus && billingCycle == BillingCycle.Yearly && isInstallment ->
+                "p1y-installment"
+
+            tier == SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> "p1m"
                 BillingCycle.Yearly -> "p1y"
             }
 
-            SubscriptionTier.Patron -> when (billingCycle) {
+            tier == SubscriptionTier.Patron -> when (billingCycle) {
                 BillingCycle.Monthly -> "patron-monthly"
                 BillingCycle.Yearly -> "patron-yearly"
             }
+
+            else -> error("Unsupported tier: $tier")
         }
     }
 }

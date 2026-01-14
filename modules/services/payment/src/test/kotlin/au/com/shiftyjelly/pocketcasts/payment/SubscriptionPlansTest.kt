@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SubscriptionPlansTest {
@@ -390,7 +392,8 @@ class SubscriptionPlansTest {
         val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()
 
         assertNotNull(plans)
-        assertNotNull(plans?.getInstallmentPlan())
+        val installmentPlan = plans?.getBasePlanOrNull(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)
+        assertNotNull(installmentPlan)
     }
 
     @Test
@@ -414,20 +417,21 @@ class SubscriptionPlansTest {
         val productsWithInstallment = products + installmentProduct
         val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
 
-        val installmentPlan = plans.getInstallmentPlan()
+        val installmentPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)
 
         assertNotNull(installmentPlan)
-        assertEquals("Plus Yearly Installment", installmentPlan?.name)
-        assertEquals(SubscriptionTier.Plus, installmentPlan?.tier)
-        assertEquals(BillingCycle.Yearly, installmentPlan?.billingCycle)
-        assertEquals(3.33.toBigDecimal(), installmentPlan?.pricingPhase?.price?.amount)
+        assertEquals("Plus Yearly Installment", installmentPlan.name)
+        assertEquals(SubscriptionTier.Plus, installmentPlan.tier)
+        assertEquals(BillingCycle.Yearly, installmentPlan.billingCycle)
+        assertTrue(installmentPlan.isInstallment)
+        assertEquals(3.33.toBigDecimal(), installmentPlan.pricingPhase.price.amount)
     }
 
     @Test
     fun `get null installment plan when not available`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val installmentPlan = plans.getInstallmentPlan()
+        val installmentPlan = plans.getBasePlanOrNull(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)
 
         assertNull(installmentPlan)
     }
@@ -437,6 +441,17 @@ class SubscriptionPlansTest {
         val plans = SubscriptionPlans.create(products).getOrNull()
 
         assertNotNull(plans)
-        assertNull(plans?.getInstallmentPlan())
+        val installmentPlan = plans?.getBasePlanOrNull(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)
+        assertNull(installmentPlan)
+    }
+
+    @Test
+    fun `get regular yearly plan when installment not available`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val regularPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = false)
+
+        assertNotNull(regularPlan)
+        assertFalse(regularPlan.isInstallment)
     }
 }

@@ -147,17 +147,19 @@ class PaymentClient @Inject constructor(
     }
 
     private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
-        // Handle installment plan separately
-        if (productId == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
-            return SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null)
-        }
-
-        val keys = SubscriptionTier.entries.flatMap { tier ->
-            BillingCycle.entries.map { cycle ->
-                SubscriptionPlan.Key(tier, cycle, offer = null)
+        val allKeys = SubscriptionTier.entries.flatMap { tier ->
+            BillingCycle.entries.flatMap { cycle ->
+                listOfNotNull(
+                    SubscriptionPlan.Key(tier, cycle, offer = null, isInstallment = false),
+                    if (tier == SubscriptionTier.Plus && cycle == BillingCycle.Yearly) {
+                        SubscriptionPlan.Key(tier, cycle, offer = null, isInstallment = true)
+                    } else {
+                        null
+                    },
+                )
             }
         }
-        return keys.firstOrNull { it.productId == productId }
+        return allKeys.firstOrNull { it.productId == productId }
     }
 
     private fun forEachListener(block: Listener.() -> Unit) {

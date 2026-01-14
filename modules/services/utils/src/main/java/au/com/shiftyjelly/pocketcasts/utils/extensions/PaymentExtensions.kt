@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 
 /**
  * Get the appropriate yearly plan based on the NEW_INSTALLMENT_PLAN feature flag.
@@ -22,12 +22,11 @@ fun SubscriptionPlans.getYearlyPlanWithFeatureFlag(
     val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
 
     if (tier == SubscriptionTier.Plus && isInstallmentEnabled) {
-        // Try to get the installment plan (may not exist if user not in supported country)
-        val installmentPlan = getInstallmentPlan()
+        val installmentPlan = getBasePlanOrNull(tier, BillingCycle.Yearly, isInstallment = true)
         if (installmentPlan != null) {
             return installmentPlan
         }
     }
 
-    return getBasePlan(tier, BillingCycle.Yearly)
+    return getBasePlan(tier, BillingCycle.Yearly, isInstallment = false)
 }
