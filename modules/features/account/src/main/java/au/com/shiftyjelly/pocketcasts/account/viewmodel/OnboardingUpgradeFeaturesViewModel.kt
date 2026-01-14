@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getYearlyPlanWithFeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
@@ -305,7 +306,8 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlan(): SubscriptionPlan.Base {
-            return subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+            // Use extension function to get installment plan when feature flag is enabled
+            return subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
         }
 
         private fun patronYearlyPlan(): SubscriptionPlan.Base {
