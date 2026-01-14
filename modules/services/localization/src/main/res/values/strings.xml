@@ -1460,6 +1460,7 @@
     <string name="settings_export_send_email">Send email</string>
     <string name="settings_export_send_email_summary">Export your podcasts in the super geeky (but widely supported) OPML format.</string>
     <string name="settings_export_subscriptions">Export podcasts</string>
+    <string name="settings_episode_description">Episode Description</string>
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
     <string name="settings_general_sleep_timer">Sleep Timer</string>
@@ -1579,6 +1580,8 @@
     <string name="settings_show_archived_summary_show">New podcasts you follow will show archived episodes.</string>
     <string name="settings_show_artwork">Show artwork on lock screen</string>
     <string name="settings_show_artwork_details">This will also show artwork on connected Bluetooth devices, watches, etc.</string>
+    <string name="settings_show_generated_transcripts">Show Generated Transcripts</string>
+    <string name="settings_show_generated_transcripts_details">Display AI-generated transcripts when available</string>
     <string name="settings_skip_back_time">Skip back time</string>
     <string name="settings_skip_back_time_summary">10 seconds</string>
     <string name="settings_skip_forward_time">Skip forward time</string>

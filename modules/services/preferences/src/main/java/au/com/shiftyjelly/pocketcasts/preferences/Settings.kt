@@ -409,6 +409,7 @@ interface Settings {
     fun showPlayedEpisodes(): Boolean
 
     val showArtworkOnLockScreen: UserSetting<Boolean>
+    val showGeneratedTranscripts: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<List<NewEpisodeNotificationAction>>
 
     val autoArchiveIncludesStarred: UserSetting<Boolean>

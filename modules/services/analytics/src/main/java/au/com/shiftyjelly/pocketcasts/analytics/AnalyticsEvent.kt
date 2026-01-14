@@ -568,6 +568,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
     SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED("settings_appearance_use_dark_up_next_toggled"),
     SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED("settings_appearance_use_dynamic_colors_widget_toggled"),
+    SETTINGS_APPEARANCE_SHOW_GENERATED_TRANSCRIPTS_TOGGLED("settings_appearance_show_generated_transcripts_toggled"),
 
     /* Settings - Advanced Episode Artwork */
     SETTINGS_ADVANCED_EPISODE_ARTWORK_SHOWN("settings_advanced_episode_artwork_shown"),
