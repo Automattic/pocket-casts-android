@@ -316,7 +316,7 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun patronYearlyPlan(): SubscriptionPlan.Base {
-            return subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron)
+            return subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly)
         }
 
         private fun plusMonthlyPlan(): SubscriptionPlan.Base {
