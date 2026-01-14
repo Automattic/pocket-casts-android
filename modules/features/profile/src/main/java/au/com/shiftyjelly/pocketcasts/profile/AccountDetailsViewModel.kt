@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getYearlyPlanWithFeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
@@ -101,7 +102,7 @@ class AccountDetailsViewModel @Inject constructor(
                 } else {
                     val recommendedPlan = subscriptionPlans.findOfferPlan(tier = SubscriptionTier.Plus, BillingCycle.Yearly, offer = SubscriptionOffer.Trial).getOrNull()?.let {
                         OnboardingSubscriptionPlan.create(plan = it).getOrNull()
-                    } ?: OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly))
+                    } ?: OnboardingSubscriptionPlan.create(subscriptionPlans.getYearlyPlanWithFeatureFlag(tier = SubscriptionTier.Plus))
                     ProfileUpgradeBannerState.NewOnboardingUpgradeState(
                         recommendedSubscription = recommendedPlan,
                     )

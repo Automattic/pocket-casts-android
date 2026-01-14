@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getYearlyPlanWithFeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
@@ -60,7 +61,8 @@ sealed interface ProfileUpgradeBannerState {
         }
 
         private fun plusYearlyPlan(): OnboardingSubscriptionPlan {
-            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly))
+            // Use extension function to get installment plan when feature flag is enabled
+            return OnboardingSubscriptionPlan.create(subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus))
         }
 
         private fun patronYearlyPlan(): OnboardingSubscriptionPlan {
