@@ -363,7 +363,7 @@ private fun SubscriptionPlan.price(): String {
 
     // For installment plans, show price per month with duration
     if (this is SubscriptionPlan.Base && isInstallmentPlan) {
-        return stringResource(LR.string.price_per_month_for_months, formattedPrice, 12)
+        return stringResource(LR.string.price_per_month_for_months, formattedPrice, monthsInYear.toInt())
     }
 
     return when (billingCycle) {
