@@ -36,6 +36,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
     val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
     val artworkConfiguration = settings.artworkConfiguration.flow
+    val showGeneratedTranscripts = settings.showGeneratedTranscripts.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -145,6 +146,14 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.artworkConfiguration.set(currentConfiguration.copy(useEpisodeArtwork = value), updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
+            mapOf("enabled" to value),
+        )
+    }
+
+    fun updateShowGeneratedTranscripts(value: Boolean) {
+        settings.showGeneratedTranscripts.set(value, updateModifiedAt = true)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_GENERATED_TRANSCRIPTS_TOGGLED,
             mapOf("enabled" to value),
         )
     }

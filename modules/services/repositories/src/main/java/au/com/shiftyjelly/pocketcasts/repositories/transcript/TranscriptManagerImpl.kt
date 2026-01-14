@@ -4,6 +4,7 @@ import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -15,9 +16,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -31,18 +32,30 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
+    private val settings: Settings,
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
-        return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
+        return combine(
+            transcriptDao.observeTranscripts(episodeUuid),
+            settings.showGeneratedTranscripts.flow,
+        ) { transcripts, showGenerated ->
+            transcripts.any { showGenerated || !it.isGenerated }
+        }
     }
 
     override suspend fun loadTranscript(
         episodeUuid: String,
     ): Transcript? {
-        val transcript = lruCache[episodeUuid] ?: findAndCacheTranscript(episodeUuid)
+        val showGenerated = settings.showGeneratedTranscripts.value
+        val cachedTranscript = lruCache[episodeUuid]
+        val transcript = when {
+            cachedTranscript == null -> findAndCacheTranscript(episodeUuid)
+            cachedTranscript.isGenerated && !showGenerated -> findAndCacheTranscript(episodeUuid)
+            else -> cachedTranscript
+        }
 
         val message = if (transcript != null) {
             "Transcript loaded for episode $episodeUuid: ${transcript.type} ${transcript.url}"
@@ -71,6 +84,7 @@ class TranscriptManagerImpl @Inject constructor(
         // Setting an arbitriarly large timeout allows us to wait for show notes to be processed.
         // In the worst case scenario transcripts won't be available for the first time if show notes haven't
         // been processed in time.
+        val showGenerated = settings.showGeneratedTranscripts.value
         val availableTranscripts = withTimeoutOrNull(1.minutes) {
             transcriptDao.observeTranscripts(episodeUuid)
                 .filter { it.isNotEmpty() }
@@ -78,6 +92,7 @@ class TranscriptManagerImpl @Inject constructor(
         }
         return availableTranscripts
             ?.filter { it.url !in transcriptUrlBlacklist[episodeUuid].orEmpty() }
+            ?.filter { showGenerated || !it.isGenerated }
             ?.sortedWith(TranscriptsComparator)
             .orEmpty()
     }
