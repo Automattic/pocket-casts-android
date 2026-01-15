@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
+import au.com.shiftyjelly.pocketcasts.payment.InstallmentPlanDetails
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
@@ -106,6 +107,12 @@ internal class BillingPaymentMapper(
                 ),
             ) ?: return null,
             tags = noOfferDetails.offerTags,
+            installmentPlanDetails = noOfferDetails.installmentPlanDetails?.let {
+                InstallmentPlanDetails(
+                    commitmentPaymentsCount = it.installmentPlanCommitmentPaymentsCount,
+                    subsequentCommitmentPaymentsCount = it.subsequentInstallmentPlanCommitmentPaymentsCount,
+                )
+            },
         )
     }
 
