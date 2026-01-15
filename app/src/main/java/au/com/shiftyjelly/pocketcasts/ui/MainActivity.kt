@@ -177,7 +177,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -457,7 +456,8 @@ class MainActivity :
         setContentView(binding.root)
 
         lifecycleScope.launch {
-            if (!FeatureFlag.isEnabledWithRemote(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+            FeatureFlag.awaitProvidersInitialised()
+            if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
                 checkForNotificationPermission()
             }
         }

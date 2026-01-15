@@ -139,7 +139,8 @@ private fun Content(
     }
 
     val isAccountCreationEnabled by produceState<Boolean?>(null) {
-        value = FeatureFlag.isEnabledWithRemote(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)
+        FeatureFlag.awaitProvidersInitialised()
+        value = FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)
     }
 
     isAccountCreationEnabled?.let { useNewOnboardingFlow ->

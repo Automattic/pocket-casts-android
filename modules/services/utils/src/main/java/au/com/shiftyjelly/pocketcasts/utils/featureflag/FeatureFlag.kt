@@ -53,26 +53,26 @@ object FeatureFlag {
     }
 
     /**
-     * Suspends until the remote config has been fetched, then returns whether the [feature] is enabled.
-     * This ensures you get the latest remote value rather than a cached or default value.
+     * Suspends until remote feature providers have completed initialization.
+     * This ensures subsequent feature flag checks will use the latest remote values
+     * rather than cached or default values.
      *
-     * @param feature The feature to check
-     * @param timeout Maximum time to wait for remote config. Defaults to 5 seconds.
-     *                If timeout is reached, returns the current value (which may be cached or default)
-     * @return true if the feature is enabled, false otherwise
+     * This method can be used before calling any feature flag accessor method
+     * (e.g., [isEnabled], [isEnabledFlow], [isEnabledForUser], [isExclusiveToPatron])
+     * to ensure remote configuration is loaded.
+     *
+     * @param timeout Maximum time to wait for remote providers to initialize. Defaults to 5 seconds.
+     *                If timeout is reached, feature flags will use currently available values.
      */
-    suspend fun isEnabledWithRemote(
-        feature: Feature,
+    suspend fun awaitProvidersInitialised(
         timeout: Duration = 5.seconds,
-    ): Boolean {
+    ) {
         withTimeoutOrNull(timeout) {
             coroutineScope {
                 providers.map { async { it.awaitInitialization() } }.awaitAll()
             }
         }
         updateFeatureFlowValues()
-
-        return isEnabled(feature)
     }
 
     fun isEnabledFlow(
