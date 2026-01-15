@@ -99,6 +99,10 @@ class FakePaymentDataSource : PaymentDataSource {
                         "p1y-installment",
                         listOf(PlusYearlyInstallmentPricingPhase),
                         emptyList(),
+                        InstallmentPlanDetails(
+                            commitmentPaymentsCount = 12,
+                            subsequentCommitmentPaymentsCount = 0,
+                        ),
                     ),
                     emptyList(),
                 ),
