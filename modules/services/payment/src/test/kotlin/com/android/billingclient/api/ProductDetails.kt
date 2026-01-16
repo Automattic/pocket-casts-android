@@ -30,6 +30,8 @@ fun createGoogleOfferDetails(
     offerIdToken: String = "offer-id-token",
     pricingPhases: List<PricingPhase> = listOf(createGooglePricingPhase()),
     offerTags: List<String> = emptyList(),
+    installmentPlanCommitmentPaymentsCount: Int? = null,
+    subsequentInstallmentPlanCommitmentPaymentsCount: Int? = null,
 ): SubscriptionOfferDetails {
     val json = JSONObject()
         .put("basePlanId", basePlanId)
@@ -37,6 +39,18 @@ fun createGoogleOfferDetails(
         .put("offerIdToken", offerIdToken)
         .put("pricingPhases", JSONArray(pricingPhases.map(PricingPhase::toJson)))
         .put("offerTags", JSONArray(offerTags))
+
+    if (installmentPlanCommitmentPaymentsCount != null || subsequentInstallmentPlanCommitmentPaymentsCount != null) {
+        val installmentDetails = JSONObject()
+        if (installmentPlanCommitmentPaymentsCount != null) {
+            installmentDetails.put("commitmentPaymentsCount", installmentPlanCommitmentPaymentsCount)
+        }
+        if (subsequentInstallmentPlanCommitmentPaymentsCount != null) {
+            installmentDetails.put("subsequentCommitmentPaymentsCount", subsequentInstallmentPlanCommitmentPaymentsCount)
+        }
+        json.put("installmentPlanDetails", installmentDetails)
+    }
+
     return SubscriptionOfferDetails(json)
 }
 
@@ -92,9 +106,20 @@ private fun PricingPhase.toJson() = JSONObject()
     .put("recurrenceMode", recurrenceMode)
     .put("billingCycleCount", billingCycleCount)
 
-private fun SubscriptionOfferDetails.toJson() = JSONObject()
-    .put("basePlanId", basePlanId)
-    .putOpt("offerId", offerId)
-    .put("offerIdToken", offerToken)
-    .put("pricingPhases", JSONArray(pricingPhases.pricingPhaseList.map(PricingPhase::toJson)))
-    .put("offerTags", JSONArray(offerTags))
+private fun SubscriptionOfferDetails.toJson(): JSONObject {
+    val json = JSONObject()
+        .put("basePlanId", basePlanId)
+        .putOpt("offerId", offerId)
+        .put("offerIdToken", offerToken)
+        .put("pricingPhases", JSONArray(pricingPhases.pricingPhaseList.map(PricingPhase::toJson)))
+        .put("offerTags", JSONArray(offerTags))
+
+    installmentPlanDetails?.let { details ->
+        val installmentJson = JSONObject()
+            .put("commitmentPaymentsCount", details.installmentPlanCommitmentPaymentsCount)
+            .put("subsequentCommitmentPaymentsCount", details.subsequentInstallmentPlanCommitmentPaymentsCount)
+        json.put("installmentPlanDetails", installmentJson)
+    }
+
+    return json
+}

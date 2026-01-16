@@ -22,11 +22,12 @@ fun SubscriptionPlans.getYearlyPlanWithFeatureFlag(
     val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
 
     if (tier == SubscriptionTier.Plus && isInstallmentEnabled) {
-        val installmentPlan = getBasePlanOrNull(tier, BillingCycle.Yearly, isInstallment = true)
+        val installmentPlanResult = findInstallmentPlan(tier, BillingCycle.Yearly)
+        val installmentPlan = installmentPlanResult.getOrNull()
         if (installmentPlan != null) {
             return installmentPlan
         }
     }
 
-    return getBasePlan(tier, BillingCycle.Yearly, isInstallment = false)
+    return getBasePlan(tier, BillingCycle.Yearly)
 }
