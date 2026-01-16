@@ -11,7 +11,6 @@ val Color.Companion.plusGoldDark get() = PocketCastsColors.plusGoldDark
 val Color.Companion.patronPurple get() = PocketCastsColors.patronPurple
 val Color.Companion.patronPurpleLight get() = PocketCastsColors.patronPurpleLight
 val Color.Companion.patronPurpleDark get() = PocketCastsColors.patronPurpleDark
-val Color.Companion.radioactiveGreen get() = PocketCastsColors.radioactiveGreen
 val Brush.Companion.plusGradientBrush get() = PocketCastsColors.plusGradientBrush
 val Brush.Companion.patronGradientBrush get() = PocketCastsColors.patronGradientBrush
 
@@ -28,5 +27,4 @@ private object PocketCastsColors {
         1f to Color.plusGoldDark,
     )
     val patronGradientBrush = SolidColor(Color.patronPurpleLight)
-    val radioactiveGreen = Color(0xFF78D549)
 }

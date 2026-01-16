@@ -62,7 +62,6 @@ class SettingsAppearanceViewModel @Inject constructor(
                     Theme.ThemeType.LIGHT_CONTRAST -> "light_contrast"
                     Theme.ThemeType.ELECTRIC -> "electric"
                     Theme.ThemeType.CLASSIC_LIGHT -> "classic"
-                    Theme.ThemeType.RADIOACTIVE -> "radioactive"
                 },
             ),
         )

@@ -150,18 +150,11 @@ tokens.each do |token_attrs|
   classic_light_hex_value = themes[:classic_light][:hex]
   classic_light_opacity = themes[:classic_light][:opacity]
 
-  # unused
-  # classic_dark_hex_value = themes[:classic_dark][:hex]
-  # classic_dark_opacity = themes[:classic_dark][:opacity]
-
   electric_hex_value = themes[:electricity][:hex]
   electric_opacity = themes[:electricity][:opacity]
 
   indigo_hex_value = themes[:indigo][:hex]
   indigo_opacity = themes[:indigo][:opacity]
-
-  radioactive_hex_value = themes[:radioactive][:hex]
-  radioactive_opacity = themes[:radioactive][:opacity]
 
   rose_hex_value = themes[:rose][:hex]
   rose_opacity = themes[:rose][:opacity]
@@ -185,7 +178,6 @@ tokens.each do |token_attrs|
   write_theme_value(classic_light_hex_value, classic_light_opacity, token_name, FILE_PATH_COLORS, 'ClassicLight')
   write_theme_value(electric_hex_value, electric_opacity, token_name, FILE_PATH_COLORS, 'Electric')
   write_theme_value(indigo_hex_value, indigo_opacity, token_name, FILE_PATH_COLORS, 'Indigo')
-  write_theme_value(radioactive_hex_value, radioactive_opacity, token_name, FILE_PATH_COLORS, 'Radioactive')
   write_theme_value(rose_hex_value, rose_opacity, token_name, FILE_PATH_COLORS, 'Rose')
   write_theme_value(light_contrast_hex_value, light_contrast_opacity, token_name, FILE_PATH_COLORS, 'LightContrast')
   write_theme_value(dark_contrast_hex_value, dark_contrast_opacity, token_name, FILE_PATH_COLORS, 'DarkContrast')
@@ -208,8 +200,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight(podcastColor)
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo(podcastColor)
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive(podcastColor)
             Theme.ThemeType.ROSE ->
                 #{token}Rose(podcastColor)
             Theme.ThemeType.LIGHT_CONTRAST ->
@@ -233,8 +223,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight(filterColor)
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo(filterColor)
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive(filterColor)
             Theme.ThemeType.ROSE ->
                 #{token}Rose(filterColor)
             Theme.ThemeType.LIGHT_CONTRAST ->
@@ -258,8 +246,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive
             Theme.ThemeType.ROSE ->
                 #{token}Rose
             Theme.ThemeType.LIGHT_CONTRAST ->
