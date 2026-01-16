@@ -33,7 +33,7 @@ def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
         original_color = if words[3] == 'white'
                            'Color.WHITE'
                          elsif words[3].start_with?('#')
-                           "Color.parseColor(\"#{words[3]}\")"
+                           "\"#{words[3]}\".toColorInt()"
                          else
                            'Color.BLACK'
                          end
@@ -46,7 +46,7 @@ def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
       end
 
     else
-      str = "@ColorInt fun #{token_name}#{theme_name}(@ColorInt filterColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
+      str = "@ColorInt fun #{token_name}#{theme_name}(@ColorInt filterColor: Int): Int { return \"#{hex_val}\".toColorInt() }\n\n"
     end
 
     File.write(file_path, str, mode: 'a')
@@ -71,7 +71,7 @@ def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
         words = opacity.split
 
         actual_opacity = words[1].gsub('%', '')
-        original_color = "Color.parseColor(\"#{words[3]}\")"
+        original_color = "\"#{words[3]}\".toColorInt()"
         overlay_color = "ColorUtils.colorWithAlpha(podcastColor, #{(actual_opacity.to_f / 100.0 * 255.0).round})"
 
         str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
@@ -79,10 +79,10 @@ def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
     }\n\n"
       end
     elsif opacity == '100%' || opacity.nil? || opacity.empty?
-      str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
+      str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int { return \"#{hex_val}\".toColorInt() }\n\n"
     elsif opacity.split.size == 1
       opacity = opacity.gsub('%', '')
-      original_color = "Color.parseColor(\"#{hex_val}\")"
+      original_color = "\"#{hex_val}\".toColorInt()"
       str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
        return ColorUtils.colorWithAlpha(#{original_color}, #{(opacity.to_f / 100.0 * 255.0).round})
     }\n\n"
@@ -97,7 +97,7 @@ def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
     return
   end
 
-  variable_str = "    val #{token_name}#{theme_name} = Color.parseColor(\"#{hex_val}\")"
+  variable_str = "    val #{token_name}#{theme_name} = \"#{hex_val}\".toColorInt()"
   if opacity == '100%' || opacity.nil? || opacity.empty?
     File.write(file_path, "#{variable_str}\n", mode: 'a')
   else
@@ -121,6 +121,7 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.colorIntWithAlpha
+import androidx.core.graphics.toColorInt
 
 object ThemeColor {\n", mode: 'a')
 File.write(FILE_PATH_STYLES, "package au.com.shiftyjelly.pocketcasts.ui.theme
@@ -149,18 +150,11 @@ tokens.each do |token_attrs|
   classic_light_hex_value = themes[:classic_light][:hex]
   classic_light_opacity = themes[:classic_light][:opacity]
 
-  # unused
-  # classic_dark_hex_value = themes[:classic_dark][:hex]
-  # classic_dark_opacity = themes[:classic_dark][:opacity]
-
   electric_hex_value = themes[:electricity][:hex]
   electric_opacity = themes[:electricity][:opacity]
 
   indigo_hex_value = themes[:indigo][:hex]
   indigo_opacity = themes[:indigo][:opacity]
-
-  radioactive_hex_value = themes[:radioactive][:hex]
-  radioactive_opacity = themes[:radioactive][:opacity]
 
   rose_hex_value = themes[:rose][:hex]
   rose_opacity = themes[:rose][:opacity]
@@ -184,7 +178,6 @@ tokens.each do |token_attrs|
   write_theme_value(classic_light_hex_value, classic_light_opacity, token_name, FILE_PATH_COLORS, 'ClassicLight')
   write_theme_value(electric_hex_value, electric_opacity, token_name, FILE_PATH_COLORS, 'Electric')
   write_theme_value(indigo_hex_value, indigo_opacity, token_name, FILE_PATH_COLORS, 'Indigo')
-  write_theme_value(radioactive_hex_value, radioactive_opacity, token_name, FILE_PATH_COLORS, 'Radioactive')
   write_theme_value(rose_hex_value, rose_opacity, token_name, FILE_PATH_COLORS, 'Rose')
   write_theme_value(light_contrast_hex_value, light_contrast_opacity, token_name, FILE_PATH_COLORS, 'LightContrast')
   write_theme_value(dark_contrast_hex_value, dark_contrast_opacity, token_name, FILE_PATH_COLORS, 'DarkContrast')
@@ -207,8 +200,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight(podcastColor)
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo(podcastColor)
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive(podcastColor)
             Theme.ThemeType.ROSE ->
                 #{token}Rose(podcastColor)
             Theme.ThemeType.LIGHT_CONTRAST ->
@@ -232,8 +223,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight(filterColor)
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo(filterColor)
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive(filterColor)
             Theme.ThemeType.ROSE ->
                 #{token}Rose(filterColor)
             Theme.ThemeType.LIGHT_CONTRAST ->
@@ -257,8 +246,6 @@ all_token_names.each_with_index do |token, index|
                 #{token}ClassicLight
             Theme.ThemeType.INDIGO ->
                 #{token}Indigo
-            Theme.ThemeType.RADIOACTIVE ->
-                #{token}Radioactive
             Theme.ThemeType.ROSE ->
                 #{token}Rose
             Theme.ThemeType.LIGHT_CONTRAST ->

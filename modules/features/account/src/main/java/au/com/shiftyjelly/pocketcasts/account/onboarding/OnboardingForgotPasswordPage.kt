@@ -61,13 +61,16 @@ fun OnboardingForgotPasswordPage(
 
     val context = LocalContext.current
     val view = LocalView.current
+    val alertTitle = stringResource(LR.string.profile_reset_password_sent)
+    val alertMessage = stringResource(LR.string.profile_reset_password_check_email)
+
     val onSuccess = {
         UiUtil.hideKeyboard(view)
         @Suppress("LocalContextGetResourceValueCall")
         UiUtil.displayAlert(
             context,
-            context.getString(LR.string.profile_reset_password_sent),
-            context.getString(LR.string.profile_reset_password_check_email),
+            alertTitle,
+            alertMessage,
             onComplete = onComplete,
         )
     }

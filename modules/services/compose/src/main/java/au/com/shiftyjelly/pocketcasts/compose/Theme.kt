@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -10,9 +9,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -61,7 +57,6 @@ fun themeTypeToColors(themeType: Theme.ThemeType) = when (themeType) {
     Theme.ThemeType.CLASSIC_LIGHT -> ThemeClassicLightColors
     Theme.ThemeType.ELECTRIC -> ThemeElectricityColors
     Theme.ThemeType.INDIGO -> ThemeIndigoColors
-    Theme.ThemeType.RADIOACTIVE -> ThemeRadioactiveColors
     Theme.ThemeType.ROSE -> ThemeRoseColors
     Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
     Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
@@ -95,18 +90,12 @@ fun AutomotiveTheme(content: @Composable () -> Unit) {
     }
 }
 
-private val radioactiveColorFilter = ColorFilter.tint(
-    color = Color.radioactiveGreen,
-    blendMode = BlendMode.Modulate,
-)
-
 data class PocketCastsTheme(
     val type: Theme.ThemeType,
     val colors: ThemeColors,
 ) {
     val isDark get() = type.darkTheme
     val isLight get() = !isDark
-    val imageColorFilter get() = if (type == Theme.ThemeType.RADIOACTIVE) radioactiveColorFilter else null
 
     @Composable
     fun rememberPlayerColors(): PlayerColors? {

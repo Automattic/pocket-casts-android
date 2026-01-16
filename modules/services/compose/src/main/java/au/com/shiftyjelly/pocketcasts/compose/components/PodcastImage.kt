@@ -109,12 +109,12 @@ fun PodcastImageDeprecated(
     placeholderType: PlaceholderType = PlaceholderType.Large,
 ) {
     val context = LocalContext.current
-
+    val contentDescriptionString = stringResource(LR.string.podcast_artwork_description)
     BoxWithConstraints(
         modifier = modifier
             .semantics(mergeDescendants = true) {
                 role = Role.Image
-                contentDescription = context.getString(LR.string.podcast_artwork_description)
+                contentDescription = contentDescriptionString
             },
     ) {
         val imageRequest = remember(uuid, maxWidth) {
