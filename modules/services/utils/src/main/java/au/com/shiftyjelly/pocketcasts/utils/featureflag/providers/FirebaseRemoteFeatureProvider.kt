@@ -11,6 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,7 +22,10 @@ class FirebaseRemoteFeatureProvider(
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val scope: CoroutineScope,
 ) : FeatureProvider {
-    @Inject constructor(firebaseRemoteConfig: FirebaseRemoteConfig) : this(
+    private val initialFetchComplete = CompletableDeferred<Boolean>()
+
+    @Inject
+    constructor(firebaseRemoteConfig: FirebaseRemoteConfig) : this(
         firebaseRemoteConfig,
         @Suppress("OPT_IN_USAGE")
         // Using GlobalScope here is perfectly fine. This type is instantiated as a singleton.
@@ -36,8 +40,14 @@ class FirebaseRemoteFeatureProvider(
         scope.launch {
             firebaseRemoteConfig.fetchSuspending()
                 .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
-                .onSuccess { Timber.i("Firebase feature flag refreshed") }
-                .onFailure { Timber.e(it, "Failed to refresh Firebase feature flags") }
+                .onSuccess {
+                    Timber.i("Firebase feature flag refreshed")
+                    initialFetchComplete.complete(true)
+                }
+                .onFailure {
+                    Timber.e(it, "Failed to refresh Firebase feature flags")
+                    initialFetchComplete.complete(false)
+                }
 
             firebaseRemoteConfig.configUpdates.collect {
                 firebaseRemoteConfig.activateSuspending()
@@ -58,6 +68,8 @@ class FirebaseRemoteFeatureProvider(
     }
 
     override fun hasFeature(feature: Feature) = feature.hasFirebaseRemoteFlag
+
+    override suspend fun awaitInitialization() = initialFetchComplete.await()
 }
 
 private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Result<Unit>> { continuation ->

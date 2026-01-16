@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -135,64 +137,72 @@ private fun Content(
     } else {
         OldOnboardingFlow.startDestination(flow)
     }
-    NavHost(navController, rootDestination) {
-        importFlowGraph(theme, navController, flow, onUpdateSystemBars)
 
-        onboardingRecommendationsFlowGraph(
-            theme,
-            flow = flow,
-            onBackPress = {
-                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-                    navController.popBackStack()
-                } else {
-                    exitOnboarding(OnboardingExitInfo.Simple)
-                }
-            },
-            onComplete = {
-                val route = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-                    NewOnboardingFlow.ROUTE_SIGN_UP
-                } else {
-                    if (signInState.isSignedInAsPlusOrPatron) {
-                        OldOnboardingFlow.WELCOME
+    val isAccountCreationEnabled by produceState<Boolean?>(null) {
+        FeatureFlag.awaitProvidersInitialised()
+        value = FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)
+    }
+
+    isAccountCreationEnabled?.let { useNewOnboardingFlow ->
+        NavHost(navController, rootDestination) {
+            importFlowGraph(theme, navController, flow, onUpdateSystemBars)
+
+            onboardingRecommendationsFlowGraph(
+                theme,
+                flow = flow,
+                onBackPress = {
+                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                        navController.popBackStack()
                     } else {
-                        OldOnboardingFlow.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
+                        exitOnboarding(OnboardingExitInfo.Simple)
                     }
-                }
-                navController.navigate(route)
-            },
-            navController = navController,
-            onUpdateSystemBars = onUpdateSystemBars,
-        )
+                },
+                onComplete = {
+                    val route = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                        NewOnboardingFlow.ROUTE_SIGN_UP
+                    } else {
+                        if (signInState.isSignedInAsPlusOrPatron) {
+                            OldOnboardingFlow.WELCOME
+                        } else {
+                            OldOnboardingFlow.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
+                        }
+                    }
+                    navController.navigate(route)
+                },
+                navController = navController,
+                onUpdateSystemBars = onUpdateSystemBars,
+            )
 
-        if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            newOnboardingFlowGraph(
-                theme = theme,
-                flow = flow,
-                navController = navController,
-                onUpdateSystemBars = onUpdateSystemBars,
-                signInState = signInState,
-                featuresViewModel = featuresViewModel,
-                state = state,
-                onAccountCreated = { onAccountCreated(rootDestination) },
-                exitOnboarding = exitOnboarding,
-                finishOnboardingFlow = ::finishOnboardingFlow,
-                onLoginToExistingAccount = { flow, subscription, exitInfo -> onLoginToExistingAccount(flow, subscription, exitInfo, navController) },
-            )
-        } else {
-            oldOnboardingFlowGraph(
-                theme = theme,
-                flow = flow,
-                navController = navController,
-                onUpdateSystemBars = onUpdateSystemBars,
-                signInState = signInState,
-                featuresViewModel = featuresViewModel,
-                state = state,
-                onAccountCreated = { onAccountCreated(rootDestination) },
-                exitOnboarding = exitOnboarding,
-                finishOnboardingFlow = ::finishOnboardingFlow,
-                onLoginToExistingAccount = { flow, subscription, exitInfo -> onLoginToExistingAccount(flow, subscription, exitInfo, navController) },
-                completeOnboardingToDiscover = { completeOnboardingToDiscover() },
-            )
+            if (useNewOnboardingFlow) {
+                newOnboardingFlowGraph(
+                    theme = theme,
+                    flow = flow,
+                    navController = navController,
+                    onUpdateSystemBars = onUpdateSystemBars,
+                    signInState = signInState,
+                    featuresViewModel = featuresViewModel,
+                    state = state,
+                    onAccountCreated = { onAccountCreated(rootDestination) },
+                    exitOnboarding = exitOnboarding,
+                    finishOnboardingFlow = ::finishOnboardingFlow,
+                    onLoginToExistingAccount = { flow, subscription, exitInfo -> onLoginToExistingAccount(flow, subscription, exitInfo, navController) },
+                )
+            } else {
+                oldOnboardingFlowGraph(
+                    theme = theme,
+                    flow = flow,
+                    navController = navController,
+                    onUpdateSystemBars = onUpdateSystemBars,
+                    signInState = signInState,
+                    featuresViewModel = featuresViewModel,
+                    state = state,
+                    onAccountCreated = { onAccountCreated(rootDestination) },
+                    exitOnboarding = exitOnboarding,
+                    finishOnboardingFlow = ::finishOnboardingFlow,
+                    onLoginToExistingAccount = { flow, subscription, exitInfo -> onLoginToExistingAccount(flow, subscription, exitInfo, navController) },
+                    completeOnboardingToDiscover = { completeOnboardingToDiscover() },
+                )
+            }
         }
     }
 }

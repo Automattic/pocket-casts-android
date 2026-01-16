@@ -18,4 +18,6 @@ class DefaultReleaseFeatureProvider @Inject constructor() : FeatureProvider {
     override fun hasFeature(feature: Feature): Boolean = true
 
     override fun isEnabled(feature: Feature) = feature.defaultValue
+
+    override suspend fun awaitInitialization() = true
 }

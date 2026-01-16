@@ -26,5 +26,7 @@ class PreferencesFeatureProvider @Inject constructor(
 
     override fun setEnabled(feature: Feature, enabled: Boolean) = preferences.edit().putBoolean(feature.key, enabled).apply()
 
+    override suspend fun awaitInitialization() = true
+
     private fun Context.featureFlagsSharedPrefs() = this.getSharedPreferences("POCKETCASTS_FEATURE_FLAGS", Context.MODE_PRIVATE)
 }
