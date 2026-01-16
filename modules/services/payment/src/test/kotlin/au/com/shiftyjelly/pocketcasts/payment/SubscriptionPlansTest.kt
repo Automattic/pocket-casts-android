@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SubscriptionPlansTest {
@@ -365,5 +367,177 @@ class SubscriptionPlansTest {
         for (plan in allPlans) {
             assertEquals(plan.recurringPrice, infinitePricingPhase.price)
         }
+    }
+
+    @Test
+    fun `create plans with installment product`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val installmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                    installmentPlanDetails = InstallmentPlanDetails(
+                        commitmentPaymentsCount = 12,
+                        subsequentCommitmentPaymentsCount = 0,
+                    ),
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInstallment = products + installmentProduct
+
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()
+
+        assertNotNull(plans)
+        val installmentPlan = plans?.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)?.getOrNull()
+        assertNotNull(installmentPlan)
+    }
+
+    @Test
+    fun `get installment plan when available`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val installmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                    installmentPlanDetails = InstallmentPlanDetails(
+                        commitmentPaymentsCount = 12,
+                        subsequentCommitmentPaymentsCount = 0,
+                    ),
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInstallment = products + installmentProduct
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
+
+        val installmentPlan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertNotNull(installmentPlan)
+        assertEquals("Plus Yearly Installment", installmentPlan.name)
+        assertEquals(SubscriptionTier.Plus, installmentPlan.tier)
+        assertEquals(BillingCycle.Yearly, installmentPlan.billingCycle)
+        assertTrue(installmentPlan.isInstallment)
+        assertEquals(3.33.toBigDecimal(), installmentPlan.pricingPhase.price.amount)
+    }
+
+    @Test
+    fun `get failure when installment plan not available`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertTrue(result is PaymentResult.Failure)
+        assertEquals(PaymentResultCode.ItemUnavailable, (result as PaymentResult.Failure).code)
+    }
+
+    @Test
+    fun `create plans succeeds even without installment product`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()
+
+        assertNotNull(plans)
+        val result = plans?.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        assertTrue(result is PaymentResult.Failure)
+    }
+
+    @Test
+    fun `get regular yearly plan when installment not available`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val regularPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertNotNull(regularPlan)
+        assertFalse(regularPlan.isInstallment)
+    }
+
+    @Test
+    fun `installment plan contains installment details`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val installmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                    installmentPlanDetails = InstallmentPlanDetails(
+                        commitmentPaymentsCount = 12,
+                        subsequentCommitmentPaymentsCount = 0,
+                    ),
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInstallment = products + installmentProduct
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
+
+        val installmentPlan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertNotNull(installmentPlan)
+        assertNotNull(installmentPlan.pricingPhase)
+
+        // Verify installment details are preserved on the SubscriptionPlan.Base
+        assertNotNull(installmentPlan.installmentPlanDetails)
+        assertEquals(12, installmentPlan.installmentPlanDetails?.commitmentPaymentsCount)
+        assertEquals(0, installmentPlan.installmentPlanDetails?.subsequentCommitmentPaymentsCount)
+    }
+
+    @Test
+    fun `regular plans do not have installment details`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val regularYearlyPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        val regularMonthlyPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
+
+        // Regular plans should not have installment details
+        assertNull(regularYearlyPlan.installmentPlanDetails)
+        assertFalse(regularYearlyPlan.isInstallment)
+        assertNull(regularMonthlyPlan.installmentPlanDetails)
+        assertFalse(regularMonthlyPlan.isInstallment)
+    }
+
+    @Test
+    fun `reject installment product without installment details`() {
+        val installmentPricingPhase = PricingPhase(
+            Price(3.33.toBigDecimal(), "USD", "$3.33"),
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 12),
+        )
+        val invalidInstallmentProduct = Product(
+            id = SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+            name = "Plus Yearly Installment",
+            pricingPlans = PricingPlans(
+                basePlan = PricingPlan.Base(
+                    planId = "p1y-installment",
+                    pricingPhases = listOf(installmentPricingPhase),
+                    tags = emptyList(),
+                    installmentPlanDetails = null,
+                ),
+                offerPlans = emptyList(),
+            ),
+        )
+        val productsWithInvalidInstallment = products + invalidInstallmentProduct
+        val result = SubscriptionPlans.create(productsWithInvalidInstallment)
+        assertTrue(result is PaymentResult.Failure)
+        val failure = result as PaymentResult.Failure
+        assertEquals(PaymentResultCode.DeveloperError, failure.code)
+        assertTrue(failure.message.contains("installmentPlanDetails"))
     }
 }

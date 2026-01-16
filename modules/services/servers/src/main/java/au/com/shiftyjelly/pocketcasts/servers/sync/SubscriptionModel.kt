@@ -36,6 +36,7 @@ data class SubscriptionResponse(
     @Json(name = "expiryDate") val expiryDate: Date?,
     @Json(name = "autoRenewing") val autoRenewing: Boolean,
     @Json(name = "giftDays") val giftDays: Int,
+    @Json(name = "isInstallment") val isInstallment: Boolean = false,
 )
 
 @JsonClass(generateAdapter = true)
@@ -86,6 +87,7 @@ fun SubscriptionStatusResponse.toMembership(): Membership {
             expiryDate = subscriptionResponse.expiryDate?.toInstant() ?: Instant.MAX,
             isAutoRenewing = subscriptionResponse.autoRenewing,
             giftDays = subscriptionResponse.giftDays,
+            isInstallment = subscriptionResponse.isInstallment,
         )
     }
 
