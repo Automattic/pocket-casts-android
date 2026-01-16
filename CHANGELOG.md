@@ -5,6 +5,9 @@
         ([#4883](https://github.com/Automattic/pocket-casts-android/pull/4883))
     *   Removed Radioactivity UI theme
         ([#4888](https://github.com/Automattic/pocket-casts-android/pull/4888))
+*   Bug Fixes
+    *   Fix transcript content being obstructed by navigation bars
+        ([#4892](https://github.com/Automattic/pocket-casts-android/pull/4892))
 
 8.3
 -----
