@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,10 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
@@ -50,6 +58,20 @@ fun UpgradeFeatureItem(
             color = textColor,
             linkColor = textColor,
             textStyleResId = UR.style.H50,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewUpgradeFeatureItem(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    AppThemeWithBackground(theme) {
+        UpgradeFeatureItem(
+            item = PlusUpgradeFeatureItem.WatchPlayback,
+            iconColor = MaterialTheme.theme.colors.primaryText01,
+            textColor = MaterialTheme.theme.colors.primaryText02,
         )
     }
 }
