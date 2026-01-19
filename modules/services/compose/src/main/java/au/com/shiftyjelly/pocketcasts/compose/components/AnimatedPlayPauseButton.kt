@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,14 +63,18 @@ fun AnimatedPlayPauseButton(
         ),
     )
 
+    val accessibilityLabel = if (isPlaying) stringResource(LR.string.pause) else stringResource(LR.string.play)
     Box(
         modifier = modifier
             .size(circleSize)
             .clip(CircleShape)
             .background(circleColor)
+            .semantics(mergeDescendants = true) {
+                contentDescription = accessibilityLabel
+            }
             .clickable(
                 role = Role.Button,
-                onClickLabel = if (isPlaying) stringResource(LR.string.pause) else stringResource(LR.string.play),
+                onClickLabel = accessibilityLabel,
                 onClick = onClick,
             ),
     ) {
