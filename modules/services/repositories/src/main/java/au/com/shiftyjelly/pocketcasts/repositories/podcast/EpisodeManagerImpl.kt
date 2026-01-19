@@ -542,8 +542,6 @@ class EpisodeManagerImpl @Inject constructor(
         for (episode in episodes) {
             deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
         }
-        // Clean up associated transcripts
-        transcriptDao.deleteForEpisodes(episodes.map { it.uuid })
         episodeDao.deleteAll(episodes)
     }
 
@@ -552,8 +550,6 @@ class EpisodeManagerImpl @Inject constructor(
 
         runBlocking {
             deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
-            // Clean up associated transcripts
-            transcriptDao.deleteForEpisode(episode.uuid)
         }
 
         episodeDao.deleteBlocking(episode)
@@ -585,6 +581,11 @@ class EpisodeManagerImpl @Inject constructor(
         // remove the temp file as well in case it's there
         val tempFilePath = DownloadHelper.tempPathForEpisode(episode, fileStorage)
         FileUtil.deleteFileByPath(tempFilePath)
+
+        // remove associated transcripts
+        runBlocking {
+            transcriptDao.deleteForEpisode(episode.uuid)
+        }
     }
 
     override fun stopDownloadAndCleanUp(episodeUuid: String, from: String) {

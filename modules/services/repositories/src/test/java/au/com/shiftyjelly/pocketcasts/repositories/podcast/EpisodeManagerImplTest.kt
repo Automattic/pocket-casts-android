@@ -108,7 +108,9 @@ class EpisodeManagerImplTest {
 
         episodeManagerImpl.deleteEpisodesWithoutSync(episodes, playbackManager)
 
-        verify(transcriptDao).deleteForEpisodes(listOf("episode-1", "episode-2"))
+        // Verify transcript deletion happens for each episode (via cleanUpDownloadFiles)
+        verify(transcriptDao).deleteForEpisode("episode-1")
+        verify(transcriptDao).deleteForEpisode("episode-2")
         verify(episodeDao).deleteAll(episodes)
     }
 
