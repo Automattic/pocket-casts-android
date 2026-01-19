@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class TranscriptDao {
-    @Query("DELETE FROM episode_transcript WHERE episode_uuid IN (:episodeUuids) AND type ")
+    @Query("DELETE FROM episode_transcript WHERE episode_uuid IN (:episodeUuids)")
     protected abstract suspend fun deleteAll(episodeUuids: List<String>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
