@@ -36,7 +36,6 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 class WinbackViewModelTest {
     @get:Rule
@@ -55,7 +54,7 @@ class WinbackViewModelTest {
             on { flow } doReturn MutableStateFlow(null)
         }
         whenever(settings.cachedSubscription) doReturn subscriptionSettingMock
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
         )
 
@@ -272,7 +271,7 @@ class WinbackViewModelTest {
         paymentDataSource.loadedPurchases = listOf(
             createPurchase(productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID)),
         )
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
@@ -313,7 +312,7 @@ class WinbackViewModelTest {
         paymentDataSource.loadedPurchases = listOf(
             createPurchase(productIds = listOf(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)),
         )
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Monthly)!!,
         )
 
@@ -337,7 +336,7 @@ class WinbackViewModelTest {
         paymentDataSource.loadedPurchases = listOf(
             createPurchase(productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID)),
         )
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Yearly)!!,
         )
 
@@ -358,7 +357,7 @@ class WinbackViewModelTest {
 
     @Test
     fun `no winback offer`() = runTest {
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn ReferralResult.EmptyResult()
+        whenever { referralManager.getWinbackResponse() } doReturn ReferralResult.EmptyResult()
 
         viewModel.loadWinbackData()
 
@@ -378,7 +377,7 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
 
         paymentDataSource.loadedPurchases = listOf(newPurchase)
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Yearly)!!,
         )
 
@@ -397,7 +396,7 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with blank offer ID`() = runTest {
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "")
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "")
 
         viewModel.loadWinbackData()
 
@@ -408,7 +407,7 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with blank redeem code`() = runTest {
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(code = "")
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(code = "")
 
         viewModel.loadWinbackData()
 
@@ -419,7 +418,7 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with unknown ID`() = runTest {
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "unknown-offer")
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "unknown-offer")
 
         viewModel.loadWinbackData()
 
@@ -433,7 +432,7 @@ class WinbackViewModelTest {
         paymentDataSource.loadedPurchases = listOf(
             createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)),
         )
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
@@ -453,7 +452,7 @@ class WinbackViewModelTest {
             val newPricingPlans = product.pricingPlans.copy(offerPlans = newOfferPlans)
             product.copy(pricingPlans = newPricingPlans)
         }
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
@@ -475,7 +474,7 @@ class WinbackViewModelTest {
             val newPricingPlans = product.pricingPlans.copy(offerPlans = newOfferPlans)
             product.copy(pricingPlans = newPricingPlans)
         }
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
@@ -490,7 +489,7 @@ class WinbackViewModelTest {
 
     @Test
     fun `claim winback offer successfully`() = runTest {
-        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
         )
 

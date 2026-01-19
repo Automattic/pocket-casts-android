@@ -56,7 +56,7 @@ class EpisodeManagerImplTest {
     fun `get all podcasts episodes`() = runTest {
         val episodes = List(26) { PodcastEpisode(uuid = "$it", publishedDate = Date()) }
         episodeDao.stub {
-            onBlocking { getAllPodcastEpisodes(any(), any()) } doReturnConsecutively (episodes.chunked(10) + listOf(emptyList()))
+            on { getAllPodcastEpisodes(any(), any()) } doReturnConsecutively (episodes.chunked(10) + listOf(emptyList()))
         }
 
         episodeManagerImpl.getAllPodcastEpisodes(10).test {
