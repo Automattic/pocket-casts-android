@@ -4,8 +4,14 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Manages feature flags in the application with a list of different feature providers.
@@ -44,6 +50,29 @@ object FeatureFlag {
                 ?.isEnabled(feature)
                 ?: feature.defaultValue
         }
+    }
+
+    /**
+     * Suspends until remote feature providers have completed initialization.
+     * This ensures subsequent feature flag checks will use the latest remote values
+     * rather than cached or default values.
+     *
+     * This method can be used before calling any feature flag accessor method
+     * (e.g., [isEnabled], [isEnabledFlow], [isEnabledForUser], [isExclusiveToPatron])
+     * to ensure remote configuration is loaded.
+     *
+     * @param timeout Maximum time to wait for remote providers to initialize. Defaults to 5 seconds.
+     *                If timeout is reached, feature flags will use currently available values.
+     */
+    suspend fun awaitProvidersInitialised(
+        timeout: Duration = 5.seconds,
+    ) {
+        withTimeoutOrNull(timeout) {
+            coroutineScope {
+                providers.map { async { it.awaitInitialization() } }.awaitAll()
+            }
+        }
+        updateFeatureFlowValues()
     }
 
     fun isEnabledFlow(

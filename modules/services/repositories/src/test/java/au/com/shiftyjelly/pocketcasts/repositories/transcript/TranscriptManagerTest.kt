@@ -59,7 +59,7 @@ class TranscriptManagerTest {
         },
         transcriptService = service,
         episodeManager = mock {
-            onBlocking { findByUuid(any()) } doReturn PodcastEpisode(
+            on { findByUuid(any()) } doReturn PodcastEpisode(
                 uuid = "episode-id",
                 podcastUuid = "podcast-id",
                 publishedDate = Date(),

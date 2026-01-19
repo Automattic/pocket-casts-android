@@ -3,7 +3,6 @@
 
 package au.com.shiftyjelly.pocketcasts.ui.theme
 
-import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.core.graphics.toColorInt
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
@@ -16,7 +15,6 @@ object ThemeColor {
     val primaryUi01ClassicLight = "#FFFFFF".toColorInt()
     val primaryUi01Electric = "#19232B".toColorInt()
     val primaryUi01Indigo = "#ECEDE6".toColorInt()
-    val primaryUi01Radioactive = "#162F1E".toColorInt()
     val primaryUi01Rose = "#fff0eb".toColorInt()
     val primaryUi01LightContrast = "#ffffff".toColorInt()
     val primaryUi01DarkContrast = "#000000".toColorInt()
@@ -26,7 +24,6 @@ object ThemeColor {
     val primaryUi01ActiveClassicLight = "#F7F9FA".toColorInt()
     val primaryUi01ActiveElectric = "#171C24".toColorInt()
     val primaryUi01ActiveIndigo = "#F1F2EF".toColorInt()
-    val primaryUi01ActiveRadioactive = "#193D25".toColorInt()
     val primaryUi01ActiveRose = "#fff9f7".toColorInt()
     val primaryUi01ActiveLightContrast = "#f7f9fa".toColorInt()
     val primaryUi01ActiveDarkContrast = "#1b1b1b".toColorInt()
@@ -36,7 +33,6 @@ object ThemeColor {
     val primaryUi02ClassicLight = "#FFFFFF".toColorInt()
     val primaryUi02Electric = "#161A20".toColorInt()
     val primaryUi02Indigo = "#F4F5F2".toColorInt()
-    val primaryUi02Radioactive = "#0d1b11".toColorInt()
     val primaryUi02Rose = "#FFEEED".toColorInt()
     val primaryUi02LightContrast = "#ffffff".toColorInt()
     val primaryUi02DarkContrast = "#000000".toColorInt()
@@ -46,7 +42,6 @@ object ThemeColor {
     val primaryUi02SelectedClassicLight = "#FEECEB".toColorInt()
     val primaryUi02SelectedElectric = "#1A2C34".toColorInt()
     val primaryUi02SelectedIndigo = "#E2E4E5".toColorInt()
-    val primaryUi02SelectedRadioactive = "#173119".toColorInt()
     val primaryUi02SelectedRose = "#f7caca".toColorInt()
     val primaryUi02SelectedLightContrast = "#e5e5e5".toColorInt()
     val primaryUi02SelectedDarkContrast = "#262626".toColorInt()
@@ -56,7 +51,6 @@ object ThemeColor {
     val primaryUi02ActiveClassicLight = "#F7F9FA".toColorInt()
     val primaryUi02ActiveElectric = "#1B212A".toColorInt()
     val primaryUi02ActiveIndigo = "#F7F9FA".toColorInt()
-    val primaryUi02ActiveRadioactive = "#0d1b11".toColorInt()
     val primaryUi02ActiveRose = "#fce2de".toColorInt()
     val primaryUi02ActiveLightContrast = "#f2f2f2".toColorInt()
     val primaryUi02ActiveDarkContrast = "#1b1b1b".toColorInt()
@@ -66,7 +60,6 @@ object ThemeColor {
     val primaryUi03ClassicLight = "#FAFAF9".toColorInt()
     val primaryUi03Electric = "#171C25".toColorInt()
     val primaryUi03Indigo = "#EFEFEF".toColorInt()
-    val primaryUi03Radioactive = "#162f1e".toColorInt()
     val primaryUi03Rose = "#F7E2E2".toColorInt()
     val primaryUi03LightContrast = "#ffffff".toColorInt()
     val primaryUi03DarkContrast = "#000000".toColorInt()
@@ -76,7 +69,6 @@ object ThemeColor {
     val primaryUi04ClassicLight = "#F7F9FA".toColorInt()
     val primaryUi04Electric = "#111419".toColorInt()
     val primaryUi04Indigo = "#ECEDE6".toColorInt()
-    val primaryUi04Radioactive = "#111419".toColorInt()
     val primaryUi04Rose = "#FCE6E6".toColorInt()
     val primaryUi04LightContrast = "#ffffff".toColorInt()
     val primaryUi04DarkContrast = "#000000".toColorInt()
@@ -86,7 +78,6 @@ object ThemeColor {
     val primaryUi05ClassicLight = "#E0E6EA".toColorInt()
     val primaryUi05Electric = "#1E3C4A".toColorInt()
     val primaryUi05Indigo = "#D8DCDC".toColorInt()
-    val primaryUi05Radioactive = "#27591a".toColorInt()
     val primaryUi05Rose = "#f5d1c4".toColorInt()
     val primaryUi05LightContrast = "#e4e4e4".toColorInt()
     val primaryUi05DarkContrast = "#333333".toColorInt()
@@ -96,7 +87,6 @@ object ThemeColor {
     val primaryUi05SelectedClassicLight = "#8F97A4".toColorInt()
     val primaryUi05SelectedElectric = "#3FD2E6".toColorInt()
     val primaryUi05SelectedIndigo = "#556675".toColorInt()
-    val primaryUi05SelectedRadioactive = "#70e84e".toColorInt()
     val primaryUi05SelectedRose = "#e53958".toColorInt()
     val primaryUi05SelectedLightContrast = "#000000".toColorInt()
     val primaryUi05SelectedDarkContrast = "#ffffff".toColorInt()
@@ -106,7 +96,6 @@ object ThemeColor {
     val primaryUi06ClassicLight = "#F7F9FA".toColorInt()
     val primaryUi06Electric = "#1B2933".toColorInt()
     val primaryUi06Indigo = "#E8E8DF".toColorInt()
-    val primaryUi06Radioactive = "#1a3e11".toColorInt()
     val primaryUi06Rose = "#fff8f7".toColorInt()
     val primaryUi06LightContrast = "#ffffff".toColorInt()
     val primaryUi06DarkContrast = "#000000".toColorInt()
@@ -116,7 +105,6 @@ object ThemeColor {
     val primaryIcon01ClassicLight = "#F43E37".toColorInt()
     val primaryIcon01Electric = "#3FD2E6".toColorInt()
     val primaryIcon01Indigo = "#3D4E70".toColorInt()
-    val primaryIcon01Radioactive = "#74f864".toColorInt()
     val primaryIcon01Rose = "#f05d54".toColorInt()
     val primaryIcon01LightContrast = "#000000".toColorInt()
     val primaryIcon01DarkContrast = "#ffffff".toColorInt()
@@ -126,7 +114,6 @@ object ThemeColor {
     val primaryIcon01ActiveClassicLight = "#F49D9A".toColorInt()
     val primaryIcon01ActiveElectric = "#8AE9FF".toColorInt()
     val primaryIcon01ActiveIndigo = "#586784".toColorInt()
-    val primaryIcon01ActiveRadioactive = "#70e84e".toColorInt()
     val primaryIcon01ActiveRose = "#ff6f66".toColorInt()
     val primaryIcon01ActiveLightContrast = "#3f3f3f".toColorInt()
     val primaryIcon01ActiveDarkContrast = "#bebebe".toColorInt()
@@ -136,7 +123,6 @@ object ThemeColor {
     val primaryIcon02ClassicLight = "#B8C3C9".toColorInt()
     val primaryIcon02Electric = "#16698C".toColorInt()
     val primaryIcon02Indigo = "#9DA7B5".toColorInt()
-    val primaryIcon02Radioactive = "#59bc3d".toColorInt()
     val primaryIcon02Rose = "#F58C87".toColorInt()
     val primaryIcon02LightContrast = "#808080".toColorInt()
     val primaryIcon02DarkContrast = "#b2b2b2".toColorInt()
@@ -146,7 +132,6 @@ object ThemeColor {
     val primaryIcon02SelectedClassicLight = "#F43E37".toColorInt()
     val primaryIcon02SelectedElectric = "#3FD2E6".toColorInt()
     val primaryIcon02SelectedIndigo = "#3F4B6A".toColorInt()
-    val primaryIcon02SelectedRadioactive = "#9FF2B1".toColorInt()
     val primaryIcon02SelectedRose = "#f22469".toColorInt()
     val primaryIcon02SelectedLightContrast = "#0225C2".toColorInt()
     val primaryIcon02SelectedDarkContrast = "#ffffff".toColorInt()
@@ -156,7 +141,6 @@ object ThemeColor {
     val primaryIcon02ActiveClassicLight = "#8F97A4".toColorInt()
     val primaryIcon02ActiveElectric = "#3FD2E6".toColorInt()
     val primaryIcon02ActiveIndigo = "#8F97A4".toColorInt()
-    val primaryIcon02ActiveRadioactive = "#70e84e".toColorInt()
     val primaryIcon02ActiveRose = "#f55c53".toColorInt()
     val primaryIcon02ActiveLightContrast = "#000000".toColorInt().colorIntWithAlpha(191)
     val primaryIcon02ActiveDarkContrast = "#000000".toColorInt().colorIntWithAlpha(191)
@@ -166,7 +150,6 @@ object ThemeColor {
     val primaryIcon03ClassicLight = "#8F97A4".toColorInt()
     val primaryIcon03Electric = "#2A7683".toColorInt()
     val primaryIcon03Indigo = "#6D7B87".toColorInt()
-    val primaryIcon03Radioactive = "#70e84e".toColorInt()
     val primaryIcon03Rose = "#e54558".toColorInt()
     val primaryIcon03LightContrast = "#656565".toColorInt()
     val primaryIcon03DarkContrast = "#656565".toColorInt()
@@ -176,7 +159,6 @@ object ThemeColor {
     val primaryIcon03ActiveClassicLight = "#03A9F4".toColorInt()
     val primaryIcon03ActiveElectric = "#8AE9FF".toColorInt()
     val primaryIcon03ActiveIndigo = "#70ADD1".toColorInt()
-    val primaryIcon03ActiveRadioactive = "#70e84e".toColorInt()
     val primaryIcon03ActiveRose = "#ff7373".toColorInt()
     val primaryIcon03ActiveLightContrast = "#000000".toColorInt()
     val primaryIcon03ActiveDarkContrast = "#ffffff".toColorInt()
@@ -186,7 +168,6 @@ object ThemeColor {
     val primaryText01ClassicLight = "#292B2E".toColorInt()
     val primaryText01Electric = "#FFFFFF".toColorInt()
     val primaryText01Indigo = "#323E5C".toColorInt()
-    val primaryText01Radioactive = "#74f864".toColorInt()
     val primaryText01Rose = "#990038".toColorInt()
     val primaryText01LightContrast = "#000000".toColorInt()
     val primaryText01DarkContrast = "#ffffff".toColorInt()
@@ -196,7 +177,6 @@ object ThemeColor {
     val primaryText02ClassicLight = "#8F97A4".toColorInt()
     val primaryText02Electric = "#21ADDB".toColorInt()
     val primaryText02Indigo = "#7E8999".toColorInt()
-    val primaryText02Radioactive = "#469431".toColorInt()
     val primaryText02Rose = "#E52535".toColorInt()
     val primaryText02LightContrast = "#595959".toColorInt()
     val primaryText02DarkContrast = "#d9d9d9".toColorInt()
@@ -206,7 +186,6 @@ object ThemeColor {
     val primaryText02SelectedClassicLight = "#F43E37".toColorInt()
     val primaryText02SelectedElectric = "#3FD2E6".toColorInt()
     val primaryText02SelectedIndigo = "#333D58".toColorInt()
-    val primaryText02SelectedRadioactive = "#9FF2B1".toColorInt()
     val primaryText02SelectedRose = "#d90048".toColorInt()
     val primaryText02SelectedLightContrast = "#023087".toColorInt()
     val primaryText02SelectedDarkContrast = "#ffffff".toColorInt()
@@ -216,7 +195,6 @@ object ThemeColor {
     val primaryField01ClassicLight = "#EFF3F5".toColorInt()
     val primaryField01Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
     val primaryField01Indigo = "#E7E8E1".toColorInt()
-    val primaryField01Radioactive = "#1a3e11".toColorInt()
     val primaryField01Rose = "#fffdfc".toColorInt()
     val primaryField01LightContrast = "#f1f1f1".toColorInt()
     val primaryField01DarkContrast = "#272727".toColorInt()
@@ -226,7 +204,6 @@ object ThemeColor {
     val primaryField01ActiveClassicLight = "#E0E6EA".toColorInt()
     val primaryField01ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
     val primaryField01ActiveIndigo = "#EBEADA".toColorInt()
-    val primaryField01ActiveRadioactive = "#27591a".toColorInt()
     val primaryField01ActiveRose = "#ffffff".toColorInt()
     val primaryField01ActiveLightContrast = "#e4e4e4".toColorInt()
     val primaryField01ActiveDarkContrast = "#181818".toColorInt()
@@ -236,7 +213,6 @@ object ThemeColor {
     val primaryField02ClassicLight = "#FBFBFC".toColorInt()
     val primaryField02Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
     val primaryField02Indigo = "#FBFBFC".toColorInt()
-    val primaryField02Radioactive = "#1a3e11".toColorInt()
     val primaryField02Rose = "#fffbfa".toColorInt()
     val primaryField02LightContrast = "#fbfbfc".toColorInt()
     val primaryField02DarkContrast = "#1a1a1a".toColorInt()
@@ -246,7 +222,6 @@ object ThemeColor {
     val primaryField02ActiveClassicLight = "#FFFFFF".toColorInt()
     val primaryField02ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
     val primaryField02ActiveIndigo = "#FFFFFF".toColorInt()
-    val primaryField02ActiveRadioactive = "#27591a".toColorInt()
     val primaryField02ActiveRose = "#ffffff".toColorInt()
     val primaryField02ActiveLightContrast = "#ffffff".toColorInt()
     val primaryField02ActiveDarkContrast = "#0c0c0c".toColorInt()
@@ -256,7 +231,6 @@ object ThemeColor {
     val primaryField03ClassicLight = "#B8C3C9".toColorInt()
     val primaryField03Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(46)
     val primaryField03Indigo = "#B8C3C9".toColorInt()
-    val primaryField03Radioactive = "#257111".toColorInt()
     val primaryField03Rose = "#f7caca".toColorInt()
     val primaryField03LightContrast = "#7e7e7e".toColorInt()
     val primaryField03DarkContrast = "#808080".toColorInt()
@@ -266,7 +240,6 @@ object ThemeColor {
     val primaryField03ActiveClassicLight = "#03A9F4".toColorInt()
     val primaryField03ActiveElectric = "#3FD2E6".toColorInt()
     val primaryField03ActiveIndigo = "#70ADD1".toColorInt()
-    val primaryField03ActiveRadioactive = "#70e84e".toColorInt()
     val primaryField03ActiveRose = "#ffaebd".toColorInt()
     val primaryField03ActiveLightContrast = "#000000".toColorInt()
     val primaryField03ActiveDarkContrast = "#ffffff".toColorInt()
@@ -276,7 +249,6 @@ object ThemeColor {
     val primaryInteractive01ClassicLight = "#F43E37".toColorInt()
     val primaryInteractive01Electric = "#3FD2E6".toColorInt()
     val primaryInteractive01Indigo = "#639ED6".toColorInt()
-    val primaryInteractive01Radioactive = "#88FF66".toColorInt()
     val primaryInteractive01Rose = "#ff7978".toColorInt()
     val primaryInteractive01LightContrast = "#000000".toColorInt()
     val primaryInteractive01DarkContrast = "#ffffff".toColorInt()
@@ -286,7 +258,6 @@ object ThemeColor {
     val primaryInteractive01HoverClassicLight = "#03A9F4".toColorInt()
     val primaryInteractive01HoverElectric = "#64DDF2".toColorInt()
     val primaryInteractive01HoverIndigo = "#AECBE5".toColorInt()
-    val primaryInteractive01HoverRadioactive = "#87ED7F".toColorInt()
     val primaryInteractive01HoverRose = "#ff9f9e".toColorInt()
     val primaryInteractive01HoverLightContrast = "#212121".toColorInt()
     val primaryInteractive01HoverDarkContrast = "#212121".toColorInt()
@@ -296,7 +267,6 @@ object ThemeColor {
     val primaryInteractive01ActiveClassicLight = "#F43E37".toColorInt()
     val primaryInteractive01ActiveElectric = "#3FD2E6".toColorInt()
     val primaryInteractive01ActiveIndigo = "#94B4D1".toColorInt()
-    val primaryInteractive01ActiveRadioactive = "#9FF2B1".toColorInt()
     val primaryInteractive01ActiveRose = "#ffc5c4".toColorInt()
     val primaryInteractive01ActiveLightContrast = "#404040".toColorInt()
     val primaryInteractive01ActiveDarkContrast = "#404040".toColorInt()
@@ -306,7 +276,6 @@ object ThemeColor {
     val primaryInteractive01DisabledClassicLight = "#F43E37".toColorInt().colorIntWithAlpha(64)
     val primaryInteractive01DisabledElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(64)
     val primaryInteractive01DisabledIndigo = "#8395A7".toColorInt().colorIntWithAlpha(64)
-    val primaryInteractive01DisabledRadioactive = "#59bc3d".toColorInt()
     val primaryInteractive01DisabledRose = "#997272".toColorInt().colorIntWithAlpha(64)
     val primaryInteractive01DisabledLightContrast = "#F43E37".toColorInt().colorIntWithAlpha(64)
     val primaryInteractive01DisabledDarkContrast = "#FB5146".toColorInt().colorIntWithAlpha(64)
@@ -316,7 +285,6 @@ object ThemeColor {
     val primaryInteractive02ClassicLight = "#FFFFFF".toColorInt()
     val primaryInteractive02Electric = "#13171C".toColorInt()
     val primaryInteractive02Indigo = "#F8FAF2".toColorInt()
-    val primaryInteractive02Radioactive = "#131711".toColorInt()
     val primaryInteractive02Rose = "#fdfaf9".toColorInt()
     val primaryInteractive02LightContrast = "#ffffff".toColorInt()
     val primaryInteractive02DarkContrast = "#000000".toColorInt()
@@ -326,7 +294,6 @@ object ThemeColor {
     val primaryInteractive02HoverClassicLight = "#03A9F4".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02HoverElectric = "#03A9F4".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02HoverIndigo = "#03A9F4".toColorInt().colorIntWithAlpha(26)
-    val primaryInteractive02HoverRadioactive = "#59BC3D".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02HoverRose = "#f4032b".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02HoverLightContrast = "#cccccc".toColorInt()
     val primaryInteractive02HoverDarkContrast = "#cccccc".toColorInt()
@@ -336,7 +303,6 @@ object ThemeColor {
     val primaryInteractive02ActiveClassicLight = "#F43E37".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02ActiveElectric = "#9FE8F2".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02ActiveIndigo = "#94A6B4".toColorInt().colorIntWithAlpha(51)
-    val primaryInteractive02ActiveRadioactive = "#9FF2B1".toColorInt().colorIntWithAlpha(51)
     val primaryInteractive02ActiveRose = "#ffffff".toColorInt().colorIntWithAlpha(204)
     val primaryInteractive02ActiveLightContrast = "#000000".toColorInt().colorIntWithAlpha(26)
     val primaryInteractive02ActiveDarkContrast = "#000000".toColorInt().colorIntWithAlpha(26)
@@ -346,7 +312,6 @@ object ThemeColor {
     val primaryInteractive03ClassicLight = "#D9D9D9".toColorInt()
     val primaryInteractive03Electric = "#284D5C".toColorInt()
     val primaryInteractive03Indigo = "#D1D8DE".toColorInt()
-    val primaryInteractive03Radioactive = "#1F5014".toColorInt()
     val primaryInteractive03Rose = "#E0CED1".toColorInt()
     val primaryInteractive03LightContrast = "#D9D9D9".toColorInt()
     val primaryInteractive03DarkContrast = "#595959".toColorInt()
@@ -356,7 +321,6 @@ object ThemeColor {
     val secondaryUi01ClassicLight = "#F43E37".toColorInt()
     val secondaryUi01Electric = "#212835".toColorInt()
     val secondaryUi01Indigo = "#32364F".toColorInt()
-    val secondaryUi01Radioactive = "#162f1e".toColorInt()
     val secondaryUi01Rose = "#FFC2C0".toColorInt()
     val secondaryUi01LightContrast = "#ffffff".toColorInt()
     val secondaryUi01DarkContrast = "#000000".toColorInt()
@@ -366,7 +330,6 @@ object ThemeColor {
     val secondaryUi02ClassicLight = "#F43E37".toColorInt()
     val secondaryUi02Electric = "#2C384B".toColorInt()
     val secondaryUi02Indigo = "#32364F".toColorInt()
-    val secondaryUi02Radioactive = "#162f1e".toColorInt()
     val secondaryUi02Rose = "#FCB3B1".toColorInt()
     val secondaryUi02LightContrast = "#bfbfbf".toColorInt()
     val secondaryUi02DarkContrast = "#333333".toColorInt()
@@ -376,7 +339,6 @@ object ThemeColor {
     val secondaryIcon01ClassicLight = "#FFFFFF".toColorInt()
     val secondaryIcon01Electric = "#3FD2E6".toColorInt()
     val secondaryIcon01Indigo = "#F3F1E4".toColorInt()
-    val secondaryIcon01Radioactive = "#70e84e".toColorInt()
     val secondaryIcon01Rose = "#d40019".toColorInt()
     val secondaryIcon01LightContrast = "#000000".toColorInt()
     val secondaryIcon01DarkContrast = "#ffffff".toColorInt()
@@ -386,7 +348,6 @@ object ThemeColor {
     val secondaryIcon02ClassicLight = "#FFFFFF".toColorInt()
     val secondaryIcon02Electric = "#16698C".toColorInt()
     val secondaryIcon02Indigo = "#DEDEDE".toColorInt()
-    val secondaryIcon02Radioactive = "#70e84e".toColorInt()
     val secondaryIcon02Rose = "#de3e59".toColorInt()
     val secondaryIcon02LightContrast = "#000000".toColorInt()
     val secondaryIcon02DarkContrast = "#cdcdcd".toColorInt()
@@ -396,7 +357,6 @@ object ThemeColor {
     val secondaryText01ClassicLight = "#FFFFFF".toColorInt()
     val secondaryText01Electric = "#3FD2E6".toColorInt()
     val secondaryText01Indigo = "#EAE8DC".toColorInt()
-    val secondaryText01Radioactive = "#70e84e".toColorInt()
     val secondaryText01Rose = "#990059".toColorInt()
     val secondaryText01LightContrast = "#000000".toColorInt()
     val secondaryText01DarkContrast = "#ffffff".toColorInt()
@@ -406,7 +366,6 @@ object ThemeColor {
     val secondaryText02ClassicLight = "#FFFFFF".toColorInt()
     val secondaryText02Electric = "#16698C".toColorInt()
     val secondaryText02Indigo = "#DEDEDE".toColorInt()
-    val secondaryText02Radioactive = "#70e84e".toColorInt()
     val secondaryText02Rose = "#ab494d".toColorInt()
     val secondaryText02LightContrast = "#000000".toColorInt().colorIntWithAlpha(204)
     val secondaryText02DarkContrast = "#d9d9d9".toColorInt()
@@ -416,7 +375,6 @@ object ThemeColor {
     val secondaryField01ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(51)
     val secondaryField01Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
     val secondaryField01Indigo = "#EFF3F5".toColorInt().colorIntWithAlpha(38)
-    val secondaryField01Radioactive = "#1a3e11".toColorInt()
     val secondaryField01Rose = "#fbf0ef".toColorInt().colorIntWithAlpha(128)
     val secondaryField01LightContrast = "#f2f2f2".toColorInt()
     val secondaryField01DarkContrast = "#252525".toColorInt()
@@ -426,7 +384,6 @@ object ThemeColor {
     val secondaryField01ActiveClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
     val secondaryField01ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
     val secondaryField01ActiveIndigo = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
-    val secondaryField01ActiveRadioactive = "#27591a".toColorInt()
     val secondaryField01ActiveRose = "#fbf0ef".toColorInt()
     val secondaryField01ActiveLightContrast = "#f8f8f8".toColorInt()
     val secondaryField01ActiveDarkContrast = "#1a1a1a".toColorInt()
@@ -436,7 +393,6 @@ object ThemeColor {
     val secondaryInteractive01ClassicLight = "#FFFFFF".toColorInt()
     val secondaryInteractive01Electric = "#3FD2E6".toColorInt()
     val secondaryInteractive01Indigo = "#FFFFFF".toColorInt()
-    val secondaryInteractive01Radioactive = "#88FF66".toColorInt()
     val secondaryInteractive01Rose = "#cf1133".toColorInt()
     val secondaryInteractive01LightContrast = "#000000".toColorInt()
     val secondaryInteractive01DarkContrast = "#ffffff".toColorInt()
@@ -446,7 +402,6 @@ object ThemeColor {
     val secondaryInteractive01HoverClassicLight = "#50D0F1".toColorInt()
     val secondaryInteractive01HoverElectric = "#64DDF2".toColorInt()
     val secondaryInteractive01HoverIndigo = "#C9CFDA".toColorInt()
-    val secondaryInteractive01HoverRadioactive = "#70e84e".toColorInt()
     val secondaryInteractive01HoverRose = "#c9cfda".toColorInt()
     val secondaryInteractive01HoverLightContrast = "#212121".toColorInt()
     val secondaryInteractive01HoverDarkContrast = "#212121".toColorInt()
@@ -456,7 +411,6 @@ object ThemeColor {
     val secondaryInteractive01ActiveClassicLight = "#F99F9B".toColorInt()
     val secondaryInteractive01ActiveElectric = "#9FE8F2".toColorInt()
     val secondaryInteractive01ActiveIndigo = "#949FB5".toColorInt()
-    val secondaryInteractive01ActiveRadioactive = "#59bc3d".toColorInt()
     val secondaryInteractive01ActiveRose = "#e8415f".toColorInt()
     val secondaryInteractive01ActiveLightContrast = "#404040".toColorInt()
     val secondaryInteractive01ActiveDarkContrast = "#c0c0c0".toColorInt()
@@ -2943,9 +2897,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi01Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi01Rose
 
@@ -2976,9 +2927,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi01ActiveRose
@@ -3011,9 +2959,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi02Rose
 
@@ -3044,9 +2989,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi02SelectedIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02SelectedRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi02SelectedRose
@@ -3079,9 +3021,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi02ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi02ActiveRose
 
@@ -3112,9 +3051,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi03Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi03Rose
@@ -3147,9 +3083,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi04Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi04Rose
 
@@ -3180,9 +3113,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi05Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi05Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi05Rose
@@ -3215,9 +3145,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi05SelectedIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi05SelectedRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi05SelectedRose
 
@@ -3248,9 +3175,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi06Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi06Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi06Rose
@@ -3283,9 +3207,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon01Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon01Rose
 
@@ -3316,9 +3237,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon01ActiveRose
@@ -3351,9 +3269,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon02Rose
 
@@ -3384,9 +3299,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon02SelectedIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02SelectedRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon02SelectedRose
@@ -3419,9 +3331,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon02ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon02ActiveRose
 
@@ -3452,9 +3361,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon03Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon03Rose
@@ -3487,9 +3393,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon03ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon03ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon03ActiveRose
 
@@ -3520,9 +3423,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryText01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText01Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryText01Rose
@@ -3555,9 +3455,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryText02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText02Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryText02Rose
 
@@ -3588,9 +3485,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryText02SelectedIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText02SelectedRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryText02SelectedRose
@@ -3623,9 +3517,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField01Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField01Rose
 
@@ -3656,9 +3547,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField01ActiveRose
@@ -3691,9 +3579,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField02Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField02Rose
 
@@ -3724,9 +3609,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField02ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField02ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField02ActiveRose
@@ -3759,9 +3641,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField03Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField03Rose
 
@@ -3792,9 +3671,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField03ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField03ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField03ActiveRose
@@ -3827,9 +3703,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive01Rose
 
@@ -3860,9 +3733,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01HoverIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01HoverRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive01HoverRose
@@ -3895,9 +3765,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive01ActiveRose
 
@@ -3928,9 +3795,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01DisabledIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01DisabledRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive01DisabledRose
@@ -3963,9 +3827,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive02Rose
 
@@ -3996,9 +3857,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02HoverIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02HoverRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive02HoverRose
@@ -4031,9 +3889,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive02ActiveRose
 
@@ -4064,9 +3919,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive03Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive03Rose
@@ -4099,9 +3951,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryUi01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryUi01Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryUi01Rose
 
@@ -4132,9 +3981,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryUi02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryUi02Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryUi02Rose
@@ -4167,9 +4013,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryIcon01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryIcon01Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryIcon01Rose
 
@@ -4200,9 +4043,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryIcon02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryIcon02Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryIcon02Rose
@@ -4235,9 +4075,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryText01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryText01Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryText01Rose
 
@@ -4268,9 +4105,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryText02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryText02Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryText02Rose
@@ -4303,9 +4137,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryField01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryField01Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryField01Rose
 
@@ -4336,9 +4167,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryField01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryField01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryField01ActiveRose
@@ -4371,9 +4199,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01Rose
 
@@ -4404,9 +4229,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01HoverIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01HoverRadioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01HoverRose
@@ -4439,9 +4261,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01ActiveRose
 
@@ -4472,9 +4291,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi01Rose(podcastColor)
@@ -4507,9 +4323,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi02Rose(podcastColor)
 
@@ -4540,9 +4353,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi03Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi03Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi03Rose(podcastColor)
@@ -4575,9 +4385,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi04Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi04Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi04Rose(podcastColor)
 
@@ -4608,9 +4415,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi05Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi05Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi05Rose(podcastColor)
@@ -4643,9 +4447,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi06Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi06Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi06Rose(podcastColor)
 
@@ -4676,9 +4477,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastIcon01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastIcon01Rose(podcastColor)
@@ -4711,9 +4509,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastIcon02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastIcon02Rose(podcastColor)
 
@@ -4744,9 +4539,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastIcon03Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon03Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastIcon03Rose(podcastColor)
@@ -4779,9 +4571,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastText01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastText01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastText01Rose(podcastColor)
 
@@ -4812,9 +4601,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastText02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastText02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastText02Rose(podcastColor)
@@ -4847,9 +4633,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive01Rose(podcastColor)
 
@@ -4880,9 +4663,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01ActiveIndigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive01ActiveRadioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive01ActiveRose(podcastColor)
@@ -4915,9 +4695,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive02Rose(podcastColor)
 
@@ -4948,9 +4725,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive03Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive03Rose(podcastColor)
@@ -4983,9 +4757,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03ActiveIndigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive03ActiveRadioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive03ActiveRose(podcastColor)
 
@@ -5016,9 +4787,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive04Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive04Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive04Rose(podcastColor)
@@ -5051,9 +4819,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive05Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive05Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive05Rose(podcastColor)
 
@@ -5084,9 +4849,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastOndarkIndigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastOndarkRadioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastOndarkRose(podcastColor)
@@ -5119,9 +4881,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastOnlightIndigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastOnlightRadioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastOnlightRose(podcastColor)
 
@@ -5152,9 +4911,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterUi01Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi01Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterUi01Rose(filterColor)
@@ -5187,9 +4943,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterUi02Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi02Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterUi02Rose(filterColor)
 
@@ -5220,9 +4973,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterUi03Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi03Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterUi03Rose(filterColor)
@@ -5255,9 +5005,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterUi04Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi04Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterUi04Rose(filterColor)
 
@@ -5288,9 +5035,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterIcon01Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterIcon01Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterIcon01Rose(filterColor)
@@ -5323,9 +5067,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterIcon02Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterIcon02Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterIcon02Rose(filterColor)
 
@@ -5356,9 +5097,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterText01Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterText01Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterText01Rose(filterColor)
@@ -5391,9 +5129,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterText02Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterText02Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterText02Rose(filterColor)
 
@@ -5424,9 +5159,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive01Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive01Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive01Rose(filterColor)
@@ -5459,9 +5191,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive01ActiveIndigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive01ActiveRadioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive01ActiveRose(filterColor)
 
@@ -5492,9 +5221,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive02Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive02Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive02Rose(filterColor)
@@ -5527,9 +5253,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive03Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive03Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive03Rose(filterColor)
 
@@ -5560,9 +5283,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive03ActiveIndigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive03ActiveRadioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive03ActiveRose(filterColor)
@@ -5595,9 +5315,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive04Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive04Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive04Rose(filterColor)
 
@@ -5628,9 +5345,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive05Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive05Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive05Rose(filterColor)
@@ -5663,9 +5377,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive06Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive06Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive06Rose(filterColor)
 
@@ -5696,9 +5407,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support01Radioactive
 
             Theme.ThemeType.ROSE ->
                 support01Rose
@@ -5731,9 +5439,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support02Radioactive
-
             Theme.ThemeType.ROSE ->
                 support02Rose
 
@@ -5764,9 +5469,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support03Radioactive
 
             Theme.ThemeType.ROSE ->
                 support03Rose
@@ -5799,9 +5501,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support04Radioactive
-
             Theme.ThemeType.ROSE ->
                 support04Rose
 
@@ -5832,9 +5531,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support05Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support05Radioactive
 
             Theme.ThemeType.ROSE ->
                 support05Rose
@@ -5867,9 +5563,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support06Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support06Radioactive
-
             Theme.ThemeType.ROSE ->
                 support06Rose
 
@@ -5900,9 +5593,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support07Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support07Radioactive
 
             Theme.ThemeType.ROSE ->
                 support07Rose
@@ -5935,9 +5625,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support08Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support08Radioactive
-
             Theme.ThemeType.ROSE ->
                 support08Rose
 
@@ -5968,9 +5655,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support09Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support09Radioactive
 
             Theme.ThemeType.ROSE ->
                 support09Rose
@@ -6003,9 +5687,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support10Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support10Radioactive
-
             Theme.ThemeType.ROSE ->
                 support10Rose
 
@@ -6036,9 +5717,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerBackground01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerBackground01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerBackground01Rose(podcastColor)
@@ -6071,9 +5749,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerBackground02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerBackground02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerBackground02Rose(podcastColor)
 
@@ -6104,9 +5779,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight01Rose(podcastColor)
@@ -6139,9 +5811,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight02Rose(podcastColor)
 
@@ -6172,9 +5841,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight03Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight03Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight03Rose(podcastColor)
@@ -6207,9 +5873,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight04Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight04Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight04Rose(podcastColor)
 
@@ -6240,9 +5903,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight05Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight05Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight05Rose(podcastColor)
@@ -6275,9 +5935,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight06Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight06Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight06Rose(podcastColor)
 
@@ -6308,9 +5965,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight07Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight07Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight07Rose(podcastColor)
@@ -6343,9 +5997,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast01Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast01Rose
 
@@ -6376,9 +6027,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast02Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast02Rose
@@ -6411,9 +6059,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast03Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast03Rose
 
@@ -6444,9 +6089,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast04Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast04Rose
@@ -6479,9 +6121,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast05Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast05Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast05Rose
 
@@ -6512,9 +6151,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast06Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast06Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast06Rose
@@ -6547,9 +6183,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 contrast01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast01Radioactive
-
             Theme.ThemeType.ROSE ->
                 contrast01Rose
 
@@ -6580,9 +6213,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 contrast02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast02Radioactive
 
             Theme.ThemeType.ROSE ->
                 contrast02Rose
@@ -6615,9 +6245,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 contrast03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast03Radioactive
-
             Theme.ThemeType.ROSE ->
                 contrast03Rose
 
@@ -6648,9 +6275,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 contrast04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast04Radioactive
 
             Theme.ThemeType.ROSE ->
                 contrast04Rose
@@ -6683,9 +6307,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter01Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter01Rose
 
@@ -6716,9 +6337,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter02Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter02Rose
@@ -6751,9 +6369,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter03Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter03Rose
 
@@ -6784,9 +6399,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter04Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter04Rose
@@ -6819,9 +6431,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter05Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter05Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter05Rose
 
@@ -6852,9 +6461,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter06Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter06Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter06Rose
@@ -6887,9 +6493,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter07Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter07Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter07Rose
 
@@ -6920,9 +6523,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter08Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter08Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter08Rose
@@ -6955,9 +6555,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter09Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter09Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter09Rose
 
@@ -6988,9 +6585,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter10Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter10Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter10Rose
@@ -7023,9 +6617,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter11Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter11Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter11Rose
 
@@ -7056,9 +6647,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter12Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter12Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter12Rose
@@ -7091,9 +6679,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 veilIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                veilRadioactive
-
             Theme.ThemeType.ROSE ->
                 veilRose
 
@@ -7124,9 +6709,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient01AIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient01ARadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient01ARose
@@ -7159,9 +6741,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient01EIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient01ERadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient01ERose
 
@@ -7192,9 +6771,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient02AIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient02ARadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient02ARose
@@ -7227,9 +6803,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient02EIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient02ERadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient02ERose
 
@@ -7260,9 +6833,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient03AIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient03ARadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient03ARose
@@ -7295,9 +6865,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient03EIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient03ERadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient03ERose
 
@@ -7328,9 +6895,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient04AIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient04ARadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient04ARose
@@ -7363,9 +6927,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient04EIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient04ERadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient04ERose
 
@@ -7396,9 +6957,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient05AIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient05ARadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient05ARose
@@ -7431,9 +6989,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient05EIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient05ERadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient05ERose
 
@@ -7464,9 +7019,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 imageFilter01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter01Radioactive
 
             Theme.ThemeType.ROSE ->
                 imageFilter01Rose
@@ -7499,9 +7051,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 imageFilter02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter02Radioactive
-
             Theme.ThemeType.ROSE ->
                 imageFilter02Rose
 
@@ -7532,9 +7081,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 imageFilter03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter03Radioactive
 
             Theme.ThemeType.ROSE ->
                 imageFilter03Rose
@@ -7567,9 +7113,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 imageFilter04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter04Radioactive
-
             Theme.ThemeType.ROSE ->
                 imageFilter04Rose
 
@@ -7600,9 +7143,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category01Radioactive
 
             Theme.ThemeType.ROSE ->
                 category01Rose
@@ -7635,9 +7175,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category02Radioactive
-
             Theme.ThemeType.ROSE ->
                 category02Rose
 
@@ -7668,9 +7205,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category03Radioactive
 
             Theme.ThemeType.ROSE ->
                 category03Rose
@@ -7703,9 +7237,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category04Radioactive
-
             Theme.ThemeType.ROSE ->
                 category04Rose
 
@@ -7736,9 +7267,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category05Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category05Radioactive
 
             Theme.ThemeType.ROSE ->
                 category05Rose
@@ -7771,9 +7299,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category06Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category06Radioactive
-
             Theme.ThemeType.ROSE ->
                 category06Rose
 
@@ -7804,9 +7329,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category07Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category07Radioactive
 
             Theme.ThemeType.ROSE ->
                 category07Rose
@@ -7839,9 +7361,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category08Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category08Radioactive
-
             Theme.ThemeType.ROSE ->
                 category08Rose
 
@@ -7872,9 +7391,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category09Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category09Radioactive
 
             Theme.ThemeType.ROSE ->
                 category09Rose
@@ -7907,9 +7423,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category10Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category10Radioactive
-
             Theme.ThemeType.ROSE ->
                 category10Rose
 
@@ -7940,9 +7453,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category11Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category11Radioactive
 
             Theme.ThemeType.ROSE ->
                 category11Rose
@@ -7975,9 +7485,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category12Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category12Radioactive
-
             Theme.ThemeType.ROSE ->
                 category12Rose
 
@@ -8008,9 +7515,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category13Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category13Radioactive
 
             Theme.ThemeType.ROSE ->
                 category13Rose
@@ -8043,9 +7547,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category14Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category14Radioactive
-
             Theme.ThemeType.ROSE ->
                 category14Rose
 
@@ -8076,9 +7577,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category15Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category15Radioactive
 
             Theme.ThemeType.ROSE ->
                 category15Rose
@@ -8111,9 +7609,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category16Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category16Radioactive
-
             Theme.ThemeType.ROSE ->
                 category16Rose
 
@@ -8144,9 +7639,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category17Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category17Radioactive
 
             Theme.ThemeType.ROSE ->
                 category17Rose
@@ -8179,9 +7671,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category18Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category18Radioactive
-
             Theme.ThemeType.ROSE ->
                 category18Rose
 
@@ -8212,9 +7701,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category19Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category19Radioactive
 
             Theme.ThemeType.ROSE ->
                 category19Rose

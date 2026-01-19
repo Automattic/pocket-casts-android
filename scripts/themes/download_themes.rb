@@ -53,10 +53,6 @@ def values_to_tokens_map(values)
           hex: row[14],
           opacity: row[15]
         },
-        radioactive: {
-          hex: row[16],
-          opacity: row[17]
-        },
         rose: {
           hex: row[18],
           opacity: row[19]

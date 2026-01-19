@@ -177,7 +177,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -455,8 +454,12 @@ class MainActivity :
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            checkForNotificationPermission()
+
+        lifecycleScope.launch {
+            FeatureFlag.awaitProvidersInitialised()
+            if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                checkForNotificationPermission()
+            }
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
@@ -665,23 +668,7 @@ class MainActivity :
         super.onResume()
 
         refreshApp()
-        addLineView()
         BumpStatsTask.scheduleToRun(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        removeLineView()
-    }
-
-    private fun addLineView() {
-        removeLineView()
-        if (theme.activeTheme != Theme.ThemeType.RADIOACTIVE) return
-        binding.radioactiveLineView.isVisible = true
-    }
-
-    private fun removeLineView() {
-        binding.radioactiveLineView.isVisible = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

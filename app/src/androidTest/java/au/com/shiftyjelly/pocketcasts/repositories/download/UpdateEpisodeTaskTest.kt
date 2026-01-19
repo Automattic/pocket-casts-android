@@ -79,10 +79,10 @@ class UpdateEpisodeTaskTest {
         }
 
         val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {
-            onBlocking { getPodcastAndEpisode(podcastUuid, episodeUuid) } doReturn serverPodcast
+            on { getPodcastAndEpisode(podcastUuid, episodeUuid) } doReturn serverPodcast
         }
         val episodeDao = mock<EpisodeDao> {
-            onBlocking { findByUuid(episodeUuid) } doReturn deviceEpisode
+            on { findByUuid(episodeUuid) } doReturn deviceEpisode
         }
         val appDatabase = mock<AppDatabase> {
             on { episodeDao() } doReturn episodeDao
