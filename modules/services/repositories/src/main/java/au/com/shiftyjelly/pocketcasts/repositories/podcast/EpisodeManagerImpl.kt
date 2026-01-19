@@ -76,6 +76,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+    private val transcriptDao = appDatabase.transcriptDao()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
         val episode = findByUuid(uuid)
@@ -541,6 +542,8 @@ class EpisodeManagerImpl @Inject constructor(
         for (episode in episodes) {
             deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
         }
+        // Clean up associated transcripts
+        transcriptDao.deleteForEpisodes(episodes.map { it.uuid })
         episodeDao.deleteAll(episodes)
     }
 
@@ -549,6 +552,8 @@ class EpisodeManagerImpl @Inject constructor(
 
         runBlocking {
             deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
+            // Clean up associated transcripts
+            transcriptDao.deleteForEpisode(episode.uuid)
         }
 
         episodeDao.deleteBlocking(episode)

@@ -22,6 +22,12 @@ abstract class TranscriptDao {
         insertAll(transcripts)
     }
 
+    @Query("DELETE FROM episode_transcript WHERE episode_uuid = :episodeUuid")
+    abstract suspend fun deleteForEpisode(episodeUuid: String)
+
+    @Query("DELETE FROM episode_transcript WHERE episode_uuid IN (:episodeUuids)")
+    abstract suspend fun deleteForEpisodes(episodeUuids: List<String>)
+
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
     abstract fun observeTranscripts(episodeUuid: String): Flow<List<Transcript>>
 }
