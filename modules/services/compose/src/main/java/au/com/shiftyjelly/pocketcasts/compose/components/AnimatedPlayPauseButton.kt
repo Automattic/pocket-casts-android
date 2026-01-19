@@ -63,18 +63,18 @@ fun AnimatedPlayPauseButton(
         ),
     )
 
-    val accessibilityLabel = if (isPlaying) stringResource(LR.string.pause) else stringResource(LR.string.play)
+    val contentDescription = stringResource(LR.string.playback_command)
     Box(
         modifier = modifier
             .size(circleSize)
             .clip(CircleShape)
             .background(circleColor)
             .semantics(mergeDescendants = true) {
-                contentDescription = accessibilityLabel
+                this.contentDescription = contentDescription
             }
             .clickable(
                 role = Role.Button,
-                onClickLabel = accessibilityLabel,
+                onClickLabel = if (isPlaying) stringResource(LR.string.pause) else stringResource(LR.string.play),
                 onClick = onClick,
             ),
     ) {
