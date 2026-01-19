@@ -1,6 +1,8 @@
 8.5
 -----
-
+*   Bug Fixes
+    *   Fix feature item text color on Classic theme
+        ([#4901](https://github.com/Automattic/pocket-casts-android/pull/4901))
 
 8.4
 -----
