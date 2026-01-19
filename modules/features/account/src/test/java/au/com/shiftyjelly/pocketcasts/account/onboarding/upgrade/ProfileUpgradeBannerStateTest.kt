@@ -88,6 +88,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with Plus Yearly renewing current subscription`() {
+        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, false)
         val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PlusYearlyPreview.key,
