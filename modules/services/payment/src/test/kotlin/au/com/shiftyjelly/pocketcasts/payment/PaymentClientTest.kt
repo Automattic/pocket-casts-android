@@ -23,7 +23,7 @@ class PaymentClientTest {
     private val purchase = Purchase(
         state = PurchaseState.Purchased("orderId"),
         token = "token",
-        productIds = listOf(planKey.productId),
+        productIds = listOf(planKey.productId!!),
         isAcknowledged = false,
         isAutoRenewing = false,
     )

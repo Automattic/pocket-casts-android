@@ -20,11 +20,11 @@ class SubscriptionPlansTest {
     private val products = SubscriptionTier.entries.flatMap { tier ->
         BillingCycle.entries.map { billingCycle ->
             Product(
-                id = SubscriptionPlan.productId(tier, billingCycle),
+                id = SubscriptionPlan.productId(tier, billingCycle)!!,
                 name = "$tier $billingCycle",
                 pricingPlans = PricingPlans(
                     basePlan = PricingPlan.Base(
-                        planId = SubscriptionPlan.basePlanId(tier, billingCycle),
+                        planId = SubscriptionPlan.basePlanId(tier, billingCycle)!!,
                         pricingPhases = listOf(infinitePricingPhase),
                         tags = emptyList(),
                     ),
@@ -33,7 +33,7 @@ class SubscriptionPlansTest {
                         .map { offerId ->
                             PricingPlan.Offer(
                                 offerId = offerId,
-                                planId = SubscriptionPlan.basePlanId(tier, billingCycle),
+                                planId = SubscriptionPlan.basePlanId(tier, billingCycle)!!,
                                 pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
                                 tags = emptyList(),
                             )
@@ -59,6 +59,7 @@ class SubscriptionPlansTest {
         assertEquals("Plus Monthly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
         assertEquals(BillingCycle.Monthly, plan.billingCycle)
+        assertFalse(plan.isInstallment)
     }
 
     @Test
@@ -70,6 +71,7 @@ class SubscriptionPlansTest {
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
         assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertFalse(plan.isInstallment)
     }
 
     @Test
@@ -81,6 +83,7 @@ class SubscriptionPlansTest {
         assertEquals("Patron Monthly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
         assertEquals(BillingCycle.Monthly, plan.billingCycle)
+        assertFalse(plan.isInstallment)
     }
 
     @Test
@@ -92,6 +95,7 @@ class SubscriptionPlansTest {
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
         assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertFalse(plan.isInstallment)
     }
 
     @Test
@@ -380,7 +384,7 @@ class SubscriptionPlansTest {
             name = "Plus Yearly Installment",
             pricingPlans = PricingPlans(
                 basePlan = PricingPlan.Base(
-                    planId = "p1y-installment",
+                    planId = "p1-installment",
                     pricingPhases = listOf(installmentPricingPhase),
                     tags = emptyList(),
                     installmentPlanDetails = InstallmentPlanDetails(
@@ -411,7 +415,7 @@ class SubscriptionPlansTest {
             name = "Plus Yearly Installment",
             pricingPlans = PricingPlans(
                 basePlan = PricingPlan.Base(
-                    planId = "p1y-installment",
+                    planId = "p1-installment",
                     pricingPhases = listOf(installmentPricingPhase),
                     tags = emptyList(),
                     installmentPlanDetails = InstallmentPlanDetails(
@@ -442,7 +446,7 @@ class SubscriptionPlansTest {
         val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
 
         assertTrue(result is PaymentResult.Failure)
-        assertEquals(PaymentResultCode.ItemUnavailable, (result as PaymentResult.Failure).code)
+        assertEquals(PaymentResultCode.DeveloperError, (result as PaymentResult.Failure).code)
     }
 
     @Test
@@ -452,16 +456,6 @@ class SubscriptionPlansTest {
         assertNotNull(plans)
         val result = plans?.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
         assertTrue(result is PaymentResult.Failure)
-    }
-
-    @Test
-    fun `get regular yearly plan when installment not available`() {
-        val plans = SubscriptionPlans.create(products).getOrNull()!!
-
-        val regularPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
-
-        assertNotNull(regularPlan)
-        assertFalse(regularPlan.isInstallment)
     }
 
     @Test
@@ -475,7 +469,7 @@ class SubscriptionPlansTest {
             name = "Plus Yearly Installment",
             pricingPlans = PricingPlans(
                 basePlan = PricingPlan.Base(
-                    planId = "p1y-installment",
+                    planId = "p1-installment",
                     pricingPhases = listOf(installmentPricingPhase),
                     tags = emptyList(),
                     installmentPlanDetails = InstallmentPlanDetails(
@@ -525,7 +519,7 @@ class SubscriptionPlansTest {
             name = "Plus Yearly Installment",
             pricingPlans = PricingPlans(
                 basePlan = PricingPlan.Base(
-                    planId = "p1y-installment",
+                    planId = "p1-installment",
                     pricingPhases = listOf(installmentPricingPhase),
                     tags = emptyList(),
                     installmentPlanDetails = null,
@@ -534,9 +528,15 @@ class SubscriptionPlansTest {
             ),
         )
         val productsWithInvalidInstallment = products + invalidInstallmentProduct
-        val result = SubscriptionPlans.create(productsWithInvalidInstallment)
-        assertTrue(result is PaymentResult.Failure)
-        val failure = result as PaymentResult.Failure
+
+        // SubscriptionPlans.create should succeed even with invalid installment plan
+        val plans = SubscriptionPlans.create(productsWithInvalidInstallment).getOrNull()
+        assertNotNull(plans)
+
+        // But trying to get the installment plan should return a failure
+        val installmentResult = plans?.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        assertTrue(installmentResult is PaymentResult.Failure)
+        val failure = installmentResult as PaymentResult.Failure
         assertEquals(PaymentResultCode.DeveloperError, failure.code)
         assertTrue(failure.message.contains("installmentPlanDetails"))
     }

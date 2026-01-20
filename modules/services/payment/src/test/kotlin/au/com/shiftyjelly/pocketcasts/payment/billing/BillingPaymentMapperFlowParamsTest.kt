@@ -31,10 +31,10 @@ class BillingPaymentMapperFlowParamsTest {
         fun `create billing params`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "offer-token",
                     ),
@@ -86,10 +86,10 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "offer-token",
                     ),
@@ -111,10 +111,10 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log too many matching products`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "${planKey.name}-offer-token",
                     ),
@@ -143,15 +143,15 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log too many matching offers`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "token-1",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "token-2",
                     ),
@@ -169,7 +169,7 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log no matching offers`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = emptyList(),
             )
 
@@ -194,9 +194,9 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
                 ),
             )
 
@@ -217,9 +217,9 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
                 ),
             )
 
@@ -234,9 +234,9 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not log anything when mapped succesfully`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
                 ),
             )
 
@@ -258,15 +258,15 @@ class BillingPaymentMapperFlowParamsTest {
         fun `map base plan to billing flow request`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = planKey.offerId,
                         offerIdToken = "${planKey.name}-offer-token",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = planKey.basePlanId!!,
                         offerId = "random-offer-id-${planKey.name}",
                         offerIdToken = "random-offer-token-1-${planKey.name}",
                     ),
@@ -296,9 +296,9 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not map base plan to billing flow request with multiple matching products`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
                 ),
             )
 
@@ -311,10 +311,10 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not map base plan to billing flow request with multiple matching offers`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = planKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = planKey.basePlanId!!, offerId = planKey.offerId),
                 ),
             )
 
@@ -348,15 +348,15 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `create billing request with correct replacement mode`() {
-            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
+            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)!!!!
             val currentPurchase = createGooglePurchase(
                 productIds = listOf(currentProductId),
             )
             val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = newPlanKey.productId,
+                productId = newPlanKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId!!, offerId = newPlanKey.offerId),
                 ),
             )
 
@@ -379,21 +379,21 @@ class BillingPaymentMapperFlowParamsTest {
                 createGooglePurchase(
                     purchaseToken = "purchase-token-1",
                     productIds = listOf(
-                        SubscriptionPlan.productId(fromTier, fromBillingCycle),
+                        SubscriptionPlan.productId(fromTier, fromBillingCycle)!!,
                     ),
                 ),
                 createGooglePurchase(
                     purchaseToken = "purchase-token-2",
                     productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), BillingCycle.entries.random()),
+                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), BillingCycle.entries.random())!!,
                     ),
                 ),
             )
             val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = newPlanKey.productId,
+                productId = newPlanKey.productId!!,
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId!!, offerId = newPlanKey.offerId),
                 ),
             )
 
@@ -406,15 +406,15 @@ class BillingPaymentMapperFlowParamsTest {
         @Test
         fun `create billing request with full price replacement mode for offers`() {
             SubscriptionOffer.entries.forEach { offer ->
-                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
+                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)!!!!
                 val currentPurchase = createGooglePurchase(
                     productIds = listOf(currentProductId),
                 )
                 val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer)
                 val product = createGoogleProductDetails(
-                    productId = newPlanKey.productId,
+                    productId = newPlanKey.productId!!,
                     subscriptionOfferDetails = listOf(
-                        createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                        createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId!!, offerId = newPlanKey.offerId),
                     ),
                 )
 

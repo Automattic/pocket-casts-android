@@ -240,6 +240,12 @@ internal class BillingPaymentMapper(
             "offer" to key.offer,
         )
 
+        // If key has null productId or basePlanId, it's an unsupported combination (e.g., Plus Monthly installment)
+        if (key.productId == null || key.basePlanId == null) {
+            dispatchMessage("Unsupported plan combination", mappingContext)
+            return null
+        }
+
         val matchingProducts = products.filter { it.productId == key.productId }
         if (matchingProducts.size > 1) {
             dispatchMessage("Found multiple matching products", mappingContext)
@@ -307,6 +313,10 @@ internal class BillingPaymentMapper(
      * * `CHARGE_PRORATED_PRICE`: Charge the price difference and keep the billing cycle.
      * * `CHARGE_FULL_PRICE`: Upgrade or downgrade immediately. The remaining value is either carried over or prorated for time.
      * * `WITH_TIME_PRORATION`: Upgrade or downgrade immediately. The remaining time is adjusted based on the price difference.
+     *
+     * Note: Installment plans are treated like their non-installment counterparts for
+     * the purposes of determining replacement modes. For example, Plus Yearly Installment
+     * is treated the same as Plus Yearly.
      *
      * Note: We avoid using the DEFERRED replacement mode because it leaves users
      * without an active subscription until the deferred date, which complicates handling

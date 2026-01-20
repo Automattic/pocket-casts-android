@@ -70,11 +70,15 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = SubscriptionTier.entries.flatMap { tier ->
                 BillingCycle.entries.map { billingCycle ->
                     Product(
-                        SubscriptionPlan.productId(tier, billingCycle),
+                        requireNotNull(SubscriptionPlan.productId(tier, billingCycle)) {
+                            "Product ID should not be null for non-installment $tier $billingCycle"
+                        },
                         productName(tier, billingCycle),
                         PricingPlans(
                             PricingPlan.Base(
-                                SubscriptionPlan.basePlanId(tier, billingCycle),
+                                requireNotNull(SubscriptionPlan.basePlanId(tier, billingCycle)) {
+                                    "Base plan ID should not be null for non-installment $tier $billingCycle"
+                                },
                                 pricingPhases(tier, billingCycle, offer = null),
                                 emptyList(),
                             ),
@@ -83,7 +87,9 @@ class FakePaymentDataSource : PaymentDataSource {
                                 .map { (offer, offerId) ->
                                     PricingPlan.Offer(
                                         offerId,
-                                        SubscriptionPlan.basePlanId(tier, billingCycle),
+                                        requireNotNull(SubscriptionPlan.basePlanId(tier, billingCycle)) {
+                                            "Base plan ID should not be null for non-installment $tier $billingCycle"
+                                        },
                                         pricingPhases(tier, billingCycle, offer),
                                         emptyList(),
                                     )
@@ -96,7 +102,7 @@ class FakePaymentDataSource : PaymentDataSource {
                 "Plus Yearly Installment (Fake)",
                 PricingPlans(
                     PricingPlan.Base(
-                        "p1y-installment",
+                        "p1-installment",
                         listOf(PlusYearlyInstallmentPricingPhase),
                         emptyList(),
                         InstallmentPlanDetails(

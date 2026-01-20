@@ -84,6 +84,7 @@ data class SubscriptionPlans private constructor(
         billingCycle: BillingCycle,
     ): SubscriptionPlan.Base {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = false)
+        // This is a safe cast because constructor is private and we validate data in the create function
         return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
     }
 
@@ -95,9 +96,10 @@ data class SubscriptionPlans private constructor(
         val result = plans[key]
         return if (result != null) {
             @Suppress("UNCHECKED_CAST")
+            // This is a safe cast because constructor is private and we validate data in the create function
             result as PaymentResult<SubscriptionPlan.Base>
         } else {
-            PaymentResult.Failure(PaymentResultCode.ItemUnavailable, "No installment plan found for $tier $billingCycle")
+            PaymentResult.Failure(PaymentResultCode.DeveloperError, "No installment plan found for $tier $billingCycle")
         }
     }
 
@@ -147,17 +149,9 @@ data class SubscriptionPlans private constructor(
             }
 
             val installmentPlanKeys = basePlanKeys.filter { it.isInstallment }
-            val installmentPlanResults = installmentPlanKeys.associateWith { key ->
+            val installmentPlans = installmentPlanKeys.associateWith { key ->
                 products.findMatchingSubscriptionPlan(key)
             }
-            // validate installment plans, fail if the product exists but is invalid (not if it's missing entirely)
-            val installmentValidationError = installmentPlanResults.values
-                .filterIsInstance<PaymentResult.Failure>()
-                .firstOrNull { it.code == PaymentResultCode.DeveloperError && it.message.contains("installmentPlanDetails") }
-            if (installmentValidationError != null) {
-                return installmentValidationError
-            }
-            val installmentPlans = installmentPlanResults.filterValues { it is PaymentResult.Success }
 
             val offerPlans = offerPlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
 
@@ -169,15 +163,6 @@ data class SubscriptionPlans private constructor(
             return when (matchingProducts.size) {
                 1 -> {
                     val product = matchingProducts[0]
-
-                    // validate that installment products have installmentPlanDetails
-                    if (key.isInstallment && product.pricingPlans.basePlan.installmentPlanDetails == null) {
-                        return PaymentResult.Failure(
-                            PaymentResultCode.DeveloperError,
-                            "Product ${key.productId} claims to be installment plan but is missing installmentPlanDetails",
-                        )
-                    }
-
                     PaymentResult.Success(
                         if (key.offer != null) {
                             product.toOfferSubscriptionPlan(key)
@@ -187,13 +172,34 @@ data class SubscriptionPlans private constructor(
                     )
                 }
 
-                0 -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+                0 -> {
+                    // Check if there's a product that matches ID/basePlan but fails installment validation
+                    if (key.isInstallment && key.productId != null && key.basePlanId != null) {
+                        val productWithMissingDetails = firstOrNull { product ->
+                            product.id == key.productId &&
+                                product.pricingPlans.basePlan.planId == key.basePlanId &&
+                                product.pricingPlans.basePlan.installmentPlanDetails == null
+                        }
+                        if (productWithMissingDetails != null) {
+                            return PaymentResult.Failure(
+                                PaymentResultCode.DeveloperError,
+                                "Product ${key.productId} claims to be installment plan but is missing installmentPlanDetails",
+                            )
+                        }
+                    }
+                    PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+                }
 
                 else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
 
         private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
+            // If key has null productId or basePlanId, it's an unsupported combination (e.g., Plus Monthly installment)
+            if (key.productId == null || key.basePlanId == null) {
+                return emptyList()
+            }
+
             return filter { product ->
                 val offerCondition = if (key.offer != null) {
                     val pricingPhases = product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }?.pricingPhases
@@ -203,7 +209,18 @@ data class SubscriptionPlans private constructor(
                     val pricingPhase = product.pricingPlans.basePlan.pricingPhases.singleOrNull()
                     pricingPhase?.schedule?.recurrenceMode == RecurrenceMode.Infinite
                 }
-                product.id == key.productId && product.pricingPlans.basePlan.planId == key.basePlanId && offerCondition
+
+                val installmentCondition = if (key.isInstallment) {
+                    // Installment plans must have installmentPlanDetails
+                    product.pricingPlans.basePlan.installmentPlanDetails != null
+                } else {
+                    true
+                }
+
+                product.id == key.productId &&
+                    product.pricingPlans.basePlan.planId == key.basePlanId &&
+                    offerCondition &&
+                    installmentCondition
             }
         }
 
@@ -238,8 +255,8 @@ sealed interface SubscriptionPlan {
     val billingCycle: BillingCycle
     val offer: SubscriptionOffer?
 
-    val productId get() = key.productId
-    val basePlanId get() = key.basePlanId
+    val productId: String? get() = key.productId
+    val basePlanId: String? get() = key.basePlanId
     val offerId get() = key.offerId
     val recurringPrice get() = when (this) {
         is Base -> pricingPhase.price
@@ -274,8 +291,8 @@ sealed interface SubscriptionPlan {
         val offer: SubscriptionOffer?,
         val isInstallment: Boolean = false,
     ) {
-        val productId = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
-        val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle, isInstallment)
+        val productId: String? = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
+        val basePlanId: String? = SubscriptionPlan.basePlanId(tier, billingCycle, isInstallment)
         val offerId = offer?.offerId(tier, billingCycle)
     }
 
@@ -295,9 +312,13 @@ sealed interface SubscriptionPlan {
             tier: SubscriptionTier,
             billingCycle: BillingCycle,
             isInstallment: Boolean = false,
-        ) = when (tier) {
+        ): String? = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                BillingCycle.Monthly -> PLUS_MONTHLY_PRODUCT_ID
+                BillingCycle.Monthly -> if (isInstallment) {
+                    null // Plus Monthly installment plan doesn't exist
+                } else {
+                    PLUS_MONTHLY_PRODUCT_ID
+                }
 
                 BillingCycle.Yearly -> if (isInstallment) {
                     PLUS_YEARLY_INSTALLMENT_PRODUCT_ID
@@ -307,8 +328,16 @@ sealed interface SubscriptionPlan {
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                BillingCycle.Monthly -> PATRON_MONTHLY_PRODUCT_ID
-                BillingCycle.Yearly -> PATRON_YEARLY_PRODUCT_ID
+                BillingCycle.Monthly -> if (isInstallment) {
+                    null // Patron installment plans don't exist
+                } else {
+                    PATRON_MONTHLY_PRODUCT_ID
+                }
+                BillingCycle.Yearly -> if (isInstallment) {
+                    null // Patron installment plans don't exist
+                } else {
+                    PATRON_YEARLY_PRODUCT_ID
+                }
             }
         }
 
@@ -316,9 +345,13 @@ sealed interface SubscriptionPlan {
             tier: SubscriptionTier,
             billingCycle: BillingCycle,
             isInstallment: Boolean = false,
-        ) = when (tier) {
+        ): String? = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                BillingCycle.Monthly -> "p1m"
+                BillingCycle.Monthly -> if (isInstallment) {
+                    null // Plus Monthly installment plan doesn't exist
+                } else {
+                    "p1m"
+                }
 
                 BillingCycle.Yearly -> if (isInstallment) {
                     "p1y-installment"
@@ -328,8 +361,16 @@ sealed interface SubscriptionPlan {
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                BillingCycle.Monthly -> "patron-monthly"
-                BillingCycle.Yearly -> "patron-yearly"
+                BillingCycle.Monthly -> if (isInstallment) {
+                    null // Patron installment plans don't exist
+                } else {
+                    "patron-monthly"
+                }
+                BillingCycle.Yearly -> if (isInstallment) {
+                    null // Patron installment plans don't exist
+                } else {
+                    "patron-yearly"
+                }
             }
         }
     }
@@ -451,5 +492,5 @@ data class AcknowledgedSubscription(
     val billingCycle: BillingCycle,
     val isAutoRenewing: Boolean,
 ) {
-    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
+    val productId: String? get() = SubscriptionPlan.productId(tier, billingCycle)
 }
