@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:drawableRight="@drawable/ic_chevron_right"
+            android:drawableEnd="@drawable/ic_chevron_right"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:paddingStart="@dimen/episode_card_edge_padding"

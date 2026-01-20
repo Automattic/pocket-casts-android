@@ -310,7 +310,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="24dp"
-            android:drawableRight="@drawable/ic_lock"
+            android:drawableEnd="@drawable/ic_lock"
             android:drawablePadding="8dp"
             style="@style/H40"
             android:text="@string/profile_cloud_upload"/>

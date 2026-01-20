@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="?android:attr/textColorSecondary"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         />
@@ -22,7 +22,7 @@
         android:text="@string/podcasts_share_subscribe_to_all"
         android:textSize="14sp"
         android:textColor="#78D549"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:padding="16dp"
         android:fontFamily="sans-serif-medium"
         android:background="?android:attr/selectableItemBackground"

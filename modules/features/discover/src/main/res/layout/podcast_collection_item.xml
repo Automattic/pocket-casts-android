@@ -13,7 +13,7 @@
         android:layout_width="101dp"
         android:layout_height="101dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:elevation="1dp"
         app:cardElevation="1dp"
         app:contentPadding="0dp"

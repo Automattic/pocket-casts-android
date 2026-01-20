@@ -5,21 +5,21 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:background="?attr/selectableItemBackground">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_gravity="center"/>
     <TextView
         android:id="@+id/lblTitle"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         style="?attr/textSubtitle1"
         android:gravity="center_vertical"/>
     <ImageView

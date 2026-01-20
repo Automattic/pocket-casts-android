@@ -43,8 +43,8 @@
         app:layout_constraintVertical_chainStyle="packed"
         android:includeFontPadding="false"
         android:layout_marginBottom="2dp"
-        android:layout_marginLeft="88dp"
-        android:layout_marginRight="61dp" />
+        android:layout_marginStart="88dp"
+        android:layout_marginEnd="61dp" />
 
     <TextView
         android:id="@+id/description"
@@ -62,8 +62,8 @@
         app:layout_constraintVertical_chainStyle="packed"
         android:includeFontPadding="false"
         android:layout_marginTop="2dp"
-        android:layout_marginLeft="88dp"
-        android:layout_marginRight="61dp" />
+        android:layout_marginStart="88dp"
+        android:layout_marginEnd="61dp" />
 
     <ImageView
         android:id="@+id/tick"
@@ -79,7 +79,7 @@
         android:layout_width="fill_parent"
         android:layout_height="@dimen/divider_height"
         android:layout_gravity="bottom"
-        android:layout_marginLeft="88dp"
+        android:layout_marginStart="88dp"
         android:background="?attr/primary_ui_05"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

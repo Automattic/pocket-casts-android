@@ -13,13 +13,13 @@
         android:clipToPadding="false"
         android:focusable="true"
         android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_gravity="center"
             app:tint="?attr/primary_icon_02"/>
         <TextView

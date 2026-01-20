@@ -10,10 +10,10 @@
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimary"
         android:fontFamily="sans-serif-medium"
-        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
         android:includeFontPadding="false"
         android:paddingTop="8dp"
-        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
         android:textSize="20sp" />
 
     <TextView
@@ -22,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingTop="6dp"
         android:textSize="16sp" />
 
