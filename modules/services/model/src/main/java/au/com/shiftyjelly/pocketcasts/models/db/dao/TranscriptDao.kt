@@ -5,21 +5,32 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class TranscriptDao {
-    @Query("DELETE FROM episode_transcript WHERE episode_uuid IN (:episodeUuids) AND type ")
-    protected abstract suspend fun deleteAll(episodeUuids: List<String>)
+    @Query("DELETE FROM episode_transcript WHERE episode_uuid IN (:episodeUuids)")
+    protected abstract suspend fun deleteForEpisodesUnsafe(episodeUuids: List<String>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertAll(transcripts: List<Transcript>)
 
     @Transaction
     open suspend fun replaceAll(transcripts: List<Transcript>) {
-        deleteAll(transcripts.map { it.episodeUuid })
+        deleteForEpisodes(transcripts.map { it.episodeUuid })
         insertAll(transcripts)
+    }
+
+    @Query("DELETE FROM episode_transcript WHERE episode_uuid = :episodeUuid")
+    abstract suspend fun deleteForEpisode(episodeUuid: String)
+
+    @Transaction
+    open suspend fun deleteForEpisodes(episodeUuids: List<String>) {
+        episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            deleteForEpisodesUnsafe(chunk)
+        }
     }
 
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
