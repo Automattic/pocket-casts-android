@@ -574,7 +574,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private fun cleanUpDownloadFiles(episode: BaseEpisode) {
+    private suspend fun cleanUpDownloadFiles(episode: BaseEpisode) {
         // remove the download file if one exists
         episode.downloadedFilePath?.let(FileUtil::deleteFileByPath)
 
@@ -583,9 +583,7 @@ class EpisodeManagerImpl @Inject constructor(
         FileUtil.deleteFileByPath(tempFilePath)
 
         // remove associated transcripts
-        runBlocking {
-            transcriptDao.deleteForEpisode(episode.uuid)
-        }
+        transcriptDao.deleteForEpisode(episode.uuid)
     }
 
     override fun stopDownloadAndCleanUp(episodeUuid: String, from: String) {
@@ -594,7 +592,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String) {
+    override suspend fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String) {
         downloadManager.removeEpisodeFromQueue(episode, from)
         cleanUpDownloadFiles(episode)
     }
