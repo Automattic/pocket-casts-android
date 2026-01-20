@@ -76,6 +76,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+    private val transcriptDao = appDatabase.transcriptDao()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
         val episode = findByUuid(uuid)
@@ -573,13 +574,16 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private fun cleanUpDownloadFiles(episode: BaseEpisode) {
+    private suspend fun cleanUpDownloadFiles(episode: BaseEpisode) {
         // remove the download file if one exists
         episode.downloadedFilePath?.let(FileUtil::deleteFileByPath)
 
         // remove the temp file as well in case it's there
         val tempFilePath = DownloadHelper.tempPathForEpisode(episode, fileStorage)
         FileUtil.deleteFileByPath(tempFilePath)
+
+        // remove associated transcripts
+        transcriptDao.deleteForEpisode(episode.uuid)
     }
 
     override fun stopDownloadAndCleanUp(episodeUuid: String, from: String) {
@@ -588,7 +592,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String) {
+    override suspend fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String) {
         downloadManager.removeEpisodeFromQueue(episode, from)
         cleanUpDownloadFiles(episode)
     }
