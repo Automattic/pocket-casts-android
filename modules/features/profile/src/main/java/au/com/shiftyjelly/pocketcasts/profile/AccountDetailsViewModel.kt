@@ -80,38 +80,17 @@ class AccountDetailsViewModel @Inject constructor(
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = AccountHeaderState.empty())
 
     internal val recommendedPlanState = signInState.asFlow().map { signInState ->
-        val signedInState = signInState as? SignInState.SignedIn
-        val isExpiring = signedInState?.subscription?.isExpiring == true
+    val signedInState = signInState as? SignInState.SignedIn
+    val isExpiring = signedInState?.subscription?.isExpiring == true
 
-        if (!signInState.isSignedInAsFree && !isExpiring) {
-            return@map null
-        }
+    if (!signInState.isSignedInAsFree && !isExpiring) {
+        return@map null
+    }
 
-        val subscription = signedInState?.subscription
-        if (subscription != null) {
-            return@map null
-        }
+    // Disabled automatic upgrade banner - only show Plus prompts when user-initiated
+    return@map null
 
-        val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
-        if (subscriptionPlans == null) {
-            return@map null
-        }
-
-        subscriptionPlans
-            .findOfferPlan(
-                tier = SubscriptionTier.Plus,
-                billingCycle = BillingCycle.Yearly,
-                offer = SubscriptionOffer.Trial,
-            )
-            .getOrNull()
-            ?.let { OnboardingSubscriptionPlan.create(plan = it).getOrNull() }
-            ?: OnboardingSubscriptionPlan.create(
-                subscriptionPlans.getBasePlan(
-                    tier = SubscriptionTier.Plus,
-                    billingCycle = BillingCycle.Yearly,
-                ),
-            )
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+}.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     internal val sectionsState = combine(
         signInState.asFlow(),
