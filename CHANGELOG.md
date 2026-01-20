@@ -1,5 +1,8 @@
 8.5
 -----
+*   Updates
+    *   Only pause playback after 200ms on AUDIO_FOCUS_LOSS_TRANSIENT_CAN_DUCK
+        ([#4905](https://github.com/Automattic/pocket-casts-android/pull/4905))
 *   Bug Fixes
     *   Fix feature item text color on Classic theme
         ([#4901](https://github.com/Automattic/pocket-casts-android/pull/4901))
