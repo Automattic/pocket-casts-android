@@ -70,7 +70,6 @@ developer.properties
 
 ### Claude Code ###
 .claude/
-CLAUDE.md
 
 # Release build artifacts
 app/release/
