@@ -14,6 +14,8 @@ class SuggestedFoldersPopupPolicy @Inject constructor(
     private val subscriptionsSetting = settings.cachedSubscription
 
     fun isEligibleForPopup(): Boolean {
+        return false // Disabled automatic popup - only show Plus prompts when user-initiated
+        @Suppress("UNREACHABLE_CODE")
         val subscription = subscriptionsSetting.value
         val currentCount = countSetting.value
 

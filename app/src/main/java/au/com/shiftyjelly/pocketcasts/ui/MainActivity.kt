@@ -355,7 +355,8 @@ class MainActivity :
 
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
-                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
+                // Disabled - only show Plus prompts when user-initiated
+                // OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
             }
 
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {

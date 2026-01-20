@@ -98,7 +98,8 @@ class StoriesActivity : ComponentActivity() {
 
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
-                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
+                // Disabled - only show Plus prompts when user-initiated
+                // OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
 
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
@@ -299,6 +300,8 @@ class StoriesActivity : ComponentActivity() {
     }
 
     private fun startUpsellFlow() {
+        return // Disabled automatic upsell - only show Plus prompts when user-initiated
+        @Suppress("UNREACHABLE_CODE")
         viewModel.trackUpsellShown()
         val flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.END_OF_YEAR)
         onboardingLauncher.launch(OnboardingActivity.newInstance(this, flow))

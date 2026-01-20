@@ -121,7 +121,7 @@ class AccountDetailsViewModel @Inject constructor(
                 )
             }
         }
-            .takeIf { signInState.isSignedInAsFree || isExpiring }
+            .takeIf { false } // Disabled automatic upgrade banner - only show Plus prompts when user-initiated
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     internal val sectionsState = combine(

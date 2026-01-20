@@ -59,7 +59,7 @@ class SuggestedFoldersPopupPolicyTest {
     fun `initial policy for free user`() {
         currentSubscription = null
 
-        assertTrue(policy.isEligibleForPopup())
+        assertFalse(policy.isEligibleForPopup()) // Auto-popup disabled
     }
 
     @Test
@@ -96,7 +96,7 @@ class SuggestedFoldersPopupPolicyTest {
         policy.markPolicyUsed()
         clock += 7.days + 1.milliseconds
 
-        assertTrue(policy.isEligibleForPopup())
+        assertFalse(policy.isEligibleForPopup()) // Auto-popup disabled
     }
 
     @Test
