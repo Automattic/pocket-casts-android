@@ -188,6 +188,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NEW_INSTALLMENT_PLAN(
+        key = "new_installment_plan",
+        title = "New Installment Plan",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(

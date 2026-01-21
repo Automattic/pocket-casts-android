@@ -240,6 +240,12 @@ internal class BillingPaymentMapper(
             "offer" to key.offer,
         )
 
+        // If key has null productId or basePlanId, it's an unsupported combination (e.g., Plus Monthly installment)
+        if (key.productId == null || key.basePlanId == null) {
+            dispatchMessage("Unsupported plan combination", mappingContext)
+            return null
+        }
+
         val matchingProducts = products.filter { it.productId == key.productId }
         if (matchingProducts.size > 1) {
             dispatchMessage("Found multiple matching products", mappingContext)
@@ -308,6 +314,10 @@ internal class BillingPaymentMapper(
      * * `CHARGE_FULL_PRICE`: Upgrade or downgrade immediately. The remaining value is either carried over or prorated for time.
      * * `WITH_TIME_PRORATION`: Upgrade or downgrade immediately. The remaining time is adjusted based on the price difference.
      *
+     * Note: Installment plans are treated like their non-installment counterparts for
+     * the purposes of determining replacement modes. For example, Plus Yearly Installment
+     * is treated the same as Plus Yearly.
+     *
      * Note: We avoid using the DEFERRED replacement mode because it leaves users
      * without an active subscription until the deferred date, which complicates handling
      * further plan changes.
@@ -319,36 +329,49 @@ internal class BillingPaymentMapper(
         currentPlanId: String,
         newPlanKey: SubscriptionPlan.Key,
     ) = when (newPlanKey.offer) {
-        null -> when (currentPlanId) {
-            SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> when (newPlanKey.productId) {
-                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
-                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
-                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
-                else -> null
+        null -> {
+            val normalizedNewProductId = if (newPlanKey.productId == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID
+            } else {
+                newPlanKey.productId
+            }
+            val normalizedCurrentPlanId = if (currentPlanId == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID
+            } else {
+                currentPlanId
             }
 
-            SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> when (newPlanKey.productId) {
-                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
-                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+            when (normalizedCurrentPlanId) {
+                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> when (normalizedNewProductId) {
+                    SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
+                    SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                    SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                    else -> null
+                }
+
+                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> when (normalizedNewProductId) {
+                    SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                    SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                    else -> null
+                }
+
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> when (normalizedNewProductId) {
+                    SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
+                    else -> null
+                }
+
+                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> when (normalizedNewProductId) {
+                    SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                    else -> null
+                }
+
                 else -> null
             }
-
-            SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> when (newPlanKey.productId) {
-                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
-                else -> null
-            }
-
-            SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> when (newPlanKey.productId) {
-                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
-                else -> null
-            }
-
-            else -> null
         }
 
         SubscriptionOffer.IntroOffer -> ReplacementMode.CHARGE_FULL_PRICE

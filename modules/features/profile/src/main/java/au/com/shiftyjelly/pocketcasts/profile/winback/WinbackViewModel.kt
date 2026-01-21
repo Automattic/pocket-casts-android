@@ -86,7 +86,7 @@ class WinbackViewModel @Inject constructor(
         newPlan: SubscriptionPlan.Base,
         activity: Activity,
     ) {
-        trackPlanSelected(newPlan.productId)
+        trackPlanSelected(newPlan.productId!!)
         if (changePlanJob?.isActive == true) {
             return
         }
@@ -115,8 +115,8 @@ class WinbackViewModel @Inject constructor(
 
                 is PurchaseResult.Purchased -> {
                     trackPlanPurchased(
-                        currentProductId = loadedState.currentSubscription.productId,
-                        newProductId = newPlan.productId,
+                        currentProductId = loadedState.currentSubscription.productId!!,
+                        newProductId = newPlan.productId!!,
                     )
                     val activeSubscriptionDeferred = async { loadActiveSubscription() }
                     val winbackOfferResponseDeferred = async { loadWinbackOffer() }

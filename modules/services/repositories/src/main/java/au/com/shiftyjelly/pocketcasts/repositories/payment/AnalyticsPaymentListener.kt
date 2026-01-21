@@ -45,8 +45,9 @@ internal class AnalyticsPaymentListener(
         }
     }
 
-    private fun SubscriptionPlan.Key.productLegacyAnalyticsValue() = when (tier) {
-        SubscriptionTier.Plus -> billingCycle.analyticsValue
-        SubscriptionTier.Patron -> productId
+    private fun SubscriptionPlan.Key.productLegacyAnalyticsValue() = when {
+        isInstallment -> "installments"
+        tier == SubscriptionTier.Plus -> billingCycle.analyticsValue
+        else -> productId!!
     }
 }

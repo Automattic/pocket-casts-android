@@ -16,13 +16,15 @@ class SubscriptionPlansTest {
     )
 
     private val products = SubscriptionTier.entries.flatMap { tier ->
-        BillingCycle.entries.map { billingCycle ->
+        BillingCycle.entries.mapNotNull { billingCycle ->
+            val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
+            val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
             Product(
-                id = SubscriptionPlan.productId(tier, billingCycle),
+                id = productId,
                 name = "$tier $billingCycle",
                 pricingPlans = PricingPlans(
                     basePlan = PricingPlan.Base(
-                        planId = SubscriptionPlan.basePlanId(tier, billingCycle),
+                        planId = basePlanId,
                         pricingPhases = listOf(infinitePricingPhase),
                         tags = emptyList(),
                     ),
@@ -31,7 +33,7 @@ class SubscriptionPlansTest {
                         .map { offerId ->
                             PricingPlan.Offer(
                                 offerId = offerId,
-                                planId = SubscriptionPlan.basePlanId(tier, billingCycle),
+                                planId = basePlanId,
                                 pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
                                 tags = emptyList(),
                             )
