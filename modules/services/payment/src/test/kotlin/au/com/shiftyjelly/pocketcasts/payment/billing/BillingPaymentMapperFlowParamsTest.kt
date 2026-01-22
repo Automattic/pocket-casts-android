@@ -116,7 +116,7 @@ class BillingPaymentMapperFlowParamsTest {
                     createGoogleOfferDetails(
                         basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
-                        offerIdToken = "${planKey.name}-offer-token",
+                        offerIdToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                 ),
             )
@@ -332,17 +332,17 @@ class BillingPaymentMapperFlowParamsTest {
                     createGoogleOfferDetails(
                         basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
-                        offerIdToken = "${planKey.name}-offer-token",
+                        offerIdToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                     createGoogleOfferDetails(
                         basePlanId = requireNotNull(planKey.basePlanId),
-                        offerId = "random-offer-id-${planKey.name}",
-                        offerIdToken = "random-offer-token-1-${planKey.name}",
+                        offerId = "random-offer-id-${planKey.tier}-${planKey.billingCycle}",
+                        offerIdToken = "random-offer-token-1-${planKey.tier}-${planKey.billingCycle}",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = "random-base-plan-id-${planKey.name}",
+                        basePlanId = "random-base-plan-id-${planKey.tier}-${planKey.billingCycle}",
                         offerId = planKey.offerId,
-                        offerIdToken = "random-offer-token-2-${planKey.name}",
+                        offerIdToken = "random-offer-token-2-${planKey.tier}-${planKey.billingCycle}",
                     ),
                 ),
             )
@@ -353,7 +353,7 @@ class BillingPaymentMapperFlowParamsTest {
                 BillingFlowRequest(
                     productQuery = BillingFlowRequest.ProductQuery(
                         product = product,
-                        offerToken = "${planKey.name}-offer-token",
+                        offerToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                     subscriptionUpdateQuery = null,
                 ),
@@ -413,16 +413,18 @@ class BillingPaymentMapperFlowParamsTest {
         private val toTier: SubscriptionTier,
         private val toBillingCycle: BillingCycle,
         private val expectedReplacementMode: Int?,
+        private val fromIsInstallment: Boolean,
+        private val toIsInstallment: Boolean,
     ) {
         private val mapper = BillingPaymentMapper(listeners = emptySet())
 
         @Test
         fun `create billing request with correct replacement mode`() {
-            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)!!
+            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!
             val currentPurchase = createGooglePurchase(
                 productIds = listOf(currentProductId),
             )
-            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
+            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null, isInstallment = toIsInstallment)
             val product = createGoogleProductDetails(
                 productId = requireNotNull(newPlanKey.productId),
                 subscriptionOfferDetails = listOf(
@@ -449,7 +451,7 @@ class BillingPaymentMapperFlowParamsTest {
                 createGooglePurchase(
                     purchaseToken = "purchase-token-1",
                     productIds = listOf(
-                        SubscriptionPlan.productId(fromTier, fromBillingCycle)!!,
+                        SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!,
                     ),
                 ),
                 createGooglePurchase(
@@ -459,7 +461,7 @@ class BillingPaymentMapperFlowParamsTest {
                     ),
                 ),
             )
-            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
+            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null, isInstallment = toIsInstallment)
             val product = createGoogleProductDetails(
                 productId = requireNotNull(newPlanKey.productId),
                 subscriptionOfferDetails = listOf(
@@ -475,12 +477,17 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `create billing request with full price replacement mode for offers`() {
+            // Skip this test for installment plans since they don't support promotional offers
+            if (toIsInstallment) {
+                return
+            }
+
             SubscriptionOffer.entries.forEach { offer ->
-                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)!!
+                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!
                 val currentPurchase = createGooglePurchase(
                     productIds = listOf(currentProductId),
                 )
-                val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer)
+                val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer, isInstallment = toIsInstallment)
                 val product = createGoogleProductDetails(
                     productId = requireNotNull(newPlanKey.productId),
                     subscriptionOfferDetails = listOf(
@@ -500,7 +507,7 @@ class BillingPaymentMapperFlowParamsTest {
         companion object {
             @JvmStatic
             @Suppress("unused")
-            @ParameterizedRobolectricTestRunner.Parameters(name = "From: {0} {1}, To: {2} {3}")
+            @ParameterizedRobolectricTestRunner.Parameters(name = "From: {0} {1} (installment={5}), To: {2} {3} (installment={6})")
             fun params() = listOf<Array<Any?>>(
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -508,6 +515,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -515,6 +524,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -522,6 +533,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -529,6 +542,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -536,6 +551,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -543,6 +560,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -550,6 +569,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -557,6 +578,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -564,6 +587,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -571,6 +596,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -578,6 +605,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -585,6 +614,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -592,6 +623,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -599,6 +632,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -606,6 +641,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -613,229 +650,95 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     null,
+                    false,
+                    false,
                 ),
-            )
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly Installment to Plus Monthly with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+                // Installment plan scenarios
+                // FROM Plus Yearly Installment TO other plans
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    true, // fromIsInstallment
+                    false, // toIsInstallment
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly Installment to Patron Monthly with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Patron, BillingCycle.Monthly, offer = null)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Patron,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    true,
+                    false,
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly Installment to Patron Yearly with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Patron, BillingCycle.Yearly, offer = null)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Patron,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
+                    true,
+                    false,
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Plus Monthly to Plus Yearly Installment with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
+                // FROM other plans TO Plus Yearly Installment
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Monthly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    true, // toIsInstallment
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Patron Monthly to Plus Yearly Installment with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID,
+                arrayOf(
+                    SubscriptionTier.Patron,
+                    BillingCycle.Monthly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    true,
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Patron Yearly to Plus Yearly Installment with correct replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertEquals(
-                BillingFlowRequest.SubscriptionUpdateQuery(
-                    SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID,
+                arrayOf(
+                    SubscriptionTier.Patron,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    true,
                 ),
-                request?.subscriptionUpdateQuery,
-            )
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly Installment to Plus Yearly Installment with no replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
+                // Same plan scenarios (installment to non-installment and vice versa)
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    true, // fromIsInstallment
+                    true, // toIsInstallment
                 ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertNotNull(request)
-            assertNull(request?.subscriptionUpdateQuery)
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly to Plus Yearly Installment with no replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    false,
+                    true, // toIsInstallment
+                ),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    true, // fromIsInstallment
+                    false,
                 ),
             )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertNotNull(request)
-            assertNull(request?.subscriptionUpdateQuery)
-        }
-
-        @Test
-        fun `create billing request from Plus Yearly Installment to Plus Yearly with no replacement mode`() {
-            val mapper = BillingPaymentMapper(listeners = emptySet())
-            val currentPurchase = createGooglePurchase(
-                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
-            )
-            val newPlanKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = false)
-            val product = createGoogleProductDetails(
-                productId = requireNotNull(newPlanKey.productId),
-                subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
-                ),
-            )
-
-            val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
-
-            assertNotNull(request)
-            assertNull(request?.subscriptionUpdateQuery)
         }
     }
 }
-
-private val SubscriptionPlan.Key.name
-    get() = buildString {
-        append(tier)
-        append(' ')
-        append(billingCycle)
-        if (offer != null) {
-            append(' ')
-            append(offer)
-        }
-    }

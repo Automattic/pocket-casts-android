@@ -87,6 +87,34 @@ class PaymentClientTest {
     }
 
     @Test
+    fun `load acknowledged installment subscription purchases`() = runTest {
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-installment"),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-regular"),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(
+            listOf(
+                AcknowledgedSubscription("order-id-installment", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true, isInstallment = true),
+                AcknowledgedSubscription("order-id-regular", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true, isInstallment = false),
+            ),
+            subscriptions,
+        )
+    }
+
+    @Test
     fun `do not load unconfirmed subscription purchases`() = runTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(

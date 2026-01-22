@@ -93,14 +93,9 @@ data class SubscriptionPlans private constructor(
         billingCycle: BillingCycle,
     ): PaymentResult<SubscriptionPlan.Base> {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = true)
-        val result = plans[key]
-        return if (result != null) {
-            @Suppress("UNCHECKED_CAST")
-            // This is a safe cast because constructor is private and we validate data in the create function
-            result as PaymentResult<SubscriptionPlan.Base>
-        } else {
-            PaymentResult.Failure(PaymentResultCode.DeveloperError, "No installment plan found for $tier $billingCycle")
-        }
+        // This is a safe cast because constructor is private and we validate data in the create function
+        @Suppress("UNCHECKED_CAST")
+        return plans.getValue(key) as PaymentResult<SubscriptionPlan.Base>
     }
 
     fun findOfferPlan(
@@ -119,24 +114,19 @@ data class SubscriptionPlans private constructor(
 
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             BillingCycle.entries.flatMap { billingCycle ->
-                listOfNotNull(
-                    SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = false),
-                    if (tier == SubscriptionTier.Plus && billingCycle == BillingCycle.Yearly) {
-                        SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = true)
-                    } else {
-                        null
-                    },
-                )
-            }
-        }
-
-        private val offerPlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            BillingCycle.entries.flatMap { billingCycle ->
-                SubscriptionOffer.entries.map { offer ->
-                    SubscriptionPlan.Key(tier, billingCycle, offer)
+                listOf(false, true).map { isInstallment ->
+                    SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment)
                 }
             }
         }
+
+        private val offerPlanKeys = basePlanKeys
+            .filter { !it.isInstallment } // Installment plans don't support promotional offers
+            .flatMap { baseKey ->
+                SubscriptionOffer.entries.map { offer ->
+                    baseKey.copy(offer = offer)
+                }
+            }
 
         fun create(products: List<Product>): PaymentResult<SubscriptionPlans> {
             val requiredBasePlanKeys = basePlanKeys.filter { !it.isInstallment }
@@ -291,6 +281,12 @@ sealed interface SubscriptionPlan {
         val offer: SubscriptionOffer?,
         val isInstallment: Boolean = false,
     ) {
+        init {
+            require(!(offer != null && isInstallment)) {
+                "Installment plans cannot have promotional offers. Key: tier=$tier, billingCycle=$billingCycle, offer=$offer, isInstallment=$isInstallment"
+            }
+        }
+
         val productId: String? = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
         val basePlanId: String? = SubscriptionPlan.basePlanId(tier, billingCycle, isInstallment)
         val offerId = offer?.offerId(tier, billingCycle)
