@@ -407,7 +407,7 @@ class BillingPaymentMapperTest {
                 createGoogleOfferDetails(
                     offerId = null,
                     installmentPlanCommitmentPaymentsCount = 12,
-                    subsequentInstallmentPlanCommitmentPaymentsCount = 0,
+                    subsequentInstallmentPlanCommitmentPaymentsCount = 1,
                 ),
             ),
         )
@@ -416,7 +416,7 @@ class BillingPaymentMapperTest {
 
         assertNotNull(basePlan.installmentPlanDetails)
         assertEquals(12, basePlan.installmentPlanDetails?.commitmentPaymentsCount)
-        assertEquals(0, basePlan.installmentPlanDetails?.subsequentCommitmentPaymentsCount)
+        assertEquals(1, basePlan.installmentPlanDetails?.subsequentCommitmentPaymentsCount)
     }
 
     @Test
