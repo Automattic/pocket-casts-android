@@ -68,13 +68,15 @@ class FakePaymentDataSource : PaymentDataSource {
     companion object {
         val DefaultLoadedProducts
             get() = SubscriptionTier.entries.flatMap { tier ->
-                BillingCycle.entries.map { billingCycle ->
+                BillingCycle.entries.mapNotNull { billingCycle ->
+                    val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
+                    val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
                     Product(
-                        SubscriptionPlan.productId(tier, billingCycle),
+                        productId,
                         productName(tier, billingCycle),
                         PricingPlans(
                             PricingPlan.Base(
-                                SubscriptionPlan.basePlanId(tier, billingCycle),
+                                basePlanId,
                                 pricingPhases(tier, billingCycle, offer = null),
                                 emptyList(),
                             ),
@@ -83,7 +85,7 @@ class FakePaymentDataSource : PaymentDataSource {
                                 .map { (offer, offerId) ->
                                     PricingPlan.Offer(
                                         offerId,
-                                        SubscriptionPlan.basePlanId(tier, billingCycle),
+                                        basePlanId,
                                         pricingPhases(tier, billingCycle, offer),
                                         emptyList(),
                                     )

@@ -165,7 +165,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 mapOf(
                     "flow" to flow.analyticsValue,
                     "source" to flow.source.analyticsValue,
-                    "product" to plan.productId,
+                    "product" to requireNotNull(plan.productId) { "productId shouldn't be null for plan=$plan" },
                 ),
             )
         }
