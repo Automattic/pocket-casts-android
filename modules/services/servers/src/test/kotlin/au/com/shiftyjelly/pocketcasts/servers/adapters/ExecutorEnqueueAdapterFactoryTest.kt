@@ -26,7 +26,7 @@ class ExecutorEnqueueAdapterFactoryTest {
     @Test
     fun `call factory is not executed on the calling thread`() = runBlocking {
         val mainThread = Thread.currentThread()
-        val calledOnMain = AtomicBoolean()
+        val calledOnMain = AtomicBoolean(true) // Setting to true to avoid false positive in the assertion
         val executor = Executors.newSingleThreadExecutor()
 
         val callFactory = OkHttpCall.Factory { request ->
