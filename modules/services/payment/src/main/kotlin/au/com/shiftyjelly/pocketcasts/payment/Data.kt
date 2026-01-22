@@ -24,6 +24,7 @@ sealed interface PricingPlan {
         override val planId: String,
         override val pricingPhases: List<PricingPhase>,
         override val tags: List<String>,
+        val installmentPlanDetails: InstallmentPlanDetails? = null,
     ) : PricingPlan
 
     data class Offer(
@@ -68,6 +69,11 @@ data class PricingSchedule(
         data object Infinite : RecurrenceMode
     }
 }
+
+data class InstallmentPlanDetails(
+    val commitmentPaymentsCount: Int,
+    val subsequentCommitmentPaymentsCount: Int,
+)
 
 @ConsistentCopyVisibility
 data class SubscriptionPlans private constructor(
