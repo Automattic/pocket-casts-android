@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -26,6 +27,8 @@ class ExecutorEnqueueAdapterFactoryTest {
     @get:Rule
     val server = MockWebServer()
 
+    private val factoryExecutor = Executors.newSingleThreadExecutor()
+
     interface Service {
         @GET("/")
         suspend fun coroutineCall()
@@ -34,11 +37,15 @@ class ExecutorEnqueueAdapterFactoryTest {
         fun regularCall(): Call<Void>
     }
 
+    @After
+    fun tearDown() {
+        factoryExecutor.shutdown()
+    }
+
     @Test
     fun `call factory is not executed on the calling thread when enqueueing call`() = runBlocking {
         val mainThread = Thread.currentThread()
         val calledOnMain = AtomicBoolean(true) // Setting to true to avoid false positive in the assertion
-        val executor = Executors.newSingleThreadExecutor()
 
         val callFactory = OkHttpCall.Factory { request ->
             calledOnMain.set(mainThread === Thread.currentThread())
@@ -47,13 +54,12 @@ class ExecutorEnqueueAdapterFactoryTest {
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
             .callFactory(callFactory)
-            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(executor))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(factoryExecutor))
             .build()
             .create<Service>()
 
         server.enqueue(MockResponse())
         service.coroutineCall()
-        executor.shutdown()
 
         assertFalse(calledOnMain.get())
     }
@@ -65,7 +71,7 @@ class ExecutorEnqueueAdapterFactoryTest {
 
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
-            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(Executors.newSingleThreadExecutor()))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(factoryExecutor))
             .build()
             .create<Service>()
 
@@ -76,7 +82,7 @@ class ExecutorEnqueueAdapterFactoryTest {
                 latch.countDown()
             }
 
-            override fun onResponse(call: Call<Void>, response: Response<Void?>) = fail("Should never happen")
+            override fun onResponse(call: Call<Void>, response: Response<Void>) = fail("Should never happen")
         })
 
         call.cancel()
@@ -87,10 +93,36 @@ class ExecutorEnqueueAdapterFactoryTest {
     }
 
     @Test
+    fun `call can be enqueued`() {
+        val latch = CountDownLatch(1)
+        var callResponse: Response<Void>? = null
+
+        val service = Retrofit.Builder()
+            .baseUrl(server.url("/"))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(factoryExecutor))
+            .build()
+            .create<Service>()
+
+        server.enqueue(MockResponse())
+        service.regularCall().enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                callResponse = response
+                latch.countDown()
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) = fail("Should never happen")
+        })
+
+        latch.await()
+
+        assertTrue(callResponse?.isSuccessful == true)
+    }
+
+    @Test
     fun `call can be executed`() {
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
-            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(Executors.newSingleThreadExecutor()))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(factoryExecutor))
             .build()
             .create<Service>()
 
@@ -104,7 +136,7 @@ class ExecutorEnqueueAdapterFactoryTest {
     fun `call can be cloned`() {
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
-            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(Executors.newSingleThreadExecutor()))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(factoryExecutor))
             .build()
             .create<Service>()
 
