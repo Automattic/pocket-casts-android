@@ -63,7 +63,7 @@ fun AnimatedPlayPauseButton(
         ),
     )
 
-    val contentDescription = stringResource(LR.string.playback_command)
+    val contentDescription = stringResource(LR.string.play)
     Box(
         modifier = modifier
             .size(circleSize)
