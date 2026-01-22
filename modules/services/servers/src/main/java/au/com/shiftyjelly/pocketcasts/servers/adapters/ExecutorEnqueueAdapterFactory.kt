@@ -54,23 +54,12 @@ private class ExecutorEnqueueCall<T>(
 ) : Call<T> {
     private val executed = AtomicBoolean(false)
 
-    @Volatile private var canceled = false
-
     override fun enqueue(callback: Callback<T>) {
         if (executed.getAndSet(true)) {
             throw IllegalStateException("Already executed.")
         }
         executor.execute {
-            if (canceled) {
-                delegate.cancel()
-                if (callbackExecutor != null) {
-                    callbackExecutor.execute { callback.onFailure(this@ExecutorEnqueueCall, IOException("Canceled")) }
-                } else {
-                    callback.onFailure(this@ExecutorEnqueueCall, IOException("Canceled"))
-                }
-            } else {
-                delegate.enqueue(callback)
-            }
+            delegate.enqueue(callback)
         }
     }
 
@@ -78,20 +67,14 @@ private class ExecutorEnqueueCall<T>(
         if (executed.getAndSet(true)) {
             throw IllegalStateException("Already executed.")
         }
-        if (canceled) {
-            delegate.cancel()
-        }
         return delegate.execute()
     }
 
     override fun isExecuted() = executed.get()
 
-    override fun cancel() {
-        canceled = true
-        delegate.cancel()
-    }
+    override fun cancel() = delegate.cancel()
 
-    override fun isCanceled() = canceled || delegate.isCanceled
+    override fun isCanceled() = delegate.isCanceled
 
     override fun clone(): Call<T> = ExecutorEnqueueCall(executor, callbackExecutor, delegate.clone())
 
