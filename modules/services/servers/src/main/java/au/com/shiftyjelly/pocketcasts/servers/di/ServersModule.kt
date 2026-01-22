@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.adapters.ExecutorEnqueueAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.addInterceptors
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
@@ -32,6 +33,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -50,6 +52,8 @@ import retrofit2.create
 @InstallIn(SingletonComponent::class)
 class ServersModule {
     companion object {
+        private val okHttpDispatcher = Dispatcher()
+
         fun createCache(folder: String, context: Context, cacheSizeInMB: Int): Cache {
             val cacheSize = cacheSizeInMB * 1024 * 1024
             val cacheDirectory = File(context.cacheDir.absolutePath, folder)
@@ -60,7 +64,8 @@ class ServersModule {
             return Retrofit.Builder()
                 .addConverterFactory(ProtoConverterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(okHttpDispatcher.executorService))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.from(okHttpDispatcher.executorService)))
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
                 .build()
@@ -92,7 +97,9 @@ class ServersModule {
     @Singleton
     @Raw
     fun provideRawClient(): OkHttpClient {
-        return OkHttpClient()
+        return OkHttpClient.Builder()
+            .dispatcher(okHttpDispatcher)
+            .build()
     }
 
     @Provides
@@ -156,8 +163,6 @@ class ServersModule {
         @Downloads interceptors: List<@JvmSuppressWildcards OkHttpInterceptor>,
     ): OkHttpClient {
         return client.newBuilder()
-            // Use a separate dispatcher for downloads.
-            .dispatcher(Dispatcher())
             .addInterceptors(interceptors)
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
