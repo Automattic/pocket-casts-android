@@ -493,6 +493,7 @@ data class AcknowledgedSubscription(
     val tier: SubscriptionTier,
     val billingCycle: BillingCycle,
     val isAutoRenewing: Boolean,
+    val isInstallment: Boolean = false,
 ) {
-    val productId: String? get() = SubscriptionPlan.productId(tier, billingCycle)
+    val productId: String? get() = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
 }

@@ -143,7 +143,8 @@ class PaymentClient @Inject constructor(
             return null
         }
 
-        return AcknowledgedSubscription(state.orderId, productKey.tier, productKey.billingCycle, isAutoRenewing)
+        val acknowledgedSubscription = AcknowledgedSubscription(state.orderId, productKey.tier, productKey.billingCycle, isAutoRenewing, productKey.isInstallment)
+        return acknowledgedSubscription
     }
 
     private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
