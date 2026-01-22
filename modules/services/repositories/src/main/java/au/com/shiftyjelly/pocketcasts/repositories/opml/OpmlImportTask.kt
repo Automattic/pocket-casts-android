@@ -136,9 +136,9 @@ class OpmlImportTask @AssistedInject constructor(
         }
     }
 
-    private fun createUrlOpmlSource(url: HttpUrl): Source? {
+    private fun createUrlOpmlSource(url: HttpUrl): Source {
         val request = Request.Builder().url(url).build()
-        return httpClient.newCall(request).execute().body?.source()
+        return httpClient.newCall(request).execute().body.source()
     }
 
     private fun createUriOpmlSource(uri: Uri): Source? {
