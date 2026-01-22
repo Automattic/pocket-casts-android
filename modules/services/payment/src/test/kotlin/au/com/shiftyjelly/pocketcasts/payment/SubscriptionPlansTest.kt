@@ -15,32 +15,57 @@ class SubscriptionPlansTest {
         PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
     )
 
-    private val products = SubscriptionTier.entries.flatMap { tier ->
-        BillingCycle.entries.mapNotNull { billingCycle ->
-            val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
-            val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
+    private val products = buildList {
+        // Add regular (non-installment) products for all tiers and billing cycles
+        SubscriptionTier.entries.flatMap { tier ->
+            BillingCycle.entries.mapNotNull { billingCycle ->
+                val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
+                val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
+                Product(
+                    id = productId,
+                    name = "$tier $billingCycle",
+                    pricingPlans = PricingPlans(
+                        basePlan = PricingPlan.Base(
+                            planId = basePlanId,
+                            pricingPhases = listOf(infinitePricingPhase),
+                            tags = emptyList(),
+                        ),
+                        offerPlans = SubscriptionOffer.entries
+                            .mapNotNull { offer -> offer.offerId(tier, billingCycle) }
+                            .map { offerId ->
+                                PricingPlan.Offer(
+                                    offerId = offerId,
+                                    planId = basePlanId,
+                                    pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
+                                    tags = emptyList(),
+                                )
+                            },
+                    ),
+                )
+            }
+        }.forEach { add(it) }
+
+        // Add Plus Yearly Installment product
+        val installmentProductId = SubscriptionPlan.productId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+        val installmentBasePlanId = SubscriptionPlan.basePlanId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+        add(
             Product(
-                id = productId,
-                name = "$tier $billingCycle",
+                id = installmentProductId,
+                name = "Plus Yearly",
                 pricingPlans = PricingPlans(
                     basePlan = PricingPlan.Base(
-                        planId = basePlanId,
+                        planId = installmentBasePlanId,
                         pricingPhases = listOf(infinitePricingPhase),
                         tags = emptyList(),
+                        installmentPlanDetails = InstallmentPlanDetails(
+                            commitmentPaymentsCount = 12,
+                            subsequentCommitmentPaymentsCount = 12,
+                        ),
                     ),
-                    offerPlans = SubscriptionOffer.entries
-                        .mapNotNull { offer -> offer.offerId(tier, billingCycle) }
-                        .map { offerId ->
-                            PricingPlan.Offer(
-                                offerId = offerId,
-                                planId = basePlanId,
-                                pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
-                                tags = emptyList(),
-                            )
-                        },
+                    offerPlans = emptyList(),
                 ),
-            )
-        }
+            ),
+        )
     }
 
     @Test
@@ -367,5 +392,139 @@ class SubscriptionPlansTest {
         for (plan in allPlans) {
             assertEquals(plan.recurringPrice, infinitePricingPhase.price)
         }
+    }
+
+    @Test
+    fun `find plus yearly installment plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        val plan = result.getOrNull()
+
+        assertNotNull(plan)
+        assertEquals("Plus Yearly", plan!!.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(true, plan.isInstallment)
+        assertNotNull(plan.installmentPlanDetails)
+        assertEquals(12, plan.installmentPlanDetails!!.commitmentPaymentsCount)
+        assertEquals(12, plan.installmentPlanDetails.subsequentCommitmentPaymentsCount)
+    }
+
+    @Test
+    fun `installment plan has correct product id and base plan id`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
+        assertEquals("p1-installment", plan.basePlanId)
+    }
+
+    @Test
+    fun `installment plan has correct recurring price`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertEquals(infinitePricingPhase.price, plan.recurringPrice)
+    }
+
+    @Test
+    fun `do not find plus monthly installment plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Monthly)
+
+        assertNull(result.getOrNull())
+    }
+
+    @Test
+    fun `do not find patron monthly installment plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Monthly)
+
+        assertNull(result.getOrNull())
+    }
+
+    @Test
+    fun `do not find patron yearly installment plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Yearly)
+
+        assertNull(result.getOrNull())
+    }
+
+    @Test
+    fun `create plans when installment product is missing`() {
+        val products = products.filter { it.id != SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
+
+        val plans = SubscriptionPlans.create(products).getOrNull()
+
+        assertNotNull(plans)
+    }
+
+    @Test
+    fun `do not find installment plan when installment product is missing`() {
+        val products = products.filter { it.id != SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertNull(result.getOrNull())
+    }
+
+    @Test
+    fun `return failure when installment product has no installment details`() {
+        val products = products.map { product ->
+            if (product.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
+                val basePlan = product.pricingPlans.basePlan.copy(installmentPlanDetails = null)
+                val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
+                product.copy(pricingPlans = pricingPlans)
+            } else {
+                product
+            }
+        }
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertNull(result.getOrNull())
+        assertEquals(PaymentResultCode.DeveloperError, (result as? PaymentResult.Failure)?.code)
+    }
+
+    @Test
+    fun `return failure when there are multiple installment products`() {
+        val installmentProduct = products.first { it.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
+        val products = products + installmentProduct
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertNull(result.getOrNull())
+        assertEquals(PaymentResultCode.DeveloperError, (result as? PaymentResult.Failure)?.code)
+    }
+
+    @Test
+    fun `regular plus yearly plan is not installment`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertEquals(false, plan.isInstallment)
+        assertNull(plan.installmentPlanDetails)
+    }
+
+    @Test
+    fun `installment plan and regular plan have different keys`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val regularPlan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        val installmentPlan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertEquals(SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = false), regularPlan.key)
+        assertEquals(SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true), installmentPlan.key)
     }
 }
