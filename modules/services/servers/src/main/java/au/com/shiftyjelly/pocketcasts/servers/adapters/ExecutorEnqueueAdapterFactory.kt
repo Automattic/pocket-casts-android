@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.adapters
 
-import java.io.IOException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.concurrent.Executor
@@ -33,23 +32,21 @@ internal class ExecutorEnqueueAdapterFactory(private val executor: Executor) : C
             "Call return type must be parameterized as Call<Foo> or Call<? extends Foo>"
         }
         val responseType = getParameterUpperBound(0, returnType)
-        return ExecutorEnqueueAdapter<Any>(executor, retrofit.callbackExecutor(), responseType)
+        return ExecutorEnqueueAdapter<Any>(executor, responseType)
     }
 }
 
 private class ExecutorEnqueueAdapter<T>(
     private val executor: Executor,
-    private val callbackExecutor: Executor?,
     private val responseType: Type,
 ) : CallAdapter<T, Call<T>> {
     override fun responseType(): Type = responseType
 
-    override fun adapt(call: Call<T>): Call<T> = ExecutorEnqueueCall(executor, callbackExecutor, call)
+    override fun adapt(call: Call<T>): Call<T> = ExecutorEnqueueCall(executor, call)
 }
 
 private class ExecutorEnqueueCall<T>(
     private val executor: Executor,
-    private val callbackExecutor: Executor?,
     private val delegate: Call<T>,
 ) : Call<T> {
     private val executed = AtomicBoolean(false)
@@ -76,7 +73,7 @@ private class ExecutorEnqueueCall<T>(
 
     override fun isCanceled() = delegate.isCanceled
 
-    override fun clone(): Call<T> = ExecutorEnqueueCall(executor, callbackExecutor, delegate.clone())
+    override fun clone(): Call<T> = ExecutorEnqueueCall(executor, delegate.clone())
 
     override fun request(): Request = delegate.request()
 
