@@ -234,7 +234,7 @@ open class ServiceManager @Inject constructor(
         val requestCallback = object : Callback {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string()
+                val body = response.body.string()
                 val responseDebug = String.format("Post response %d %s", response.code, call.request().url)
                 val serverResponse = DataParser.parseServerResponse(body)
                 if (serverResponse.requiresPolling()) {
