@@ -108,7 +108,6 @@ import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
-import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -160,9 +159,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companion.TRENDING
 import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
@@ -1666,7 +1663,7 @@ class MainActivity :
 
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
-                    val searchResult = serviceManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
+                    val searchResult = serviceManager.getSharedItemDetails("/social/share/show/$episodeUuid").getOrNull()
                     dialog.hide()
                     searchResult?.episode?.let {
                         EpisodeContainerFragment.newInstance(
@@ -1689,35 +1686,26 @@ class MainActivity :
         url ?: return
 
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
-        serviceManager.searchForPodcasts(
-            url,
-            object : ServerCallback<PodcastSearch> {
-                override fun dataReturned(result: PodcastSearch?) {
-                    UiUtil.hideProgressDialog(dialog)
-                    val uuid = result?.searchResults?.firstOrNull()?.uuid ?: return
-                    openPodcastPage(uuid)
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?,
-                ) {
-                    UiUtil.hideProgressDialog(dialog)
-
-                    val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getString)
-                        ?: userMessage
-                        ?: getString(LR.string.podcast_add_failed)
+        lifecycleScope.launch {
+            val result = serviceManager
+                .searchForPodcasts(url)
+                .onFailure { error ->
                     UiUtil.displayAlertError(
                         context = this@MainActivity,
-                        message = message,
+                        message = error.message ?: getString(LR.string.podcast_add_failed),
                         null,
                     )
                 }
-            },
-        )
+                .getOrNull()
+
+            UiUtil.hideProgressDialog(dialog)
+            if (result != null) {
+                val podcastUuid = result.searchResults.firstOrNull()?.uuid
+                if (podcastUuid != null) {
+                    openPodcastPage(podcastUuid)
+                }
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -1730,48 +1718,11 @@ class MainActivity :
         }
 
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
-        serviceManager.getSharedItemDetails(
-            deepLink.sharePath,
-            object : ServerCallback<au.com.shiftyjelly.pocketcasts.models.to.Share> {
-                override fun dataReturned(result: au.com.shiftyjelly.pocketcasts.models.to.Share?) {
-                    UiUtil.hideProgressDialog(dialog)
-                    result ?: return
-
-                    val podcastUuid = result.podcast.uuid
-                    if (podcastUuid.isBlank()) {
-                        UiUtil.displayAlertError(
-                            this@MainActivity,
-                            getString(LR.string.podcast_share_open_fail_title),
-                            getString(LR.string.podcast_share_open_fail),
-                            null,
-                        )
-                        return
-                    }
-
-                    val episode = result.episode
-                    if (episode != null) {
-                        openEpisodeDialog(
-                            episodeUuid = episode.uuid,
-                            source = EpisodeViewSource.SHARE,
-                            podcastUuid = podcastUuid,
-                            forceDark = false,
-                            autoPlay = false,
-                            startTimestamp = deepLink.startTimestamp,
-                        )
-                    } else {
-                        openPodcastPage(podcastUuid)
-                    }
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?,
-                ) {
-                    UiUtil.hideProgressDialog(dialog)
-                    Timber.e(serverMessage)
+        lifecycleScope.launch {
+            val result = serviceManager
+                .getSharedItemDetails(deepLink.sharePath)
+                .onFailure { error ->
+                    Timber.e(error)
                     UiUtil.displayAlertError(
                         this@MainActivity,
                         getString(LR.string.podcast_share_open_fail_title),
@@ -1779,8 +1730,36 @@ class MainActivity :
                         null,
                     )
                 }
-            },
-        )
+                .getOrNull()
+
+            UiUtil.hideProgressDialog(dialog)
+            if (result != null) {
+                val podcastUuid = result.podcast.uuid
+                if (podcastUuid.isBlank()) {
+                    UiUtil.displayAlertError(
+                        this@MainActivity,
+                        getString(LR.string.podcast_share_open_fail_title),
+                        getString(LR.string.podcast_share_open_fail),
+                        null,
+                    )
+                    return@launch
+                }
+
+                val episode = result.episode
+                if (episode != null) {
+                    openEpisodeDialog(
+                        episodeUuid = episode.uuid,
+                        source = EpisodeViewSource.SHARE,
+                        podcastUuid = podcastUuid,
+                        forceDark = false,
+                        autoPlay = false,
+                        startTimestamp = deepLink.startTimestamp,
+                    )
+                } else {
+                    openPodcastPage(podcastUuid)
+                }
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
