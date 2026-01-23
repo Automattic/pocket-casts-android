@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -47,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import java.text.NumberFormat
+import java.util.Currency
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -74,13 +75,20 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
+    // Don't show savings percent for installment plans
+    val calculatedSavingPercent = if (plan is SubscriptionPlan.Base && plan.isInstallment) {
+        null
+    } else {
+        priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) }
+    }
+
     SubscriptionPlanRow(
         plan = plan,
         isSelected = isSelected,
         onClick = onClick,
         modifier = modifier,
         rowConfig = RowConfig.upgradePlansConfig(
-            calculatedSavingPercent = priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) },
+            calculatedSavingPercent = calculatedSavingPercent,
         ),
     )
 }
@@ -300,8 +308,29 @@ private val SubscriptionPlan.pricePerWeek: Float
 private val monthsInYear = 12.toBigDecimal()
 private val weeksInYear = 52.toBigDecimal()
 
+private fun SubscriptionPlan.Base.formattedTotalYearlyPrice(): String {
+    val totalAmount = recurringPrice.amount * monthsInYear
+    val currencyCode = recurringPrice.currencyCode
+
+    return try {
+        val currency = Currency.getInstance(currencyCode)
+        val formatter = NumberFormat.getCurrencyInstance().apply {
+            this.currency = currency
+            minimumFractionDigits = currency.defaultFractionDigits
+            maximumFractionDigits = currency.defaultFractionDigits
+        }
+        formatter.format(totalAmount.toDouble())
+    } catch (_: IllegalArgumentException) {
+        String.format("%.2f %s", totalAmount.toDouble(), currencyCode)
+    }
+}
+
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
+    if (this is SubscriptionPlan.Base && isInstallment) {
+        return stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+    }
+
     return if (this.billingCycle == BillingCycle.Yearly) {
         when (config.pricePerPeriod) {
             PricePerPeriod.PRICE_PER_MONTH -> {
@@ -333,6 +362,11 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
     val formattedPrice = recurringPrice.formattedPrice
+
+    // For installment plans, show price per month with duration
+    if (this is SubscriptionPlan.Base && isInstallment) {
+        return stringResource(LR.string.price_per_month_for_months, formattedPrice, monthsInYear.toInt())
+    }
 
     return when (billingCycle) {
         BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)

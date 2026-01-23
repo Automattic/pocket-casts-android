@@ -108,6 +108,7 @@ class WinbackFragment : BaseDialogFragment() {
             ) {
                 composable(WinbackNavRoutes.MAIN) {
                     CancelOfferPage(
+                        isInstallment = state.isInstallment,
                         onSeeAvailablePlans = {
                             viewModel.trackAvailablePlansTapped()
                             navController.navigate(WinbackNavRoutes.AVAILABLE_PLANS)
@@ -185,6 +186,7 @@ class WinbackFragment : BaseDialogFragment() {
                 composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {
                     CancelConfirmationPage(
                         expirationDate = state.currentSubscriptionExpirationDate,
+                        isInstallment = state.isInstallment,
                         onKeepSubscription = {
                             viewModel.trackKeepSubscriptionTapped()
                             dismiss()
