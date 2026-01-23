@@ -9,11 +9,6 @@
       "encrypt": true
     },
     {
-      "file": "android/pocket-casts/sentry.properties",
-      "destination": "sentry.properties",
-      "encrypt": true
-    },
-    {
       "file": "android/pocket-casts/google-services.json",
       "destination": "app/google-services.json",
       "encrypt": true
