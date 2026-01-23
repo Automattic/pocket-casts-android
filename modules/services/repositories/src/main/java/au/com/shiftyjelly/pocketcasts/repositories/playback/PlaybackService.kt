@@ -687,7 +687,7 @@ open class PlaybackService :
             if (termCleaned.length <= 1) {
                 emptyList()
             } else {
-                serviceManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
+                serviceManager.searchForPodcasts(searchTerm = term).getOrThrow().searchResults
             }
         } catch (ex: Exception) {
             Timber.e(ex)
