@@ -86,7 +86,7 @@ data class SubscriptionPlans private constructor(
     ): SubscriptionPlan.Base {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = false)
         return requireNotNull(basePlans.getValue(key).getOrNull()) {
-            throw AssertionError("This should never happen. Base plans are asserted in the create method.")
+            "This should never happen. Base plans are asserted in the create method."
         }
     }
 
