@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SubscriptionPlansTest {
@@ -15,30 +17,57 @@ class SubscriptionPlansTest {
         PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
     )
 
-    private val products = SubscriptionTier.entries.flatMap { tier ->
-        BillingCycle.entries.map { billingCycle ->
+    private val products = buildList {
+        // Add regular (non-installment) products for all tiers and billing cycles
+        SubscriptionTier.entries.flatMap { tier ->
+            BillingCycle.entries.mapNotNull { billingCycle ->
+                val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
+                val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
+                Product(
+                    id = productId,
+                    name = "$tier $billingCycle",
+                    pricingPlans = PricingPlans(
+                        basePlan = PricingPlan.Base(
+                            planId = basePlanId,
+                            pricingPhases = listOf(infinitePricingPhase),
+                            tags = emptyList(),
+                        ),
+                        offerPlans = SubscriptionOffer.entries
+                            .mapNotNull { offer -> offer.offerId(tier, billingCycle) }
+                            .map { offerId ->
+                                PricingPlan.Offer(
+                                    offerId = offerId,
+                                    planId = basePlanId,
+                                    pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
+                                    tags = emptyList(),
+                                )
+                            },
+                    ),
+                )
+            }
+        }.forEach { add(it) }
+
+        // Add Plus Yearly Installment product
+        val installmentProductId = SubscriptionPlan.productId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+        val installmentBasePlanId = SubscriptionPlan.basePlanId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+        add(
             Product(
-                id = SubscriptionPlan.productId(tier, billingCycle),
-                name = "$tier $billingCycle",
+                id = installmentProductId,
+                name = "Plus Yearly",
                 pricingPlans = PricingPlans(
                     basePlan = PricingPlan.Base(
-                        planId = SubscriptionPlan.basePlanId(tier, billingCycle),
+                        planId = installmentBasePlanId,
                         pricingPhases = listOf(infinitePricingPhase),
                         tags = emptyList(),
+                        installmentPlanDetails = InstallmentPlanDetails(
+                            commitmentPaymentsCount = 12,
+                            subsequentCommitmentPaymentsCount = 12,
+                        ),
                     ),
-                    offerPlans = SubscriptionOffer.entries
-                        .mapNotNull { offer -> offer.offerId(tier, billingCycle) }
-                        .map { offerId ->
-                            PricingPlan.Offer(
-                                offerId = offerId,
-                                planId = SubscriptionPlan.basePlanId(tier, billingCycle),
-                                pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
-                                tags = emptyList(),
-                            )
-                        },
+                    offerPlans = emptyList(),
                 ),
-            )
-        }
+            ),
+        )
     }
 
     @Test
@@ -57,6 +86,7 @@ class SubscriptionPlansTest {
         assertEquals("Plus Monthly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
         assertEquals(BillingCycle.Monthly, plan.billingCycle)
+        assertNull(plan.installmentPlanDetails)
     }
 
     @Test
@@ -68,6 +98,7 @@ class SubscriptionPlansTest {
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
         assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertNull(plan.installmentPlanDetails)
     }
 
     @Test
@@ -79,6 +110,7 @@ class SubscriptionPlansTest {
         assertEquals("Patron Monthly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
         assertEquals(BillingCycle.Monthly, plan.billingCycle)
+        assertNull(plan.installmentPlanDetails)
     }
 
     @Test
@@ -90,6 +122,7 @@ class SubscriptionPlansTest {
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
         assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertNull(plan.installmentPlanDetails)
     }
 
     @Test
@@ -365,5 +398,114 @@ class SubscriptionPlansTest {
         for (plan in allPlans) {
             assertEquals(plan.recurringPrice, infinitePricingPhase.price)
         }
+    }
+
+    @Test
+    fun `find plus yearly installment plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertTrue(plan.isInstallment)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
+        assertEquals("p1-installment", plan.basePlanId)
+        assertEquals(infinitePricingPhase.price, plan.recurringPrice)
+        assertNotNull(plan.installmentPlanDetails)
+        assertEquals(12, plan.installmentPlanDetails!!.commitmentPaymentsCount)
+        assertEquals(12, plan.installmentPlanDetails.subsequentCommitmentPaymentsCount)
+        assertEquals(
+            SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true),
+            plan.key,
+        )
+    }
+
+    @Test
+    fun `do not find non-existent installment plans`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        assertNull(plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Monthly).getOrNull())
+        assertNull(plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Monthly).getOrNull())
+        assertNull(plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Yearly).getOrNull())
+    }
+
+    @Test
+    fun `prevent creating key with both offer and installment`() {
+        val exception = try {
+            SubscriptionPlan.Key(
+                tier = SubscriptionTier.Plus,
+                billingCycle = BillingCycle.Yearly,
+                offer = SubscriptionOffer.Trial,
+                isInstallment = true,
+            )
+            null
+        } catch (e: IllegalArgumentException) {
+            e
+        }
+
+        assertNotNull(exception)
+        assertTrue(exception!!.message!!.contains("Installment plans cannot have promotional offers"))
+    }
+
+    @Test
+    fun `allow creating key with offer but no installment`() {
+        val key = SubscriptionPlan.Key(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            offer = SubscriptionOffer.Trial,
+            isInstallment = false,
+        )
+
+        assertEquals(SubscriptionOffer.Trial, key.offer)
+        assertFalse(key.isInstallment)
+    }
+
+    @Test
+    fun `allow creating key with installment but no offer`() {
+        val key = SubscriptionPlan.Key(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            offer = null,
+            isInstallment = true,
+        )
+
+        assertNull(key.offer)
+        assertTrue(key.isInstallment)
+    }
+
+    @Test
+    fun `handle installment plan edge cases`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        // Plans can be created even when installment product is missing (installments are optional)
+        val productsWithoutInstallment = products.filter { it.id != SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
+        assertNotNull(SubscriptionPlans.create(productsWithoutInstallment).getOrNull())
+        val plansWithoutInstallment = SubscriptionPlans.create(productsWithoutInstallment).getOrNull()!!
+        assertNull(plansWithoutInstallment.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull())
+
+        // Return failure when installment product has no installment details
+        val productsWithoutDetails = products.map { product ->
+            if (product.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
+                val basePlan = product.pricingPlans.basePlan.copy(installmentPlanDetails = null)
+                val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
+                product.copy(pricingPlans = pricingPlans)
+            } else {
+                product
+            }
+        }
+        val plansWithoutDetails = SubscriptionPlans.create(productsWithoutDetails).getOrNull()!!
+        val resultWithoutDetails = plansWithoutDetails.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        assertNull(resultWithoutDetails.getOrNull())
+        assertEquals(PaymentResultCode.DeveloperError, (resultWithoutDetails as? PaymentResult.Failure)?.code)
+
+        // Return failure when there are multiple installment products
+        val installmentProduct = products.first { it.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
+        val productsWithDuplicate = products + installmentProduct
+        val plansWithDuplicate = SubscriptionPlans.create(productsWithDuplicate).getOrNull()!!
+        val resultWithDuplicate = plansWithDuplicate.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        assertNull(resultWithDuplicate.getOrNull())
+        assertEquals(PaymentResultCode.DeveloperError, (resultWithDuplicate as? PaymentResult.Failure)?.code)
     }
 }

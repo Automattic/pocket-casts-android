@@ -31,6 +31,7 @@ dependencies {
 
     implementation(libs.automattic.crashlogging)
     implementation(libs.coroutines.core)
+    implementation(libs.coroutines.rx2)
     implementation(libs.moshi.adapters)
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit.moshi)

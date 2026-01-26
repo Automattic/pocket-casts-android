@@ -106,5 +106,10 @@ project.apply {
         set("encryptionKey", secretProperties.getProperty("encryption_key", ""))
         set("appSecret", secretProperties.getProperty("app_secret", ""))
         set("metaAppId", secretProperties.getProperty("metaAppId", ""))
+        set("sentryAuthToken", secretProperties.getProperty("sentryAuthToken", ""))
+        set("sentryOrg", secretProperties.getProperty("sentryOrg", ""))
+        set("sentryAndroidProject", secretProperties.getProperty("sentryAndroidProject", ""))
+        set("sentryAutomotiveProject", secretProperties.getProperty("sentryAutomotiveProject", ""))
+        set("sentryWearProject", secretProperties.getProperty("sentryWearProject", ""))
     }
 }

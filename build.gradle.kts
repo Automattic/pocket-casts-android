@@ -172,7 +172,7 @@ subprojects {
     }
 
     plugins.withId(rootProject.libs.plugins.sentry.get().pluginId) {
-        configureSentry()
+        applyCommonSentryConfiguration()
     }
 
     configurations.configureEach {
@@ -416,8 +416,11 @@ subprojects {
     }
 }
 
-fun Project.configureSentry() {
+fun Project.applyCommonSentryConfiguration() {
     extensions.getByType(SentryPluginExtension::class.java).apply {
+        authToken = project.findProperty("sentryAuthToken")?.toString()
+        org = project.findProperty("sentryOrg")?.toString()
+
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
             !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
         includeProguardMapping = shouldUploadDebugFiles

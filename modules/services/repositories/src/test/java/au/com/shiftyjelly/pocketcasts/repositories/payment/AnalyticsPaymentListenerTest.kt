@@ -37,6 +37,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
+                "is_installment" to false,
                 "product" to "yearly",
                 "source" to "purchase_source",
             ),
@@ -57,6 +58,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "patron",
                 "frequency" to "monthly",
                 "offer_type" to "referral",
+                "is_installment" to false,
                 "product" to "com.pocketcasts.monthly.patron",
                 "source" to "purchase_source",
                 "error" to "user_cancelled",
@@ -78,6 +80,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
+                "is_installment" to false,
                 "product" to "yearly",
                 "source" to "purchase_source",
                 "error" to "unknown",
@@ -108,6 +111,31 @@ class AnalyticsPaymentListenerTest {
                 "com.pocketcasts.yearly.patron",
             ),
             productProperties,
+        )
+    }
+
+    @Test
+    fun `installment plan purchase`() = runTest {
+        val key = SubscriptionPlan.Key(
+            tier = au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier.Plus,
+            billingCycle = au.com.shiftyjelly.pocketcasts.payment.BillingCycle.Yearly,
+            offer = null,
+            isInstallment = true,
+        )
+
+        paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
+
+        val event = tracker.events.first()
+        event.assertType(AnalyticsEvent.PURCHASE_SUCCESSFUL)
+        event.assertProperties(
+            mapOf(
+                "tier" to "plus",
+                "frequency" to "yearly",
+                "offer_type" to "none",
+                "is_installment" to true,
+                "product" to "yearly",
+                "source" to "purchase_source",
+            ),
         )
     }
 }

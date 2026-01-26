@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -178,13 +177,9 @@ class RefreshPodcastsThread(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
                 processRefreshResponse(response)
             }
-            .onFailure { throwable ->
-                val serverError = throwable as? ServerResponseException
-                val message = "Not refreshing as server call failed errorCode: ${serverError?.errorCode} serverMessage: ${serverError?.serverMessage ?: ""}"
-
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
-                refreshFailedOrCancelled(message)
+            .onFailure { error ->
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, error, "Server call failed")
+                refreshFailedOrCancelled("Server call failed")
             }
     }
 

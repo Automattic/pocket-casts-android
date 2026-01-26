@@ -45,7 +45,10 @@ class WinbackViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
-                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = subscription?.expiryDate)
+                _uiState.value = _uiState.value.copy(
+                    currentSubscriptionExpirationDate = subscription?.expiryDate,
+                    isInstallment = subscription?.isInstallment ?: false,
+                )
             }
         }
     }
@@ -86,7 +89,7 @@ class WinbackViewModel @Inject constructor(
         newPlan: SubscriptionPlan.Base,
         activity: Activity,
     ) {
-        trackPlanSelected(newPlan.productId)
+        trackPlanSelected(requireNotNull(newPlan.productId) { "productId shouldn't be null for plan=$newPlan" })
         if (changePlanJob?.isActive == true) {
             return
         }
@@ -115,8 +118,8 @@ class WinbackViewModel @Inject constructor(
 
                 is PurchaseResult.Purchased -> {
                     trackPlanPurchased(
-                        currentProductId = loadedState.currentSubscription.productId,
-                        newProductId = newPlan.productId,
+                        currentProductId = requireNotNull(loadedState.currentSubscription.productId) { "productId shouldn't be null for plan=${loadedState.currentSubscription}" },
+                        newProductId = requireNotNull(newPlan.productId) { "productId shouldn't be null for plan=${newPlan.key}" },
                     )
                     val activeSubscriptionDeferred = async { loadActiveSubscription() }
                     val winbackOfferResponseDeferred = async { loadWinbackOffer() }
@@ -412,12 +415,14 @@ class WinbackViewModel @Inject constructor(
         val currentSubscriptionExpirationDate: Instant?,
         val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
+        val isInstallment: Boolean,
     ) {
         companion object {
             val Empty = UiState(
                 currentSubscriptionExpirationDate = null,
                 winbackOfferState = null,
                 subscriptionPlansState = SubscriptionPlansState.Loading,
+                isInstallment = false,
             )
         }
     }

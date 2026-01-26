@@ -76,7 +76,7 @@ data class PlaybackState(
                 positionMs = episode.playedUpToMs,
                 episodeUuid = episode.uuid,
                 podcast = podcast,
-                chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
+                chapters = if (sameEpisode) previousPlaybackState.chapters else Chapters(),
                 playbackSpeed = playbackEffects.playbackSpeed,
                 trimMode = playbackEffects.trimMode,
                 isVolumeBoosted = playbackEffects.isVolumeBoosted,

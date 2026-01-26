@@ -137,7 +137,7 @@ class CollectionListRowAdapter(
                     onItemClicked = { pageIndex, podcastIndex ->
                         val items = getItem(pageIndex)
                         val podcasts = items.filterIsInstance<CollectionPodcast>().map { it.podcast }
-                        val podcast = podcasts.getOrNull(podcastIndex) as? DiscoverPodcast
+                        val podcast = podcasts.getOrNull(podcastIndex)
 
                         if (podcast == null) return@PodcastsViewHolder
 
@@ -155,7 +155,7 @@ class CollectionListRowAdapter(
                     onPodcastSubscribe = { pageIndex, podcastIndex ->
                         val items = getItem(pageIndex)
                         val podcasts = items.filterIsInstance<CollectionPodcast>().map { it.podcast }
-                        val podcast = podcasts.getOrNull(podcastIndex) as? DiscoverPodcast
+                        val podcast = podcasts.getOrNull(podcastIndex)
                         podcast?.let { onPodcastSubscribe(it, fromListId) }
                     },
                 )
