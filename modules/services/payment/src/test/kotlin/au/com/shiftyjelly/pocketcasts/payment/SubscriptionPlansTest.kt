@@ -404,7 +404,7 @@ class SubscriptionPlansTest {
     fun `find plus yearly installment plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).also { println("!!! $it") }.getOrNull()!!
+        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
