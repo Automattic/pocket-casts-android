@@ -17,9 +17,12 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,7 +33,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val episodeManager: EpisodeManager,
-    @Downloads private val httpClient: OkHttpClient,
+    @Downloads private val httpClient: Lazy<OkHttpClient>,
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateEpisodeDetailsTask"
@@ -97,7 +100,8 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 }
 
                 try {
-                    val response = httpClient.newCall(request).await()
+                    val client = withContext(Dispatchers.Default) { httpClient.get() }
+                    val response = client.newCall(request).await()
 
                     val contentType = response.header("Content-Type")
                     if (!contentType.isNullOrBlank()) {

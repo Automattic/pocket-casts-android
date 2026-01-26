@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
@@ -56,7 +58,7 @@ class OpmlImportTask @AssistedInject constructor(
     @Assisted parameters: WorkerParameters,
     private val podcastManager: PodcastManager,
     private val refreshServiceManager: RefreshServiceManager,
-    @Downloads private val httpClient: OkHttpClient,
+    @Downloads private val httpClient: Lazy<OkHttpClient>,
     private val notificationHelper: NotificationHelper,
     private val analyticsTracker: AnalyticsTracker,
     private val onboardingNotificationManager: OnboardingNotificationManager,
@@ -136,9 +138,10 @@ class OpmlImportTask @AssistedInject constructor(
         }
     }
 
-    private fun createUrlOpmlSource(url: HttpUrl): Source {
+    private suspend fun createUrlOpmlSource(url: HttpUrl): Source {
         val request = Request.Builder().url(url).build()
-        return httpClient.newCall(request).execute().body.source()
+        val client = withContext(Dispatchers.Default) { httpClient.get() }
+        return client.newCall(request).execute().body.source()
     }
 
     private fun createUriOpmlSource(uri: Uri): Source? {

@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -69,12 +70,14 @@ class NetworkModule {
     fun provideDispatcher(): Dispatcher = Dispatcher()
 
     @Provides
+    @Singleton
     @Cached
     fun provideCachedCache(@ApplicationContext context: Context): Cache {
         return createCache(folder = "HttpCache", context = context, cacheSizeInMB = 10)
     }
 
     @Provides
+    @Singleton
     @Transcripts
     fun provideTranscriptCache(@ApplicationContext context: Context): Cache {
         return createCache(folder = "TranscriptCache", context = context, cacheSizeInMB = 50)
@@ -231,11 +234,11 @@ class NetworkModule {
     @Singleton
     fun provideApiRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_API_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -244,11 +247,11 @@ class NetworkModule {
     @Singleton
     fun provideWpComApiRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.WP_COM_API_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -257,11 +260,11 @@ class NetworkModule {
     @Singleton
     fun provideRefreshRetrofit(
         builder: Retrofit.Builder,
-        @NoCacheTokened okHttpClient: OkHttpClient,
+        @NoCacheTokened httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_MAIN_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -270,11 +273,11 @@ class NetworkModule {
     @Singleton
     fun providePodcastRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_CACHE_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -283,11 +286,11 @@ class NetworkModule {
     @Singleton
     fun provideStaticRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -296,11 +299,11 @@ class NetworkModule {
     @Singleton
     fun provideListDownloadRetrofit(
         builder: Retrofit.Builder,
-        @NoCache okHttpClient: OkHttpClient,
+        @NoCache httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_LIST_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -309,11 +312,11 @@ class NetworkModule {
     @Singleton
     fun provideListUploadRetrofit(
         builder: Retrofit.Builder,
-        @NoCache okHttpClient: OkHttpClient,
+        @NoCache httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_SHARING_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -322,11 +325,11 @@ class NetworkModule {
     @Singleton
     fun provideDiscoverRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -335,11 +338,11 @@ class NetworkModule {
     @Singleton
     fun provideTranscriptRetrofit(
         builder: Retrofit.Builder,
-        @Transcripts okHttpClient: OkHttpClient,
+        @Transcripts httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl("http://localhost/") // Base URL is required but will be set using the annotation @Url
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
@@ -348,11 +351,11 @@ class NetworkModule {
     @SearchRetrofit
     fun provideSearchApiRetrofit(
         builder: Retrofit.Builder,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): Retrofit {
         return builder
             .baseUrl(Settings.SEARCH_API_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 

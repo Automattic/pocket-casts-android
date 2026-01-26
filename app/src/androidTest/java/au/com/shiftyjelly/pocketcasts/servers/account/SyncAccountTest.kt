@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import dagger.Lazy
 import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
 import okhttp3.Dispatcher
@@ -47,7 +48,7 @@ internal class SyncAccountTest {
         val okhttpCache = NetworkModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
@@ -59,13 +60,13 @@ internal class SyncAccountTest {
             moshi = moshi,
             notificationManager = mock(),
         )
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
     }
 
     @After
     fun tearDown() {
         mockWebServer.shutdown()
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
     }
 
     @Test

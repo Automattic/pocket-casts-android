@@ -43,6 +43,7 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
+import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -51,6 +52,8 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -64,7 +67,7 @@ import retrofit2.Response
 open class SyncServiceManager @Inject constructor(
     private val service: SyncService,
     val settings: Settings,
-    @Cached val cache: Cache,
+    @Cached val cache: Lazy<Cache>,
 ) {
 
     companion object {
@@ -317,7 +320,8 @@ open class SyncServiceManager @Inject constructor(
         return service.redeemReferralCode(addBearer(token), request)
     }
 
-    fun signOut() {
+    suspend fun signOut() {
+        val cache = withContext(Dispatchers.Default) { cache.get() }
         cache.evictAll()
     }
 

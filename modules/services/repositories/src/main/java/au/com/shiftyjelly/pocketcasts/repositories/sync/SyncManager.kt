@@ -61,7 +61,7 @@ interface SyncManager : NamedSettingsCaller {
     fun getEmail(): String?
     fun emailFlow(): Flow<String?>
     fun emailFlowable(): Flowable<Optional<String>>
-    fun signOut(action: () -> Unit = {})
+    suspend fun signOut(action: suspend () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult

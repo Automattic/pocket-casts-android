@@ -15,9 +15,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import dagger.Lazy
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
@@ -65,7 +67,7 @@ class PocketCastsAccountAuthenticatorTest {
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
         val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
-        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
 
         val syncManager = SyncManagerImpl(
             analyticsTracker = AnalyticsTracker.test(),
@@ -77,7 +79,7 @@ class PocketCastsAccountAuthenticatorTest {
             notificationManager = mock(),
         )
         // make sure the test device is signed out
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
 
         authenticator = PocketCastsAccountAuthenticator(context, syncManager)
     }
