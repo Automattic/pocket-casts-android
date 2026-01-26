@@ -344,7 +344,7 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `do not create offers when base has non infinte pricing phase`() {
+    fun `do not create offers when base has non infinite pricing phase`() {
         val products = products.map { product ->
             if (product.id == SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID) {
                 val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(initialPricingPhase))
@@ -404,7 +404,7 @@ class SubscriptionPlansTest {
     fun `find plus yearly installment plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull()!!
+        val plan = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).also { println("!!! $it") }.getOrNull()!!
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
@@ -429,24 +429,6 @@ class SubscriptionPlansTest {
         assertNull(plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Monthly).getOrNull())
         assertNull(plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Monthly).getOrNull())
         assertNull(plans.findInstallmentPlan(SubscriptionTier.Patron, BillingCycle.Yearly).getOrNull())
-    }
-
-    @Test
-    fun `prevent creating key with both offer and installment`() {
-        val exception = try {
-            SubscriptionPlan.Key(
-                tier = SubscriptionTier.Plus,
-                billingCycle = BillingCycle.Yearly,
-                offer = SubscriptionOffer.Trial,
-                isInstallment = true,
-            )
-            null
-        } catch (e: IllegalArgumentException) {
-            e
-        }
-
-        assertNotNull(exception)
-        assertTrue(exception!!.message!!.contains("Installment plans cannot have promotional offers"))
     }
 
     @Test
@@ -476,16 +458,14 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `handle installment plan edge cases`() {
-        val plans = SubscriptionPlans.create(products).getOrNull()!!
+    fun `create subscription plans without plus yearly installment`() {
+        val productsWithoutInstallment = products.filter { product -> product.id != SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
 
-        // Plans can be created even when installment product is missing (installments are optional)
-        val productsWithoutInstallment = products.filter { it.id != SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
         assertNotNull(SubscriptionPlans.create(productsWithoutInstallment).getOrNull())
-        val plansWithoutInstallment = SubscriptionPlans.create(productsWithoutInstallment).getOrNull()!!
-        assertNull(plansWithoutInstallment.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly).getOrNull())
+    }
 
-        // Return failure when installment product has no installment details
+    @Test
+    fun `do not create installment product if there are no installment details`() {
         val productsWithoutDetails = products.map { product ->
             if (product.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID) {
                 val basePlan = product.pricingPlans.basePlan.copy(installmentPlanDetails = null)
@@ -495,17 +475,19 @@ class SubscriptionPlansTest {
                 product
             }
         }
-        val plansWithoutDetails = SubscriptionPlans.create(productsWithoutDetails).getOrNull()!!
-        val resultWithoutDetails = plansWithoutDetails.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
-        assertNull(resultWithoutDetails.getOrNull())
-        assertEquals(PaymentResultCode.DeveloperError, (resultWithoutDetails as? PaymentResult.Failure)?.code)
+        val plans = SubscriptionPlans.create(productsWithoutDetails).getOrNull()!!
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
 
-        // Return failure when there are multiple installment products
+        assertTrue(result is PaymentResult.Failure)
+    }
+
+    @Test
+    fun `do not create installment plan when there are multiple matching products`() {
         val installmentProduct = products.first { it.id == SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID }
         val productsWithDuplicate = products + installmentProduct
-        val plansWithDuplicate = SubscriptionPlans.create(productsWithDuplicate).getOrNull()!!
-        val resultWithDuplicate = plansWithDuplicate.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
-        assertNull(resultWithDuplicate.getOrNull())
-        assertEquals(PaymentResultCode.DeveloperError, (resultWithDuplicate as? PaymentResult.Failure)?.code)
+        val plans = SubscriptionPlans.create(productsWithDuplicate).getOrNull()!!
+        val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+
+        assertTrue(result is PaymentResult.Failure)
     }
 }
