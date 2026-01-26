@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -216,17 +217,19 @@ class AppIcon @Inject constructor(
             settings.appIcon.set(value.setting, updateModifiedAt = false)
         }
 
-    val allAppIconTypes = AppIconType.values()
+    val allAppIconTypes get() = AppIconType.entries
 
     fun enableSelectedAlias(selectedIconType: AppIconType) {
-        val componentPackage =
-            if (BuildConfig.DEBUG) "au.com.shiftyjelly.pocketcasts.debug" else "au.com.shiftyjelly.pocketcasts"
         val classPath = "au.com.shiftyjelly.pocketcasts"
-        AppIconType.values().forEach { iconType ->
-            val componentName = ComponentName(componentPackage, "$classPath${iconType.aliasName}")
+        AppIconType.entries.forEach { iconType ->
+            val componentName = ComponentName(context.packageName, "$classPath${iconType.aliasName}")
             // If we are using the default icon we just switch every alias off
-            val enabledFlag =
-                if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            val enabledFlag = if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) {
+              PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+            } else {
+              PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            }
+
             context.packageManager.setComponentEnabledSetting(
                 componentName,
                 enabledFlag,

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.room)
@@ -41,10 +40,6 @@ dependencies {
     implementation(libs.timber)
 
     implementation(projects.modules.services.localization)
-
-    debugImplementation(libs.compose.ui.tooling)
-
-    debugProdImplementation(libs.compose.ui.tooling)
 
     compileOnly(libs.media3.common)
 
