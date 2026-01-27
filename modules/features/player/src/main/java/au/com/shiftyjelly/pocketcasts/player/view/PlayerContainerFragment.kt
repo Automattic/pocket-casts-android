@@ -354,7 +354,7 @@ class PlayerContainerFragment :
 
 private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private sealed class Section(@StringRes val titleRes: Int) {
-        data object Player : Section(VR.string.player_tab_playing)
+        data object Player : Section(LR.string.player_tab_playing)
         data object Notes : Section(LR.string.player_tab_notes)
         data object Bookmarks : Section(LR.string.player_tab_bookmarks)
         data object Chapters : Section(LR.string.player_tab_chapters)

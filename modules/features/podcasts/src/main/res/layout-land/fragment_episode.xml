@@ -17,7 +17,7 @@
             android:id="@+id/loadingGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="lblDate,lblTimeLeft,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
+            app:constraint_referenced_ids="lblDate, lblTimeLeft, btnDownload, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
             android:visibility="gone"
             tools:visibility="visible"
             />
