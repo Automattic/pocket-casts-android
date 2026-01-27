@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.DynamicShortcutsSynchronizer
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
@@ -105,8 +104,6 @@ class PocketCastsApplication :
     @Inject lateinit var userManager: UserManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
-
-    @Inject lateinit var syncManager: SyncManager
 
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 

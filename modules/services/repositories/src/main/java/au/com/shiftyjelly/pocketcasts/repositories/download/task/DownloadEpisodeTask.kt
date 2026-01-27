@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Observable
@@ -54,8 +55,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -74,7 +77,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     private val downloadManager: DownloadManager,
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
-    @Downloads private val callFactory: Call.Factory,
+    @Downloads private val callFactory: Lazy<Call.Factory>,
     @Downloads private val requestBuilderProvider: Provider<Request.Builder>,
 ) : Worker(context, params) {
 
@@ -318,7 +321,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     .header("Range", "bytes=$localFileSize-")
                     .header("Accept-Encoding", "identity")
                     .build()
-                call = callFactory.newCall(request)
+                call = callFactory.get().newCall(request)
                 response = call.blockingEnqueue()
 
                 if (response.code != HTTP_RESUME_SUPPORTED) {
@@ -337,7 +340,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
             if (response == null) {
                 val request = requestBuilder.build()
-                call = callFactory.newCall(request)
+                call = callFactory.get().newCall(request)
                 response = call.blockingEnqueue()
             }
 
