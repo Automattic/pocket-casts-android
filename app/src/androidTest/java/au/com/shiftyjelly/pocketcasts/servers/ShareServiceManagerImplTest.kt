@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
+import au.com.shiftyjelly.pocketcasts.servers.list.ListDownloadService
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.list.ListUploadService
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -19,11 +21,12 @@ import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 
 class ShareServiceManagerImplTest {
-
     private lateinit var mockWebServer: MockWebServer
-    private lateinit var retrofit: Retrofit
+    private lateinit var uploadService: ListUploadService
+    private lateinit var downloadService: ListDownloadService
 
     @Before
     fun setUp() {
@@ -36,11 +39,13 @@ class ShareServiceManagerImplTest {
             .writeTimeout(1, TimeUnit.SECONDS)
             .build()
 
-        retrofit = Retrofit.Builder()
+        val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(MoshiConverterFactory.create(ServersModule().provideMoshi()))
+            .addConverterFactory(MoshiConverterFactory.create(NetworkModule().provideMoshi()))
             .client(client)
             .build()
+        uploadService = retrofit.create()
+        downloadService = retrofit.create()
     }
 
     @Test
@@ -69,7 +74,7 @@ class ShareServiceManagerImplTest {
         val instant = LocalDateTime.parse("2021-11-25T15:20").atZone(ZoneId.systemDefault()).toInstant()
 
         runTest {
-            val url = ListServiceManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
+            val url = ListServiceManagerImpl(uploadService, downloadService)
                 .createPodcastList(
                     title = "A fun title",
                     description = "A even funnier description",
@@ -130,7 +135,7 @@ class ShareServiceManagerImplTest {
         mockWebServer.enqueue(response)
 
         runTest {
-            val podcastList = ListServiceManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
+            val podcastList = ListServiceManagerImpl(uploadService, downloadService)
                 .openPodcastList(listId = "85c4bc9c-d905-40b1-96de-50c197803e4b")
 
             assertEquals("Android Development", podcastList.title)

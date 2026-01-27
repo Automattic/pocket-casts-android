@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlin.time.Duration.Companion.days
 import org.junit.Assert.assertFalse
@@ -24,7 +24,7 @@ class SettingsImplTest {
         sharedPreferences = context.getSharedPreferences("test_prefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().clear().commit()
 
-        val moshi = ServersModule().provideMoshi()
+        val moshi = NetworkModule().provideMoshi()
         val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
         settings = SettingsImpl(
