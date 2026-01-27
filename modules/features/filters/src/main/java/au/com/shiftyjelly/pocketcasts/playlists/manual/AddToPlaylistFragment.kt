@@ -213,6 +213,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 // that references it would capture the fragment's `this` reference, potentially causing a memory leak.
 // Making it an extension function on FragmentHostListener ensures only the activity and playlistUuid are captured.
 private fun FragmentHostListener.openManualPlaylist(playlistUuid: String) {
+    closeDialogs()
     closeFiltersToRoot()
     addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
     closeBottomSheet()

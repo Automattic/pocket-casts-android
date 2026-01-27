@@ -23,6 +23,10 @@ interface AddToPlaylistFragmentFactory {
             analyticsValue = "shelf",
             episodeEditAnalyticsValue = "shelf",
         ),
+        EpisodeDetails(
+            analyticsValue = "episode_details",
+            episodeEditAnalyticsValue = "episode_details",
+        ),
     }
 
     companion object {
