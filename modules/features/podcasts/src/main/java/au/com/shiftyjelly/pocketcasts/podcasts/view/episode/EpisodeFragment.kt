@@ -459,12 +459,12 @@ class EpisodeFragment : BaseFragment() {
 
         // Up Next
         var podcastTint = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
-        var podcastUuid: String? = null
+        var loadedPodcastUuid: String? = null
         viewModel.state.observe(viewLifecycleOwner) { state ->
             val loadedState = state as? EpisodeFragmentState.Loaded
             val stateTint = loadedState?.tintColor ?: 0xFF000000.toInt()
             podcastTint = ThemeColor.podcastIcon02(activeTheme, stateTint)
-            podcastUuid = loadedState?.podcast?.uuid
+            loadedPodcastUuid = loadedState?.podcast?.uuid
         }
         binding?.btnAddEpisode?.setOnClickListener { _ ->
             val dialog = OptionsDialog().setIconColor(podcastTint)
@@ -502,7 +502,7 @@ class EpisodeFragment : BaseFragment() {
                     }
                 }
             }
-            podcastUuid?.let { podcastUuid ->
+            loadedPodcastUuid?.let { podcastUuid ->
                 dialog.addCheckedOption(LR.string.add_to_playlist_description, imageId = IR.drawable.ic_playlist_add_episode) {
                     if (parentFragmentManager.findFragmentByTag("add-to-playlist") == null) {
                         val fragment = addToPlaylistFragmentFactory.create(
