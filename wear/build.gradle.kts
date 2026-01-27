@@ -11,6 +11,10 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+sentry {
+    projectName = project.findProperty("sentryWearProject")?.toString()
+}
+
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
@@ -32,8 +36,8 @@ android {
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
-            if (!file("${project.rootDir}/sentry.properties").exists()) {
-                println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")
+            if (project.findProperty("sentryWearProject")?.toString().isNullOrBlank()) {
+                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
             }
         }
     }
