@@ -225,9 +225,9 @@ class AppIcon @Inject constructor(
             val componentName = ComponentName(context.packageName, "$classPath${iconType.aliasName}")
             // If we are using the default icon we just switch every alias off
             val enabledFlag = if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) {
-              PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
             } else {
-              PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
             }
 
             context.packageManager.setComponentEnabledSetting(
