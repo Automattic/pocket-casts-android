@@ -48,7 +48,7 @@ data class Price(
 
 data class PricingSchedule(
     val recurrenceMode: RecurrenceMode,
-    val period: PricingSchedule.Period,
+    val period: Period,
     val periodCount: Int,
 ) {
     enum class Period {
@@ -77,15 +77,17 @@ data class InstallmentPlanDetails(
 
 @ConsistentCopyVisibility
 data class SubscriptionPlans private constructor(
-    private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
+    private val basePlans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan.Base>>,
+    private val offerPlans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan.WithOffer>>,
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
     ): SubscriptionPlan.Base {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = false)
-        // This is a safe cast because constructor is private and we validate data in the create function
-        return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
+        return requireNotNull(basePlans.getValue(key).getOrNull()) {
+            "This should never happen. Base plans are asserted in the create method."
+        }
     }
 
     fun findInstallmentPlan(
@@ -93,9 +95,7 @@ data class SubscriptionPlans private constructor(
         billingCycle: BillingCycle,
     ): PaymentResult<SubscriptionPlan.Base> {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment = true)
-        // This is a safe cast because constructor is private and we validate data in the create function
-        @Suppress("UNCHECKED_CAST")
-        return plans.getValue(key) as PaymentResult<SubscriptionPlan.Base>
+        return basePlans[key] ?: missingPlanResult(key)
     }
 
     fun findOfferPlan(
@@ -104,13 +104,11 @@ data class SubscriptionPlans private constructor(
         offer: SubscriptionOffer,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer)
-        // This is a safe cast because constructor is private and we validate data in the create function
-        @Suppress("UNCHECKED_CAST")
-        return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
+        return offerPlans[key] ?: missingPlanResult(key)
     }
 
     companion object {
-        val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
+        val Preview get() = create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
 
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             BillingCycle.entries.flatMap { billingCycle ->
@@ -121,7 +119,6 @@ data class SubscriptionPlans private constructor(
         }
 
         private val offerPlanKeys = basePlanKeys
-            .filter { !it.isInstallment } // Installment plans don't support promotional offers
             .flatMap { baseKey ->
                 SubscriptionOffer.entries.map { offer ->
                     baseKey.copy(offer = offer)
@@ -130,7 +127,11 @@ data class SubscriptionPlans private constructor(
 
         fun create(products: List<Product>): PaymentResult<SubscriptionPlans> {
             val requiredBasePlanKeys = basePlanKeys.filter { !it.isInstallment }
-            val basePlans = requiredBasePlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
+            val basePlans = requiredBasePlanKeys.associateWith { key ->
+                products.findMatchingSubscriptionPlan(key) { product ->
+                    product.toBaseSubscriptionPlan(key)
+                }
+            }
             val basePlanFailure = basePlans.values
                 .filterIsInstance<PaymentResult.Failure>()
                 .firstOrNull()
@@ -140,107 +141,118 @@ data class SubscriptionPlans private constructor(
 
             val installmentPlanKeys = basePlanKeys.filter { it.isInstallment }
             val installmentPlans = installmentPlanKeys.associateWith { key ->
-                products.findMatchingSubscriptionPlan(key)
+                products.findMatchingSubscriptionPlan(key) { product ->
+                    product.toBaseSubscriptionPlan(key)
+                }
             }
 
-            val offerPlans = offerPlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
+            val offerPlans = offerPlanKeys.associateWith { key ->
+                products.findMatchingSubscriptionPlan(key) { product ->
+                    product.toOfferSubscriptionPlan(key)
+                }
+            }
 
-            return PaymentResult.Success(SubscriptionPlans(basePlans + installmentPlans + offerPlans))
+            return PaymentResult.Success(
+                SubscriptionPlans(
+                    basePlans = basePlans + installmentPlans,
+                    offerPlans = offerPlans,
+                ),
+            )
         }
 
-        private fun List<Product>.findMatchingSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan> {
+        private fun <T : SubscriptionPlan> List<Product>.findMatchingSubscriptionPlan(
+            key: SubscriptionPlan.Key,
+            mapper: (Product) -> PaymentResult<T>,
+        ): PaymentResult<T> {
             val matchingProducts = findMatchingProducts(key)
             return when (matchingProducts.size) {
-                1 -> {
-                    val product = matchingProducts[0]
-                    PaymentResult.Success(
-                        if (key.offer != null) {
-                            product.toOfferSubscriptionPlan(key)
-                        } else {
-                            product.toBaseSubscriptionPlan(key)
-                        },
-                    )
-                }
-
-                0 -> {
-                    // Check if there's a product that matches ID/basePlan but fails installment validation
-                    if (key.isInstallment && key.productId != null && key.basePlanId != null) {
-                        val productWithMissingDetails = firstOrNull { product ->
-                            product.id == key.productId &&
-                                product.pricingPlans.basePlan.planId == key.basePlanId &&
-                                product.pricingPlans.basePlan.installmentPlanDetails == null
-                        }
-                        if (productWithMissingDetails != null) {
-                            return PaymentResult.Failure(
-                                PaymentResultCode.DeveloperError,
-                                "Product ${key.productId} claims to be installment plan but is missing installmentPlanDetails",
-                            )
-                        }
-                    }
-                    PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
-                }
-
+                1 -> mapper(matchingProducts[0])
+                0 -> missingPlanResult(key)
                 else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
 
         private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
-            // If key has null productId or basePlanId, it's an unsupported combination (e.g., Plus Monthly installment)
-            if (key.productId == null || key.basePlanId == null) {
-                return emptyList()
-            }
+            return asSequence()
+                .filter(isMatchingProduct(key))
+                .filter(isMatchingBasePlan(key))
+                .filter(isValidPricingPlan(key))
+                .filter(isValidInstallment(key))
+                .toList()
+        }
 
-            return filter { product ->
-                val offerCondition = if (key.offer != null) {
-                    val pricingPhases = product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }?.pricingPhases
-                    val infinitePricingPhase = pricingPhases?.singleOrNull { it.schedule.recurrenceMode == RecurrenceMode.Infinite }
-                    infinitePricingPhase != null && infinitePricingPhase == pricingPhases.last()
-                } else {
-                    val pricingPhase = product.pricingPlans.basePlan.pricingPhases.singleOrNull()
-                    pricingPhase?.schedule?.recurrenceMode == RecurrenceMode.Infinite
-                }
+        private fun isMatchingProduct(key: SubscriptionPlan.Key) = { product: Product ->
+            product.id == key.productId
+        }
 
-                val installmentCondition = if (key.isInstallment) {
-                    // Installment plans must have installmentPlanDetails
-                    product.pricingPlans.basePlan.installmentPlanDetails != null
-                } else {
-                    true
-                }
+        private fun isMatchingBasePlan(key: SubscriptionPlan.Key) = { product: Product ->
+            product.pricingPlans.basePlan.planId == key.basePlanId
+        }
 
-                product.id == key.productId &&
-                    product.pricingPlans.basePlan.planId == key.basePlanId &&
-                    offerCondition &&
-                    installmentCondition
+        private fun isValidPricingPlan(key: SubscriptionPlan.Key) = { product: Product ->
+            if (key.offer != null) {
+                val pricingPhases = product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }?.pricingPhases
+                val infinitePricingPhase = pricingPhases?.singleOrNull { it.schedule.recurrenceMode == RecurrenceMode.Infinite }
+                infinitePricingPhase != null && infinitePricingPhase == pricingPhases.last()
+            } else {
+                val pricingPhase = product.pricingPlans.basePlan.pricingPhases.singleOrNull()
+                pricingPhase?.schedule?.recurrenceMode == RecurrenceMode.Infinite
             }
         }
 
-        private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.Base {
-            return SubscriptionPlan.Base(
-                name,
-                key.tier,
-                key.billingCycle,
-                pricingPlans.basePlan.pricingPhases[0],
-                pricingPlans.basePlan.installmentPlanDetails,
-            )
+        private fun isValidInstallment(key: SubscriptionPlan.Key) = { product: Product ->
+            if (key.isInstallment) {
+                key.offer == null && product.pricingPlans.basePlan.installmentPlanDetails != null
+            } else {
+                true
+            }
         }
 
-        private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.WithOffer {
-            checkNotNull(key.offer)
-            val matchingPricingPhases = pricingPlans.offerPlans.single { it.offerId == key.offerId }.pricingPhases
-            return SubscriptionPlan.WithOffer(
-                name,
-                key.tier,
-                key.billingCycle,
-                key.offer,
-                matchingPricingPhases,
-            )
+        private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.Base> {
+            val pricingPhase = pricingPlans.basePlan.pricingPhases.getOrNull(0)
+            return when {
+                pricingPhase == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing pricing phase for $id")
+
+                else -> PaymentResult.Success(
+                    SubscriptionPlan.Base(
+                        name,
+                        key.tier,
+                        key.billingCycle,
+                        pricingPhase,
+                        pricingPlans.basePlan.installmentPlanDetails,
+                    ),
+                )
+            }
+        }
+
+        private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.WithOffer> {
+            val matchingOfferPlan = pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }
+            return when {
+                key.offer == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing offer for $id")
+
+                matchingOfferPlan == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching offer plan for $id")
+
+                else -> PaymentResult.Success(
+                    SubscriptionPlan.WithOffer(
+                        name,
+                        key.tier,
+                        key.billingCycle,
+                        key.offer,
+                        matchingOfferPlan.pricingPhases,
+                    ),
+                )
+            }
         }
     }
 }
 
+private fun missingPlanResult(key: SubscriptionPlan.Key): PaymentResult.Failure {
+    return PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+}
+
 sealed interface SubscriptionPlan {
     val name: String
-    val key: SubscriptionPlan.Key
+    val key: Key
     val tier: SubscriptionTier
     val billingCycle: BillingCycle
     val offer: SubscriptionOffer?
@@ -262,7 +274,7 @@ sealed interface SubscriptionPlan {
     ) : SubscriptionPlan {
         override val offer get() = null
         val isInstallment: Boolean get() = installmentPlanDetails != null
-        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer = null, isInstallment)
+        override val key get() = Key(tier, billingCycle, offer = null, isInstallment)
     }
 
     data class WithOffer(
@@ -272,7 +284,7 @@ sealed interface SubscriptionPlan {
         override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
     ) : SubscriptionPlan {
-        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer)
+        override val key get() = Key(tier, billingCycle, offer)
     }
 
     data class Key(
@@ -281,14 +293,8 @@ sealed interface SubscriptionPlan {
         val offer: SubscriptionOffer?,
         val isInstallment: Boolean = false,
     ) {
-        init {
-            require(!(offer != null && isInstallment)) {
-                "Installment plans cannot have promotional offers. Key: tier=$tier, billingCycle=$billingCycle, offer=$offer, isInstallment=$isInstallment"
-            }
-        }
-
-        val productId: String? = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
-        val basePlanId: String? = SubscriptionPlan.basePlanId(tier, billingCycle, isInstallment)
+        val productId: String? = productId(tier, billingCycle, isInstallment)
+        val basePlanId: String? = basePlanId(tier, billingCycle, isInstallment)
         val offerId = offer?.offerId(tier, billingCycle)
     }
 
