@@ -189,6 +189,10 @@ class EpisodeContainerFragment :
         binding.btnClose.setOnClickListener { dismiss() }
     }
 
+    override fun snackBarView(): View? {
+        return binding?.snackBarView
+    }
+
     private fun FragmentEpisodeContainerBinding.setupViewPager() {
         // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
         viewPager.getChildAt(0).isNestedScrollingEnabled = false

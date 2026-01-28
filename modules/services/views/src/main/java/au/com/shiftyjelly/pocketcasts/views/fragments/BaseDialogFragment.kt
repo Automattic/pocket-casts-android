@@ -60,6 +60,8 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
+    open fun snackBarView(): View? = null
+
     @Inject
     lateinit var theme: Theme
 

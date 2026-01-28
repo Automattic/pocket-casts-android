@@ -184,6 +184,7 @@ import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.extensions.spring
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -1106,12 +1107,22 @@ class MainActivity :
     }
 
     override fun snackBarView(): View {
-        val playerView = supportFragmentManager
+        return dialogSnackBarView() ?: playerSnackBarView() ?: binding.snackbarFragment
+    }
+
+    private fun dialogSnackBarView(): View? {
+        return supportFragmentManager.fragments
+            .filterIsInstance<BaseDialogFragment>()
+            .lastOrNull { it.isAdded && it.dialog?.isShowing == true }
+            ?.snackBarView()
+    }
+
+    private fun playerSnackBarView(): View? {
+        return supportFragmentManager
             .takeIf { viewModel.isPlayerOpen }
             ?.fragments
             ?.firstNotNullOfOrNull { it as? PlayerContainerFragment }
             ?.view
-        return playerView ?: binding.snackbarFragment
     }
 
     override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
@@ -1200,6 +1211,12 @@ class MainActivity :
     override fun closeBottomSheet() {
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+
+    override fun closeDialogs() {
+        supportFragmentManager.fragments.filterIsInstance<DialogFragment>().forEach {
+            it.dismissAllowingStateLoss()
+        }
     }
 
     override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name

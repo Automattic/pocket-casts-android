@@ -21,8 +21,8 @@
     <string name="playing_bookmark">Playing \"%s\"</string>
     <string name="skipping_to">Skipping to %s</string>
     <string name="add_to_up_next">Add to Up Next</string>
-    <string name="add_to_up_next_top">Add to Up Next top</string>
-    <string name="add_to_up_next_bottom">Add to Up Next bottom</string>
+    <string name="add_to_up_next_top">Play next in Up Next</string>
+    <string name="add_to_up_next_bottom">Play last in Up Next</string>
     <string name="add_to_up_next_question">Add to up next?</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
@@ -571,6 +571,7 @@
     <string name="podcasts_unarchive">Unarchive</string>
     <string name="podcasts_unsubscribe_are_you_sure" translatable="false">@string/are_you_sure</string>
     <string name="podcasts_up_next" translatable="false">@string/up_next</string>
+    <string name="podcasts_add_episode">Add</string>
     <string name="create_folder">Create folder</string>
     <string name="save_folder">Save folder</string>
     <string name="folder_name">Folder name</string>
@@ -844,8 +845,8 @@
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_episode">E%d</string>
-    <string name="episode_added_to_up_next">Added to up next</string>
-    <string name="episode_removed_from_up_next">Removed from up next</string>
+    <string name="episode_added_to_up_next">Added to Up Next</string>
+    <string name="episode_removed_from_up_next">Removed from Up Next</string>
     <string name="episode_in_up_next">In up next</string>
     <string name="episode_downloading">Downloading</string>
     <string name="remove_downloaded_file">Remove downloaded file</string>

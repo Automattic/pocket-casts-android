@@ -78,6 +78,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -143,6 +145,9 @@ class EpisodeFragment : BaseFragment() {
 
     @Inject
     lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
+
+    @Inject
+    lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -273,7 +278,7 @@ class EpisodeFragment : BaseFragment() {
                         binding.lblAuthor.setTextColor(state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
-                        binding.btnAddToUpNext.tintColor = iconColor
+                        binding.btnAddEpisode.tintColor = iconColor
                         binding.btnArchive.tintColor = iconColor
                         binding.btnPlayed.tintColor = iconColor
                         binding.progressBar.progressTintList = ColorStateList.valueOf(state.podcastColor)
@@ -453,28 +458,65 @@ class EpisodeFragment : BaseFragment() {
         }
 
         // Up Next
-        binding?.btnAddToUpNext?.setOnClickListener { _ ->
-            val binding = binding ?: return@setOnClickListener
-            if (!binding.btnAddToUpNext.isOn && viewModel.shouldShowUpNextDialog()) {
-                val tintColor = ThemeColor.podcastIcon02(activeTheme, (viewModel.state.value as? EpisodeFragmentState.Loaded)?.tintColor ?: 0xFF000000.toInt())
-                val dialog = OptionsDialog()
-                    .setIconColor(tintColor)
-                    .addCheckedOption(LR.string.play_next, imageId = IR.drawable.ic_upnext_playnext, click = { viewModel.addToUpNext(binding.btnAddToUpNext.isOn) })
-                    .addCheckedOption(LR.string.play_last, imageId = IR.drawable.ic_upnext_playlast, click = { viewModel.addToUpNext(binding.btnAddToUpNext.isOn, addLast = true) })
-                activity?.supportFragmentManager?.let {
-                    dialog.show(it, "upnext")
+        var podcastTint = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
+        var loadedPodcastUuid: String? = null
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            val loadedState = state as? EpisodeFragmentState.Loaded
+            val stateTint = loadedState?.tintColor ?: 0xFF000000.toInt()
+            podcastTint = ThemeColor.podcastIcon02(activeTheme, stateTint)
+            loadedPodcastUuid = loadedState?.podcast?.uuid
+        }
+        binding?.btnAddEpisode?.setOnClickListener { _ ->
+            val dialog = OptionsDialog().setIconColor(podcastTint)
+            when {
+                viewModel.isEpisodeInUpNext() -> {
+                    dialog.addCheckedOption(LR.string.remove_from_up_next, imageId = IR.drawable.ic_upnext_remove) {
+                        viewModel.removeFromUpNext()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_removed_from_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
-            } else {
-                val wasAdded = viewModel.addToUpNext(binding.btnAddToUpNext.isOn)
-                activity?.let { activity ->
-                    val text = if (wasAdded) LR.string.episode_added_to_up_next else LR.string.episode_removed_from_up_next
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
+
+                viewModel.isUpNextEmpty() -> {
+                    dialog.addCheckedOption(LR.string.add_to_up_next, imageId = IR.drawable.ic_upnext_playnext) {
+                        viewModel.addToUpNextTop()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                }
+
+                else -> {
+                    dialog.addCheckedOption(LR.string.add_to_up_next_top, imageId = IR.drawable.ic_upnext_playnext) {
+                        viewModel.addToUpNextTop()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                    dialog.addCheckedOption(LR.string.add_to_up_next_bottom, imageId = IR.drawable.ic_upnext_playlast) {
+                        viewModel.addToUpNextBottom()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
             }
-        }
-        viewModel.inUpNext.observe(viewLifecycleOwner) { isInUpNext ->
-            // Up Next
-            binding?.btnAddToUpNext?.isOn = isInUpNext
+            loadedPodcastUuid?.let { podcastUuid ->
+                dialog.addCheckedOption(LR.string.add_to_playlist_description, imageId = IR.drawable.ic_playlist_add_episode) {
+                    if (parentFragmentManager.findFragmentByTag("add-to-playlist") == null) {
+                        val fragment = addToPlaylistFragmentFactory.create(
+                            source = AddToPlaylistFragmentFactory.Source.EpisodeDetails,
+                            episodeUuid = episodeUUID,
+                            podcastUuid = podcastUuid,
+                        )
+                        fragment.show(parentFragmentManager, "add-to-playlist")
+                    }
+                }
+            }
+            if (parentFragmentManager.findFragmentByTag("EpisodeDetailsAddEpisode") == null) {
+                dialog.show(parentFragmentManager, "EpisodeDetailsAddEpisode")
+            }
         }
 
         viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
@@ -506,7 +548,7 @@ class EpisodeFragment : BaseFragment() {
             }
         }
 
-        binding?.btnAddToUpNext?.setup(ToggleActionButton.State.On(LR.string.podcasts_up_next, IR.drawable.ic_upnext_remove), ToggleActionButton.State.Off(LR.string.podcasts_up_next, IR.drawable.ic_upnext_playnext), false)
+        binding?.btnAddEpisode?.setup(ToggleActionButton.State.On(LR.string.podcasts_add_episode, IR.drawable.ic_add_black_24dp), ToggleActionButton.State.Off(LR.string.podcasts_add_episode, IR.drawable.ic_add_black_24dp), false)
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
 

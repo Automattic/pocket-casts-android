@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -29,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -71,7 +69,6 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val source = SourceView.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
     lateinit var showNotesState: LiveData<ShowNotesState>
-    lateinit var inUpNext: LiveData<Boolean>
     val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {
         it.episodeUuid == episode?.uuid && it.isPlaying
     }
@@ -170,10 +167,6 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
             .distinctUntilChanged()
 
-        val inUpNextObservable = playbackManager.upNextQueue.changesObservable.toFlowable(BackpressureStrategy.LATEST)
-            .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUuid)) }
-        inUpNext = inUpNextObservable.toLiveData()
-
         if (transcript.value?.episodeUuid != episodeUuid) {
             val oldJob = loadTranscriptJob
             loadTranscriptJob = launch {
@@ -243,30 +236,30 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
-    fun addToUpNext(isOn: Boolean, addLast: Boolean = false): Boolean {
+    fun addToUpNextTop() {
         episode?.let { episode ->
-            return if (!isOn) {
-                launch {
-                    if (addLast) {
-                        playbackManager.playLast(episode = episode, source = source)
-                    } else {
-                        playbackManager.playNext(episode = episode, source = source)
-                    }
-                }
-
-                true
-            } else {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = source)
-
-                false
-            }
+            launch { playbackManager.playNext(episode = episode, source = source) }
         }
-
-        return false
     }
 
-    fun shouldShowUpNextDialog(): Boolean {
-        return playbackManager.upNextQueue.queueEpisodes.isNotEmpty()
+    fun addToUpNextBottom() {
+        episode?.let { episode ->
+            launch { playbackManager.playLast(episode = episode, source = source) }
+        }
+    }
+
+    fun removeFromUpNext() {
+        episode?.let { episode ->
+            launch { playbackManager.removeEpisode(episodeToRemove = episode, source = source) }
+        }
+    }
+
+    fun isEpisodeInUpNext(): Boolean {
+        return playbackManager.upNextQueue.allEpisodes.any { it.uuid == episode?.uuid }
+    }
+
+    fun isUpNextEmpty(): Boolean {
+        return playbackManager.upNextQueue.queueEpisodes.isEmpty()
     }
 
     fun seekToTimeMs(positionMs: Int) {
