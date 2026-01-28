@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
@@ -27,6 +26,8 @@ dependencies {
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
+
+    implementation(platform(libs.compose.bom))
 
     implementation(libs.coil)
     implementation(libs.coil.network.okhttp)

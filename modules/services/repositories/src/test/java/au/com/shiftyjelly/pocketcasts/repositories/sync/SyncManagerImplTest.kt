@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
@@ -16,7 +18,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -87,13 +88,15 @@ class SyncManagerImplTest {
     }
 
     private fun createMockLoginResponse(isNew: Boolean): LoginTokenResponse {
-        return mock<LoginTokenResponse>().apply {
-            whenever(email).thenReturn("test@example.com")
-            whenever(uuid).thenReturn("uuid")
-            whenever(refreshToken).thenReturn(mock())
-            whenever(accessToken).thenReturn(mock())
-            whenever(this.isNew).thenReturn(isNew)
-        }
+        return LoginTokenResponse(
+            email = "test@example.com",
+            uuid = "uuid",
+            isNew = isNew,
+            accessToken = AccessToken("value"),
+            refreshToken = RefreshToken("value"),
+            tokenType = "token_type",
+            expiresIn = 0,
+        )
     }
 
     private suspend fun verifyNotificationCalled() {

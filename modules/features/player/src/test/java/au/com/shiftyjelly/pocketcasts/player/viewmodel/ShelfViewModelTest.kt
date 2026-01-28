@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_MINIMUM_SHELF_ITEMS
@@ -13,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import kotlin.collections.listOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -53,7 +53,7 @@ class ShelfViewModelTest {
             mock<ShelfItem>(),
             mock<ShelfItem>(),
         )
-        val episode = mock<PodcastEpisode>()
+        val episode = PodcastEpisode(uuid = "uuid", publishedDate = SafeDate())
         initViewModel(isEditable = true)
 
         try {
@@ -72,7 +72,7 @@ class ShelfViewModelTest {
             mock<ShelfItem>(),
             mock<ShelfItem>(),
         )
-        val episode = mock<PodcastEpisode>()
+        val episode = PodcastEpisode(uuid = "uuid", publishedDate = SafeDate())
         initViewModel(isEditable = true)
 
         shelfViewModel.setData(items, episode)
@@ -94,7 +94,7 @@ class ShelfViewModelTest {
     fun `given non-editable state, when setData is called, then shelfRowItems are updated without titles`() = runTest {
         initViewModel(isEditable = false)
         val items = listOf<ShelfItem>(mock(), mock())
-        val episode = mock<PodcastEpisode>()
+        val episode = PodcastEpisode(uuid = "uuid", publishedDate = SafeDate())
 
         shelfViewModel.setData(items, episode)
 
@@ -204,7 +204,7 @@ class ShelfViewModelTest {
     ) {
         val items = ShelfItem.entries
         initViewModel(isEditable = true)
-        shelfViewModel.setData(items, mock<PodcastEpisode>())
+        shelfViewModel.setData(items, PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
 
         shelfViewModel.onShelfItemMove(from, to)
     }

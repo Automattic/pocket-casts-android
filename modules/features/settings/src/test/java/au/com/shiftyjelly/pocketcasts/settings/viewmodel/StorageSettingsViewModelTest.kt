@@ -79,11 +79,9 @@ class StorageSettingsViewModelTest {
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.empty())
-        whenever(episodeDao.hasNormalizedEpisodeTitles(any())).thenReturn(flowOf(true))
         viewModel = StorageSettingsViewModel(
             episodeManager,
             fileStorage,
-            episodeDao,
             fileUtil,
             settings,
             analyticsTracker,
