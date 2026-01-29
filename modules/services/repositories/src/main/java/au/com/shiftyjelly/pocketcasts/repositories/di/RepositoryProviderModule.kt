@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
+import android.accounts.AccountManager
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -83,5 +84,11 @@ class RepositoryProviderModule {
             syncManager,
             platform,
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
+        return AccountManager.get(context)
     }
 }

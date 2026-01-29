@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
-import android.accounts.AccountManager
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
@@ -16,18 +15,25 @@ import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.adapters.ExecutorEnqueueAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.addInterceptors
+import au.com.shiftyjelly.pocketcasts.servers.bumpstats.WpComService
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticService
+import au.com.shiftyjelly.pocketcasts.servers.list.ListDownloadService
+import au.com.shiftyjelly.pocketcasts.servers.list.ListUploadService
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshService
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,26 +56,31 @@ import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ServersModule {
+class NetworkModule {
     companion object {
-        private val okHttpDispatcher = Dispatcher()
-
         fun createCache(folder: String, context: Context, cacheSizeInMB: Int): Cache {
             val cacheSize = cacheSizeInMB * 1024 * 1024
             val cacheDirectory = File(context.cacheDir.absolutePath, folder)
             return Cache(cacheDirectory, cacheSize.toLong())
         }
+    }
 
-        fun provideRetrofit(baseUrl: String, okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-            return Retrofit.Builder()
-                .addConverterFactory(ProtoConverterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(okHttpDispatcher.executorService))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.from(okHttpDispatcher.executorService)))
-                .baseUrl(baseUrl)
-                .client(okHttpClient)
-                .build()
-        }
+    @Provides
+    @Singleton
+    fun provideDispatcher(): Dispatcher = Dispatcher()
+
+    @Provides
+    @Singleton
+    @Cached
+    fun provideCachedCache(@ApplicationContext context: Context): Cache {
+        return createCache(folder = "HttpCache", context = context, cacheSizeInMB = 10)
+    }
+
+    @Provides
+    @Singleton
+    @Transcripts
+    fun provideTranscriptCache(@ApplicationContext context: Context): Cache {
+        return createCache(folder = "TranscriptCache", context = context, cacheSizeInMB = 50)
     }
 
     @Provides
@@ -94,18 +105,21 @@ class ServersModule {
     }
 
     @Provides
-    @Singleton
-    @Raw
-    fun provideRawClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .dispatcher(okHttpDispatcher)
-            .build()
+    fun provideRetrofitBuilder(moshi: Moshi, dispatcher: Dispatcher): Retrofit.Builder {
+        return Retrofit.Builder()
+            .addConverterFactory(ProtoConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addCallAdapterFactory(ExecutorEnqueueAdapterFactory(dispatcher.executorService))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.from(dispatcher.executorService)))
     }
 
     @Provides
-    @Cached
-    fun provideCachedCache(@ApplicationContext context: Context): Cache {
-        return createCache(folder = "HttpCache", context = context, cacheSizeInMB = 10)
+    @Singleton
+    @Raw
+    fun provideRawClient(dispatcher: Dispatcher): OkHttpClient {
+        return OkHttpClient.Builder()
+            .dispatcher(dispatcher)
+            .build()
     }
 
     @Provides
@@ -171,15 +185,9 @@ class ServersModule {
     }
 
     @Provides
-    @Transcripts
-    fun provideTranscriptCache(@ApplicationContext context: Context): Cache {
-        return createCache(folder = "TranscriptCache", context = context, cacheSizeInMB = 50)
-    }
-
-    @Provides
     @Singleton
     @Transcripts
-    internal fun provideTranscriptsClient(
+    fun provideTranscriptsClient(
         @Raw client: OkHttpClient,
         @Transcripts cache: Cache,
         @Transcripts interceptors: List<@JvmSuppressWildcards OkHttpInterceptor>,
@@ -197,7 +205,7 @@ class ServersModule {
     @Provides
     @Singleton
     @Player
-    fun providePlayerClinet(
+    fun providePlayerClient(
         @Raw client: OkHttpClient,
         @Player interceptors: List<@JvmSuppressWildcards OkHttpInterceptor>,
     ): OkHttpClient {
@@ -224,107 +232,172 @@ class ServersModule {
     @Provides
     @SyncServiceRetrofit
     @Singleton
-    internal fun provideApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_API_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun provideApiRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_API_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @WpComServiceRetrofit
     @Singleton
-    internal fun provideWpComApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+    fun provideWpComApiRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
             .baseUrl(Settings.WP_COM_API_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
     @Provides
     @RefreshServiceRetrofit
     @Singleton
-    internal fun provideRefreshRetrofit(@NoCacheTokened okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_MAIN_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun provideRefreshRetrofit(
+        builder: Retrofit.Builder,
+        @NoCacheTokened httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_MAIN_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @PodcastCacheServiceRetrofit
     @Singleton
-    internal fun providePodcastRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_CACHE_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun providePodcastRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_CACHE_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @StaticServiceRetrofit
     @Singleton
-    internal fun provideStaticRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun provideStaticRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_STATIC_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @ListDownloadServiceRetrofit
     @Singleton
-    internal fun provideListDownloadRetrofit(@NoCache okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_LIST_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun provideListDownloadRetrofit(
+        builder: Retrofit.Builder,
+        @NoCache httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_LIST_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @ListUploadServiceRetrofit
     @Singleton
-    internal fun provideListUploadRetrofit(@NoCache okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_SHARING_URL, okHttpClient = okHttpClient, moshi = moshi)
+    fun provideListUploadRetrofit(
+        builder: Retrofit.Builder,
+        @NoCache httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_SHARING_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @DiscoverServiceRetrofit
     @Singleton
-    internal fun provideDiscoverRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
-    }
-
-    @Provides
-    @Singleton
-    internal fun provideListWebService(@DiscoverServiceRetrofit retrofit: Retrofit): ListWebService {
-        return retrofit.create(ListWebService::class.java)
+    fun provideDiscoverRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.SERVER_STATIC_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
     }
 
     @Provides
     @TranscriptRetrofit
     @Singleton
-    internal fun provideTranscriptRetrofit(@Transcripts okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient)
+    fun provideTranscriptRetrofit(
+        builder: Retrofit.Builder,
+        @Transcripts httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
             .baseUrl("http://localhost/") // Base URL is required but will be set using the annotation @Url
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
     @Provides
     @Singleton
     @SearchRetrofit
-    internal fun provideSearchApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+    fun provideSearchApiRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
             .baseUrl(Settings.SEARCH_API_URL)
-            .client(okHttpClient)
+            .callFactory { request -> httpClient.get().newCall(request) }
             .build()
     }
 
+    @Provides
+    @Singleton
+    fun provideListWebService(@DiscoverServiceRetrofit retrofit: Retrofit): ListWebService = retrofit.create()
+
     @Singleton
     @Provides
-    internal fun provideAutoCompleteSearchService(@SearchRetrofit retrofit: Retrofit): AutoCompleteSearchService = retrofit.create(AutoCompleteSearchService::class.java)
+    fun provideAutoCompleteSearchService(@SearchRetrofit retrofit: Retrofit): AutoCompleteSearchService = retrofit.create()
 
     @Provides
     @Singleton
-    internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
-        return AccountManager.get(context)
-    }
+    fun provideCacheService(@PodcastCacheServiceRetrofit retrofit: Retrofit): PodcastCacheService = retrofit.create()
 
     @Provides
     @Singleton
-    fun provideCacheServer(@PodcastCacheServiceRetrofit retrofit: Retrofit): PodcastCacheService = retrofit.create()
+    fun provideTranscriptCacheService(@TranscriptRetrofit retrofit: Retrofit): TranscriptService = retrofit.create()
 
     @Provides
     @Singleton
-    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptService = retrofit.create()
+    fun provideStaticService(@StaticServiceRetrofit retrofit: Retrofit): StaticService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideListUploadService(@ListUploadServiceRetrofit retrofit: Retrofit): ListUploadService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideListDownloadService(@ListDownloadServiceRetrofit retrofit: Retrofit): ListDownloadService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideRefreshService(@RefreshServiceRetrofit retrofit: Retrofit): RefreshService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideWpComService(@WpComServiceRetrofit retrofit: Retrofit): WpComService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideSyncService(@SyncServiceRetrofit retrofit: Retrofit): SyncService = retrofit.create()
 }
 
 @Qualifier

@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:paddingBottom="5dp"
-                app:layout_constraintEnd_toStartOf="@+id/btnAddToUpNext"
+                app:layout_constraintEnd_toStartOf="@+id/btnAddEpisode"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/topDivider"
@@ -123,13 +123,13 @@
                 tools:text="Download" />
 
             <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
-                android:id="@+id/btnAddToUpNext"
+                android:id="@+id/btnAddEpisode"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="5dp"
                 android:gravity="top"
                 tools:background="@tools:sample/avatars"
-                android:contentDescription="@string/add_to_up_next"
+                android:contentDescription="@string/podcasts_add_episode"
                 app:layout_constraintStart_toEndOf="@+id/btnDownload"
                 app:layout_constraintEnd_toStartOf="@+id/btnPadding"
                 app:layout_constraintTop_toTopOf="@+id/btnDownload"

@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokened
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshPodcastBatcher
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Single
 import java.io.IOException
@@ -19,8 +20,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -28,7 +31,7 @@ import okhttp3.Request
 @Singleton
 open class ServiceManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    @NoCacheTokened private val httpClientNoCache: OkHttpClient,
+    @NoCacheTokened private val httpClient: Lazy<OkHttpClient>,
     private val settings: Settings,
 ) {
     companion object {
@@ -81,7 +84,8 @@ open class ServiceManager @Inject constructor(
                 .post(requestParams.toFormBody())
                 .build()
 
-            val response = httpClientNoCache.newCall(request).await()
+            val client = withContext(Dispatchers.Default) { httpClient.get() }
+            val response = client.newCall(request).await()
             val serverResponse = DataParser.parseServerResponse(response.body.string())
 
             when {

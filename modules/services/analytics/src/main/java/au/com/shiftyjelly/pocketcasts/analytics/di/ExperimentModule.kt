@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +39,7 @@ object ExperimentModule {
     @Singleton
     fun provideVariationsRepository(
         @ApplicationContext context: Context,
-        @Cached okHttpClient: OkHttpClient,
+        @Cached httpClient: Lazy<OkHttpClient>,
     ): VariationsRepository {
         val directory = File(context.filesDir, "experiments")
 
@@ -63,7 +64,7 @@ object ExperimentModule {
             failFast = BuildConfig.DEBUG,
             cacheDir = directory,
             coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
-            okhttpClient = okHttpClient,
+            callFactory = { request -> httpClient.get().newCall(request) },
         )
     }
 }

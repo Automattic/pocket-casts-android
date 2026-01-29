@@ -7,6 +7,7 @@ import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,16 +24,14 @@ class UiModule {
     @Singleton
     internal fun provideCoilImageLoader(
         @ApplicationContext context: Context,
-        @Artwork client: OkHttpClient,
+        @Artwork httpClient: Lazy<OkHttpClient>,
     ): ImageLoader {
         return ImageLoader.Builder(context)
             .crossfade(true)
             .components {
                 add(
                     OkHttpNetworkFetcherFactory(
-                        callFactory = {
-                            client
-                        },
+                        callFactory = { httpClient.get() },
                     ),
                 )
             }

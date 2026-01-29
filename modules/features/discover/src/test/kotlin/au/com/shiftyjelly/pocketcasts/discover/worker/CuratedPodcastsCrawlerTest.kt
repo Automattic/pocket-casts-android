@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
@@ -25,7 +25,7 @@ class CuratedPodcastsCrawlerTest {
 
     @Before
     fun setup() {
-        val moshi = ServersModule().provideMoshi()
+        val moshi = NetworkModule().provideMoshi()
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
             .addConverterFactory(MoshiConverterFactory.create(moshi))
