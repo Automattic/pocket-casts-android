@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
@@ -42,7 +42,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val tracker: AnalyticsTracker,
     @Assisted private val source: Source,
-    @Assisted("uuids") private val episodeUuids: List<EpisodeUuids>,
+    @Assisted("uuids") private val episodeUuids: List<EpisodeUuidPair>,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
     private val previewsFlow = MutableStateFlow<List<PlaylistPreviewForEpisode>?>(null)
@@ -123,7 +123,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         isCreationTriggered = true
         viewModelScope.launch {
             val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
-            val uuids = episodeUuids.map(EpisodeUuids::episodeUuid)
+            val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
             playlistManager.addManualEpisodes(playlistUuid, uuids)
             tracker.track(AnalyticsEvent.FILTER_CREATED)
             _createdPlaylist.complete(playlistUuid)
@@ -137,7 +137,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
-                        val newUuids = preview.episodeUuids + episodeUuids.map(EpisodeUuids::episodeUuid)
+                        val newUuids = preview.episodeUuids + episodeUuids.map(EpisodeUuidPair::episodeUuid)
                         preview.copy(episodeUuids = newUuids)
                     } else {
                         preview
@@ -154,7 +154,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
-                        val newUuids = preview.episodeUuids - episodeUuids.mapTo(mutableSetOf(), EpisodeUuids::episodeUuid)
+                        val newUuids = preview.episodeUuids - episodeUuids.mapTo(mutableSetOf(), EpisodeUuidPair::episodeUuid)
                         preview.copy(episodeUuids = newUuids)
                     } else {
                         preview
@@ -166,7 +166,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
 
     fun commitPlaylistChanges() {
         viewModelScope.launch(NonCancellable) {
-            val uuids = episodeUuids.map(EpisodeUuids::episodeUuid)
+            val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
             for ((playlistUuid, isAdded) in playlistsChanges) {
                 if (isAdded) {
                     playlistManager.addManualEpisodes(playlistUuid, uuids)
@@ -268,7 +268,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             source: Source,
-            @Assisted("uuids") episodeUuids: List<EpisodeUuids>,
+            @Assisted("uuids") episodeUuids: List<EpisodeUuidPair>,
             @Assisted("title") initialPlaylistTitle: String,
         ): AddToPlaylistViewModel
     }

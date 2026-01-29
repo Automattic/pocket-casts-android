@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.playlists.create.FakePlaylistManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
@@ -26,7 +26,7 @@ class AddToPlaylistViewModelTest {
             tracker = AnalyticsTracker.test(),
             source = AddToPlaylistFragmentFactory.Source.Shelf,
             episodeUuids = List(3) { index ->
-                EpisodeUuids("episode-uuid-$index", "podcast-uuid-$index")
+                EpisodeUuidPair("episode-uuid-$index", "podcast-uuid-$index")
             },
             initialPlaylistTitle = "Title",
         )

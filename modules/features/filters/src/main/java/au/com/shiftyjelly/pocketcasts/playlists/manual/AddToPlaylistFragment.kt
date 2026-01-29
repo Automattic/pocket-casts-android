@@ -26,7 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -72,7 +72,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         val coroutineScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
-        val newEpisodeUuids = args.uuids.map(EpisodeUuids::episodeUuid)
+        val newEpisodeUuids = args.uuids.map(EpisodeUuidPair::episodeUuid)
 
         OpenCreatedPlaylistEffect()
 
@@ -184,7 +184,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val source: Source,
-        val uuids: List<EpisodeUuids>,
+        val uuids: List<EpisodeUuidPair>,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
 
@@ -201,7 +201,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                 NEW_INSTANCE_ARGS to Args(
                     source = source,
                     uuids = listOf(
-                        EpisodeUuids(
+                        EpisodeUuidPair(
                             episodeUuid = episodeUuid,
                             podcastUuid = podcastUuid,
                         ),
@@ -213,7 +213,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 
         fun newInstance(
             source: Source,
-            uuids: List<EpisodeUuids>,
+            uuids: List<EpisodeUuidPair>,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
             arguments = bundleOf(
