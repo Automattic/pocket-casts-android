@@ -978,6 +978,9 @@
     <string name="playlist_episodes_hide_archived" translatable="false">@string/podcast_hide_archived</string>
     <string name="playlist_episodes_show_archived" translatable="false">@string/show_archived</string>
     <string name="playlist_is_full_description" translatable="false">@string/add_to_playlist_failure_message</string>
+    <string name="playlist_limit_almost_full">Playlist is almost full. Try adding fewer episodes.</string>
+    <string name="playlist_limit_reached">Playlist can only contain up to %d episodes.</string>
+    <string name="playlist_only_podcast_episodes_allowed">Playlist can only contain podcast episodes.</string>
     <string name="playlist_options">Playlist options</string>
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>

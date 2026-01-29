@@ -19,9 +19,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.R
@@ -29,7 +31,9 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 import kotlin.math.min
@@ -55,6 +59,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val shareDialogFactory: ShareDialogFactory,
+    private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -162,6 +167,11 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
             UR.id.menu_remove_listening_history -> {
                 removeListeningHistory(resources = resources)
+                true
+            }
+
+            UR.id.menu_add_to_playlist -> {
+                addToPlaylist(activity)
                 true
             }
 
@@ -521,6 +531,42 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val list = selectedList.toList()
         playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
+    }
+
+    private fun addToPlaylist(activity: FragmentActivity) {
+        if (selectedList.any { episode -> episode !is PodcastEpisode }) {
+            val snackbarView = (activity as? FragmentHostListener)?.snackBarView()
+            if (snackbarView != null) {
+                Snackbar.make(snackbarView, LR.string.playlist_only_podcast_episodes_allowed, Snackbar.LENGTH_LONG).show()
+            }
+            return
+        }
+
+        val episodeUuids = selectedList.mapNotNull { episode ->
+            when (episode) {
+                is PodcastEpisode -> episode.uuids
+                is UserEpisode -> null
+            }
+        }
+        if (episodeUuids.size > PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT) {
+            val snackbarView = (activity as? FragmentHostListener)?.snackBarView()
+            if (snackbarView != null) {
+                val message = activity.getString(LR.string.playlist_limit_reached, PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG).show()
+            }
+            return
+        }
+        if (episodeUuids.isNotEmpty()) {
+            val fragmentManager = activity.supportFragmentManager
+            if (fragmentManager.findFragmentByTag("add-to-playlist") == null) {
+                val fragment = addToPlaylistFragmentFactory.create(
+                    source = AddToPlaylistFragmentFactory.Source.MultiSelect,
+                    uuids = episodeUuids,
+                )
+                fragment.show(fragmentManager, "add-to-playlist")
+            }
+            closeMultiSelect()
+        }
     }
 
     companion object {

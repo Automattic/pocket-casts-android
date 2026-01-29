@@ -90,7 +90,7 @@ internal fun AddToPlaylistPage(
     refreshArtworkUuids: suspend (String) -> Unit,
     onClickCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
-    onClickContinueWithNewPlaylist: () -> Unit,
+    onClickContinueWithNewPlaylist: () -> Boolean,
     onClickDoneButton: () -> Unit,
     onClickNavigationButton: () -> Unit,
     modifier: Modifier = Modifier,
@@ -139,8 +139,9 @@ internal fun AddToPlaylistPage(
                     getArtworkUuidsFlow = getArtworkUuidsFlow,
                     refreshArtworkUuids = refreshArtworkUuids,
                     onCreatePlaylist = {
-                        onClickContinueWithNewPlaylist()
-                        navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST)
+                        if (onClickContinueWithNewPlaylist()) {
+                            navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST)
+                        }
                     },
                     onChangeEpisodeInPlaylist = onChangeEpisodeInPlaylist,
                     onClickDoneButton = onClickDoneButton,
@@ -468,7 +469,7 @@ private fun AddToPlaylistPageEmptyStatePreview() {
             refreshArtworkUuids = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
-            onClickContinueWithNewPlaylist = {},
+            onClickContinueWithNewPlaylist = { true },
             onClickDoneButton = {},
             onClickNavigationButton = {},
             modifier = Modifier.fillMaxSize(),
@@ -489,7 +490,7 @@ private fun AddToPlaylistPageNoSearchPreview() {
             refreshArtworkUuids = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
-            onClickContinueWithNewPlaylist = {},
+            onClickContinueWithNewPlaylist = { true },
             onClickDoneButton = {},
             onClickNavigationButton = {},
             modifier = Modifier.fillMaxSize(),
@@ -536,7 +537,7 @@ private fun AddToPlaylistPagePreview(
             navController = navController,
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
-            onClickContinueWithNewPlaylist = {},
+            onClickContinueWithNewPlaylist = { true },
             onClickDoneButton = {},
             onClickNavigationButton = navController::popBackStack,
             modifier = Modifier.fillMaxSize(),
