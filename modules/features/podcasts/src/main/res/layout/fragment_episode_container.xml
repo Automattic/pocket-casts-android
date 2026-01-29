@@ -92,9 +92,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/snackBarView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
 </au.com.shiftyjelly.pocketcasts.views.helper.MatchParentFrameLayout>

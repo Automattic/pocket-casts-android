@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -98,7 +99,8 @@ class EpisodeContainerFragment :
 
     override val includeNavigationBarPadding: Boolean = false
 
-    var binding: FragmentEpisodeContainerBinding? = null
+    private var binding: FragmentEpisodeContainerBinding? = null
+    private var snackBarView: CoordinatorLayout? = null
 
     private val args get() = requireArguments().requireParcelable<EpisodeFragmentArgs>(NEW_INSTANCE_ARG)
 
@@ -156,6 +158,9 @@ class EpisodeContainerFragment :
         savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentEpisodeContainerBinding.inflate(inflater, container, false)
+        snackBarView = CoordinatorLayout(ContextThemeWrapper(context, activeTheme.resourceId)).also {
+            binding?.root?.addView(it)
+        }
         return binding?.root
     }
 
@@ -189,9 +194,7 @@ class EpisodeContainerFragment :
         binding.btnClose.setOnClickListener { dismiss() }
     }
 
-    override fun snackBarView(): View? {
-        return binding?.snackBarView
-    }
+    override fun snackBarView() = snackBarView
 
     private fun FragmentEpisodeContainerBinding.setupViewPager() {
         // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
@@ -267,6 +270,7 @@ class EpisodeContainerFragment :
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        snackBarView = null
         with(bookmarksViewModel.multiSelectHelper) {
             isMultiSelecting = false
             context = null
