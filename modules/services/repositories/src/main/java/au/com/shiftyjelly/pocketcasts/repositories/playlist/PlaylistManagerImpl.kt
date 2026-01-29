@@ -401,40 +401,48 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
-        return appDatabase.withTransaction {
-            val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid)
-            val episodeUuids = episodes.map(ManualPlaylistEpisode::episodeUuid)
-            if (episodeUuid in episodeUuids) {
-                return@withTransaction true
-            }
+    override suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean {
+        return withContext(computationContext) {
+            appDatabase.withTransaction {
+                val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid)
+                val existingEpisodeUuids = episodes.map(ManualPlaylistEpisode::episodeUuid)
+                val newEpisodeUuids = episodeUuids.filter { uuid -> uuid !in existingEpisodeUuids }
+                if (newEpisodeUuids.isEmpty()) {
+                    return@withTransaction true
+                }
 
-            if (episodeUuids.size >= manualEpisodeLimit) {
-                return@withTransaction false
-            }
+                if (existingEpisodeUuids.size + newEpisodeUuids.size > manualEpisodeLimit) {
+                    return@withTransaction false
+                }
 
-            val podcastEpisode = episodeDao.findByUuid(episodeUuid)
-            if (podcastEpisode == null) {
-                return@withTransaction false
-            }
+                val newPodcastEpisodes = episodeDao.findByUuids(newEpisodeUuids)
+                if (newPodcastEpisodes.isEmpty()) {
+                    return@withTransaction false
+                }
+                val podcastUuids = newPodcastEpisodes.map(PodcastEpisode::podcastUuid)
+                val podcastSlugs = podcastDao.findAllIn(podcastUuids).associate { it.uuid to it.slug }
 
-            val podcast = podcastDao.findPodcastByUuid(podcastEpisode.podcastUuid)
-            val newEpisode = ManualPlaylistEpisode(
-                playlistUuid = playlistUuid,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastEpisode.podcastUuid,
-                title = podcastEpisode.title,
-                addedAt = clock.instant(),
-                publishedAt = podcastEpisode.publishedDate.toInstant(),
-                downloadUrl = podcastEpisode.downloadUrl,
-                episodeSlug = podcastEpisode.slug,
-                podcastSlug = podcast?.slug.orEmpty(),
-                sortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0,
-                isSynced = false,
-            )
-            playlistDao.upsertManualEpisode(newEpisode)
-            playlistDao.markPlaylistAsNotSynced(playlistUuid)
-            true
+                val addedAt = clock.instant()
+                val startSortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0
+                newPodcastEpisodes.forEachIndexed { index, podcastEpisode ->
+                    val newEpisode = ManualPlaylistEpisode(
+                        playlistUuid = playlistUuid,
+                        episodeUuid = podcastEpisode.uuid,
+                        podcastUuid = podcastEpisode.podcastUuid,
+                        title = podcastEpisode.title,
+                        addedAt = addedAt,
+                        publishedAt = podcastEpisode.publishedDate.toInstant(),
+                        downloadUrl = podcastEpisode.downloadUrl,
+                        episodeSlug = podcastEpisode.slug,
+                        podcastSlug = podcastSlugs[podcastEpisode.podcastUuid].orEmpty(),
+                        sortPosition = startSortPosition + index,
+                        isSynced = false,
+                    )
+                    playlistDao.upsertManualEpisode(newEpisode)
+                }
+                playlistDao.markPlaylistAsNotSynced(playlistUuid)
+                true
+            }
         }
     }
 

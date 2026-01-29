@@ -120,8 +120,10 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     val addManualEpisodeTurbine = Turbine<Pair<String, String>>(name = "addManualEpisodeTurbine")
-    override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
-        addManualEpisodeTurbine.add(playlistUuid to episodeUuid)
+    override suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean {
+        for (episodeUuid in episodeUuids) {
+            addManualEpisodeTurbine.add(playlistUuid to episodeUuid)
+        }
         return true
     }
 
