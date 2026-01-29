@@ -544,7 +544,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
         val episodeUuids = selectedList.mapNotNull { episode ->
             when (episode) {
-                is PodcastEpisode -> episode.uuids
+                is PodcastEpisode -> episode.uuidPair
                 is UserEpisode -> null
             }
         }

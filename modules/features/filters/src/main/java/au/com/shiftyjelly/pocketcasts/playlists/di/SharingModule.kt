@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.di
 
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -18,7 +18,7 @@ object SharingModule {
     fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = object : AddToPlaylistFragmentFactory {
         override fun create(
             source: Source,
-            uuids: List<EpisodeUuids>,
+            uuids: List<EpisodeUuidPair>,
             customTheme: Theme.ThemeType?,
         ): BaseDialogFragment {
             return AddToPlaylistFragment.newInstance(

@@ -1,13 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 
 interface AddToPlaylistFragmentFactory {
     fun create(
         source: Source,
-        uuids: List<EpisodeUuids>,
+        uuids: List<EpisodeUuidPair>,
         customTheme: Theme.ThemeType? = null,
     ): BaseDialogFragment
 
@@ -19,7 +19,7 @@ interface AddToPlaylistFragmentFactory {
     ): BaseDialogFragment = create(
         source = source,
         uuids = listOf(
-            EpisodeUuids(
+            EpisodeUuidPair(
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),
@@ -54,7 +54,7 @@ interface AddToPlaylistFragmentFactory {
         val Stub = object : AddToPlaylistFragmentFactory {
             override fun create(
                 source: Source,
-                uuids: List<EpisodeUuids>,
+                uuids: List<EpisodeUuidPair>,
                 customTheme: Theme.ThemeType?,
             ): BaseDialogFragment {
                 error("Adding episodes to playlist is not supported")
