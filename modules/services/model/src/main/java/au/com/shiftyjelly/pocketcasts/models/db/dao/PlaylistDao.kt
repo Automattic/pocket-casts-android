@@ -31,8 +31,16 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.time.Clock
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 @Dao
 abstract class PlaylistDao {
@@ -66,28 +74,7 @@ abstract class PlaylistDao {
     @Query(
         """
         SELECT
-          playlist.uuid AS uuid,
-          playlist.title AS title,
-          (
-            SELECT
-              COUNT(*)
-            FROM
-              manual_playlist_episodes AS episode
-            WHERE
-              episode.playlist_uuid IS playlist.uuid
-          ) AS episode_count,
-          (
-            SELECT
-              EXISTS(
-                SELECT
-                  *
-                FROM
-                  manual_playlist_episodes AS episode
-                WHERE
-                  episode.playlist_uuid IS playlist.uuid
-                  AND episode.episode_uuid IS :episodeUuid
-              )
-          ) AS has_episode
+          playlist.*
         FROM
           playlists AS playlist
         WHERE
@@ -102,11 +89,32 @@ abstract class PlaylistDao {
           sortPosition ASC
     """,
     )
-    protected abstract fun playlistPreviewsForEpisodeFlowUnsafe(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisode>>
+    protected abstract fun allManualPlaylistsFlow(searchTerm: String): Flow<List<PlaylistEntity>>
 
-    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisode>> {
+    @Query("SELECT episode_uuid FROM manual_playlist_episodes WHERE playlist_uuid = :playlistUuid")
+    protected abstract fun playlistEpisodeUuids(playlistUuid: String): Flow<List<String>>
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun playlistPreviewsForEpisodeFlow(searchTerm: String): Flow<List<PlaylistPreviewForEpisode>> {
         val escapedTerm = searchTerm.escapeLike('\\')
-        return playlistPreviewsForEpisodeFlowUnsafe(episodeUuid, escapedTerm)
+        return allManualPlaylistsFlow(escapedTerm)
+            .flatMapLatest { playlists ->
+                if (playlists.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val episodeFlow = playlists.map { playlist ->
+                        playlistEpisodeUuids(playlist.uuid).map { episodeUuids ->
+                            PlaylistPreviewForEpisode(
+                                uuid = playlist.uuid,
+                                title = playlist.title,
+                                episodeUuids = episodeUuids.toSet(),
+                            )
+                        }
+                    }
+                    combine(episodeFlow) { flows -> flows.toList() }
+                }
+            }
+            .distinctUntilChanged()
     }
 
     @Query("SELECT * FROM playlists WHERE uuid IN (:uuids)")

@@ -103,7 +103,7 @@ class FakePlaylistManager : PlaylistManager {
         return manualPlaylist
     }
 
-    override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
+    override fun playlistPreviewsForEpisodeFlow(searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
         return flowOf(emptyList())
     }
 
