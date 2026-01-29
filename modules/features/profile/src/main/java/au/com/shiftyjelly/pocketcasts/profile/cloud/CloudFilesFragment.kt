@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -150,6 +151,7 @@ class CloudFilesFragment :
         multiSelectHelper.isMultiSelecting = false
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
 

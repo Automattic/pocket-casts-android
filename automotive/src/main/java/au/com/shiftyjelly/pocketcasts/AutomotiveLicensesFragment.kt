@@ -22,7 +22,6 @@ import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
-import kotlinx.collections.immutable.toImmutableList
 
 class AutomotiveLicensesFragment : Fragment() {
 
@@ -48,9 +47,7 @@ class AutomotiveLicensesFragment : Fragment() {
             libraries = produceLibraries { context ->
                 val libs = Libs.Builder().withContext(context).build()
                 // without displaying the artifact id the libraries seem to appear twice
-                libs.copy(
-                    libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
-                )
+                libs.copy(libraries = libs.libraries.distinctBy { "${it.name}##${it.author}" })
             }.value,
             onLibraryClick = { library: Library ->
                 val website = library.website ?: return@LibrariesContainer

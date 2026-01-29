@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 import android.content.Context
 import android.os.StatFs
 import android.widget.Toast
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -46,12 +45,9 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
-import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel.State.DatabaseEpisodeNormalizationState.NormalizationState
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.material.snackbar.Snackbar
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -158,11 +154,6 @@ fun StorageSettingsView(
                     StorageDataWarningRow(state.storageDataWarningState)
                 }
             }
-            item {
-                SettingSection(heading = stringResource(LR.string.database)) {
-                    NormalizeEpisodeTitles(state.episodeTitlesState)
-                }
-            }
         }
     }
 }
@@ -209,31 +200,6 @@ private fun FixDownloads(
         modifier = modifier
             .clickable { onClick() }
             .padding(vertical = 6.dp),
-    )
-}
-
-@Composable
-private fun NormalizeEpisodeTitles(
-    state: StorageSettingsViewModel.State.DatabaseEpisodeNormalizationState,
-    modifier: Modifier = Modifier,
-) {
-    val activity = LocalActivity.current
-    SettingRow(
-        primaryText = stringResource(LR.string.settings_storage_normalize_episode_titles),
-        secondaryText = stringResource(
-            LR.string.settings_storage_normalize_episode_titles_description,
-            stringResource(state.normalizationState.labelId),
-        ),
-        modifier = modifier.clickable(
-            role = Role.Button,
-            onClick = {
-                state.onNormalize()
-                (activity as? FragmentHostListener)?.snackBarView()?.let { view ->
-                    Snackbar.make(view, activity.getString(LR.string.normalization_started), Snackbar.LENGTH_LONG).show()
-                }
-            },
-            enabled = state.normalizationState == NormalizationState.NotNormalized,
-        ),
     )
 }
 
@@ -406,10 +372,6 @@ private fun StorageSettingsPreview(
                 ),
                 storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
                     onCheckedChange = {},
-                ),
-                episodeTitlesState = StorageSettingsViewModel.State.DatabaseEpisodeNormalizationState(
-                    normalizationState = NormalizationState.Normalized,
-                    onNormalize = {},
                 ),
             ),
             onBackPress = {},

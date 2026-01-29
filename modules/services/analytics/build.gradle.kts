@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -29,10 +28,6 @@ dependencies {
     implementation(libs.automattic.tracks)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
-
-    debugImplementation(libs.compose.ui.tooling)
-
-    debugProdImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
