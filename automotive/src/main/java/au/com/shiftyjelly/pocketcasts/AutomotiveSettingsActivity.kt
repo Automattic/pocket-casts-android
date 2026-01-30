@@ -88,6 +88,9 @@ class AutomotiveSettingsActivity :
     override fun openPlayer() {
     }
 
+    override fun closeDialogs() {
+    }
+
     override fun closePlayer() {
     }
 

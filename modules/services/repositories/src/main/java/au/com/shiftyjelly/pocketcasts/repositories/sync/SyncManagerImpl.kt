@@ -176,7 +176,7 @@ class SyncManagerImpl @Inject constructor(
         }
     }
 
-    override fun signOut(action: () -> Unit) {
+    override suspend fun signOut(action: suspend () -> Unit) {
         syncServiceManager.signOut()
         action()
         syncAccountManager.signOut()

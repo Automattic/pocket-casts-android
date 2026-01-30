@@ -351,6 +351,8 @@ enum class AnalyticsEvent(val key: String) {
     ADD_TO_PLAYLISTS_CREATE_NEW_PLAYLIST_TAPPED("add_to_playlists_create_new_playlist_tapped"),
     EPISODE_ADDED_TO_LIST("episode_added_to_list"),
     EPISODE_REMOVED_FROM_LIST("episode_removed_from_list"),
+    EPISODE_ADDED_TO_LIST_BULK("episode_added_to_list_bulk"),
+    EPISODE_REMOVED_FROM_LIST_BULK("episode_removed_from_list_bulk"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),

@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import java.util.Date
@@ -61,7 +61,7 @@ class PlaylistManagerDsl : TestWatcher() {
 
     override fun starting(description: Description) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val moshi = ServersModule().provideMoshi()
+        val moshi = NetworkModule().provideMoshi()
 
         database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(moshi))
@@ -498,8 +498,7 @@ class PlaylistManagerDsl : TestWatcher() {
             PlaylistPreviewForEpisode(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
-                episodeCount = 0,
-                hasEpisode = false,
+                episodeUuids = emptySet(),
             ),
         )
     }

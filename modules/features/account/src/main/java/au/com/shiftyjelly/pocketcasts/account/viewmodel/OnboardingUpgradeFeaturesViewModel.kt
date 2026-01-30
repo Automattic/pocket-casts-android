@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getYearlyPlanWithFeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
@@ -165,7 +166,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 mapOf(
                     "flow" to flow.analyticsValue,
                     "source" to flow.source.analyticsValue,
-                    "product" to plan.productId,
+                    "product" to requireNotNull(plan.productId) { "productId shouldn't be null for plan=$plan" },
                 ),
             )
         }
@@ -290,6 +291,11 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlanWithOffer(): SubscriptionPlan {
+            // When installment plan feature is enabled, show installment plan instead of trial/intro offer
+            if (FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)) {
+                return plusYearlyPlan()
+            }
+
             val offer = if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
                 SubscriptionOffer.IntroOffer
             } else {
@@ -305,7 +311,8 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlan(): SubscriptionPlan.Base {
-            return subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+            // Use installment plan when feature flag is enabled
+            return subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
         }
 
         private fun patronYearlyPlan(): SubscriptionPlan.Base {

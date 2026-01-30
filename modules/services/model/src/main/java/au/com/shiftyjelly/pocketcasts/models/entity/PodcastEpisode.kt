@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
@@ -166,6 +167,11 @@ data class PodcastEpisode(
 
     val lastPlaybackInteractionDate: Date?
         get() = lastPlaybackInteraction?.let { Date(it) }
+
+    val uuidPair get() = EpisodeUuidPair(
+        episodeUuid = uuid,
+        podcastUuid = podcastUuid,
+    )
 
     fun setPlayingStatusInt(status: Int) {
         this.playingStatus = when (status) {

@@ -62,8 +62,8 @@ class CreateEmailFragment : BaseFragment() {
         viewModel.updateEmail(startingEmailValue)
         viewModel.updatePassword(startingPasswordValue)
 
-        txtEmail.setText(viewModel.email.value?.toString())
-        txtPassword.setText(viewModel.password.value?.toString())
+        txtEmail.setText(viewModel.email.value)
+        txtPassword.setText(viewModel.password.value)
 
         txtEmail.showKeyboard()
         currentEditText = txtEmail

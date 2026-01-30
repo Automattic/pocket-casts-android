@@ -103,7 +103,7 @@ interface EpisodeManager {
     suspend fun clearEpisodeHistory(episodes: List<PodcastEpisode>)
     fun markPlaybackHistorySyncedBlocking()
     fun stopDownloadAndCleanUp(episodeUuid: String, from: String)
-    fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String)
+    suspend fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String)
 
     /** Remove methods  */
     suspend fun deleteAll()

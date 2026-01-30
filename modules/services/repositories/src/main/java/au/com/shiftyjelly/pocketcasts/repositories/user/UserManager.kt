@@ -134,8 +134,8 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
-            syncManager.signOut {
-                applicationScope.launch {
+            applicationScope.launch {
+                syncManager.signOut {
                     settings.clearPlusPreferences()
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
@@ -156,8 +156,8 @@ class UserManagerImpl @Inject constructor(
                     settings.setEndOfYearShowModal(true)
                     endOfYearSync.reset()
                 }
+                subscriptionManager.clearCachedMembership()
             }
-            subscriptionManager.clearCachedMembership()
         }
         settings.setFullySignedOut(true)
     }

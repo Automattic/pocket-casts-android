@@ -5,16 +5,20 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
 class ServiceStatusChecker @Inject constructor(
     @ApplicationContext private val context: Context,
-    @NoCache private val httpClient: OkHttpClient,
+    @NoCache private val httpClient: Lazy<OkHttpClient>,
 ) {
 
     suspend fun check(check: Check): ServiceStatus {
@@ -37,27 +41,30 @@ class ServiceStatusChecker @Inject constructor(
     private suspend fun checkUrl(url: String): ServiceStatus {
         val log = StringBuilder()
 
-        val okHttpClient = httpClient
-            .newBuilder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .addNetworkInterceptor { chain ->
-                val request: Request = chain.request()
-                val startTime = System.nanoTime()
-                log.append(String.format("Sending request %s on %s%n%s", request.url, chain.connection(), request.headers))
-                val response: Response = chain.proceed(request)
-                val endTime = System.nanoTime()
-                log.append(String.format("Received response for %s in %.1fms%n%s", response.request.url, (endTime - startTime) / 1e6, response.headers))
-                response
-            }
-            .build()
+        val client = withContext(Dispatchers.Default) {
+            httpClient
+                .get()
+                .newBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .addNetworkInterceptor { chain ->
+                    val request: Request = chain.request()
+                    val startTime = System.nanoTime()
+                    log.append(String.format(Locale.ROOT, "Sending request %s on %s%n%s", request.url, chain.connection(), request.headers))
+                    val response: Response = chain.proceed(request)
+                    val endTime = System.nanoTime()
+                    log.append(String.format(Locale.ROOT, "Received response for %s in %.1fms%n%s", response.request.url, (endTime - startTime) / 1e6, response.headers))
+                    response
+                }
+                .build()
+        }
 
         try {
             val request = Request.Builder()
                 .url(url)
                 .build()
-            val response = okHttpClient.newCall(request).await()
+            val response = client.newCall(request).await()
             return if (response.isSuccessful) {
                 ServiceStatus.Success
             } else {

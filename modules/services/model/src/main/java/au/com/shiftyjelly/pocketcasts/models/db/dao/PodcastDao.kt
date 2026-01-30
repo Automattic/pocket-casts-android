@@ -28,9 +28,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PodcastDao {
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
-    abstract suspend fun findAllIn(uuids: Collection<String>): List<Podcast>
+    protected abstract suspend fun findAllInUnsafe(uuids: Collection<String>): List<Podcast>
+
+    @Transaction
+    open suspend fun findAllIn(uuids: Collection<String>): List<Podcast> {
+        return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
+            findAllInUnsafe(chunk)
+        }
+    }
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
@@ -221,10 +227,6 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuidRxMaybe(uuid: String): Maybe<Podcast>
-
-    @Transaction
-    @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
-    abstract fun findByUuidsBlocking(uuids: Array<String>): List<Podcast>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")

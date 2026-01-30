@@ -70,7 +70,7 @@ interface PlaylistManager {
         searchTerm: String? = null,
     ): Flow<ManualPlaylist?>
 
-    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
+    fun playlistPreviewsForEpisodeFlow(searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
 
     suspend fun getManualEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
 
@@ -78,7 +78,9 @@ interface PlaylistManager {
 
     fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
-    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean
+    suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean
+
+    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean = addManualEpisodes(playlistUuid, listOf(episodeUuid))
 
     suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>)
 

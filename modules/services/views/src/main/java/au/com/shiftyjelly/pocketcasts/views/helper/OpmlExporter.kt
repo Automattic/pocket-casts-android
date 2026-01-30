@@ -13,15 +13,15 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.io.FileWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import okhttp3.Call
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -35,70 +35,50 @@ class OpmlExporter(
     private val applicationScope: CoroutineScope,
 ) {
 
-    private var serviceTask: Call? = null
+    private var exportJob: Job? = null
     private var progressDialog: ProgressDialog? = null
-    private var sendAsEmail: Boolean = false
-    private var opmlFile: File? = null
 
     fun sendEmail() {
-        sendAsEmail = true
-        exportPodcasts()
+        exportPodcasts(sendAsEmail = true)
     }
 
     fun saveFile() {
-        sendAsEmail = false
-        exportPodcasts()
+        exportPodcasts(sendAsEmail = false)
     }
 
-    private fun exportPodcasts() {
+    private fun exportPodcasts(sendAsEmail: Boolean) {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_STARTED)
         showProgressDialog()
 
-        applicationScope.launch(Dispatchers.IO) {
-            val uuidToTitle = podcastManager.findSubscribedBlocking().associateBy({ it.uuid }, { it.title })
+        exportJob?.cancel()
+        exportJob = applicationScope.launch {
+            val uuidToTitle = podcastManager.findSubscribedNoOrder().associateBy({ it.uuid }, { it.title })
             val uuids = uuidToTitle.keys.toList()
 
-            serviceTask = serviceManager.exportFeedUrls(
-                uuids,
-                object : ServerCallback<Map<String, String>> {
-                    override fun onFailed(
-                        errorCode: Int,
-                        userMessage: String?,
-                        serverMessageId: String?,
-                        serverMessage: String?,
-                        throwable: Throwable?,
-                    ) {
-                        trackFailure(reason = "server_call_failure")
-                        UiUtil.hideProgressDialog(progressDialog)
-                    }
-
-                    override fun dataReturned(result: Map<String, String>?) {
-                        try {
-                            opmlFile = if (result == null) null else exportOpml(uuidToTitle, result, context)
-                            analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FINISHED)
-                            UiUtil.hideProgressDialog(progressDialog)
-                            val opmlFile = opmlFile
-                            if (opmlFile != null && opmlFile.exists()) {
-                                if (sendAsEmail) {
-                                    sendIntentEmail(opmlFile)
-                                } else {
-                                    IntentUtil.sendIntent(
-                                        context = context,
-                                        file = opmlFile,
-                                        intentType = "text/xml",
-                                        errorMessage = context.getString(LR.string.settings_opml_export_failed),
-                                        errorTitle = context.getString(LR.string.settings_no_file_browser_title),
-                                    )
-                                }
-                            }
-                        } catch (e: Exception) {
+            val opmlFile = serviceManager.exportFeedUrls(uuids)
+                .onFailure { trackFailure(reason = "server_call_failure") }
+                .getOrNull()
+                ?.let { result ->
+                    runCatching { exportOpml(uuidToTitle, result, context) }
+                        .onFailure { error ->
                             trackFailure(reason = "unknown")
-                            UiUtil.hideProgressDialog(progressDialog)
-                            Timber.e(e)
+                            Timber.e(error)
                         }
+                }
+                ?.getOrNull()
+                ?.takeIf(File::exists)
+
+            withContext(Dispatchers.Main) {
+                UiUtil.hideProgressDialog(progressDialog)
+                if (opmlFile != null) {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FINISHED)
+                    if (sendAsEmail) {
+                        sendIntentEmail(opmlFile)
+                    } else {
+                        sendIntent(opmlFile)
                     }
-                },
-            )
+                }
+            }
         }
     }
 
@@ -134,11 +114,21 @@ class OpmlExporter(
         }
     }
 
+    private fun sendIntent(file: File) {
+        IntentUtil.sendIntent(
+            context = context,
+            file = file,
+            intentType = "text/xml",
+            errorMessage = context.getString(LR.string.settings_opml_export_failed),
+            errorTitle = context.getString(LR.string.settings_no_file_browser_title),
+        )
+    }
+
     @Suppress("deprecation")
     fun showProgressDialog() {
         UiUtil.hideProgressDialog(progressDialog)
         progressDialog = ProgressDialog.show(context, "", context.getString(LR.string.settings_opml_exporting), true, true) {
-            serviceTask?.cancel()
+            exportJob?.cancel()
         }.apply {
             show()
         }

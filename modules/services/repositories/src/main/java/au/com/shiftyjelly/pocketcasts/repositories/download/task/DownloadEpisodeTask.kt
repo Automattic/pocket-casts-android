@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Observable
@@ -54,8 +55,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -74,7 +77,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     private val downloadManager: DownloadManager,
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
-    @Downloads private val callFactory: Call.Factory,
+    @Downloads private val callFactory: Lazy<Call.Factory>,
     @Downloads private val requestBuilderProvider: Provider<Request.Builder>,
 ) : Worker(context, params) {
 
@@ -318,7 +321,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     .header("Range", "bytes=$localFileSize-")
                     .header("Accept-Encoding", "identity")
                     .build()
-                call = callFactory.newCall(request)
+                call = callFactory.get().newCall(request)
                 response = call.blockingEnqueue()
 
                 if (response.code != HTTP_RESUME_SUPPORTED) {
@@ -337,7 +340,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
             if (response == null) {
                 val request = requestBuilder.build()
-                call = callFactory.newCall(request)
+                call = callFactory.get().newCall(request)
                 response = call.blockingEnqueue()
             }
 
@@ -374,107 +377,106 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 return
             }
 
-            response.body?.use { body ->
-                bytesRemaining = body.contentLength()
-                if (bytesRemaining <= 0) {
-                    // okhttp can return -1 if unknown so try to find it manually
-                    bytesRemaining = response.header("Content-Length", null)?.toLongOrNull() ?: 0L
-                }
-                episodeDownloadError.expectedContentLength = bytesRemaining
-                val contentType = body.contentType()
+            val body = response.body
+            bytesRemaining = body.contentLength()
+            if (bytesRemaining <= 0) {
+                // okhttp can return -1 if unknown so try to find it manually
+                bytesRemaining = response.header("Content-Length", null)?.toLongOrNull() ?: 0L
+            }
+            episodeDownloadError.expectedContentLength = bytesRemaining
+            val contentType = body.contentType()
 
-                // basic sanity checks to make sure the file looks big enough and it's content type isn't text
-                if (bytesRemaining in 1..<BAD_EPISODE_SIZE || (bytesRemaining in 1..<SUSPECT_EPISODE_SIZE && contentType?.toString().orEmpty().contains("text", ignoreCase = true))) {
-                    episodeDownloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
-                    if (!emitter.isDisposed) {
-                        emitter.onError(DownloadFailed(FileNotFoundException(), "File not found. The podcast author may have moved or deleted this episode file.", false))
+            // basic sanity checks to make sure the file looks big enough and it's content type isn't text
+            if (bytesRemaining in 1..<BAD_EPISODE_SIZE || (bytesRemaining in 1..<SUSPECT_EPISODE_SIZE && contentType?.toString().orEmpty().contains("text", ignoreCase = true))) {
+                episodeDownloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
+                if (!emitter.isDisposed) {
+                    emitter.onError(DownloadFailed(FileNotFoundException(), "File not found. The podcast author may have moved or deleted this episode file.", false))
+                }
+                return
+            }
+
+            body.byteStream().use { inputStream ->
+                RandomAccessFile(tempDownloadFile, "rw").use { outFile ->
+                    if (localFileSize == 0L) {
+                        outFile.setLength(0) // if we're starting a download again, make sure we zero out the file
                     }
-                    return
-                }
+                    outFile.seek(localFileSize)
 
-                body.byteStream().use { inputStream ->
-                    RandomAccessFile(tempDownloadFile, "rw").use { outFile ->
-                        if (localFileSize == 0L) {
-                            outFile.setLength(0) // if we're starting a download again, make sure we zero out the file
-                        }
-                        outFile.seek(localFileSize)
+                    var lastReportedProgressTime = System.currentTimeMillis()
+                    val buffer = ByteArray(8192)
+                    bytesDownloadedSoFar = localFileSize
+                    episodeDownloadError.responseBodyBytesReceived = bytesDownloadedSoFar
 
-                        var lastReportedProgressTime = System.currentTimeMillis()
-                        val buffer = ByteArray(8192)
-                        bytesDownloadedSoFar = localFileSize
-                        episodeDownloadError.responseBodyBytesReceived = bytesDownloadedSoFar
-
-                        var bytes = inputStream.read(buffer)
-                        while (bytes >= 0) {
-                            outFile.write(buffer, 0, bytes)
-                            bytes = inputStream.read(buffer)
-
-                            if (emitter.isDisposed || isStopped) {
-                                return
-                            }
-
-                            bytesDownloadedSoFar += bytes.toLong()
-                            episodeDownloadError.responseBodyBytesReceived = bytesDownloadedSoFar
-                            bytesRemaining -= bytes.toLong()
-                            if (System.currentTimeMillis() - lastReportedProgressTime > MIN_TIME_BETWEEN_UPDATE_REPORTS) {
-                                try {
-                                    fireProgressUpdate(emitter)
-                                } catch (e: Exception) {
-                                    Timber.e(e)
-                                }
-
-                                lastReportedProgressTime = System.currentTimeMillis()
-                            }
-                        }
+                    var bytes = inputStream.read(buffer)
+                    while (bytes >= 0) {
+                        outFile.write(buffer, 0, bytes)
+                        bytes = inputStream.read(buffer)
 
                         if (emitter.isDisposed || isStopped) {
                             return
                         }
 
-                        // check to see the file on the file system is the right size
-                        val bytesRequired = bytesRemaining + localFileSize
-                        if (bytesRemaining > 0 && bytesRequired > tempDownloadFile.length()) {
-                            episodeDownloadError.reason = EpisodeDownloadError.Reason.PartialDownload
-                            if (!emitter.isDisposed) {
-                                emitter.onError(DownloadFailed(null, "Download failed, only part of the episode was downloaded", true))
+                        bytesDownloadedSoFar += bytes.toLong()
+                        episodeDownloadError.responseBodyBytesReceived = bytesDownloadedSoFar
+                        bytesRemaining -= bytes.toLong()
+                        if (System.currentTimeMillis() - lastReportedProgressTime > MIN_TIME_BETWEEN_UPDATE_REPORTS) {
+                            try {
+                                fireProgressUpdate(emitter)
+                            } catch (e: Exception) {
+                                Timber.e(e)
                             }
-                            return
+
+                            lastReportedProgressTime = System.currentTimeMillis()
                         }
                     }
 
-                    tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
-                    val fullDownloadFile = File(pathToSaveTo)
-                    try {
-                        episodeDownloadError.fileSize = tempDownloadFile.length()
-                        FileUtil.copy(tempDownloadFile, fullDownloadFile)
-                    } catch (exception: IOException) {
-                        episodeDownloadError.reason = EpisodeDownloadError.Reason.StorageIssue
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
-
-                        // the move failed, so delete the temp file
-                        if (tempDownloadFile.exists()) {
-                            tempDownloadFile.delete()
-                        }
-
-                        if (!emitter.isDisposed) {
-                            emitter.onError(DownloadFailed(null, "An error occurred saving your download. Try again, if the error persists there might be an issue with your device.", true))
-                        }
+                    if (emitter.isDisposed || isStopped) {
                         return
                     }
 
-                    tempDownloadFile.delete()
+                    // check to see the file on the file system is the right size
+                    val bytesRequired = bytesRemaining + localFileSize
+                    if (bytesRemaining > 0 && bytesRequired > tempDownloadFile.length()) {
+                        episodeDownloadError.reason = EpisodeDownloadError.Reason.PartialDownload
+                        if (!emitter.isDisposed) {
+                            emitter.onError(DownloadFailed(null, "Download failed, only part of the episode was downloaded", true))
+                        }
+                        return
+                    }
+                }
 
-                    if (episode.sizeInBytes != fullDownloadFile.length()) {
-                        episodeManager.updateSizeInBytesBlocking(episode, fullDownloadFile.length())
+                tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
+                val fullDownloadFile = File(pathToSaveTo)
+                try {
+                    episodeDownloadError.fileSize = tempDownloadFile.length()
+                    FileUtil.copy(tempDownloadFile, fullDownloadFile)
+                } catch (exception: IOException) {
+                    episodeDownloadError.reason = EpisodeDownloadError.Reason.StorageIssue
+                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
+
+                    // the move failed, so delete the temp file
+                    if (tempDownloadFile.exists()) {
+                        tempDownloadFile.delete()
                     }
 
                     if (!emitter.isDisposed) {
-                        emitter.onComplete()
+                        emitter.onError(DownloadFailed(null, "An error occurred saving your download. Try again, if the error persists there might be an issue with your device.", true))
                     }
-                    fixMissingDuration()
-                    fixInvalidContentType(body.contentType())
                     return
                 }
+
+                tempDownloadFile.delete()
+
+                if (episode.sizeInBytes != fullDownloadFile.length()) {
+                    episodeManager.updateSizeInBytesBlocking(episode, fullDownloadFile.length())
+                }
+
+                if (!emitter.isDisposed) {
+                    emitter.onComplete()
+                }
+                fixMissingDuration()
+                fixInvalidContentType(body.contentType())
+                return
             }
         } catch (e: SocketTimeoutException) {
             episodeDownloadError.reason = EpisodeDownloadError.Reason.ConnectionTimeout
@@ -534,11 +536,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
         } finally {
             call?.cancel()
         }
-        if (exception != null) {
-            // don't report issues such as timeouts to Sentry
-            val logPriority = if (exception is IOException) Log.INFO else Log.ERROR
-            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
-        }
+        // don't report issues such as timeouts to Sentry
+        val logPriority = if (exception is IOException) Log.INFO else Log.ERROR
+        LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
 
         if (!emitter.isDisposed) {
             emitter.onError(DownloadFailed(exception, errorMessage ?: "", retry))

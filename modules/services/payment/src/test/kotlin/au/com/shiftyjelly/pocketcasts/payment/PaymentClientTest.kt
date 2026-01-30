@@ -23,7 +23,7 @@ class PaymentClientTest {
     private val purchase = Purchase(
         state = PurchaseState.Purchased("orderId"),
         token = "token",
-        productIds = listOf(planKey.productId),
+        productIds = listOf(planKey.productId!!),
         isAcknowledged = false,
         isAutoRenewing = false,
     )
@@ -81,6 +81,34 @@ class PaymentClientTest {
                 AcknowledgedSubscription("order-id-2", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true),
                 AcknowledgedSubscription("order-id-3", SubscriptionTier.Patron, BillingCycle.Monthly, isAutoRenewing = true),
                 AcknowledgedSubscription("order-id-4", SubscriptionTier.Patron, BillingCycle.Yearly, isAutoRenewing = false),
+            ),
+            subscriptions,
+        )
+    }
+
+    @Test
+    fun `load acknowledged installment subscription purchases`() = runTest {
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-installment"),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-regular"),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(
+            listOf(
+                AcknowledgedSubscription("order-id-installment", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true, isInstallment = true),
+                AcknowledgedSubscription("order-id-regular", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true, isInstallment = false),
             ),
             subscriptions,
         )

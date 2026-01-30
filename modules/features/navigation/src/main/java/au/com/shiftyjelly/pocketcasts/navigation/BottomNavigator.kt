@@ -91,7 +91,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                     tabStackMap.peekValue().toString() == currentFragment.tag
 
                 if (resetRootFragmentSubject.hasObservers() && tabstackAndFragmentManagerInSync) {
-                    resetRootFragmentSubject.onNext(currentFragment!!)
+                    resetRootFragmentSubject.onNext(currentFragment)
                 } else {
                     reset(tab, true)
                 }

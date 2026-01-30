@@ -13,12 +13,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import dagger.Lazy
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -30,8 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 
 class PocketCastsAccountAuthenticatorTest {
 
@@ -47,12 +49,12 @@ class PocketCastsAccountAuthenticatorTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = ServersModule().provideMoshi()
+        val module = NetworkModule()
+        val moshi = module.provideMoshi()
 
-        val retrofit = Retrofit.Builder()
+        val retrofit = module.provideRetrofitBuilder(moshi, Dispatcher())
             .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(OkHttpClient.Builder().build())
+            .client(OkHttpClient())
             .build()
 
         val okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
@@ -65,7 +67,7 @@ class PocketCastsAccountAuthenticatorTest {
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
         val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
-        val syncServiceManager = SyncServiceManager(retrofit, mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
 
         val syncManager = SyncManagerImpl(
             analyticsTracker = AnalyticsTracker.test(),
@@ -77,7 +79,7 @@ class PocketCastsAccountAuthenticatorTest {
             notificationManager = mock(),
         )
         // make sure the test device is signed out
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
 
         authenticator = PocketCastsAccountAuthenticator(context, syncManager)
     }
