@@ -78,7 +78,9 @@ interface PlaylistManager {
 
     fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
-    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean
+    suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean
+
+    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean = addManualEpisodes(playlistUuid, listOf(episodeUuid))
 
     suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>)
 

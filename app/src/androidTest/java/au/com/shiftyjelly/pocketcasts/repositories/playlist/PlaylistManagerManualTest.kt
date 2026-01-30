@@ -365,7 +365,7 @@ class PlaylistManagerManualTest {
     }
 
     @Test
-    fun addEpisodes() = dsl.test {
+    fun addSingleEpisode() = dsl.test {
         insertManualPlaylist(index = 0)
         insertPodcast(index = 0)
         insertPodcastEpisode(index = 0, podcastIndex = 0)
@@ -403,6 +403,72 @@ class PlaylistManagerManualTest {
                 )
             },
         )
+    }
+
+    @Test
+    fun addMultipleEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1"))
+        assertTrue(isAdded)
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "",
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun ignoreMissingEpisodesWhenAddingThem() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1", "episode-id-3"))
+        assertTrue(isAdded)
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "",
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun failToAddEpisodesWhenNoneAreFound() = dsl.test {
+        insertManualPlaylist(index = 0)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1"))
+        assertFalse(isAdded)
     }
 
     @Test
