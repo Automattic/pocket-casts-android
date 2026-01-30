@@ -70,7 +70,7 @@ interface PlaylistManager {
         searchTerm: String? = null,
     ): Flow<ManualPlaylist?>
 
-    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
+    fun playlistPreviewsForEpisodeFlow(searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
 
     suspend fun getManualEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
 

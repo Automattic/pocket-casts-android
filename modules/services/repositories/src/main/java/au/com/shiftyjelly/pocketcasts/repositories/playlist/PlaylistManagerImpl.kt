@@ -372,8 +372,8 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
+    override fun playlistPreviewsForEpisodeFlow(searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
+        return playlistDao.playlistPreviewsForEpisodeFlow(searchTerm.orEmpty())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {

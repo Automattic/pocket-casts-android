@@ -82,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AddToPlaylistPage(
+    newEpisodeUuids: List<String>,
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
@@ -130,6 +131,7 @@ internal fun AddToPlaylistPage(
         ) {
             composable(AddToPlaylistRoutes.HOME) {
                 SelectPlaylistsPage(
+                    newEpisodeUuids = newEpisodeUuids,
                     playlistPreviews = playlistPreviews,
                     unfilteredPlaylistsCount = unfilteredPlaylistsCount,
                     episodeLimit = episodeLimit,
@@ -157,6 +159,7 @@ internal fun AddToPlaylistPage(
 
 @Composable
 private fun SelectPlaylistsPage(
+    newEpisodeUuids: List<String>,
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
@@ -197,6 +200,7 @@ private fun SelectPlaylistsPage(
             )
         }
         PlaylistPreviewsColumn(
+            newEpisodeUuids = newEpisodeUuids,
             playlistPreviews = playlistPreviews,
             unfilteredPlaylistsCount = unfilteredPlaylistsCount,
             episodeLimit = episodeLimit,
@@ -260,6 +264,7 @@ private fun NewPlaylistButton(
 
 @Composable
 private fun PlaylistPreviewsColumn(
+    newEpisodeUuids: List<String>,
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
@@ -286,8 +291,8 @@ private fun PlaylistPreviewsColumn(
                 key = { _, playlist -> playlist.uuid },
                 contentType = { _, _ -> "playlist" },
             ) { index, playlist ->
-                val contentDescription = if (playlist.canAddOrRemoveEpisode(episodeLimit)) {
-                    if (playlist.hasEpisode) {
+                val contentDescription = if (playlist.canAddOrRemoveEpisodes(episodeLimit, newEpisodeUuids)) {
+                    if (playlist.hasAllEpisodes(newEpisodeUuids)) {
                         stringResource(LR.string.remove_from_playlist)
                     } else {
                         stringResource(LR.string.add_to_playlist_description)
@@ -296,6 +301,7 @@ private fun PlaylistPreviewsColumn(
                     stringResource(LR.string.playlist_is_full_description)
                 }
                 PlaylistPreviewRow(
+                    newEpisodeUuids = newEpisodeUuids,
                     playlist = playlist,
                     episodeLimit = episodeLimit,
                     showDivider = index != playlistPreviews.lastIndex,
@@ -337,6 +343,7 @@ private fun PlaylistPreviewsColumn(
 
 @Composable
 private fun PlaylistPreviewRow(
+    newEpisodeUuids: List<String>,
     playlist: PlaylistPreviewForEpisode,
     episodeLimit: Int,
     showDivider: Boolean,
@@ -361,11 +368,12 @@ private fun PlaylistPreviewRow(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            val alpha = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1f else 0.4f
+            val canAddOrRemove = playlist.canAddOrRemoveEpisodes(episodeLimit, newEpisodeUuids)
+            val alpha = if (canAddOrRemove) 1f else 0.4f
             PlaylistArtwork(
                 podcastUuids = artworkUuids.orEmpty(),
                 artworkSize = 56.dp,
-                elevation = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1.dp else 0.dp,
+                elevation = if (canAddOrRemove) 1.dp else 0.dp,
                 modifier = Modifier.alpha(alpha),
             )
             Spacer(
@@ -380,7 +388,7 @@ private fun PlaylistPreviewRow(
                     text = playlist.title,
                 )
                 TextP50(
-                    text = pluralStringResource(LR.plurals.episode_count, playlist.episodeCount, playlist.episodeCount),
+                    text = pluralStringResource(LR.plurals.episode_count, playlist.episodeUuids.size, playlist.episodeUuids.size),
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
@@ -388,8 +396,8 @@ private fun PlaylistPreviewRow(
                 modifier = Modifier.width(16.dp),
             )
             Checkbox(
-                checked = playlist.hasEpisode,
-                enabled = playlist.canAddOrRemoveEpisode(episodeLimit),
+                checked = playlist.hasAllEpisodes(newEpisodeUuids),
+                enabled = canAddOrRemove,
                 onCheckedChange = null,
                 modifier = Modifier.alpha(alpha),
             )
@@ -452,6 +460,7 @@ private object AddToPlaylistRoutes {
 private fun AddToPlaylistPageEmptyStatePreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
         AddToPlaylistPage(
+            newEpisodeUuids = emptyList(),
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 0,
             episodeLimit = 100,
@@ -472,6 +481,7 @@ private fun AddToPlaylistPageEmptyStatePreview() {
 private fun AddToPlaylistPageNoSearchPreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
         AddToPlaylistPage(
+            newEpisodeUuids = emptyList(),
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 1,
             episodeLimit = 100,
@@ -496,33 +506,30 @@ private fun AddToPlaylistPagePreview(
 
     AppThemeWithBackground(themeType) {
         AddToPlaylistPage(
+            newEpisodeUuids = listOf("episode-uuid-10"),
             playlistPreviews = listOf(
                 PlaylistPreviewForEpisode(
                     uuid = "id-1",
                     title = "Playlist 1",
-                    episodeCount = 99,
-                    hasEpisode = false,
+                    episodeUuids = List(9) { "episode-uuid-$it" }.toSet(),
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-2",
                     title = "Playlist 2",
-                    episodeCount = 100,
-                    hasEpisode = false,
+                    episodeUuids = List(10) { "episode-uuid-$it" }.toSet(),
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-3",
                     title = "Playlist 3",
-                    episodeCount = 100,
-                    hasEpisode = true,
+                    episodeUuids = List(10) { "episode-uuid-$it" }.toSet(),
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-4",
                     title = "Playlist 4",
-                    episodeCount = 99,
-                    hasEpisode = true,
+                    episodeUuids = List(9) { "episode-uuid-$it" }.toSet(),
                 ),
             ),
-            episodeLimit = 100,
+            episodeLimit = 10,
             getArtworkUuidsFlow = { MutableStateFlow(null) },
             refreshArtworkUuids = {},
             unfilteredPlaylistsCount = 4,
