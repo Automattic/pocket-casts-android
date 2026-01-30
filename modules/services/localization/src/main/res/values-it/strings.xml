@@ -101,8 +101,6 @@ Language: it
     <string name="add_to_playlist_find_playlist">Cerca playlist</string>
     <string name="add_to_playlist_description">Aggiungi alla playlist</string>
     <string name="remove_from_playlist">Rimuovi dalla playlist</string>
-    <string name="add_to_up_next_bottom">Aggiungi a Successivo dalla fine</string>
-    <string name="add_to_up_next_top">Aggiungi a Successivo dall\'inizio </string>
     <string name="playlist_episodes_archived_title">Nessun episodio</string>
     <string name="playlist_episodes_archived_count">%1$d archiviato/i</string>
     <string name="playlist_edit_episodes">Riordina gli episodi</string>
@@ -467,7 +465,6 @@ Language: it
     <string name="shuffle_whats_new_title">Introduzione a Shuffle</string>
     <string name="chapter_time_remaining_content_description">%s rimanente nel capitolo</string>
     <string name="chapter_count_summary">%1$d di %2$d</string>
-    <string name="referrals_share_text">Ciao!\n\nQuesto è un %1$s pass per ospiti per Pocket Casts Plus, il mio podcast player preferito. È ricco di funzionalità uniche come segnalibri, cartelle e molto altro che non troverai da nessun\'altra parte. Penso che piacerà anche a te.</string>
     <string name="files_plus_prompt">Carica i tuoi file con Pocket Casts Plus e molto altro ancora</string>
     <string name="icons_plus_prompt">Ottieni icone di app esclusive con Pocket Casts Plus e molto altro ancora</string>
     <string name="themes_plus_prompt">Ottieni temi esclusivi con Pocket Casts Plus e molto altro ancora</string>

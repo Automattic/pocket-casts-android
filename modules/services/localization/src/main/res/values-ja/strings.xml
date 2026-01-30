@@ -101,8 +101,6 @@ Language: ja_JP
     <string name="add_to_playlist_find_playlist">プレイリストを検索</string>
     <string name="add_to_playlist_description">プレイリストに追加</string>
     <string name="remove_from_playlist">プレイリストから削除</string>
-    <string name="add_to_up_next_bottom">「次のエピソード待機リスト」の下部に追加</string>
-    <string name="add_to_up_next_top">「次のエピソード待機リスト」の上部に追加</string>
     <string name="playlist_episodes_archived_title">エピソードなし</string>
     <string name="playlist_episodes_archived_count">%1$d件をアーカイブ済み</string>
     <string name="playlist_edit_episodes">エピソードを並べ替え</string>
@@ -468,7 +466,6 @@ Language: ja_JP
     <string name="shuffle_whats_new_title">シャッフルの紹介</string>
     <string name="chapter_time_remaining_content_description">チャプターの残り%s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
-    <string name="referrals_share_text">こんにちは。\n\nこちらは、私のお気に入りのポッドキャストプレイヤー、Pocket Casts Plus を利用できる%1$sのゲストパスです。 ブックマークやフォルダーなど、他にはないユニークな機能が満載です。 きっと気に入ってもらえると思います。</string>
     <string name="files_plus_prompt">Pocket Casts Plus でファイルのアップロードなどを利用しましょう</string>
     <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
     <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>

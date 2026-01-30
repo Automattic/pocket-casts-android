@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-28 23:46:29+0000
+Translation-Revision-Date: 2026-01-25 23:20:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="winback_cancel_subscription_perk_installment">Tens un pla de pagament a terminis de 12 mesos. Si cancel·les, finalitzarà el teu accés, però Google Play continuarà cobrant els mesos restants.</string>
+    <string name="winback_cancel_subscription_header_description_installment">La cancel·lació acaba la teva subscripció a Pocket Casts. \nEl teu pla de pagament de Google Play continuarà.</string>
+    <string name="winback_cancel_subscription_perk_history">Els teus pòdcasts i l\'historial d\'escolta seguiran sent accessibles.</string>
+    <string name="price_per_month_for_months">%1$s/mes durant %2$d mesos</string>
     <string name="no_episodes">No hi ha episodis</string>
     <string name="more_rules">Més regles</string>
     <string name="player_notification_skip_forward_seconds">Avançar %d segons</string>
@@ -101,8 +105,6 @@ Language: ca
     <string name="add_to_playlist_find_playlist">Cercar una llista de reproducció</string>
     <string name="add_to_playlist_description">Afegeix a la llista de reproducció</string>
     <string name="remove_from_playlist">Esborrar de la llista de reproducció</string>
-    <string name="add_to_up_next_bottom">Afegir al final de la cua</string>
-    <string name="add_to_up_next_top">Afegir al principi de la cua</string>
     <string name="playlist_episodes_archived_title">No hi ha episodis</string>
     <string name="playlist_episodes_archived_count">%1$d arxivats</string>
     <string name="playlist_edit_episodes">Reordenar els episodis</string>
@@ -468,7 +470,6 @@ Language: ca
     <string name="shuffle_whats_new_title">Presentem la reproducció aleatòria</string>
     <string name="chapter_time_remaining_content_description">%s queden al capítol</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
-    <string name="referrals_share_text">Ep!\n\nAquí tens  %1$s  invitacions per a Pocket Casts Plus, el meu reproductor de pòdcasts favorit. Està ple de funcions úniques com ara marcadors, carpetes i més, que no trobaràs enlloc més. Crec que també t\'encantarà!</string>
     <string name="files_plus_prompt">Carrega els teus arxius amb Pocket Casts Plus, i més</string>
     <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
     <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>

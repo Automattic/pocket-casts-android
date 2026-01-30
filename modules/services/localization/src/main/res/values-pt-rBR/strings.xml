@@ -100,8 +100,6 @@ Language: pt_BR
     <string name="add_to_playlist_no_playlist_found_body">Não encontramos nenhuma playlist para essa pesquisa. Crie uma nova playlist ou tente outra palavra-chave.</string>
     <string name="add_to_playlist_find_playlist">Encontrar playlist</string>
     <string name="add_to_playlist_description">Adicionar à playlist</string>
-    <string name="add_to_up_next_bottom">Adicionar à parte inferior da lista de Próximos</string>
-    <string name="add_to_up_next_top">Adicionar ao topo da lista de Próximos</string>
     <string name="remove_from_playlist">Remover da playlist</string>
     <string name="playlist_episodes_archived_title">Sem episódios</string>
     <string name="playlist_episodes_archived_count">%1$d arquivado(s)</string>
@@ -468,7 +466,6 @@ Language: pt_BR
     <string name="shuffle_whats_new_title">Apresentamos a ordem aleatória</string>
     <string name="chapter_time_remaining_content_description">%s restante(s) no capítulo</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
-    <string name="referrals_share_text">Olá!\n\nAqui está um passe de convidado de %1$s para o Pocket Casts Plus, meu reprodutor de podcast favorito. Ele tem funcionalidades exclusivas, como favoritos, pastas, entre outras que você não encontra em nenhum outro lugar. Acho que você também vai amar!</string>
     <string name="files_plus_prompt">Faça upload dos seus arquivos e muito mais com o Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Tenha ícones de apps exclusivos e muito mais com o Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Tenha temas exclusivos e muito mais com o Pocket Casts Plus</string>
