@@ -101,8 +101,6 @@ Language: zh_CN
     <string name="add_to_playlist_find_playlist">查找播放列表</string>
     <string name="add_to_playlist_description">添加至播放列表</string>
     <string name="remove_from_playlist">从播放列表中移除</string>
-    <string name="add_to_up_next_bottom">添加到“接下来播放”底部</string>
-    <string name="add_to_up_next_top">添加到“接下来播放”顶部</string>
     <string name="playlist_episodes_archived_title">无剧集</string>
     <string name="playlist_episodes_archived_count">%1$d 已存档</string>
     <string name="playlist_edit_episodes">重新排列剧集</string>
@@ -468,7 +466,6 @@ Language: zh_CN
     <string name="shuffle_whats_new_message">无需更改队列顺序，即可轻松播放随机剧集。</string>
     <string name="chapter_time_remaining_content_description">本章还剩 %s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
-    <string name="referrals_share_text">您好！\n\n这是一张 %1$s 的 Pocket Casts Plus 访客通行证，Pocket Casts Plus 是我最喜欢的播客播放器。 它拥有您在别处享受不到的独特功能，如书签、文件夹等。 我想您也会喜欢！</string>
     <string name="files_plus_prompt">通过 Pocket Casts Plus 上传文件，并享用更多功能</string>
     <string name="icons_plus_prompt">通过 Pocket Casts Plus 获取独家应用程序图标，并享用更多功能</string>
     <string name="themes_plus_prompt">通过 Pocket Casts Plus 获取专属主题，并享用更多功能</string>

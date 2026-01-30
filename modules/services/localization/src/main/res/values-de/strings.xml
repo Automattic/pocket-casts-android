@@ -100,8 +100,6 @@ Language: de
     <string name="add_to_playlist_no_playlist_found_body">Wir konnten keine Playlist für diese Suche finden. Erstelle eine neue oder versuche es mit einem anderen Stichwort.</string>
     <string name="add_to_playlist_find_playlist">Playlist suchen</string>
     <string name="add_to_playlist_description">Zu Playlist hinzufügen</string>
-    <string name="add_to_up_next_bottom">Zum Ende der Warteschlange hinzufügen</string>
-    <string name="add_to_up_next_top">Zum Anfang der Warteschlange hinzufügen</string>
     <string name="remove_from_playlist">Aus Playlist entfernen</string>
     <string name="playlist_episodes_archived_title">Keine Folgen</string>
     <string name="playlist_episodes_archived_count">%1$d archiviert</string>
@@ -468,7 +466,6 @@ Language: de
     <string name="shuffle_whats_new_title">Jetzt neu: Mischen</string>
     <string name="chapter_time_remaining_content_description">Das Kapitel dauert noch %s</string>
     <string name="chapter_count_summary">%1$d von %2$d</string>
-    <string name="referrals_share_text">Hallo!\n\nHier ist ein Gastpass für Pocket Casts Plus (%1$s) ‒ meinen liebsten Podcast Player. Er bietet eine Vielzahl einzigartiger Funktionen, die du sonst bei keinem anderen Podcast Player finden wirst, wie Lesezeichen, Ordner und vieles mehr. Ich bin mir sicher, er wird dir auch gefallen!</string>
     <string name="files_plus_prompt">Lade deine Dateien mit Pocket Casts Plus hoch und vieles mehr</string>
     <string name="icons_plus_prompt">Hol dir exklusive App-Icons mit Pocket Casts Plus und vieles mehr</string>
     <string name="themes_plus_prompt">Hol dir exklusive Themes mit Pocket Casts Plus und vieles mehr</string>

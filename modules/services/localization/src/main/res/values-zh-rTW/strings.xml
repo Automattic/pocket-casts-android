@@ -101,8 +101,6 @@ Language: zh_TW
     <string name="add_to_playlist_find_playlist">尋找播放清單</string>
     <string name="add_to_playlist_description">新增至播放清單</string>
     <string name="remove_from_playlist">從播放清單移除</string>
-    <string name="add_to_up_next_bottom">新增至「接下來播放」尾聲</string>
-    <string name="add_to_up_next_top">新增至「接下來播放」開頭</string>
     <string name="playlist_episodes_archived_title">沒有單集</string>
     <string name="playlist_episodes_archived_count">已封存 %1$d 集</string>
     <string name="playlist_edit_episodes">重新排序單集</string>
@@ -468,7 +466,6 @@ Language: zh_TW
     <string name="shuffle_whats_new_title">隆重介紹隨機播放</string>
     <string name="chapter_time_remaining_content_description">本章剩餘 %s</string>
     <string name="chapter_count_summary">第 %1$d 章，共 %2$d 章</string>
-    <string name="referrals_share_text">你好！\n\n在此送上 Pocket Casts Plus 的 %1$s訪客體驗券，這是我最愛的 Podcast 播放器。 Pocket Casts Plus 提供書籤、資料夾等獨特功能，其他播放器找不到。 我相信你也會愛上這項工具！</string>
     <string name="files_plus_prompt">運用 Pocket Casts Plus 上傳檔案和其他內容</string>
     <string name="icons_plus_prompt">Pocket Casts Plus 帶給你專屬應用程式圖示和更多內容</string>
     <string name="themes_plus_prompt">Pocket Casts Plus 帶給你專屬佈景主題和更多內容</string>

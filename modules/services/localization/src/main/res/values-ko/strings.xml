@@ -101,8 +101,6 @@ Language: ko_KR
     <string name="add_to_playlist_find_playlist">재생목록 찾기</string>
     <string name="add_to_playlist_description">재생목록에 추가</string>
     <string name="remove_from_playlist">재생목록에서 제거</string>
-    <string name="add_to_up_next_bottom">다음 차례에 추가(맨 끝)</string>
-    <string name="add_to_up_next_top">다음 차례에 추가(맨 처음)</string>
     <string name="playlist_episodes_archived_title">에피소드 없음</string>
     <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
     <string name="playlist_edit_episodes">에피소드 재정렬</string>
@@ -468,7 +466,6 @@ Language: ko_KR
     <string name="shuffle_whats_new_title">셔플 기능 소개</string>
     <string name="chapter_time_remaining_content_description">챕터에서 %s 남음</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
-    <string name="referrals_share_text">안녕하세요.\n\n제가 가장 좋아하는 팟캐스트 플레이어인 %1$s Pocket Casts Plus 비회원 패스를 확인해 보세요. 북마크, 폴더 등 다른 곳에서는 찾아볼 수 없는 특별한 기능이 가득합니다. 마음에 드실 거예요!</string>
     <string name="files_plus_prompt">Pocket Casts Plus로 파일을 업로드하고 더 많은 혜택을 누리세요</string>
     <string name="icons_plus_prompt">Pocket Casts Plus로 독점 앱 아이콘을 받고 더 많은 혜택을 누리세요</string>
     <string name="themes_plus_prompt">Pocket Casts Plus로 독점 테마를 받고 더 많은 혜택을 누리세요</string>
