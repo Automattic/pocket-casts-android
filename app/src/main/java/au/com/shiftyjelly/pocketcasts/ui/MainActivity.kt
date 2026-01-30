@@ -1122,7 +1122,7 @@ class MainActivity :
             .takeIf { viewModel.isPlayerOpen }
             ?.fragments
             ?.firstNotNullOfOrNull { it as? PlayerContainerFragment }
-            ?.view
+            ?.snackBarView()
     }
 
     override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {

@@ -110,15 +110,30 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                             }
                         } else {
                             viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
+                            val message = if (playlist.episodeUuids.size >= uiState.episodeLimit) {
+                                getString(LR.string.playlist_is_full_description)
+                            } else if (newEpisodeUuids.size > uiState.episodeLimit) {
+                                getString(LR.string.playlist_limit_reached, uiState.episodeLimit)
+                            } else {
+                                getString(LR.string.playlist_limit_almost_full)
+                            }
+
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
+                                    snackbarHostState.showSnackbar(message)
                                 }
                             }
                         }
                     },
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
+                        val canCreatePlaylist = newEpisodeUuids.size <= uiState.episodeLimit
+                        if (!canCreatePlaylist && snackbarHostState.currentSnackbarData == null) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(getString(LR.string.playlist_limit_reached, uiState.episodeLimit))
+                            }
+                        }
+                        canCreatePlaylist
                     },
                     onClickDoneButton = {
                         isDoneTapped = true

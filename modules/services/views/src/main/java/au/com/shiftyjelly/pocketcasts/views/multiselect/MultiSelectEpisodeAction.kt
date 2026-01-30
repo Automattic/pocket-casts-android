@@ -116,9 +116,16 @@ sealed class MultiSelectEpisodeAction(
         iconRes = IR.drawable.ic_delete,
         analyticsValue = "remove_listening_history",
     )
+    object AddToPlaylist : MultiSelectEpisodeAction(
+        groupId = "add_to_playlist",
+        actionId = UR.id.menu_add_to_playlist,
+        title = LR.string.add_to_playlist_description,
+        iconRes = IR.drawable.ic_add_to_playlist_action,
+        analyticsValue = "add_to_playlist",
+    )
 
     companion object {
-        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share, RemoveListeningHistory)
+        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, AddToPlaylist, PlayNext, PlayLast, Star, Share, RemoveListeningHistory)
         private val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
         private val STANDARD_BY_GROUP_ID = STANDARD.associateBy { it.groupId }
         val ALL_BY_ACTION_ID = ALL.associateBy { it.actionId }
@@ -190,6 +197,12 @@ sealed class MultiSelectEpisodeAction(
                         selected.firstOrNull() is PodcastEpisode
                     ) {
                         return Share
+                    }
+                }
+
+                AddToPlaylist.groupId -> {
+                    if (selected.all { it is PodcastEpisode }) {
+                        return AddToPlaylist
                     }
                 }
             }

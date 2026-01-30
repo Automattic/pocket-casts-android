@@ -212,7 +212,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                 }
 
                 else -> {
-                    Timber.d("https://linear.app/a8c/issue/PCDROID-413/")
+                    tracker.track(
+                        AnalyticsEvent.EPISODE_ADDED_TO_LIST_BULK,
+                        buildMap {
+                            put("playlist_name", playlist.title)
+                            put("playlist_uuid", playlist.uuid)
+                            put("episode_count", episodeUuids.size)
+                            put("source", source.episodeEditAnalyticsValue)
+                        },
+                    )
                 }
             }
         }
@@ -239,7 +247,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             }
 
             else -> {
-                Timber.d("https://linear.app/a8c/issue/PCDROID-413/")
+                tracker.track(
+                    AnalyticsEvent.EPISODE_REMOVED_FROM_LIST_BULK,
+                    buildMap {
+                        put("playlist_name", playlist.title)
+                        put("playlist_uuid", playlist.uuid)
+                        put("episode_count", episodeUuids.size)
+                        put("source", source.episodeEditAnalyticsValue)
+                    },
+                )
             }
         }
     }
