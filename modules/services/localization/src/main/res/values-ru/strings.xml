@@ -101,8 +101,6 @@ Language: ru
     <string name="add_to_playlist_find_playlist">Найти плейлист</string>
     <string name="add_to_playlist_description">Добавить в плейлист</string>
     <string name="remove_from_playlist">Удалить из плейлиста</string>
-    <string name="add_to_up_next_bottom">Добавить в конец списка «Следующие»</string>
-    <string name="add_to_up_next_top">Добавить в начало списка «Следующие»</string>
     <string name="playlist_episodes_archived_title">Нет выпусков</string>
     <string name="playlist_episodes_archived_count">Архивировано: %1$d</string>
     <string name="playlist_edit_episodes">Изменить очерёдность выпусков</string>
@@ -468,7 +466,6 @@ Language: ru
     <string name="shuffle_whats_new_title">Представляем режим случайного воспроизведения</string>
     <string name="chapter_time_remaining_content_description">%s до конца главы</string>
     <string name="chapter_count_summary">%1$d из %2$d</string>
-    <string name="referrals_share_text">Здравствуйте!\n\nЭто %1$s гостевой пропуск в Pocket Casts Plus — мой любимый плеер подкастов. В нём есть множество уникальных функций, которых больше нет нигде: закладки, папки и многое другое. Надеюсь, вам он тоже понравится!</string>
     <string name="files_plus_prompt">Загружайте свои файлы с Pocket Casts Plus и многое другое</string>
     <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
     <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>

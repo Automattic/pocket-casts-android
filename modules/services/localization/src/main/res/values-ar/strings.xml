@@ -101,8 +101,6 @@ Language: ar
     <string name="add_to_playlist_find_playlist">بحث عن قائمة تشغيل</string>
     <string name="add_to_playlist_description">يمكنك استخدام ذلك للإضافة إلى قائمة التشغيل</string>
     <string name="remove_from_playlist">إزالة من قائمة التشغيل</string>
-    <string name="add_to_up_next_bottom">إضافة في نهاية قائمة التشغيل التالية</string>
-    <string name="add_to_up_next_top">إضافة في بداية قائمة التشغيل التالية</string>
     <string name="playlist_episodes_archived_title">لا توجد حلقات</string>
     <string name="playlist_episodes_archived_count">⁦%1$d⁩ مؤرشف</string>
     <string name="playlist_edit_episodes">إعادة تسجيل الحلقات</string>
@@ -468,7 +466,6 @@ Language: ar
     <string name="shuffle_whats_new_title">طرح مقدمة حول الخلط</string>
     <string name="chapter_time_remaining_content_description">تم ترك %s في الفصل</string>
     <string name="chapter_count_summary">⁦%1$d⁩ من ⁦%2$d⁩</string>
-    <string name="referrals_share_text">مرحبًا!\n\nفي ما يأتي ⁦%1$s⁩ guest pass لـ Pocket Casts Plus - مشغِّل البث الصوتي المفضَّل لدي. إنه مزوَّد بميزات فريدة، مثل: الإشارات المرجعية والمجلدات والمزيد، التي لن تجدها في أي مكان آخر. أعتقد أنك ستحبه كذلك!</string>
     <string name="files_plus_prompt">رفع ملفاتك باستخدام Pocket Casts Plus، والمزيد</string>
     <string name="icons_plus_prompt">الحصول على أيقونات تطبيق حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="themes_plus_prompt">الحصول على قوالب حصرية من خلال Pocket Casts Plus، والمزيد</string>
