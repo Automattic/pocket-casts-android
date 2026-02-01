@@ -637,12 +637,15 @@ platform :android do
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    comment_on_pr(
-      project: 'automattic/pocket-casts-android',
-      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
-      reuse_identifier: 'app-prototype-build-link',
-      body: '🚧 Prototype builds will be available soon'
-    )
+    pr_num = pull_request_number
+    if pr_num
+      comment_on_pr(
+        project: 'automattic/pocket-casts-android',
+        pr_number: pr_num,
+        reuse_identifier: 'app-prototype-build-link',
+        body: '🚧 Prototype builds will be available soon'
+      )
+    end
 
     prototype_build_type = 'DebugProd'
 
@@ -674,12 +677,14 @@ platform :android do
       )
     end
 
-    comment_on_pr(
-      project: 'automattic/pocket-casts-android',
-      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
-      reuse_identifier: 'app-prototype-build-link',
-      body: prototype_build_comments.join
-    )
+    if pr_num
+      comment_on_pr(
+        project: 'automattic/pocket-casts-android',
+        pr_number: pr_num,
+        reuse_identifier: 'app-prototype-build-link',
+        body: prototype_build_comments.join
+      )
+    end
   end
 
   # Builds a prototype build and uploads it to Firebase App Distribution (FAD)
