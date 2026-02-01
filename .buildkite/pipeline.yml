@@ -88,35 +88,19 @@ steps:
           - "**/build/outputs/apk/**/*"
 
     ##########
-    # Optional Prototype Builds for PR branches, distributed via S3
+    # Optional Prototype Builds for PR and main branches
+    # Builds all modules, uploads to S3, and uploads app to FAD
     ##########
   - group: Prototype Builds
-    if: "build.pull_request.id != null"
+    if: "build.pull_request.id != null || build.branch == 'main'"
     steps:
       - input: "🚀 Generate Prototype Builds?"
-        prompt: Generate Prototype Builds on the PR?
+        prompt: Generate Prototype Builds? (uploads to S3 and FAD)
         key: prototype_builds_triggered
-      - label: ":github: Prototype Builds"
+      - label: ":rocket: Prototype Builds"
         depends_on: prototype_builds_triggered
         command: |
           ".buildkite/commands/prototype-build.sh"
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
-
-    ##########
-    # Optional Prototype Builds (app only) for PR and main branches, distributed via FAD
-    ##########
-  - group: Prototype Builds (FAD)
-    if: "build.pull_request.id != null || build.branch == 'main'"
-    steps:
-      - input: ":rocket: Generate Prototype Builds (FAD)?"
-        prompt: Generate Prototype Builds via Firebase App Distribution (FAD)?
-        key: prototype_builds_fad_triggered
-      - label: ":firebase: Prototype Builds (FAD)"
-        depends_on: prototype_builds_fad_triggered
-        command: |
-          ".buildkite/commands/prototype-build-fad.sh"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "app/build/outputs/apk/**/*"
