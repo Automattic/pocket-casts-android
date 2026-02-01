@@ -677,6 +677,24 @@ platform :android do
       )
     end
 
+    # Upload app APK to Firebase App Distribution
+    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| p.include?('/app-') }
+    if app_apk && ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
+      release_notes = <<~NOTES
+        Pull Request: ##{pr_num || 'N/A'}
+        Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
+        Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
+      NOTES
+
+      firebase_app_distribution(
+        app: FIREBASE_APP_ID,
+        apk_path: app_apk,
+        service_credentials_json_data: ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil),
+        release_notes: release_notes,
+        groups: FIREBASE_TESTERS_GROUP
+      )
+    end
+
     if pr_num
       comment_on_pr(
         project: 'automattic/pocket-casts-android',
