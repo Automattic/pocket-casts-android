@@ -647,7 +647,7 @@ platform :android do
       )
     end
 
-    prototype_build_type = 'DebugProd'
+    prototype_build_type = 'Prototype'
 
     gradle(
       task: 'assemble',
