@@ -705,37 +705,6 @@ platform :android do
     end
   end
 
-  # Builds a prototype build and uploads it to Firebase App Distribution (FAD)
-  #
-  lane :build_and_upload_prototype_build_fad do
-    UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
-
-    # 'Pull Request' and 'Branch' is always going to point to 'N/A' and 'main' respectively.
-    # No matter, it's better to have this setup ready for when and if we ever run this lane for PR builds as well.
-    release_notes = <<~NOTES
-      Pull Request: ##{pull_request_number || 'N/A'}
-      Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
-      Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
-    NOTES
-
-    prototype_build_type = 'Prototype'
-
-    gradle(
-      task: 'app:assemble',
-      build_type: prototype_build_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
-    )
-
-    firebase_app_distribution(
-      app: FIREBASE_APP_ID,
-      service_credentials_json_data: ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil),
-      release_notes: release_notes,
-      groups: FIREBASE_TESTERS_GROUP
-    )
-  end
-
   def pull_request_number
     # Buildkite sets this env var to the PR number if on a PR, but to 'false' (and not nil) if not on a PR
     pr_num = ENV.fetch('BUILDKITE_PULL_REQUEST', 'false')
