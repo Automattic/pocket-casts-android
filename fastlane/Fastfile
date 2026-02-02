@@ -647,11 +647,15 @@ platform :android do
       )
     end
 
-    prototype_build_type = pr_number ? 'DebugProd' : 'Prototype'
+    build_config = if pr_number
+                     { task: 'assemble', build_type: 'DebugProd' }
+                   else
+                     { task: 'app:assemble', build_type: 'Prototype' }
+                   end
 
     gradle(
-      task: pr_number ? 'assemble' : 'app:assemble',
-      build_type: prototype_build_type,
+      task: build_config[:task],
+      build_type: build_config[:build_type],
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
@@ -671,7 +675,7 @@ platform :android do
         app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
         metadata: {
-          'Build Type': prototype_build_type
+          'Build Type': build_config[:build_type]
         },
         fold: true
       )
