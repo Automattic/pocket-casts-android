@@ -419,7 +419,8 @@ class PlaylistManagerImpl(
                 if (newPodcastEpisodes.isEmpty()) {
                     return@withTransaction false
                 }
-                val podcastSlugs = podcastDao.findAllIn(newPodcastEpisodes.keys).associate { it.uuid to it.slug }
+                val podcastUuids = newPodcastEpisodes.mapTo(mutableSetOf()) { (_, episode) -> episode.podcastUuid }
+                val podcastSlugs = podcastDao.findAllIn(podcastUuids).associate { it.uuid to it.slug }
 
                 val addedAt = clock.instant()
                 val startSortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0
