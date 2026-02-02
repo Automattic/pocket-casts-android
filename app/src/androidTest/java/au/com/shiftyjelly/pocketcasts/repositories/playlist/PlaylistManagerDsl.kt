@@ -498,8 +498,7 @@ class PlaylistManagerDsl : TestWatcher() {
             PlaylistPreviewForEpisode(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
-                episodeCount = 0,
-                hasEpisode = false,
+                episodeUuids = emptySet(),
             ),
         )
     }

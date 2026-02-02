@@ -237,7 +237,6 @@ Language: el_GR
     <string name="shuffle_whats_new_message">Παίξε εύκολα ένα τυχαίο επεισόδιο χωρίς να αλλάξεις τη σειρά της ουράς σου.</string>
     <string name="chapter_time_remaining_content_description">%s ακόμη στο κεφάλαιο</string>
     <string name="chapter_count_summary">%1$d από %2$d</string>
-    <string name="referrals_share_text">Γεια σου!\n\nΟρίστε ένα πάσο επισκέπτη %1$s για το Pocket Casts Plus–τον αγαπημένο μου αναπαραγωγέα podcast. Είναι γεμάτο με μοναδικά χαρακτηριστικά όπως σελιδοδείκτες, φακέλους και άλλα που δεν θα βρεις πουθενά αλλού. Νομίζω ότι θα το αγαπήσεις κι εσύ!</string>
     <string name="files_plus_prompt">Ανέβασε τα αρχεία σου με το Pocket Casts Plus και άλλα</string>
     <string name="icons_plus_prompt">Απόκτησε αποκλειστικά εικονίδια εφαρμογής με το Pocket Casts Plus και άλλα</string>
     <string name="themes_plus_prompt">Απόκτησε αποκλειστικά θέματα με το Pocket Casts Plus και άλλα</string>

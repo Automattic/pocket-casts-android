@@ -101,8 +101,6 @@ Language: sv_SE
     <string name="add_to_playlist_find_playlist">Hitta spellista</string>
     <string name="add_to_playlist_description">Lägg till i spellista</string>
     <string name="remove_from_playlist">Ta bort från spellista</string>
-    <string name="add_to_up_next_bottom">Lägg till längst ner i Nästa</string>
-    <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
     <string name="playlist_episodes_archived_title">Inga avsnitt</string>
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
     <string name="playlist_edit_episodes">Sortera om avsnitt</string>
@@ -468,7 +466,6 @@ Language: sv_SE
     <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
     <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
     <string name="chapter_count_summary">%1$d av %2$d</string>
-    <string name="referrals_share_text">Hej där!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
     <string name="files_plus_prompt">Ladda upp dina filer och mer därtill med Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>

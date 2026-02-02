@@ -96,6 +96,17 @@ class PlayerContainerFragment :
         return binding?.root
     }
 
+    fun snackBarView(): View? {
+        return upNextSnackBarView() ?: view
+    }
+
+    private fun upNextSnackBarView(): View? {
+        return childFragmentManager.fragments
+            .filterIsInstance<UpNextFragment>()
+            .lastOrNull { it.isAdded && it.isResumed }
+            ?.view
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         (activity as? FragmentHostListener)?.removePlayerBottomSheetCallback(closeUpNextCallback)

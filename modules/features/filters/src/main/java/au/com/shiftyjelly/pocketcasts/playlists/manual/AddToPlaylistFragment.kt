@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -52,8 +53,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             defaultViewModelCreationExtras.withCreationCallback<AddToPlaylistViewModel.Factory> { factory ->
                 factory.create(
                     source = args.source,
-                    episodeUuid = args.episodeUuid,
-                    podcastUuid = args.podcastUuid,
+                    episodeUuids = args.uuids,
                     initialPlaylistTitle = getString(LR.string.new_playlist),
                 )
             }
@@ -72,6 +72,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         val coroutineScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
+        val newEpisodeUuids = args.uuids.map(EpisodeUuidPair::episodeUuid)
 
         OpenCreatedPlaylistEffect()
 
@@ -85,6 +86,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                 exit = fadeOut,
             ) { uiState ->
                 AddToPlaylistPage(
+                    newEpisodeUuids = newEpisodeUuids,
                     playlistPreviews = uiState.playlistPreviews,
                     unfilteredPlaylistsCount = uiState.unfilteredPlaylistsCount,
                     episodeLimit = uiState.episodeLimit,
@@ -98,8 +100,8 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                         viewModel.createPlaylist()
                     },
                     onChangeEpisodeInPlaylist = { playlist ->
-                        if (playlist.canAddOrRemoveEpisode(uiState.episodeLimit)) {
-                            if (playlist.hasEpisode) {
+                        if (playlist.canAddOrRemoveEpisodes(uiState.episodeLimit, newEpisodeUuids)) {
+                            if (playlist.hasAllEpisodes(newEpisodeUuids)) {
                                 viewModel.trackEpisodeRemoveTapped(playlist)
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
@@ -108,15 +110,30 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                             }
                         } else {
                             viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
+                            val message = if (playlist.episodeUuids.size >= uiState.episodeLimit) {
+                                getString(LR.string.playlist_is_full_description)
+                            } else if (newEpisodeUuids.size > uiState.episodeLimit) {
+                                getString(LR.string.playlist_limit_reached, uiState.episodeLimit)
+                            } else {
+                                getString(LR.string.playlist_limit_almost_full)
+                            }
+
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
+                                    snackbarHostState.showSnackbar(message)
                                 }
                             }
                         }
                     },
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
+                        val canCreatePlaylist = newEpisodeUuids.size <= uiState.episodeLimit
+                        if (!canCreatePlaylist && snackbarHostState.currentSnackbarData == null) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(getString(LR.string.playlist_limit_reached, uiState.episodeLimit))
+                            }
+                        }
+                        canCreatePlaylist
                     },
                     onClickDoneButton = {
                         isDoneTapped = true
@@ -182,8 +199,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val source: Source,
-        val episodeUuid: String,
-        val podcastUuid: String,
+        val uuids: List<EpisodeUuidPair>,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
 
@@ -199,8 +215,26 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             arguments = bundleOf(
                 NEW_INSTANCE_ARGS to Args(
                     source = source,
-                    episodeUuid = episodeUuid,
-                    podcastUuid = podcastUuid,
+                    uuids = listOf(
+                        EpisodeUuidPair(
+                            episodeUuid = episodeUuid,
+                            podcastUuid = podcastUuid,
+                        ),
+                    ),
+                    customTheme = customTheme,
+                ),
+            )
+        }
+
+        fun newInstance(
+            source: Source,
+            uuids: List<EpisodeUuidPair>,
+            customTheme: Theme.ThemeType? = null,
+        ) = AddToPlaylistFragment().apply {
+            arguments = bundleOf(
+                NEW_INSTANCE_ARGS to Args(
+                    source = source,
+                    uuids = uuids,
                     customTheme = customTheme,
                 ),
             )

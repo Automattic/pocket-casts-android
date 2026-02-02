@@ -100,8 +100,6 @@ Language: nl
     <string name="add_to_playlist_no_playlist_found_body">We kunnen geen playlist vinden voor die zoekopdracht. Maak een nieuwe of gebruik een ander trefwoord.</string>
     <string name="add_to_playlist_find_playlist">Playlist zoeken</string>
     <string name="add_to_playlist_description">Toevoegen aan playlist</string>
-    <string name="add_to_up_next_bottom">Onderaan Hierna toevoegen</string>
-    <string name="add_to_up_next_top">Bovenaan Hierna toevoegen</string>
     <string name="remove_from_playlist">Verwijderen uit playlist</string>
     <string name="playlist_episodes_archived_title">Geen afleveringen</string>
     <string name="playlist_episodes_archived_count">%1$d gearchiveerd</string>
@@ -467,7 +465,6 @@ Language: nl
     <string name="shuffle_whats_new_title">Maak kennis met shuffle</string>
     <string name="chapter_time_remaining_content_description">nog %s te gaan in het hoofdstuk</string>
     <string name="chapter_count_summary">%1$d van %2$d</string>
-    <string name="referrals_share_text">Hallo!\n\nHier is een %1$s gastenpas voor Pocket Casts Plus, mijn favoriete podcastspeler. Het zit vol met unieke functies die je nergens anders vindt, zoals bladwijzers, mappen en meer. Jij zal er vast ook dol op zijn!</string>
     <string name="files_plus_prompt">Upload je bestanden met Pocket Casts Plus, en meer</string>
     <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
     <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>

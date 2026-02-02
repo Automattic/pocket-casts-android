@@ -3,6 +3,8 @@
 *   New Features
     *   Add episode to a playlist from episode details
         ([#4923](https://github.com/Automattic/pocket-casts-android/pull/4923))
+    *   Add toolbar action to add episodes in bulk to playlists
+        ([#4928](https://github.com/Automattic/pocket-casts-android/pull/4928))
 *   Updates
     *   Only pause playback after 200ms on AUDIO_FOCUS_LOSS_TRANSIENT_CAN_DUCK
         ([#4905](https://github.com/Automattic/pocket-casts-android/pull/4905))
