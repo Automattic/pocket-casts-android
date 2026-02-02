@@ -104,3 +104,5 @@ steps:
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
+        # No notify node to avoid GitHub checks status being stuck on yellow.
+        # This step being optional, chances are it will never be triggered.
