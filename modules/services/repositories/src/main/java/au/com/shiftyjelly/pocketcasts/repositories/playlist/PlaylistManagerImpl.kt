@@ -424,8 +424,9 @@ class PlaylistManagerImpl(
 
                 val addedAt = clock.instant()
                 val startSortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0
-                newEpisodeUuids.forEachIndexed { index, episodeUuid ->
-                    newPodcastEpisodes[episodeUuid]?.let { podcastEpisode ->
+                newEpisodeUuids
+                    .mapNotNull { uuid -> newPodcastEpisodes[uuid] }
+                    .forEachIndexed { index, podcastEpisode ->
                         val newEpisode = ManualPlaylistEpisode(
                             playlistUuid = playlistUuid,
                             episodeUuid = podcastEpisode.uuid,
@@ -441,7 +442,6 @@ class PlaylistManagerImpl(
                         )
                         playlistDao.upsertManualEpisode(newEpisode)
                     }
-                }
                 playlistDao.markPlaylistAsNotSynced(playlistUuid)
                 true
             }
