@@ -678,7 +678,7 @@ platform :android do
     end
 
     # Upload app APK to Firebase App Distribution
-    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| p.include?('/app-') }
+    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| File.basename(p).start_with?('app-') }
     if app_apk && ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
       release_notes = <<~NOTES
         Pull Request: ##{pr_number || 'N/A'}
