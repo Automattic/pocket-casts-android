@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.utils.extensions
+package au.com.shiftyjelly.pocketcasts.coroutines.flow
 
 import app.cash.turbine.test
 import kotlinx.coroutines.flow.MutableSharedFlow

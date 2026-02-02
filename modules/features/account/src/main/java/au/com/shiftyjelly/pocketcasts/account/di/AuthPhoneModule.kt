@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.di
 
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthDataSerializer
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
 import com.google.android.horologist.auth.data.phone.tokenshare.impl.TokenBundleRepositoryImpl

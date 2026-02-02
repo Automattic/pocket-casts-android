@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -13,26 +14,15 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Singleton
-class FirebaseRemoteFeatureProvider(
+class FirebaseRemoteFeatureProvider @Inject constructor(
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
-    private val scope: CoroutineScope,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : FeatureProvider {
     private val initialFetchComplete = CompletableDeferred<Boolean>()
-
-    @Inject
-    constructor(firebaseRemoteConfig: FirebaseRemoteConfig) : this(
-        firebaseRemoteConfig,
-        @Suppress("OPT_IN_USAGE")
-        // Using GlobalScope here is perfectly fine. This type is instantiated as a singleton.
-        // We have @ApplicationScope but it lives in a different module which cannot be included here.
-        // GlobalScope and @ApplicationScope are effectively the same as they have the same lifetime.
-        GlobalScope,
-    )
 
     override val priority: Int = MAX_PRIORITY
 

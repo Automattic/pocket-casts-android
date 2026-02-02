@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.reimagine.clip
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -14,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.VisualCardType
-import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

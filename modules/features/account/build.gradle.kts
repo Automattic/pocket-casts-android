@@ -31,6 +31,7 @@ dependencies {
     api(libs.moshi)
     api(libs.navigation.runtime)
 
+    api(projects.modules.services.coroutines)
     api(projects.modules.features.search)
     api(projects.modules.features.settings)
     api(projects.modules.services.analytics)

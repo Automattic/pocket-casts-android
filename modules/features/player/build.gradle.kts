@@ -38,6 +38,7 @@ dependencies {
     api(projects.modules.features.transcripts)
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
