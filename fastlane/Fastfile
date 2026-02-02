@@ -640,7 +640,7 @@ platform :android do
     pr_number = pull_request_number
     if pr_number
       comment_on_pr(
-        project: 'automattic/pocket-casts-android',
+        project: GITHUB_REPO,
         pr_number: pr_number,
         reuse_identifier: 'app-prototype-build-link',
         body: '🚧 Prototype builds will be available soon'
@@ -697,7 +697,7 @@ platform :android do
 
     if pr_number
       comment_on_pr(
-        project: 'automattic/pocket-casts-android',
+        project: GITHUB_REPO,
         pr_number: pr_number,
         reuse_identifier: 'app-prototype-build-link',
         body: prototype_build_comments.join
