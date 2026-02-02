@@ -636,6 +636,8 @@ platform :android do
   #
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+    firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
+    UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless firebase_account_key
 
     pr_number = pull_request_number
     if pr_number
@@ -664,38 +666,38 @@ platform :android do
 
     all_apks = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
     app_apk = all_apks.find { |p| File.basename(p).start_with?('app-') }
+
+    UI.user_error!("No app APK found in Gradle output. Output was:\n#{all_apks}") unless app_apk
+
     other_apks = all_apks - [app_apk]
 
     prototype_build_comments = []
 
     # Upload app APK to Firebase App Distribution
-    firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
-    if app_apk && firebase_account_key
-      release_notes = <<~NOTES
-        Pull Request: ##{pr_number || 'N/A'}
-        Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
-        Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
-      NOTES
+    release_notes = <<~NOTES
+      Pull Request: ##{pr_number || 'N/A'}
+      Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
+      Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
+    NOTES
 
-      firebase_app_distribution(
-        app: FIREBASE_APP_ID,
-        apk_path: app_apk,
-        service_credentials_json_data: firebase_account_key,
-        release_notes: release_notes,
-        groups: FIREBASE_TESTERS_GROUP
-      )
+    fad_release = firebase_app_distribution(
+      app: FIREBASE_APP_ID,
+      apk_path: app_apk,
+      service_credentials_json_data: firebase_account_key,
+      release_notes: release_notes,
+      groups: FIREBASE_TESTERS_GROUP
+    )
 
-      prototype_build_comments << prototype_build_details_comment(
-        app_display_name: get_app_display_name(apk_path: app_apk),
-        download_url: 'Available via Firebase App Distribution',
-        metadata: {
-          'Build Type': build_config[:build_type]
-        },
-        fold: true
-      )
-    end
+    prototype_build_comments << prototype_build_details_comment(
+      app_display_name: get_app_display_name(apk_path: app_apk),
+      download_url: fad_release[:testingUri],
+      metadata: {
+        'Build Type': build_config[:build_type]
+      },
+      fold: true
+    )
 
-    # Upload wear/automotive APKs to S3
+    # Upload other APKs (wear and automotive) to S3
     other_apks.each do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
