@@ -662,29 +662,15 @@ platform :android do
       }
     )
 
-    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map do |apk_path|
-      upload_path = upload_to_s3(
-        bucket: 'a8c-apps-public-artifacts',
-        key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
-        file: apk_path,
-        skip_if_exists: true
-      )
+    all_apks = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+    app_apk = all_apks.find { |p| File.basename(p).start_with?('app-') }
+    other_apks = all_apks - [app_apk]
 
-      install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
-
-      prototype_build_details_comment(
-        app_display_name: get_app_display_name(apk_path: apk_path),
-        download_url: install_url,
-        metadata: {
-          'Build Type': build_config[:build_type]
-        },
-        fold: true
-      )
-    end
+    prototype_build_comments = []
 
     # Upload app APK to Firebase App Distribution
-    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| File.basename(p).start_with?('app-') }
-    if app_apk && ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
+    firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
+    if app_apk && firebase_account_key
       release_notes = <<~NOTES
         Pull Request: ##{pr_number || 'N/A'}
         Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
@@ -694,20 +680,50 @@ platform :android do
       firebase_app_distribution(
         app: FIREBASE_APP_ID,
         apk_path: app_apk,
-        service_credentials_json_data: ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil),
+        service_credentials_json_data: firebase_account_key,
         release_notes: release_notes,
         groups: FIREBASE_TESTERS_GROUP
       )
-    end
 
-    if pr_number
-      comment_on_pr(
-        project: GITHUB_REPO,
-        pr_number: pr_number,
-        reuse_identifier: 'app-prototype-build-link',
-        body: prototype_build_comments.join
+      prototype_build_comments << prototype_build_details_comment(
+        app_display_name: get_app_display_name(apk_path: app_apk),
+        download_url: 'Available via Firebase App Distribution',
+        metadata: {
+          'Build Type': build_config[:build_type]
+        },
+        fold: true
       )
     end
+
+    # Upload wear/automotive APKs to S3
+    other_apks.each do |apk_path|
+      upload_path = upload_to_s3(
+        bucket: 'a8c-apps-public-artifacts',
+        key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
+        file: apk_path,
+        skip_if_exists: true
+      )
+
+      install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
+
+      prototype_build_comments << prototype_build_details_comment(
+        app_display_name: get_app_display_name(apk_path: apk_path),
+        download_url: install_url,
+        metadata: {
+          'Build Type': build_config[:build_type]
+        },
+        fold: true
+      )
+    end
+
+    next unless pr_number
+
+    comment_on_pr(
+      project: GITHUB_REPO,
+      pr_number: pr_number,
+      reuse_identifier: 'app-prototype-build-link',
+      body: prototype_build_comments.join
+    )
   end
 
   def pull_request_number
