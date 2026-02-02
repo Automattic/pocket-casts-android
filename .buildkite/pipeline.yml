@@ -99,8 +99,7 @@ steps:
         key: prototype_builds_triggered
       - label: ":rocket: Prototype Builds"
         depends_on: prototype_builds_triggered
-        command: |
-          ".buildkite/commands/prototype-build.sh"
+        command: .buildkite/commands/prototype-build.sh
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
