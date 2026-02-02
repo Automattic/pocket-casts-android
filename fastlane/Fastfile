@@ -637,11 +637,11 @@ platform :android do
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    pr_num = pull_request_number
-    if pr_num
+    pr_number = pull_request_number
+    if pr_number
       comment_on_pr(
         project: 'automattic/pocket-casts-android',
-        pr_number: pr_num,
+        pr_number: pr_number,
         reuse_identifier: 'app-prototype-build-link',
         body: '🚧 Prototype builds will be available soon'
       )
@@ -681,7 +681,7 @@ platform :android do
     app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| p.include?('/app-') }
     if app_apk && ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
       release_notes = <<~NOTES
-        Pull Request: ##{pr_num || 'N/A'}
+        Pull Request: ##{pr_number || 'N/A'}
         Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
         Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
       NOTES
@@ -695,10 +695,10 @@ platform :android do
       )
     end
 
-    if pr_num
+    if pr_number
       comment_on_pr(
         project: 'automattic/pocket-casts-android',
-        pr_number: pr_num,
+        pr_number: pr_number,
         reuse_identifier: 'app-prototype-build-link',
         body: prototype_build_comments.join
       )
