@@ -1,10 +1,6 @@
-package au.com.shiftyjelly.pocketcasts.utils.extensions
+package au.com.shiftyjelly.pocketcasts.coroutines.flow
 
-import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.combine as kotlinCombine
 
 inline fun <T1, T2, T3, T4, T5, T6, R> combine(
@@ -98,55 +94,3 @@ inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> combine(
         array[8] as T9,
     )
 }
-
-fun <T> Flow<T>.windowed(size: Int) = flow {
-    check(size > 0) { "Window size must be positive: $size" }
-    val queue = ArrayDeque<T>(size)
-    collect { item ->
-        if (queue.size < size) {
-            queue.addLast(item)
-            if (queue.size == size) {
-                emit(queue.toList())
-            }
-        } else {
-            queue.removeFirst()
-            queue.addLast(item)
-            emit(queue.toList())
-        }
-    }
-}
-
-// Source: https://github.com/Kotlin/kotlinx.coroutines/issues/2631#issuecomment-2812699291
-@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
-fun <T, R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> = object : StateFlow<R> {
-    override val replayCache: List<R> get() = listOf(value)
-
-    override suspend fun collect(collector: FlowCollector<R>): Nothing {
-        var lastEmittedValue: Any? = nullSurrogate
-        this@mapState.collect { newValue ->
-            val transformedValue = transform(newValue)
-            if (transformedValue != lastEmittedValue) {
-                lastEmittedValue = transformedValue
-                collector.emit(transformedValue)
-            }
-        }
-    }
-
-    private var lastUpstreamValue = this@mapState.value
-
-    override var value: R = transform(lastUpstreamValue)
-        private set
-        get() {
-            val currentUpstreamValue: T = this@mapState.value
-            if (currentUpstreamValue == lastUpstreamValue) {
-                return field
-            }
-
-            val newValue = transform(currentUpstreamValue)
-            field = newValue
-            lastUpstreamValue = currentUpstreamValue
-            return newValue
-        }
-}
-
-private val nullSurrogate = Any()

@@ -21,6 +21,7 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.hilt.work)
 
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.repositories)
 
     implementation(libs.coroutines.play.services)

@@ -27,6 +27,7 @@ dependencies {
     api(libs.rx2.java)
     api(libs.timber)
 
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.payment)
 
     implementation(platform(libs.compose.bom))

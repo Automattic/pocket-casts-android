@@ -123,6 +123,7 @@ dependencies {
     implementation(projects.modules.features.widgets)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)
