@@ -650,6 +650,7 @@ platform :android do
     build_config = if pr_number
                      { task: 'assemble', build_type: 'DebugProd' }
                    else
+                     # Only build the app (no wear or automotive) on the main branch
                      { task: 'app:assemble', build_type: 'Prototype' }
                    end
 
