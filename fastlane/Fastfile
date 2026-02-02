@@ -650,7 +650,7 @@ platform :android do
     prototype_build_type = pr_number ? 'DebugProd' : 'Prototype'
 
     gradle(
-      task: 'assemble',
+      task: pr_number ? 'assemble' : 'app:assemble',
       build_type: prototype_build_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
