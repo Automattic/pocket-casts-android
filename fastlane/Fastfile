@@ -632,48 +632,26 @@ platform :android do
     )
   end
 
-  # Builds a prototype build and uploads it to S3
+  # Builds prototype builds and uploads to FAD (app) and S3 (wear/automotive)
   #
   lane :build_and_upload_prototype_build do
-    UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
     firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
     UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless firebase_account_key
 
     pr_number = pull_request_number
-    if pr_number
-      comment_on_pr(
-        project: GITHUB_REPO,
-        pr_number: pr_number,
-        reuse_identifier: 'app-prototype-build-link',
-        body: '🚧 Prototype builds will be available soon'
-      )
-    end
 
-    build_config = if pr_number
-                     { task: 'assemble', build_type: 'DebugProd' }
-                   else
-                     # Only build the app (no wear or automotive) on the main branch
-                     { task: 'app:assemble', build_type: 'Prototype' }
-                   end
-
+    # Build app and upload to FAD
     gradle(
-      task: build_config[:task],
-      build_type: build_config[:build_type],
+      task: 'app:assemble',
+      build_type: 'Prototype',
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
     )
 
-    all_apks = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
-    app_apk = all_apks.find { |p| File.basename(p).start_with?('app-') }
+    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+    UI.user_error!("No app APK found in Gradle output.") unless app_apk
 
-    UI.user_error!("No app APK found in Gradle output. Output was:\n#{all_apks}") unless app_apk
-
-    other_apks = all_apks - [app_apk]
-
-    prototype_build_comments = []
-
-    # Upload app APK to Firebase App Distribution
     release_notes = <<~NOTES
       Pull Request: ##{pr_number || 'N/A'}
       Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
@@ -688,17 +666,36 @@ platform :android do
       groups: FIREBASE_TESTERS_GROUP
     )
 
-    prototype_build_comments << prototype_build_details_comment(
-      app_display_name: get_app_display_name(apk_path: app_apk),
-      download_url: fad_release[:testingUri],
-      metadata: {
-        'Build Type': build_config[:build_type]
-      },
-      fold: true
+    if pr_number
+      comment_on_pr(
+        project: GITHUB_REPO,
+        pr_number: pr_number,
+        reuse_identifier: 'prototype-build-fad',
+        body: prototype_build_details_comment(
+          app_display_name: get_app_display_name(apk_path: app_apk),
+          download_url: fad_release[:testingUri],
+          metadata: { 'Build Type': 'Prototype' },
+          fold: false
+        )
+      )
+    end
+
+    # Build wear/automotive and upload to S3 (PRs only)
+    next unless pr_number
+
+    UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+
+    gradle(
+      task: 'wear:assemble automotive:assemble',
+      build_type: 'DebugProd',
+      properties: {
+        'skipSentryProguardMappingUpload' => true
+      }
     )
 
-    # Upload other APKs (wear and automotive) to S3
-    other_apks.each do |apk_path|
+    other_apks = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+
+    s3_comments = other_apks.map do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
         key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
@@ -708,23 +705,19 @@ platform :android do
 
       install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
 
-      prototype_build_comments << prototype_build_details_comment(
+      prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
-        metadata: {
-          'Build Type': build_config[:build_type]
-        },
+        metadata: { 'Build Type': 'DebugProd' },
         fold: true
       )
     end
 
-    next unless pr_number
-
     comment_on_pr(
       project: GITHUB_REPO,
       pr_number: pr_number,
-      reuse_identifier: 'app-prototype-build-link',
-      body: prototype_build_comments.join
+      reuse_identifier: 'prototype-build-s3',
+      body: s3_comments.join
     )
   end
 
