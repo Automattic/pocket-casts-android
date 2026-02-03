@@ -28,8 +28,8 @@ constructor(
      * the watch app in the data layer.
      */
     @OptIn(ExperimentalHorologistApi::class)
-    suspend fun sendAuthToDataLayer() {
-        withContext(Dispatchers.Default) {
+    suspend fun sendAuthToDataLayer(): Result<Unit> {
+        return withContext(Dispatchers.Default) {
             try {
                 Timber.i("Updating WatchSyncAuthData in data layer")
 
@@ -47,6 +47,7 @@ constructor(
                 }
 
                 tokenBundleRepository.update(watchSyncAuthData)
+                Result.success(Unit)
             } catch (cancellationException: CancellationException) {
                 // Don't catch CancellationException since this represents the normal cancellation of a coroutine
                 throw cancellationException
@@ -55,28 +56,40 @@ constructor(
                     LogBuffer.TAG_BACKGROUND_TASKS,
                     "Saving refresh token to data layer failed: $exception",
                 )
+                Result.failure(exception)
             }
         }
     }
 
     suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
-        if (data != null) {
-            Timber.i("Received WatchSyncAuthData change from phone")
+        try {
+            if (data != null) {
+                Timber.i("Received WatchSyncAuthData change from phone")
 
-            if (!syncManager.isLoggedIn()) {
-                val result = syncManager.loginWithToken(
-                    token = data.refreshToken,
-                    loginIdentity = data.loginIdentity,
-                    signInSource = SignInSource.WatchPhoneSync,
-                )
-                onResult(result)
+                if (!syncManager.isLoggedIn()) {
+                    val result = syncManager.loginWithToken(
+                        token = data.refreshToken,
+                        loginIdentity = data.loginIdentity,
+                        signInSource = SignInSource.WatchPhoneSync,
+                    )
+                    onResult(result)
+                } else {
+                    Timber.i("Already logged in, skipping login")
+                }
             } else {
-                Timber.i("Received WatchSyncAuthData from phone, but user is already logged in")
+                // The user either was never logged in on their phone or just logged out.
+                // Either way, leave the user's login state on the watch unchanged.
+                Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
             }
-        } else {
-            // The user either was never logged in on their phone or just logged out.
-            // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received null WatchSyncAuthData change")
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(TAG, "Failed to process auth data: ${e.message}")
+            onResult(LoginResult.Failed(message = e.message ?: "Unknown error", messageId = null))
         }
+    }
+
+    companion object {
+        private const val TAG = "WatchSync"
     }
 }
