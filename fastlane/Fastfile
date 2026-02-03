@@ -688,14 +688,24 @@ platform :android do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
     gradle(
-      task: 'wear:assemble automotive:assemble',
+      task: 'wear:assemble',
       build_type: other_builds_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
     )
+    wear_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
 
-    other_apks = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+    gradle(
+      task: 'automotive:assemble',
+      build_type: other_builds_type,
+      properties: {
+        'skipSentryProguardMappingUpload' => true
+      }
+    )
+    automotive_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+
+    other_apks = [wear_apk, automotive_apk].compact
 
     s3_comments = other_apks.map do |apk_path|
       upload_path = upload_to_s3(
