@@ -51,7 +51,7 @@ class WearMainActivityViewModel @Inject constructor(
     data class State(
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState = SignInState.SignedOut,
-        val syncState: WatchSyncState = WatchSyncState.Syncing,
+        val syncState: WatchSyncState = WatchSyncState.Idle,
     )
 
     private val _state = MutableStateFlow(State())
