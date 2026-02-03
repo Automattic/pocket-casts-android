@@ -711,6 +711,7 @@ platform :android do
 
       s3_comments << prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
+        app_icon: ':amazon-s3:',
         download_url: install_url,
         metadata: { 'Build Type': other_builds_type },
         fold: true
