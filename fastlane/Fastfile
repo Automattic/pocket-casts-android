@@ -686,23 +686,20 @@ platform :android do
 
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    gradle(
-      task: 'wear:assemble',
-      build_type: other_builds_type,
-      properties: gradle_properties
-    )
-    wear_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+    other_platforms = %w[wear automotive]
 
-    gradle(
-      task: 'automotive:assemble',
-      build_type: other_builds_type,
-      properties: gradle_properties
-    )
-    automotive_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+    other_apks = []
+    other_platforms.each do |platform|
+      gradle(
+        task: "#{platform}:assemble",
+        build_type: other_builds_type,
+        properties: gradle_properties
+      )
+      other_apks << lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+    end
 
-    other_apks = [wear_apk, automotive_apk].compact
-
-    s3_comments = other_apks.map do |apk_path|
+    s3_comments = []
+    other_apks.each do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
         key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
@@ -712,7 +709,7 @@ platform :android do
 
       install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
 
-      prototype_build_details_comment(
+      s3_comments << prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
         metadata: { 'Build Type': other_builds_type },
