@@ -61,7 +61,7 @@ class PaymentExtensionsTest {
         name = "Plus Yearly Installment",
         pricingPlans = PricingPlans(
             basePlan = PricingPlan.Base(
-                planId = "p1-installment",
+                planId = "p1y-installments",
                 pricingPhases = listOf(installmentPricingPhase),
                 tags = emptyList(),
                 installmentPlanDetails = InstallmentPlanDetails(

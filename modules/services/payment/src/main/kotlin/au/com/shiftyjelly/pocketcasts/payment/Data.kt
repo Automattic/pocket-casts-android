@@ -357,7 +357,7 @@ sealed interface SubscriptionPlan {
                 }
 
                 BillingCycle.Yearly -> if (isInstallment) {
-                    "p1-installment"
+                    "p1y-installments"
                 } else {
                     "p1y"
                 }
