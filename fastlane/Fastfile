@@ -652,7 +652,7 @@ platform :android do
     )
 
     app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
-    UI.user_error!("No app APK found in Gradle output.") unless app_apk
+    UI.user_error!('No app APK found in Gradle output.') unless app_apk
 
     release_notes = <<~NOTES
       Pull Request: ##{pr_number || 'N/A'}
