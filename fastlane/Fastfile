@@ -641,14 +641,13 @@ platform :android do
     pr_number = pull_request_number
     app_build_type = 'Prototype'
     other_builds_type = 'DebugProd'
+    gradle_properties = { 'skipSentryProguardMappingUpload' => true }
 
     # Build app and upload to FAD
     gradle(
       task: 'app:assemble',
       build_type: app_build_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
+      properties: gradle_properties
     )
 
     app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
@@ -690,18 +689,14 @@ platform :android do
     gradle(
       task: 'wear:assemble',
       build_type: other_builds_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
+      properties: gradle_properties
     )
     wear_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
 
     gradle(
       task: 'automotive:assemble',
       build_type: other_builds_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
+      properties: gradle_properties
     )
     automotive_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
 
