@@ -372,7 +372,9 @@ subprojects {
                     applicationIdSuffix = ".debug"
                 }
 
-                maybeCreate("debugProd")
+                maybeCreate("debugProd").apply {
+                    applicationIdSuffix = ".debug"
+                }
 
                 maybeCreate("prototype").apply {
                     isMinifyEnabled = true
