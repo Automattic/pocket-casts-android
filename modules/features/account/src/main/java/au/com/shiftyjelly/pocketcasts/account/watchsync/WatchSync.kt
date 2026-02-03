@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.watchsync
 
 import android.annotation.SuppressLint
-import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
@@ -56,12 +54,6 @@ constructor(
                 }
 
                 tokenBundleRepository.update(watchSyncAuthData)
-
-                if (watchSyncAuthData != null) {
-                    LogBuffer.i(TAG, "Successfully sent auth token to Wear via Data Layer")
-                } else {
-                    LogBuffer.i(TAG, "Successfully removed auth token from Wear Data Layer")
-                }
                 Result.success(Unit)
             } catch (cancellationException: CancellationException) {
                 // Don't catch CancellationException since this represents the normal cancellation of a coroutine
@@ -77,35 +69,24 @@ constructor(
     }
 
     suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
-        if (data == null) {
-            // The user either was never logged in on their phone or just logged out.
-            // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
-            return
-        }
         try {
-            Timber.i("Received WatchSyncAuthData change from phone")
+            if (data != null) {
+                Timber.i("Received WatchSyncAuthData change from phone")
 
-            if (!syncManager.isLoggedIn()) {
-                val result = syncManager.loginWithToken(
-                    token = data.refreshToken,
-                    loginIdentity = data.loginIdentity,
-                    signInSource = SignInSource.WatchPhoneSync,
-                )
-                onResult(result)
+                if (!syncManager.isLoggedIn()) {
+                    val result = syncManager.loginWithToken(
+                        token = data.refreshToken,
+                        loginIdentity = data.loginIdentity,
+                        signInSource = SignInSource.WatchPhoneSync,
+                    )
+                    onResult(result)
+                } else {
+                    Timber.i("Already logged in, skipping login")
+                }
             } else {
-                Timber.i("Already logged in, sync successful")
-                // Create a minimal AuthResultModel since user is already logged in
-                // The ViewModel doesn't use the values from Success, only the success state
-                onResult(
-                    LoginResult.Success(
-                        AuthResultModel(
-                            token = AccessToken(""),
-                            uuid = "",
-                            isNewAccount = false,
-                        ),
-                    ),
-                )
+                // The user either was never logged in on their phone or just logged out.
+                // Either way, leave the user's login state on the watch unchanged.
+                Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
             }
         } catch (e: CancellationException) {
             throw e
