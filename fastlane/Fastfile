@@ -639,11 +639,13 @@ platform :android do
     UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless firebase_account_key
 
     pr_number = pull_request_number
+    app_build_type = 'Prototype'
+    other_builds_type = 'DebugProd'
 
     # Build app and upload to FAD
     gradle(
       task: 'app:assemble',
-      build_type: 'Prototype',
+      build_type: app_build_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
@@ -674,7 +676,7 @@ platform :android do
         body: prototype_build_details_comment(
           app_display_name: get_app_display_name(apk_path: app_apk),
           download_url: fad_release[:testingUri],
-          metadata: { 'Build Type': 'Prototype' },
+          metadata: { 'Build Type': app_build_type },
           fold: false
         )
       )
@@ -687,7 +689,7 @@ platform :android do
 
     gradle(
       task: 'wear:assemble automotive:assemble',
-      build_type: 'DebugProd',
+      build_type: other_builds_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
@@ -708,7 +710,7 @@ platform :android do
       prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
-        metadata: { 'Build Type': 'DebugProd' },
+        metadata: { 'Build Type': other_builds_type },
         fold: true
       )
     end
