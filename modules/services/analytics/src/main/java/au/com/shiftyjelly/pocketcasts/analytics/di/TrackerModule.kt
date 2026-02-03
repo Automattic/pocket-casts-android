@@ -32,6 +32,7 @@ abstract class TrackerModule {
         ): AnalyticsTracker = AnalyticsTracker(trackers, listeners)
 
         @Provides
+        @Singleton
         fun provideEventSink(
             trackers: Set<@JvmSuppressWildcards Tracker>,
             listeners: Set<@JvmSuppressWildcards AnalyticsTracker.Listener>,
