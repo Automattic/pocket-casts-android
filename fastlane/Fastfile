@@ -695,7 +695,7 @@ platform :android do
         build_type: other_builds_type,
         properties: gradle_properties
       )
-      other_apks << lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+      other_apks << lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| p.include?("/#{platform}/") }
     end
 
     s3_comments = []
