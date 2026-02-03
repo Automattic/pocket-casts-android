@@ -632,7 +632,7 @@ platform :android do
     )
   end
 
-  # Builds prototype builds and uploads to FAD (app) and S3 (wear/automotive)
+  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive)
   #
   lane :build_and_upload_prototype_build do
     firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
