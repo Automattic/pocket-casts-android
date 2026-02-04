@@ -21,15 +21,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 @HiltViewModel
@@ -52,6 +50,8 @@ class WearMainActivityViewModel @Inject constructor(
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
+    private var syncJob: Job? = null
+
     init {
         startSyncFlow()
 
@@ -66,27 +66,27 @@ class WearMainActivityViewModel @Inject constructor(
     }
 
     private fun startSyncFlow() {
-        viewModelScope.launch {
+        syncJob?.cancel()
+
+        syncJob = viewModelScope.launch {
             _state.update { it.copy(syncState = WatchSyncState.Syncing) }
 
             try {
-                withTimeout(30_000) {
-                    tokenBundleRepository.flow
-                        .retry(3) { exception ->
-                            LogBuffer.e(TAG, "TokenBundle flow error, retrying: ${exception.message}")
-                            delay(2000)
-                            true
+                val timeoutJob = launch {
+                    delay(SYNC_TIMEOUT_MS)
+                    if (_state.value.syncState == WatchSyncState.Syncing) {
+                        LogBuffer.e(TAG, "Watch sync timeout after ${SYNC_TIMEOUT_MS / 1000} seconds")
+                        _state.update {
+                            it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Timeout))
                         }
-                        .collect { watchSyncAuthData ->
-                            watchSync.processAuthDataChange(watchSyncAuthData) { result ->
-                                onLoginFromPhoneResult(result)
-                            }
-                        }
+                    }
                 }
-            } catch (e: TimeoutCancellationException) {
-                LogBuffer.e(TAG, "Watch sync timeout after 30 seconds")
-                _state.update {
-                    it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Timeout))
+
+                tokenBundleRepository.flow.collect { watchSyncAuthData ->
+                    watchSync.processAuthDataChange(watchSyncAuthData) { result ->
+                        timeoutJob.cancel()
+                        onLoginFromPhoneResult(result)
+                    }
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -154,6 +154,7 @@ class WearMainActivityViewModel @Inject constructor(
 
     companion object {
         private const val REFRESH_START_DELAY = 1000L
+        private const val SYNC_TIMEOUT_MS = 30_000L
         private const val TAG = "WearMainActivityViewModel"
     }
 }

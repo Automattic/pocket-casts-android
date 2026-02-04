@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -62,6 +62,9 @@ class WearMainActivityViewModelTest {
 
     private lateinit var viewModel: WearMainActivityViewModel
 
+    // Flow that never completes, simulating real tokenBundleRepository behavior
+    private val tokenFlow = MutableSharedFlow<WatchSyncAuthData?>()
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
@@ -71,15 +74,16 @@ class WearMainActivityViewModelTest {
             Flowable.just(SignInState.SignedOut),
         )
 
-        // Mock tokenBundleRepository to return empty flow (prevents infinite collection)
-        whenever(tokenBundleRepository.flow).thenReturn(emptyFlow())
+        // Mock tokenBundleRepository to return a flow that never completes (hot flow behavior)
+        whenever(tokenBundleRepository.flow).thenReturn(tokenFlow)
     }
 
     @Test
     fun `initial state has correct default values`() = runTest(testDispatcher) {
         // When
         viewModel = createViewModel()
-        testDispatcher.scheduler.advanceUntilIdle()
+        // Run current tasks without advancing time to avoid triggering timeout
+        testDispatcher.scheduler.runCurrent()
 
         // Then
         val state = viewModel.state.value
@@ -92,7 +96,7 @@ class WearMainActivityViewModelTest {
     fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest(testDispatcher) {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.runCurrent()
 
         // Manually update state to simulate successful login
         viewModel.state.value.copy(
@@ -111,7 +115,7 @@ class WearMainActivityViewModelTest {
     fun `signOut delegates to UserManager`() = runTest(testDispatcher) {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.runCurrent()
 
         // When
         viewModel.signOut()
@@ -124,13 +128,13 @@ class WearMainActivityViewModelTest {
     fun `retrySync can be called without error`() = runTest(testDispatcher) {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.runCurrent()
 
         // When - should not throw
         viewModel.retrySync()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.runCurrent()
 
-        // Then - verify state is still Syncing after retry
+        // Then - verify state is reset to Syncing after retry
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
     }
 
