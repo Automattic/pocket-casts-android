@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.utils.getPackageInfo
+import com.automattic.eventhorizon.ShareActionPlatform
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -48,6 +49,16 @@ enum class SocialPlatform(
         packageId = null,
     ),
     ;
+
+    val eventHorizonValue get() = when (this) {
+        Instagram -> ShareActionPlatform.IgStory
+        WhatsApp -> ShareActionPlatform.WhatsApp
+        Telegram -> ShareActionPlatform.Telegram
+        X -> ShareActionPlatform.Twitter
+        Tumblr -> ShareActionPlatform.Tumblr
+        PocketCasts -> ShareActionPlatform.Url
+        More -> ShareActionPlatform.SystemSheet
+    }
 
     companion object {
         fun getAvailablePlatforms(

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import com.automattic.eventhorizon.EventHorizon
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,8 +26,8 @@ object SharingModule {
     @Provides
     @IntoSet
     fun provideAnalyticsListener(
-        analyticsTracker: AnalyticsTracker,
-    ): SharingClient.Listener = SharingAnalytics(analyticsTracker)
+        eventHorizon: EventHorizon,
+    ): SharingClient.Listener = SharingAnalytics(eventHorizon)
 
     @Provides
     @IntoSet

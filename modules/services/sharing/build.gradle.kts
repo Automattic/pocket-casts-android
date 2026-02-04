@@ -19,6 +19,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.dagger.hilt.android)
+    api(libs.eventhorizon)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.deeplink)
@@ -38,4 +39,6 @@ dependencies {
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+
+    testImplementation(projects.modules.services.analytics.testing)
 }

@@ -59,4 +59,5 @@ dependencies {
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)
+    testImplementation(projects.modules.services.analytics.testing)
 }
