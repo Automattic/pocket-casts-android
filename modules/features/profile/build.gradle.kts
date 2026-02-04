@@ -34,6 +34,7 @@ dependencies {
     api(projects.modules.features.podcasts)
     api(projects.modules.features.settings)
     api(projects.modules.services.analytics)
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)

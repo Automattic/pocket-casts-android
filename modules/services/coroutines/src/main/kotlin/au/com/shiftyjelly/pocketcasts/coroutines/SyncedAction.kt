@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.utils.coroutines
+package au.com.shiftyjelly.pocketcasts.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
