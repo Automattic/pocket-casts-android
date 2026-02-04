@@ -163,7 +163,13 @@ open class PlaybackManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val focusManager = FocusManager(application, settings, this, applicationScope)
+    private val focusManager = FocusManager(
+        context = application,
+        settings = settings,
+        focusChangeListener = this,
+        coroutineScope = applicationScope,
+        mainThreadContext = Dispatchers.Main,
+    )
 
     private var audioNoisyManager = AudioNoisyManager(application)
 
