@@ -695,7 +695,14 @@ platform :android do
         build_type: other_builds_type,
         properties: gradle_properties
       )
-      other_apks << lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].find { |p| p.include?("/#{platform}/") }
+
+      generated_apk_paths = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+
+      platform_apk = generated_apk_paths&.find { |p| p.include?("/#{platform}/") }
+
+      UI.user_error!("Could not find generated APK for '#{platform}' platform in the GRADLE_ALL_APK_OUTPUT_PATHS list.") if platform_apk.nil?
+
+      other_apks << platform_apk
     end
 
     s3_comments = []
