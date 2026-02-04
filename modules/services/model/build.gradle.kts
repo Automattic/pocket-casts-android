@@ -22,6 +22,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     api(libs.billing.ktx)
+    api(libs.eventhorizon)
     api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)

@@ -233,10 +233,8 @@ class ShareClipViewModel @AssistedInject constructor(
         cardType: CardType,
         sourceView: SourceView,
     ): SharingRequest {
-        return SharingRequest.clipLink(podcast, episode, clipRange)
-            .setPlatform(platform)
-            .setCardType(cardType)
-            .setSourceView(sourceView)
+        return SharingRequest
+            .clipLink(podcast, episode, clipRange, sourceView, platform, cardType)
             .build()
     }
 
@@ -246,8 +244,8 @@ class ShareClipViewModel @AssistedInject constructor(
         clipRange: Clip.Range,
         sourceView: SourceView,
     ): SharingRequest {
-        return SharingRequest.audioClip(podcast, episode, clipRange)
-            .setSourceView(sourceView)
+        return SharingRequest
+            .audioClip(podcast, episode, clipRange, sourceView)
             .build()
     }
 
@@ -260,9 +258,8 @@ class ShareClipViewModel @AssistedInject constructor(
         backgroundAsset: File,
         sourceView: SourceView,
     ): SharingRequest {
-        return SharingRequest.videoClip(podcast, episode, clipRange, cardType, backgroundAsset)
-            .setPlatform(platform)
-            .setSourceView(sourceView)
+        return SharingRequest
+            .videoClip(podcast, episode, clipRange, backgroundAsset, sourceView, platform, cardType)
             .build()
     }
 

@@ -15,7 +15,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
@@ -38,6 +37,16 @@ import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.toBitmap
+import com.automattic.eventhorizon.EndOfYearShareSource
+import com.automattic.eventhorizon.EndOfYearStoryShareEvent
+import com.automattic.eventhorizon.EndOfYearStorySharedEvent
+import com.automattic.eventhorizon.PodcastSharedEvent
+import com.automattic.eventhorizon.ReferralPassSharedEvent
+import com.automattic.eventhorizon.ShareActionCardType
+import com.automattic.eventhorizon.ShareActionPlatform
+import com.automattic.eventhorizon.ShareActionType
+import com.automattic.eventhorizon.Trackable
+import com.automattic.eventhorizon.TranscriptSharedEvent
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Year
@@ -262,11 +271,10 @@ class SharingClient(
                 }
                 val pendingIntent = ItemSharedReceiver.intent(
                     context = context,
-                    event = AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
-                    values = mapOf(
-                        "story" to data.story.analyticsValue,
-                        "current_year" to data.year.value,
-                        "from" to "button",
+                    event = EndOfYearStorySharedEvent(
+                        from = EndOfYearShareSource.Button,
+                        story = data.story.eventHorizonValue,
+                        currentYear = data.year.value.toLong(),
                     ),
                 )
                 Intent()
@@ -356,193 +364,214 @@ class SharingClient(
 @ConsistentCopyVisibility
 data class SharingRequest internal constructor(
     val data: Data,
+    val trackable: Trackable?,
     val platform: SocialPlatform,
     val cardType: CardType?,
     val backgroundImage: File?,
-    val source: SourceView,
-    val analyticsEvent: AnalyticsEvent?,
-    val analyticsProperties: Map<String, Any>,
 ) {
     companion object {
         fun podcast(
             podcast: PodcastModel,
-        ) = Builder(Data.Podcast(podcast))
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: CardType,
+        ) = Builder(
+            data = Data.Podcast(podcast),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.Podcast,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        )
 
         fun episode(
             podcast: PodcastModel,
             episode: PodcastEpisode,
-        ) = Builder(Data.Episode(podcast, episode))
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: CardType,
+        ) = Builder(
+            data = Data.Episode(podcast, episode),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.Episode,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        )
 
         fun episodePosition(
             podcast: PodcastModel,
             episode: PodcastEpisode,
             position: Duration,
-        ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: CardType,
+        ) = Builder(
+            data = Data.EpisodePosition(podcast, episode, position, TimestampType.Episode),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.CurrentTime,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        )
 
         fun bookmark(
             podcast: PodcastModel,
             episode: PodcastEpisode,
             position: Duration,
-        ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: CardType,
+        ) = Builder(
+            data = Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.BookmarkTime,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        )
 
         fun episodeFile(
             podcast: Podcast,
             episode: PodcastEpisode,
-        ) = Builder(Data.EpisodeFile(podcast, episode))
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+        ) = Builder(
+            data = Data.EpisodeFile(podcast, episode),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.EpisodeFile,
+                action = ShareActionPlatform.SystemSheet,
+            ),
+        )
 
         fun clipLink(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipLink(podcast, episode, range))
-            .setPlatform(PocketCasts)
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: CardType,
+        ) = Builder(
+            data = Data.ClipLink(podcast, episode, range),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.ClipLink,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        )
 
         fun audioClip(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipAudio(podcast, episode, range))
-            .setCardType(CardType.Audio)
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+        ) = Builder(
+            data = Data.ClipAudio(podcast, episode, range),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.ClipAudio,
+                action = ShareActionPlatform.SystemSheet,
+                cardType = ShareActionCardType.Audio,
+            ),
+            platform = More,
+            cardType = CardType.Audio,
+        )
 
         fun videoClip(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-            cardType: VisualCardType,
             backgroundImage: File,
-        ) = Builder(Data.ClipVideo(podcast, episode, range))
-            .setCardType(cardType)
-            .setBackgroundImage(backgroundImage)
-            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
+            source: SourceView,
+            platform: SocialPlatform,
+            cardType: VisualCardType,
+        ) = Builder(
+            data = Data.ClipVideo(podcast, episode, range),
+            trackable = PodcastSharedEvent(
+                source = source.eventHorizonValue,
+                type = ShareActionType.ClipVideo,
+                action = platform.eventHorizonValue,
+                cardType = cardType.eventHorizonValue,
+            ),
+            platform = platform,
+            cardType = cardType,
+        ).setBackgroundImage(backgroundImage)
 
         fun referralLink(
             referralCode: String,
             offerName: String,
             offerDuration: String,
-        ) = Builder(Data.ReferralLink(referralCode, offerName, offerDuration))
-            .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
-            .addAnalyticsProperty("code", referralCode)
+            source: SourceView,
+        ) = Builder(
+            data = Data.ReferralLink(referralCode, offerName, offerDuration),
+            trackable = ReferralPassSharedEvent(
+                source = source.eventHorizonValue,
+                code = referralCode,
+            ),
+        )
 
         fun endOfYearStory(
             story: Story,
             year: Year,
             screenshot: File,
-        ) = Builder(Data.EndOfYearStory(story, year, screenshot))
-            .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
-            .addAnalyticsProperty("story", story.analyticsValue)
-            .addAnalyticsProperty("current_year", year.value)
+        ) = Builder(
+            data = Data.EndOfYearStory(story, year, screenshot),
+            trackable = EndOfYearStoryShareEvent(
+                story = story.eventHorizonValue,
+                currentYear = year.value.toLong(),
+            ),
+        )
 
         fun transcript(
-            podcastUuid: String?,
+            podcastUuid: String,
             episodeUuid: String,
             episodeTitle: String,
             transcript: String,
-        ) = Builder(Data.Transcript(episodeUuid, episodeTitle, transcript))
-            .setAnalyticsEvent(AnalyticsEvent.TRANSCRIPT_SHARED)
-            .addAnalyticsProperty("podcast_uuid", podcastUuid.orEmpty())
-            .addAnalyticsProperty("episode_uuid", episodeUuid)
+            source: SourceView,
+        ) = Builder(
+            data = Data.Transcript(episodeUuid, episodeTitle, transcript),
+            trackable = TranscriptSharedEvent(
+                source = source.eventHorizonValue,
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+            ),
+        )
     }
 
     class Builder internal constructor(
-        private var data: Data,
+        private val data: Data,
+        private val trackable: Trackable,
+        private val platform: SocialPlatform = More,
+        private val cardType: CardType? = null,
     ) {
-        private var platform = More
-        private var cardType: CardType? = null
-        private var source = SourceView.UNKNOWN
         private var backgroundImage: File? = null
-        private var analyticsEvent: AnalyticsEvent? = null
-        private var analyticsProperties = HashMap<String, Any>()
-
-        fun setPlatform(platform: SocialPlatform) = apply {
-            this.platform = platform
-        }
-
-        fun setCardType(cardType: CardType) = apply {
-            this.cardType = cardType
-        }
-
-        fun setSourceView(source: SourceView) = apply {
-            this.source = source
-        }
 
         fun setBackgroundImage(backgroundImage: File) = apply {
             this.backgroundImage = backgroundImage
         }
 
-        fun setAnalyticsEvent(analyticsEvent: AnalyticsEvent) = apply {
-            this.analyticsEvent = analyticsEvent
-        }
-
-        fun addAnalyticsProperty(key: String, value: Any) = apply {
-            analyticsProperties.put(key, value)
-        }
-
         fun build() = SharingRequest(
             data = data,
+            trackable = trackable,
             platform = platform,
             cardType = cardType,
             backgroundImage = backgroundImage,
-            source = source,
-            analyticsEvent = analyticsEvent,
-            analyticsProperties = buildMap {
-                put("type", data.analyticsValue)
-                put("source", source.analyticsValue)
-                put("action", platform.analyticsValue)
-                cardType?.let { type ->
-                    put("card_type", type.analyticsValue)
-                }
-                putAll(analyticsProperties)
-            },
         )
-
-        private val Data.analyticsValue get() = when (this) {
-            is Data.Podcast -> "podcast"
-
-            is Data.Episode -> "episode"
-
-            is Data.EpisodePosition -> when (type) {
-                TimestampType.Episode -> "current_time"
-                TimestampType.Bookmark -> "bookmark_time"
-            }
-
-            is Data.EpisodeFile -> "episode_file"
-
-            is Data.ClipLink -> "clip_link"
-
-            is Data.ClipAudio -> "clip_audio"
-
-            is Data.ClipVideo -> "clip_video"
-
-            is Data.ReferralLink -> "referral_link"
-
-            is Data.EndOfYearStory -> "end_of_year_story"
-
-            is Data.Transcript -> "transcript"
-        }
-
-        private val SocialPlatform.analyticsValue get() = when (this) {
-            Instagram -> "ig_story"
-            WhatsApp -> "whats_app"
-            Telegram -> "telegram"
-            X -> "twitter"
-            Tumblr -> "tumblr"
-            PocketCasts -> "url"
-            More -> "system_sheet"
-        }
-
-        private val CardType.analyticsValue get() = when (this) {
-            CardType.Vertical -> "vertical"
-            CardType.Horizontal -> "horizontal"
-            CardType.Square -> "square"
-            CardType.Audio -> "audio"
-        }
     }
 
     internal sealed interface Sociable {
