@@ -11,6 +11,7 @@ import androidx.media.AudioManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,6 +25,7 @@ class FocusManager(
     private val settings: Settings,
     private val focusChangeListener: FocusChangeListener,
     private val coroutineScope: CoroutineScope,
+    private val mainThreadContext: CoroutineContext,
 ) : AudioManager.OnAudioFocusChangeListener {
 
     companion object {
@@ -173,7 +175,7 @@ class FocusManager(
                 if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK && previousAudioFocus == AUDIO_FOCUSED) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost (can duck). Delaying notification by ${DUCK_LOSS_DELAY_MS}ms")
                     pendingDuckLossJob?.cancel()
-                    pendingDuckLossJob = coroutineScope.launch {
+                    pendingDuckLossJob = coroutineScope.launch(mainThreadContext) {
                         delay(DUCK_LOSS_DELAY_MS)
                         val playOverNotification = canDuck()
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost (can duck) after delay. Play over notification: $playOverNotification, is transient: $isLostTransient")
