@@ -985,6 +985,7 @@ class MainActivity :
                 settings.setTrialFinishedSeen(true)
             }
 
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Sign-in state changed (isSignedIn=${signinState.isSignedIn}), syncing auth to Wear")
             lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 
