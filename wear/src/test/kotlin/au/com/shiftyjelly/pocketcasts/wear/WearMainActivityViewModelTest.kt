@@ -13,9 +13,10 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -34,10 +35,8 @@ import org.mockito.kotlin.whenever
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class WearMainActivityViewModelTest {
-    private val testDispatcher = StandardTestDispatcher()
-
     @get:Rule
-    val coroutineRule = MainCoroutineRule(testDispatcher)
+    val coroutineRule = MainCoroutineRule()
 
     @Mock
     private lateinit var playbackManager: PlaybackManager
@@ -78,12 +77,28 @@ class WearMainActivityViewModelTest {
         whenever(tokenBundleRepository.flow).thenReturn(tokenFlow)
     }
 
+    @After
+    fun tearDown() {
+        // Cancel the ViewModel's sync job to prevent coroutine leakage into next test
+        // The ViewModel stores its sync job, so we can access it via reflection
+        if (::viewModel.isInitialized) {
+            try {
+                val syncJobField = WearMainActivityViewModel::class.java.getDeclaredField("syncJob")
+                syncJobField.isAccessible = true
+                val syncJob = syncJobField.get(viewModel) as? kotlinx.coroutines.Job
+                syncJob?.cancel()
+            } catch (e: Exception) {
+                // If reflection fails, that's okay - the test framework will clean up eventually
+            }
+        }
+    }
+
     @Test
-    fun `initial state has correct default values`() = runTest(testDispatcher) {
+    fun `initial state has correct default values`() = runTest {
         // When
         viewModel = createViewModel()
         // Run current tasks without advancing time to avoid triggering timeout
-        testDispatcher.scheduler.runCurrent()
+        testScheduler.runCurrent()
 
         // Then
         val state = viewModel.state.value
@@ -93,10 +108,10 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest(testDispatcher) {
+    fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.runCurrent()
+        testScheduler.runCurrent()
 
         // Manually update state to simulate successful login
         viewModel.state.value.copy(
@@ -112,10 +127,10 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `signOut delegates to UserManager`() = runTest(testDispatcher) {
+    fun `signOut delegates to UserManager`() = runTest {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.runCurrent()
+        testScheduler.runCurrent()
 
         // When
         viewModel.signOut()
@@ -125,14 +140,14 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `retrySync can be called without error`() = runTest(testDispatcher) {
+    fun `retrySync can be called without error`() = runTest {
         // Given
         viewModel = createViewModel()
-        testDispatcher.scheduler.runCurrent()
+        testScheduler.runCurrent()
 
         // When - should not throw
         viewModel.retrySync()
-        testDispatcher.scheduler.runCurrent()
+        testScheduler.runCurrent()
 
         // Then - verify state is reset to Syncing after retry
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
