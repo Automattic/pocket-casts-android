@@ -225,3 +225,73 @@ private fun ErrorContent(
         }
     }
 }
+
+@Preview
+@Composable
+private fun LoginWithPhoneInstructionsPreview() {
+    WearAppTheme {
+        LoginWithPhoneInstructionsContent(
+            onLoginClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SyncingContentPreview() {
+    WearAppTheme {
+        SyncingContent()
+    }
+}
+
+@Preview
+@Composable
+private fun SuccessContentPreview() {
+    WearAppTheme {
+        SuccessContent()
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorContentTimeoutPreview() {
+    WearAppTheme {
+        ErrorContent(
+            error = WatchSyncError.Timeout,
+            onRetry = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorContentNoConnectionPreview() {
+    WearAppTheme {
+        ErrorContent(
+            error = WatchSyncError.NoPhoneConnection,
+            onRetry = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorContentLoginFailedPreview() {
+    WearAppTheme {
+        ErrorContent(
+            error = WatchSyncError.LoginFailed("Invalid credentials"),
+            onRetry = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorContentUnknownPreview() {
+    WearAppTheme {
+        ErrorContent(
+            error = WatchSyncError.Unknown("Network error"),
+            onRetry = {},
+        )
+    }
+}
