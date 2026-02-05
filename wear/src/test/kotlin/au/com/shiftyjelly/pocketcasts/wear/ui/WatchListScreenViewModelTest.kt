@@ -3,16 +3,21 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WatchListScreenViewModelTest {
@@ -31,12 +36,23 @@ class WatchListScreenViewModelTest {
     @Mock
     private lateinit var podcastManager: PodcastManager
 
+    @Mock
+    private lateinit var upNextQueue: UpNextQueue
+
     private lateinit var viewModel: WatchListScreenViewModel
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
+        whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
+            .thenReturn(Observable.never())
         viewModel = WatchListScreenViewModel(analyticsTracker, episodeManager, playbackManager, podcastManager)
+    }
+
+    @After
+    fun tearDown() = runTest {
+        testScheduler.advanceUntilIdle()
     }
 
     @Test
