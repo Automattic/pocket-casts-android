@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,12 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
@@ -44,7 +48,7 @@ fun LoginWithPhoneScreen(
 
         WatchSyncState.Syncing -> SyncingContent(modifier = modifier)
 
-        WatchSyncState.Success -> Unit
+        WatchSyncState.Success -> SuccessContent(modifier = modifier)
 
         is WatchSyncState.Failed -> ErrorContent(
             error = syncState.error,
@@ -144,6 +148,36 @@ private fun SyncingContent(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun SuccessContent(modifier: Modifier = Modifier) {
+    ScreenScaffold(
+        timeText = null,
+        modifier = modifier,
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                tint = WearColors.success,
+                contentDescription = stringResource(LR.string.watch_sync_success),
+                modifier = Modifier.size(52.dp),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(LR.string.watch_sync_success),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.title3,
+                color = MaterialTheme.colors.onPrimary,
+            )
+        }
+    }
+}
+
+@Composable
 private fun ErrorContent(
     error: WatchSyncError,
     onRetry: () -> Unit,
@@ -179,8 +213,8 @@ private fun ErrorContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Error,
-                        tint = Color.Red,
-                        contentDescription = null,
+                        tint = MaterialTheme.colors.error,
+                        contentDescription = stringResource(LR.string.error),
                         modifier = Modifier.size(52.dp),
                     )
                 }
