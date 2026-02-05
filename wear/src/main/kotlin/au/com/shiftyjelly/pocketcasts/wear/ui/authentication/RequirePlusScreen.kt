@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -53,9 +54,9 @@ fun RequirePlusScreen(
             if (syncState != null) {
                 item {
                     val (statusText, statusColor) = when (syncState) {
-                        WatchSyncState.Syncing -> stringResource(LR.string.watch_sync_syncing) to Color.White.copy(alpha = 0.7f)
+                        WatchSyncState.Syncing -> stringResource(LR.string.watch_sync_syncing) to MaterialTheme.colors.onPrimary.copy(alpha = 0.7f)
 
-                        WatchSyncState.Success -> "" to Color.White
+                        WatchSyncState.Success -> "" to MaterialTheme.colors.onPrimary
 
                         is WatchSyncState.Failed -> {
                             val text = when (syncState.error) {
@@ -64,7 +65,7 @@ fun RequirePlusScreen(
                                 is WatchSyncError.LoginFailed -> stringResource(LR.string.watch_sync_error_login_failed)
                                 is WatchSyncError.Unknown -> stringResource(LR.string.watch_sync_error_unknown)
                             }
-                            text to Color.Red.copy(alpha = 0.8f)
+                            text to MaterialTheme.colors.error.copy(alpha = 0.8f)
                         }
                     }
 
@@ -73,7 +74,7 @@ fun RequirePlusScreen(
                             text = statusText,
                             textAlign = TextAlign.Center,
                             color = statusColor,
-                            style = androidx.wear.compose.material.MaterialTheme.typography.caption1,
+                            style = MaterialTheme.typography.caption1,
                         )
                         Spacer(Modifier.height(8.dp))
                     }
