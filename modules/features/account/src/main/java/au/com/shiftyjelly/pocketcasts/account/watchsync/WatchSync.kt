@@ -69,24 +69,24 @@ constructor(
     }
 
     suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
+        if (data == null) {
+            // The user either was never logged in on their phone or just logged out.
+            // Either way, leave the user's login state on the watch unchanged.
+            Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
+            return
+        }
         try {
-            if (data != null) {
-                Timber.i("Received WatchSyncAuthData change from phone")
+            Timber.i("Received WatchSyncAuthData change from phone")
 
-                if (!syncManager.isLoggedIn()) {
-                    val result = syncManager.loginWithToken(
-                        token = data.refreshToken,
-                        loginIdentity = data.loginIdentity,
-                        signInSource = SignInSource.WatchPhoneSync,
-                    )
-                    onResult(result)
-                } else {
-                    Timber.i("Already logged in, skipping login")
-                }
+            if (!syncManager.isLoggedIn()) {
+                val result = syncManager.loginWithToken(
+                    token = data.refreshToken,
+                    loginIdentity = data.loginIdentity,
+                    signInSource = SignInSource.WatchPhoneSync,
+                )
+                onResult(result)
             } else {
-                // The user either was never logged in on their phone or just logged out.
-                // Either way, leave the user's login state on the watch unchanged.
-                Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
+                Timber.i("Already logged in, skipping login")
             }
         } catch (e: CancellationException) {
             throw e
