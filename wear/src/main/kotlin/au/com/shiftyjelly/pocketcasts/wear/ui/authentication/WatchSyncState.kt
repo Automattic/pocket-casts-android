@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 sealed interface WatchSyncState {
-    data object Idle : WatchSyncState
     data object Syncing : WatchSyncState
     data object Success : WatchSyncState
     data class Failed(val error: WatchSyncError) : WatchSyncState

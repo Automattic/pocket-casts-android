@@ -9,11 +9,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -59,6 +61,9 @@ class WearMainActivityViewModelTest {
     @Mock
     private lateinit var watchSync: WatchSync
 
+    @Mock
+    private lateinit var phoneConnectionMonitor: PhoneConnectionMonitor
+
     private lateinit var viewModel: WearMainActivityViewModel
 
     // Flow that never completes, simulating real tokenBundleRepository behavior
@@ -77,8 +82,13 @@ class WearMainActivityViewModelTest {
         whenever(tokenBundleRepository.flow).thenReturn(tokenFlow)
     }
 
+    private suspend fun setupPhoneConnectionMock() {
+        // Mock phoneConnectionMonitor to return true (phone is connected)
+        whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
+    }
+
     @After
-    fun tearDown() {
+    fun tearDown() = runTest {
         // Cancel the ViewModel's sync job to prevent coroutine leakage into next test
         // The ViewModel stores its sync job, so we can access it via reflection
         if (::viewModel.isInitialized) {
@@ -86,7 +96,7 @@ class WearMainActivityViewModelTest {
                 val syncJobField = WearMainActivityViewModel::class.java.getDeclaredField("syncJob")
                 syncJobField.isAccessible = true
                 val syncJob = syncJobField.get(viewModel) as? kotlinx.coroutines.Job
-                syncJob?.cancel()
+                syncJob?.cancelAndJoin() // Wait for cancellation to complete
             } catch (e: Exception) {
                 // If reflection fails, that's okay - the test framework will clean up eventually
             }
@@ -95,6 +105,9 @@ class WearMainActivityViewModelTest {
 
     @Test
     fun `initial state has correct default values`() = runTest {
+        // Given
+        setupPhoneConnectionMock()
+
         // When
         viewModel = createViewModel()
         // Run current tasks without advancing time to avoid triggering timeout
@@ -110,6 +123,7 @@ class WearMainActivityViewModelTest {
     @Test
     fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest {
         // Given
+        setupPhoneConnectionMock()
         viewModel = createViewModel()
         testScheduler.runCurrent()
 
@@ -129,6 +143,7 @@ class WearMainActivityViewModelTest {
     @Test
     fun `signOut delegates to UserManager`() = runTest {
         // Given
+        setupPhoneConnectionMock()
         viewModel = createViewModel()
         testScheduler.runCurrent()
 
@@ -142,6 +157,7 @@ class WearMainActivityViewModelTest {
     @Test
     fun `retrySync can be called without error`() = runTest {
         // Given
+        setupPhoneConnectionMock()
         viewModel = createViewModel()
         testScheduler.runCurrent()
 
@@ -161,5 +177,6 @@ class WearMainActivityViewModelTest {
         context = context,
         tokenBundleRepository = tokenBundleRepository,
         watchSync = watchSync,
+        phoneConnectionMonitor = phoneConnectionMonitor,
     )
 }
