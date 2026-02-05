@@ -34,6 +34,7 @@ object RequirePlusScreen {
 fun RequirePlusScreen(
     onContinueToLogin: () -> Unit,
     modifier: Modifier = Modifier,
+    syncState: WatchSyncState? = null,
     viewModel: RequirePlusViewModel = hiltViewModel(),
 ) {
     val columnState = rememberResponsiveColumnState()
@@ -49,6 +50,36 @@ fun RequirePlusScreen(
         ScalingLazyColumn(
             columnState = columnState,
         ) {
+            if (syncState != null) {
+                item {
+                    val (statusText, statusColor) = when (syncState) {
+                        WatchSyncState.Syncing -> stringResource(LR.string.watch_sync_syncing) to Color.White.copy(alpha = 0.7f)
+
+                        WatchSyncState.Success -> "" to Color.White
+
+                        is WatchSyncState.Failed -> {
+                            val text = when (syncState.error) {
+                                WatchSyncError.NoPhoneConnection -> stringResource(LR.string.watch_sync_error_no_connection)
+                                WatchSyncError.Timeout -> stringResource(LR.string.watch_sync_error_timeout)
+                                is WatchSyncError.LoginFailed -> stringResource(LR.string.watch_sync_error_login_failed)
+                                is WatchSyncError.Unknown -> stringResource(LR.string.watch_sync_error_unknown)
+                            }
+                            text to Color.Red.copy(alpha = 0.8f)
+                        }
+                    }
+
+                    if (statusText.isNotEmpty()) {
+                        Text(
+                            text = statusText,
+                            textAlign = TextAlign.Center,
+                            color = statusColor,
+                            style = androidx.wear.compose.material.MaterialTheme.typography.caption1,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            }
+
             item {
                 SubscriptionBadge(
                     iconRes = IR.drawable.ic_plus,
