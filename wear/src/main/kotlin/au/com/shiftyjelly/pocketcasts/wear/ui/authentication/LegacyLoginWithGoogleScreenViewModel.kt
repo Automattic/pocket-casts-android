@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.horologist.auth.data.googlesignin.GoogleSignInEventListener
@@ -48,7 +49,7 @@ class LegacyLoginWithGoogleScreenViewModel @Inject constructor(
             val loginResult = syncManager.loginWithGoogle(idToken, SignInSource.UserInitiated.Watch)
             when (loginResult) {
                 is LoginResult.Failed -> {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "${WearLogging.PREFIX} Failed to login with Google: ${loginResult.message}")
                 }
 
                 is LoginResult.Success -> {

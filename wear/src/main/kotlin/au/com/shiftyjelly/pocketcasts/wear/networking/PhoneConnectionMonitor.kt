@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import com.google.android.horologist.networks.data.NetworkType
 import com.google.android.horologist.networks.status.NetworkRepository
 import javax.inject.Inject
@@ -23,7 +24,7 @@ class PhoneConnectionMonitor @Inject constructor(
                 networkStatus.networkInfo.type == NetworkType.BT
             }
         } catch (e: Exception) {
-            Timber.d("PhoneConnectionMonitor.isPhoneConnected failed: ${e.message}")
+            Timber.d("${WearLogging.PREFIX} PhoneConnectionMonitor.isPhoneConnected failed: ${e.message}")
             false
         }
     }

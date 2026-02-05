@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -84,7 +85,7 @@ class LoginWithGoogleViewModel @Inject constructor(
                                     idToken = googleIdTokenCredential.idToken,
                                 )
                             } else {
-                                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with GetGoogleIdOption")
+                                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "${WearLogging.PREFIX} Failed to sign in with GetGoogleIdOption")
                                 _state.value = State.Failed.Other
                             }
                         }
@@ -97,12 +98,12 @@ class LoginWithGoogleViewModel @Inject constructor(
                         }
 
                         else -> {
-                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with Google One Tap")
+                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "${WearLogging.PREFIX} Failed to sign in with Google One Tap")
                             _state.value = State.Failed.Other
                         }
                     }
                 }.onFailure {
-                    LogBuffer.e(LogBuffer.TAG_CRASH, it, "Unable to sign in with Google One Tap")
+                    LogBuffer.e(LogBuffer.TAG_CRASH, it, "${WearLogging.PREFIX} Unable to sign in with Google One Tap")
                     _state.value = when (it) {
                         is NoCredentialException -> State.Failed.GoogleLoginUnavailable
 
@@ -129,7 +130,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             }
 
             is LoginResult.Failed -> {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "${WearLogging.PREFIX} Failed to login with Google: ${loginResult.message}")
                 _state.value = State.Failed.Other
             }
         }
@@ -146,7 +147,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             }
 
             is LoginResult.Failed -> {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with email and password: ${loginResult.message}")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "${WearLogging.PREFIX} Failed to login with email and password: ${loginResult.message}")
                 _state.value = State.Failed.Other
             }
         }
