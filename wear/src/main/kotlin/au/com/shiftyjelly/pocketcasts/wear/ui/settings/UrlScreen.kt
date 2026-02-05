@@ -16,6 +16,7 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.navigation.composable
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -106,7 +107,7 @@ private suspend fun openUrlOnPhone(url: String, context: Context) {
             .startRemoteActivity(intent)
             .await()
     } catch (e: Exception) {
-        Timber.i("UrlScreen failed to open url $url on phone")
+        Timber.i("${WearLogging.PREFIX} UrlScreen failed to open url $url on phone")
         Toast.makeText(context, LR.string.settings_could_not_open_on_phone, Toast.LENGTH_SHORT)
             .show()
     }

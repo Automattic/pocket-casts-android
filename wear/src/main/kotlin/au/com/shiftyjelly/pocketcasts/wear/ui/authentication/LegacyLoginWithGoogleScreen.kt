@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.horologist.auth.ui.googlesignin.signin.GoogleSignInScreen
@@ -40,7 +41,7 @@ fun LegacyLoginWithGoogleScreen(
         GoogleSignInScreen(
             viewModel = viewModel.googleSignInViewModel,
             onAuthCancelled = {
-                Timber.i("Google sign in cancelled")
+                Timber.i("${WearLogging.PREFIX} Google sign in cancelled")
                 onCancel()
             },
             failedContent = {
