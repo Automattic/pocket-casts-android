@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncError
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
@@ -24,12 +23,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 @HiltViewModel
@@ -47,13 +48,14 @@ class WearMainActivityViewModel @Inject constructor(
     data class State(
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState = SignInState.SignedOut,
-        val syncState: WatchSyncState = WatchSyncState.Idle,
+        val syncState: WatchSyncState = WatchSyncState.Syncing,
     )
 
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
     private var syncJob: Job? = null
+    private var lastRetryTime: Long = 0L
 
     init {
         startSyncFlow()
@@ -74,7 +76,7 @@ class WearMainActivityViewModel @Inject constructor(
         syncJob = viewModelScope.launch {
             // Check phone connectivity before starting sync
             if (!phoneConnectionMonitor.isPhoneConnected()) {
-                LogBuffer.e(TAG, "${WearLogging.PREFIX} Phone not connected - cannot sync")
+                LogBuffer.e(TAG, "Phone not connected - cannot sync")
                 _state.update {
                     it.copy(syncState = WatchSyncState.Failed(WatchSyncError.NoPhoneConnection))
                 }
@@ -84,26 +86,22 @@ class WearMainActivityViewModel @Inject constructor(
             _state.update { it.copy(syncState = WatchSyncState.Syncing) }
 
             try {
-                val timeoutJob = launch {
-                    delay(SYNC_TIMEOUT_MS)
-                    if (_state.value.syncState == WatchSyncState.Syncing) {
-                        LogBuffer.e(TAG, "${WearLogging.PREFIX} Watch sync timeout after ${SYNC_TIMEOUT_MS / 1000} seconds")
-                        _state.update {
-                            it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Timeout))
+                withTimeout(SYNC_TIMEOUT_MS) {
+                    tokenBundleRepository.flow.collect { watchSyncAuthData ->
+                        watchSync.processAuthDataChange(watchSyncAuthData) { result ->
+                            onLoginFromPhoneResult(result)
                         }
                     }
                 }
-
-                tokenBundleRepository.flow.collect { watchSyncAuthData ->
-                    watchSync.processAuthDataChange(watchSyncAuthData) { result ->
-                        timeoutJob.cancel()
-                        onLoginFromPhoneResult(result)
-                    }
+            } catch (e: TimeoutCancellationException) {
+                LogBuffer.e(TAG, "Watch sync timeout after ${SYNC_TIMEOUT_MS / 1000} seconds")
+                _state.update {
+                    it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Timeout))
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                LogBuffer.e(TAG, "${WearLogging.PREFIX} Watch sync error: ${e.message}")
+                LogBuffer.e(TAG, "Watch sync error: ${e.message}")
                 _state.update {
                     it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Unknown(e.message)))
                 }
@@ -112,6 +110,12 @@ class WearMainActivityViewModel @Inject constructor(
     }
 
     fun retrySync() {
+        val now = System.currentTimeMillis()
+        if (now - lastRetryTime < RETRY_DEBOUNCE_MS) {
+            LogBuffer.i(TAG, "Retry debounced - too soon after previous attempt")
+            return
+        }
+        lastRetryTime = now
         startSyncFlow()
     }
 
@@ -138,7 +142,7 @@ class WearMainActivityViewModel @Inject constructor(
                     try {
                         podcastManager.refreshPodcastsAfterSignIn()
                     } catch (e: Exception) {
-                        LogBuffer.e(TAG, "${WearLogging.PREFIX} Failed to refresh podcasts after sign in: ${e.message}")
+                        LogBuffer.e(TAG, "Failed to refresh podcasts after sign in: ${e.message}")
                     }
                 }
             }
@@ -168,7 +172,7 @@ class WearMainActivityViewModel @Inject constructor(
             try {
                 podcastManager.refreshPodcastsIfRequired(fromLog = "watch - open app")
             } catch (e: Exception) {
-                Timber.e(e, "${WearLogging.PREFIX} Failed to refresh podcasts")
+                Timber.e(e)
             }
         }
         // Schedule next refresh in the background
@@ -178,6 +182,7 @@ class WearMainActivityViewModel @Inject constructor(
     companion object {
         private const val REFRESH_START_DELAY = 1000L
         private const val SYNC_TIMEOUT_MS = 30_000L
+        private const val RETRY_DEBOUNCE_MS = 3_000L
         private const val TAG = "WearMainActivityViewModel"
     }
 }

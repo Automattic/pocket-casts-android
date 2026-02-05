@@ -2158,7 +2158,6 @@
     <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
 
     <!-- Watch sync status -->
-    <string name="watch_sync_connecting">Connecting to phone…</string>
     <string name="watch_sync_syncing">Syncing with phone…</string>
     <string name="watch_sync_success">Logged in from phone!</string>
 
@@ -2176,7 +2175,6 @@
 
     <!-- Watch sync actions -->
     <string name="watch_sync_retry">Try Again</string>
-    <string name="watch_sync_manual_login">Log In Manually</string>
     <string name="watch_sync_waiting_for_phone">Waiting for phone to sync…</string>
 
     <!-- Phone sync confirmation -->
