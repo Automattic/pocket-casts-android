@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -79,6 +80,7 @@ class ChangeEmailFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         setupKeyboardModeResize()

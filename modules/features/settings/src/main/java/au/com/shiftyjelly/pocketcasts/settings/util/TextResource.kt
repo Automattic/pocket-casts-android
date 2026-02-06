@@ -8,8 +8,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 sealed interface TextResource {
@@ -17,10 +15,10 @@ sealed interface TextResource {
     data class Text(val text: String) : TextResource
 
     @Immutable
-    data class StringId(@StringRes val id: Int, val args: ImmutableList<Any> = emptyList<Any>().toImmutableList()) : TextResource
+    data class StringId(@StringRes val id: Int, val args: List<Any> = emptyList()) : TextResource
 
     @Immutable
-    data class PluralId(@PluralsRes val id: Int, val count: Int, val args: ImmutableList<Any> = emptyList<Any>().toImmutableList()) : TextResource
+    data class PluralId(@PluralsRes val id: Int, val count: Int, val args: List<Any> = emptyList()) : TextResource
 
     @Suppress("SpreadOperator")
     @Composable
@@ -42,7 +40,7 @@ sealed interface TextResource {
         @JvmName("fromNullableText")
         fun fromText(text: String?) = text?.let { fromText(it) }
         fun fromText(text: String) = Text(text)
-        fun fromStringId(@StringRes id: Int, vararg args: Any) = StringId(id, args.toImmutableList())
-        fun fromPluralId(@PluralsRes id: Int, count: Int, vararg args: Any) = PluralId(id, count, args.toImmutableList())
+        fun fromStringId(@StringRes id: Int, vararg args: Any) = StringId(id, args.toList())
+        fun fromPluralId(@PluralsRes id: Int, count: Int, vararg args: Any) = PluralId(id, count, args.toList())
     }
 }

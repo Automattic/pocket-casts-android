@@ -72,14 +72,13 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun loadThemesAndIcons() {
         createAccountState.postValue(SettingsAppearanceState.ThemesAndIconsLoading)
-        val appIcons = appIcon.allAppIconTypes.toList()
 
         createAccountState.postValue(
             SettingsAppearanceState.ThemesAndIconsLoaded(
                 theme.activeTheme,
                 theme.allThemes.toList(),
                 appIcon.activeAppIcon,
-                appIcons,
+                appIcon.allAppIconTypes,
             ),
         )
     }

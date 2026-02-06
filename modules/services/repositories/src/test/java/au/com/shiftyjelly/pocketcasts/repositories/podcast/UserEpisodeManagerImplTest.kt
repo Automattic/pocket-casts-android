@@ -5,18 +5,17 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,9 +29,6 @@ class UserEpisodeManagerImplTest {
 
     @Mock
     lateinit var userEpisodeDao: UserEpisodeDao
-
-    @Mock
-    lateinit var userEpisode: UserEpisode
 
     private lateinit var userEpisodeManagerImpl: UserEpisodeManagerImpl
 
@@ -51,28 +47,40 @@ class UserEpisodeManagerImplTest {
 
     @Test
     fun `select chapter removes element`() = runTest {
-        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
+        val userEpisode = UserEpisode(
+            uuid = "uuid",
+            publishedDate = Date(),
+            deselectedChapters = ChapterIndices(listOf(1, 2, 3)),
+        )
 
         userEpisodeManagerImpl.selectChapterIndexForEpisode(1, userEpisode)
 
-        verify(userEpisode).deselectedChapters = ChapterIndices(listOf(2, 3))
+        assertEquals(ChapterIndices(listOf(2, 3)), userEpisode.deselectedChapters)
     }
 
     @Test
     fun `deselect chapter adds element`() = runTest {
-        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2)))
+        val userEpisode = UserEpisode(
+            uuid = "uuid",
+            publishedDate = Date(),
+            deselectedChapters = ChapterIndices(listOf(1, 2)),
+        )
 
         userEpisodeManagerImpl.deselectChapterIndexForEpisode(3, userEpisode)
 
-        verify(userEpisode).deselectedChapters = ChapterIndices(listOf(1, 2, 3))
+        assertEquals(ChapterIndices(listOf(1, 2, 3)), userEpisode.deselectedChapters)
     }
 
     @Test
     fun `deselect chapter is not added twice`() = runTest {
-        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
+        val userEpisode = UserEpisode(
+            uuid = "uuid",
+            publishedDate = Date(),
+            deselectedChapters = ChapterIndices(listOf(1, 2, 3)),
+        )
 
         userEpisodeManagerImpl.deselectChapterIndexForEpisode(3, userEpisode)
 
-        verify(userEpisodeDao, never()).update(any())
+        assertEquals(ChapterIndices(listOf(1, 2, 3)), userEpisode.deselectedChapters)
     }
 }

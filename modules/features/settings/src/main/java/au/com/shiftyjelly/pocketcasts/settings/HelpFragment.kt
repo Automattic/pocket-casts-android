@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -72,6 +73,7 @@ class HelpFragment :
         }
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         setupKeyboardModeResize()

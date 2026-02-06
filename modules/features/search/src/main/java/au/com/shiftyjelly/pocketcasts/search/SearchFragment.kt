@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
@@ -114,6 +115,7 @@ class SearchFragment : BaseFragment() {
     val source: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = context as Listener

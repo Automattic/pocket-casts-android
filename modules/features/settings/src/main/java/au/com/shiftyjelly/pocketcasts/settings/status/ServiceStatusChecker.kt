@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.status
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -82,6 +83,8 @@ class ServiceStatusChecker @Inject constructor(
     private fun checkInternet(): ServiceStatus {
         return try {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            @SuppressLint("MissingPermission") // False positive
             val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return ServiceStatus.Failed(userMessage = null, log = "Unable to get network capabilities")
             if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
                 ServiceStatus.Success

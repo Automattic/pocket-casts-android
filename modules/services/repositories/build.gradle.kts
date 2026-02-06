@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
@@ -41,6 +40,8 @@ dependencies {
     api(projects.modules.services.protobuf)
     api(projects.modules.services.servers)
     api(projects.modules.services.utils)
+
+    implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

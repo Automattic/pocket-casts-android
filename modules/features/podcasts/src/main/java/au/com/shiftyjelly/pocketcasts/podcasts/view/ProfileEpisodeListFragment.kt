@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -224,6 +225,7 @@ class ProfileEpisodeListFragment :
         return binding?.root
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,12 +14,12 @@
         android:layout_marginTop="40dp"
         android:background="?attr/actionBarItemBackground"
         android:contentDescription="@string/cancel"
-        android:scaleType="fitCenter"
-        android:tint="?attr/primary_icon_01"
         android:padding="20dp"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_cancel" />
+        app:srcCompat="@drawable/ic_cancel"
+        app:tint="?attr/primary_icon_01" />
 
     <ImageView
         android:id="@+id/imgLogo"
