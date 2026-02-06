@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.account.watchsync
 
 import android.annotation.SuppressLint
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
@@ -79,7 +81,18 @@ constructor(
                 )
                 onResult(result)
             } else {
-                Timber.i("Already logged in, skipping login")
+                Timber.i("Already logged in, sync successful")
+                // Create a minimal AuthResultModel since user is already logged in
+                // The ViewModel doesn't use the values from Success, only the success state
+                onResult(
+                    LoginResult.Success(
+                        AuthResultModel(
+                            token = AccessToken(""),
+                            uuid = "",
+                            isNewAccount = false,
+                        ),
+                    ),
+                )
             }
         } catch (e: CancellationException) {
             throw e

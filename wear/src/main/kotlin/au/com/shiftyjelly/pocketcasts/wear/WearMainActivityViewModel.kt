@@ -27,6 +27,8 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -87,11 +89,14 @@ class WearMainActivityViewModel @Inject constructor(
 
             try {
                 withTimeout(SYNC_TIMEOUT_MS) {
-                    tokenBundleRepository.flow.collect { watchSyncAuthData ->
-                        watchSync.processAuthDataChange(watchSyncAuthData) { result ->
-                            onLoginFromPhoneResult(result)
+                    tokenBundleRepository.flow
+                        .filterNotNull()
+                        .first()
+                        .let { watchSyncAuthData ->
+                            watchSync.processAuthDataChange(watchSyncAuthData) { result ->
+                                onLoginFromPhoneResult(result)
+                            }
                         }
-                    }
                 }
             } catch (e: TimeoutCancellationException) {
                 LogBuffer.e(TAG, "Watch sync timeout after ${SYNC_TIMEOUT_MS / 1000} seconds")
