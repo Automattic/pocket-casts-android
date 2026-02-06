@@ -1,6 +1,8 @@
 8.6
 -----
-
+*   Bug Fixes
+    *   Fix up next queue episode ordering on the large widget
+        ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
 
 8.5
 -----
