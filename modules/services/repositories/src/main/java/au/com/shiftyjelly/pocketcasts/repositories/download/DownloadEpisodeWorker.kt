@@ -49,15 +49,15 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private var notificationJob: Job? = null
 
     override fun doWork(): Result {
-        val episode = runBlocking { episodeManager.findEpisodeByUuid(args.episodeUuid) } ?: run {
-            // TODO: Handle missing episode
-            return Result.failure()
-        }
-        val downloadFile = DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File) ?: run {
-            // TODO: Handle no download file
-            return Result.failure()
-        }
-        val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
+        // TODO: Clean this up once the real implementation starts
+        val episode = runBlocking { episodeManager.findEpisodeByUuid(args.episodeUuid) }
+            ?: run { return Result.failure() }
+        val downloadFile = runCatching { DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File) }
+            .getOrNull()
+            ?: run { return Result.failure() }
+        val tempFile = runCatching { File(DownloadHelper.tempPathForEpisode(episode, fileStorage)) }
+            .getOrNull()
+            ?: run { return Result.failure() }
 
         notificationJob = notificationObserver.observeNotificationUpdates(episode) { id, notification ->
             setForegroundAsync(createForegroundInfo(id, notification))
