@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityLogger
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
@@ -65,6 +66,8 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
+    @Inject lateinit var connectivityLogger: ConnectivityLogger
+
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
@@ -85,6 +88,7 @@ class PocketCastsWearApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+        connectivityLogger.startMonitoring()
     }
 
     private fun setupApp() {
