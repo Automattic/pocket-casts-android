@@ -12,7 +12,7 @@ class DownloadProgressTest {
             contentLength = 1000,
         )
 
-        assertEquals(37, value.progress)
+        assertEquals(37, value.percentage)
     }
 
     @Test
@@ -22,7 +22,7 @@ class DownloadProgressTest {
             contentLength = 100,
         )
 
-        assertEquals(100, value.progress)
+        assertEquals(100, value.percentage)
     }
 
     @Test
@@ -32,7 +32,7 @@ class DownloadProgressTest {
             contentLength = 100,
         )
 
-        assertNull(value.progress)
+        assertNull(value.percentage)
     }
 
     @Test
@@ -42,7 +42,7 @@ class DownloadProgressTest {
             contentLength = -100,
         )
 
-        assertNull(value.progress)
+        assertNull(value.percentage)
     }
 
     @Test
@@ -52,7 +52,7 @@ class DownloadProgressTest {
             contentLength = 0,
         )
 
-        assertNull(value.progress)
+        assertNull(value.percentage)
     }
 
     @Test
@@ -62,6 +62,6 @@ class DownloadProgressTest {
             contentLength = null,
         )
 
-        assertNull(value.progress)
+        assertNull(value.percentage)
     }
 }
