@@ -204,7 +204,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         fun createWorkRequest(args: Args): OneTimeWorkRequest {
             val constraints = Constraints.Builder()
                 .setRequiresCharging(args.waitForPower)
-                .setRequiredNetworkType(if (args.waitForWifi) NetworkType.UNMETERED else NetworkType.NOT_REQUIRED)
+                .setRequiredNetworkType(if (args.waitForWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
                 .setRequiresStorageNotLow(true)
                 .build()
             return OneTimeWorkRequestBuilder<DownloadEpisodeWorker>()
