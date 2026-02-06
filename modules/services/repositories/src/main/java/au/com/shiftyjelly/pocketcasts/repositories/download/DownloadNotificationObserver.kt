@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
 import java.time.Instant
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.abs
@@ -90,7 +91,7 @@ class DownloadNotificationObserver @Inject constructor(
             .setOngoing(true)
             .setWhen(startedAt.toEpochMilli())
             .setShowWhen(false)
-            .setSortKey("%013d_%s".format(startedAt.toEpochMilli(), episode.uuid))
+            .setSortKey("%013d_%s".format(Locale.ROOT, startedAt.toEpochMilli(), episode.uuid))
             .build()
     }
 
