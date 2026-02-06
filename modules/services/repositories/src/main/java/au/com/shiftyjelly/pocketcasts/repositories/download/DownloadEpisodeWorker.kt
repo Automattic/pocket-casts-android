@@ -172,7 +172,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 }
 
                 is IOException -> {
-                    if (throwable.message?.lowercase() == "Cancelled") {
+                    if (throwable.message?.lowercase() == "cancelled") {
                         return true
                     }
                 }
