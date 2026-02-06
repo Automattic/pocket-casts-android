@@ -38,6 +38,8 @@ fun NavGraphBuilder.authenticationNavGraph(
     navController: NavController,
     onEmailSignInSuccess: () -> Unit,
     googleSignInSuccessScreen: @Composable (GoogleAccountData) -> Unit,
+    syncState: WatchSyncState? = null,
+    onRetrySync: () -> Unit = {},
 ) {
     navigation(
         startDestination = AuthenticationNavRoutes.LOGIN_SCREEN,
@@ -77,6 +79,8 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             LoginWithPhoneScreen(
                 onLoginClick = { navController.popBackStack() },
+                syncState = syncState,
+                onRetry = onRetrySync,
             )
         }
 
