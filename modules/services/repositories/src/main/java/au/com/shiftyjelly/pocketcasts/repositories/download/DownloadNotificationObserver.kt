@@ -26,6 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class DownloadNotificationObserver @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -82,7 +83,7 @@ class DownloadNotificationObserver @Inject constructor(
         return notificationHelper.downloadChannelBuilder()
             .setSmallIcon(IR.drawable.notification_download)
             .setColor(ContextCompat.getColor(context, R.color.notification_color))
-            .setContentTitle("Downloading ${episode.title}")
+            .setContentTitle(context.getString(LR.string.downloading, episode.title))
             .setContentIntent(downloadsPendingIntent())
             .setProgress(100, progress.percentage ?: 0, progress.percentage == null)
             .setOnlyAlertOnce(true)
