@@ -22,7 +22,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-class EpisodeDownloadedTest {
+class EpisodeDownloaderTest {
     @get:Rule
     val tempDir = TemporaryFolder()
 
