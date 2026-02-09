@@ -411,7 +411,7 @@ class SubscriptionPlansTest {
         assertEquals(BillingCycle.Yearly, plan.billingCycle)
         assertTrue(plan.isInstallment)
         assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
-        assertEquals("p1-installment", plan.basePlanId)
+        assertEquals("p1y-installments", plan.basePlanId)
         assertEquals(infinitePricingPhase.price, plan.recurringPrice)
         assertNotNull(plan.installmentPlanDetails)
         assertEquals(12, plan.installmentPlanDetails!!.commitmentPaymentsCount)

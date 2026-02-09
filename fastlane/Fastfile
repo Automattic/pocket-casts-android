@@ -632,29 +632,81 @@ platform :android do
     )
   end
 
-  # Builds a prototype build and uploads it to S3
+  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive)
   #
   lane :build_and_upload_prototype_build do
+    firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
+    UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless firebase_account_key
+
+    pr_number = pull_request_number
+    app_build_type = 'Prototype'
+    other_builds_type = 'DebugProd'
+    gradle_properties = { 'skipSentryProguardMappingUpload' => true }
+
+    # Build app and upload to FAD
+    gradle(
+      task: 'app:assemble',
+      build_type: app_build_type,
+      properties: gradle_properties
+    )
+
+    app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
+    UI.user_error!('No app APK found in Gradle output.') unless app_apk
+
+    release_notes = <<~NOTES
+      Pull Request: ##{pr_number || 'N/A'}
+      Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
+      Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
+    NOTES
+
+    fad_release = firebase_app_distribution(
+      app: FIREBASE_APP_ID,
+      apk_path: app_apk,
+      service_credentials_json_data: firebase_account_key,
+      release_notes: release_notes,
+      groups: FIREBASE_TESTERS_GROUP
+    )
+
+    if pr_number
+      comment_on_pr(
+        project: GITHUB_REPO,
+        pr_number: pr_number,
+        reuse_identifier: 'prototype-build-fad',
+        body: prototype_build_details_comment(
+          app_display_name: get_app_display_name(apk_path: app_apk),
+          download_url: fad_release[:testingUri],
+          metadata: { 'Build Type': app_build_type },
+          fold: false
+        )
+      )
+    end
+
+    # Build wear/automotive and upload to S3 (PRs only)
+    next unless pr_number
+
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    comment_on_pr(
-      project: 'automattic/pocket-casts-android',
-      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
-      reuse_identifier: 'app-prototype-build-link',
-      body: '🚧 Prototype builds will be available soon'
-    )
+    other_platforms = %w[wear automotive]
 
-    prototype_build_type = 'DebugProd'
+    other_apks = []
+    other_platforms.each do |platform|
+      gradle(
+        task: "#{platform}:assemble",
+        build_type: other_builds_type,
+        properties: gradle_properties
+      )
 
-    gradle(
-      task: 'assemble',
-      build_type: prototype_build_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
-    )
+      generated_apk_paths = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
 
-    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map do |apk_path|
+      platform_apk = generated_apk_paths&.find { |p| p.include?("/#{platform}/") }
+
+      UI.user_error!("Could not find generated APK for '#{platform}' platform in the GRADLE_ALL_APK_OUTPUT_PATHS list.") if platform_apk.nil?
+
+      other_apks << platform_apk
+    end
+
+    s3_comments = []
+    other_apks.each do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
         key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
@@ -664,52 +716,20 @@ platform :android do
 
       install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
 
-      prototype_build_details_comment(
+      s3_comments << prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
+        app_icon: ':amazon-s3:',
         download_url: install_url,
-        metadata: {
-          'Build Type': prototype_build_type
-        },
+        metadata: { 'Build Type': other_builds_type },
         fold: true
       )
     end
 
     comment_on_pr(
-      project: 'automattic/pocket-casts-android',
-      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
-      reuse_identifier: 'app-prototype-build-link',
-      body: prototype_build_comments.join
-    )
-  end
-
-  # Builds a prototype build and uploads it to Firebase App Distribution (FAD)
-  #
-  lane :build_and_upload_prototype_build_fad do
-    UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
-
-    # 'Pull Request' and 'Branch' is always going to point to 'N/A' and 'main' respectively.
-    # No matter, it's better to have this setup ready for when and if we ever run this lane for PR builds as well.
-    release_notes = <<~NOTES
-      Pull Request: ##{pull_request_number || 'N/A'}
-      Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
-      Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
-    NOTES
-
-    prototype_build_type = 'Prototype'
-
-    gradle(
-      task: 'app:assemble',
-      build_type: prototype_build_type,
-      properties: {
-        'skipSentryProguardMappingUpload' => true
-      }
-    )
-
-    firebase_app_distribution(
-      app: FIREBASE_APP_ID,
-      service_credentials_json_data: ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil),
-      release_notes: release_notes,
-      groups: FIREBASE_TESTERS_GROUP
+      project: GITHUB_REPO,
+      pr_number: pr_number,
+      reuse_identifier: 'prototype-build-s3',
+      body: s3_comments.join
     )
   end
 

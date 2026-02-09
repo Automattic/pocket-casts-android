@@ -31,6 +31,7 @@ dependencies {
     api(libs.work.rx2)
 
     api(projects.modules.services.analytics)
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.crashlogging)
     api(projects.modules.services.localization)
     api(projects.modules.services.model)

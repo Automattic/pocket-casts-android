@@ -20,6 +20,8 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.encryptedlogging)
 
+    api(projects.modules.services.coroutines)
+
     implementation(projects.modules.services.utils)
 
     testImplementation(libs.coroutines.test)

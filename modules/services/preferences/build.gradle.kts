@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.ksp)
@@ -37,6 +35,7 @@ dependencies {
     implementation(libs.play.cast)
     implementation(libs.timber)
 
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
 

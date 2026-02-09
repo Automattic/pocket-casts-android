@@ -7,6 +7,7 @@ import android.media.AudioManager
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -34,7 +35,7 @@ class FocusManagerTest {
     @Test
     fun `audio focus regained within 200ms should not pause playback`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
@@ -51,7 +52,7 @@ class FocusManagerTest {
     @Test
     fun `audio focus lost for more than 200ms should pause playback`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
@@ -65,7 +66,7 @@ class FocusManagerTest {
     @Test
     fun `audio focus lost for exactly 200ms should pause playback`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
@@ -79,7 +80,7 @@ class FocusManagerTest {
     @Test
     fun `multiple rapid focus loss and gain should cancel previous jobs`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
@@ -102,7 +103,7 @@ class FocusManagerTest {
     @Test
     fun `non-duck audio focus loss should pause immediately`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
@@ -113,7 +114,7 @@ class FocusManagerTest {
     @Test
     fun `permanent audio focus loss should pause immediately`() = runTest {
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settings, listener, this)
+        val focusManager = FocusManager(context, settings, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS)
@@ -130,7 +131,7 @@ class FocusManagerTest {
             on { playOverNotification } doReturn duckSetting
         }
         val listener = mock<FocusManager.FocusChangeListener>()
-        val focusManager = FocusManager(context, settingsWithDuck, listener, this)
+        val focusManager = FocusManager(context, settingsWithDuck, listener, this, EmptyCoroutineContext)
 
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN)
         focusManager.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)

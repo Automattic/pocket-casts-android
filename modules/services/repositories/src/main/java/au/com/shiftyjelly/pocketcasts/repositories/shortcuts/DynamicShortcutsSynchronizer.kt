@@ -8,10 +8,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import androidx.room.concurrent.AtomicBoolean
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPlaylistDeepLink
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import dagger.hilt.android.qualifiers.ApplicationContext

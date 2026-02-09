@@ -20,6 +20,7 @@ dependencies {
     api(libs.dagger.hilt.android)
 
     api(projects.modules.services.analytics)
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.crashlogging)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)

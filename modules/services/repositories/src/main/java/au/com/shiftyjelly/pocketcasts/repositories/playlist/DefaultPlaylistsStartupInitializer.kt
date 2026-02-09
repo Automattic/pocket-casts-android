@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import android.content.Context
 import androidx.startup.Initializer
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.initializerEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
