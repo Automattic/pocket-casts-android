@@ -23,6 +23,8 @@ import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -96,11 +98,6 @@ class WearMainActivityViewModelTest {
         whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
     }
 
-    @After
-    fun tearDown() {
-        // Cleanup is handled automatically by viewModelScope and test framework
-    }
-
     @Test
     fun `initial state has correct default values`() = runTest {
         // Given
@@ -109,7 +106,7 @@ class WearMainActivityViewModelTest {
         // When
         viewModel = createViewModel()
         // Run current tasks without advancing time to avoid triggering timeout
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then
         viewModel.state.test {
@@ -125,7 +122,7 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // When
         viewModel.signOut()
@@ -139,11 +136,11 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // When - should not throw
         viewModel.retrySync()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then - verify state is reset to Syncing after retry
         viewModel.state.test {
@@ -160,7 +157,7 @@ class WearMainActivityViewModelTest {
         viewModel = createViewModel()
 
         // When: ViewModel initializes and starts sync flow
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then: Should immediately fail with NoPhoneConnection error
         viewModel.state.test {
@@ -202,7 +199,7 @@ class WearMainActivityViewModelTest {
         viewModel = createViewModel()
 
         // When: Start sync flow
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then: Should be in Success state
         viewModel.state.test {
@@ -233,7 +230,7 @@ class WearMainActivityViewModelTest {
         viewModel = createViewModel()
 
         // When: Start sync flow
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then: Should be in Failed state with LoginFailed error
         viewModel.state.test {
@@ -255,8 +252,8 @@ class WearMainActivityViewModelTest {
         viewModel = createViewModel()
 
         // When: Advance time to just before timeout
-        testScheduler.advanceTimeBy(29_999)
-        testScheduler.runCurrent()
+        advanceTimeBy(29_999)
+        runCurrent()
 
         // Should still be syncing
         viewModel.state.test {
@@ -265,8 +262,8 @@ class WearMainActivityViewModelTest {
         }
 
         // Advance time past timeout threshold
-        testScheduler.advanceTimeBy(1)
-        testScheduler.runCurrent()
+        advanceTimeBy(1)
+        runCurrent()
 
         // Then: Should be in Failed state with Timeout error
         viewModel.state.test {
@@ -284,28 +281,28 @@ class WearMainActivityViewModelTest {
         whenever(tokenBundleRepository.flow).thenReturn(authFlow)
 
         viewModel = createViewModel()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // When: First retry attempt (after initial sync)
         viewModel.retrySync()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Record how many times phone connection was checked
         var callCount = 1 // Once for initial sync, once for first retry
 
         // Immediate retry - should be debounced (no additional check)
         viewModel.retrySync()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Advance 2 seconds - still within debounce window
-        testScheduler.advanceTimeBy(2_000)
+        advanceTimeBy(2_000)
         viewModel.retrySync()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Advance 1 more second (total 3s) - debounce expired, should work now
-        testScheduler.advanceTimeBy(1_000)
+        advanceTimeBy(1_000)
         viewModel.retrySync()
-        testScheduler.runCurrent()
+        runCurrent()
 
         // Then: Verify second retry happened (state is Syncing)
         viewModel.state.test {

@@ -8,8 +8,6 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,14 +41,8 @@ class LoggingInScreenViewModelTest {
         )
     }
 
-    @After
-    fun tearDown() = runTest {
-        testScheduler.advanceUntilIdle()
-    }
-
     @Test
     fun `shouldClose immediately when state is None`() = runBlocking {
-        LoggingInScreenViewModel.State.None
         val result = testSubject.shouldClose(withMinimumDelay = true)
 
         assertEquals(true, result)
@@ -58,7 +50,6 @@ class LoggingInScreenViewModelTest {
 
     @Test
     fun `shouldClose immediately when state is RefreshComplete`() = runBlocking {
-        LoggingInScreenViewModel.State.RefreshComplete
         val result = testSubject.shouldClose(withMinimumDelay = true)
 
         assertEquals(true, result)
