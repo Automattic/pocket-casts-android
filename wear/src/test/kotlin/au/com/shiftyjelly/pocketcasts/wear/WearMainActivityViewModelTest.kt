@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
@@ -17,6 +18,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -64,26 +66,28 @@ class WearMainActivityViewModelTest {
     @Mock
     private lateinit var phoneConnectionMonitor: PhoneConnectionMonitor
 
+    @Mock
+    private lateinit var connectivityStateManager: ConnectivityStateManager
+
     private lateinit var viewModel: WearMainActivityViewModel
 
-    // Flow that never completes, simulating real tokenBundleRepository behavior
     private val tokenFlow = MutableSharedFlow<WatchSyncAuthData?>()
+    private val connectivityStateFlow = MutableStateFlow(true)
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
 
-        // Mock UserManager to return a Flowable of SignInState
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(SignInState.SignedOut),
         )
 
-        // Mock tokenBundleRepository to return a flow that never completes (hot flow behavior)
         whenever(tokenBundleRepository.flow).thenReturn(tokenFlow)
+
+        whenever(connectivityStateManager.isConnected).thenReturn(connectivityStateFlow)
     }
 
     private suspend fun setupPhoneConnectionMock() {
-        // Mock phoneConnectionMonitor to return true (phone is connected)
         whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
     }
 
@@ -169,6 +173,20 @@ class WearMainActivityViewModelTest {
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
     }
 
+    @Test
+    fun `onConnectivityNotificationDismissed sets showConnectivityNotification to false`() = runTest {
+        // Given
+        setupPhoneConnectionMock()
+        viewModel = createViewModel()
+        testScheduler.runCurrent()
+
+        // When
+        viewModel.onConnectivityNotificationDismissed()
+
+        // Then
+        assertEquals(false, viewModel.state.value.showConnectivityNotification)
+    }
+
     private fun createViewModel() = WearMainActivityViewModel(
         playbackManager = playbackManager,
         podcastManager = podcastManager,
@@ -178,5 +196,6 @@ class WearMainActivityViewModelTest {
         tokenBundleRepository = tokenBundleRepository,
         watchSync = watchSync,
         phoneConnectionMonitor = phoneConnectionMonitor,
+        connectivityStateManager = connectivityStateManager,
     )
 }

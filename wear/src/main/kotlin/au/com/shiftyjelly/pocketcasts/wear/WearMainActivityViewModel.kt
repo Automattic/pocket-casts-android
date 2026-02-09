@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncError
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
@@ -22,17 +23,20 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
@@ -43,12 +47,15 @@ class WearMainActivityViewModel @Inject constructor(
     private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
     private val watchSync: WatchSync,
     private val phoneConnectionMonitor: PhoneConnectionMonitor,
+    private val connectivityStateManager: ConnectivityStateManager,
 ) : ViewModel() {
 
     data class State(
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState = SignInState.SignedOut,
         val syncState: WatchSyncState = WatchSyncState.Syncing,
+        val showConnectivityNotification: Boolean = false,
+        val isConnected: Boolean = false,
     )
 
     private val _state = MutableStateFlow(State())
@@ -66,6 +73,24 @@ class WearMainActivityViewModel @Inject constructor(
                 .asFlow()
                 .collect { signInState ->
                     _state.update { it.copy(signInState = signInState) }
+                }
+        }
+
+        viewModelScope.launch {
+            var previousConnectivityState: Boolean? = null
+            connectivityStateManager.isConnected
+                .debounce(CONNECTIVITY_DEBOUNCE_MS)
+                .collect { isConnected ->
+                    val shouldShowNotification = previousConnectivityState != null &&
+                        previousConnectivityState != isConnected &&
+                        !isConnected
+                    _state.update {
+                        it.copy(
+                            isConnected = isConnected,
+                            showConnectivityNotification = shouldShowNotification,
+                        )
+                    }
+                    previousConnectivityState = isConnected
                 }
         }
     }
@@ -157,6 +182,12 @@ class WearMainActivityViewModel @Inject constructor(
         }
     }
 
+    fun onConnectivityNotificationDismissed() {
+        _state.update {
+            it.copy(showConnectivityNotification = false)
+        }
+    }
+
     fun signOut() {
         userManager.signOut(playbackManager, wasInitiatedByUser = false)
     }
@@ -183,6 +214,7 @@ class WearMainActivityViewModel @Inject constructor(
         private const val REFRESH_START_DELAY = 1000L
         private const val SYNC_TIMEOUT_MS = 30_000L
         private const val RETRY_DEBOUNCE_MS = 3_000L
+        private const val CONNECTIVITY_DEBOUNCE_MS = 2_000L
         private const val TAG = "WearMainActivityViewModel"
     }
 }

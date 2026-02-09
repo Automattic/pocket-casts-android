@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
@@ -32,6 +36,7 @@ import androidx.wear.compose.material.Scaffold
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ConnectivityBanner
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PodcastControlButtonsStyled
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.SetVolumeButtonStyled
@@ -167,11 +172,20 @@ fun NowPlayingScreen(
             },
             buttons = {
                 if (state is NowPlayingViewModel.State.Loaded) {
-                    NowPlayingSettingsButtons(
-                        volumeUiState = volumeUiState,
-                        onVolumeClick = { navController.navigate(PCVolumeScreen.ROUTE) },
-                        navController = navController,
-                    )
+                    Column {
+                        if (state.showConnectivityBanner) {
+                            ConnectivityBanner(
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
+                        NowPlayingSettingsButtons(
+                            volumeUiState = volumeUiState,
+                            onVolumeClick = { navController.navigate(PCVolumeScreen.ROUTE) },
+                            navController = navController,
+                        )
+                    }
                 }
             },
             background = {

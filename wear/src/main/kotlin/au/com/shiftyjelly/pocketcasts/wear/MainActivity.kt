@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.AUTHENTICATION_SUB_
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ConnectivityNotificationOverlay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
@@ -73,6 +74,9 @@ class MainActivity : ComponentActivity() {
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     onRetrySync = viewModel::retrySync,
                     signOut = viewModel::signOut,
+                    showConnectivityNotification = state.showConnectivityNotification,
+                    isConnected = state.isConnected,
+                    dismissConnectivityNotification = viewModel::onConnectivityNotificationDismissed,
                 )
             }
         }
@@ -92,7 +96,18 @@ private fun WearApp(
     onShowLoginScreen: () -> Unit,
     onRetrySync: () -> Unit,
     signOut: () -> Unit,
+    showConnectivityNotification: Boolean,
+    isConnected: Boolean,
+    dismissConnectivityNotification: () -> Unit,
 ) {
+    if (showConnectivityNotification) {
+        ConnectivityNotificationOverlay(
+            isConnected = isConnected,
+            onDismiss = dismissConnectivityNotification,
+        )
+        return
+    }
+
     val navController = rememberSwipeDismissableNavController()
     val swipeToDismissState = rememberSwipeToDismissBoxState()
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
@@ -441,5 +456,8 @@ private fun DefaultPreview() {
         onShowLoginScreen = {},
         onRetrySync = {},
         signOut = {},
+        showConnectivityNotification = false,
+        isConnected = true,
+        dismissConnectivityNotification = {},
     )
 }
