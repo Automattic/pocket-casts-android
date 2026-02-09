@@ -35,7 +35,7 @@ data class DownloadProgress(
     val downloadedByteCount: Long,
     val contentLength: Long?,
 ) {
-    val progress = if (contentLength != null && contentLength > 0L && downloadedByteCount >= 0L) {
+    val percentage = if (contentLength != null && contentLength > 0L && downloadedByteCount >= 0L) {
         val percentage = downloadedByteCount.toDouble() / contentLength
         (percentage * 100).roundToInt().coerceAtMost(100)
     } else {
