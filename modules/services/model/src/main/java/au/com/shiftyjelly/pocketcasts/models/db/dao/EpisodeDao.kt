@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatis
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
@@ -495,5 +496,21 @@ abstract class EpisodeDao {
     @Transaction
     open suspend fun updateAllCleanTitles(episodes: Collection<EpisodeWithTitle>) {
         episodes.forEach { episode -> updateCleanTitle(episode.uuid, episode.title) }
+    }
+
+    @Query(
+        """
+        UPDATE podcast_episodes 
+        SET episode_status = :status, downloaded_file_path = :downloadPath, downloaded_error_details = :downloadError 
+        WHERE uuid = :episodeUuid
+        """,
+    )
+    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeStatusEnum, downloadPath: String?, downloadError: String?)
+
+    @Transaction
+    open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
+        for ((episodeUuid, statusUpdate) in entries) {
+            updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
+        }
     }
 }
