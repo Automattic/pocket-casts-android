@@ -36,7 +36,7 @@
             android:layout_marginBottom="8dp"
             android:background="@drawable/background_large_item_subscribe"
             android:contentDescription="@string/subscribe"
-            android:tint="@color/white" />
+            app:tint="@color/white" />
 
     </androidx.cardview.widget.CardView>
 

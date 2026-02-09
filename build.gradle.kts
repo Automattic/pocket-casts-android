@@ -1,10 +1,10 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.Lint
 import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.BasePlugin
-import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
 import com.automattic.android.measure.reporters.RemoteBuildCacheMetricsReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
@@ -42,7 +41,7 @@ apply(from = rootProject.file("dependencies.gradle.kts"))
 apply(from = "scripts/git-hooks/install.gradle")
 
 measureBuilds {
-    enable = project.extra.properties.get("measureBuildsEnabled")?.toString().toBoolean()
+    enable = project.extra.properties["measureBuildsEnabled"]?.toString().toBoolean()
     onBuildMetricsReadyListener {
         val report = this@onBuildMetricsReadyListener
         SlowSlowTasksMetricsReporter.report(report)
@@ -212,20 +211,20 @@ subprojects {
         checkReleaseBuilds = false
     }
 
+    val canSignRelease = project.property("canSignRelease") == true
+
     plugins.withType<BasePlugin>().configureEach {
-        configure<BaseExtension> {
-            compileOptions {
+        configure<CommonExtension> {
+            compileSdk = project.property("compileSdkVersion") as Int
+
+            with(compileOptions) {
                 isCoreLibraryDesugaringEnabled = true
                 sourceCompatibility = JavaVersion.toVersion(javaTarget.target)
                 targetCompatibility = JavaVersion.toVersion(javaTarget.target)
             }
 
-            setCompileSdkVersion(project.property("compileSdkVersion") as Int)
-
-            defaultConfig {
+            with(defaultConfig) {
                 minSdk = project.property("minSdkVersion") as Int
-                versionCode = project.property("versionCode") as Int
-                versionName = project.property("versionName") as String
 
                 buildConfigField("boolean", "IS_PROTOTYPE", "false")
 
@@ -259,11 +258,9 @@ subprojects {
                 vectorDrawables.useSupportLibrary = true
             }
 
-            testOptions {
-                animationsDisabled = true
-            }
+            testOptions.animationsDisabled = true
 
-            packagingOptions.resources.excludes += listOf(
+            packaging.resources.excludes += listOf(
                 "META-INF/rxjava.properties",
                 "META-INF/AL2.0",
                 "META-INF/LGPL2.1",
@@ -271,8 +268,6 @@ subprojects {
                 // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
                 "**/attach_hotspot_windows.dll",
             )
-
-            val canSignRelease = project.property("canSignRelease") == true
 
             signingConfigs {
                 maybeCreate("debug").apply {
@@ -312,32 +307,19 @@ subprojects {
                     buildConfigField("String", "WEB_BASE_HOST", "\"pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\"")
-
-                    signingConfig = signingConfigs.getByName("debug")
                 }
 
                 maybeCreate("debugProd").apply {
-                    isDebuggable = true
                     isPseudoLocalesEnabled = true
                     enableUnitTestCoverage = false
                     enableAndroidTestCoverage = false
                     ext.set("alwaysUpdateBuildId", false)
 
-                    signingConfig = signingConfigs.getByName("debug")
+                    buildConfigField("boolean", "DEBUG", "true")
                 }
 
                 maybeCreate("prototype").apply {
                     buildConfigField("boolean", "IS_PROTOTYPE", "true")
-
-                    if (canSignRelease) {
-                        signingConfig = signingConfigs.getByName("release")
-                    }
-                }
-
-                named("release") {
-                    if (canSignRelease) {
-                        signingConfig = signingConfigs.getByName("release")
-                    }
                 }
             }
         }
@@ -364,16 +346,24 @@ subprojects {
     }
 
     plugins.withType<AppPlugin>().configureEach {
-        configure<BaseAppModuleExtension> {
+        configure<ApplicationExtension> {
+            defaultConfig.versionCode = project.property("versionCode") as Int
+            defaultConfig.versionName = project.property("versionName") as String
+
             lint(configureLint)
 
             buildTypes {
                 named("debug") {
                     applicationIdSuffix = ".debug"
+
+                    signingConfig = signingConfigs.getByName("debug")
                 }
 
                 maybeCreate("debugProd").apply {
+                    isDebuggable = true
                     applicationIdSuffix = ".debug"
+
+                    signingConfig = signingConfigs.getByName("debug")
                 }
 
                 maybeCreate("prototype").apply {
@@ -386,9 +376,17 @@ subprojects {
                             rootProject.file("proguard-rules-no-obfuscate.pro"),
                         ),
                     )
+
+                    if (canSignRelease) {
+                        signingConfig = signingConfigs.getByName("release")
+                    }
                 }
 
                 named("release") {
+                    if (canSignRelease) {
+                        signingConfig = signingConfigs.getByName("release")
+                    }
+
                     isMinifyEnabled = true
                     isShrinkResources = true
                     proguardFiles.addAll(

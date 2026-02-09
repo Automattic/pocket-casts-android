@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.util
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
@@ -8,6 +9,7 @@ val DISCOVER_PODCAST_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Any>() {
         return oldItem is DiscoverPodcast && newItem is DiscoverPodcast && oldItem.uuid == newItem.uuid
     }
 
+    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
         return oldItem == newItem
     }

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
@@ -100,6 +99,7 @@ dependencies {
     implementation(libs.zxing)
 
     implementation(projects.modules.features.account)
+    implementation(projects.modules.features.cartheme)
     implementation(projects.modules.features.discover)
     implementation(projects.modules.features.player)
     implementation(projects.modules.features.podcasts)
@@ -111,6 +111,7 @@ dependencies {
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.crashlogging)
+    implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
