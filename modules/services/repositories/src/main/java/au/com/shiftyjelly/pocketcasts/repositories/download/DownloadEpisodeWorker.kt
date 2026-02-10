@@ -13,6 +13,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -36,7 +37,6 @@ import javax.net.ssl.SSLException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
 
@@ -87,6 +87,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     override fun doWork(): Result {
         val result = try {
+            dispatchWorkStarted()
             var episode = getEpisodeOrThrow()
             prepareForegroundNotification(episode)
 
@@ -107,19 +108,27 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         return when (result) {
             is DownloadResult.Success -> {
-                Timber.d("Download success ${args.episodeUuid}: ${result.file}")
-                Result.success()
+                val data = Data.Builder()
+                    .putString(DOWNLOAD_FILE_PATH_KEY, result.file.path)
+                    .build()
+                Result.success(data)
             }
 
             is DownloadResult.Failure -> {
-                Timber.d("Download failure ${args.episodeUuid}: ${processFailure(result)}")
-                Result.failure()
+                val data = Data.Builder()
+                    .putString(ERROR_MESSAGE_KEY, processFailure(result))
+                    .build()
+                Result.failure(data)
             }
         }
     }
 
     override fun onStopped() {
         notificationJob?.cancel()
+    }
+
+    private fun dispatchWorkStarted() {
+        setProgressAsync(Data.Builder().putBoolean(IS_WORK_STARTED_KEY, true).build()).get()
     }
 
     private fun getEpisodeOrThrow() = runBlocking {
@@ -283,9 +292,11 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     )
 
     companion object {
-        private const val WORKER_TAG = "EpisodeDownloadWorker"
+        const val WORKER_TAG = "EpisodeDownloadWorker"
 
-        fun episodeWorkerName(episodeUuid: String) = "$WORKER_TAG:$episodeUuid"
+        internal const val WORKER_EPISODE_TAG_PREFIX = "$WORKER_TAG:"
+
+        fun episodeWorkerName(episodeUuid: String) = "$WORKER_EPISODE_TAG_PREFIX$episodeUuid"
 
         fun createWorkRequest(args: Args): OneTimeWorkRequest {
             val constraints = Constraints.Builder()
@@ -301,7 +312,93 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 .addTag(args.episodeUuid)
                 .build()
         }
+
+        fun mapToDownloadWorkInfo(info: WorkInfo): DownloadWorkInfo? {
+            return info.tags
+                .firstOrNull { tag -> tag.startsWith(WORKER_EPISODE_TAG_PREFIX) }
+                ?.substringAfter(WORKER_EPISODE_TAG_PREFIX, missingDelimiterValue = "")
+                ?.takeIf(String::isNotEmpty)
+                ?.let { episodeUuid ->
+                    val isWifiRequired = info.constraints.requiredNetworkType == NetworkType.UNMETERED
+                    val isPowerRequired = info.constraints.requiresCharging()
+                    val isStorageRequired = info.constraints.requiresStorageNotLow()
+                    when (info.state) {
+                        WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
+                            DownloadWorkInfo.Pending(
+                                episodeUuid = episodeUuid,
+                                isWifiRequired = isWifiRequired,
+                                isPowerRequired = isPowerRequired,
+                                isStorageRequired = isStorageRequired,
+                            )
+                        }
+
+                        WorkInfo.State.RUNNING -> {
+                            // Running doesn't necessarily mean that Worker.doWork() was called.
+                            // For this reason we use a separate flag.
+                            if (info.progress.getBoolean(IS_WORK_STARTED_KEY, false)) {
+                                DownloadWorkInfo.InProgress(episodeUuid)
+                            } else {
+                                DownloadWorkInfo.Pending(
+                                    episodeUuid = episodeUuid,
+                                    isWifiRequired = isWifiRequired,
+                                    isPowerRequired = isPowerRequired,
+                                    isStorageRequired = isStorageRequired,
+                                )
+                            }
+                        }
+
+                        WorkInfo.State.SUCCEEDED -> {
+                            val filePath = requireNotNull(info.outputData.getString(DOWNLOAD_FILE_PATH_KEY)) {
+                                "Output file path is missing for the episode $episodeUuid download"
+                            }
+                            DownloadWorkInfo.Success(episodeUuid, File(filePath))
+                        }
+
+                        WorkInfo.State.FAILED -> {
+                            val errorMessage = info.outputData.getString(ERROR_MESSAGE_KEY)
+                            if (errorMessage == CANCELLED_MESSAGE) {
+                                DownloadWorkInfo.Cancelled(episodeUuid)
+                            } else {
+                                DownloadWorkInfo.Failure(episodeUuid, errorMessage)
+                            }
+                        }
+
+                        WorkInfo.State.CANCELLED -> {
+                            DownloadWorkInfo.Cancelled(episodeUuid)
+                        }
+                    }
+                }
+        }
     }
+}
+
+sealed interface DownloadWorkInfo {
+    val episodeUuid: String
+
+    data class Pending(
+        override val episodeUuid: String,
+        val isWifiRequired: Boolean,
+        val isPowerRequired: Boolean,
+        val isStorageRequired: Boolean,
+    ) : DownloadWorkInfo
+
+    data class InProgress(
+        override val episodeUuid: String,
+    ) : DownloadWorkInfo
+
+    data class Success(
+        override val episodeUuid: String,
+        val downloadFile: File,
+    ) : DownloadWorkInfo
+
+    data class Failure(
+        override val episodeUuid: String,
+        val errorMessage: String?,
+    ) : DownloadWorkInfo
+
+    data class Cancelled(
+        override val episodeUuid: String,
+    ) : DownloadWorkInfo
 }
 
 private fun Data.toArgs() = DownloadEpisodeWorker.Args(
@@ -316,9 +413,17 @@ private fun DownloadEpisodeWorker.Args.toData() = Data.Builder()
     .putBoolean(WAIT_FOR_POWER_KEY, waitForPower)
     .build()
 
+// Input keys
 private const val EPISODE_UUID_KEY = "episode_uuid"
 private const val WAIT_FOR_WIFI_KEY = "wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "wait_for_power"
 
+// Progress keys
+internal const val IS_WORK_STARTED_KEY = "is_work_started"
+
+// Output keys
+internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
+internal const val ERROR_MESSAGE_KEY = "error_message"
+
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-private const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
+internal const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
