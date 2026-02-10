@@ -41,6 +41,37 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
 
+/**
+ * **Note**: This `Worker` is intentionally implemented as a synchronous `Worker`
+ * and must remain so.
+ *
+ * `WorkManager` invokes Worker.doWork() on a background thread provided by
+ * its executor, and the method is expected to run synchronously until the
+ * work completes. This worker relies on that contract to ensure requirements.
+ *
+ * Bounded concurrency: Episode downloads are limited to the fixed number
+ * of `Worker` threads configured for `WorkManager` in the `Application` class.
+ * By blocking within `doWork()`, we guarantee that no more than the
+ * configured number of downloads run concurrently.
+ *
+ * Correct notification behavior: If this were implemented as a
+ * `CoroutineWorker`, the suspending nature of `doWork()` could allow
+ * additional workers to start while earlier work is still in flight.
+ * This can lead to multiple episode notifications being triggered
+ * concurrently and to perception of too many downloads at the same time.
+ *
+ * Lifecycle alignment: All download execution, including URL refresh,
+ * file resolution, and EpisodeDownloader execution, completes within the
+ * lifetime of `doWork()`. No coroutine jobs or asynchronous work may
+ * outlive `doWork()`, ensuring that `Result.success()` or `Result.failure()`
+ * accurately reflects the completion of the episode download and its
+ * associated notification lifecycle.
+ *
+ * In a coroutine-heavy codebase, the use of `runBlocking` here is
+ * deliberate: it confines execution to WorkManager’s executor and
+ * preserves the application’s configured concurrency and notification
+ * guarantees.
+ */
 @HiltWorker
 class DownloadEpisodeWorker @AssistedInject constructor(
     @Assisted private val context: Context,
