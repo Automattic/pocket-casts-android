@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
@@ -152,4 +153,20 @@ abstract class UserEpisodeDao {
 
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
+
+    @Query(
+        """
+        UPDATE user_episodes 
+        SET episode_status = :status, downloaded_file_path = :downloadPath, downloaded_error_details = :downloadError 
+        WHERE uuid = :episodeUuid
+        """,
+    )
+    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeStatusEnum, downloadPath: String?, downloadError: String?)
+
+    @Transaction
+    open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
+        for ((episodeUuid, statusUpdate) in entries) {
+            updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
+        }
+    }
 }
