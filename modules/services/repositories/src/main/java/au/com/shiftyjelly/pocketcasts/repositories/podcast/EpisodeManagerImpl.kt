@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -340,9 +340,9 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum) {
+    override suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeDownloadStatus) {
         episode ?: return
-        episode.episodeStatus = status
+        episode.downloadStatus = status
 
         if (episode is PodcastEpisode) {
             episodeDao.updateEpisodeStatus(status, episode.uuid)
@@ -351,7 +351,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeStatusEnum) {
+    override fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeDownloadStatus) {
         episodeDao.updateAllEpisodeStatusBlocking(episodeStatus)
     }
 
@@ -377,7 +377,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (markAsDownloaded) {
             runBlocking {
-                updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                updateEpisodeStatus(episode, EpisodeDownloadStatus.Downloaded)
             }
         }
     }
@@ -567,7 +567,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (updateDatabase) {
             updateDownloadTaskId(episode, null)
-            updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
+            updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
             if (disableAutoDownload) {
                 updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             }
@@ -628,11 +628,11 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun setDownloadFailedBlocking(episode: BaseEpisode, errorMessage: String) {
         if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadErrorBlocking(episode.uuid, errorMessage, EpisodeStatusEnum.DOWNLOAD_FAILED)
+            episodeDao.updateDownloadErrorBlocking(episode.uuid, errorMessage, EpisodeDownloadStatus.DownloadFailed)
         } else if (episode is UserEpisode) {
             runBlocking {
                 userEpisodeManager.updateDownloadErrorDetails(episode, errorMessage)
-                userEpisodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+                userEpisodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.DownloadFailed)
             }
         }
     }
@@ -648,9 +648,9 @@ class EpisodeManagerImpl @Inject constructor(
         episode ?: return
         episodeDao.updateDownloadErrorDetailsBlocking(null, episode.uuid)
         runBlocking {
-            updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
+            updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
         }
-        episode.episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED
+        episode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
         episode.downloadErrorDetails = null
     }
 
@@ -833,18 +833,18 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     private fun buildEpisodeStatusWhere(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): String {
-        val status = mutableSetOf<EpisodeStatusEnum>()
+        val status = mutableSetOf<EpisodeDownloadStatus>()
         if (queued) {
-            status.add(EpisodeStatusEnum.QUEUED)
+            status.add(EpisodeDownloadStatus.Queued)
         }
         if (waitingForPower) {
-            status.add(EpisodeStatusEnum.WAITING_FOR_POWER)
+            status.add(EpisodeDownloadStatus.WaitingForPower)
         }
         if (waitingForWifi) {
-            status.add(EpisodeStatusEnum.WAITING_FOR_WIFI)
+            status.add(EpisodeDownloadStatus.WaitingForWifi)
         }
         if (downloading) {
-            status.add(EpisodeStatusEnum.DOWNLOADING)
+            status.add(EpisodeDownloadStatus.Downloading)
         }
         val statusSql = status.joinToString(" OR ") { "episode_status = " + it.ordinal.toString() }
         return "($statusSql)"

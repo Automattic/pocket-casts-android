@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.servers
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Share
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -141,7 +141,7 @@ object DataParser {
             return null
         }
         return PodcastEpisode(
-            episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+            downloadStatus = EpisodeDownloadStatus.NotDownloaded,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,

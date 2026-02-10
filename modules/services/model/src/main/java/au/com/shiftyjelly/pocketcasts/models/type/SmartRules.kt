@@ -80,15 +80,15 @@ data class SmartRules(
             val statuses = when (this@DownloadStatusRule) {
                 Any -> return@buildString
 
-                Downloaded -> listOf(EpisodeStatusEnum.DOWNLOADED)
+                Downloaded -> listOf(EpisodeDownloadStatus.Downloaded)
 
                 NotDownloaded -> listOf(
-                    EpisodeStatusEnum.DOWNLOADING,
-                    EpisodeStatusEnum.QUEUED,
-                    EpisodeStatusEnum.WAITING_FOR_POWER,
-                    EpisodeStatusEnum.WAITING_FOR_WIFI,
-                    EpisodeStatusEnum.NOT_DOWNLOADED,
-                    EpisodeStatusEnum.DOWNLOAD_FAILED,
+                    EpisodeDownloadStatus.Downloading,
+                    EpisodeDownloadStatus.Queued,
+                    EpisodeDownloadStatus.WaitingForPower,
+                    EpisodeDownloadStatus.WaitingForWifi,
+                    EpisodeDownloadStatus.NotDownloaded,
+                    EpisodeDownloadStatus.DownloadFailed,
                 )
             }
             append("episode.episode_status IN (")

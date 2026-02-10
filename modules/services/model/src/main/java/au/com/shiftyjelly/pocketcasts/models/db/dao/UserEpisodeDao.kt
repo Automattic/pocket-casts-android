@@ -10,8 +10,8 @@ import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -98,7 +98,7 @@ abstract class UserEpisodeDao {
     abstract fun updatePlayingStatusBlocking(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
 
     @Query("UPDATE user_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeStatusEnum)
+    abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeDownloadStatus)
 
     @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
@@ -161,7 +161,7 @@ abstract class UserEpisodeDao {
         WHERE uuid = :episodeUuid
         """,
     )
-    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeStatusEnum, downloadPath: String?, downloadError: String?)
+    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeDownloadStatus, downloadPath: String?, downloadError: String?)
 
     @Transaction
     open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {

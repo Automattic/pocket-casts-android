@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -51,7 +51,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -84,7 +83,7 @@ interface UserEpisodeManager {
     suspend fun updateFileType(episode: UserEpisode, fileType: String)
     suspend fun updateSizeInBytes(episode: UserEpisode, sizeInBytes: Long)
     suspend fun updateLastDownloadDate(episode: UserEpisode, date: Date)
-    suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeStatusEnum)
+    suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeDownloadStatus)
     suspend fun updateDownloadErrorDetails(episode: UserEpisode, errorDetails: String?)
     suspend fun updateDownloadTaskId(episode: UserEpisode, taskId: String?)
     fun accountUsageRxFlowable(): Flowable<Optional<FileAccount>>
@@ -529,7 +528,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         return syncManager.getPlaybackUrlRxSingle(userEpisode)
     }
 
-    override suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeStatusEnum) {
+    override suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeDownloadStatus) {
         userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, status)
     }
 
@@ -564,7 +563,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
         if (settings.deleteLocalFileAfterPlaying.value) {
             deleteFilesForEpisode(episode)
-            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeStatusEnum.NOT_DOWNLOADED)
+            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeDownloadStatus.NotDownloaded)
 
             if (episode.serverStatus == UserEpisodeServerStatus.LOCAL) {
                 userEpisodeDao.delete(episode)

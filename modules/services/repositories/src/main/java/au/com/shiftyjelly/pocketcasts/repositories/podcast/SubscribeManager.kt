@@ -8,8 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -115,7 +115,7 @@ class SubscribeManager @Inject constructor(
                         val numberOfEpisodes = settings.autoDownloadLimit.value.episodeCount
 
                         episodes.take(numberOfEpisodes).forEach { episode ->
-                            if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
+                            if (episode.isDownloadPending || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
                                 return@forEach
                             }
 
@@ -321,7 +321,7 @@ class SubscribeManager @Inject constructor(
         episode.podcastUuid = podcast.uuid
         episode.playedUpTo = 0.0
         episode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
-        episode.episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED
+        episode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
         return episode
     }
 

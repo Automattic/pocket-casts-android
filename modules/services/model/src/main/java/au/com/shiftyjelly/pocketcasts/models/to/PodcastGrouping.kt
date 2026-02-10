@@ -5,6 +5,7 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -44,7 +45,9 @@ sealed class PodcastGrouping(
         serverId = 1,
     ) {
         override val sortFunction: ((PodcastEpisode) -> Int)
-            get() = { if (it.isDownloaded || it.isDownloading || it.isQueued) 0 else 1 }
+            get() = {
+                if (it.isDownloaded || it.isDownloading || it.isDownloadPending) 0 else 1
+            }
 
         override fun groupTitles(index: Int, context: Context): String {
             return if (index == 0) {

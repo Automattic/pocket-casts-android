@@ -7,8 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
@@ -323,7 +323,7 @@ private fun UpNextResponse.EpisodeResponse.toSkeletonEpisode(podcastUuid: String
         publishedDate = published.toDate() ?: Date(),
         addedDate = Date(),
         playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-        episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+        downloadStatus = EpisodeDownloadStatus.NotDownloaded,
         title = title.orEmpty(),
         downloadUrl = url.orEmpty(),
         podcastUuid = podcastUuid,

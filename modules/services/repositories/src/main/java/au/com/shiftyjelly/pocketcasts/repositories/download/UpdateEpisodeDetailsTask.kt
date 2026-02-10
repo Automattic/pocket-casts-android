@@ -64,7 +64,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 
         private fun ignoreEpisode(episode: PodcastEpisode): Boolean {
             // Skip metadata check for episodes that are already downloaded, as the download task also checks the content type.
-            return episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isArchived
+            return episode.isDownloadPending || episode.isDownloaded || episode.isDownloading || episode.isArchived
         }
     }
 

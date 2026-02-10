@@ -4,8 +4,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import io.reactivex.Flowable
@@ -68,7 +68,7 @@ interface EpisodeManager {
     fun updateDurationBlocking(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
     fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus)
     suspend fun updateImageUrls(updates: List<ImageUrlUpdate>)
-    suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
+    suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeDownloadStatus)
     suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
     fun updateDownloadFilePathBlocking(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileTypeBlocking(episode: BaseEpisode?, fileType: String)
@@ -77,7 +77,7 @@ interface EpisodeManager {
     fun updateLastDownloadAttemptDateBlocking(episode: BaseEpisode?)
     fun updateDownloadErrorDetailsBlocking(episode: BaseEpisode?, message: String?)
 
-    fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeStatusEnum)
+    fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeDownloadStatus)
 
     fun markAsNotPlayedBlocking(episode: BaseEpisode?)
     suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)

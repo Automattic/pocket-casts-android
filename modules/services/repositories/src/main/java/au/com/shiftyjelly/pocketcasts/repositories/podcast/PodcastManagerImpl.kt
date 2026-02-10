@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -434,7 +434,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun clearAllDownloadErrorsBlocking() {
-        episodeDao.clearAllDownloadErrorsBlocking(EpisodeStatusEnum.NOT_DOWNLOADED, EpisodeStatusEnum.DOWNLOAD_FAILED)
+        episodeDao.clearAllDownloadErrorsBlocking(EpisodeDownloadStatus.NotDownloaded, EpisodeDownloadStatus.DownloadFailed)
     }
 
     /**
@@ -595,7 +595,7 @@ class PodcastManagerImpl @Inject constructor(
             Timber.i(
                 "Auto download " + episode.title +
                     " autoDownload: " + (autoDownload?.toString() ?: "null") +
-                    " isQueued: " + episode.isQueued +
+                    " isQueued: " + episode.isDownloadPending +
                     " isDownloaded: " + episode.isDownloaded +
                     " isDownloading: " + episode.isDownloading +
                     " isFinished: " + episode.isFinished,
@@ -603,7 +603,7 @@ class PodcastManagerImpl @Inject constructor(
 
             if (autoDownload == null ||
                 !autoDownload ||
-                episode.isQueued ||
+                episode.isDownloadPending ||
                 episode.isDownloaded ||
                 episode.isDownloading ||
                 episode.isFinished ||
@@ -626,7 +626,7 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun countEpisodesInPodcastWithStatusBlocking(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int {
+    override fun countEpisodesInPodcastWithStatusBlocking(podcastUuid: String, episodeStatus: EpisodeDownloadStatus): Int {
         return podcastDao.countEpisodesInPodcastWithStatusBlocking(podcastUuid, episodeStatus)
     }
 

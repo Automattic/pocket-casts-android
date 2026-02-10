@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -538,15 +538,15 @@ class PlayerViewModel @Inject constructor(
     fun handleDownloadClickFromPlaybackActions(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
 
-        if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-            onDeleteStart.invoke()
-            launch {
-                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false)
-            }
-        } else {
+        if (episode.isNotDownloaded) {
             onDownloadStart.invoke()
             launch {
                 DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, source = source)
+            }
+        } else {
+            onDeleteStart.invoke()
+            launch {
+                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false)
             }
         }
     }

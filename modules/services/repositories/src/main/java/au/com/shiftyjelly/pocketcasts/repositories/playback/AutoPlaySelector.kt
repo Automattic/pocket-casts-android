@@ -6,8 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
@@ -81,7 +81,7 @@ class AutoPlaySelector @Inject constructor(
 
                 PodcastGrouping.Downloaded -> episodes.map { episode ->
                     if (episode.uuid == currentEpisodeUuid) {
-                        episode.copy(episodeStatus = EpisodeStatusEnum.DOWNLOADED)
+                        episode.copy(downloadStatus = EpisodeDownloadStatus.Downloaded)
                     } else {
                         episode
                     }

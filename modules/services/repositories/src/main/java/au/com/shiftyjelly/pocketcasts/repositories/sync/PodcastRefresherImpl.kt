@@ -4,8 +4,8 @@ import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
@@ -66,7 +66,7 @@ class PodcastRefresherImpl @Inject constructor(
                     // don't add anything newer than the latest episode so it runs through the refresh logic (auto download, auto add to Up Next etc
                     if (!existingPodcast.isSubscribed || (mostRecentEpisode != null && newEpisode.publishedDate.before(mostRecentEpisode.publishedDate))) {
                         newEpisode.podcastUuid = existingPodcast.uuid
-                        newEpisode.episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED
+                        newEpisode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
                         newEpisode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
 
                         // for podcast you're subscribed to, if we find episodes older than a week, we add them in as archived so they don't flood your filters, etc

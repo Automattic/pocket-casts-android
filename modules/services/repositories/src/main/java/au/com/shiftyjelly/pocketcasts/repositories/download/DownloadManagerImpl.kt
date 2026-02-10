@@ -21,8 +21,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -219,8 +219,8 @@ class DownloadManagerImpl @Inject constructor(
 
                                 episodeManager.findEpisodeByUuid(episodeUUID)?.let {
                                     episodeManager.updateDownloadTaskId(it, null)
-                                    if (!it.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-                                        episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
+                                    if (!it.isDownloaded) {
+                                        episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.NotDownloaded)
                                     }
                                 }
                             }
@@ -254,8 +254,8 @@ class DownloadManagerImpl @Inject constructor(
                                 } else {
                                     episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
                                         episodeManager.updateDownloadTaskId(episode, null)
-                                        if (!episode.isDownloaded && episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-                                            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
+                                        if (!episode.isDownloaded) {
+                                            episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
                                         }
                                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
                                     }
@@ -288,7 +288,7 @@ class DownloadManagerImpl @Inject constructor(
                 val missingOrCancelled = state == null || state.outputData.getBoolean(DownloadEpisodeTask.OUTPUT_CANCELLED, false)
                 if (missingOrCancelled) {
                     episodeManager.updateDownloadTaskId(episode, null)
-                    episodeManager.updateEpisodeStatus(episode, status = EpisodeStatusEnum.NOT_DOWNLOADED)
+                    episodeManager.updateEpisodeStatus(episode, status = EpisodeDownloadStatus.NotDownloaded)
                     episodesUuidsForReQueue.add(episode.uuid)
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {
@@ -316,7 +316,7 @@ class DownloadManagerImpl @Inject constructor(
             val downloadingEpisodes = episodeManager.findEpisodesDownloadingBlocking()
             downloadingEpisodes.forEach {
                 stopDownloadingEpisode(it.uuid, "Cancel all")
-                episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
+                episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.NotDownloaded)
             }
         }
         WorkManager.getInstance(context).cancelAllWorkByTag(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
@@ -436,17 +436,17 @@ class DownloadManagerImpl @Inject constructor(
     private fun updateEpisodeStatusAsync(episode: BaseEpisode, networkRequirements: NetworkRequirements): Deferred<Unit> {
         return async {
             val status = getEpisodeStatusForRequirements(networkRequirements)
-            if (status != episode.episodeStatus) {
+            if (status != episode.downloadStatus) {
                 episodeManager.updateEpisodeStatus(episode, status)
             }
         }
     }
 
-    private fun getEpisodeStatusForRequirements(networkRequirements: NetworkRequirements): EpisodeStatusEnum {
+    private fun getEpisodeStatusForRequirements(networkRequirements: NetworkRequirements): EpisodeDownloadStatus {
         return when {
-            networkRequirements.requiresUnmetered && !Network.isUnmeteredConnection(context) -> EpisodeStatusEnum.WAITING_FOR_WIFI
-            networkRequirements.requiresPower && !Power.isConnected(context) -> EpisodeStatusEnum.WAITING_FOR_POWER
-            else -> EpisodeStatusEnum.QUEUED
+            networkRequirements.requiresUnmetered && !Network.isUnmeteredConnection(context) -> EpisodeDownloadStatus.WaitingForWifi
+            networkRequirements.requiresPower && !Power.isConnected(context) -> EpisodeDownloadStatus.WaitingForPower
+            else -> EpisodeDownloadStatus.Queued
         }
     }
 
@@ -481,7 +481,7 @@ class DownloadManagerImpl @Inject constructor(
             episodeManager.updateDownloadTaskId(episode, null)
 
             if (result.success) {
-                episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.Downloaded)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid, source = sourceView)
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)

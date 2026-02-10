@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
@@ -25,7 +25,7 @@ data class UserEpisode(
     @ColumnInfo(name = "episode_description") override var episodeDescription: String = "",
     @ColumnInfo(name = "title") override var title: String = "",
     @ColumnInfo(name = "size_in_bytes") override var sizeInBytes: Long = 0,
-    @ColumnInfo(name = "episode_status") override var episodeStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED,
+    @ColumnInfo(name = "episode_status") override var downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.NotDownloaded,
     @ColumnInfo(name = "file_type") override var fileType: String? = null,
     @ColumnInfo(name = "duration") override var duration: Double = 0.0,
     @ColumnInfo(name = "download_url") override var downloadUrl: String? = null,

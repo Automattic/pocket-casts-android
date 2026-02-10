@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -16,7 +14,6 @@ import androidx.core.widget.ImageViewCompat
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowData
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -91,41 +88,41 @@ class FileStatusIconsView @JvmOverloads constructor(
                     imgIcon.setImageResource(IR.drawable.ic_failed)
                     lblStatus.text = if (!hideErrorDetails) episode.playErrorDetails else ""
                     ImageViewCompat.setImageTintList(imgIcon, null)
-                } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED) {
+                } else if (episode.isDownloaded) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
                     progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_downloaded)
                     updateTimeLeft(textView = lblStatus, episode = episode)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(context.getThemeColor(UR.attr.support_02)))
-                } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADING) {
+                } else if (episode.isDownloading) {
                     imgIcon.isVisible = false
                     progressBar.isVisible = false
                     progressCircle.isVisible = true
                     lblStatus.text = context.getString(LR.string.episode_row_downloading, data.downloadProgress)
                     progressCircle.setPercent(data.downloadProgress / 100f)
-                } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+                } else if (episode.isDownloadFailure) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
                     progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_download_failed_row)
                     lblStatus.text = context.getString(LR.string.episode_row_download_failed)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
-                } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER) {
+                } else if (episode.isWaitingForPower) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
                     progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_waitingforpower)
                     lblStatus.text = context.getString(LR.string.episode_row_waiting_for_power)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
-                } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI) {
+                } else if (episode.isWaitingForWifi) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
                     progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_waitingforwifi)
                     lblStatus.text = context.getString(LR.string.episode_row_waiting_for_wifi)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
-                } else if (episode.episodeStatus == EpisodeStatusEnum.QUEUED) {
+                } else if (episode.isQueuedForDownload) {
                     imgIcon.isVisible = false
                     progressBar.isVisible = false
                     progressCircle.isVisible = false

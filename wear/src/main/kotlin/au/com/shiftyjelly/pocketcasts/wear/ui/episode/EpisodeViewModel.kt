@@ -18,8 +18,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -194,21 +194,21 @@ class EpisodeViewModel @Inject constructor(
         val errorIconRes: Int?
         var errorDescription: String? = null
 
-        val episodeStatus = episode.episodeStatus
+        val episodeStatus = episode.downloadStatus
         if (episode.playErrorDetails == null) {
             errorTitleRes = when (episodeStatus) {
-                EpisodeStatusEnum.DOWNLOAD_FAILED -> LR.string.podcasts_download_failed
-                EpisodeStatusEnum.WAITING_FOR_WIFI -> LR.string.podcasts_download_wifi
-                EpisodeStatusEnum.WAITING_FOR_POWER -> LR.string.podcasts_download_power
+                EpisodeDownloadStatus.DownloadFailed -> LR.string.podcasts_download_failed
+                EpisodeDownloadStatus.WaitingForWifi -> LR.string.podcasts_download_wifi
+                EpisodeDownloadStatus.WaitingForPower -> LR.string.podcasts_download_power
                 else -> null
             }
-            if (episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+            if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
                 errorDescription = episode.downloadErrorDetails
             }
             errorIconRes = when (episodeStatus) {
-                EpisodeStatusEnum.DOWNLOAD_FAILED -> IR.drawable.ic_failedwarning
-                EpisodeStatusEnum.WAITING_FOR_WIFI -> IR.drawable.ic_waitingforwifi
-                EpisodeStatusEnum.WAITING_FOR_POWER -> IR.drawable.ic_waitingforpower
+                EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
+                EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
+                EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
                 else -> null
             }
         } else {
