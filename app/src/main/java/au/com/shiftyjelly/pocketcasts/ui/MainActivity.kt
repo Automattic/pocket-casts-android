@@ -985,6 +985,7 @@ class MainActivity :
                 settings.setTrialFinishedSeen(true)
             }
 
+            // Result is intentionally ignored; failures are logged internally by sendAuthToDataLayer
             lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 

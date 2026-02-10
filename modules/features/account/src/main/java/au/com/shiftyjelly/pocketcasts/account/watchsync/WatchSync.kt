@@ -28,6 +28,9 @@ constructor(
     /**
      * This should be called by the phone app to update the refresh token available to
      * the watch app in the data layer.
+     *
+     * @return Result indicating success or failure. The Result is primarily for testing purposes;
+     * failures are logged internally so callers may safely ignore the return value in production code.
      */
     @OptIn(ExperimentalHorologistApi::class)
     suspend fun sendAuthToDataLayer(): Result<Unit> {
