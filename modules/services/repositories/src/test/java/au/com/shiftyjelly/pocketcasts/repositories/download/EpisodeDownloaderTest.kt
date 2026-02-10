@@ -63,7 +63,7 @@ class EpisodeDownloaderTest {
             tempFile = tempDir.newFile("file.tmp"),
         )
 
-        assertEquals(Result.Success, result)
+        assertEquals(Result.Success(downloadFile), result)
         assertEquals(server.takeRequest().url, episode.downloadUrl?.toHttpUrl())
         assertEquals("Hello, world!", downloadFile.readText())
     }
