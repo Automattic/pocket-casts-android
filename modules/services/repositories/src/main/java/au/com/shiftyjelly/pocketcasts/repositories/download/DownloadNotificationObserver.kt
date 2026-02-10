@@ -38,13 +38,9 @@ class DownloadNotificationObserver @Inject constructor(
 ) {
     private val manager = requireNotNull(context.getSystemService<NotificationManager>())
 
-    fun observeNotificationUpdates(
-        episode: BaseEpisode,
-        onCreateNotification: (Int, Notification) -> Unit,
-    ): Job {
+    fun observeNotificationUpdates(episode: BaseEpisode): NotificationJob {
         val now = clock.instant()
         val notificationId = episode.notificationId()
-
         val job = scope.launch {
             var lastNotifiedProgress: DownloadProgress? = null
             downloadProgressCache.progressFlow(episode.uuid).collect { downloadProgress ->
@@ -54,9 +50,6 @@ class DownloadNotificationObserver @Inject constructor(
                 if (shouldUpdateNotification(current = lastNotifiedProgress, new = downloadProgress)) {
                     val notification = createEpisodeNotification(episode, now, downloadProgress)
                     withContext(Dispatchers.Main) { manager.notify(notificationId, notification) }
-                    if (lastNotifiedProgress == null) {
-                        onCreateNotification(notificationId, notification)
-                    }
                     lastNotifiedProgress = downloadProgress
                 }
             }
@@ -64,7 +57,16 @@ class DownloadNotificationObserver @Inject constructor(
         job.invokeOnCompletion {
             scope.launch(Dispatchers.Main) { manager.cancel(notificationId) }
         }
-        return job
+
+        return NotificationJob(
+            id = notificationId,
+            notification = createEpisodeNotification(
+                episode = episode,
+                startedAt = now,
+                progress = DownloadProgress(0, contentLength = null),
+            ),
+            job = job,
+        )
     }
 
     private fun shouldUpdateNotification(current: DownloadProgress?, new: DownloadProgress): Boolean {
@@ -112,6 +114,14 @@ class DownloadNotificationObserver @Inject constructor(
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         }
+    }
+
+    class NotificationJob(
+        val id: Int,
+        val notification: Notification,
+        private val job: Job,
+    ) {
+        fun cancel() = job.cancel()
     }
 }
 

@@ -15,6 +15,11 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadNotificationObserver.NotificationJob
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
@@ -25,18 +30,20 @@ import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.IOException
 import java.io.InterruptedIOException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLException
-import kotlinx.coroutines.Job
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
 
 @HiltWorker
 class DownloadEpisodeWorker @AssistedInject constructor(
-    @Assisted context: Context,
+    @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
     @Downloads httpClient: Lazy<OkHttpClient>,
     private val episodeManager: EpisodeManager,
@@ -46,28 +53,26 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 ) : Worker(context, params) {
     private val args = inputData.toArgs()
     private val downloader = EpisodeDownloader(httpClient, progressCache)
-    private var notificationJob: Job? = null
+    private var notificationJob: NotificationJob? = null
 
     override fun doWork(): Result {
-        // TODO: Clean this up once the real implementation starts
-        val episode = runBlocking { episodeManager.findEpisodeByUuid(args.episodeUuid) }
-            ?: run { return Result.failure() }
-        val downloadFile = runCatching { DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File) }
-            .getOrNull()
-            ?: run { return Result.failure() }
-        val tempFile = runCatching { File(DownloadHelper.tempPathForEpisode(episode, fileStorage)) }
-            .getOrNull()
-            ?: run { return Result.failure() }
+        val result = try {
+            var episode = getEpisodeOrThrow()
+            prepareForegroundNotification(episode)
 
-        notificationJob = notificationObserver.observeNotificationUpdates(episode) { id, notification ->
-            setForegroundAsync(createForegroundInfo(id, notification))
+            episode = refreshDownloadUrl(episode)
+            val downloadFile = getDownloadFileOrThrow(episode)
+            val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
+
+            val downloadResult = downloader.download(
+                episode = episode,
+                downloadFile = downloadFile,
+                tempFile = tempFile,
+            )
+            downloadResult
+        } catch (e: Throwable) {
+            DownloadResult.ExceptionFailure(e)
         }
-
-        val result = downloader.download(
-            episode = episode,
-            downloadFile = downloadFile,
-            tempFile = tempFile,
-        )
         notificationJob?.cancel()
 
         return when (result) {
@@ -76,7 +81,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is DownloadResult.Failure -> {
-                processFailure(result)
+                Timber.d("Download failure: ${processFailure(result)}")
                 Result.failure()
             }
         }
@@ -86,55 +91,88 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         notificationJob?.cancel()
     }
 
-    private fun processFailure(result: DownloadResult.Failure) {
-        val message = when (result) {
+    private fun getEpisodeOrThrow() = runBlocking {
+        requireNotNull(episodeManager.findEpisodeByUuid(args.episodeUuid)) {
+            context.getString(LR.string.error_missing_episode)
+        }
+    }
+
+    private fun refreshDownloadUrl(episode: BaseEpisode) = runBlocking<BaseEpisode> {
+        when (episode) {
+            is PodcastEpisode -> {
+                val freshDownloadUrl = episodeManager.updateDownloadUrl(episode)
+                episode.copy(downloadUrl = freshDownloadUrl)
+            }
+
+            is UserEpisode -> {
+                episode
+            }
+        }
+    }
+
+    private fun getDownloadFileOrThrow(episode: BaseEpisode): File {
+        val file = DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File)
+        return requireNotNull(file) {
+            context.getString(LR.string.error_download_no_episode)
+        }
+    }
+
+    private fun processFailure(result: DownloadResult.Failure): DownloadStatusUpdate {
+        return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
-                "Invalid URL: ${result.url}"
+                DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_invalid_url))
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                "Failed HTTP call: ${result.code}"
+                DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_http_failure, result.code))
             }
 
             is DownloadResult.ExceptionFailure -> {
-                Timber.tag("Downloads").d(result.throwable)
                 val throwable = result.throwable
+                Timber.tag("LOG_TAG").i(throwable)
+                // Order of checks here is important. Wrong order will result in mapping to wrong messages or states.
+                // For example SocketTimeoutException inherits from InterruptedIOException. Checking for isCancelled
+                // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
-                        "Out of storage"
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_no_storage))
                     }
 
                     throwable.isChartableBlocked() -> {
-                        "Blocked chartable"
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_chartable))
+                    }
+
+                    throwable.isAnyCause<UnknownHostException>() -> {
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_unknown_host))
+                    }
+
+                    throwable.isAnyCause<ConnectException>() -> {
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_socket_timeout))
+                    }
+
+                    throwable.isAnyCause<SocketTimeoutException>() -> {
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_socket_timeout))
+                    }
+
+                    throwable.isAnyCause<SSLException>() -> {
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_ssl_failure))
                     }
 
                     throwable.isCancelled() -> {
-                        "Download cancelled"
-                    }
-
-                    throwable is SocketTimeoutException -> {
-                        "Socket timeout"
-                    }
-
-                    throwable is UnknownHostException -> {
-                        "Unknown host"
-                    }
-
-                    throwable is SSLException -> {
-                        "SSL problem"
+                        DownloadStatusUpdate.Idle
                     }
 
                     throwable is IOException -> {
-                        "IO problem"
+                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_io_failure))
                     }
 
                     else -> {
-                        "Generic problem"
+                        val message = context.getString(LR.string.error_download_generic_failure, throwable.message.orEmpty())
+                        DownloadStatusUpdate.Failure(message.trim())
                     }
                 }
             }
         }
-        Timber.tag("Downloads").d("Download failed: $message")
     }
 
     private fun Throwable.isOutOfStorage(): Boolean {
@@ -167,7 +205,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         var throwable: Throwable? = this
         while (throwable != null) {
             when (throwable) {
-                is InterruptedIOException -> {
+                is InterruptedIOException, is InterruptedException, is CancellationException -> {
                     return true
                 }
 
@@ -180,6 +218,24 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             throwable = throwable.cause
         }
         return false
+    }
+
+    private inline fun <reified T : Throwable> Throwable.isAnyCause(): Boolean {
+        var throwable: Throwable? = this
+        while (throwable != null) {
+            if (throwable is T) {
+                return true
+            }
+            throwable = throwable.cause
+        }
+        return false
+    }
+
+    private fun prepareForegroundNotification(episode: BaseEpisode) {
+        val notificationJob = notificationObserver.observeNotificationUpdates(episode)
+        this.notificationJob = notificationJob
+        val foregroundInfo = createForegroundInfo(notificationJob.id, notificationJob.notification)
+        setForegroundAsync(foregroundInfo).get()
     }
 
     private fun createForegroundInfo(id: Int, notification: Notification): ForegroundInfo {
@@ -212,6 +268,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 .setInputData(args.toData())
                 .addTag(WORKER_TAG)
                 .addTag(episodeWorkerName(args.episodeUuid))
+                .addTag(args.episodeUuid)
                 .build()
         }
     }
