@@ -33,7 +33,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLException
-import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import timber.log.Timber
@@ -124,7 +124,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     private fun getEpisodeOrThrow() = runBlocking {
         requireNotNull(episodeManager.findEpisodeByUuid(args.episodeUuid)) {
-            context.getString(LR.string.error_missing_episode)
+            context.getString(LR.string.error_download_missing_episode)
         }
     }
 
@@ -144,7 +144,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private fun getDownloadFileOrThrow(episode: BaseEpisode): File {
         val file = DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File)
         return requireNotNull(file) {
-            context.getString(LR.string.error_download_no_episode)
+            context.getString(LR.string.error_download_no_episode_file)
         }
     }
 
