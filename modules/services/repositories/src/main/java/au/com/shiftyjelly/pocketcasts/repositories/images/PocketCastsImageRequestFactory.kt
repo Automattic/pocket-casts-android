@@ -31,6 +31,7 @@ data class PocketCastsImageRequestFactory(
     private val size: Int? = null,
     private val placeholderType: PlaceholderType = PlaceholderType.Large,
     private val transformations: List<Transformation> = emptyList(),
+    private val showErrorPlaceholder: Boolean = true,
 ) {
     private val actualCornerRadius = cornerRadius.dpToPx(context)
     private val actualSize = size?.dpToPx(context)?.takeIf { it > 0 }
@@ -67,7 +68,7 @@ data class PocketCastsImageRequestFactory(
     ) = ImageRequest.Builder(context)
         .data(type.data(context))
         .let { if (placeholderType == PlaceholderType.None) it else it.placeholder(placeholderId) }
-        .error(if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork)
+        .let { if (showErrorPlaceholder) it.error(if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork) else it }
         .transformations(
             buildList {
                 add(RoundedCornersTransformation(actualCornerRadius.toFloat()))
