@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
+import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import java.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -92,7 +93,8 @@ data class SmartRules(
                 )
             }
             append("episode.episode_status IN (")
-            append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
+            val converter = EpisodeDownloadStatusConverter()
+            append(statuses.joinToString(separator = ",") { status -> "${converter.toInt(status)}" })
             append(')')
         }
 
@@ -192,9 +194,9 @@ data class SmartRules(
         data class Selected(
             val uuids: Set<String>,
         ) : PodcastsRule {
-            fun withPodcast(podcastUuid: String) = copy(uuids + podcastUuid)
+            fun withPodcast(podcastUuid: String) = copy(uuids = uuids + podcastUuid)
 
-            fun withoutPodcast(podcastUuid: String) = copy(uuids - podcastUuid)
+            fun withoutPodcast(podcastUuid: String) = copy(uuids = uuids - podcastUuid)
 
             override fun toSqlWhereClause(clock: Clock) = buildString {
                 append("episode.podcast_id IN (")

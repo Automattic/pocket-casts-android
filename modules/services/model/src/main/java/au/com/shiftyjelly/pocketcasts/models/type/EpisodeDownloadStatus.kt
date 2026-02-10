@@ -21,7 +21,7 @@ enum class EpisodeDownloadStatus(
         isPending = true,
     ),
     Downloading(
-        isCancellable = false,
+        isCancellable = true,
         isPending = false,
     ),
     DownloadFailed(

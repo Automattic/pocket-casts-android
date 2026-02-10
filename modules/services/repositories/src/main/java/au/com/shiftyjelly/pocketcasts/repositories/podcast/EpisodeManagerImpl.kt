@@ -9,6 +9,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -827,27 +828,16 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findStarredEpisodes()
     }
 
-    override fun findEpisodesDownloadingBlocking(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {
-        val sql = buildEpisodeStatusWhere(queued, waitingForPower, waitingForWifi, downloading)
+    override fun findEpisodesDownloadingBlocking(): List<PodcastEpisode> {
+        val statuses = EpisodeDownloadStatus.entries.filter { it.isCancellable }
+        val converter = EpisodeDownloadStatusConverter()
+        val sql = statuses.joinToString(
+            prefix = "(",
+            postfix = ")",
+            separator = " OR ",
+            transform = { "episode_status = ${converter.toInt(it)}" },
+        )
         return findEpisodesWhereBlocking(sql)
-    }
-
-    private fun buildEpisodeStatusWhere(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): String {
-        val status = mutableSetOf<EpisodeDownloadStatus>()
-        if (queued) {
-            status.add(EpisodeDownloadStatus.Queued)
-        }
-        if (waitingForPower) {
-            status.add(EpisodeDownloadStatus.WaitingForPower)
-        }
-        if (waitingForWifi) {
-            status.add(EpisodeDownloadStatus.WaitingForWifi)
-        }
-        if (downloading) {
-            status.add(EpisodeDownloadStatus.Downloading)
-        }
-        val statusSql = status.joinToString(" OR ") { "episode_status = " + it.ordinal.toString() }
-        return "($statusSql)"
     }
 
     override fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
