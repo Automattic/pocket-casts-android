@@ -9,8 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -26,7 +30,9 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -36,16 +42,41 @@ fun ConnectivityNotificationOverlay(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
+    val scope = rememberCoroutineScope()
+
+    DisposableEffect(lifecycleOwner) {
+        var dismissJob: Job? = null
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    dismissJob?.cancel()
+                    dismissJob = scope.launch {
+                        delay(4.seconds)
+                        currentOnDismiss()
+                    }
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    dismissJob?.cancel()
+                }
+
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            dismissJob?.cancel()
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     ScreenScaffold(
         timeText = null,
         modifier = modifier,
     ) {
-        val currentOnDismiss by rememberUpdatedState(onDismiss)
-        LaunchedEffect(Unit) {
-            delay(4.seconds)
-            currentOnDismiss()
-        }
-
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

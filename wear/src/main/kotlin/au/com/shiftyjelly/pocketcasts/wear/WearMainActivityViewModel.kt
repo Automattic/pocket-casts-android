@@ -29,7 +29,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -79,7 +79,7 @@ class WearMainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             var previousConnectivityState: Boolean? = null
             connectivityStateManager.isConnected
-                .debounce(CONNECTIVITY_DEBOUNCE_MS)
+                .sample(CONNECTIVITY_DEBOUNCE_MS)
                 .collect { isConnected ->
                     val shouldShowNotification = previousConnectivityState != null &&
                         previousConnectivityState != isConnected &&

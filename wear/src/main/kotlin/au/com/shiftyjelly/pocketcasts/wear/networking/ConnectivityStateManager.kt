@@ -20,7 +20,7 @@ class ConnectivityStateManager @Inject constructor(
 ) {
     val isConnected: StateFlow<Boolean> = networkRepository.networkStatus
         .map { networks ->
-            val networkTypes = networks.networks.map { it.networkInfo.type }.toSet()
+            val networkTypes = networks.networks.mapTo(mutableSetOf()) { it.networkInfo.type }
             networkTypes.contains(NetworkType.Wifi) || networkTypes.contains(NetworkType.Cell)
         }
         .stateIn(

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
-import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import app.cash.turbine.test
 import com.google.android.horologist.networks.data.NetworkInfo
 import com.google.android.horologist.networks.data.NetworkStatus
 import com.google.android.horologist.networks.data.NetworkType
@@ -10,11 +10,10 @@ import com.google.android.horologist.networks.status.NetworkRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -23,14 +22,10 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConnectivityStateManagerTest {
 
-    @get:Rule
-    val coroutineRule = MainCoroutineRule()
-
     @Mock
     private lateinit var networkRepository: NetworkRepository
 
-    private lateinit var connectivityStateManager: ConnectivityStateManager
-    private lateinit var testScope: TestScope
+    private val testScope = TestScope()
 
     private val networkStatusFlow = MutableStateFlow(
         Networks(
@@ -43,56 +38,68 @@ class ConnectivityStateManagerTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         whenever(networkRepository.networkStatus).thenReturn(networkStatusFlow)
-        testScope = TestScope(coroutineRule.testDispatcher)
-        connectivityStateManager = ConnectivityStateManager(networkRepository, testScope)
     }
 
+    private fun createConnectivityStateManager() = ConnectivityStateManager(networkRepository, testScope.backgroundScope)
+
     @Test
-    fun `isConnected is false when no networks available`() = runTest {
+    fun `isConnected is false when no networks available`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = emptyList(),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(false, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(false, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected is false with only Bluetooth`() = runTest {
+    fun `isConnected is false with only Bluetooth`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.BT)),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(false, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(false, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected is true with WiFi`() = runTest {
+    fun `isConnected is true with WiFi`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected is true with Cellular`() = runTest {
+    fun `isConnected is true with Cellular`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.Cell)),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected is true with WiFi and Bluetooth`() = runTest {
+    fun `isConnected is true with WiFi and Bluetooth`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(
@@ -100,13 +107,16 @@ class ConnectivityStateManagerTest {
                 buildNetworkStatus(NetworkType.BT),
             ),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected is true with Cellular and Bluetooth`() = runTest {
+    fun `isConnected is true with Cellular and Bluetooth`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(
@@ -114,63 +124,71 @@ class ConnectivityStateManagerTest {
                 buildNetworkStatus(NetworkType.BT),
             ),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected changes from false to true when WiFi connects`() = runTest {
-        networkStatusFlow.value = Networks(
-            activeNetwork = null,
-            networks = emptyList(),
-        )
-        advanceUntilIdle()
-        assertEquals(false, connectivityStateManager.isConnected.value)
+    fun `isConnected changes from false to true when WiFi connects`() = testScope.runTest {
+        val connectivityStateManager = createConnectivityStateManager()
 
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(false, awaitItem())
+
+            networkStatusFlow.value = Networks(
+                activeNetwork = null,
+                networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
+            )
+            yield()
+            assertEquals(true, awaitItem())
+        }
+    }
+
+    @Test
+    fun `isConnected changes from true to false when WiFi disconnects`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
-        advanceUntilIdle()
+        val connectivityStateManager = createConnectivityStateManager()
 
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+
+            networkStatusFlow.value = Networks(
+                activeNetwork = null,
+                networks = emptyList(),
+            )
+            yield()
+            assertEquals(false, awaitItem())
+        }
     }
 
     @Test
-    fun `isConnected changes from true to false when WiFi disconnects`() = runTest {
+    fun `isConnected remains true when switching from WiFi to Cellular`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
-        advanceUntilIdle()
-        assertEquals(true, connectivityStateManager.isConnected.value)
+        val connectivityStateManager = createConnectivityStateManager()
 
-        networkStatusFlow.value = Networks(
-            activeNetwork = null,
-            networks = emptyList(),
-        )
-        advanceUntilIdle()
+        yield()
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
 
-        assertEquals(false, connectivityStateManager.isConnected.value)
-    }
-
-    @Test
-    fun `isConnected remains true when switching from WiFi to Cellular`() = runTest {
-        networkStatusFlow.value = Networks(
-            activeNetwork = null,
-            networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
-        )
-        advanceUntilIdle()
-        assertEquals(true, connectivityStateManager.isConnected.value)
-
-        networkStatusFlow.value = Networks(
-            activeNetwork = null,
-            networks = listOf(buildNetworkStatus(NetworkType.Cell)),
-        )
-        advanceUntilIdle()
-
-        assertEquals(true, connectivityStateManager.isConnected.value)
+            networkStatusFlow.value = Networks(
+                activeNetwork = null,
+                networks = listOf(buildNetworkStatus(NetworkType.Cell)),
+            )
+            yield()
+            expectNoEvents()
+        }
     }
 
     private fun buildNetworkStatus(networkType: NetworkType) = NetworkStatus(
