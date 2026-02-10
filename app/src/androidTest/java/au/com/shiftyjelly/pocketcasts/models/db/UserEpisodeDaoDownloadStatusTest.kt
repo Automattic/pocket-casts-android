@@ -128,4 +128,44 @@ class UserEpisodeDaoDownloadStatusTest {
         assertEquals(null, result.downloadedFilePath)
         assertEquals(errorMessage, result.downloadErrorDetails)
     }
+
+    @Test
+    fun updateMultipleEpisodes() = runTest {
+        userEpisodeDao.insertAll(
+            listOf(
+                UserEpisode(
+                    uuid = "id-1",
+                    publishedDate = Date(),
+                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadedFilePath = "invalid_path",
+                    downloadErrorDetails = "invalid_details",
+                ),
+                UserEpisode(
+                    uuid = "id-2",
+                    publishedDate = Date(),
+                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadedFilePath = "invalid_path",
+                    downloadErrorDetails = "invalid_details",
+                ),
+            ),
+        )
+
+        userEpisodeDao.updateDownloadStatuses(
+            mapOf(
+                "id-1" to DownloadStatusUpdate.InProgress,
+                "id-2" to DownloadStatusUpdate.Success(File("audio.mp3")),
+            ),
+        )
+
+        val result1 = userEpisodeDao.findEpisodeByUuid("id-1")!!
+        val result2 = userEpisodeDao.findEpisodeByUuid("id-2")!!
+
+        assertEquals(EpisodeStatusEnum.DOWNLOADING, result1.episodeStatus)
+        assertEquals(null, result1.downloadedFilePath)
+        assertEquals(null, result1.downloadErrorDetails)
+
+        assertEquals(EpisodeStatusEnum.DOWNLOADED, result2.episodeStatus)
+        assertEquals("audio.mp3", result2.downloadedFilePath)
+        assertEquals(null, result2.downloadErrorDetails)
+    }
 }

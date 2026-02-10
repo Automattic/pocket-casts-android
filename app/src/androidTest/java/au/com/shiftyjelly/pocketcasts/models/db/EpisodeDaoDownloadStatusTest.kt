@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import com.squareup.moshi.Moshi
@@ -127,5 +128,45 @@ class EpisodeDaoDownloadStatusTest {
         assertEquals(EpisodeStatusEnum.DOWNLOAD_FAILED, result.episodeStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(errorMessage, result.downloadErrorDetails)
+    }
+
+    @Test
+    fun updateMultipleEpisodes() = runTest {
+        episodeDao.insertAllBlocking(
+            listOf(
+                PodcastEpisode(
+                    uuid = "id-1",
+                    publishedDate = Date(),
+                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadedFilePath = "invalid_path",
+                    downloadErrorDetails = "invalid_details",
+                ),
+                PodcastEpisode(
+                    uuid = "id-2",
+                    publishedDate = Date(),
+                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadedFilePath = "invalid_path",
+                    downloadErrorDetails = "invalid_details",
+                ),
+            ),
+        )
+
+        episodeDao.updateDownloadStatuses(
+            mapOf(
+                "id-1" to DownloadStatusUpdate.InProgress,
+                "id-2" to DownloadStatusUpdate.Success(File("audio.mp3")),
+            ),
+        )
+
+        val result1 = episodeDao.findByUuid("id-1")!!
+        val result2 = episodeDao.findByUuid("id-2")!!
+
+        assertEquals(EpisodeStatusEnum.DOWNLOADING, result1.episodeStatus)
+        assertEquals(null, result1.downloadedFilePath)
+        assertEquals(null, result1.downloadErrorDetails)
+
+        assertEquals(EpisodeStatusEnum.DOWNLOADED, result2.episodeStatus)
+        assertEquals("audio.mp3", result2.downloadedFilePath)
+        assertEquals(null, result2.downloadErrorDetails)
     }
 }
