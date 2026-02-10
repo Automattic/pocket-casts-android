@@ -18,7 +18,6 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadNotificationObserver.NotificationJob
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -108,11 +107,12 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         return when (result) {
             is DownloadResult.Success -> {
+                Timber.d("Download success ${args.episodeUuid}: ${result.file}")
                 Result.success()
             }
 
             is DownloadResult.Failure -> {
-                Timber.d("Download failure: ${processFailure(result)}")
+                Timber.d("Download failure ${args.episodeUuid}: ${processFailure(result)}")
                 Result.failure()
             }
         }
@@ -148,58 +148,57 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         }
     }
 
-    private fun processFailure(result: DownloadResult.Failure): DownloadStatusUpdate {
+    private fun processFailure(result: DownloadResult.Failure): String {
         return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
-                DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_invalid_url))
+                context.getString(LR.string.error_download_invalid_url)
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_http_failure, result.code))
+                context.getString(LR.string.error_download_http_failure, result.code)
             }
 
             is DownloadResult.ExceptionFailure -> {
                 val throwable = result.throwable
-                Timber.tag("LOG_TAG").i(throwable)
                 // Order of checks here is important. Wrong order will result in mapping to wrong messages or states.
                 // For example SocketTimeoutException inherits from InterruptedIOException. Checking for isCancelled
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_no_storage))
+                        context.getString(LR.string.error_download_no_storage)
                     }
 
                     throwable.isChartableBlocked() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_chartable))
+                        context.getString(LR.string.error_download_chartable)
                     }
 
                     throwable.isAnyCause<UnknownHostException>() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_unknown_host))
+                        context.getString(LR.string.error_download_unknown_host)
                     }
 
                     throwable.isAnyCause<ConnectException>() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_socket_timeout))
+                        context.getString(LR.string.error_download_socket_timeout)
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_socket_timeout))
+                        context.getString(LR.string.error_download_socket_timeout)
                     }
 
                     throwable.isAnyCause<SSLException>() -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_ssl_failure))
+                        context.getString(LR.string.error_download_ssl_failure)
                     }
 
                     throwable.isCancelled() -> {
-                        DownloadStatusUpdate.Idle
+                        CANCELLED_MESSAGE
                     }
 
                     throwable is IOException -> {
-                        DownloadStatusUpdate.Failure(context.getString(LR.string.error_download_io_failure))
+                        context.getString(LR.string.error_download_io_failure)
                     }
 
                     else -> {
                         val message = context.getString(LR.string.error_download_generic_failure, throwable.message.orEmpty())
-                        DownloadStatusUpdate.Failure(message.trim())
+                        message.trim()
                     }
                 }
             }
@@ -322,3 +321,4 @@ private const val WAIT_FOR_WIFI_KEY = "wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "wait_for_power"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
+private const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
