@@ -11,7 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -50,9 +49,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(false, awaitItem())
+            cancel()
         }
     }
 
@@ -64,9 +63,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(false, awaitItem())
+            cancel()
         }
     }
 
@@ -78,9 +77,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
+            cancel()
         }
     }
 
@@ -92,9 +91,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
+            cancel()
         }
     }
 
@@ -109,9 +108,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
+            cancel()
         }
     }
 
@@ -126,9 +125,9 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
+            cancel()
         }
     }
 
@@ -136,7 +135,6 @@ class ConnectivityStateManagerTest {
     fun `isConnected changes from false to true when WiFi connects`() = testScope.runTest {
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(false, awaitItem())
 
@@ -144,8 +142,8 @@ class ConnectivityStateManagerTest {
                 activeNetwork = null,
                 networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
             )
-            yield()
             assertEquals(true, awaitItem())
+            cancel()
         }
     }
 
@@ -157,7 +155,6 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
 
@@ -165,8 +162,8 @@ class ConnectivityStateManagerTest {
                 activeNetwork = null,
                 networks = emptyList(),
             )
-            yield()
             assertEquals(false, awaitItem())
+            cancel()
         }
     }
 
@@ -178,7 +175,6 @@ class ConnectivityStateManagerTest {
         )
         val connectivityStateManager = createConnectivityStateManager()
 
-        yield()
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
 
@@ -186,8 +182,8 @@ class ConnectivityStateManagerTest {
                 activeNetwork = null,
                 networks = listOf(buildNetworkStatus(NetworkType.Cell)),
             )
-            yield()
             expectNoEvents()
+            cancel()
         }
     }
 
