@@ -177,7 +177,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                     }
 
                     throwable.isAnyCause<ConnectException>() -> {
-                        context.getString(LR.string.error_download_socket_timeout)
+                        context.getString(LR.string.error_download_connection_error)
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
