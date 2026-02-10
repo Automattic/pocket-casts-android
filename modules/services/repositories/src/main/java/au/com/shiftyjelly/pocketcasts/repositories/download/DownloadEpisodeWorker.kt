@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Re
  *
  * `WorkManager` invokes Worker.doWork() on a background thread provided by
  * its executor, and the method is expected to run synchronously until the
- * work completes. This worker relies on that contract to ensure requirements.
+ * work completes. This worker relies on that contract to ensure that these requirements are met.
  *
  * Bounded concurrency: Episode downloads are limited to the fixed number
  * of `Worker` threads configured for `WorkManager` in the `Application` class.
