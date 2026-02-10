@@ -1856,7 +1856,7 @@
     <string name="error_login_failed">Unable to login to your sync account, sorry. Please try again later.</string>
     <string name="error_search_failed">Search Failed</string>
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
-    <string name="error_missing_episode">Failed find the episode data on the device. Please contact the support.</string>
+    <string name="error_missing_episode">Failed to find the episode data on the device. Please contact support.</string>
     <string name="error_download_no_episode">Failed to create a download file for the episode. Please check that you have enough space on your device.</string>
     <string name="error_download_invalid_url">The episode has an invalid URL. Please contact the podcast’s author.</string>
     <string name="error_download_http_failure">Failed to download the episode. Error code: %1$d.</string>
