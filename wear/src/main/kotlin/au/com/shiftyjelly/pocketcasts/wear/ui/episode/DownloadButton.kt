@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import au.com.shiftyjelly.pocketcasts.images.R
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
+import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 
 @Composable

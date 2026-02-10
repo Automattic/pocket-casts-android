@@ -6,6 +6,9 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.MainDispatcher
+import au.com.shiftyjelly.pocketcasts.coroutines.di.WearDefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -28,8 +31,9 @@ import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -38,19 +42,19 @@ class PocketCastsWearApplication :
     Application(),
     Configuration.Provider {
 
-    @Inject lateinit var moshi: Moshi
+    @Inject lateinit var moshi: dagger.Lazy<Moshi>
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Inject lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var episodeManager: dagger.Lazy<EpisodeManager>
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var podcastManager: dagger.Lazy<PodcastManager>
 
     @Inject lateinit var settings: Settings
 
@@ -58,23 +62,36 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var analyticsTracker: dagger.Lazy<AnalyticsTracker>
 
-    @Inject lateinit var experimentProvider: ExperimentProvider
+    @Inject lateinit var experimentProvider: dagger.Lazy<ExperimentProvider>
 
-    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
+    @Inject lateinit var downloadStatisticsReporter: dagger.Lazy<DownloadStatisticsReporter>
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var connectivityLogger: ConnectivityLogger
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
+    @Inject @WearDefaultDispatcher
+    lateinit var defaultDispatcher: CoroutineDispatcher
+
+    @Inject @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()
-        setupAnalytics()
-        setupApp()
+
+        // Launch heavyweight initialization in background to avoid blocking app startup
+        applicationScope.launch {
+            setupApp()
+            setupAnalytics()
+        }
     }
 
     private fun setupCrashLogging() {
@@ -91,44 +108,52 @@ class PocketCastsWearApplication :
         connectivityLogger.startMonitoring()
     }
 
-    private fun setupApp() {
-        runBlocking {
+    private suspend fun setupApp() {
+        // Notification channels and lifecycle observers must be set up on the main thread
+        withContext(mainDispatcher) {
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
-
-            withContext(Dispatchers.Default) {
-                playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playbackManager)
-
-                val storageChoice = settings.getStorageChoice()
-                if (storageChoice == null) {
-                    val folder = StorageOptions()
-                        .getFolderLocations(this@PocketCastsWearApplication)
-                        .firstOrNull()
-                    if (folder != null) {
-                        settings.setStorageChoice(folder.filePath, folder.label)
-                    } else {
-                        settings.setStorageCustomFolder(this@PocketCastsWearApplication.filesDir.absolutePath)
-                    }
-                }
-            }
-
-            VersionMigrationsWorker.performMigrations(
-                context = this@PocketCastsWearApplication,
-                settings = settings,
-                moshi = moshi,
-            )
         }
 
-        userManager.beginMonitoringAccountManager(playbackManager)
+        withContext(defaultDispatcher) {
+            playbackManager.setup()
+            downloadManager.setup(episodeManager.get(), podcastManager.get(), playbackManager)
+
+            val storageChoice = settings.getStorageChoice()
+            if (storageChoice == null) {
+                val folder = StorageOptions()
+                    .getFolderLocations(this@PocketCastsWearApplication)
+                    .firstOrNull()
+                if (folder != null) {
+                    settings.setStorageChoice(folder.filePath, folder.label)
+                } else {
+                    settings.setStorageCustomFolder(this@PocketCastsWearApplication.filesDir.absolutePath)
+                }
+            }
+        }
+
+        VersionMigrationsWorker.performMigrations(
+            context = this@PocketCastsWearApplication,
+            settings = settings,
+            moshi = moshi.get(),
+        )
+
+        // AccountManager operations must run on main thread
+        withContext(mainDispatcher) {
+            userManager.beginMonitoringAccountManager(playbackManager)
+        }
+
         downloadManager.beginMonitoringWorkManager(applicationContext)
     }
 
-    private fun setupAnalytics() {
-        analyticsTracker.clearAllData()
-        analyticsTracker.refreshMetadata()
-        experimentProvider.initialize()
-        downloadStatisticsReporter.setup()
+    private suspend fun setupAnalytics() {
+        analyticsTracker.get().clearAllData()
+        analyticsTracker.get().refreshMetadata()
+        experimentProvider.get().initialize()
+
+        withContext(mainDispatcher) {
+            downloadStatisticsReporter.get().setup()
+        }
     }
 
     override val workManagerConfiguration: Configuration

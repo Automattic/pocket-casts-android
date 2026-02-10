@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.net.ConnectivityManager
-import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +16,4 @@ object WearAppModule {
     fun connectivityManager(
         @ApplicationContext application: Context,
     ): ConnectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-    @Provides
-    fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = AddToPlaylistFragmentFactory.Stub
 }

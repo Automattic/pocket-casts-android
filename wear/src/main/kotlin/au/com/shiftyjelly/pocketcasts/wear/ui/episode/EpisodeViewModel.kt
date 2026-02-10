@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.WearIoDispatcher
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -20,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
@@ -30,6 +31,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.ui.di.WearImageLoader
+import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
+import au.com.shiftyjelly.pocketcasts.ui.episode.UserEpisodeColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
@@ -45,6 +49,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,6 +88,8 @@ class EpisodeViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
+    @WearImageLoader private val imageLoader: ImageLoader,
+    @WearIoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -248,7 +255,7 @@ class EpisodeViewModel @Inject constructor(
 
         is UserEpisode ->
             // First check if the user has set a custom color for this episode
-            AddFileActivity.darkThemeColors().find {
+            UserEpisodeColors.darkThemeColors().find {
                 episode.tintColorIndex == it.tintColorIndex
             }?.let {
                 Color(it.color)
@@ -257,7 +264,7 @@ class EpisodeViewModel @Inject constructor(
 
     fun downloadEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val fromString = "wear episode screen"
             clearErrors(episode)
             if (episode.downloadTaskId != null) {
@@ -291,7 +298,7 @@ class EpisodeViewModel @Inject constructor(
     }
 
     private suspend fun clearErrors(episode: BaseEpisode) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             if (episode is PodcastEpisode) {
                 episodeManager.clearDownloadErrorBlocking(episode)
             }
@@ -301,7 +308,7 @@ class EpisodeViewModel @Inject constructor(
 
     fun deleteDownloadedEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             when (episode) {
                 is PodcastEpisode -> {
                     episodeManager.deleteEpisodeFile(
@@ -418,7 +425,7 @@ class EpisodeViewModel @Inject constructor(
             Timber.e("Attempted to archive a non-podcast episode")
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             if (episode.isArchived) {
                 episodeManager.unarchiveBlocking(episode)
                 episodeAnalytics.trackEvent(
@@ -451,7 +458,7 @@ class EpisodeViewModel @Inject constructor(
     }
 
     fun onMarkAsPlayedClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             (stateFlow.value as? State.Loaded)?.episode?.let { episode ->
                 val event = if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
                     episodeManager.markAsNotPlayedBlocking(episode)
@@ -467,13 +474,12 @@ class EpisodeViewModel @Inject constructor(
 
     private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color = userEpisode.artworkUrl?.let { artworkUrl ->
         val context = getApplication<Application>()
-        val loader = ImageLoader(context)
         val request = ImageRequest.Builder(context)
             .data(artworkUrl)
             .allowHardware(false) // Disable hardware bitmaps.
             .build()
 
-        val successResult = loader.execute(request) as? SuccessResult
+        val successResult = imageLoader.execute(request) as? SuccessResult
             ?: return@let null
         val bitmap = successResult.image.toBitmap()
 
