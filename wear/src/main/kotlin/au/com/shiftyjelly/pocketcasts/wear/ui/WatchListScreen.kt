@@ -71,11 +71,12 @@ fun WatchListScreen(
             Spacer(Modifier)
         }
 
-        if (state.refreshState is RefreshState.Refreshing) {
-            item {
-                RefreshStatusHeader()
-            }
-        }
+        // Temporarily hidden - using global edge indicator instead
+        // if (state.refreshState is RefreshState.Refreshing) {
+        //     item {
+        //         RefreshStatusHeader()
+        //     }
+        // }
 
         if (upNextState is UpNextQueue.State.Loaded) {
             item {

@@ -14,20 +14,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
+import androidx.wear.compose.material.CircularProgressIndicator
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import androidx.wear.tooling.preview.devices.WearDevices
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
@@ -74,6 +79,7 @@ class MainActivity : ComponentActivity() {
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
                     syncState = state.syncState,
+                    refreshState = state.refreshState,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     onRetrySync = viewModel::retrySync,
                     signOut = viewModel::signOut,
@@ -96,6 +102,7 @@ private fun WearApp(
     signInState: SignInState,
     showLoggingInScreen: Boolean,
     syncState: WatchSyncState,
+    refreshState: RefreshState,
     onShowLoginScreen: () -> Unit,
     onRetrySync: () -> Unit,
     signOut: () -> Unit,
@@ -121,8 +128,8 @@ private fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.ROUTE else RequirePlusScreen.ROUTE
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AppScaffold {
+    AppScaffold {
+        Box(modifier = Modifier.fillMaxSize()) {
             SwipeDismissableNavHost(
                 startDestination = startDestination,
                 navController = navController,
@@ -156,26 +163,6 @@ private fun WearApp(
                             },
                         )
                     }
-                }
-
-                composable(
-                    route = PCVolumeScreen.ROUTE,
-                ) {
-                    PCVolumeScreen()
-                }
-
-                composable(
-                    route = StreamingConfirmationScreen.ROUTE,
-                ) {
-                    StreamingConfirmationScreen(
-                        onFinish = { result ->
-                            navController.previousBackStackEntry?.savedStateHandle?.set(
-                                StreamingConfirmationScreen.RESULT_KEY,
-                                result,
-                            )
-                            navController.popBackStack()
-                        },
-                    )
                 }
 
                 composable(
@@ -366,6 +353,30 @@ private fun WearApp(
                 ) {
                     EffectsScreen()
                 }
+
+                composable(
+                    route = StreamingConfirmationScreen.ROUTE,
+                ) {
+                    StreamingConfirmationScreen(
+                        onFinish = { result ->
+                            navController.previousBackStackEntry?.savedStateHandle?.set(
+                                StreamingConfirmationScreen.RESULT_KEY,
+                                result,
+                            )
+                            navController.popBackStack()
+                        },
+                    )
+                }
+            }
+
+            // Global refresh indicator overlay
+            if (refreshState is RefreshState.Refreshing) {
+                CircularProgressIndicator(
+                    indicatorColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.9f),
+                    trackColor = Color.Transparent,
+                    strokeWidth = 3.dp,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
 
@@ -457,6 +468,7 @@ private fun DefaultPreview() {
         signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
         syncState = WatchSyncState.Syncing,
+        refreshState = RefreshState.Never,
         onShowLoginScreen = {},
         onRetrySync = {},
         signOut = {},
