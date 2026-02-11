@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogOption
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.episode.ShareEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastFragment
@@ -252,7 +252,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
         val episodeTitle: String,
         @TypeParceler<Duration, DurationParceler>() val episodePlayedUpTo: Duration,
         val episodeFileType: String?,
-        val episodeDownloadStatus: EpisodeStatusEnum,
+        val episodeDownloadStatus: EpisodeDownloadStatus,
         val episodeFilePath: String?,
         @TypeParceler<Color?, ColorParceler>() val backgroundColor: Color?,
         val options: List<ShareDialogFragment.Options>,
@@ -271,7 +271,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                 title = episodeTitle,
                 playedUpTo = episodePlayedUpTo.toDouble(DurationUnit.SECONDS),
                 fileType = episodeFileType,
-                episodeStatus = episodeDownloadStatus,
+                downloadStatus = episodeDownloadStatus,
                 downloadedFilePath = episodeFilePath,
                 podcastUuid = podcastUuid,
                 publishedDate = Date(0), // Dummy date, not imporatant for sharing,
@@ -296,7 +296,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     episodeTitle = episode.title,
                     episodePlayedUpTo = episode.playedUpTo.seconds,
                     episodeFileType = episode.fileType,
-                    episodeDownloadStatus = episode.episodeStatus,
+                    episodeDownloadStatus = episode.downloadStatus,
                     episodeFilePath = episode.downloadedFilePath,
                     backgroundColor = null,
                     options = options,
@@ -322,7 +322,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     episodeTitle = episode.title,
                     episodePlayedUpTo = episode.playedUpTo.seconds,
                     episodeFileType = episode.fileType,
-                    episodeDownloadStatus = episode.episodeStatus,
+                    episodeDownloadStatus = episode.downloadStatus,
                     episodeFilePath = episode.downloadedFilePath,
                     backgroundColor = Color(theme.playerBackgroundColor(podcast)),
                     options = options,

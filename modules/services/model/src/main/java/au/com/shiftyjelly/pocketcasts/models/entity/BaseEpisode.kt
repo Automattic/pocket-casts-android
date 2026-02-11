@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
 import java.util.UUID
 
@@ -27,7 +27,7 @@ sealed interface BaseEpisode {
     var episodeDescription: String
     var title: String
     var sizeInBytes: Long
-    var episodeStatus: EpisodeStatusEnum
+    var downloadStatus: EpisodeDownloadStatus
     var fileType: String?
     var duration: Double
     var downloadUrl: String?
@@ -68,14 +68,32 @@ sealed interface BaseEpisode {
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
 
-    val isQueued: Boolean
-        get() = EpisodeStatusEnum.QUEUED == episodeStatus || EpisodeStatusEnum.WAITING_FOR_WIFI == episodeStatus || EpisodeStatusEnum.WAITING_FOR_POWER == episodeStatus
+    val isDownloadNotRequested
+        get() = downloadStatus == EpisodeDownloadStatus.DownloadNotRequested
 
-    val isDownloading: Boolean
-        get() = EpisodeStatusEnum.DOWNLOADING == episodeStatus
+    val isQueuedForDownload
+        get() = downloadStatus == EpisodeDownloadStatus.Queued
 
-    val isDownloaded: Boolean
-        get() = EpisodeStatusEnum.DOWNLOADED == episodeStatus
+    val isWaitingForWifi
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForWifi
+
+    val isWaitingForPower
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForPower
+
+    val isDownloadPending
+        get() = downloadStatus.isPending
+
+    val isDownloadCancellable
+        get() = downloadStatus.isCancellable
+
+    val isDownloading
+        get() = downloadStatus == EpisodeDownloadStatus.Downloading
+
+    val isDownloaded
+        get() = downloadStatus == EpisodeDownloadStatus.Downloaded
+
+    val isDownloadFailure
+        get() = downloadStatus == EpisodeDownloadStatus.DownloadFailed
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus

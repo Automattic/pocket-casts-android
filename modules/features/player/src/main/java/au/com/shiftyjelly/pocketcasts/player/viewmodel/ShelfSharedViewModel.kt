@@ -73,7 +73,7 @@ class ShelfSharedViewModel @Inject constructor(
 
             oldPodcastEpisode?.uuid == newPodcastEpisode?.uuid &&
                 oldPodcastEpisode?.isStarred == newPodcastEpisode?.isStarred &&
-                oldLoaded.episode.episodeStatus == newLoaded.episode.episodeStatus &&
+                oldLoaded.episode.downloadStatus == newLoaded.episode.downloadStatus &&
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
 

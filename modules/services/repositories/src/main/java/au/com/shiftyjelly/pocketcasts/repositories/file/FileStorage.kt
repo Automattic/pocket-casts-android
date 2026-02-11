@@ -4,7 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -295,7 +295,7 @@ open class FileStorage @Inject constructor(
     private suspend fun Flow<Pair<File, PodcastEpisode>>.restoreDownloadedFilePaths(episodeManager: EpisodeManager) = collect { (file, episode) ->
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for ${episode.title} from ${file.absolutePath}")
         // Link to the found episode
-        episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
+        episode.downloadStatus = EpisodeDownloadStatus.Downloaded
         episode.downloadedFilePath = file.absolutePath
         episodeManager.updateBlocking(episode)
     }

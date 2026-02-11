@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
@@ -55,10 +55,8 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -152,7 +150,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             setForegroundAsync(createForegroundInfo())
 
             runBlocking {
-                episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
+                episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.Downloading)
             }
 
             download()
@@ -164,7 +162,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 pathToSaveTo?.let {
                     episodeManager.updateDownloadFilePathBlocking(episode, it, false)
                     runBlocking {
-                        episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                        episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.Downloaded)
                     }
                 }
 
@@ -227,7 +225,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             .build()
 
         runBlocking {
-            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+            episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.DownloadFailed)
         }
         val message = if (downloadMessage.isNullOrBlank()) "Download Failed" else downloadMessage
         episodeManager.updateDownloadErrorDetailsBlocking(episode, message)

@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -28,7 +28,7 @@ data class UpNextSyncResponse(
                 publishedDate = published?.parseIsoDate() ?: Date(),
                 addedDate = Date(),
                 playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                 title = title ?: "",
                 downloadUrl = url ?: "",
                 podcastUuid = podcastUuid,

@@ -56,14 +56,14 @@ enum class ShelfItem(
         id = "download",
         titleId = {
             when {
-                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> LR.string.episode_downloading
+                it is PodcastEpisode && (it.isDownloading || it.isDownloadPending) -> LR.string.episode_downloading
                 it is PodcastEpisode && it.isDownloaded -> LR.string.remove_downloaded_file
                 else -> LR.string.download
             }
         },
         iconId = {
             when {
-                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> IR.drawable.ic_download
+                it is PodcastEpisode && (it.isDownloading || it.isDownloadPending) -> IR.drawable.ic_download
                 it is PodcastEpisode && it.isDownloaded -> IR.drawable.ic_downloaded_24dp
                 else -> IR.drawable.ic_download
             }

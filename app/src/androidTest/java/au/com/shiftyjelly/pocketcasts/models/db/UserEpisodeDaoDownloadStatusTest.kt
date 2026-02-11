@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import com.squareup.moshi.Moshi
 import java.io.File
 import java.util.Date
@@ -29,7 +29,7 @@ class UserEpisodeDaoDownloadStatusTest {
         uuid = "episode-id",
         publishedDate = Date(),
         // Prepare episode with some data to verify correct state in tests
-        episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+        downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         downloadedFilePath = "invalid_path",
         downloadErrorDetails = "invalid_details",
     )
@@ -51,12 +51,12 @@ class UserEpisodeDaoDownloadStatusTest {
 
     @Test
     fun updateDownloadStatusToIdle() = runTest {
-        userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeStatusEnum.DOWNLOADING)
+        userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeDownloadStatus.Downloading)
         userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Idle))
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.NOT_DOWNLOADED, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -67,7 +67,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.WAITING_FOR_WIFI, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.WaitingForWifi, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -78,7 +78,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.WAITING_FOR_POWER, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.WaitingForPower, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -89,7 +89,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.QUEUED, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.Queued, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -100,7 +100,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.DOWNLOADING, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.Downloading, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -112,7 +112,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.DOWNLOADED, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.Downloaded, result.downloadStatus)
         assertEquals(file.path, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -124,7 +124,7 @@ class UserEpisodeDaoDownloadStatusTest {
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeStatusEnum.DOWNLOAD_FAILED, result.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.DownloadFailed, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(errorMessage, result.downloadErrorDetails)
     }
@@ -136,14 +136,14 @@ class UserEpisodeDaoDownloadStatusTest {
                 UserEpisode(
                     uuid = "id-1",
                     publishedDate = Date(),
-                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                     downloadedFilePath = "invalid_path",
                     downloadErrorDetails = "invalid_details",
                 ),
                 UserEpisode(
                     uuid = "id-2",
                     publishedDate = Date(),
-                    episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                     downloadedFilePath = "invalid_path",
                     downloadErrorDetails = "invalid_details",
                 ),
@@ -160,11 +160,11 @@ class UserEpisodeDaoDownloadStatusTest {
         val result1 = userEpisodeDao.findEpisodeByUuid("id-1")!!
         val result2 = userEpisodeDao.findEpisodeByUuid("id-2")!!
 
-        assertEquals(EpisodeStatusEnum.DOWNLOADING, result1.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.Downloading, result1.downloadStatus)
         assertEquals(null, result1.downloadedFilePath)
         assertEquals(null, result1.downloadErrorDetails)
 
-        assertEquals(EpisodeStatusEnum.DOWNLOADED, result2.episodeStatus)
+        assertEquals(EpisodeDownloadStatus.Downloaded, result2.downloadStatus)
         assertEquals("audio.mp3", result2.downloadedFilePath)
         assertEquals(null, result2.downloadErrorDetails)
     }

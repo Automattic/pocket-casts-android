@@ -44,8 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
@@ -307,36 +307,36 @@ class EpisodeFragment : BaseFragment() {
                                 LR.string.podcasts_download_download,
                             ),
                         )
-                        val episodeStatus = state.episode.episodeStatus
+                        val episodeStatus = state.episode.downloadStatus
                         binding.btnDownload.state = when (episodeStatus) {
-                            EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButtonState.NotDownloaded(downloadSize)
-                            EpisodeStatusEnum.QUEUED -> DownloadButtonState.Queued
-                            EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(state.downloadProgress)
-                            EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
-                            EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
+                            EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(downloadSize)
+                            EpisodeDownloadStatus.Queued -> DownloadButtonState.Queued
+                            EpisodeDownloadStatus.Downloading -> DownloadButtonState.Downloading(state.downloadProgress)
+                            EpisodeDownloadStatus.DownloadFailed -> DownloadButtonState.Errored
+                            EpisodeDownloadStatus.Downloaded -> DownloadButtonState.Downloaded(downloadSize)
                             else -> DownloadButtonState.Queued
                         }
 
                         val playbackError = state.episode.playErrorDetails
 
                         if (playbackError == null) {
-                            binding.errorLayout.isVisible = episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED || episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER || episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI
+                            binding.errorLayout.isVisible = episodeStatus == EpisodeDownloadStatus.DownloadFailed || episodeStatus == EpisodeDownloadStatus.WaitingForPower || episodeStatus == EpisodeDownloadStatus.WaitingForWifi
                             binding.lblErrorDetail.isVisible = false
 
                             binding.lblError.text = when (episodeStatus) {
-                                EpisodeStatusEnum.DOWNLOAD_FAILED -> getString(LR.string.podcasts_download_failed)
-                                EpisodeStatusEnum.WAITING_FOR_WIFI -> getString(LR.string.podcasts_download_wifi)
-                                EpisodeStatusEnum.WAITING_FOR_POWER -> getString(LR.string.podcasts_download_power)
+                                EpisodeDownloadStatus.DownloadFailed -> getString(LR.string.podcasts_download_failed)
+                                EpisodeDownloadStatus.WaitingForWifi -> getString(LR.string.podcasts_download_wifi)
+                                EpisodeDownloadStatus.WaitingForPower -> getString(LR.string.podcasts_download_power)
                                 else -> null
                             }
-                            if (episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+                            if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
                                 binding.lblErrorDetail.text = state.episode.downloadErrorDetails
                                 binding.lblErrorDetail.isVisible = true
                             }
                             val iconResource = when (episodeStatus) {
-                                EpisodeStatusEnum.DOWNLOAD_FAILED -> IR.drawable.ic_failedwarning
-                                EpisodeStatusEnum.WAITING_FOR_WIFI -> IR.drawable.ic_waitingforwifi
-                                EpisodeStatusEnum.WAITING_FOR_POWER -> IR.drawable.ic_waitingforpower
+                                EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
+                                EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
+                                EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
                                 else -> null
                             }
                             if (iconResource != null) {

@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.models.converter.BlazeAdLocationConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
-import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PlaylistEpisodeSortTypeConverter
@@ -121,7 +121,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     DateTypeConverter::class,
     SafeDateTypeConverter::class,
     EpisodePlayingStatusConverter::class,
-    EpisodeStatusEnumConverter::class,
+    EpisodeDownloadStatusConverter::class,
     EpisodesSortTypeConverter::class,
     PodcastAutoUpNextConverter::class,
     PodcastLicensingEnumConverter::class,

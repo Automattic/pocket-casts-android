@@ -9,8 +9,8 @@ import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
 import java.util.Date
@@ -29,7 +29,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "published_date") override var publishedDate: SafeDate,
     @ColumnInfo(name = "title") override var title: String = "",
     @ColumnInfo(name = "size_in_bytes") override var sizeInBytes: Long = 0,
-    @ColumnInfo(name = "episode_status") override var episodeStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED,
+    @ColumnInfo(name = "episode_status") override var downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
     @ColumnInfo(name = "file_type") override var fileType: String? = null,
     @ColumnInfo(name = "duration") override var duration: Double = 0.0,
     @ColumnInfo(name = "download_url") override var downloadUrl: String? = null,
