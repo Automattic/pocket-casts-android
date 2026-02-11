@@ -177,6 +177,7 @@ fun PodcastImageDeprecated(
                     imageRequest = imageRequest,
                     title = title,
                     showTitle = showTitle,
+                    uuid = uuid,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -186,6 +187,7 @@ fun PodcastImageDeprecated(
                 title = title,
                 showTitle = showTitle,
                 corners = corners,
+                uuid = uuid,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -223,18 +225,11 @@ internal fun PodcastImageFallback(
     Box(
         modifier = modifier.background(backgroundColor),
     ) {
-        // Gradient overlay: Black at 0% from top to Black at 100%, 20% opacity
+        // Solid overlay: Black at 20% opacity throughout
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0x33000000), // 20% opacity black at top
-                            Color(0x33000000), // 20% opacity black at bottom
-                        ),
-                    ),
-                ),
+                .background(Color(0x33000000)), // 20% opacity black
         )
         
         // Text in bottom left, white color
