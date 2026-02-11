@@ -13,12 +13,12 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
-        <!-- Overlay for 20% opacity black tint -->
         <View
             android:id="@+id/podcast_artwork_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#33000000"
+            android:alpha="0.2"
+            android:background="@drawable/artwork_overlay_gradient"
             android:visibility="gone" />
 
         <TextView
@@ -27,10 +27,9 @@
             android:layout_height="match_parent"
             android:padding="8dp"
             android:gravity="bottom|start"
-            android:maxLines="3"
+            android:maxLines="4"
             android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            style="@style/H50" />
 
         <ImageView
             android:id="@+id/podcast_artwork"

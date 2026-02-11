@@ -26,10 +26,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
-import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -40,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
-import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import coil3.imageLoader
+import coil3.request.target
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -228,13 +226,13 @@ class FolderAdapter(
                             // Show the colored fallback
                             podcastTitle.show()
                             podcastOverlay?.show()
-                            // Set folder color background using UUID hash
-                            val colorIndex = abs(podcast.uuid.hashCode()) % FOLDER_COLOR_COUNT
+                            // Set color background using UUID hash so the same podcast gets the same color each time
+                            val colorIndex = abs(podcast.uuid.hashCode()) % Theme.folderColors.size
                             val folderColorAttr = Theme.folderColors.getOrElse(colorIndex) { Theme.folderColors.first() }
                             val folderColor = view.context.getThemeColor(folderColorAttr)
                             podcastCardView?.setCardBackgroundColor(folderColor)
                         }
-                    }
+                    },
                 )
                 .target(podcastThumbnail)
                 .build()
