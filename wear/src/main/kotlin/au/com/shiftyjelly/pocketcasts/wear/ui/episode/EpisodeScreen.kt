@@ -133,6 +133,7 @@ fun EpisodeScreen(
                         )
 
                         EpisodeDownloadStatus.Queued,
+                        EpisodeDownloadStatus.QueuedRetry,
                         EpisodeDownloadStatus.WaitingForWifi,
                         EpisodeDownloadStatus.WaitingForPower,
                         EpisodeDownloadStatus.WaitingForStorage,

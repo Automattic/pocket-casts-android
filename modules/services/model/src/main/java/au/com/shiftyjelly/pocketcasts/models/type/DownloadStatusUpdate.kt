@@ -31,8 +31,14 @@ sealed interface DownloadStatusUpdate {
         override val errorMessage get() = null
     }
 
-    data object Enqueued : DownloadStatusUpdate {
+    data object Queued : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.Queued
+        override val outputFile get() = null
+        override val errorMessage get() = null
+    }
+
+    data object QueuedRetry : DownloadStatusUpdate {
+        override val episodeStatus get() = EpisodeDownloadStatus.QueuedRetry
         override val outputFile get() = null
         override val errorMessage get() = null
     }

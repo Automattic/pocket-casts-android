@@ -136,6 +136,13 @@ class FileStatusIconsView @JvmOverloads constructor(
                     lblStatus.text = context.getString(LR.string.episode_row_queued)
                     imgIcon.setImageResource(IR.drawable.ic_waitingforwifi)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
+                } else if (episode.isQueuedForDownloadRetry) {
+                    imgIcon.isVisible = false
+                    progressBar.isVisible = false
+                    progressCircle.isVisible = false
+                    lblStatus.text = context.getString(LR.string.episode_row_queued_retry)
+                    imgIcon.setImageResource(IR.drawable.ic_waitingforwifi)
+                    ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else {
                     imgIcon.isVisible = false
                     progressBar.isVisible = false

@@ -1,12 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.models.converter
 
 import androidx.room.TypeConverter
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.DownloadFailed
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.DownloadNotRequested
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Downloaded
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Downloading
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Queued
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.QueuedRetry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForPower
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForStorage
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForWifi
@@ -37,6 +39,7 @@ private val EpisodeDownloadStatus.dbValue get() = when (this) {
     WaitingForWifi -> 5
     WaitingForPower -> 6
     WaitingForStorage -> 7
+    QueuedRetry -> 8
 }
 
 private val DB_VALUE_MAP = EpisodeDownloadStatus.entries.associateBy { it.dbValue }

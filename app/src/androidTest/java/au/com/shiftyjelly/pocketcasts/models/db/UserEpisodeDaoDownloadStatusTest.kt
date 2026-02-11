@@ -95,12 +95,23 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun updateDownloadStatusToEnqueued() = runTest {
-        userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Enqueued))
+    fun updateDownloadStatusToQueued() = runTest {
+        userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Queued))
 
         val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
 
         assertEquals(EpisodeDownloadStatus.Queued, result.downloadStatus)
+        assertEquals(null, result.downloadedFilePath)
+        assertEquals(null, result.downloadErrorDetails)
+    }
+
+    @Test
+    fun updateDownloadStatusToQueuedRetry() = runTest {
+        userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.QueuedRetry))
+
+        val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
+
+        assertEquals(EpisodeDownloadStatus.QueuedRetry, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }

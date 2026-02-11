@@ -323,7 +323,8 @@ class EpisodeFragment : BaseFragment() {
                             binding.errorLayout.isVisible = episodeStatus == EpisodeDownloadStatus.DownloadFailed ||
                                 episodeStatus == EpisodeDownloadStatus.WaitingForPower ||
                                 episodeStatus == EpisodeDownloadStatus.WaitingForWifi ||
-                                episodeStatus == EpisodeDownloadStatus.WaitingForStorage
+                                episodeStatus == EpisodeDownloadStatus.WaitingForStorage ||
+                                episodeStatus == EpisodeDownloadStatus.QueuedRetry
                             binding.lblErrorDetail.isVisible = false
 
                             binding.lblError.text = when (episodeStatus) {
@@ -331,6 +332,7 @@ class EpisodeFragment : BaseFragment() {
                                 EpisodeDownloadStatus.WaitingForWifi -> getString(LR.string.podcasts_download_wifi)
                                 EpisodeDownloadStatus.WaitingForPower -> getString(LR.string.podcasts_download_power)
                                 EpisodeDownloadStatus.WaitingForStorage -> getString(LR.string.podcasts_download_storage)
+                                EpisodeDownloadStatus.QueuedRetry -> getString(LR.string.podcasts_download_queued_retry)
                                 else -> null
                             }
                             if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
@@ -342,6 +344,7 @@ class EpisodeFragment : BaseFragment() {
                                 EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
                                 EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
                                 EpisodeDownloadStatus.WaitingForStorage -> IR.drawable.ic_waitingforstorage
+                                EpisodeDownloadStatus.QueuedRetry -> IR.drawable.ic_failedwarning
                                 else -> null
                             }
                             if (iconResource != null) {

@@ -513,6 +513,7 @@
     <string name="podcasts_download_power">Auto download waiting for power</string>
     <string name="podcasts_download_storage">Download waiting for storage space</string>
     <string name="podcasts_download_queued">Queued</string>
+    <string name="podcasts_download_queued_retry">The download failed. Retrying shortly.</string>
     <string name="podcasts_download_retry" translatable="false">@string/retry</string>
     <string name="podcasts_download_wifi">Auto download waiting for WiFi</string>
     <string name="podcasts_layout_large_grid">Podcasts layout large grid</string>
@@ -829,6 +830,7 @@
     <string name="episode_row_download_failed">Download Failed</string>
     <string name="episode_row_downloading">Downloading&#x2026; (%d%%)</string>
     <string name="episode_row_queued">Queued for download</string>
+    <string name="episode_row_queued_retry">Retrying download shortly</string>
     <string name="episode_row_queued_upload">Queued for upload</string>
     <string name="episode_row_uploading">Uploading&#x2026; (%d%%)</string>
     <string name="episode_row_waiting_for_power">Waiting for power</string>

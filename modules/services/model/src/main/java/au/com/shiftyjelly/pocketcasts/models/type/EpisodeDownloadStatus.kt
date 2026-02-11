@@ -12,6 +12,10 @@ enum class EpisodeDownloadStatus(
         isCancellable = true,
         isPending = true,
     ),
+    QueuedRetry(
+        isCancellable = true,
+        isPending = true,
+    ),
     WaitingForWifi(
         isCancellable = true,
         isPending = true,

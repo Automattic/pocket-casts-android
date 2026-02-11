@@ -74,6 +74,9 @@ sealed interface BaseEpisode {
     val isQueuedForDownload
         get() = downloadStatus == EpisodeDownloadStatus.Queued
 
+    val isQueuedForDownloadRetry
+        get() = downloadStatus == EpisodeDownloadStatus.QueuedRetry
+
     val isWaitingForWifi
         get() = downloadStatus == EpisodeDownloadStatus.WaitingForWifi
 

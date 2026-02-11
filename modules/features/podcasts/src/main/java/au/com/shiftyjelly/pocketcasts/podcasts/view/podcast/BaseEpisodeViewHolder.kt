@@ -247,6 +247,12 @@ abstract class BaseEpisodeViewHolder<T : Any>(
                 iconId = IR.drawable.ic_waitingforwifi,
                 iconTint = primaryIcon02Tint,
             )
+        } else if (episode.isQueuedForDownloadRetry) {
+            bindStatus(
+                text = context.getString(LR.string.episode_row_queued_retry),
+                iconId = IR.drawable.ic_waitingforwifi,
+                iconTint = primaryIcon02Tint,
+            )
         } else if (episode.isArchived) {
             val archivedString = context.getString(LR.string.archived)
             val timeLeft = TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
