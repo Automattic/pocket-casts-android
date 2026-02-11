@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -196,7 +195,7 @@ fun PodcastImageDeprecated(
 
 /**
  * Fallback UI for podcast image when loading fails.
- * Shows a colored background (using folder colors) with a gradient overlay and the podcast title.
+ * Shows a colored background (using folder colors) with a solid overlay and the podcast title.
  */
 @Composable
 internal fun PodcastImageFallback(
