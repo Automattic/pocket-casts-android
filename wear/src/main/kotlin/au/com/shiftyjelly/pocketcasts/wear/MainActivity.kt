@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.ScrollToTop
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.AUTHENTICATION_SUB_GRAPH
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
@@ -68,7 +69,9 @@ class MainActivity : ComponentActivity() {
                 WearApp(
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
+                    syncState = state.syncState,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
+                    onRetrySync = viewModel::retrySync,
                     signOut = viewModel::signOut,
                 )
             }
@@ -85,7 +88,9 @@ class MainActivity : ComponentActivity() {
 private fun WearApp(
     signInState: SignInState,
     showLoggingInScreen: Boolean,
+    syncState: WatchSyncState,
     onShowLoginScreen: () -> Unit,
+    onRetrySync: () -> Unit,
     signOut: () -> Unit,
 ) {
     val navController = rememberSwipeDismissableNavController()
@@ -117,6 +122,7 @@ private fun WearApp(
             ) {
                 RequirePlusScreen(
                     onContinueToLogin = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
+                    syncState = syncState,
                 )
             }
 
@@ -309,6 +315,8 @@ private fun WearApp(
                         onClose = {},
                     )
                 },
+                syncState = syncState,
+                onRetrySync = onRetrySync,
             )
 
             loggingInScreens(
@@ -429,7 +437,9 @@ private fun DefaultPreview() {
     WearApp(
         signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
+        syncState = WatchSyncState.Syncing,
         onShowLoginScreen = {},
+        onRetrySync = {},
         signOut = {},
     )
 }

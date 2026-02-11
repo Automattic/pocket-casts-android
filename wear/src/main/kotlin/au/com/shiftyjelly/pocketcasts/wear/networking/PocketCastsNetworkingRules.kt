@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.networking
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import com.google.android.horologist.networks.data.NetworkInfo
 import com.google.android.horologist.networks.data.NetworkStatus
 import com.google.android.horologist.networks.data.NetworkType
@@ -47,7 +48,7 @@ object PocketCastsNetworkingRules : NetworkingRules {
             networks.networks.prefer(NetworkType.Wifi)
         }
     }.also { networkStatus ->
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Preferred network according to networking rules: $networkStatus")
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "${WearLogging.PREFIX} Preferred network according to networking rules: $networkStatus")
     }
 
     private fun getPreferredNetworkForMedia(
