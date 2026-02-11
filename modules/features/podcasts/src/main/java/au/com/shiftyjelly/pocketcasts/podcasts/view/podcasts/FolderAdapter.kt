@@ -189,15 +189,6 @@ class FolderAdapter(
             podcastTitle.show()
             author?.text = podcast.author
             
-            // Set up fallback color background using folder color logic
-            if (!isListLayout) {
-                // Select color based on UUID hash (same as Compose implementation)
-                val colorIndex = abs(podcast.uuid.hashCode()) % 12
-                val folderColorAttr = Theme.folderColors.getOrElse(colorIndex) { Theme.folderColors.first() }
-                val folderColor = view.context.getThemeColor(folderColorAttr)
-                podcastCardView?.setCardBackgroundColor(folderColor)
-            }
-            
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
                 BadgeType.OFF -> 0
@@ -226,6 +217,8 @@ class FolderAdapter(
                         if (!isListLayout) {
                             podcastTitle.hide()
                             podcastOverlay?.hide()
+                            // Reset background color on success
+                            podcastCardView?.setCardBackgroundColor(0)
                         }
                     },
                     onError = { _, _ ->
@@ -233,6 +226,11 @@ class FolderAdapter(
                             // Show the colored fallback
                             podcastTitle.show()
                             podcastOverlay?.show()
+                            // Set folder color background using UUID hash
+                            val colorIndex = abs(podcast.uuid.hashCode()) % FOLDER_COLOR_COUNT
+                            val folderColorAttr = Theme.folderColors.getOrElse(colorIndex) { Theme.folderColors.first() }
+                            val folderColor = view.context.getThemeColor(folderColorAttr)
+                            podcastCardView?.setCardBackgroundColor(folderColor)
                         }
                     }
                 )
@@ -240,6 +238,10 @@ class FolderAdapter(
                 .build()
             
             view.context.imageLoader.enqueue(imageRequest)
+        }
+
+        companion object {
+            private const val FOLDER_COLOR_COUNT = 12
         }
 
         private fun ComposeView.setBadgeContent(
