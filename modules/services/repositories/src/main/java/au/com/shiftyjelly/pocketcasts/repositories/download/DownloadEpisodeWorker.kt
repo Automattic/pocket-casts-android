@@ -115,10 +115,15 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is DownloadResult.Failure -> {
-                val data = Data.Builder()
-                    .putString(ERROR_MESSAGE_KEY, processFailure(result))
-                    .build()
-                Result.failure(data)
+                val (message, shouldRetry) = processFailure(result)
+                if (shouldRetry && runAttemptCount < MAX_RETRY_ATTEMPTS - 1) {
+                    Result.retry()
+                } else {
+                    val data = Data.Builder()
+                        .putString(ERROR_MESSAGE_KEY, message)
+                        .build()
+                    Result.failure(data)
+                }
             }
         }
     }
@@ -157,14 +162,14 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         }
     }
 
-    private fun processFailure(result: DownloadResult.Failure): String {
+    private fun processFailure(result: DownloadResult.Failure): Pair<String, Boolean> {
         return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
-                context.getString(LR.string.error_download_invalid_url)
+                context.getString(LR.string.error_download_invalid_url) to false
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                context.getString(LR.string.error_download_http_failure, result.code)
+                context.getString(LR.string.error_download_http_failure, result.code) to true
             }
 
             is DownloadResult.ExceptionFailure -> {
@@ -174,40 +179,40 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
-                        context.getString(LR.string.error_download_no_storage)
+                        context.getString(LR.string.error_download_no_storage) to false
                     }
 
                     throwable.isChartableBlocked() -> {
-                        context.getString(LR.string.error_download_chartable)
+                        context.getString(LR.string.error_download_chartable) to false
                     }
 
                     throwable.isAnyCause<UnknownHostException>() -> {
-                        context.getString(LR.string.error_download_unknown_host)
+                        context.getString(LR.string.error_download_unknown_host) to true
                     }
 
                     throwable.isAnyCause<ConnectException>() -> {
-                        context.getString(LR.string.error_download_connection_error)
+                        context.getString(LR.string.error_download_connection_error) to true
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
-                        context.getString(LR.string.error_download_socket_timeout)
+                        context.getString(LR.string.error_download_socket_timeout) to true
                     }
 
                     throwable.isAnyCause<SSLException>() -> {
-                        context.getString(LR.string.error_download_ssl_failure)
+                        context.getString(LR.string.error_download_ssl_failure) to true
                     }
 
                     throwable.isCancelled() -> {
-                        CANCELLED_MESSAGE
+                        CANCELLED_MESSAGE to false
                     }
 
                     throwable is IOException -> {
-                        context.getString(LR.string.error_download_io_failure)
+                        context.getString(LR.string.error_download_io_failure) to true
                     }
 
                     else -> {
                         val message = context.getString(LR.string.error_download_generic_failure, throwable.message.orEmpty())
-                        message.trim()
+                        message.trim() to true
                     }
                 }
             }
@@ -326,6 +331,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             DownloadWorkInfo.Pending(
                                 episodeUuid = episodeUuid,
+                                retryAttemptCount = info.runAttemptCount,
                                 isWifiRequired = isWifiRequired,
                                 isPowerRequired = isPowerRequired,
                                 isStorageRequired = isStorageRequired,
@@ -340,6 +346,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                             } else {
                                 DownloadWorkInfo.Pending(
                                     episodeUuid = episodeUuid,
+                                    retryAttemptCount = info.runAttemptCount,
                                     isWifiRequired = isWifiRequired,
                                     isPowerRequired = isPowerRequired,
                                     isStorageRequired = isStorageRequired,
@@ -377,6 +384,7 @@ sealed interface DownloadWorkInfo {
 
     data class Pending(
         override val episodeUuid: String,
+        val retryAttemptCount: Int,
         val isWifiRequired: Boolean,
         val isPowerRequired: Boolean,
         val isStorageRequired: Boolean,
@@ -427,3 +435,5 @@ internal const val ERROR_MESSAGE_KEY = "error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
 internal const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
+
+private const val MAX_RETRY_ATTEMPTS = 3

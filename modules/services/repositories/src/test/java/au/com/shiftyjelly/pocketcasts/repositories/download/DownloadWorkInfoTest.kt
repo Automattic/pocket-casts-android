@@ -51,6 +51,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -72,6 +73,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -111,6 +113,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -132,6 +135,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -259,7 +263,31 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = true,
+                isPowerRequired = false,
+                isStorageRequired = false,
+            ),
+            downloadInfo,
+        )
+    }
+
+    @Test
+    fun `map work info run attempt count`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            runAttemptCount = 10,
+            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertEquals(
+            DownloadWorkInfo.Pending(
+                episodeUuid = "episode-id",
+                retryAttemptCount = 10,
+                isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
             ),
@@ -281,6 +309,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = true,
                 isStorageRequired = false,
@@ -303,6 +332,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
+                retryAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = true,
