@@ -67,7 +67,7 @@ internal class EpisodeDownloader(
             if (response.isSuccessful) {
                 response.downloadProgressSource(episode).readTo(tempFile)
                 tempFile.copyTo(downloadFile, overwrite = true)
-                Result.Success
+                Result.Success(downloadFile)
             } else {
                 Result.UnsuccessfulHttpCall(response.code)
             }
@@ -91,7 +91,7 @@ internal class EpisodeDownloader(
     }
 
     sealed interface Result {
-        data object Success : Result
+        data class Success(val file: File) : Result
 
         sealed interface Failure : Result
 
