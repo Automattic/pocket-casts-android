@@ -28,6 +28,7 @@ internal fun CoilImage(
     contentScale: ContentScale = ContentScale.Crop,
     corners: Dp? = null,
     expandContentSize: Boolean = false,
+    uuid: String = "", // UUID for fallback color selection
 ) {
     val painter = rememberAsyncImagePainter(
         model = imageRequest,
@@ -47,10 +48,6 @@ internal fun CoilImage(
         )
         val state by painter.state.collectAsState()
         if (showTitle && state is AsyncImagePainter.State.Error) {
-            // Extract UUID from image request for color selection
-            val uuid = remember(imageRequest) {
-                imageRequest.data.toString().substringAfterLast("/").substringBefore("?")
-            }
             PodcastImageFallback(
                 uuid = uuid,
                 title = title,
