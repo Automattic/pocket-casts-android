@@ -25,7 +25,7 @@ data class UserEpisode(
     @ColumnInfo(name = "episode_description") override var episodeDescription: String = "",
     @ColumnInfo(name = "title") override var title: String = "",
     @ColumnInfo(name = "size_in_bytes") override var sizeInBytes: Long = 0,
-    @ColumnInfo(name = "episode_status") override var downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.NotDownloaded,
+    @ColumnInfo(name = "episode_status") override var downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
     @ColumnInfo(name = "file_type") override var fileType: String? = null,
     @ColumnInfo(name = "duration") override var duration: Double = 0.0,
     @ColumnInfo(name = "download_url") override var downloadUrl: String? = null,

@@ -66,7 +66,7 @@ class PodcastRefresherImpl @Inject constructor(
                     // don't add anything newer than the latest episode so it runs through the refresh logic (auto download, auto add to Up Next etc
                     if (!existingPodcast.isSubscribed || (mostRecentEpisode != null && newEpisode.publishedDate.before(mostRecentEpisode.publishedDate))) {
                         newEpisode.podcastUuid = existingPodcast.uuid
-                        newEpisode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
+                        newEpisode.downloadStatus = EpisodeDownloadStatus.DownloadNotRequested
                         newEpisode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
 
                         // for podcast you're subscribed to, if we find episodes older than a week, we add them in as archived so they don't flood your filters, etc

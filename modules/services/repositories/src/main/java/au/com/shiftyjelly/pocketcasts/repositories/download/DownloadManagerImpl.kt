@@ -220,7 +220,7 @@ class DownloadManagerImpl @Inject constructor(
                                 episodeManager.findEpisodeByUuid(episodeUUID)?.let {
                                     episodeManager.updateDownloadTaskId(it, null)
                                     if (!it.isDownloaded) {
-                                        episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.NotDownloaded)
+                                        episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.DownloadNotRequested)
                                     }
                                 }
                             }
@@ -255,7 +255,7 @@ class DownloadManagerImpl @Inject constructor(
                                     episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
                                         episodeManager.updateDownloadTaskId(episode, null)
                                         if (!episode.isDownloaded) {
-                                            episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
+                                            episodeManager.updateEpisodeStatus(episode, EpisodeDownloadStatus.DownloadNotRequested)
                                         }
                                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
                                     }
@@ -288,7 +288,7 @@ class DownloadManagerImpl @Inject constructor(
                 val missingOrCancelled = state == null || state.outputData.getBoolean(DownloadEpisodeTask.OUTPUT_CANCELLED, false)
                 if (missingOrCancelled) {
                     episodeManager.updateDownloadTaskId(episode, null)
-                    episodeManager.updateEpisodeStatus(episode, status = EpisodeDownloadStatus.NotDownloaded)
+                    episodeManager.updateEpisodeStatus(episode, status = EpisodeDownloadStatus.DownloadNotRequested)
                     episodesUuidsForReQueue.add(episode.uuid)
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {
@@ -316,7 +316,7 @@ class DownloadManagerImpl @Inject constructor(
             val downloadingEpisodes = episodeManager.findEpisodesDownloadingBlocking()
             downloadingEpisodes.forEach {
                 stopDownloadingEpisode(it.uuid, "Cancel all")
-                episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.NotDownloaded)
+                episodeManager.updateEpisodeStatus(it, EpisodeDownloadStatus.DownloadNotRequested)
             }
         }
         WorkManager.getInstance(context).cancelAllWorkByTag(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)

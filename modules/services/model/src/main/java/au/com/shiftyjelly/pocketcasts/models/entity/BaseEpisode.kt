@@ -68,8 +68,8 @@ sealed interface BaseEpisode {
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
 
-    val isNotDownloaded
-        get() = downloadStatus == EpisodeDownloadStatus.NotDownloaded
+    val isDownloadNotRequested
+        get() = downloadStatus == EpisodeDownloadStatus.DownloadNotRequested
 
     val isQueuedForDownload
         get() = downloadStatus == EpisodeDownloadStatus.Queued

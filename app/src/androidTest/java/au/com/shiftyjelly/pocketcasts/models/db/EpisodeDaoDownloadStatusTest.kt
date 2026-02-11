@@ -28,7 +28,7 @@ class EpisodeDaoDownloadStatusTest {
         uuid = "episode-id",
         publishedDate = Date(),
         // Prepare episode with some data to verify correct state in tests
-        downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+        downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         downloadedFilePath = "invalid_path",
         downloadErrorDetails = "invalid_details",
     )
@@ -56,7 +56,7 @@ class EpisodeDaoDownloadStatusTest {
 
         val result = episodeDao.findByUuid(episode.uuid)!!
 
-        assertEquals(EpisodeDownloadStatus.NotDownloaded, result.downloadStatus)
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
         assertEquals(null, result.downloadedFilePath)
         assertEquals(null, result.downloadErrorDetails)
     }
@@ -136,14 +136,14 @@ class EpisodeDaoDownloadStatusTest {
                 PodcastEpisode(
                     uuid = "id-1",
                     publishedDate = Date(),
-                    downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                     downloadedFilePath = "invalid_path",
                     downloadErrorDetails = "invalid_details",
                 ),
                 PodcastEpisode(
                     uuid = "id-2",
                     publishedDate = Date(),
-                    downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                     downloadedFilePath = "invalid_path",
                     downloadErrorDetails = "invalid_details",
                 ),

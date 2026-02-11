@@ -18,13 +18,13 @@ class EpisodeDownloadStatusConverterTest {
     @Test
     fun `null value`() {
         assertEquals(0, converter.toInt(null))
-        assertEquals(EpisodeDownloadStatus.NotDownloaded, converter.fromInt(null))
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, converter.fromInt(null))
     }
 
     @Test
     fun `legacy ordinal values`() {
-        assertEquals(0, converter.toInt(EpisodeDownloadStatus.NotDownloaded))
-        assertEquals(EpisodeDownloadStatus.NotDownloaded, converter.fromInt(0))
+        assertEquals(0, converter.toInt(EpisodeDownloadStatus.DownloadNotRequested))
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, converter.fromInt(0))
 
         assertEquals(1, converter.toInt(EpisodeDownloadStatus.Queued))
         assertEquals(EpisodeDownloadStatus.Queued, converter.fromInt(1))

@@ -309,7 +309,7 @@ class EpisodeFragment : BaseFragment() {
                         )
                         val episodeStatus = state.episode.downloadStatus
                         binding.btnDownload.state = when (episodeStatus) {
-                            EpisodeDownloadStatus.NotDownloaded -> DownloadButtonState.NotDownloaded(downloadSize)
+                            EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(downloadSize)
                             EpisodeDownloadStatus.Queued -> DownloadButtonState.Queued
                             EpisodeDownloadStatus.Downloading -> DownloadButtonState.Downloading(state.downloadProgress)
                             EpisodeDownloadStatus.DownloadFailed -> DownloadButtonState.Errored

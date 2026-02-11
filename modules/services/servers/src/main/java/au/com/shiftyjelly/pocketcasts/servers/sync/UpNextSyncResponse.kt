@@ -28,7 +28,7 @@ data class UpNextSyncResponse(
                 publishedDate = published?.parseIsoDate() ?: Date(),
                 addedDate = Date(),
                 playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+                downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                 title = title ?: "",
                 downloadUrl = url ?: "",
                 podcastUuid = podcastUuid,

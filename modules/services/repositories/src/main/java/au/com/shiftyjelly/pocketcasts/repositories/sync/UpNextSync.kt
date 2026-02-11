@@ -323,7 +323,7 @@ private fun UpNextResponse.EpisodeResponse.toSkeletonEpisode(podcastUuid: String
         publishedDate = published.toDate() ?: Date(),
         addedDate = Date(),
         playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-        downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+        downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         title = title.orEmpty(),
         downloadUrl = url.orEmpty(),
         podcastUuid = podcastUuid,

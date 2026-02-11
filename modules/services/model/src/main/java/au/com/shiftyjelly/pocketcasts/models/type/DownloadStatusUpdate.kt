@@ -8,7 +8,7 @@ sealed interface DownloadStatusUpdate {
     val errorMessage: String?
 
     data object Idle : DownloadStatusUpdate {
-        override val episodeStatus get() = EpisodeDownloadStatus.NotDownloaded
+        override val episodeStatus get() = EpisodeDownloadStatus.DownloadNotRequested
         override val outputFile get() = null
         override val errorMessage get() = null
     }

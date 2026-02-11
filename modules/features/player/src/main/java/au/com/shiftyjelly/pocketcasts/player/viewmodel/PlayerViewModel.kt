@@ -538,7 +538,7 @@ class PlayerViewModel @Inject constructor(
     fun handleDownloadClickFromPlaybackActions(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
 
-        if (episode.isNotDownloaded) {
+        if (episode.isDownloadNotRequested) {
             onDownloadStart.invoke()
             launch {
                 DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, source = source)

@@ -321,7 +321,7 @@ class SubscribeManager @Inject constructor(
         episode.podcastUuid = podcast.uuid
         episode.playedUpTo = 0.0
         episode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
-        episode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
+        episode.downloadStatus = EpisodeDownloadStatus.DownloadNotRequested
         return episode
     }
 

@@ -551,7 +551,7 @@ class UpNextSyncTest {
             title = title,
             downloadUrl = "https://example.com/$uuid.mp3",
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-            downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         )
     }
 
@@ -563,7 +563,7 @@ class UpNextSyncTest {
             uuid = uuid,
             publishedDate = Date(),
             title = title,
-            downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         )
     }
 

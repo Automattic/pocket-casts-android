@@ -128,7 +128,7 @@ fun EpisodeScreen(
                         }
                     },
                     downloadButtonState = when (episode.downloadStatus) {
-                        EpisodeDownloadStatus.NotDownloaded -> DownloadButtonState.NotDownloaded(
+                        EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(
                             downloadSize,
                         )
 

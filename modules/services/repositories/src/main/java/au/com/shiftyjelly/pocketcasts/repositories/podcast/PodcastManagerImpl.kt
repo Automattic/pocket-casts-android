@@ -434,7 +434,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun clearAllDownloadErrorsBlocking() {
-        episodeDao.clearAllDownloadErrorsBlocking(EpisodeDownloadStatus.NotDownloaded, EpisodeDownloadStatus.DownloadFailed)
+        episodeDao.clearAllDownloadErrorsBlocking(EpisodeDownloadStatus.DownloadNotRequested, EpisodeDownloadStatus.DownloadFailed)
     }
 
     /**

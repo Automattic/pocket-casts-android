@@ -4,7 +4,7 @@ enum class EpisodeDownloadStatus(
     val isCancellable: Boolean,
     val isPending: Boolean,
 ) {
-    NotDownloaded(
+    DownloadNotRequested(
         isCancellable = false,
         isPending = false,
     ),

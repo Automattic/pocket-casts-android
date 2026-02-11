@@ -568,7 +568,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (updateDatabase) {
             updateDownloadTaskId(episode, null)
-            updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
+            updateEpisodeStatus(episode, EpisodeDownloadStatus.DownloadNotRequested)
             if (disableAutoDownload) {
                 updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             }
@@ -649,9 +649,9 @@ class EpisodeManagerImpl @Inject constructor(
         episode ?: return
         episodeDao.updateDownloadErrorDetailsBlocking(null, episode.uuid)
         runBlocking {
-            updateEpisodeStatus(episode, EpisodeDownloadStatus.NotDownloaded)
+            updateEpisodeStatus(episode, EpisodeDownloadStatus.DownloadNotRequested)
         }
-        episode.downloadStatus = EpisodeDownloadStatus.NotDownloaded
+        episode.downloadStatus = EpisodeDownloadStatus.DownloadNotRequested
         episode.downloadErrorDetails = null
     }
 

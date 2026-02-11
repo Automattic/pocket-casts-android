@@ -141,7 +141,7 @@ object DataParser {
             return null
         }
         return PodcastEpisode(
-            downloadStatus = EpisodeDownloadStatus.NotDownloaded,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,

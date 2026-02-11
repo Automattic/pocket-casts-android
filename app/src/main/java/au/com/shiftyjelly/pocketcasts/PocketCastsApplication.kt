@@ -247,7 +247,7 @@ class PocketCastsApplication :
                     val restoredFromBackup = podcasts.isNotEmpty()
                     if (restoredFromBackup) {
                         // check to see if the episode files already exist
-                        episodeManager.updateAllEpisodeStatusBlocking(EpisodeDownloadStatus.NotDownloaded)
+                        episodeManager.updateAllEpisodeStatusBlocking(EpisodeDownloadStatus.DownloadNotRequested)
                         fileStorage.fixBrokenFiles(episodeManager)
                         // reset stats
                         statsManager.reset()

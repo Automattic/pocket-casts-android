@@ -38,7 +38,7 @@ class PlayButton @JvmOverloads constructor(
     private var buttonColor: Int? = null
     private var fromListUuid: String? = null
     private var playedUpToMs: Int? = null
-    private var episodeStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.NotDownloaded
+    private var episodeStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested
     private val progressCircle: ProgressCircleView
     private val buttonImage: ImageView
 
@@ -110,8 +110,8 @@ class PlayButton @JvmOverloads constructor(
         this.setOnTouchListener(popup.dragToOpenListener)
         popup.inflate(R.menu.play_button)
         val menu = popup.menu
-        menu.findItem(R.id.download).isVisible = (episodeStatus == EpisodeDownloadStatus.NotDownloaded && buttonType != PlayButtonType.DOWNLOAD)
-        menu.findItem(R.id.stream).isVisible = (episodeStatus == EpisodeDownloadStatus.NotDownloaded && buttonType == PlayButtonType.DOWNLOAD)
+        menu.findItem(R.id.download).isVisible = (episodeStatus == EpisodeDownloadStatus.DownloadNotRequested && buttonType != PlayButtonType.DOWNLOAD)
+        menu.findItem(R.id.stream).isVisible = (episodeStatus == EpisodeDownloadStatus.DownloadNotRequested && buttonType == PlayButtonType.DOWNLOAD)
         menu.findItem(R.id.stop_downloading).isVisible = episodeStatus.isCancellable
         popup.setOnMenuItemClickListener { item ->
             val episodeUuid = episodeUuid

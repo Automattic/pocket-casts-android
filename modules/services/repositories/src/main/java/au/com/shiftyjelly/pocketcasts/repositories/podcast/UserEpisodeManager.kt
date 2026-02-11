@@ -563,7 +563,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
         if (settings.deleteLocalFileAfterPlaying.value) {
             deleteFilesForEpisode(episode)
-            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeDownloadStatus.NotDownloaded)
+            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeDownloadStatus.DownloadNotRequested)
 
             if (episode.serverStatus == UserEpisodeServerStatus.LOCAL) {
                 userEpisodeDao.delete(episode)

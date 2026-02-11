@@ -88,7 +88,7 @@ data class SmartRules(
                     EpisodeDownloadStatus.Queued,
                     EpisodeDownloadStatus.WaitingForPower,
                     EpisodeDownloadStatus.WaitingForWifi,
-                    EpisodeDownloadStatus.NotDownloaded,
+                    EpisodeDownloadStatus.DownloadNotRequested,
                     EpisodeDownloadStatus.DownloadFailed,
                 )
             }
