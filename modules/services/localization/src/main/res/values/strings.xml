@@ -2154,6 +2154,31 @@
     <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
     <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
     <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
+
+    <!-- Watch sync status -->
+    <string name="watch_sync_syncing">Syncing with phone…</string>
+    <string name="watch_sync_success">Logged in from phone!</string>
+
+    <!-- Watch sync errors -->
+    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
+    <string name="watch_sync_error_no_connection">Phone not connected</string>
+    <string name="watch_sync_error_login_failed">Login failed</string>
+    <string name="watch_sync_error_unknown">Something went wrong</string>
+
+    <!-- Watch sync error help text -->
+    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
+    <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
+    <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
+    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
+
+    <!-- Watch sync actions -->
+    <string name="watch_sync_retry">Try Again</string>
+    <string name="watch_sync_waiting_for_phone">Waiting for phone to sync…</string>
+
+    <!-- Phone sync confirmation -->
+    <string name="watch_synced_successfully">Watch synced successfully</string>
+    <string name="watch_sync_failed">Couldn\'t sync to watch</string>
+
     <string name="enter_password">Enter password</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
