@@ -190,7 +190,7 @@ class FolderAdapter(
             podcastTitle.text = podcast.title
             podcastTitle.show()
             author?.text = podcast.author
-            
+
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
                 BadgeType.OFF -> 0
@@ -238,7 +238,7 @@ class FolderAdapter(
                 )
                 .target(podcastThumbnail)
                 .build()
-            
+
             view.context.imageLoader.enqueue(imageRequest)
         }
 
