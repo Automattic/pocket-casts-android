@@ -8,6 +8,8 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +41,11 @@ class LoggingInScreenViewModelTest {
             settings = settings,
             syncManager = syncManager,
         )
+    }
+
+    @After
+    fun tearDown() = runTest {
+        testScheduler.advanceUntilIdle()
     }
 
     @Test

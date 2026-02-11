@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +48,11 @@ class WatchListScreenViewModelTest {
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
             .thenReturn(Observable.never())
         viewModel = WatchListScreenViewModel(analyticsTracker, episodeManager, playbackManager, podcastManager)
+    }
+
+    @After
+    fun tearDown() = runTest {
+        testScheduler.advanceUntilIdle()
     }
 
     @Test
