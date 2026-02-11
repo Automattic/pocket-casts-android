@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -28,6 +29,9 @@ class WatchListScreenViewModelTest {
     private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
+    private lateinit var settings: Settings
+
+    @Mock
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
@@ -47,7 +51,7 @@ class WatchListScreenViewModelTest {
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
             .thenReturn(Observable.never())
-        viewModel = WatchListScreenViewModel(analyticsTracker, episodeManager, playbackManager, podcastManager)
+        viewModel = WatchListScreenViewModel(analyticsTracker, settings, episodeManager, playbackManager, podcastManager)
     }
 
     @After

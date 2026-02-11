@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -82,11 +83,11 @@ class WearMainActivityViewModelTest {
         )
         whenever(tokenBundleRepository.flow).thenReturn(flowOf(null))
         whenever(connectivityStateManager.isConnected).thenReturn(connectivityFlow)
-    }
 
-    @After
-    fun tearDown() = runTest {
-        testScheduler.advanceUntilIdle()
+        // Mock settings.refreshStateFlow to return a flow
+        whenever(settings.refreshStateFlow).thenReturn(
+            MutableStateFlow(RefreshState.Never),
+        )
     }
 
     private suspend fun setupPhoneConnectionMock() {
