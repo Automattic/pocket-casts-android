@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Download
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Downloading
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.Queued
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForPower
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForStorage
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus.WaitingForWifi
 
 class EpisodeDownloadStatusConverter {
@@ -35,6 +36,7 @@ private val EpisodeDownloadStatus.dbValue get() = when (this) {
     Downloaded -> 4
     WaitingForWifi -> 5
     WaitingForPower -> 6
+    WaitingForStorage -> 7
 }
 
 private val DB_VALUE_MAP = EpisodeDownloadStatus.entries.associateBy { it.dbValue }

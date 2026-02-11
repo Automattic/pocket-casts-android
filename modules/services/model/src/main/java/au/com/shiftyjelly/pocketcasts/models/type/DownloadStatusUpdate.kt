@@ -25,6 +25,12 @@ sealed interface DownloadStatusUpdate {
         override val errorMessage get() = null
     }
 
+    data object WaitingForStorage : DownloadStatusUpdate {
+        override val episodeStatus get() = EpisodeDownloadStatus.WaitingForStorage
+        override val outputFile get() = null
+        override val errorMessage get() = null
+    }
+
     data object Enqueued : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.Queued
         override val outputFile get() = null

@@ -282,7 +282,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         val waitForPower: Boolean,
     )
 
-    companion object Companion {
+    companion object {
         private const val WORKER_TAG = "EpisodeDownloadWorker"
 
         fun episodeWorkerName(episodeUuid: String) = "$WORKER_TAG:$episodeUuid"

@@ -200,6 +200,7 @@ class EpisodeViewModel @Inject constructor(
                 EpisodeDownloadStatus.DownloadFailed -> LR.string.podcasts_download_failed
                 EpisodeDownloadStatus.WaitingForWifi -> LR.string.podcasts_download_wifi
                 EpisodeDownloadStatus.WaitingForPower -> LR.string.podcasts_download_power
+                EpisodeDownloadStatus.WaitingForStorage -> LR.string.podcasts_download_storage
                 else -> null
             }
             if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
@@ -209,6 +210,7 @@ class EpisodeViewModel @Inject constructor(
                 EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
                 EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
                 EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
+                EpisodeDownloadStatus.WaitingForStorage -> IR.drawable.ic_waitingforstorage
                 else -> null
             }
         } else {

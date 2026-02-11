@@ -320,13 +320,17 @@ class EpisodeFragment : BaseFragment() {
                         val playbackError = state.episode.playErrorDetails
 
                         if (playbackError == null) {
-                            binding.errorLayout.isVisible = episodeStatus == EpisodeDownloadStatus.DownloadFailed || episodeStatus == EpisodeDownloadStatus.WaitingForPower || episodeStatus == EpisodeDownloadStatus.WaitingForWifi
+                            binding.errorLayout.isVisible = episodeStatus == EpisodeDownloadStatus.DownloadFailed ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForPower ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForWifi ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForStorage
                             binding.lblErrorDetail.isVisible = false
 
                             binding.lblError.text = when (episodeStatus) {
                                 EpisodeDownloadStatus.DownloadFailed -> getString(LR.string.podcasts_download_failed)
                                 EpisodeDownloadStatus.WaitingForWifi -> getString(LR.string.podcasts_download_wifi)
                                 EpisodeDownloadStatus.WaitingForPower -> getString(LR.string.podcasts_download_power)
+                                EpisodeDownloadStatus.WaitingForStorage -> getString(LR.string.podcasts_download_storage)
                                 else -> null
                             }
                             if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
@@ -337,6 +341,7 @@ class EpisodeFragment : BaseFragment() {
                                 EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
                                 EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
                                 EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
+                                EpisodeDownloadStatus.WaitingForStorage -> IR.drawable.ic_waitingforstorage
                                 else -> null
                             }
                             if (iconResource != null) {

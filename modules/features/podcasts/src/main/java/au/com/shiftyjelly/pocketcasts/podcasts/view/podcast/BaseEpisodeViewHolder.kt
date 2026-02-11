@@ -229,6 +229,12 @@ abstract class BaseEpisodeViewHolder<T : Any>(
                 iconId = IR.drawable.ic_waitingforpower,
                 iconTint = primaryIcon02Tint,
             )
+        } else if (episode.isWaitingForStorage) {
+            bindStatus(
+                text = context.getString(LR.string.episode_row_waiting_for_storage),
+                iconId = IR.drawable.ic_waitingforstorage,
+                iconTint = primaryIcon02Tint,
+            )
         } else if (episode.isWaitingForWifi) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_waiting_for_wifi),

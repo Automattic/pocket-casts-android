@@ -84,6 +84,17 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
+    fun updateDownloadStatusToWaitingForStorage() = runTest {
+        userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.WaitingForStorage))
+
+        val result = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
+
+        assertEquals(EpisodeDownloadStatus.WaitingForStorage, result.downloadStatus)
+        assertEquals(null, result.downloadedFilePath)
+        assertEquals(null, result.downloadErrorDetails)
+    }
+
+    @Test
     fun updateDownloadStatusToEnqueued() = runTest {
         userEpisodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Enqueued))
 

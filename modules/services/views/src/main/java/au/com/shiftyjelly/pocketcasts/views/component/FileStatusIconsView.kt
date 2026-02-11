@@ -115,6 +115,13 @@ class FileStatusIconsView @JvmOverloads constructor(
                     imgIcon.setImageResource(IR.drawable.ic_waitingforpower)
                     lblStatus.text = context.getString(LR.string.episode_row_waiting_for_power)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
+                } else if (episode.isWaitingForStorage) {
+                    imgIcon.isVisible = true
+                    progressBar.isVisible = false
+                    progressCircle.isVisible = false
+                    imgIcon.setImageResource(IR.drawable.ic_waitingforstorage)
+                    lblStatus.text = context.getString(LR.string.episode_row_waiting_for_storage)
+                    ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.isWaitingForWifi) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
