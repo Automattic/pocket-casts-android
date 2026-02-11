@@ -12,16 +12,25 @@
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
+
+        <!-- Overlay for 20% opacity black tint -->
+        <View
+            android:id="@+id/podcast_artwork_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#33000000"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/library_podcast_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="8dp"
-            android:gravity="center"
-            android:maxLines="4"
-            android:textColor="#B3FFFFFF"
+            android:gravity="bottom|start"
+            android:maxLines="3"
+            android:textColor="#FFFFFFFF"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-medium" />
 
         <ImageView
             android:id="@+id/podcast_artwork"
