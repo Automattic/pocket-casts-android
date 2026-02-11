@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class EpisodeDownloadStatusConverterTest {
-    val converter = EpisodeDownloadStatusConverter()
+    private val converter = EpisodeDownloadStatusConverter()
 
     @Test
     fun `each status is mapped to a different value`() {
