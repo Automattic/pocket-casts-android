@@ -51,7 +51,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -73,7 +73,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -113,7 +113,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -135,7 +135,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -263,7 +263,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = true,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -286,7 +286,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 10,
+                runAttemptCount = 10,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -309,7 +309,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = true,
                 isStorageRequired = false,
@@ -332,7 +332,7 @@ class DownloadWorkInfoTest {
         assertEquals(
             DownloadWorkInfo.Pending(
                 episodeUuid = "episode-id",
-                retryAttemptCount = 0,
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = true,

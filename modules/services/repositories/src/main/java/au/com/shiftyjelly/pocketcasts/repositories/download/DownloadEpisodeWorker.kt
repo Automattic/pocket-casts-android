@@ -331,7 +331,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             DownloadWorkInfo.Pending(
                                 episodeUuid = episodeUuid,
-                                retryAttemptCount = info.runAttemptCount,
+                                runAttemptCount = info.runAttemptCount,
                                 isWifiRequired = isWifiRequired,
                                 isPowerRequired = isPowerRequired,
                                 isStorageRequired = isStorageRequired,
@@ -346,7 +346,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                             } else {
                                 DownloadWorkInfo.Pending(
                                     episodeUuid = episodeUuid,
-                                    retryAttemptCount = info.runAttemptCount,
+                                    runAttemptCount = info.runAttemptCount,
                                     isWifiRequired = isWifiRequired,
                                     isPowerRequired = isPowerRequired,
                                     isStorageRequired = isStorageRequired,
@@ -384,7 +384,7 @@ sealed interface DownloadWorkInfo {
 
     data class Pending(
         override val episodeUuid: String,
-        val retryAttemptCount: Int,
+        val runAttemptCount: Int,
         val isWifiRequired: Boolean,
         val isPowerRequired: Boolean,
         val isStorageRequired: Boolean,
