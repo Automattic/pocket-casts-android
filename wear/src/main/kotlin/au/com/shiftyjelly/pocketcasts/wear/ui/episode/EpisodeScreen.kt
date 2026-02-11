@@ -135,6 +135,7 @@ fun EpisodeScreen(
                         EpisodeDownloadStatus.Queued,
                         EpisodeDownloadStatus.WaitingForWifi,
                         EpisodeDownloadStatus.WaitingForPower,
+                        EpisodeDownloadStatus.WaitingForStorage,
                         -> DownloadButtonState.Queued
 
                         EpisodeDownloadStatus.Downloading -> DownloadButtonState.Downloading(

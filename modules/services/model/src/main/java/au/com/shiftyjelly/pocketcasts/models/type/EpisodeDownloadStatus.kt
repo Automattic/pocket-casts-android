@@ -20,6 +20,10 @@ enum class EpisodeDownloadStatus(
         isCancellable = true,
         isPending = true,
     ),
+    WaitingForStorage(
+        isCancellable = true,
+        isPending = true,
+    ),
     Downloading(
         isCancellable = true,
         isPending = false,

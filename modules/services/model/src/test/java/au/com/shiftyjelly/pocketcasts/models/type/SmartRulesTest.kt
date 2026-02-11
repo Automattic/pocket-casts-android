@@ -102,7 +102,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock)
 
-        assertEquals("episode.episode_status IN (2,1,6,5,0,3)", clause)
+        assertEquals("episode.episode_status IN (0,1,5,6,7,2,3)", clause)
     }
 
     @Test

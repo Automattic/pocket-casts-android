@@ -80,6 +80,9 @@ sealed interface BaseEpisode {
     val isWaitingForPower
         get() = downloadStatus == EpisodeDownloadStatus.WaitingForPower
 
+    val isWaitingForStorage
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForStorage
+
     val isDownloadPending
         get() = downloadStatus.isPending
 

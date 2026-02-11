@@ -80,17 +80,8 @@ data class SmartRules(
         override fun toSqlWhereClause(clock: Clock) = buildString {
             val statuses = when (this@DownloadStatusRule) {
                 Any -> return@buildString
-
                 Downloaded -> listOf(EpisodeDownloadStatus.Downloaded)
-
-                NotDownloaded -> listOf(
-                    EpisodeDownloadStatus.Downloading,
-                    EpisodeDownloadStatus.Queued,
-                    EpisodeDownloadStatus.WaitingForPower,
-                    EpisodeDownloadStatus.WaitingForWifi,
-                    EpisodeDownloadStatus.DownloadNotRequested,
-                    EpisodeDownloadStatus.DownloadFailed,
-                )
+                NotDownloaded -> EpisodeDownloadStatus.entries - EpisodeDownloadStatus.Downloaded
             }
             append("episode.episode_status IN (")
             val converter = EpisodeDownloadStatusConverter()
