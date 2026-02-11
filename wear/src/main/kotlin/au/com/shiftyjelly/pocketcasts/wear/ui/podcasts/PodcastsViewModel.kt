@@ -3,12 +3,13 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.podcasts
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.WearIoDispatcher
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class PodcastsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val folderManager: FolderManager,
+    @WearIoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val folderUuid: String = savedStateHandle[PodcastsScreen.ARGUMENT_FOLDER_UUID] ?: ""
@@ -34,7 +36,7 @@ class PodcastsViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _uiState
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val folder: Folder?
             val items: List<FolderItem>
             if (folderUuid.isEmpty()) {

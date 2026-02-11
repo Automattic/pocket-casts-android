@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.di.WearImageLoader
 import coil3.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,7 +25,7 @@ class NowPlayingChipViewModel @Inject constructor(
     playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
     settings: Settings,
-    @WearImageLoader val imageLoader: ImageLoader,
+    val imageLoader: ImageLoader,
 ) : ViewModel() {
 
     data class State(

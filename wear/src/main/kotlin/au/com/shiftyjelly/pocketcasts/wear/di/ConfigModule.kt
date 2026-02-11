@@ -56,6 +56,7 @@ object ConfigModule {
     /**
      * Wear-optimized ImageLoader with smaller caches for limited Wear OS resources.
      * Memory: 10MB, Disk: 50MB (vs 25% RAM / 250MB default).
+     * TODO: Make this the default ImageLoader for Wear app (requires excluding UiModule).
      */
     @Singleton
     @Provides

@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
-import au.com.shiftyjelly.pocketcasts.ui.di.WearImageLoader
 import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.ui.episode.UserEpisodeColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -88,7 +87,7 @@ class EpisodeViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    @WearImageLoader private val imageLoader: ImageLoader,
+    private val imageLoader: ImageLoader,
     @WearIoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null

@@ -133,7 +133,6 @@ dependencies {
     implementation(libs.google.identity)
 
     implementation(projects.modules.features.account)
-    implementation(projects.modules.features.filters)
     implementation(projects.modules.features.profile)
     implementation(projects.modules.features.settings)
     implementation(projects.modules.features.shared)
