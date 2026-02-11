@@ -30,7 +30,7 @@
             android:maxLines="3"
             android:textColor="#FFFFFFFF"
             android:textSize="14sp"
-            android:fontFamily="sans-serif-medium" />
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/podcast_artwork"
