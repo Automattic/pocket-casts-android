@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import coil3.imageLoader
+import kotlin.math.abs
 import kotlin.math.min
 
 class FolderAdapter(
@@ -218,7 +220,7 @@ class FolderAdapter(
                             podcastTitle.hide()
                             podcastOverlay?.hide()
                             // Reset background color on success
-                            podcastCardView?.setCardBackgroundColor(0)
+                            podcastCardView?.setCardBackgroundColor(Color.TRANSPARENT)
                         }
                     },
                     onError = { _, _ ->
