@@ -213,6 +213,8 @@ GEM
       google-apis-core (>= 0.11.0, < 2.a)
     google-apis-playcustomapp_v1 (0.13.0)
       google-apis-core (>= 0.11.0, < 2.a)
+    google-apis-sheets_v4 (0.26.0)
+      google-apis-core (>= 0.11.0, < 2.a)
     google-apis-storage_v1 (0.31.0)
       google-apis-core (>= 0.11.0, < 2.a)
     google-cloud-core (1.8.0)
@@ -365,6 +367,7 @@ DEPENDENCIES
   fastlane (~> 2.226)
   fastlane-plugin-firebase_app_distribution (~> 0.10)
   fastlane-plugin-wpmreleasetoolkit (~> 13.8)
+  google-apis-sheets_v4 (~> 0.26)
   openssl (~> 4.0)
 
 BUNDLED WITH
