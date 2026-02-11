@@ -192,7 +192,7 @@ class FolderAdapter(
             // Set up fallback color background using folder color logic
             if (!isListLayout) {
                 // Select color based on UUID hash (same as Compose implementation)
-                val colorIndex = kotlin.math.abs(podcast.uuid.hashCode()) % 12
+                val colorIndex = abs(podcast.uuid.hashCode()) % 12
                 val folderColorAttr = Theme.folderColors.getOrElse(colorIndex) { Theme.folderColors.first() }
                 val folderColor = view.context.getThemeColor(folderColorAttr)
                 podcastCardView?.setCardBackgroundColor(folderColor)
