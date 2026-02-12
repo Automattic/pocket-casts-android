@@ -86,7 +86,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
             tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_STARTED_KEY, true).build(),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, true).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -103,7 +103,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
             tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_STARTED_KEY, false).build(),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, false).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)

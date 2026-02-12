@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -33,6 +34,7 @@ import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.Future
 import javax.net.ssl.SSLException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
@@ -87,7 +89,10 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     override fun doWork(): Result {
         val result = try {
-            dispatchWorkStarted()
+            // Block the work until the state is dispatched
+            // to keep the state consistent
+            dispatchProgressData(isWorkExecuting = true).get()
+
             var episode = getEpisodeOrThrow()
             prepareForegroundNotification(episode)
 
@@ -104,7 +109,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         } catch (e: Throwable) {
             DownloadResult.ExceptionFailure(e)
         }
+
         notificationJob?.cancel()
+        dispatchProgressData(isWorkExecuting = false)
 
         return when (result) {
             is DownloadResult.Success -> {
@@ -125,10 +132,14 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     override fun onStopped() {
         notificationJob?.cancel()
+        dispatchProgressData(isWorkExecuting = false)
     }
 
-    private fun dispatchWorkStarted() {
-        setProgressAsync(Data.Builder().putBoolean(IS_WORK_STARTED_KEY, true).build()).get()
+    private fun dispatchProgressData(isWorkExecuting: Boolean): ListenableFuture<Void> {
+        val data = Data.Builder()
+            .putBoolean(IS_WORK_EXECUTING, isWorkExecuting)
+            .build()
+        return setProgressAsync(data)
     }
 
     private fun getEpisodeOrThrow() = runBlocking {
@@ -335,7 +346,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.RUNNING -> {
                             // Running doesn't necessarily mean that Worker.doWork() was called.
                             // For this reason we use a separate flag.
-                            if (info.progress.getBoolean(IS_WORK_STARTED_KEY, false)) {
+                            if (info.progress.getBoolean(IS_WORK_EXECUTING, false)) {
                                 DownloadWorkInfo.InProgress(episodeUuid)
                             } else {
                                 DownloadWorkInfo.Pending(
@@ -419,7 +430,7 @@ private const val WAIT_FOR_WIFI_KEY = "wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "wait_for_power"
 
 // Progress keys
-internal const val IS_WORK_STARTED_KEY = "is_work_started"
+internal const val IS_WORK_EXECUTING = "is_work_executing"
 
 // Output keys
 internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
