@@ -99,7 +99,12 @@ private class DownloadQueueController(
     private val userEpisodeDao = appDatabase.userEpisodeDao()
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType) {
-        val episodes = episodeDao.findByUuids(episodeUuids) + userEpisodeDao.findEpisodesByUuids(episodeUuids)
+        var episodes = episodeDao.findByUuids(episodeUuids) + userEpisodeDao.findEpisodesByUuids(episodeUuids)
+        episodes = episodes.filterNot(BaseEpisode::isDownloaded)
+        if (episodes.isEmpty()) {
+            return
+        }
+
         val pendingWorks = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
             .firstOrNull()
             ?.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo)
