@@ -186,7 +186,7 @@ class FolderAdapter(
             button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
-            podcastTitle.show()
+            podcastTitle.hide()
             author?.text = podcast.author
 
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
