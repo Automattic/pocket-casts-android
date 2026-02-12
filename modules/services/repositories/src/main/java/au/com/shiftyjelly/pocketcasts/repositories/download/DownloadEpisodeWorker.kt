@@ -121,7 +121,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
             is DownloadResult.Failure -> {
                 val (errorMessage, shouldRetry) = processFailure(result)
-                if (shouldRetry && runAttemptCount < MAX_ATTEMPT_COUNT) {
+                if (shouldRetry && runAttemptCount < MAX_DOWNLOAD_ATTEMPT_COUNT) {
                     Result.retry()
                 } else {
                     val data = Data.Builder()
@@ -289,19 +289,20 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         fun episodeWorkerName(episodeUuid: String) = "$WORKER_EPISODE_TAG_PREFIX$episodeUuid"
 
-        fun createWorkRequest(args: Args): OneTimeWorkRequest {
+        fun createWorkRequest(args: Args): Pair<OneTimeWorkRequest, Constraints> {
             val constraints = Constraints.Builder()
                 .setRequiresCharging(args.waitForPower)
                 .setRequiredNetworkType(if (args.waitForWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
                 .setRequiresStorageNotLow(true)
                 .build()
-            return OneTimeWorkRequestBuilder<DownloadEpisodeWorker>()
+            val request = OneTimeWorkRequestBuilder<DownloadEpisodeWorker>()
                 .setConstraints(constraints)
                 .setInputData(args.toData())
                 .addTag(WORKER_TAG)
                 .addTag(episodeWorkerName(args.episodeUuid))
                 .addTag(args.episodeUuid)
                 .build()
+            return request to constraints
         }
 
         fun mapToDownloadWorkInfo(info: WorkInfo): DownloadWorkInfo? {
@@ -447,4 +448,4 @@ internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
 internal const val ERROR_MESSAGE_KEY = "error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-private const val MAX_ATTEMPT_COUNT = 3
+internal const val MAX_DOWNLOAD_ATTEMPT_COUNT = 3

@@ -1870,6 +1870,7 @@
     <string name="error_download_socket_timeout">Failed to establish a connection with the podcast author’s server in time. Please check your internet connection.</string>
     <string name="error_download_io_failure">Failed to download the episode. Please check your internet connection and that you have enough space on your device.</string>
     <string name="error_download_generic_failure">Failed to download the episode. %1$s</string>
+    <string name="error_download_too_many_attempts">Failed to download due to too many attempts. Please try again.</string>
 
     <!-- Discover -->
 

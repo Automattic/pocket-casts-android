@@ -169,4 +169,7 @@ abstract class UserEpisodeDao {
             updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
         }
     }
+
+    @Query("SELECT uuid FROM user_episodes WHERE episode_status IN (:statuses)")
+    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
 }

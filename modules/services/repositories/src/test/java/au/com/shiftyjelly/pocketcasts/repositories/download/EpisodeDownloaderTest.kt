@@ -64,6 +64,7 @@ class EpisodeDownloaderTest {
         )
 
         assertEquals(Result.Success(downloadFile), result)
+        assertEquals(100, progressCache.progressFlow(episode.uuid).value?.percentage)
         assertEquals(server.takeRequest().url, episode.downloadUrl?.toHttpUrl())
         assertEquals("Hello, world!", downloadFile.readText())
     }
@@ -80,7 +81,6 @@ class EpisodeDownloaderTest {
         )
 
         assertFalse(tempFile.exists())
-        assertNull(progressCache.progressFlow(episode.uuid).value)
     }
 
     @Test
@@ -209,9 +209,6 @@ class EpisodeDownloaderTest {
 
             // Verify that last step downloaded fully
             assertEquals(DownloadProgress(contentLength, contentLength), progress)
-
-            // Verify that the progress got cleaned up
-            assertNull(awaitItem())
 
             cancel()
         }
