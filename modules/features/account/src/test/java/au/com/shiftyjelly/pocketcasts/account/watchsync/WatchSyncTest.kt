@@ -84,21 +84,21 @@ class WatchSyncTest {
     }
 
     @Test
-    fun `processAuthDataChange invokes callback with Success when already logged in`() = runTest {
+    fun `processAuthDataChange does not call loginWithToken when already logged in`() = runTest {
         // Given
         val authData = WatchSyncAuthData(testRefreshToken, testLoginIdentity)
-        var callbackResult: LoginResult? = null
+        var callbackInvoked = false
 
         whenever(syncManager.isLoggedIn()).thenReturn(true)
 
         // When
-        watchSync.processAuthDataChange(authData) { result ->
-            callbackResult = result
+        watchSync.processAuthDataChange(authData) {
+            callbackInvoked = true
         }
 
         // Then
         verify(syncManager, never()).loginWithToken(any(), any(), any())
-        assertTrue(callbackResult is LoginResult.Success)
+        assertTrue("Callback should not be invoked when already logged in", !callbackInvoked)
     }
 
     @Test
