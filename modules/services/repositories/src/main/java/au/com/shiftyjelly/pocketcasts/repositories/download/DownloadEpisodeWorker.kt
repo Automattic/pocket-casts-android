@@ -120,10 +120,15 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is DownloadResult.Failure -> {
-                val data = Data.Builder()
-                    .putString(ERROR_MESSAGE_KEY, processFailure(result))
-                    .build()
-                Result.failure(data)
+                val (errorMessage, shouldRetry) = processFailure(result)
+                if (shouldRetry && runAttemptCount < MAX_ATTEMPT_COUNT) {
+                    Result.retry()
+                } else {
+                    val data = Data.Builder()
+                        .putString(ERROR_MESSAGE_KEY, errorMessage)
+                        .build()
+                    Result.failure(data)
+                }
             }
         }
     }
@@ -166,14 +171,14 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         }
     }
 
-    private fun processFailure(result: DownloadResult.Failure): String {
+    private fun processFailure(result: DownloadResult.Failure): Pair<String, Boolean> {
         return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
-                context.getString(LR.string.error_download_invalid_url)
+                context.getString(LR.string.error_download_invalid_url) to false
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                context.getString(LR.string.error_download_http_failure, result.code)
+                context.getString(LR.string.error_download_http_failure, result.code) to true
             }
 
             is DownloadResult.ExceptionFailure -> {
@@ -183,36 +188,36 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
-                        context.getString(LR.string.error_download_no_storage)
+                        context.getString(LR.string.error_download_no_storage) to false
                     }
 
                     throwable.isChartableBlocked() -> {
-                        context.getString(LR.string.error_download_chartable)
+                        context.getString(LR.string.error_download_chartable) to false
                     }
 
                     throwable.isAnyCause<UnknownHostException>() -> {
-                        context.getString(LR.string.error_download_unknown_host)
+                        context.getString(LR.string.error_download_unknown_host) to true
                     }
 
                     throwable.isAnyCause<ConnectException>() -> {
-                        context.getString(LR.string.error_download_connection_error)
+                        context.getString(LR.string.error_download_connection_error) to true
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
-                        context.getString(LR.string.error_download_socket_timeout)
+                        context.getString(LR.string.error_download_socket_timeout) to true
                     }
 
                     throwable.isAnyCause<SSLException>() -> {
-                        context.getString(LR.string.error_download_ssl_failure)
+                        context.getString(LR.string.error_download_ssl_failure) to true
                     }
 
                     throwable is IOException -> {
-                        context.getString(LR.string.error_download_io_failure)
+                        context.getString(LR.string.error_download_io_failure) to true
                     }
 
                     else -> {
                         val message = context.getString(LR.string.error_download_generic_failure, throwable.message.orEmpty())
-                        message.trim()
+                        message.trim() to true
                     }
                 }
             }
