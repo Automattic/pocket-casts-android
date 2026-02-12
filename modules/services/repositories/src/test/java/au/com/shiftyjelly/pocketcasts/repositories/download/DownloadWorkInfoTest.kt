@@ -213,23 +213,6 @@ class DownloadWorkInfoTest {
     }
 
     @Test
-    fun `map failed work info with cancelled message`() {
-        val workInfo = WorkInfo(
-            id = UUID.randomUUID(),
-            state = WorkInfo.State.FAILED,
-            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            outputData = Data.Builder().putString(ERROR_MESSAGE_KEY, CANCELLED_MESSAGE).build(),
-        )
-
-        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
-
-        assertEquals(
-            DownloadWorkInfo.Cancelled(episodeUuid = "episode-id"),
-            downloadInfo,
-        )
-    }
-
-    @Test
     fun `map cancelled work info`() {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),

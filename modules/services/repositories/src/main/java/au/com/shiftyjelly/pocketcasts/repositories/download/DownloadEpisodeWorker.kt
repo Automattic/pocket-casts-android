@@ -30,13 +30,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.IOException
-import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.concurrent.Future
 import javax.net.ssl.SSLException
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -208,10 +205,6 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         context.getString(LR.string.error_download_ssl_failure)
                     }
 
-                    throwable.isCancelled() -> {
-                        CANCELLED_MESSAGE
-                    }
-
                     throwable is IOException -> {
                         context.getString(LR.string.error_download_io_failure)
                     }
@@ -249,25 +242,6 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     private fun Throwable.isChartableBlocked(): Boolean {
         return anyMessageContains("chtbl.com")
-    }
-
-    private fun Throwable.isCancelled(): Boolean {
-        var throwable: Throwable? = this
-        while (throwable != null) {
-            when (throwable) {
-                is InterruptedIOException, is InterruptedException, is CancellationException -> {
-                    return true
-                }
-
-                is IOException -> {
-                    if (throwable.message?.lowercase() == "cancelled") {
-                        return true
-                    }
-                }
-            }
-            throwable = throwable.cause
-        }
-        return false
     }
 
     private inline fun <reified T : Throwable> Throwable.isAnyCause(): Boolean {
@@ -367,11 +341,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData.getString(ERROR_MESSAGE_KEY)
-                            if (errorMessage == CANCELLED_MESSAGE) {
-                                DownloadWorkInfo.Cancelled(episodeUuid)
-                            } else {
-                                DownloadWorkInfo.Failure(episodeUuid, errorMessage)
-                            }
+                            DownloadWorkInfo.Failure(episodeUuid, errorMessage)
                         }
 
                         WorkInfo.State.CANCELLED -> {
@@ -437,4 +407,3 @@ internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
 internal const val ERROR_MESSAGE_KEY = "error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-internal const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
