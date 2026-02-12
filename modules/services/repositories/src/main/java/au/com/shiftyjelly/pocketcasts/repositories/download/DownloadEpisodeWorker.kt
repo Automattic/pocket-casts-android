@@ -311,6 +311,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             DownloadWorkInfo.Pending(
                                 episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
                                 isWifiRequired = isWifiRequired,
                                 isPowerRequired = isPowerRequired,
                                 isStorageRequired = isStorageRequired,
@@ -321,10 +322,14 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                             // Running doesn't necessarily mean that Worker.doWork() was called.
                             // For this reason we use a separate flag.
                             if (info.progress.getBoolean(IS_WORK_EXECUTING, false)) {
-                                DownloadWorkInfo.InProgress(episodeUuid)
+                                DownloadWorkInfo.InProgress(
+                                    episodeUuid = episodeUuid,
+                                    runAttemptCount = info.runAttemptCount,
+                                )
                             } else {
                                 DownloadWorkInfo.Pending(
                                     episodeUuid = episodeUuid,
+                                    runAttemptCount = info.runAttemptCount,
                                     isWifiRequired = isWifiRequired,
                                     isPowerRequired = isPowerRequired,
                                     isStorageRequired = isStorageRequired,
@@ -334,18 +339,29 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                         WorkInfo.State.SUCCEEDED -> {
                             val filePath = requireNotNull(info.outputData.getString(DOWNLOAD_FILE_PATH_KEY)) {
-                                "Output file path is missing for the episode $episodeUuid download"
+                                "Output file path is missing for the downloaded episode $episodeUuid"
                             }
-                            DownloadWorkInfo.Success(episodeUuid, File(filePath))
+                            DownloadWorkInfo.Success(
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                                downloadFile = File(filePath),
+                            )
                         }
 
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData.getString(ERROR_MESSAGE_KEY)
-                            DownloadWorkInfo.Failure(episodeUuid, errorMessage)
+                            DownloadWorkInfo.Failure(
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                                errorMessage = errorMessage,
+                            )
                         }
 
                         WorkInfo.State.CANCELLED -> {
-                            DownloadWorkInfo.Cancelled(episodeUuid)
+                            DownloadWorkInfo.Cancelled(
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                            )
                         }
                     }
                 }
@@ -355,9 +371,11 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
 sealed interface DownloadWorkInfo {
     val episodeUuid: String
+    val runAttemptCount: Int
 
     data class Pending(
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val isWifiRequired: Boolean,
         val isPowerRequired: Boolean,
         val isStorageRequired: Boolean,
@@ -365,20 +383,24 @@ sealed interface DownloadWorkInfo {
 
     data class InProgress(
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
     ) : DownloadWorkInfo
 
     data class Success(
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val downloadFile: File,
     ) : DownloadWorkInfo
 
     data class Failure(
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val errorMessage: String?,
     ) : DownloadWorkInfo
 
     data class Cancelled(
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
     ) : DownloadWorkInfo
 }
 
