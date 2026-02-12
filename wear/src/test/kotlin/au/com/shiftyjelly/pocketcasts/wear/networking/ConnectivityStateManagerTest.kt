@@ -76,6 +76,7 @@ class ConnectivityStateManagerTest {
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
@@ -90,6 +91,7 @@ class ConnectivityStateManagerTest {
             networks = listOf(buildNetworkStatus(NetworkType.Cell)),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
@@ -107,6 +109,7 @@ class ConnectivityStateManagerTest {
             ),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
@@ -124,6 +127,7 @@ class ConnectivityStateManagerTest {
             ),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
@@ -154,6 +158,7 @@ class ConnectivityStateManagerTest {
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())
@@ -174,6 +179,7 @@ class ConnectivityStateManagerTest {
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
             assertEquals(true, awaitItem())

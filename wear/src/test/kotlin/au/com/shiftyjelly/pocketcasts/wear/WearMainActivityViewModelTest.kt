@@ -15,10 +15,9 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -40,7 +39,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class WearMainActivityViewModelTest {
     @get:Rule
-    val coroutineRule = MainCoroutineRule()
+    val coroutineRule = MainCoroutineRule(StandardTestDispatcher())
 
     @Mock
     private lateinit var playbackManager: PlaybackManager
@@ -71,8 +70,8 @@ class WearMainActivityViewModelTest {
 
     private lateinit var viewModel: WearMainActivityViewModel
 
-    private val tokenFlow = MutableSharedFlow<WatchSyncAuthData?>()
-    private val connectivityStateFlow = MutableStateFlow(true)
+    // Use MutableStateFlow for connectivity so .sample() doesn't block
+    private val connectivityFlow = MutableStateFlow(true)
 
     @Before
     fun setup() {
@@ -81,30 +80,17 @@ class WearMainActivityViewModelTest {
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(SignInState.SignedOut),
         )
-
-        whenever(tokenBundleRepository.flow).thenReturn(tokenFlow)
-
-        whenever(connectivityStateManager.isConnected).thenReturn(connectivityStateFlow)
-    }
-
-    private suspend fun setupPhoneConnectionMock() {
-        whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
+        whenever(tokenBundleRepository.flow).thenReturn(flowOf(null))
+        whenever(connectivityStateManager.isConnected).thenReturn(connectivityFlow)
     }
 
     @After
     fun tearDown() = runTest {
-        // Cancel the ViewModel's sync job to prevent coroutine leakage into next test
-        // The ViewModel stores its sync job, so we can access it via reflection
-        if (::viewModel.isInitialized) {
-            try {
-                val syncJobField = WearMainActivityViewModel::class.java.getDeclaredField("syncJob")
-                syncJobField.isAccessible = true
-                val syncJob = syncJobField.get(viewModel) as? kotlinx.coroutines.Job
-                syncJob?.cancelAndJoin() // Wait for cancellation to complete
-            } catch (e: Exception) {
-                // If reflection fails, that's okay - the test framework will clean up eventually
-            }
-        }
+        testScheduler.advanceUntilIdle()
+    }
+
+    private suspend fun setupPhoneConnectionMock() {
+        whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
     }
 
     @Test
@@ -114,7 +100,7 @@ class WearMainActivityViewModelTest {
 
         // When
         viewModel = createViewModel()
-        // Run current tasks without advancing time to avoid triggering timeout
+        testScheduler.advanceTimeBy(2100)
         testScheduler.runCurrent()
 
         // Then
@@ -129,6 +115,7 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
         testScheduler.runCurrent()
 
         // Manually update state to simulate successful login
@@ -149,6 +136,7 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
         testScheduler.runCurrent()
 
         // When
@@ -163,11 +151,11 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
         testScheduler.runCurrent()
 
         // When - should not throw
         viewModel.retrySync()
-        testScheduler.runCurrent()
 
         // Then - verify state is reset to Syncing after retry
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
@@ -178,6 +166,7 @@ class WearMainActivityViewModelTest {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
         testScheduler.runCurrent()
 
         // When
