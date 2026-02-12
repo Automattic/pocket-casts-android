@@ -202,6 +202,8 @@ class FolderAdapter(
             }
             podcastCardView?.cardElevation = cardElevation
             podcastCardView?.radius = cardCornerRadius
+            podcastCardView?.setCardBackgroundColor(Color.TRANSPARENT)
+            podcastOverlay?.hide()
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
             val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
@@ -214,16 +216,12 @@ class FolderAdapter(
                 .newBuilder()
                 .listener(
                     onSuccess = { _, _ ->
-                        if (!isListLayout) {
-                            podcastTitle.hide()
-                            podcastOverlay?.hide()
-                            // Reset background color on success
-                            podcastCardView?.setCardBackgroundColor(Color.TRANSPARENT)
-                        }
+                        podcastTitle.hide()
+                        podcastOverlay?.hide()
                     },
                     onError = { _, _ ->
                         if (!isListLayout) {
-                            // Show the colored fallback
+                            // Show the fallback podcast title and artwork color
                             podcastTitle.show()
                             podcastOverlay?.show()
                             // Set color background using UUID hash so the same podcast gets the same color each time
@@ -238,10 +236,6 @@ class FolderAdapter(
                 .build()
 
             view.context.imageLoader.enqueue(imageRequest)
-        }
-
-        companion object {
-            private const val FOLDER_COLOR_COUNT = 12
         }
 
         private fun ComposeView.setBadgeContent(
