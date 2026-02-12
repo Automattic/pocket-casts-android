@@ -275,30 +275,6 @@ class DownloadWorkInfoTest {
     }
 
     @Test
-    fun `map work info's run attempt count`() {
-        val workInfo = WorkInfo(
-            id = UUID.randomUUID(),
-            state = WorkInfo.State.ENQUEUED,
-            runAttemptCount = 10,
-            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-        )
-
-        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
-
-        assertEquals(
-            DownloadWorkInfo.Pending(
-                id = workInfo.id,
-                episodeUuid = "episode-id",
-                runAttemptCount = 10,
-                isWifiRequired = false,
-                isPowerRequired = false,
-                isStorageRequired = false,
-            ),
-            downloadInfo,
-        )
-    }
-
-    @Test
     fun `map work info with power constraint`() {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
@@ -341,6 +317,30 @@ class DownloadWorkInfoTest {
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = true,
+            ),
+            downloadInfo,
+        )
+    }
+
+    @Test
+    fun `map work info's run attempt count`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            runAttemptCount = 10,
+            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertEquals(
+            DownloadWorkInfo.Pending(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                runAttemptCount = 10,
+                isWifiRequired = false,
+                isPowerRequired = false,
+                isStorageRequired = false,
             ),
             downloadInfo,
         )
