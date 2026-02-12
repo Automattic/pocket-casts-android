@@ -52,7 +52,7 @@ class DownloadManager2 @Inject constructor(
     DownloadStatusObserver {
 
     private val workManager = WorkManager.getInstance(context)
-    private val constraintsProvider = DownloadConstraintsProvider(workManager, context)
+    private val prerequisitesProvider = DownloadPrerequisitesProvider(workManager, context)
     private val queueController = DownloadQueueController(appDatabase, settings, workManager, context)
     private val statusController = DownloadStatusController(appDatabase, context)
 
@@ -68,7 +68,7 @@ class DownloadManager2 @Inject constructor(
             return
         }
         scope.launch {
-            val constraintsFlow = constraintsProvider.getConstraintsFlow()
+            val constraintsFlow = prerequisitesProvider.getConstraintsFlow()
             val workInfosFlow = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
                 .conflate()
                 .map { infos -> infos.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo) }
@@ -177,8 +177,18 @@ private class DownloadStatusController(
 
     private val pendingStatuses = EpisodeDownloadStatus.entries.filter { it.isPending }
 
-    suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadConstraints) {
-        val statusUpdates = infos.associate { info -> info.episodeUuid to info.toStatusUpdate(constraints) }
+    suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadPrerequisites) {
+        val tooManyAttemptsError = context.getString(LR.string.error_download_too_many_attempts)
+        val defaultErrorMessage = context.getString(LR.string.error_download_generic_failure, "").trim()
+        val statusUpdates = infos.associate { info ->
+            val update = info.toStatusUpdate(
+                constraints = constraints,
+                tooManyAttemptsErrorMessage = tooManyAttemptsError,
+                defaultErrorMessage = defaultErrorMessage,
+            )
+            info.episodeUuid to update
+        }
+
         appDatabase.withTransaction {
             val staleEpisodeUuids = episodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - statusUpdates.keys
             episodeDao.updateDownloadStatuses(staleEpisodeUuids.associateWith { DownloadStatusUpdate.Idle })
@@ -190,12 +200,15 @@ private class DownloadStatusController(
         }
     }
 
-    private fun DownloadWorkInfo.toStatusUpdate(constraints: DownloadConstraints): DownloadStatusUpdate {
+    private fun DownloadWorkInfo.toStatusUpdate(
+        constraints: DownloadPrerequisites,
+        tooManyAttemptsErrorMessage: String,
+        defaultErrorMessage: String,
+    ): DownloadStatusUpdate {
         return when (this) {
             is DownloadWorkInfo.Cancelled -> {
                 if (runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT) {
-                    val errorMessage = context.getString(LR.string.error_download_too_many_attempts)
-                    DownloadStatusUpdate.Failure(errorMessage)
+                    DownloadStatusUpdate.Failure(tooManyAttemptsErrorMessage)
                 } else {
                     DownloadStatusUpdate.Idle
                 }
@@ -220,14 +233,13 @@ private class DownloadStatusController(
             }
 
             is DownloadWorkInfo.Failure -> {
-                val fallbackMessage = context.getString(LR.string.error_download_generic_failure, "").trim()
-                DownloadStatusUpdate.Failure(errorMessage ?: fallbackMessage)
+                DownloadStatusUpdate.Failure(errorMessage ?: defaultErrorMessage)
             }
         }
     }
 }
 
-private data class DownloadConstraints(
+private data class DownloadPrerequisites(
     val isPowerAvailable: Boolean,
     val isNetworkAvailable: Boolean,
     val isUnmeteredAvailable: Boolean,
@@ -235,11 +247,11 @@ private data class DownloadConstraints(
 )
 
 @SuppressLint("RestrictedApi")
-private class DownloadConstraintsProvider(
+private class DownloadPrerequisitesProvider(
     private val workManager: WorkManager,
     private val context: Context,
 ) {
-    fun getConstraintsFlow(): Flow<DownloadConstraints> {
+    fun getConstraintsFlow(): Flow<DownloadPrerequisites> {
         // We intentionally try to use WorkManager's internal constraint trackers when available,
         // because they encapsulate platform/version/device-specific edge cases (API-level quirks,
         // OEM behavior, etc.). There is currently no public WorkManager API that exposes whether
@@ -256,7 +268,7 @@ private class DownloadConstraintsProvider(
         return constraintsFlow.distinctUntilChanged()
     }
 
-    private fun getWorkManagerConstraintsFlow(workManager: WorkManagerImpl): Flow<DownloadConstraints> {
+    private fun getWorkManagerConstraintsFlow(workManager: WorkManagerImpl): Flow<DownloadPrerequisites> {
         fun <T> ConstraintTracker<T>.asFlow() = callbackFlow {
             val listener = object : ConstraintListener<T> {
                 override fun onConstraintChanged(newValue: T) {
@@ -273,7 +285,7 @@ private class DownloadConstraintsProvider(
         val networkFlow = trackers.networkStateTracker.asFlow().map { it.isConnected to it.isMetered }
         val storageTracker = trackers.storageNotLowTracker.asFlow()
         return combine(powerFlow, networkFlow, storageTracker) { isCharging, (isConnected, isMetered), isStorageNotLow ->
-            DownloadConstraints(
+            DownloadPrerequisites(
                 isPowerAvailable = isCharging,
                 isNetworkAvailable = isConnected,
                 isUnmeteredAvailable = !isMetered,
@@ -282,11 +294,11 @@ private class DownloadConstraintsProvider(
         }
     }
 
-    private fun getInAppConstraintsFlow(): Flow<DownloadConstraints> {
+    private fun getInAppConstraintsFlow(): Flow<DownloadPrerequisites> {
         return flow {
             while (true) {
                 emit(
-                    DownloadConstraints(
+                    DownloadPrerequisites(
                         isPowerAvailable = Power.isConnected(context),
                         isNetworkAvailable = Network.isConnected(context),
                         isUnmeteredAvailable = Network.isUnmeteredConnection(context),
