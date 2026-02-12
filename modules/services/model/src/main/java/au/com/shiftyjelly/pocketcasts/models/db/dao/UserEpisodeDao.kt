@@ -82,7 +82,7 @@ abstract class UserEpisodeDao {
     protected abstract suspend fun findEpisodesByUuidsUnsafe(episodeUuids: Collection<String>): List<UserEpisode>
 
     @Transaction
-    open suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode> {
+    open suspend fun findEpisodesByUuids(episodeUuids: Collection<String>): List<UserEpisode> {
         return episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
             findEpisodesByUuidsUnsafe(chunk)
         }
