@@ -62,6 +62,14 @@ class DownloadManager2 @Inject constructor(
         scope.launch { queueController.addToQueue(episodeUuids, downloadType) }
     }
 
+    override fun cancelAll(episodeUuids: Collection<String>) {
+        queueController.removeFromQueue(episodeUuids)
+    }
+
+    override fun cancelAll(podcastUuid: String) {
+        queueController.removeFromQueue(podcastUuid)
+    }
+
     @OptIn(FlowPreview::class)
     override fun monitorDownloadStatus() {
         if (isMonitoring.getAndSet(true)) {
@@ -98,7 +106,7 @@ private class DownloadQueueController(
             val args = episode.toDownloadArgs(downloadType)
             val (request, constraints) = DownloadEpisodeWorker.createWorkRequest(args)
             val operation = workManager.enqueueUniqueWork(
-                uniqueWorkName = DownloadEpisodeWorker.episodeWorkerName(episode.uuid),
+                uniqueWorkName = DownloadEpisodeWorker.episodeTag(episode.uuid),
                 // TODO(PCDROID-429): Check if work should be replaced due to looser constraints
                 existingWorkPolicy = ExistingWorkPolicy.KEEP,
                 request = request,
@@ -112,8 +120,14 @@ private class DownloadQueueController(
 
     fun removeFromQueue(episodeUuids: Collection<String>) {
         episodeUuids.forEach { episodeUuid ->
-            workManager.cancelUniqueWork(DownloadEpisodeWorker.episodeWorkerName(episodeUuid))
+            workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
+            workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(episodeUuid))
         }
+    }
+
+    fun removeFromQueue(podcastUuid: String) {
+        workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
+        workManager.cancelAllWorkByTag(UpdateShowNotesTask.podcastTag(podcastUuid))
     }
 
     fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
@@ -140,6 +154,7 @@ private class DownloadQueueController(
     private fun BaseEpisode.toDownloadArgs(downloadType: DownloadType) = when (this) {
         is PodcastEpisode -> DownloadEpisodeWorker.Args(
             episodeUuid = uuid,
+            podcastUuid = podcastUuid,
             waitForWifi = when (downloadType) {
                 DownloadType.UserTriggered -> false
                 DownloadType.Automatic -> settings.autoDownloadUnmeteredOnly.value
@@ -152,6 +167,7 @@ private class DownloadQueueController(
 
         is UserEpisode -> DownloadEpisodeWorker.Args(
             episodeUuid = uuid,
+            podcastUuid = podcastOrSubstituteUuid,
             waitForWifi = when (downloadType) {
                 DownloadType.UserTriggered -> false
                 DownloadType.Automatic -> settings.cloudDownloadOnlyOnWifi.value
