@@ -33,6 +33,7 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.UUID
 import javax.net.ssl.SSLException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -310,6 +311,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                     when (info.state) {
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             DownloadWorkInfo.Pending(
+                                id = info.id,
                                 episodeUuid = episodeUuid,
                                 runAttemptCount = info.runAttemptCount,
                                 isWifiRequired = isWifiRequired,
@@ -323,11 +325,13 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                             // For this reason we use a separate flag.
                             if (info.progress.getBoolean(IS_WORK_EXECUTING, false)) {
                                 DownloadWorkInfo.InProgress(
+                                    id = info.id,
                                     episodeUuid = episodeUuid,
                                     runAttemptCount = info.runAttemptCount,
                                 )
                             } else {
                                 DownloadWorkInfo.Pending(
+                                    id = info.id,
                                     episodeUuid = episodeUuid,
                                     runAttemptCount = info.runAttemptCount,
                                     isWifiRequired = isWifiRequired,
@@ -342,6 +346,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                                 "Output file path is missing for the downloaded episode $episodeUuid"
                             }
                             DownloadWorkInfo.Success(
+                                id = info.id,
                                 episodeUuid = episodeUuid,
                                 runAttemptCount = info.runAttemptCount,
                                 downloadFile = File(filePath),
@@ -351,6 +356,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData.getString(ERROR_MESSAGE_KEY)
                             DownloadWorkInfo.Failure(
+                                id = info.id,
                                 episodeUuid = episodeUuid,
                                 runAttemptCount = info.runAttemptCount,
                                 errorMessage = errorMessage,
@@ -359,6 +365,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                         WorkInfo.State.CANCELLED -> {
                             DownloadWorkInfo.Cancelled(
+                                id = info.id,
                                 episodeUuid = episodeUuid,
                                 runAttemptCount = info.runAttemptCount,
                             )
@@ -370,10 +377,12 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 }
 
 sealed interface DownloadWorkInfo {
+    val id: UUID
     val episodeUuid: String
     val runAttemptCount: Int
 
     data class Pending(
+        override val id: UUID,
         override val episodeUuid: String,
         override val runAttemptCount: Int,
         val isWifiRequired: Boolean,
@@ -382,23 +391,27 @@ sealed interface DownloadWorkInfo {
     ) : DownloadWorkInfo
 
     data class InProgress(
+        override val id: UUID,
         override val episodeUuid: String,
         override val runAttemptCount: Int,
     ) : DownloadWorkInfo
 
     data class Success(
+        override val id: UUID,
         override val episodeUuid: String,
         override val runAttemptCount: Int,
         val downloadFile: File,
     ) : DownloadWorkInfo
 
     data class Failure(
+        override val id: UUID,
         override val episodeUuid: String,
         override val runAttemptCount: Int,
         val errorMessage: String?,
     ) : DownloadWorkInfo
 
     data class Cancelled(
+        override val id: UUID,
         override val episodeUuid: String,
         override val runAttemptCount: Int,
     ) : DownloadWorkInfo
@@ -429,3 +442,4 @@ internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
 internal const val ERROR_MESSAGE_KEY = "error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
+private const val MAX_ATTEMPT_COUNT = 3
