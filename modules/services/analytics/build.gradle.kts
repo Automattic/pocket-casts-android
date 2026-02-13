@@ -16,6 +16,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.dagger.hilt.android)
+    api(libs.eventhorizon)
 
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
@@ -32,6 +33,8 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-    testImplementation(projects.modules.services.sharedtest)
     testImplementation(libs.coroutines.test)
+
+    testImplementation(projects.modules.services.sharedtest)
+    testImplementation(projects.modules.services.analytics.testing)
 }

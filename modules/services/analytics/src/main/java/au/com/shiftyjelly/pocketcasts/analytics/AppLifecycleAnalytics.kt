@@ -1,46 +1,35 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import com.automattic.eventhorizon.ApplicationClosedEvent
+import com.automattic.eventhorizon.ApplicationInstalledEvent
+import com.automattic.eventhorizon.ApplicationOpenedEvent
+import com.automattic.eventhorizon.ApplicationUpdatedEvent
+import com.automattic.eventhorizon.EventHorizon
 import javax.inject.Inject
+import kotlin.time.TimeSource
 
 class AppLifecycleAnalytics @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
+    private val timeSource: TimeSource,
 ) {
-    /* The date the app was last opened, used for calculating time in app */
-    private var applicationOpenedDate: Date? = null
+    private var timeMark = timeSource.markNow()
 
-    // Called when Pocket Casts is installed on a device that does not already have a previous version of
-    // the app installed
     fun onNewApplicationInstall() {
-        analyticsTracker.track(AnalyticsEvent.APPLICATION_INSTALLED)
+        eventHorizon.track(ApplicationInstalledEvent)
     }
 
-    // Called when Pocket Casts is upgraded on a device
     fun onApplicationUpgrade(previousVersionCode: Int) {
-        analyticsTracker.track(
-            AnalyticsEvent.APPLICATION_UPDATED,
-            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode),
-        )
+        eventHorizon.track(ApplicationUpdatedEvent(previousVersion = previousVersionCode.toString()))
     }
 
     fun onApplicationEnterForeground() {
-        applicationOpenedDate = Date()
-        analyticsTracker.track(AnalyticsEvent.APPLICATION_OPENED)
+        timeMark = timeSource.markNow()
+        eventHorizon.track(ApplicationOpenedEvent)
     }
 
     fun onApplicationEnterBackground() {
-        val properties: MutableMap<String, Any> = HashMap()
-        applicationOpenedDate?.let {
-            properties[KEY_TIME_IN_APP] = TimeUnit.MILLISECONDS.toSeconds(it.timeIntervalSinceNow()).toInt()
-            applicationOpenedDate = null
-        }
-        analyticsTracker.track(AnalyticsEvent.APPLICATION_CLOSED, properties)
-    }
-
-    companion object {
-        const val KEY_PREVIOUS_VERSION_CODE = "previous_version_code"
-        const val KEY_TIME_IN_APP = "time_in_app" // time in seconds
+        val elapsedSeconds = timeMark.elapsedNow().inWholeSeconds
+        timeMark = timeSource.markNow()
+        eventHorizon.track(ApplicationClosedEvent(timeInApp = elapsedSeconds))
     }
 }

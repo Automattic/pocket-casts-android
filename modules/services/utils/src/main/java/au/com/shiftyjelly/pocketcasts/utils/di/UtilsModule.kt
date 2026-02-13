@@ -10,12 +10,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.time.Clock
+import kotlin.time.TimeSource
 
 @Module
 @InstallIn(SingletonComponent::class)
 object UtilsModule {
     @Provides
     fun provideClock(): Clock = Clock.systemUTC()
+
+    @Provides
+    fun provideTimeSource(): TimeSource = TimeSource.Monotonic
 
     @Provides
     fun provideUuidProvider(): UUIDProvider = UUIDProviderImpl()

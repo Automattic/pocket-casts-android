@@ -69,6 +69,7 @@ include(":modules:features:widgets")
 
 // services
 include(":modules:services:analytics")
+include(":modules:services:analytics:testing")
 include(":modules:services:compose")
 include(":modules:services:coroutines")
 include(":modules:services:crashlogging")
