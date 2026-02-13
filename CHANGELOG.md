@@ -5,6 +5,8 @@
         ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
     *   On the podcasts tab show the podcast title when artwork is missing
         ([#4973](https://github.com/Automattic/pocket-casts-android/pull/4973))
+    *   Fix Up Next not syncing for free users when a custom file is added to it
+        ([#4973](https://github.com/Automattic/pocket-casts-android/pull/4973))
 
 8.5
 -----
