@@ -261,6 +261,7 @@ class WinbackViewModel @Inject constructor(
             },
             tier = plan.tier,
             billingCycle = plan.billingCycle,
+            isInstallment = plan.isInstallment,
         )
     }
 
@@ -344,6 +345,7 @@ class WinbackViewModel @Inject constructor(
                 currentScubscription?.billingCycle?.let { billingCycle ->
                     put("frequency", billingCycle.analyticsValue)
                 }
+                put("is_installment", (currentScubscription?.isInstallment ?: false).toString())
             },
         )
     }
@@ -471,8 +473,9 @@ internal data class WinbackOffer(
     val formattedPrice: String,
     val tier: SubscriptionTier,
     val billingCycle: BillingCycle,
+    val isInstallment: Boolean,
 ) {
-    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
+    val productId get() = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
 }
 
 internal enum class FailureReason {
