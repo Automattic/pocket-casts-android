@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.utils.Util

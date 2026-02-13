@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +29,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import com.google.android.horologist.compose.material.Chip
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -161,7 +160,7 @@ private fun SuccessContent(modifier: Modifier = Modifier) {
                 .fillMaxSize(),
         ) {
             Icon(
-                imageVector = Icons.Default.CheckCircle,
+                painter = painterResource(IR.drawable.ic_check),
                 tint = WearColors.success,
                 contentDescription = stringResource(LR.string.watch_sync_success),
                 modifier = Modifier.size(52.dp),
@@ -212,7 +211,7 @@ private fun ErrorContent(
                     modifier = Modifier.padding(top = 16.dp),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Error,
+                        painter = painterResource(IR.drawable.ic_failedwarning),
                         tint = MaterialTheme.colors.error,
                         contentDescription = stringResource(LR.string.error),
                         modifier = Modifier.size(52.dp),
