@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-17 16:54:03+0000
+Translation-Revision-Date: 2026-02-05 18:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Плейлисты могут содержать только выпуски подкастов.</string>
+    <string name="playlist_limit_reached">Плейлисты могут содержать не более %d вып.</string>
+    <string name="playlist_limit_almost_full">Плейлист почти заполнен. Попробуйте снизить число выпусков.</string>
+    <string name="podcasts_add_episode">Добавить</string>
+    <string name="add_to_up_next_bottom">Воспроизвести последний в списке «Следующие»</string>
+    <string name="add_to_up_next_top">Воспроизвести следующий в списке «Следующие»</string>
+    <string name="winback_cancel_subscription_perk_installment">У вас оформлен тарифный план в рассрочку на 12 месяцев. В случае отмены вы лишитесь доступа, но Google Play будет по-прежнему взимать плату за оставшиеся месяцы.</string>
+    <string name="winback_cancel_subscription_header_description_installment">При отмене действие вашей подписки Pocket Casts прекращается.\nДействие тарифного плана Google Play продолжится.</string>
+    <string name="winback_cancel_subscription_perk_history">Ваши подкасты и история прослушиваний останутся доступными.</string>
+    <string name="price_per_month_for_months">%1$s в мес. в течение %2$d мес.</string>
     <string name="no_episodes">Нет выпусков</string>
     <string name="more_rules">Другие правила</string>
     <string name="player_notification_skip_forward_seconds">На %d сек вперёд</string>
@@ -44,9 +54,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">В этом году вы прослушали на 500% больше — добро пожаловать в клуб</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">С нуля — в чемпионы!</string>
     <string name="end_of_year_stories_year_over_year_title_flat">В %1$s году вы посвятили прослушиванию столько же времени, сколько и в предыдущем.</string>
-    <string name="settings_storage_normalize_episode_titles_description">Статус: %1$s\n Некоторые элементы приложения выполняют поиск по выпускам, для которого требуются стандартизованные заголовки. Если нажать эту настройку, будет выполнена стандартизация базы данных, если выпуски ещё не стандартизованы.</string>
-    <string name="settings_storage_normalize_episode_titles">Стандартизовать заголовки выпусков</string>
-    <string name="normalization_started">Стандартизация запущена</string>
     <string name="not_normalized">Не стандартизован</string>
     <string name="normalized">Стандартизован</string>
     <string name="database">База данных</string>
@@ -466,6 +473,7 @@ Language: ru
     <string name="shuffle_whats_new_title">Представляем режим случайного воспроизведения</string>
     <string name="chapter_time_remaining_content_description">%s до конца главы</string>
     <string name="chapter_count_summary">%1$d из %2$d</string>
+    <string name="referrals_share_text">Здравствуйте!\n\nЭто гостевой пропуск на %1$s в Pocket Casts Plus — мой любимый плеер подкастов. В нём есть множество уникальных функций, которых больше нет нигде: закладки, папки и многое другое. Надеюсь, вам он тоже понравится!</string>
     <string name="files_plus_prompt">Загружайте свои файлы с Pocket Casts Plus и многое другое</string>
     <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
     <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>
@@ -641,7 +649,6 @@ Language: ru
     <string name="widget_preview_time_left_2">Ещё 12 мин</string>
     <string name="widget_preview_time_left_1">Ещё 25 мин</string>
     <string name="hour_and_minutes">1 ч %d мин</string>
-    <string name="hours_and_minutes">%d ч %d мин</string>
     <string name="player_sleep_time_fired_end_of_chapter">Таймер сна остановился в конце главы.</string>
     <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
     <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>

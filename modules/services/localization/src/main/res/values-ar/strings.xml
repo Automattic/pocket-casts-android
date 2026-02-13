@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 13:54:04+0000
+Translation-Revision-Date: 2026-02-05 13:54:07+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">لا يمكن أن تحتوي قوائم التشغيل إلا على حلقات بودكاست.</string>
+    <string name="playlist_limit_reached">يمكن أن تحتوي قائمة التشغيل على ما يصل إلى %d حلقة فقط.</string>
+    <string name="playlist_limit_almost_full">قائمة التشغيل أوشكت على الامتلاء. حاول إضافة عدد أقل من الحلقات.</string>
+    <string name="podcasts_add_episode">إضافة</string>
+    <string name="add_to_up_next_bottom">التشغيل أخيرًا في \"التالي للتشغيل\"</string>
+    <string name="add_to_up_next_top">التشغيل بعد ذلك في \"التالي للتشغيل\"</string>
+    <string name="winback_cancel_subscription_perk_installment">أنت مشترك في خطة تقسيط لمدة 12 شهرًا. سيؤدي الإلغاء إلى إنهاء وصولك، لكن سيستمر Google Play في تحصيل رسوم الأشهر المتبقية.</string>
+    <string name="winback_cancel_subscription_header_description_installment">سيؤدي الإلغاء إلى إنهاء اشتراكك في Pocket Casts.\nستستمر خطة الدفع عبر Google Play.</string>
+    <string name="winback_cancel_subscription_perk_history">ستظل ملفات البودكاست وسجل الاستماع الخاص بك متاحة.</string>
+    <string name="price_per_month_for_months">⁦%1$s⁩شهريًا لمدة ⁦%2$d⁩ من الشهور</string>
     <string name="no_episodes">لا توجد حلقات</string>
     <string name="more_rules">المزيد من القواعد</string>
     <string name="player_notification_skip_forward_seconds">تقديم %d ثوانٍ</string>
@@ -44,9 +54,6 @@ Language: ar
     <string name="end_of_year_stories_year_over_year_title_flat">ظل استماع ⁦%1$s⁩ الخاص بك ثابتًا</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">لقد استمعت بنسبة تفوق 500% هذا العام — أهلاً بك بين المستمعين المميزين</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">من صفر إلى بطل!</string>
-    <string name="settings_storage_normalize_episode_titles_description">الحالة: ⁦%1$s⁩\nتستخدم بعض أجزاء التطبيق البحث في الحلقة الذي يتطلب عناوين مُوحّدة. يؤدي النقر على هذا الإعداد إلى تشغيل عملية توحيد قاعدة البيانات إذا لم يتم توحيد الحلقات بالفعل.</string>
-    <string name="settings_storage_normalize_episode_titles">توحيد عناوين الحلقات</string>
-    <string name="normalization_started">تم بدء عملية التوحيد</string>
     <string name="not_normalized">غير مُوحّد</string>
     <string name="normalized">مُوحّد</string>
     <string name="database">قاعدة البيانات</string>
@@ -466,6 +473,7 @@ Language: ar
     <string name="shuffle_whats_new_title">طرح مقدمة حول الخلط</string>
     <string name="chapter_time_remaining_content_description">تم ترك %s في الفصل</string>
     <string name="chapter_count_summary">⁦%1$d⁩ من ⁦%2$d⁩</string>
+    <string name="referrals_share_text">مرحبًا!\n\nإليك ⁦%1$s⁩ دعوة ضيف إلى Pocket Casts Plus - مشغّل البودكاست المفضل لدي. يحتوي على ميزات فريدة مثل العلامات المرجعية والمجلدات والمزيد، وهي أشياء لن تجدها في أي مكان آخر. أعتقد أنك ستحبه أيضًا!</string>
     <string name="files_plus_prompt">رفع ملفاتك باستخدام Pocket Casts Plus، والمزيد</string>
     <string name="icons_plus_prompt">الحصول على أيقونات تطبيق حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="themes_plus_prompt">الحصول على قوالب حصرية من خلال Pocket Casts Plus، والمزيد</string>
@@ -641,7 +649,6 @@ Language: ar
     <string name="widget_preview_episode_in_up_next_title">الحلقة التالية</string>
     <string name="widget_preview_episode_title">عنوان الحلقة</string>
     <string name="hour_and_minutes">ساعة واحدة و %d من الدقائق</string>
-    <string name="hours_and_minutes">%d من الساعات و%d من الدقائق</string>
     <string name="player_sleep_time_fired_end_of_chapter">توقفَ مؤقت السكون في نهاية الفصل الخاص بك.</string>
     <string name="player_sleep_in_chapters">السكون في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>

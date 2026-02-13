@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-01-25 23:20:03+0000
+Translation-Revision-Date: 2026-02-09 23:18:27+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Les llistes de reproducció només poden tenir episodis de pòdcasts.</string>
+    <string name="playlist_limit_reached">Les llistes de reproducció només poden tenir fins a %d episodis.</string>
+    <string name="playlist_limit_almost_full">La llista de reproducció està gairebé plena. Prova d\'afegir menys episodis.</string>
+    <string name="podcasts_add_episode">Afegir</string>
+    <string name="add_to_up_next_bottom">Reprodueix al final de \'Tot seguit\'</string>
+    <string name="add_to_up_next_top">Reprodueix després a \'Tot seguit\'</string>
     <string name="winback_cancel_subscription_perk_installment">Tens un pla de pagament a terminis de 12 mesos. Si cancel·les, finalitzarà el teu accés, però Google Play continuarà cobrant els mesos restants.</string>
     <string name="winback_cancel_subscription_header_description_installment">La cancel·lació acaba la teva subscripció a Pocket Casts. \nEl teu pla de pagament de Google Play continuarà.</string>
     <string name="winback_cancel_subscription_perk_history">Els teus pòdcasts i l\'historial d\'escolta seguiran sent accessibles.</string>
@@ -51,9 +57,6 @@ Language: ca
     <string name="database">Base de dades</string>
     <string name="normalized">Normalitzat</string>
     <string name="not_normalized">No normalitzat</string>
-    <string name="normalization_started">Normalització començada</string>
-    <string name="settings_storage_normalize_episode_titles">Normalitzar els títols dels episodis</string>
-    <string name="settings_storage_normalize_episode_titles_description">Estat: %1$s\nAlgunes parts de l\'aplicació utilitzen una cerca d\'episodis que requereix títols normalitzats. Tocar aquesta configuració executa la normalització de la base de dades si els episodis no estan normalitzats ja.</string>
     <string name="end_of_year_story_top_podcast_stats_hours">%1$s i %2$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s i %3$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_subtitle">No hi ha res que sigui més “tu” que això</string>
@@ -470,6 +473,7 @@ Language: ca
     <string name="shuffle_whats_new_title">Presentem la reproducció aleatòria</string>
     <string name="chapter_time_remaining_content_description">%s queden al capítol</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
+    <string name="referrals_share_text">Ep!\n\nAquí tens  %1$s  invitacions per a Pocket Casts Plus, el meu reproductor de pòdcasts favorit. Està ple de funcions úniques com ara marcadors, carpetes i més, que no trobaràs enlloc més. Crec que també t\'encantarà!</string>
     <string name="files_plus_prompt">Carrega els teus arxius amb Pocket Casts Plus, i més</string>
     <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
     <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>
@@ -645,7 +649,7 @@ Language: ca
     <string name="widget_preview_episode_in_up_next_title">Episodi a \'Tot seguit\'</string>
     <string name="widget_preview_episode_title">Títol de l\'episodi</string>
     <string name="hour_and_minutes">1 hora i %d minuts</string>
-    <string name="hours_and_minutes">%d hores i %d minuts</string>
+    <string name="hours_and_minutes">%1$d hores i %2$d minuts</string>
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>

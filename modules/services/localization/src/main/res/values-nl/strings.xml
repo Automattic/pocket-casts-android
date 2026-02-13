@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-05 11:54:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Afspeellijsten mogen alleen podcastafleveringen bevatten.</string>
+    <string name="playlist_limit_reached">Afspeellijsten kunnen maximaal %d afleveringen bevatten.</string>
+    <string name="playlist_limit_almost_full">Afspeellijst is bijna vol. Voeg minder afleveringen toe.</string>
+    <string name="podcasts_add_episode">Toevoegen</string>
+    <string name="add_to_up_next_bottom">Als laatste afspelen in Hierna</string>
+    <string name="add_to_up_next_top">Hierna afspelen in Hierna</string>
+    <string name="winback_cancel_subscription_perk_installment">Je hebt een abonnement van 12 maanden. Als je je toegang annuleert, wordt Google Play de resterende maanden in rekening gebracht.</string>
+    <string name="winback_cancel_subscription_header_description_installment">Door te annuleren, wordt je Pocket Casts-abonnement beëindigd.\nJe Google Play-betalingsplan wordt voortgezet.</string>
+    <string name="winback_cancel_subscription_perk_history">Je podcasts en luistergeschiedenis blijven toegankelijk.</string>
+    <string name="price_per_month_for_months">%1$sper maand voor %2$d maanden</string>
     <string name="no_episodes">Geen afleveringen</string>
     <string name="more_rules">Meer regels</string>
     <string name="set_volume">Volume instellen</string>
@@ -44,9 +54,6 @@ Language: nl
     <string name="end_of_year_stories_year_over_year_title_flat">Je luistergedrag in %1$s bleef stabiel</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Je hebt dit jaar 500% meer geluisterd - welkom bij de club</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Van nul naar held!</string>
-    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nSommige delen van de app gebruiken een afleveringzoekopdracht die genormaliseerde titels vereist. Door op deze instelling te tikken, wordt de database genormaliseerd als de afleveringen nog niet genormaliseerd zijn.</string>
-    <string name="settings_storage_normalize_episode_titles">Afleveringstitels normaliseren</string>
-    <string name="normalization_started">Normalisatie gestart</string>
     <string name="not_normalized">Niet genormaliseerd</string>
     <string name="normalized">Genormaliseerd</string>
     <string name="database">Database</string>
@@ -465,6 +472,7 @@ Language: nl
     <string name="shuffle_whats_new_title">Maak kennis met shuffle</string>
     <string name="chapter_time_remaining_content_description">nog %s te gaan in het hoofdstuk</string>
     <string name="chapter_count_summary">%1$d van %2$d</string>
+    <string name="referrals_share_text">Hallo!\n\nHier is een %1$s gastenpas voor Pocket Casts Plus, mijn favoriete podcastspeler. Het zit vol met unieke functies die je nergens anders vindt, zoals bladwijzers, mappen en meer. Jij zal er vast ook dol op zijn!</string>
     <string name="files_plus_prompt">Upload je bestanden met Pocket Casts Plus, en meer</string>
     <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
     <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>
@@ -640,7 +648,6 @@ Language: nl
     <string name="widget_preview_episode_in_up_next_title">Aflevering in Hierna</string>
     <string name="widget_preview_episode_title">Titel van aflevering</string>
     <string name="hour_and_minutes">1 uur en %d minuten</string>
-    <string name="hours_and_minutes">%d uur %d minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Slaaptimer is gestopt aan het einde van het hoofdstuk.</string>
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>

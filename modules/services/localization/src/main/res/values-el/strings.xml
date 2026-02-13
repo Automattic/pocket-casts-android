@@ -406,7 +406,6 @@ Language: el_GR
     <string name="widget_preview_time_left_2">12λ ακόμη</string>
     <string name="widget_preview_time_left_3">55λ ακόμη</string>
     <string name="widget_preview_time_left_4">1ώ 36λ ακόμη</string>
-    <string name="hours_and_minutes">%d ώρες και %d λεπτά</string>
     <string name="hour_and_minutes">1 ώρα και %d λεπτά</string>
     <string name="player_sleep_time_fired_end_of_chapter">Ο χρονοδιακόπτης ύπνου σταμάτησε στο τέλος του κεφαλαίου σου.</string>
     <string name="player_sleep_in_chapters">Ύπνος σε %d κεφάλαια</string>
