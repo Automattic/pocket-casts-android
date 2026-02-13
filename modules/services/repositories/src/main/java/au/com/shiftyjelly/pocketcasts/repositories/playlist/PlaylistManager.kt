@@ -19,6 +19,8 @@ interface PlaylistManager {
 
     suspend fun getAutoPlayEpisodes(playlistUuid: String, currentEpisodeUuid: String?): List<PodcastEpisode>
 
+    suspend fun getAutoDownloadPlaylists(): List<Playlist>
+
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?>
 
     fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?>

@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 sealed interface Playlist {
     val uuid: String
@@ -35,7 +36,19 @@ sealed interface Playlist {
         val displayedEpisodeCount: Int,
         val displayedAvailableEpisodeCount: Int,
         val archivedEpisodeCount: Int,
-    )
+    ) {
+        companion object {
+            val ForPreview = Metadata(
+                playbackDurationLeft = 0.seconds,
+                artworkUuids = emptyList(),
+                isShowingArchived = true,
+                totalEpisodeCount = 0,
+                displayedEpisodeCount = 0,
+                displayedAvailableEpisodeCount = 0,
+                archivedEpisodeCount = 0,
+            )
+        }
+    }
 
     enum class Type(
         val analyticsValue: String,

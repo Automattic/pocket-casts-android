@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -49,8 +50,15 @@ class AutoDownloadEpisodeProvider @Inject constructor(
 
     private suspend fun getPlaylistEpisodes(): Set<String> {
         return playlistManager
-            .getAutoDownloadEpisodes()
-            .mapTo(mutableSetOf(), PodcastEpisode::uuid)
+            .getAutoDownloadPlaylists()
+            .flatMapTo(mutableSetOf()) { playlist ->
+                playlist.episodes
+                    .asSequence()
+                    .mapNotNull(PlaylistEpisode::toPodcastEpisode)
+                    .filter(BaseEpisode::canDownload)
+                    .map(BaseEpisode::uuid)
+                    .take(playlist.settings.autoDownloadLimit)
+            }
     }
 
     private fun getUpNextAutoEpisodes(): Set<String> {
