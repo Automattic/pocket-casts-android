@@ -102,8 +102,9 @@ data class SubscriptionPlans private constructor(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
         offer: SubscriptionOffer,
+        isInstallment: Boolean = false,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
-        val key = SubscriptionPlan.Key(tier, billingCycle, offer)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer, isInstallment)
         return offerPlans[key] ?: missingPlanResult(key)
     }
 
@@ -202,7 +203,7 @@ data class SubscriptionPlans private constructor(
 
         private fun isValidInstallment(key: SubscriptionPlan.Key) = { product: Product ->
             if (key.isInstallment) {
-                key.offer == null && product.pricingPlans.basePlan.installmentPlanDetails != null
+                product.pricingPlans.basePlan.installmentPlanDetails != null
             } else {
                 true
             }
@@ -239,6 +240,7 @@ data class SubscriptionPlans private constructor(
                         key.billingCycle,
                         key.offer,
                         matchingOfferPlan.pricingPhases,
+                        key.isInstallment,
                     ),
                 )
             }
@@ -283,8 +285,9 @@ sealed interface SubscriptionPlan {
         override val billingCycle: BillingCycle,
         override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
+        val isInstallment: Boolean = false,
     ) : SubscriptionPlan {
-        override val key get() = Key(tier, billingCycle, offer)
+        override val key get() = Key(tier, billingCycle, offer, isInstallment)
     }
 
     data class Key(
@@ -295,7 +298,7 @@ sealed interface SubscriptionPlan {
     ) {
         val productId: String? = productId(tier, billingCycle, isInstallment)
         val basePlanId: String? = basePlanId(tier, billingCycle, isInstallment)
-        val offerId = offer?.offerId(tier, billingCycle)
+        val offerId = offer?.offerId(tier, billingCycle, isInstallment)
     }
 
     companion object {
@@ -424,6 +427,7 @@ enum class SubscriptionOffer(
     fun offerId(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
+        isInstallment: Boolean = false,
     ) = when (this) {
         IntroOffer -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
@@ -437,7 +441,12 @@ enum class SubscriptionOffer(
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-trial-30days"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    "plus-yearly-installments-trial-30days"
+                } else {
+                    "plus-yearly-trial-30days"
+                }
             }
 
             SubscriptionTier.Patron -> null
@@ -455,7 +464,12 @@ enum class SubscriptionOffer(
         Winback -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> "plus-monthly-winback"
-                BillingCycle.Yearly -> "plus-yearly-winback"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    "plus-yearly-installments-winback"
+                } else {
+                    "plus-yearly-winback"
+                }
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {

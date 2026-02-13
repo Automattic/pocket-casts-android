@@ -291,10 +291,7 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlanWithOffer(): SubscriptionPlan {
-            // When installment plan feature is enabled, show installment plan instead of trial/intro offer
-            if (FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)) {
-                return plusYearlyPlan()
-            }
+            val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
 
             val offer = if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
                 SubscriptionOffer.IntroOffer
@@ -302,7 +299,12 @@ sealed class OnboardingUpgradeFeaturesState {
                 SubscriptionOffer.Trial
             }
 
-            val offerPlan = subscriptionPlans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, offer).getOrNull()
+            val offerPlan = subscriptionPlans.findOfferPlan(
+                SubscriptionTier.Plus,
+                BillingCycle.Yearly,
+                offer,
+                isInstallment = isInstallmentEnabled,
+            ).getOrNull()
             return if (offerPlan == null || OnboardingSubscriptionPlan.create(offerPlan).getOrNull() == null) {
                 plusYearlyPlan()
             } else {
