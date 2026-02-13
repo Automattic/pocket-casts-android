@@ -44,10 +44,10 @@ internal class EpisodeDownloader(
         } catch (error: Throwable) {
             Result.ExceptionFailure(error)
         } finally {
-            progressCache.clearProgress(episode.uuid)
             runCatching { tempFile.delete() }
         }
         if (result is Result.Failure) {
+            progressCache.clearProgress(episode.uuid)
             runCatching { downloadFile.delete() }
         }
         return result
