@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
-import androidx.room.util.copy
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
