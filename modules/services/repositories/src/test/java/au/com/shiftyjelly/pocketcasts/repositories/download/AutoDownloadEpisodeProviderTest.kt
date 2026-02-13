@@ -395,4 +395,3 @@ private class PodcastEpisodeDsl {
     var isArchived = false
     var isCompleted = false
 }
-
