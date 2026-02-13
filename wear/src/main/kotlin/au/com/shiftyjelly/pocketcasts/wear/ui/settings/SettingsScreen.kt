@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import au.com.shiftyjelly.pocketcasts.wear.ui.formatRefreshTime
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
@@ -87,6 +89,7 @@ private fun Content(
     onAboutClick: () -> Unit,
     onHelpClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     ScalingLazyColumn(columnState = scrollState) {
         item {
             ScreenHeaderChip(LR.string.settings)
@@ -146,6 +149,29 @@ private fun Content(
                     )
                 },
                 onClick = onRefreshClick,
+            )
+        }
+
+        item {
+            val refreshStatusText = when (val refreshState = state.refreshState) {
+                is RefreshState.Success -> {
+                    val timeText = formatRefreshTime(refreshState.date, context)
+                    stringResource(LR.string.profile_last_refresh_at, timeText)
+                }
+
+                is RefreshState.Refreshing -> stringResource(LR.string.profile_refreshing)
+
+                is RefreshState.Failed -> stringResource(LR.string.profile_refresh_failed)
+
+                is RefreshState.Never, null -> stringResource(LR.string.profile_refreshed_never)
+            }
+
+            Text(
+                text = refreshStatusText,
+                style = MaterialTheme.typography.caption3,
+                color = MaterialTheme.colors.onSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             )
         }
 

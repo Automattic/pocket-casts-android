@@ -14,8 +14,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -27,11 +29,12 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.whenever
 
-@RunWith(MockitoJUnitRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(MockitoJUnitRunner.Silent::class)
 class PodcastViewModelTest {
 
     @get:Rule
-    val coroutineRule = MainCoroutineRule()
+    val coroutineRule = MainCoroutineRule(StandardTestDispatcher())
 
     @Mock
     private lateinit var episodeManager: EpisodeManager
@@ -63,17 +66,17 @@ class PodcastViewModelTest {
     }
 
     @Test
-    fun `when podcast not found, then emits Empty state`() = runTest {
+    fun `when podcast not found, then emits Empty state`() = runTest(coroutineRule.testDispatcher) {
         whenever(podcastManager.findPodcastByUuid(testPodcastUuid)).thenReturn(null)
-        viewModel = createViewModel()
-        viewModel.uiState.test {
+
+        createViewModel().uiState.test {
             val state = awaitItem()
             assertTrue(state is PodcastViewModel.UiState.Empty)
         }
     }
 
     @Test
-    fun `when podcast found with episodes, then emits Loaded state with episodes`() = runTest {
+    fun `when podcast found with episodes, then emits Loaded state with episodes`() = runTest(coroutineRule.testDispatcher) {
         val podcast = createTestPodcast(uuid = testPodcastUuid)
         val episodes = listOf(
             createTestEpisode(uuid = "ep1", title = "Episode 1"),
@@ -84,9 +87,8 @@ class PodcastViewModelTest {
         whenever(episodeManager.findEpisodesByPodcastOrderedFlow(podcast))
             .thenReturn(flowOf(episodes))
 
-        viewModel = createViewModel()
-
-        viewModel.uiState.test {
+        createViewModel().uiState.test {
+            skipItems(1)
             val state = awaitItem()
             assertTrue(state is PodcastViewModel.UiState.Loaded)
             val loadedState = state as PodcastViewModel.UiState.Loaded
@@ -97,7 +99,7 @@ class PodcastViewModelTest {
     }
 
     @Test
-    fun `when episodes are archived, then filter them out`() = runTest {
+    fun `when episodes are archived, then filter them out`() = runTest(coroutineRule.testDispatcher) {
         val podcast = createTestPodcast(uuid = testPodcastUuid)
         val episodes = listOf(
             createTestEpisode(uuid = "ep1", title = "Episode 1", isArchived = false),
@@ -109,9 +111,8 @@ class PodcastViewModelTest {
         whenever(episodeManager.findEpisodesByPodcastOrderedFlow(podcast))
             .thenReturn(flowOf(episodes))
 
-        viewModel = createViewModel()
-
-        viewModel.uiState.test {
+        createViewModel().uiState.test {
+            skipItems(1)
             val state = awaitItem() as PodcastViewModel.UiState.Loaded
             assertEquals(2, state.episodes.size)
             assertEquals("ep1", state.episodes[0].uuid)
@@ -120,7 +121,7 @@ class PodcastViewModelTest {
     }
 
     @Test
-    fun `when episodes are finished, then filter them out`() = runTest {
+    fun `when episodes are finished, then filter them out`() = runTest(coroutineRule.testDispatcher) {
         val podcast = createTestPodcast(uuid = testPodcastUuid)
         val episodes = listOf(
             createTestEpisode(uuid = "ep1", title = "Episode 1", playingStatus = EpisodePlayingStatus.NOT_PLAYED),
@@ -132,8 +133,8 @@ class PodcastViewModelTest {
         whenever(episodeManager.findEpisodesByPodcastOrderedFlow(podcast))
             .thenReturn(flowOf(episodes))
 
-        viewModel = createViewModel()
-        viewModel.uiState.test {
+        createViewModel().uiState.test {
+            skipItems(1)
             val state = awaitItem() as PodcastViewModel.UiState.Loaded
             assertEquals(2, state.episodes.size)
             assertEquals("ep1", state.episodes[0].uuid)
