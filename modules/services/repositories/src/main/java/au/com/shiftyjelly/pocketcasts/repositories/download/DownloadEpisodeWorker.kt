@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadNotificationObserver.NotificationJob
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import com.google.common.util.concurrent.ListenableFuture
@@ -36,6 +37,7 @@ import java.net.UnknownHostException
 import java.util.UUID
 import javax.net.ssl.SSLException
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
 import okhttp3.OkHttpClient
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
@@ -77,6 +79,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     @Downloads httpClient: Lazy<OkHttpClient>,
     private val episodeManager: EpisodeManager,
+    private val userEpisodeManager: UserEpisodeManager,
     private val fileStorage: FileStorage,
     private val progressCache: DownloadProgressCache,
     private val notificationObserver: DownloadNotificationObserver,
@@ -94,7 +97,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             var episode = getEpisodeOrThrow()
             prepareForegroundNotification(episode)
 
-            episode = refreshDownloadUrl(episode)
+            episode = refreshDownloadUrlOrThrow(episode)
             val downloadFile = getDownloadFileOrThrow(episode)
             val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
 
@@ -151,7 +154,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         }
     }
 
-    private fun refreshDownloadUrl(episode: BaseEpisode) = runBlocking<BaseEpisode> {
+    private fun refreshDownloadUrlOrThrow(episode: BaseEpisode) = runBlocking<BaseEpisode> {
         when (episode) {
             is PodcastEpisode -> {
                 val freshDownloadUrl = episodeManager.updateDownloadUrl(episode)
@@ -159,7 +162,8 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is UserEpisode -> {
-                episode
+                val freshDownloadUrl = userEpisodeManager.getPlaybackUrlRxSingle(episode).await()
+                episode.copy(downloadUrl = freshDownloadUrl)
             }
         }
     }
