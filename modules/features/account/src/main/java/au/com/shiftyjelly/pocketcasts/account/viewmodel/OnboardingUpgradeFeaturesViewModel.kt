@@ -158,7 +158,9 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                     flow = flow,
                     source = source,
                     variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
-                ),
+                ).toMutableMap().apply {
+                    put("is_installment", plan.isInstallment.toString())
+                },
             )
         } else {
             analyticsTracker.track(
@@ -167,6 +169,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                     "flow" to flow.analyticsValue,
                     "source" to flow.source.analyticsValue,
                     "product" to requireNotNull(plan.productId) { "productId shouldn't be null for plan=$plan" },
+                    "is_installment" to plan.isInstallment.toString(),
                 ),
             )
         }
