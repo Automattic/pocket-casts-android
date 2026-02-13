@@ -33,9 +33,6 @@ import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -97,8 +94,7 @@ class LicensesFragment : BaseFragment() {
                     libs.copy(
                         libraries = libraries
                             .distinctBy { "${it.name}##${it.author}" }
-                            .sortedBy { it.name }
-                            .toImmutableList(),
+                            .sortedBy { it.name },
                     )
                 }.value,
             )
@@ -516,7 +512,7 @@ private val appReviewEmojisLibrary: Library = Library(
         name = "Google",
         url = "https://fonts.google.com/",
     ),
-    licenses = persistentSetOf(
+    licenses = setOf(
         License(
             name = "CC BY 4.0",
             url = "https://creativecommons.org/licenses/by/4.0/legalcode",
@@ -524,6 +520,6 @@ private val appReviewEmojisLibrary: Library = Library(
             hash = CC_BY_LICENSE_HASH,
         ),
     ),
-    developers = persistentListOf(),
+    developers = emptyList(),
     scm = null,
 )

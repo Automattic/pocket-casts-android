@@ -127,7 +127,7 @@ class PlayButtonListener @Inject constructor(
     override fun onStopDownloading(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let {
-                if (it.isDownloading || it.isQueued) {
+                if (it.isDownloadCancellable) {
                     downloadManager.removeEpisodeFromQueue(it, "play button")
                 }
             }

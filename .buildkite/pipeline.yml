@@ -88,35 +88,21 @@ steps:
           - "**/build/outputs/apk/**/*"
 
     ##########
-    # Optional Prototype Builds for PR branches, distributed via S3
+    # Optional Prototype Builds
+    #
+    # Builds all modules, uploads app to FAD and Wear and Automotive to S3
     ##########
   - group: Prototype Builds
-    if: "build.pull_request.id != null"
+    if: "build.pull_request.id != null || build.branch == 'main'"
     steps:
       - input: "🚀 Generate Prototype Builds?"
-        prompt: Generate Prototype Builds on the PR?
+        prompt: Generate Prototype Builds?
         key: prototype_builds_triggered
-      - label: ":github: Prototype Builds"
+      - label: ":rocket: Prototype Builds"
         depends_on: prototype_builds_triggered
-        command: |
-          ".buildkite/commands/prototype-build.sh"
+        command: .buildkite/commands/prototype-build.sh
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
-
-    ##########
-    # Optional Prototype Builds for main branch, distributed via FAD
-    ##########
-  - group: Prototype Builds (FAD)
-    if: "build.branch == 'main'"
-    steps:
-      - input: ":rocket: Generate Prototype Builds (FAD)?"
-        prompt: Generate Prototype Builds via Firebase App Distribution (FAD)?
-        key: prototype_builds_fad_triggered
-      - label: ":firebase: Prototype Builds (FAD)"
-        depends_on: prototype_builds_fad_triggered
-        command: |
-          ".buildkite/commands/prototype-build-fad.sh"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "app/build/outputs/apk/**/*"
+        # No notify node to avoid GitHub checks status being stuck on yellow.
+        # This step being optional, chances are it will never be triggered.

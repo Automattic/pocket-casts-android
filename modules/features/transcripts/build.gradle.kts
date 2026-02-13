@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -43,6 +42,7 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.ktx)
     implementation(libs.rx2.java)
 
     implementation(projects.modules.features.settings)

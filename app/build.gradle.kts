@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -24,7 +23,7 @@ android {
 
     sourceSets {
         getByName("androidTest") {
-            assets.srcDir(files("$rootDir/modules/services/model/schemas"))
+            assets.directories.add("$rootDir/modules/services/model/schemas")
         }
     }
 
@@ -123,6 +122,7 @@ dependencies {
     implementation(projects.modules.features.widgets)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)

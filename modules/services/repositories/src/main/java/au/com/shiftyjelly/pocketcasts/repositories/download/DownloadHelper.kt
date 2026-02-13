@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -30,8 +29,8 @@ object DownloadHelper {
     }
 
     fun addAutoDownloadedEpisodeToQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager, source: SourceView) {
-        if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
-            if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+        if (episode.isDownloadPending || episode.isDownloaded || episode.isDownloading || episode.isDownloadFailure) {
+            if (episode.isDownloadFailure) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not autodownloading ${episode.title} from $from because it has already failed.")
             }
             return

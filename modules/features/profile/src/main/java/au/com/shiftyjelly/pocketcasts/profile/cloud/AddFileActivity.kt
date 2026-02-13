@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
@@ -515,7 +515,7 @@ class AddFileActivity :
                     val imageFile = saveBitmapToFile()
 
                     userEpisode.downloadedFilePath = outFile.absolutePath
-                    userEpisode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
+                    userEpisode.downloadStatus = EpisodeDownloadStatus.Downloaded
                     userEpisode.title = binding.txtFilename.text.toString()
                     userEpisode.durationMs = length?.toInt() ?: 0
                     userEpisode.fileType = intentType

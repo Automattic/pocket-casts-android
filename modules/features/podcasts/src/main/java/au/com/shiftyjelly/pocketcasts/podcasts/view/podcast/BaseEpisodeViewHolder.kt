@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -207,36 +206,42 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         binding.progressBar.isVisible = false
         binding.progressCircle.isVisible = false
 
-        if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED) {
+        if (episode.isDownloaded) {
             bindTimeLeft(
                 iconId = IR.drawable.ic_downloaded,
                 iconTint = support02Tint,
             )
-        } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADING) {
+        } else if (episode.isDownloading) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_downloading, downloadProgress),
             )
             binding.progressCircle.isVisible = true
             binding.progressCircle.setPercent(downloadProgress / 100.0f)
-        } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+        } else if (episode.isDownloadFailure) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_download_failed),
                 iconId = IR.drawable.ic_download_failed_row,
                 iconTint = primaryIcon02Tint,
             )
-        } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER) {
+        } else if (episode.isWaitingForPower) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_waiting_for_power),
                 iconId = IR.drawable.ic_waitingforpower,
                 iconTint = primaryIcon02Tint,
             )
-        } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI) {
+        } else if (episode.isWaitingForStorage) {
+            bindStatus(
+                text = context.getString(LR.string.episode_row_waiting_for_storage),
+                iconId = IR.drawable.ic_waitingforstorage,
+                iconTint = primaryIcon02Tint,
+            )
+        } else if (episode.isWaitingForWifi) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_waiting_for_wifi),
                 iconId = IR.drawable.ic_waitingforwifi,
                 iconTint = primaryIcon02Tint,
             )
-        } else if (episode.episodeStatus == EpisodeStatusEnum.QUEUED) {
+        } else if (episode.isQueuedForDownload) {
             bindStatus(
                 text = context.getString(LR.string.episode_row_queued),
                 iconId = IR.drawable.ic_waitingforwifi,

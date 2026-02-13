@@ -146,10 +146,17 @@ abstract class UpNextDao {
     @Transaction
     open suspend fun getUpNextBaseEpisodes(limit: Int): List<BaseEpisode> {
         val upNextEpisodes = getUpNextEpisodes(limit)
-        val idToPosition = upNextEpisodes.associate { it.episodeUuid to it.position }
-        val podcastEpisodes = findPodcastEpisodes(idToPosition.keys)
-        val userEpisodes = if (podcastEpisodes.size != upNextEpisodes.size) findUserEpisodes(idToPosition.keys) else emptyList()
-        return (podcastEpisodes + userEpisodes).sortedBy { idToPosition.getOrDefault(it.uuid, null) }
+        val podcastEpisodes = findPodcastEpisodes(upNextEpisodes.map { it.episodeUuid }).associateBy { it.uuid }
+        val userEpisodes = if (podcastEpisodes.size != upNextEpisodes.size) {
+            findUserEpisodes(upNextEpisodes.map { it.episodeUuid }).associateBy { it.uuid }
+        } else {
+            emptyMap()
+        }
+
+        // Map over ordered upNextEpisodes to preserve position order
+        return upNextEpisodes.mapNotNull { upNext ->
+            podcastEpisodes[upNext.episodeUuid] as BaseEpisode? ?: userEpisodes[upNext.episodeUuid] as BaseEpisode?
+        }
     }
 
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT :limit")

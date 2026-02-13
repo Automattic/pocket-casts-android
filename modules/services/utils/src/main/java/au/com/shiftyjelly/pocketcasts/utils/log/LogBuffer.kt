@@ -22,6 +22,7 @@ object LogBuffer {
     const val TAG_RX_JAVA_DEFAULT_ERROR_HANDLER = "RxJavaDefaultErrorHandler"
     const val TAG_SUBSCRIPTIONS = "Subscriptions"
     const val TAG_INVALID_STATE = "InvalidState"
+    const val TAG_CONNECTIVITY = "Connectivity"
 
     private const val LOG_FILE_NAME = "debug.log"
     private const val LOG_BACKUP_FILE_NAME = "debug.log.1"

@@ -12,14 +12,15 @@ import androidx.palette.graphics.Palette
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
@@ -31,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
@@ -194,21 +194,23 @@ class EpisodeViewModel @Inject constructor(
         val errorIconRes: Int?
         var errorDescription: String? = null
 
-        val episodeStatus = episode.episodeStatus
+        val episodeStatus = episode.downloadStatus
         if (episode.playErrorDetails == null) {
             errorTitleRes = when (episodeStatus) {
-                EpisodeStatusEnum.DOWNLOAD_FAILED -> LR.string.podcasts_download_failed
-                EpisodeStatusEnum.WAITING_FOR_WIFI -> LR.string.podcasts_download_wifi
-                EpisodeStatusEnum.WAITING_FOR_POWER -> LR.string.podcasts_download_power
+                EpisodeDownloadStatus.DownloadFailed -> LR.string.podcasts_download_failed
+                EpisodeDownloadStatus.WaitingForWifi -> LR.string.podcasts_download_wifi
+                EpisodeDownloadStatus.WaitingForPower -> LR.string.podcasts_download_power
+                EpisodeDownloadStatus.WaitingForStorage -> LR.string.podcasts_download_storage
                 else -> null
             }
-            if (episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+            if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
                 errorDescription = episode.downloadErrorDetails
             }
             errorIconRes = when (episodeStatus) {
-                EpisodeStatusEnum.DOWNLOAD_FAILED -> IR.drawable.ic_failedwarning
-                EpisodeStatusEnum.WAITING_FOR_WIFI -> IR.drawable.ic_waitingforwifi
-                EpisodeStatusEnum.WAITING_FOR_POWER -> IR.drawable.ic_waitingforpower
+                EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
+                EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
+                EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
+                EpisodeDownloadStatus.WaitingForStorage -> IR.drawable.ic_waitingforstorage
                 else -> null
             }
         } else {

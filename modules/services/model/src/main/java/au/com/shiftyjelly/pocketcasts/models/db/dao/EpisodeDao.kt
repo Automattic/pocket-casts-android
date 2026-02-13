@@ -16,8 +16,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatis
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -239,7 +240,7 @@ abstract class EpisodeDao {
     abstract fun findByPodcastOrderDurationDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Query("UPDATE podcast_episodes SET downloaded_error_details = NULL, episode_status = :episodeStatusNotDownloaded WHERE episode_status = :episodeStatusFailed")
-    abstract fun clearAllDownloadErrorsBlocking(episodeStatusNotDownloaded: EpisodeStatusEnum, episodeStatusFailed: EpisodeStatusEnum)
+    abstract fun clearAllDownloadErrorsBlocking(episodeStatusNotDownloaded: EpisodeDownloadStatus, episodeStatusFailed: EpisodeDownloadStatus)
 
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestBlocking(podcastUuid: String): PodcastEpisode?
@@ -248,20 +249,20 @@ abstract class EpisodeDao {
     abstract fun findLatestRxMaybe(podcastUuid: String): Maybe<PodcastEpisode>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
-    abstract fun findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flow<List<PodcastEpisode>>
+    @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeDownloadStatus OR (episode_status == :failedEpisodeDownloadStatus AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
+    abstract fun findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff: Long, failedEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadFailed, downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status != :status)")
-    abstract suspend fun findNotFinishedDownloads(status: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): List<PodcastEpisode>
+    abstract suspend fun findNotFinishedDownloads(status: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): List<PodcastEpisode>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
-    abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
+    @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus ORDER BY last_download_attempt_date DESC")
+    abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flowable<List<PodcastEpisode>>
 
-    @Query("SELECT COUNT(*) FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum AND playing_status == :playingStatus")
+    @Query("SELECT COUNT(*) FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus AND playing_status == :playingStatus")
     abstract suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(
-        downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED,
+        downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded,
         playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED,
     ): Int
 
@@ -345,7 +346,7 @@ abstract class EpisodeDao {
     abstract fun updateLastDownloadAttemptDateBlocking(lastDownloadAttemptDate: Date, uuid: String)
 
     @Query("UPDATE podcast_episodes SET downloaded_error_details = :errorMessage, episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateDownloadErrorBlocking(uuid: String, errorMessage: String?, episodeStatus: EpisodeStatusEnum)
+    abstract fun updateDownloadErrorBlocking(uuid: String, errorMessage: String?, episodeStatus: EpisodeDownloadStatus)
 
     @Query("UPDATE podcast_episodes SET downloaded_file_path = :downloadedFilePath WHERE uuid = :uuid")
     abstract fun updateDownloadedFilePathBlocking(downloadedFilePath: String, uuid: String)
@@ -360,10 +361,10 @@ abstract class EpisodeDao {
     abstract fun updateDownloadErrorDetailsBlocking(downloadErrorDetails: String?, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract suspend fun updateEpisodeStatus(episodeStatus: EpisodeStatusEnum, uuid: String)
+    abstract suspend fun updateEpisodeStatus(episodeStatus: EpisodeDownloadStatus, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus")
-    abstract fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeStatusEnum)
+    abstract fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeDownloadStatus)
 
     @Query("UPDATE podcast_episodes SET last_playback_interaction_date = 0 WHERE last_playback_interaction_date <= :lastCleared")
     abstract fun clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared: Date)
@@ -497,6 +498,22 @@ abstract class EpisodeDao {
         episodes.forEach { episode -> updateCleanTitle(episode.uuid, episode.title) }
     }
 
-    @Query("SELECT NOT EXISTS(SELECT * FROM podcast_episodes WHERE cleanTitle IS NULL OR TRIM(cleanTitle) = '' OR cleanTitle = :normalizationToken)")
-    abstract fun hasNormalizedEpisodeTitles(normalizationToken: String): Flow<Boolean>
+    @Query(
+        """
+        UPDATE podcast_episodes 
+        SET episode_status = :status, downloaded_file_path = :downloadPath, downloaded_error_details = :downloadError 
+        WHERE uuid = :episodeUuid
+        """,
+    )
+    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeDownloadStatus, downloadPath: String?, downloadError: String?)
+
+    @Transaction
+    open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
+        for ((episodeUuid, statusUpdate) in entries) {
+            updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
+        }
+    }
+
+    @Query("SELECT uuid FROM podcast_episodes WHERE episode_status IN (:statuses)")
+    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
 }

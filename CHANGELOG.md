@@ -1,6 +1,10 @@
 8.6
 -----
-
+*   Bug Fixes
+    *   Fix up next queue episode ordering on the large widget
+        ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
+    *   On the podcasts tab show the podcast title when artwork is missing
+        ([#4973](https://github.com/Automattic/pocket-casts-android/pull/4973))
 
 8.5
 -----

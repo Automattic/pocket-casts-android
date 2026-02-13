@@ -6,8 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
@@ -551,7 +551,7 @@ class UpNextSyncTest {
             title = title,
             downloadUrl = "https://example.com/$uuid.mp3",
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-            episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         )
     }
 
@@ -563,7 +563,7 @@ class UpNextSyncTest {
             uuid = uuid,
             publishedDate = Date(),
             title = title,
-            episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         )
     }
 

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -21,6 +20,7 @@ dependencies {
     api(libs.dagger.hilt.android)
 
     api(projects.modules.services.analytics)
+    api(projects.modules.services.coroutines)
     api(projects.modules.services.crashlogging)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)

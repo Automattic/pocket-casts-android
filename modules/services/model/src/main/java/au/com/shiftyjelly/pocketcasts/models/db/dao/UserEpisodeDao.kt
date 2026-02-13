@@ -9,8 +9,9 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -97,7 +98,7 @@ abstract class UserEpisodeDao {
     abstract fun updatePlayingStatusBlocking(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
 
     @Query("UPDATE user_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeStatusEnum)
+    abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeDownloadStatus)
 
     @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
@@ -152,4 +153,23 @@ abstract class UserEpisodeDao {
 
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
+
+    @Query(
+        """
+        UPDATE user_episodes 
+        SET episode_status = :status, downloaded_file_path = :downloadPath, downloaded_error_details = :downloadError 
+        WHERE uuid = :episodeUuid
+        """,
+    )
+    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeDownloadStatus, downloadPath: String?, downloadError: String?)
+
+    @Transaction
+    open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
+        for ((episodeUuid, statusUpdate) in entries) {
+            updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
+        }
+    }
+
+    @Query("SELECT uuid FROM user_episodes WHERE episode_status IN (:statuses)")
+    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
 }

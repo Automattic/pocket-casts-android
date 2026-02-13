@@ -16,8 +16,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -603,7 +603,7 @@ class ExternalDataDaoTest {
                 number = 399,
                 publishedDate = publishedDate3,
                 lastPlaybackInteraction = 0,
-                episodeStatus = EpisodeStatusEnum.DOWNLOADED,
+                downloadStatus = EpisodeDownloadStatus.Downloaded,
             ),
         )
         podcastEpisodeDao.insertAllBlocking(episodes)
@@ -934,7 +934,7 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
                 publishedDate = Date(2),
                 lastPlaybackInteraction = 0,
-                episodeStatus = EpisodeStatusEnum.DOWNLOADED,
+                downloadStatus = EpisodeDownloadStatus.Downloaded,
             ),
             PodcastEpisode(
                 uuid = "id-3",

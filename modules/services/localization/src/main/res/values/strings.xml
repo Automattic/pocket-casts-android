@@ -44,6 +44,7 @@
     <string name="donate">Donate</string>
     <string name="done">Done</string>
     <string name="download">Download</string>
+    <string name="downloading">Downloading %s</string>
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
     <string name="error_no_network">No network connection detected. Please try again later.</string>
@@ -176,7 +177,6 @@
     <string name="none">None</string>
     <string name="normalized">Normalized</string>
     <string name="not_normalized">Not normalized</string>
-    <string name="normalization_started">Normalization started</string>
     <string name="expand_details">Expand details</string>
     <string name="add_podcasts">Add Podcasts</string>
     <string name="please_try_again">Please try again</string>
@@ -266,7 +266,7 @@
     <string name="minutes_short_plural">%d mins</string>
     <string name="hours_singular">1 hour</string>
     <string name="hours_plural">%d hours</string>
-    <string name="hours_and_minutes">%d hours and %d minutes</string>
+    <string name="hours_and_minutes">%1$d hours and %2$d minutes</string>
     <string name="hour_and_minutes">1 hour and %d minutes</string>
     <string name="days_singular">1 day</string>
     <string name="days_plural">%d days</string>
@@ -511,6 +511,7 @@
     <string name="podcasts_download_download" translatable="false">@string/download</string>
     <string name="podcasts_download_failed">Download Failed</string>
     <string name="podcasts_download_power">Auto download waiting for power</string>
+    <string name="podcasts_download_storage">Download waiting for storage space</string>
     <string name="podcasts_download_queued">Queued</string>
     <string name="podcasts_download_retry" translatable="false">@string/retry</string>
     <string name="podcasts_download_wifi">Auto download waiting for WiFi</string>
@@ -831,6 +832,7 @@
     <string name="episode_row_queued_upload">Queued for upload</string>
     <string name="episode_row_uploading">Uploading&#x2026; (%d%%)</string>
     <string name="episode_row_waiting_for_power">Waiting for power</string>
+    <string name="episode_row_waiting_for_storage">Waiting for storage space</string>
     <string name="episode_row_waiting_for_wifi">Waiting for WiFi</string>
     <string name="episode_sort_custom_order">Custom order</string>
     <string name="episode_sort_long_to_short">Longest to shortest</string>
@@ -1622,8 +1624,6 @@
     <string name="settings_storage_store_on">Store podcasts on</string>
     <string name="settings_storage_fix_downloads">Fix downloads</string>
     <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
-    <string name="settings_storage_normalize_episode_titles">Normalize episode titles</string>
-    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nSome parts of the app use an episode search that requires normalized titles. Tapping this setting runs database normalization if the episodes aren\'t normalized already.</string>
     <string name="settings_subscribe_to_played">Follow played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -1858,6 +1858,19 @@
     <string name="error_login_failed">Unable to login to your sync account, sorry. Please try again later.</string>
     <string name="error_search_failed">Search Failed</string>
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
+    <string name="error_download_missing_episode">Failed to find the episode data on the device. Please contact support.</string>
+    <string name="error_download_no_episode_file">Failed to create a download file for the episode. Please check that you have enough space on your device.</string>
+    <string name="error_download_invalid_url">The episode has an invalid URL. Please contact the podcast’s author.</string>
+    <string name="error_download_http_failure">Failed to download the episode. Error code: %1$d.</string>
+    <string name="error_download_no_storage">Failed to download the episode. Please check that you have enough space on your device.</string>
+    <string name="error_download_chartable" translatable="false">@string/error_chartable</string>
+    <string name="error_download_unknown_host">Failed to find the podcast author’s server. Please check your internet connection.</string>
+    <string name="error_download_connection_error">Failed to establish a connection with the podcast author’s server. Please check your internet connection.</string>
+    <string name="error_download_ssl_failure">Failed to establish a secure connection with the podcast author’s server. Please check if your device is up-to-date.</string>
+    <string name="error_download_socket_timeout">Failed to establish a connection with the podcast author’s server in time. Please check your internet connection.</string>
+    <string name="error_download_io_failure">Failed to download the episode. Please check your internet connection and that you have enough space on your device.</string>
+    <string name="error_download_generic_failure">Failed to download the episode. %1$s</string>
+    <string name="error_download_too_many_attempts">Failed to download due to too many attempts. Please try again.</string>
 
     <!-- Discover -->
 
@@ -2144,6 +2157,31 @@
     <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
     <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
     <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
+
+    <!-- Watch sync status -->
+    <string name="watch_sync_syncing">Syncing with phone…</string>
+    <string name="watch_sync_success">Logged in from phone!</string>
+
+    <!-- Watch sync errors -->
+    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
+    <string name="watch_sync_error_no_connection">Phone not connected</string>
+    <string name="watch_sync_error_login_failed">Login failed</string>
+    <string name="watch_sync_error_unknown">Something went wrong</string>
+
+    <!-- Watch sync error help text -->
+    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
+    <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
+    <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
+    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
+
+    <!-- Watch sync actions -->
+    <string name="watch_sync_retry">Try Again</string>
+    <string name="watch_sync_waiting_for_phone">Waiting for phone to sync…</string>
+
+    <!-- Phone sync confirmation -->
+    <string name="watch_synced_successfully">Watch synced successfully</string>
+    <string name="watch_sync_failed">Couldn\'t sync to watch</string>
+
     <string name="enter_password">Enter password</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
@@ -2376,6 +2414,9 @@
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
+    <string name="wear_connectivity_lost">Connection lost</string>
+    <string name="wear_connectivity_restored">Connected</string>
+    <string name="wear_connectivity_streaming_warning">Streaming may be affected</string>
 
     <!-- Nova Launcher -->
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>

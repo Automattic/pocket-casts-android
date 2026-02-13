@@ -11,6 +11,9 @@ gem 'fastlane-plugin-wpmreleasetoolkit', '~> 13.8'
 # gem 'fastlane-plugin-wpmreleasetoolkit', path: '../../release-toolkit'
 # gem 'fastlane-plugin-wpmreleasetoolkit', git: 'https://github.com/wordpress-mobile/release-toolkit', branch: ''
 
+# Used in scripts/themes/
+gem 'google-apis-sheets_v4', '~> 0.26'
+
 # To avoid errors like:
 #
 # SSL_connect returned=1 errno=0 peeraddr=3.5.132.155:443 state=error: certificate verify failed (unable to get certificate CRL)

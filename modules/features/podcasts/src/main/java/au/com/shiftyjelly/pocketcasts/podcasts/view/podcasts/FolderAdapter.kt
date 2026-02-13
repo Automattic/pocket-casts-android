@@ -77,7 +77,7 @@ class FolderAdapter(
                 val podcastGridLayout = settings.podcastGridLayout.value
                 PodcastViewHolder(
                     view,
-                    imageRequestFactory.copy(cornerRadius = 4),
+                    imageRequestFactory.copy(cornerRadius = 4, showErrorPlaceholder = isLayoutListView),
                     podcastGridLayout,
                     theme,
                 )
@@ -170,7 +170,9 @@ class FolderAdapter(
         val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
         val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
-        val podcastTitle: TextView = view.findViewById(R.id.library_podcast_title)
+        val podcastTitle: TextView = view.findViewById<TextView>(R.id.library_podcast_title).apply {
+            textSize = if (podcastGridLayout == PodcastGridLayoutType.SMALL_ARTWORK) 10f else 14f
+        }
         val author: TextView? = view.findViewById(R.id.podcast_author)
         val cardElevation: Float = 1.dpToPx(view.resources.displayMetrics).toFloat()
         val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()

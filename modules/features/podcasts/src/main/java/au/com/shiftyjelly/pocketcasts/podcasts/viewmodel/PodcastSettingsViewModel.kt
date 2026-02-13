@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -354,7 +354,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     suspend fun getDownloadedEpisodeCount() = withContext(Dispatchers.IO) {
-        podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeStatusEnum.DOWNLOADED)
+        podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeDownloadStatus.Downloaded)
     }
 
     private fun changePodcastRule(
