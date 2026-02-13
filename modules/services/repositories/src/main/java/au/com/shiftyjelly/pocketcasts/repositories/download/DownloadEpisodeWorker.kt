@@ -278,6 +278,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     data class Args(
         val episodeUuid: String,
+        val podcastUuid: String,
         val waitForWifi: Boolean,
         val waitForPower: Boolean,
     )
@@ -285,9 +286,13 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     companion object {
         const val WORKER_TAG = "EpisodeDownloadWorker"
 
-        internal const val WORKER_EPISODE_TAG_PREFIX = "$WORKER_TAG:"
+        internal const val WORKER_EPISODE_TAG_PREFIX = "$WORKER_TAG:Episode:"
 
-        fun episodeWorkerName(episodeUuid: String) = "$WORKER_EPISODE_TAG_PREFIX$episodeUuid"
+        internal const val WORKER_PODCAST_TAG_PREFIX = "$WORKER_TAG:Podcast:"
+
+        fun episodeTag(episodeUuid: String) = "$WORKER_EPISODE_TAG_PREFIX$episodeUuid"
+
+        fun podcastTag(podcastUuid: String) = "$WORKER_PODCAST_TAG_PREFIX$podcastUuid"
 
         fun createWorkRequest(args: Args): Pair<OneTimeWorkRequest, Constraints> {
             val constraints = Constraints.Builder()
@@ -299,8 +304,8 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 .setConstraints(constraints)
                 .setInputData(args.toData())
                 .addTag(WORKER_TAG)
-                .addTag(episodeWorkerName(args.episodeUuid))
-                .addTag(args.episodeUuid)
+                .addTag(episodeTag(args.episodeUuid))
+                .addTag(podcastTag(args.podcastUuid))
                 .build()
             return request to constraints
         }
@@ -425,18 +430,21 @@ sealed interface DownloadWorkInfo {
 
 private fun Data.toArgs() = DownloadEpisodeWorker.Args(
     episodeUuid = requireNotNull(getString(EPISODE_UUID_KEY)),
+    podcastUuid = requireNotNull(getString(PODCAST_UUID_KEY)),
     waitForWifi = getBoolean(WAIT_FOR_WIFI_KEY, true),
     waitForPower = getBoolean(WAIT_FOR_POWER_KEY, true),
 )
 
 private fun DownloadEpisodeWorker.Args.toData() = Data.Builder()
     .putString(EPISODE_UUID_KEY, episodeUuid)
+    .putString(PODCAST_UUID_KEY, podcastUuid)
     .putBoolean(WAIT_FOR_WIFI_KEY, waitForWifi)
     .putBoolean(WAIT_FOR_POWER_KEY, waitForPower)
     .build()
 
 // Input keys
 private const val EPISODE_UUID_KEY = "episode_uuid"
+private const val PODCAST_UUID_KEY = "podcast_uuid"
 private const val WAIT_FOR_WIFI_KEY = "wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "wait_for_power"
 
