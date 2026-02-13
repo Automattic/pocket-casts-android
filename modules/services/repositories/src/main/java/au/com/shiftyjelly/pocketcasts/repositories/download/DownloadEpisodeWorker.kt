@@ -24,17 +24,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.IOException
-import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.UUID
 import javax.net.ssl.SSLException
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -87,7 +87,10 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     override fun doWork(): Result {
         val result = try {
-            dispatchWorkStarted()
+            // Block the work until the state is dispatched
+            // to keep the state consistent
+            dispatchProgressData(isWorkExecuting = true).get()
+
             var episode = getEpisodeOrThrow()
             prepareForegroundNotification(episode)
 
@@ -104,7 +107,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         } catch (e: Throwable) {
             DownloadResult.ExceptionFailure(e)
         }
+
         notificationJob?.cancel()
+        dispatchProgressData(isWorkExecuting = false)
 
         return when (result) {
             is DownloadResult.Success -> {
@@ -115,20 +120,29 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is DownloadResult.Failure -> {
-                val data = Data.Builder()
-                    .putString(ERROR_MESSAGE_KEY, processFailure(result))
-                    .build()
-                Result.failure(data)
+                val (errorMessage, shouldRetry) = processFailure(result)
+                if (shouldRetry && runAttemptCount < MAX_ATTEMPT_COUNT) {
+                    Result.retry()
+                } else {
+                    val data = Data.Builder()
+                        .putString(ERROR_MESSAGE_KEY, errorMessage)
+                        .build()
+                    Result.failure(data)
+                }
             }
         }
     }
 
     override fun onStopped() {
         notificationJob?.cancel()
+        dispatchProgressData(isWorkExecuting = false)
     }
 
-    private fun dispatchWorkStarted() {
-        setProgressAsync(Data.Builder().putBoolean(IS_WORK_STARTED_KEY, true).build()).get()
+    private fun dispatchProgressData(isWorkExecuting: Boolean): ListenableFuture<Void> {
+        val data = Data.Builder()
+            .putBoolean(IS_WORK_EXECUTING, isWorkExecuting)
+            .build()
+        return setProgressAsync(data)
     }
 
     private fun getEpisodeOrThrow() = runBlocking {
@@ -157,14 +171,14 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         }
     }
 
-    private fun processFailure(result: DownloadResult.Failure): String {
+    private fun processFailure(result: DownloadResult.Failure): Pair<String, Boolean> {
         return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
-                context.getString(LR.string.error_download_invalid_url)
+                context.getString(LR.string.error_download_invalid_url) to false
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                context.getString(LR.string.error_download_http_failure, result.code)
+                context.getString(LR.string.error_download_http_failure, result.code) to true
             }
 
             is DownloadResult.ExceptionFailure -> {
@@ -174,40 +188,36 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
-                        context.getString(LR.string.error_download_no_storage)
+                        context.getString(LR.string.error_download_no_storage) to false
                     }
 
                     throwable.isChartableBlocked() -> {
-                        context.getString(LR.string.error_download_chartable)
+                        context.getString(LR.string.error_download_chartable) to false
                     }
 
                     throwable.isAnyCause<UnknownHostException>() -> {
-                        context.getString(LR.string.error_download_unknown_host)
+                        context.getString(LR.string.error_download_unknown_host) to true
                     }
 
                     throwable.isAnyCause<ConnectException>() -> {
-                        context.getString(LR.string.error_download_connection_error)
+                        context.getString(LR.string.error_download_connection_error) to true
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
-                        context.getString(LR.string.error_download_socket_timeout)
+                        context.getString(LR.string.error_download_socket_timeout) to true
                     }
 
                     throwable.isAnyCause<SSLException>() -> {
-                        context.getString(LR.string.error_download_ssl_failure)
-                    }
-
-                    throwable.isCancelled() -> {
-                        CANCELLED_MESSAGE
+                        context.getString(LR.string.error_download_ssl_failure) to true
                     }
 
                     throwable is IOException -> {
-                        context.getString(LR.string.error_download_io_failure)
+                        context.getString(LR.string.error_download_io_failure) to true
                     }
 
                     else -> {
                         val message = context.getString(LR.string.error_download_generic_failure, throwable.message.orEmpty())
-                        message.trim()
+                        message.trim() to true
                     }
                 }
             }
@@ -238,25 +248,6 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
     private fun Throwable.isChartableBlocked(): Boolean {
         return anyMessageContains("chtbl.com")
-    }
-
-    private fun Throwable.isCancelled(): Boolean {
-        var throwable: Throwable? = this
-        while (throwable != null) {
-            when (throwable) {
-                is InterruptedIOException, is InterruptedException, is CancellationException -> {
-                    return true
-                }
-
-                is IOException -> {
-                    if (throwable.message?.lowercase() == "cancelled") {
-                        return true
-                    }
-                }
-            }
-            throwable = throwable.cause
-        }
-        return false
     }
 
     private inline fun <reified T : Throwable> Throwable.isAnyCause(): Boolean {
@@ -325,7 +316,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                     when (info.state) {
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             DownloadWorkInfo.Pending(
+                                id = info.id,
                                 episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
                                 isWifiRequired = isWifiRequired,
                                 isPowerRequired = isPowerRequired,
                                 isStorageRequired = isStorageRequired,
@@ -335,11 +328,17 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                         WorkInfo.State.RUNNING -> {
                             // Running doesn't necessarily mean that Worker.doWork() was called.
                             // For this reason we use a separate flag.
-                            if (info.progress.getBoolean(IS_WORK_STARTED_KEY, false)) {
-                                DownloadWorkInfo.InProgress(episodeUuid)
+                            if (info.progress.getBoolean(IS_WORK_EXECUTING, false)) {
+                                DownloadWorkInfo.InProgress(
+                                    id = info.id,
+                                    episodeUuid = episodeUuid,
+                                    runAttemptCount = info.runAttemptCount,
+                                )
                             } else {
                                 DownloadWorkInfo.Pending(
+                                    id = info.id,
                                     episodeUuid = episodeUuid,
+                                    runAttemptCount = info.runAttemptCount,
                                     isWifiRequired = isWifiRequired,
                                     isPowerRequired = isPowerRequired,
                                     isStorageRequired = isStorageRequired,
@@ -349,22 +348,32 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                         WorkInfo.State.SUCCEEDED -> {
                             val filePath = requireNotNull(info.outputData.getString(DOWNLOAD_FILE_PATH_KEY)) {
-                                "Output file path is missing for the episode $episodeUuid download"
+                                "Output file path is missing for the downloaded episode $episodeUuid"
                             }
-                            DownloadWorkInfo.Success(episodeUuid, File(filePath))
+                            DownloadWorkInfo.Success(
+                                id = info.id,
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                                downloadFile = File(filePath),
+                            )
                         }
 
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData.getString(ERROR_MESSAGE_KEY)
-                            if (errorMessage == CANCELLED_MESSAGE) {
-                                DownloadWorkInfo.Cancelled(episodeUuid)
-                            } else {
-                                DownloadWorkInfo.Failure(episodeUuid, errorMessage)
-                            }
+                            DownloadWorkInfo.Failure(
+                                id = info.id,
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                                errorMessage = errorMessage,
+                            )
                         }
 
                         WorkInfo.State.CANCELLED -> {
-                            DownloadWorkInfo.Cancelled(episodeUuid)
+                            DownloadWorkInfo.Cancelled(
+                                id = info.id,
+                                episodeUuid = episodeUuid,
+                                runAttemptCount = info.runAttemptCount,
+                            )
                         }
                     }
                 }
@@ -373,31 +382,43 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 }
 
 sealed interface DownloadWorkInfo {
+    val id: UUID
     val episodeUuid: String
+    val runAttemptCount: Int
 
     data class Pending(
+        override val id: UUID,
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val isWifiRequired: Boolean,
         val isPowerRequired: Boolean,
         val isStorageRequired: Boolean,
     ) : DownloadWorkInfo
 
     data class InProgress(
+        override val id: UUID,
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
     ) : DownloadWorkInfo
 
     data class Success(
+        override val id: UUID,
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val downloadFile: File,
     ) : DownloadWorkInfo
 
     data class Failure(
+        override val id: UUID,
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
         val errorMessage: String?,
     ) : DownloadWorkInfo
 
     data class Cancelled(
+        override val id: UUID,
         override val episodeUuid: String,
+        override val runAttemptCount: Int,
     ) : DownloadWorkInfo
 }
 
@@ -419,11 +440,11 @@ private const val WAIT_FOR_WIFI_KEY = "wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "wait_for_power"
 
 // Progress keys
-internal const val IS_WORK_STARTED_KEY = "is_work_started"
+internal const val IS_WORK_EXECUTING = "is_work_executing"
 
 // Output keys
 internal const val DOWNLOAD_FILE_PATH_KEY = "download_file_path"
 internal const val ERROR_MESSAGE_KEY = "error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-internal const val CANCELLED_MESSAGE = "___EPISODE_DOWNLOAD_CANCELLED___"
+private const val MAX_ATTEMPT_COUNT = 3

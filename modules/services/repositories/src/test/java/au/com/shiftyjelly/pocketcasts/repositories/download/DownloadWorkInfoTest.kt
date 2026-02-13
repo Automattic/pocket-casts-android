@@ -50,7 +50,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -71,7 +73,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -86,13 +90,17 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
             tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_STARTED_KEY, true).build(),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, true).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
 
         assertEquals(
-            DownloadWorkInfo.InProgress(episodeUuid = "episode-id"),
+            DownloadWorkInfo.InProgress(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                runAttemptCount = 0,
+            ),
             downloadInfo,
         )
     }
@@ -103,14 +111,16 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
             tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_STARTED_KEY, false).build(),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, false).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -131,7 +141,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -153,7 +165,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Success(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 downloadFile = File("file.mp3"),
             ),
             downloadInfo,
@@ -186,7 +200,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Failure(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 errorMessage = "Whoops!",
             ),
             downloadInfo,
@@ -205,26 +221,11 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Failure(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 errorMessage = null,
             ),
-            downloadInfo,
-        )
-    }
-
-    @Test
-    fun `map failed work info with cancelled message`() {
-        val workInfo = WorkInfo(
-            id = UUID.randomUUID(),
-            state = WorkInfo.State.FAILED,
-            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
-            outputData = Data.Builder().putString(ERROR_MESSAGE_KEY, CANCELLED_MESSAGE).build(),
-        )
-
-        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
-
-        assertEquals(
-            DownloadWorkInfo.Cancelled(episodeUuid = "episode-id"),
             downloadInfo,
         )
     }
@@ -240,7 +241,11 @@ class DownloadWorkInfoTest {
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
 
         assertEquals(
-            DownloadWorkInfo.Cancelled(episodeUuid = "episode-id"),
+            DownloadWorkInfo.Cancelled(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                runAttemptCount = 0,
+            ),
             downloadInfo,
         )
     }
@@ -258,7 +263,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = true,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -280,7 +287,9 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = true,
                 isStorageRequired = false,
@@ -302,10 +311,36 @@ class DownloadWorkInfoTest {
 
         assertEquals(
             DownloadWorkInfo.Pending(
+                id = workInfo.id,
                 episodeUuid = "episode-id",
+                runAttemptCount = 0,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = true,
+            ),
+            downloadInfo,
+        )
+    }
+
+    @Test
+    fun `map work info's run attempt count`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            runAttemptCount = 10,
+            tags = setOf(DownloadEpisodeWorker.episodeWorkerName("episode-id")),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertEquals(
+            DownloadWorkInfo.Pending(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                runAttemptCount = 10,
+                isWifiRequired = false,
+                isPowerRequired = false,
+                isStorageRequired = false,
             ),
             downloadInfo,
         )
