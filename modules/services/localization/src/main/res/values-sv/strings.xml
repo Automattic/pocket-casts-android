@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-04 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Spellistor kan endast innehålla podcastavsnitt.</string>
+    <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
+    <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
+    <string name="podcasts_add_episode">Lägg till</string>
+    <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
+    <string name="add_to_up_next_top">Spela upp nästa i Up Next</string>
+    <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
+    <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
+    <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>
+    <string name="price_per_month_for_months">%1$s/månad för %2$d månader</string>
     <string name="no_episodes">Inga avsnitt</string>
     <string name="more_rules">Fler regler</string>
     <string name="player_notification_skip_forward_seconds">Framåt %d sekunder</string>
@@ -44,10 +54,7 @@ Language: sv_SE
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Du lyssnade mer än 500 % i år — välkommen till klubben</string>
     <string name="end_of_year_stories_year_over_year_title_flat">Din lyssnande %1$s höll sig stabilt</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Från noll till hjälte!</string>
-    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nVissa delar av appen använder en avsnittssökning som kräver normaliserade rubriker. Om du trycker på den här inställningen körs databasnormalisering om avsnitten inte redan är normaliserade.</string>
-    <string name="normalization_started">Normalisering påbörjad</string>
     <string name="database">Databas</string>
-    <string name="settings_storage_normalize_episode_titles">Normalisera avsnittstitlar</string>
     <string name="not_normalized">Inte normaliserat</string>
     <string name="normalized">Normaliserat</string>
     <string name="end_of_year_story_top_podcast_subtitle">Det blir inte mer ”du” än så här</string>
@@ -466,6 +473,7 @@ Language: sv_SE
     <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
     <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
     <string name="chapter_count_summary">%1$d av %2$d</string>
+    <string name="referrals_share_text">Hej!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
     <string name="files_plus_prompt">Ladda upp dina filer och mer därtill med Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
@@ -641,7 +649,6 @@ Language: sv_SE
     <string name="widget_preview_episode_in_up_next_title">Avsnitt i Nästa</string>
     <string name="widget_preview_episode_title">Avsnittstitel</string>
     <string name="hour_and_minutes">1 timme och %d minuter</string>
-    <string name="hours_and_minutes">%d timmar och %d minuter</string>
     <string name="player_sleep_time_fired_end_of_chapter">Vilolägestimern stoppades i slutet av kapitlet.</string>
     <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>

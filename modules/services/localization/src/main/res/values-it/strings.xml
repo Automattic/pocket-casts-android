@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-05 11:54:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Le playlist possono contenere solo episodi di podcast.</string>
+    <string name="playlist_limit_reached">Le playlist possono contenere solo un massimo di %d episodi.</string>
+    <string name="playlist_limit_almost_full">Playlist quasi piena. Prova ad aggiungere meno episodi.</string>
+    <string name="podcasts_add_episode">Aggiungi</string>
+    <string name="add_to_up_next_bottom">Riproduci ultimo in Successivo</string>
+    <string name="add_to_up_next_top">Riproduci successivo in Successivo</string>
+    <string name="winback_cancel_subscription_perk_installment">Hai un piano a rate di 12 mesi. L\'annullamento termina l\'accesso, ma Google Play continuerà ad addebitare i mesi rimanenti.</string>
+    <string name="winback_cancel_subscription_header_description_installment">L\'annullamento termina l\'abbonamento a Pocket Casts.\nIl tuo piano di pagamento Google Play continuerà.</string>
+    <string name="winback_cancel_subscription_perk_history">Potrai ancora accedere ai podcast e alla cronologia degli ascolti.</string>
+    <string name="price_per_month_for_months">%1$sal mese per %2$d mesi</string>
     <string name="no_episodes">Nessun episodio</string>
     <string name="more_rules">Altre regole</string>
     <string name="set_volume">Imposta il volume</string>
@@ -44,12 +54,9 @@ Language: it
     <string name="end_of_year_stories_year_over_year_title_flat">Il tuo ascolto nel %1$s è stato costante</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Quest\'anno hai ascoltato il 500% in più: benvenuto nel club</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Dalle stalle alle stelle!</string>
-    <string name="settings_storage_normalize_episode_titles">Normalizza i titoli degli episodi</string>
-    <string name="normalization_started">Normalizzazione avviata</string>
     <string name="not_normalized">Non normalizzato</string>
     <string name="normalized">Normalizzato</string>
     <string name="database">Database</string>
-    <string name="settings_storage_normalize_episode_titles_description">Stato: %1$s\nAlcune sezioni dell\'app utilizzano una ricerca per episodi che richiede titoli normalizzati. Toccando questa impostazione si esegue la normalizzazione del database se gli episodi non sono già normalizzati.</string>
     <string name="end_of_year_story_top_podcast_stats_hours">%1$s e %2$s.\nQuesta sì che è dedizione!</string>
     <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s e %3$s.\nQuesta sì che è dedizione!</string>
     <string name="end_of_year_story_top_podcast_subtitle">Niente ti rappresenta di più</string>
@@ -465,6 +472,7 @@ Language: it
     <string name="shuffle_whats_new_title">Introduzione a Shuffle</string>
     <string name="chapter_time_remaining_content_description">%s rimanente nel capitolo</string>
     <string name="chapter_count_summary">%1$d di %2$d</string>
+    <string name="referrals_share_text">Ciao!\n\nQuesto è un %1$s pass per ospiti per Pocket Casts Plus, il mio podcast player preferito. È ricco di funzionalità uniche come segnalibri, cartelle e molto altro che non troverai da nessun\'altra parte. Penso che piacerà anche a te.</string>
     <string name="files_plus_prompt">Carica i tuoi file con Pocket Casts Plus e molto altro ancora</string>
     <string name="icons_plus_prompt">Ottieni icone di app esclusive con Pocket Casts Plus e molto altro ancora</string>
     <string name="themes_plus_prompt">Ottieni temi esclusivi con Pocket Casts Plus e molto altro ancora</string>
@@ -640,7 +648,6 @@ Language: it
     <string name="widget_preview_episode_in_up_next_title">Episodio in Successivo</string>
     <string name="widget_preview_episode_title">Titolo episodio</string>
     <string name="hour_and_minutes">1 ora e %d minuti</string>
-    <string name="hours_and_minutes">%d ore e %d minuti</string>
     <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>

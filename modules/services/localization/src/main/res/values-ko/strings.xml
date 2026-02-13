@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 09:54:04+0000
+Translation-Revision-Date: 2026-02-05 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">재생목록에는 팟캐스트 에피소드만 포함할 수 있습니다.</string>
+    <string name="playlist_limit_reached">재생목록에는 최대 %d개 에피소드만 포함할 수 있습니다.</string>
+    <string name="playlist_limit_almost_full">재생목록이 거의 가득 찼습니다. 에피소드를 더 적게 추가해 보세요.</string>
+    <string name="podcasts_add_episode">추가</string>
+    <string name="add_to_up_next_bottom">재생목록에 마지막 재생 항목으로 추가</string>
+    <string name="add_to_up_next_top">재생목록에 다음 재생 항목으로 추가</string>
+    <string name="winback_cancel_subscription_perk_installment">12개월 할부 요금제를 이용하고 계십니다. 취소하면 접근 권한이 종료되지만, Google Play에서 남은 기간에 대한 요금이 계속 청구됩니다.</string>
+    <string name="winback_cancel_subscription_header_description_installment">취소하면 Pocket Casts 구독이 종료됩니다.\nGoogle Play 결제 요금제는 계속 유지됩니다.</string>
+    <string name="winback_cancel_subscription_perk_history">팟캐스트와 청취 기록에 계속 접근하실 수 있습니다.</string>
+    <string name="price_per_month_for_months">%1$s/%2$d개월</string>
     <string name="no_episodes">에피소드 없음</string>
     <string name="more_rules">추가 규칙</string>
     <string name="player_notification_skip_forward_seconds">앞으로 %d초 이동</string>
@@ -44,9 +54,6 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_year_title_flat">%1$s에도 꾸준하게 청취하셨습니다.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">올해 청취 시간이 500% 이상 증가했습니다. 환영합니다.</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">0에서 주인공으로!</string>
-    <string name="settings_storage_normalize_episode_titles_description">상태: %1$s\n앱의 일부분에서는 정규화된 제목이 필요한 에피소드 검색을 사용합니다. 이 설정을 누르면 에피소드가 아직 정규화되지 않은 경우 데이터베이스 정규화가 실행됩니다.</string>
-    <string name="settings_storage_normalize_episode_titles">에피소드 제목 정규화</string>
-    <string name="normalization_started">정규화 시작됨</string>
     <string name="not_normalized">정규화되지 않음</string>
     <string name="normalized">정규화됨</string>
     <string name="database">데이터베이스</string>
@@ -466,6 +473,7 @@ Language: ko_KR
     <string name="shuffle_whats_new_title">셔플 기능 소개</string>
     <string name="chapter_time_remaining_content_description">챕터에서 %s 남음</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
+    <string name="referrals_share_text">안녕하세요.\n\n제가 가장 좋아하는 팟캐스트 플레이어인 %1$s Pocket Casts Plus 비회원 패스를 확인해 보세요. 북마크, 폴더 등 다른 곳에서는 찾아볼 수 없는 특별한 기능이 가득합니다. 마음에 드실 거예요!</string>
     <string name="files_plus_prompt">Pocket Casts Plus로 파일을 업로드하고 더 많은 혜택을 누리세요</string>
     <string name="icons_plus_prompt">Pocket Casts Plus로 독점 앱 아이콘을 받고 더 많은 혜택을 누리세요</string>
     <string name="themes_plus_prompt">Pocket Casts Plus로 독점 테마를 받고 더 많은 혜택을 누리세요</string>
@@ -641,7 +649,6 @@ Language: ko_KR
     <string name="widget_preview_episode_in_up_next_title">다음 에피소드</string>
     <string name="widget_preview_episode_title">에피소드 제목</string>
     <string name="hour_and_minutes">1시간 %d분</string>
-    <string name="hours_and_minutes">%d시간 %d분</string>
     <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
     <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>
