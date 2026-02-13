@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-04 13:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Playlists só podem conter episódios de podcast.</string>
+    <string name="playlist_limit_reached">Playlists só podem conter até %d episódios.</string>
+    <string name="playlist_limit_almost_full">A playlist está quase cheia. Tente adicionar menos episódios.</string>
+    <string name="podcasts_add_episode">Adicionar</string>
+    <string name="add_to_up_next_bottom">Reproduzir o último na lista de Próximos</string>
+    <string name="add_to_up_next_top">Reproduzir o próximo na lista de Próximos</string>
+    <string name="winback_cancel_subscription_perk_installment">Você está em um plano parcelado em 12 meses. O cancelamento encerra seu acesso, mas o Google Play continuará cobrando os meses restantes.</string>
+    <string name="winback_cancel_subscription_header_description_installment">O cancelamento encerra sua assinatura do Pocket Casts.\nSeu plano de pagamento do Google Play continuará.</string>
+    <string name="winback_cancel_subscription_perk_history">Você ainda poderá acessar seus podcasts e seu histórico de reprodução.</string>
+    <string name="price_per_month_for_months">%1$s/mês por %2$d meses</string>
     <string name="no_episodes">Sem episódios</string>
     <string name="more_rules">Mais regras</string>
     <string name="player_notification_skip_forward_seconds">Avançar %d segundos</string>
@@ -44,9 +54,6 @@ Language: pt_BR
     <string name="end_of_year_stories_year_over_year_title_flat">Suas reproduções em %1$s se mantiveram estáveis</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Você ouviu mais de 500% este ano. Boas-vindas ao clube!</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">De zero a cem!</string>
-    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nAlgumas partes do aplicativo usam uma pesquisa de episódio que requer títulos normalizados. Se esta configuração for ativada, a normalização do banco de dados será executada se os episódios ainda não estiverem normalizados.</string>
-    <string name="settings_storage_normalize_episode_titles">Normalizar títulos de episódios</string>
-    <string name="normalization_started">Normalização iniciada</string>
     <string name="not_normalized">Não normalizado</string>
     <string name="normalized">Normalizado</string>
     <string name="database">Banco de dados</string>
@@ -466,6 +473,7 @@ Language: pt_BR
     <string name="shuffle_whats_new_title">Apresentamos a ordem aleatória</string>
     <string name="chapter_time_remaining_content_description">%s restante(s) no capítulo</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
+    <string name="referrals_share_text">Olá!\n\nAqui está um passe de convidado de %1$s para o Pocket Casts Plus, meu reprodutor de podcast favorito. Ele tem funcionalidades exclusivas, como favoritos, pastas, entre outras que você não encontra em nenhum outro lugar. Acho que você também vai amar!</string>
     <string name="files_plus_prompt">Faça upload dos seus arquivos e muito mais com o Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Tenha ícones de apps exclusivos e muito mais com o Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Tenha temas exclusivos e muito mais com o Pocket Casts Plus</string>
@@ -641,7 +649,6 @@ Language: pt_BR
     <string name="widget_preview_episode_in_up_next_title">Episódio em Próximos</string>
     <string name="widget_preview_episode_title">Título do episódio</string>
     <string name="hour_and_minutes">1 hora e %d minutos</string>
-    <string name="hours_and_minutes">%d horas e %d minutos</string>
     <string name="player_sleep_time_fired_end_of_chapter">O temporizador parou no fim do seu capítulo.</string>
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Em %d capítulos</string>

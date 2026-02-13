@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 09:54:04+0000
+Translation-Revision-Date: 2026-02-05 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">プレイリストに含められるのはポッドキャストのエピソードのみです。</string>
+    <string name="playlist_limit_reached">プレイリストに含められるエピソードは最大%d件です。</string>
+    <string name="playlist_limit_almost_full">プレイリストの残り容量がわずかです。 追加するエピソードの数を減らしてみてください。</string>
+    <string name="podcasts_add_episode">追加</string>
+    <string name="add_to_up_next_bottom">「次のエピソード」の最後に再生</string>
+    <string name="add_to_up_next_top">「次のエピソード」で次に再生</string>
+    <string name="winback_cancel_subscription_perk_installment">12か月間の分割払いプランを利用しています。 キャンセルするとご利用は終了しますが、Google Play は残りの月の料金を引き続き請求します。</string>
+    <string name="winback_cancel_subscription_header_description_installment">キャンセルすると Pocket Casts のサブスクリプションが終了します。\nGoogle Play の支払いプランは継続します。</string>
+    <string name="winback_cancel_subscription_perk_history">ポッドキャストと聴取履歴は引き続き利用できます。</string>
+    <string name="price_per_month_for_months">%1$s/月 (%2$dか月間)</string>
     <string name="no_episodes">エピソードなし</string>
     <string name="more_rules">その他のルール</string>
     <string name="player_notification_skip_forward_seconds">%d秒前方に移動</string>
@@ -44,9 +54,6 @@ Language: ja_JP
     <string name="end_of_year_stories_year_over_year_title_flat">%1$sの聴取時間は変わりませんでした</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">今年は500%以上聴いたんですね – クラブへようこそ</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">ゼロからヒーローへ !</string>
-    <string name="settings_storage_normalize_episode_titles_description">ステータス: %1$s\nアプリの一部では、正規化されたタイトルが必要となるエピソード検索が使用されています。 この設定をタップすると、エピソードがまだ正規化されていない場合にデータベースの正規化が実行されます。</string>
-    <string name="settings_storage_normalize_episode_titles">エピソードタイトルを正規化</string>
-    <string name="normalization_started">正規化を開始しました</string>
     <string name="not_normalized">正規化されていません</string>
     <string name="normalized">正規化</string>
     <string name="database">データベース</string>
@@ -466,6 +473,7 @@ Language: ja_JP
     <string name="shuffle_whats_new_title">シャッフルの紹介</string>
     <string name="chapter_time_remaining_content_description">チャプターの残り%s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
+    <string name="referrals_share_text">こんにちは。\n\nこちらは、私のお気に入りのポッドキャストプレイヤー、Pocket Casts Plus を利用できる%1$sのゲストパスです。 ブックマークやフォルダーなど、他にはないユニークな機能が満載です。 きっと気に入ってもらえると思います。</string>
     <string name="files_plus_prompt">Pocket Casts Plus でファイルのアップロードなどを利用しましょう</string>
     <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
     <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>
@@ -641,7 +649,6 @@ Language: ja_JP
     <string name="widget_preview_episode_in_up_next_title">次のエピソード</string>
     <string name="widget_preview_episode_title">エピソードのタイトル</string>
     <string name="hour_and_minutes">1時間%d分</string>
-    <string name="hours_and_minutes">%d時間%d分</string>
     <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>

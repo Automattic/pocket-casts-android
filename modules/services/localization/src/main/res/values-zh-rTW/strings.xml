@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 09:54:04+0000
+Translation-Revision-Date: 2026-02-06 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">播放清單只能包含 Podcast 單集。</string>
+    <string name="playlist_limit_reached">播放清單只能包含最多 %d 個單集。</string>
+    <string name="playlist_limit_almost_full">播放清單快滿了。 嘗試新增較少單集。</string>
+    <string name="podcasts_add_episode">新增</string>
+    <string name="add_to_up_next_bottom">播放「接下來播放」中的最後一集</string>
+    <string name="add_to_up_next_top">播放「接下來播放」中的下一集</string>
+    <string name="winback_cancel_subscription_perk_installment">你使用的是 12 個月的分期付款方案。 取消會結束存取權，但 Google Play 會在剩餘幾個月繼續收費。</string>
+    <string name="winback_cancel_subscription_header_description_installment">取消會結束 Pocket Casts 訂閱。\nGoogle Play 付款方案將會繼續。</string>
+    <string name="winback_cancel_subscription_perk_history">你將能繼續存取自己的 Podcast 和收聽記錄。</string>
+    <string name="price_per_month_for_months">每月 %1$s，共 %2$d 個月</string>
     <string name="no_episodes">沒有單集</string>
     <string name="more_rules">更多規則</string>
     <string name="player_notification_skip_forward_seconds">往前 %d 秒</string>
@@ -44,9 +54,6 @@ Language: zh_TW
     <string name="end_of_year_stories_year_over_year_title_flat">你的 %1$s 年收聽狀況維持穩定</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">你今年的收聽時間成長幅度超過 500%，歡迎加入我們的行列</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">直上天際！</string>
-    <string name="settings_storage_normalize_episode_titles_description">狀態：%1$s\n應用程式的某部分的功能，使用需要標準化的標題才能進行單集搜尋。 若單集尚未進行標準化，只要點選此設定，系統就會執行資料庫標準化。</string>
-    <string name="settings_storage_normalize_episode_titles">將單集標題標準化</string>
-    <string name="normalization_started">已開始標準化作業</string>
     <string name="not_normalized">未標準化</string>
     <string name="normalized">已標準化</string>
     <string name="database">資料庫</string>
@@ -466,6 +473,7 @@ Language: zh_TW
     <string name="shuffle_whats_new_title">隆重介紹隨機播放</string>
     <string name="chapter_time_remaining_content_description">本章剩餘 %s</string>
     <string name="chapter_count_summary">第 %1$d 章，共 %2$d 章</string>
+    <string name="referrals_share_text">你好！\n\n在此送上 Pocket Casts Plus 的 %1$s訪客體驗券，這是我最愛的 Podcast 播放器。 Pocket Casts Plus 提供書籤、資料夾等其他播放器找不到的獨特功能。 我相信你也會愛上這個工具！</string>
     <string name="files_plus_prompt">運用 Pocket Casts Plus 上傳檔案和其他內容</string>
     <string name="icons_plus_prompt">Pocket Casts Plus 帶給你專屬應用程式圖示和更多內容</string>
     <string name="themes_plus_prompt">Pocket Casts Plus 帶給你專屬佈景主題和更多內容</string>
@@ -641,7 +649,6 @@ Language: zh_TW
     <string name="widget_preview_episode_title">單集標題</string>
     <string name="widget_preview_episode_in_up_next_title">「接下來播放」的單集</string>
     <string name="hour_and_minutes">1 小時 %d 分鐘</string>
-    <string name="hours_and_minutes">%d 小時 %d 分鐘</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠計時器於章節結尾停止。</string>
     <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>

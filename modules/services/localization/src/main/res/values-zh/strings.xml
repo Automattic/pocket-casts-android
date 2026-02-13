@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 09:54:06+0000
+Translation-Revision-Date: 2026-02-05 11:54:09+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">播放列表只能包含播客剧集。</string>
+    <string name="playlist_limit_reached">播放列表最多只能包含 %d 个剧集。</string>
+    <string name="playlist_limit_almost_full">播放列表几乎已满。 尝试减少添加的剧集数量。</string>
+    <string name="podcasts_add_episode">添加</string>
+    <string name="add_to_up_next_bottom">在“接下来播放”中最后播放</string>
+    <string name="add_to_up_next_top">在“接下来播放”中接着播放</string>
+    <string name="winback_cancel_subscription_perk_installment">您正在执行 12 个月分期付款计划。 取消将终止您的访问权限，但 Google Play 将继续收取剩余月份的费用。</string>
+    <string name="winback_cancel_subscription_header_description_installment">取消将终止您对 Pocket Casts 的订阅。\n您的 Google Play 付款计划将继续生效。</string>
+    <string name="winback_cancel_subscription_perk_history">您仍可继续访问您的播客和收听历史记录。</string>
+    <string name="price_per_month_for_months">%1$s/月，共 %2$d 个月</string>
     <string name="no_episodes">无剧集</string>
     <string name="more_rules">更多规则</string>
     <string name="player_notification_skip_forward_seconds">快进 %d 秒</string>
@@ -44,9 +54,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_over_year_title_flat">您的 %1$s 年收听量保持稳定</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">今年您的收听量增长了 500% 以上，欢迎加入这个行列</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">从新人到王者！</string>
-    <string name="settings_storage_normalize_episode_titles_description">状态：%1$s\n该应用程序的某些部分使用剧集搜索功能，该功能需要使用规范化的标题。 如果剧集尚未规范化，则轻点此设置将运行数据库规范化。</string>
-    <string name="settings_storage_normalize_episode_titles">规范化剧集标题</string>
-    <string name="normalization_started">规范化已开始</string>
     <string name="not_normalized">未规范化</string>
     <string name="normalized">已规范化</string>
     <string name="database">数据库</string>
@@ -466,6 +473,7 @@ Language: zh_CN
     <string name="shuffle_whats_new_message">无需更改队列顺序，即可轻松播放随机剧集。</string>
     <string name="chapter_time_remaining_content_description">本章还剩 %s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
+    <string name="referrals_share_text">您好！\n\n这是一张 %1$s 的 Pocket Casts Plus 访客通行证，Pocket Casts Plus 是我最喜欢的播客播放器。 它拥有您在别处享受不到的独特功能，如书签、文件夹等。 我想您也会喜欢！</string>
     <string name="files_plus_prompt">通过 Pocket Casts Plus 上传文件，并享用更多功能</string>
     <string name="icons_plus_prompt">通过 Pocket Casts Plus 获取独家应用程序图标，并享用更多功能</string>
     <string name="themes_plus_prompt">通过 Pocket Casts Plus 获取专属主题，并享用更多功能</string>
@@ -641,7 +649,6 @@ Language: zh_CN
     <string name="widget_preview_episode_in_up_next_title">下集预告</string>
     <string name="widget_preview_episode_title">剧集标题</string>
     <string name="hour_and_minutes">1 小时 %d 分钟</string>
-    <string name="hours_and_minutes">%d 小时 %d 分钟</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠定时器在章节结束时停止。</string>
     <string name="player_sleep_in_chapters">%d 个章节后进入睡眠状态</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>
