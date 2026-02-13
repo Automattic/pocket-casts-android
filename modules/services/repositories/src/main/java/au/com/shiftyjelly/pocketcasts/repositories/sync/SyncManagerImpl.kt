@@ -302,8 +302,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getPlaybackUrl(episode, token)
     }
 
-    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = // If user isn't signed it do not bother grabbing the file
-        // as it will result in unauthorized access
+    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> =
         if (settings.cachedMembership.value.subscription != null) {
             getCacheTokenOrLoginRxSingle { token ->
                 syncServiceManager.getUserEpisode(uuid, token)
@@ -317,6 +316,7 @@ class SyncManagerImpl @Inject constructor(
                 }
             }
         } else {
+            // If the user doesn't have an active subscription, do not bother grabbing the file
             Maybe.empty()
         }
 
