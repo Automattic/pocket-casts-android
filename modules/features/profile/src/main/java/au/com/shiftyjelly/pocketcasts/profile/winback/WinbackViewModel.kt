@@ -175,6 +175,7 @@ class WinbackViewModel @Inject constructor(
                 loadedState.currentSubscription.tier,
                 loadedState.currentSubscription.billingCycle,
                 SubscriptionOffer.Winback,
+                loadedState.currentSubscription.isInstallment,
             )
             when (paymentClient.purchaseSubscriptionPlan(newPlanKey, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Purchased -> {
@@ -294,9 +295,12 @@ class WinbackViewModel @Inject constructor(
     private fun SubscriptionPlans.finMatchingWinbackPlan(offerId: String): SubscriptionPlan.WithOffer? {
         SubscriptionTier.entries.forEach { tier ->
             BillingCycle.entries.forEach { billingCycle ->
-                val offer = findOfferPlan(tier, billingCycle, SubscriptionOffer.Winback).getOrNull()
-                if (offer != null && offer.offerId == offerId) {
-                    return offer
+                // Check both non-installment and installment winback offers
+                listOf(false, true).forEach { isInstallment ->
+                    val offer = findOfferPlan(tier, billingCycle, SubscriptionOffer.Winback, isInstallment).getOrNull()
+                    if (offer != null && offer.offerId == offerId) {
+                        return offer
+                    }
                 }
             }
         }
