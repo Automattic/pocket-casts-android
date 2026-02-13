@@ -260,6 +260,7 @@ private fun WinbackOfferPageThemePreview(
                 formattedPrice = "\$3.99",
                 tier = SubscriptionTier.Plus,
                 billingCycle = BillingCycle.Monthly,
+                isInstallment = false,
             ),
         )
     }
@@ -272,12 +273,14 @@ private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOf
             formattedPrice = "\$3.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Monthly,
+            isInstallment = false,
         ),
         WinbackOffer(
             redeemCode = "",
             formattedPrice = "\$19.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Yearly,
+            isInstallment = false,
         ),
     )
 }

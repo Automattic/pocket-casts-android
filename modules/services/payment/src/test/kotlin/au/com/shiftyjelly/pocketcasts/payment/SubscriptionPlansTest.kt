@@ -547,27 +547,27 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `offerId returns same ID for installment intro offer`() {
+    fun `offerId returns null for installment intro offer`() {
         val offerId = SubscriptionOffer.IntroOffer.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
             isInstallment = true,
         )
 
-        // IntroOffer doesn't have installment-specific offers, returns regular offer ID
-        assertEquals("plus-yearly-intro-50percent", offerId)
+        // IntroOffer is not supported for installment plans
+        assertNull(offerId)
     }
 
     @Test
-    fun `offerId returns same ID for installment referral offer`() {
+    fun `offerId returns null for installment referral offer`() {
         val offerId = SubscriptionOffer.Referral.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
             isInstallment = true,
         )
 
-        // Referral doesn't have installment-specific offers, returns regular offer ID
-        assertEquals("plus-yearly-referral-two-months-free", offerId)
+        // Referral is not supported for installment plans
+        assertNull(offerId)
     }
 
     @Test
@@ -673,7 +673,7 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `intro offer does not have installment-specific offer ID`() {
+    fun `intro offer is not supported for installment plans`() {
         val installmentOfferId = SubscriptionOffer.IntroOffer.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
@@ -686,14 +686,12 @@ class SubscriptionPlansTest {
             isInstallment = false,
         )
 
-        // IntroOffer returns the same offer ID regardless of installment flag
-        // because it doesn't have installment-specific offers configured in Google Play
-        assertEquals(regularOfferId, installmentOfferId)
-        assertEquals("plus-yearly-intro-50percent", installmentOfferId)
+        assertNull(installmentOfferId)
+        assertEquals("plus-yearly-intro-50percent", regularOfferId)
     }
 
     @Test
-    fun `referral offer does not have installment-specific offer ID`() {
+    fun `referral offer is not supported for installment plans`() {
         val installmentOfferId = SubscriptionOffer.Referral.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
@@ -706,9 +704,7 @@ class SubscriptionPlansTest {
             isInstallment = false,
         )
 
-        // Referral returns the same offer ID regardless of installment flag
-        // because it doesn't have installment-specific offers configured in Google Play
-        assertEquals(regularOfferId, installmentOfferId)
-        assertEquals("plus-yearly-referral-two-months-free", installmentOfferId)
+        assertNull(installmentOfferId)
+        assertEquals("plus-yearly-referral-two-months-free", regularOfferId)
     }
 }

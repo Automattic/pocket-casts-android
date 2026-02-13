@@ -432,7 +432,12 @@ enum class SubscriptionOffer(
         IntroOffer -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-intro-50percent"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    null
+                } else {
+                    "plus-yearly-intro-50percent"
+                }
             }
 
             SubscriptionTier.Patron -> null
@@ -455,7 +460,12 @@ enum class SubscriptionOffer(
         Referral -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    null
+                } else {
+                    "plus-yearly-referral-two-months-free"
+                }
             }
 
             SubscriptionTier.Patron -> null
