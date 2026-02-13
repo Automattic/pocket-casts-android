@@ -20,3 +20,7 @@ gem 'google-apis-sheets_v4', '~> 0.26'
 #
 # See https://github.com/ruby/openssl/issues/949
 gem 'openssl', '~> 4.0'
+
+# Security: https://github.com/lostisland/faraday/pull/1665
+# Faraday 2.0 is not compatible with Fastlane
+gem 'faraday', '~> 1.10', '>= 1.10.5'
