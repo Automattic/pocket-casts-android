@@ -100,7 +100,12 @@ private class DownloadQueueController(
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType) {
         var episodes = episodeDao.findByUuids(episodeUuids) + userEpisodeDao.findEpisodesByUuids(episodeUuids)
-        episodes = episodes.filterNot(BaseEpisode::isDownloaded)
+        episodes = episodes.filter { episode ->
+            when (episode) {
+                is PodcastEpisode -> !episode.isDownloaded
+                is UserEpisode -> !episode.isDownloaded && episode.isUploaded
+            }
+        }
         if (episodes.isEmpty()) {
             return
         }
