@@ -128,17 +128,15 @@ class PlaylistManagerImpl(
     }
 
     override suspend fun getAutoDownloadPlaylists(): List<Playlist> {
-        return appDatabase.withTransaction {
-            val playlists = playlistDao.getAllAutoDownloadPlaylists()
-            withContext(computationContext) {
-                playlists.mapNotNull { playlist ->
-                    val playlistFlow = if (playlist.manual) {
-                        manualPlaylistFlow(playlist.uuid)
-                    } else {
-                        smartPlaylistFlow(playlist.uuid)
-                    }
-                    playlistFlow.first()
+        val playlists = playlistDao.getAllAutoDownloadPlaylists()
+        return withContext(computationContext) {
+            playlists.mapNotNull { playlist ->
+                val playlistFlow = if (playlist.manual) {
+                    manualPlaylistFlow(playlist.uuid)
+                } else {
+                    smartPlaylistFlow(playlist.uuid)
                 }
+                playlistFlow.first()
             }
         }
     }
