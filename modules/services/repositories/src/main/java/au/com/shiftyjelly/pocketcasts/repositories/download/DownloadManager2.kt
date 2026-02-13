@@ -99,16 +99,32 @@ private class DownloadQueueController(
     private val userEpisodeDao = appDatabase.userEpisodeDao()
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType) {
-        val episodes = episodeUuids.toSet().mapNotNull { episodeUuid ->
-            episodeDao.findByUuid(episodeUuid) ?: userEpisodeDao.findEpisodeByUuid(episodeUuid)
+        var episodes = episodeDao.findByUuids(episodeUuids) + userEpisodeDao.findEpisodesByUuids(episodeUuids)
+        episodes = episodes.filterNot(BaseEpisode::isDownloaded)
+        if (episodes.isEmpty()) {
+            return
         }
+
+        val pendingWorks = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
+            .firstOrNull()
+            ?.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo)
+            ?.filterIsInstance<DownloadWorkInfo.Pending>()
+            .orEmpty()
+            .associateBy(DownloadWorkInfo::episodeUuid)
+
         episodes.forEach { episode ->
+            val pendingWork = pendingWorks[episode.uuid]
             val args = episode.toDownloadArgs(downloadType)
             val (request, constraints) = DownloadEpisodeWorker.createWorkRequest(args)
+
             val operation = workManager.enqueueUniqueWork(
                 uniqueWorkName = DownloadEpisodeWorker.episodeTag(episode.uuid),
-                // TODO(PCDROID-429): Check if work should be replaced due to looser constraints
-                existingWorkPolicy = ExistingWorkPolicy.KEEP,
+                existingWorkPolicy = when {
+                    pendingWork == null -> ExistingWorkPolicy.KEEP
+                    !args.waitForWifi && pendingWork.isWifiRequired -> ExistingWorkPolicy.REPLACE
+                    !args.waitForPower && pendingWork.isPowerRequired -> ExistingWorkPolicy.REPLACE
+                    else -> ExistingWorkPolicy.KEEP
+                },
                 request = request,
             )
             val operationState = operation.state.asFlow().firstOrNull()
