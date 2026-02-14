@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
+import au.com.shiftyjelly.pocketcasts.coroutines.di.WearIoDispatcher
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -22,6 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -48,6 +50,7 @@ class WearMainActivityViewModel @Inject constructor(
     private val watchSync: WatchSync,
     private val phoneConnectionMonitor: PhoneConnectionMonitor,
     private val connectivityStateManager: ConnectivityStateManager,
+    @WearIoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     data class State(
@@ -198,7 +201,7 @@ class WearMainActivityViewModel @Inject constructor(
     }
 
     fun refreshPodcasts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             delay(REFRESH_START_DELAY) // delay the refresh to allow the UI to load
             try {
                 podcastManager.refreshPodcastsIfRequired(fromLog = "watch - open app")
