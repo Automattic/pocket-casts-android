@@ -54,6 +54,7 @@ fun EffectsScreen(
 
     ScreenScaffold(
         scrollState = columnState,
+        timeText = {}, // Hide default TimeText, using global one
     ) {
         val state = viewModel.state.collectAsStateWithLifecycle().value
         Content(

@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ConnectivityNotificationOverlay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.TimeTextWithConnectivity
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
@@ -369,7 +370,6 @@ private fun WearApp(
                 }
             }
 
-            // Global refresh indicator overlay
             if (refreshState is RefreshState.Refreshing) {
                 CircularProgressIndicator(
                     indicatorColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.9f),
@@ -378,6 +378,8 @@ private fun WearApp(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
+
+            TimeTextWithConnectivity(isConnected = isConnected)
         }
 
         if (showConnectivityNotification) {

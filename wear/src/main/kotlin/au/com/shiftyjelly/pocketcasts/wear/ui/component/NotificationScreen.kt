@@ -43,7 +43,7 @@ fun NotificationScreen(
     },
 ) {
     ScreenScaffold(
-        timeText = null,
+        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         LaunchedEffect(closeAfterDuration, onClose) {

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +44,9 @@ class WatchListScreenViewModelTest {
     @Mock
     private lateinit var upNextQueue: UpNextQueue
 
+    @Mock
+    private lateinit var connectivityStateManager: ConnectivityStateManager
+
     private lateinit var viewModel: WatchListScreenViewModel
 
     @Before
@@ -54,7 +58,10 @@ class WatchListScreenViewModelTest {
         whenever(settings.refreshStateFlow).thenReturn(
             MutableStateFlow(RefreshState.Never),
         )
-        viewModel = WatchListScreenViewModel(analyticsTracker, settings, episodeManager, playbackManager, podcastManager)
+        whenever(connectivityStateManager.isConnected).thenReturn(
+            MutableStateFlow(true),
+        )
+        viewModel = WatchListScreenViewModel(analyticsTracker, settings, episodeManager, playbackManager, podcastManager, connectivityStateManager)
     }
 
     @Test

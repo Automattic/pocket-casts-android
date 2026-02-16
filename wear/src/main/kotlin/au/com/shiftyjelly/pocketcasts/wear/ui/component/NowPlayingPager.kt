@@ -49,11 +49,7 @@ fun NowPlayingPager(
 
     ScreenScaffold(
         scrollState = columState,
-        timeText = if (showTimeText) {
-            null
-        } else {
-            {}
-        },
+        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
