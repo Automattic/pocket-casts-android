@@ -17,7 +17,7 @@
 
 [versions]
 aboutlibraries = "14.0.0-b02"
-android-gradle-plugin = "9.0.0"
+android-gradle-plugin = "9.0.1"
 billing = "8.3.0"
 coil = "3.3.0"
 compose = "2025.12.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
