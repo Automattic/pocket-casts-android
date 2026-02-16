@@ -302,16 +302,21 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getPlaybackUrl(episode, token)
     }
 
-    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getUserEpisode(uuid, token)
-    }.flatMapMaybe {
-        if (it.isSuccessful) {
-            Maybe.just(it.body())
-        } else if (it.code() == HttpURLConnection.HTTP_NOT_FOUND) {
-            Maybe.empty()
-        } else {
-            Maybe.error(HttpException(it))
+    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = if (settings.cachedMembership.value.subscription != null) {
+        getCacheTokenOrLoginRxSingle { token ->
+            syncServiceManager.getUserEpisode(uuid, token)
+        }.flatMapMaybe {
+            if (it.isSuccessful) {
+                Maybe.just(it.body())
+            } else if (it.code() == HttpURLConnection.HTTP_NOT_FOUND) {
+                Maybe.empty()
+            } else {
+                Maybe.error(HttpException(it))
+            }
         }
+    } else {
+        // If the user doesn't have an active subscription, do not bother grabbing the file
+        Maybe.empty()
     }
 
 // History
