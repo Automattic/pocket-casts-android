@@ -13,6 +13,7 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.PullToRefresh
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.playlists.PlaylistsScreen
@@ -43,88 +44,95 @@ fun WatchListScreen(
         viewModel.onShown()
     }
 
-    ScalingLazyColumn(
-        columnState = columnState,
-        modifier = modifier.fillMaxWidth(),
+    PullToRefresh(
+        state = state.refreshState,
+        listState = columnState.state,
+        onRefresh = { viewModel.refreshPodcasts() },
+        modifier = modifier,
     ) {
-        item {
-            // Need this to position the first chip correctly when the screen loads
-            Spacer(Modifier)
-        }
-
-        if (upNextState is UpNextQueue.State.Loaded) {
+        ScalingLazyColumn(
+            columnState = columnState,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             item {
-                NowPlayingChip(onClick = {
-                    viewModel.onNowPlayingClicked()
-                    toNowPlaying()
-                })
+                // Need this to position the first chip correctly when the screen loads
+                Spacer(Modifier)
             }
-        }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.podcasts),
-                iconRes = IR.drawable.ic_podcasts,
-                onClick = {
-                    viewModel.onPodcastsClicked()
-                    navigateToRoute(PodcastsScreen.ROUTE_HOME_FOLDER)
-                },
-            )
-        }
+            if (upNextState is UpNextQueue.State.Loaded) {
+                item {
+                    NowPlayingChip(onClick = {
+                        viewModel.onNowPlayingClicked()
+                        toNowPlaying()
+                    })
+                }
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.downloads),
-                iconRes = IR.drawable.ic_download,
-                onClick = {
-                    viewModel.onDownloadsClicked()
-                    navigateToRoute(DownloadsScreen.ROUTE)
-                },
-            )
-        }
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.podcasts),
+                    iconRes = IR.drawable.ic_podcasts,
+                    onClick = {
+                        viewModel.onPodcastsClicked()
+                        navigateToRoute(PodcastsScreen.ROUTE_HOME_FOLDER)
+                    },
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.playlists),
-                iconRes = IR.drawable.ic_playlists,
-                onClick = {
-                    viewModel.onPlaylistsClicked()
-                    navigateToRoute(PlaylistsScreen.ROUTE)
-                },
-            )
-        }
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.downloads),
+                    iconRes = IR.drawable.ic_download,
+                    onClick = {
+                        viewModel.onDownloadsClicked()
+                        navigateToRoute(DownloadsScreen.ROUTE)
+                    },
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.profile_navigation_files),
-                iconRes = IR.drawable.ic_file,
-                onClick = {
-                    viewModel.onFilesClicked()
-                    navigateToRoute(FilesScreen.ROUTE)
-                },
-            )
-        }
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.playlists),
+                    iconRes = IR.drawable.ic_playlists,
+                    onClick = {
+                        viewModel.onPlaylistsClicked()
+                        navigateToRoute(PlaylistsScreen.ROUTE)
+                    },
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.profile_navigation_starred),
-                iconRes = IR.drawable.ic_starred,
-                onClick = {
-                    viewModel.onStarredClicked()
-                    navigateToRoute(StarredScreen.ROUTE)
-                },
-            )
-        }
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.profile_navigation_files),
+                    iconRes = IR.drawable.ic_file,
+                    onClick = {
+                        viewModel.onFilesClicked()
+                        navigateToRoute(FilesScreen.ROUTE)
+                    },
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.settings),
-                iconRes = IR.drawable.ic_profile_settings,
-                onClick = {
-                    viewModel.onSettingsClicked()
-                    navigateToRoute(SettingsScreen.ROUTE)
-                },
-            )
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.profile_navigation_starred),
+                    iconRes = IR.drawable.ic_starred,
+                    onClick = {
+                        viewModel.onStarredClicked()
+                        navigateToRoute(StarredScreen.ROUTE)
+                    },
+                )
+            }
+
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.settings),
+                    iconRes = IR.drawable.ic_profile_settings,
+                    onClick = {
+                        viewModel.onSettingsClicked()
+                        navigateToRoute(SettingsScreen.ROUTE)
+                    },
+                )
+            }
         }
     }
 }

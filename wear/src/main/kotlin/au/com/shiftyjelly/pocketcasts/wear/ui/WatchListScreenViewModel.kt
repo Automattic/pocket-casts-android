@@ -28,7 +28,7 @@ class WatchListScreenViewModel @Inject constructor(
     private val settings: Settings,
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
-    podcastManager: PodcastManager,
+    private val podcastManager: PodcastManager,
     connectivityStateManager: ConnectivityStateManager,
 ) : ViewModel() {
 
@@ -103,5 +103,13 @@ class WatchListScreenViewModel @Inject constructor(
 
     fun onSettingsClicked() {
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
+    }
+
+    fun refreshPodcasts() {
+        // Prevent multiple simultaneous refresh requests
+        if (_state.value.refreshState is RefreshState.Refreshing) {
+            return
+        }
+        podcastManager.refreshPodcasts("watch - list screen")
     }
 }
