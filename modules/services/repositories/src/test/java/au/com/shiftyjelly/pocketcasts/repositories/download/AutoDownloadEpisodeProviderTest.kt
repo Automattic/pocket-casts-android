@@ -1,14 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.TestSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -24,7 +28,7 @@ import org.mockito.kotlin.mock
 
 class AutoDownloadEpisodeProviderTest {
     private val podcastEpisodes = mutableMapOf<Podcast, List<PodcastEpisode>>()
-    private val playlistEpisodes = mutableListOf<PodcastEpisode>()
+    private val playlists = mutableListOf<Playlist>()
     private val upNextEpisodes = mutableListOf<BaseEpisode>()
     private val userEpisodes = mutableListOf<UserEpisode>()
     private val isAutoDownloadEnabled = TestSetting(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
@@ -43,7 +47,7 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     private val playlistManager = mock<PlaylistManager> {
-        on { getAutoDownloadEpisodes() } doAnswer { playlistEpisodes }
+        on { getAutoDownloadPlaylists() } doAnswer { playlists }
     }
 
     private val upNextQueue = mock<UpNextQueue> {
@@ -115,10 +119,73 @@ class AutoDownloadEpisodeProviderTest {
 
     @Test
     fun `provide playlist episodes`() = runTest {
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
-        assertProviderEpisodes(playlist)
+        assertProviderEpisodes(playlistEpisodes)
+    }
+
+    @Test
+    fun `ignore archived playlist episodes`() = runTest {
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+            addEpisode {
+                isArchived = true
+            }
+        }
+        playlists += playlist
+
+        assertProviderEpisodes(playlistEpisodes)
+    }
+
+    @Test
+    fun `ignore played playlist episodes`() = runTest {
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+            addEpisode {
+                isCompleted = true
+            }
+        }
+        playlists += playlist
+
+        assertProviderEpisodes(playlistEpisodes)
+    }
+
+    @Test
+    fun `ignore unavailable playlist episodes`() = runTest {
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+            addEpisode {
+                isPlaylistAvailable = false
+            }
+        }
+        playlists += playlist
+
+        assertProviderEpisodes(playlistEpisodes)
+    }
+
+    @Test
+    fun `respect playlist limit setting`() = runTest {
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            autoDownloadLimit = 2
+            addEpisode {
+                isPlaylistAvailable = false
+            }
+            addEpisodes(playlistEpisodes)
+            addEpisode {
+                isPlaylistAvailable = false
+            }
+        }
+        playlists += playlist
+
+        assertProviderEpisodes(playlistEpisodes.take(2))
     }
 
     @Test
@@ -168,8 +235,11 @@ class AutoDownloadEpisodeProviderTest {
         val podcast = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         podcastEpisodes += mapOf(podcast() to podcast)
 
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
         val upNext = listOf(podcastEpisode(), userEpisode(), podcastEpisode())
         upNextEpisodes += upNext
@@ -177,7 +247,7 @@ class AutoDownloadEpisodeProviderTest {
         val user = listOf(userEpisode(), userEpisode(), userEpisode())
         userEpisodes += user
 
-        assertProviderEpisodes(podcast + playlist + upNext + user)
+        assertProviderEpisodes(podcast + playlistEpisodes + upNext + user)
     }
 
     @Test
@@ -186,7 +256,7 @@ class AutoDownloadEpisodeProviderTest {
         val user = listOf(userEpisode(), userEpisode(), userEpisode())
 
         podcastEpisodes += mapOf(podcast() to podcast)
-        playlistEpisodes += podcast
+        playlists += playlist { addEpisodes(podcast) }
         upNextEpisodes += podcast + user
         userEpisodes += user
 
@@ -219,8 +289,11 @@ class AutoDownloadEpisodeProviderTest {
 
     @Test
     fun `ignore global podcast auto download setting for not podcast sources`() = runTest {
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
         val upNext = listOf(podcastEpisode(), userEpisode(), podcastEpisode())
         upNextEpisodes += upNext
@@ -230,7 +303,7 @@ class AutoDownloadEpisodeProviderTest {
 
         isAutoDownloadEnabled.set(Podcast.AUTO_DOWNLOAD_OFF)
 
-        assertProviderEpisodes(playlist + upNext + user)
+        assertProviderEpisodes(playlistEpisodes + upNext + user)
     }
 
     @Test
@@ -248,15 +321,18 @@ class AutoDownloadEpisodeProviderTest {
         val podcast = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         podcastEpisodes += mapOf(podcast() to podcast)
 
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
         val user = listOf(userEpisode(), userEpisode(), userEpisode())
         userEpisodes += user
 
         isUpNextAutoDownloadEnabled.set(false)
 
-        assertProviderEpisodes(podcast + playlist + user)
+        assertProviderEpisodes(podcast + playlistEpisodes + user)
     }
 
     @Test
@@ -274,15 +350,18 @@ class AutoDownloadEpisodeProviderTest {
         val podcast = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         podcastEpisodes += mapOf(podcast() to podcast)
 
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
         val upNext = listOf(podcastEpisode(), userEpisode(), podcastEpisode())
         upNextEpisodes += upNext
 
         isCloudAutoDownloadEnabled.set(false)
 
-        assertProviderEpisodes(podcast + playlist + upNext)
+        assertProviderEpisodes(podcast + playlistEpisodes + upNext)
     }
 
     @Test
@@ -323,8 +402,11 @@ class AutoDownloadEpisodeProviderTest {
 
     @Test
     fun `ignore global podcast auto download limit setting for not podcast sources`() = runTest {
-        val playlist = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
-        playlistEpisodes += playlist
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+        }
+        playlists += playlist
 
         val upNext = listOf(podcastEpisode(), userEpisode(), podcastEpisode())
         upNextEpisodes += upNext
@@ -334,7 +416,7 @@ class AutoDownloadEpisodeProviderTest {
 
         autoDownloadLimit.set(AutoDownloadLimitSetting.LATEST_EPISODE)
 
-        assertProviderEpisodes(playlist + upNext + user)
+        assertProviderEpisodes(playlistEpisodes + upNext + user)
     }
 
     private suspend fun assertProviderEpisodes(episodes: Collection<BaseEpisode>) {
@@ -346,10 +428,31 @@ class AutoDownloadEpisodeProviderTest {
 }
 
 private fun podcast(block: PodcastDsl.() -> Unit = {}): Podcast {
-    val dsl = PodcastDsl().apply(block)
-    return Podcast(
-        uuid = dsl.uuid,
-        autoDownloadStatus = if (dsl.isAutoDownloadEnabled) {
+    return PodcastDsl().apply(block).toPodcast()
+}
+
+private fun playlist(block: PlaylistDsl.() -> Unit = {}): Playlist {
+    return PlaylistDsl().apply(block).toPlaylist()
+}
+
+private fun podcastEpisode(block: EpisodeDsl.() -> Unit = {}): PodcastEpisode {
+    return EpisodeDsl().apply(block).toPodcastEpisode()
+}
+
+private fun userEpisode(block: EpisodeDsl.() -> Unit = {}): UserEpisode {
+    return EpisodeDsl().apply(block).toUserEpisode()
+}
+
+@DslMarker private annotation class TestingDsl
+
+@TestingDsl
+private class PodcastDsl {
+    val uuid = UUID.randomUUID().toString()
+    var isAutoDownloadEnabled = false
+
+    fun toPodcast() = Podcast(
+        uuid = uuid,
+        autoDownloadStatus = if (isAutoDownloadEnabled) {
             Podcast.AUTO_DOWNLOAD_NEW_EPISODES
         } else {
             Podcast.AUTO_DOWNLOAD_OFF
@@ -357,41 +460,61 @@ private fun podcast(block: PodcastDsl.() -> Unit = {}): Podcast {
     )
 }
 
-private fun podcastEpisode(block: PodcastEpisodeDsl.() -> Unit = {}): PodcastEpisode {
-    val dsl = PodcastEpisodeDsl().apply(block)
-    return PodcastEpisode(
-        uuid = dsl.uuid,
-        publishedDate = Date(),
-        isArchived = dsl.isArchived,
-        playingStatus = if (dsl.isCompleted) {
-            EpisodePlayingStatus.COMPLETED
-        } else {
-            EpisodePlayingStatus.NOT_PLAYED
-        },
-    )
-}
-
-private fun userEpisode(block: PodcastEpisodeDsl.() -> Unit = {}): UserEpisode {
-    val dsl = PodcastEpisodeDsl().apply(block)
-    return UserEpisode(
-        uuid = dsl.uuid,
-        publishedDate = Date(),
-        isArchived = dsl.isArchived,
-        playingStatus = if (dsl.isCompleted) {
-            EpisodePlayingStatus.COMPLETED
-        } else {
-            EpisodePlayingStatus.NOT_PLAYED
-        },
-    )
-}
-
-private class PodcastDsl {
+@TestingDsl
+private class PlaylistDsl {
     val uuid = UUID.randomUUID().toString()
-    var isAutoDownloadEnabled = false
+    var autoDownloadLimit = 10
+    var episodes = emptyList<PlaylistEpisode>()
+
+    fun addEpisodes(episodes: Collection<PodcastEpisode>) {
+        this.episodes += episodes.map(PlaylistEpisode::Available)
+    }
+
+    fun addEpisode(block: EpisodeDsl.() -> Unit = {}) {
+        episodes += EpisodeDsl().apply(block).toPlaylistEpisode()
+    }
+
+    fun toPlaylist() = ManualPlaylist(
+        uuid = uuid,
+        title = "",
+        episodes = episodes.toList(),
+        settings = Playlist.Settings.ForPreview.copy(autoDownloadLimit = autoDownloadLimit),
+        metadata = Playlist.Metadata.ForPreview,
+    )
 }
 
-private class PodcastEpisodeDsl {
+@TestingDsl
+private class EpisodeDsl {
     val uuid = UUID.randomUUID().toString()
     var isArchived = false
     var isCompleted = false
+    var isPlaylistAvailable = true
+
+    fun toPodcastEpisode() = PodcastEpisode(
+        uuid = uuid,
+        publishedDate = Date(),
+        isArchived = isArchived,
+        playingStatus = if (isCompleted) {
+            EpisodePlayingStatus.COMPLETED
+        } else {
+            EpisodePlayingStatus.NOT_PLAYED
+        },
+    )
+
+    fun toUserEpisode() = UserEpisode(
+        uuid = uuid,
+        publishedDate = Date(),
+        isArchived = isArchived,
+        playingStatus = if (isCompleted) {
+            EpisodePlayingStatus.COMPLETED
+        } else {
+            EpisodePlayingStatus.NOT_PLAYED
+        },
+    )
+
+    fun toPlaylistEpisode() = if (isPlaylistAvailable) {
+        PlaylistEpisode.Available(toPodcastEpisode())
+    } else {
+        PlaylistEpisode.Unavailable(ManualPlaylistEpisode.test(episodeUuid = uuid))
+    }
 }
