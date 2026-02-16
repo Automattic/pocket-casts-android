@@ -6,6 +6,7 @@ import androidx.lifecycle.asFlow
 import androidx.room.withTransaction
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
 import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.impl.WorkManagerImpl
@@ -20,9 +21,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
+import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,7 +57,7 @@ class DownloadManager2 @Inject constructor(
 
     private val workManager = WorkManager.getInstance(context)
     private val prerequisitesProvider = DownloadPrerequisitesProvider(workManager, context)
-    private val queueController = DownloadQueueController(appDatabase, settings, workManager, context)
+    private val queueController = DownloadQueueController(appDatabase, settings, workManager, context, scope)
     private val statusController = DownloadStatusController(appDatabase, context)
 
     private val isMonitoring = AtomicBoolean()
@@ -62,12 +66,12 @@ class DownloadManager2 @Inject constructor(
         scope.launch { queueController.addToQueue(episodeUuids, downloadType) }
     }
 
-    override fun cancelAll(episodeUuids: Collection<String>) {
-        queueController.removeFromQueue(episodeUuids)
+    override fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean) {
+        scope.launch { queueController.removeFromQueue(episodeUuids, disableAutoDownload) }
     }
 
-    override fun cancelAll(podcastUuid: String) {
-        queueController.removeFromQueue(podcastUuid)
+    override fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean) {
+        scope.launch { queueController.removeFromQueue(podcastUuid, disableAutoDownload) }
     }
 
     @OptIn(FlowPreview::class)
@@ -75,12 +79,14 @@ class DownloadManager2 @Inject constructor(
         if (isMonitoring.getAndSet(true)) {
             return
         }
+
         scope.launch {
+            queueController.clearStaleTasks()
+
             val constraintsFlow = prerequisitesProvider.getConstraintsFlow()
             val workInfosFlow = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
                 .conflate()
                 .map { infos -> infos.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo) }
-
             combine(workInfosFlow, constraintsFlow, ::Pair).collect { (infos, constraints) ->
                 statusController.updateStatuses(infos, constraints)
                 queueController.cancelDownloadsExceedingMaxAttempts(infos)
@@ -90,68 +96,70 @@ class DownloadManager2 @Inject constructor(
 }
 
 private class DownloadQueueController(
-    appDatabase: AppDatabase,
+    private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val workManager: WorkManager,
     private val context: Context,
+    private val coroutineScope: CoroutineScope,
 ) {
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+    private val fileStorage = FileStorage(settings, context)
+
+    private val pendingStatuses = EpisodeDownloadStatus.entries.filter { it.isPending }
+
+    suspend fun clearStaleTasks() {
+        val pendingEpisodes = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>().keys
+        appDatabase.withTransaction {
+            val staleEpisodes = episodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - pendingEpisodes
+            episodeDao.updateDownloadStatuses(staleEpisodes.associateWith { DownloadStatusUpdate.Idle })
+
+            val staleUserEpisodes = userEpisodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - pendingEpisodes
+            userEpisodeDao.updateDownloadStatuses(staleUserEpisodes.associateWith { DownloadStatusUpdate.Idle })
+        }
+    }
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType) {
-        var episodes = episodeDao.findByUuids(episodeUuids) + userEpisodeDao.findEpisodesByUuids(episodeUuids)
-        episodes = episodes.filter { episode ->
-            when (episode) {
-                is PodcastEpisode -> !episode.isDownloaded
-                is UserEpisode -> !episode.isDownloaded && episode.isUploaded
-            }
-        }
+        val podcastEpisodes = episodeDao.findByUuids(episodeUuids)
+        val userEpisodes = userEpisodeDao.findEpisodesByUuids(episodeUuids)
+        val episodes = (podcastEpisodes + userEpisodes).filter { episode -> canDownload(episode, downloadType) }
         if (episodes.isEmpty()) {
             return
         }
 
-        val pendingWorks = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
-            .firstOrNull()
-            ?.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo)
-            ?.filterIsInstance<DownloadWorkInfo.Pending>()
-            .orEmpty()
-            .associateBy(DownloadWorkInfo::episodeUuid)
+        val pendingWorks = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>()
+        val downloadCommands = episodes.map { episode -> episode.toDownloadCommand(downloadType, pendingWorks) }
 
-        episodes.forEach { episode ->
-            val pendingWork = pendingWorks[episode.uuid]
-            val args = episode.toDownloadArgs(downloadType)
-            val (request, constraints) = DownloadEpisodeWorker.createWorkRequest(args)
+        val associatedWorkers = downloadCommands.associate { command -> command.episodeUuid to command.request.id }
+        applyQueueTransition(QueueTransition.Enqueue(associatedWorkers))
 
-            val operation = workManager.enqueueUniqueWork(
-                uniqueWorkName = DownloadEpisodeWorker.episodeTag(episode.uuid),
-                existingWorkPolicy = when {
-                    pendingWork == null -> ExistingWorkPolicy.KEEP
-                    !args.waitForWifi && pendingWork.isWifiRequired -> ExistingWorkPolicy.REPLACE
-                    !args.waitForPower && pendingWork.isPowerRequired -> ExistingWorkPolicy.REPLACE
-                    else -> ExistingWorkPolicy.KEEP
-                },
-                request = request,
-            )
+        downloadCommands.forEach { command ->
+            val operation = command.enqueue(workManager)
             val operationState = operation.state.asFlow().firstOrNull()
             if (operationState != null && operationState !is Operation.State.FAILURE) {
-                enqueueShowNotesUpdate(episode, constraints)
+                enqueueShowNotesUpdate(command.episode, command.constraints)
             }
         }
     }
 
-    fun removeFromQueue(episodeUuids: Collection<String>) {
+    suspend fun removeFromQueue(episodeUuids: Collection<String>, disableAutoDownload: Boolean) {
+        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload))
+
         episodeUuids.forEach { episodeUuid ->
             workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
             workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(episodeUuid))
         }
     }
 
-    fun removeFromQueue(podcastUuid: String) {
+    suspend fun removeFromQueue(podcastUuid: String, disableAutoDownload: Boolean) {
+        val episodeUuids = episodeDao.findByPodcastUuid(podcastUuid)
+        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload))
+
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.podcastTag(podcastUuid))
     }
 
-    fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
+    suspend fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
         // We normally check the retry/attempt count inside the download worker.
         // However, the worker may never actually reach doWork().
         //
@@ -169,7 +177,82 @@ private class DownloadQueueController(
                 ?.takeIf { it.runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT }
                 ?.episodeUuid
         }
-        removeFromQueue(episodesToCancel)
+        removeFromQueue(episodesToCancel, disableAutoDownload = false)
+    }
+
+    private suspend fun applyQueueTransition(transition: QueueTransition) {
+        appDatabase.withTransaction {
+            when (transition) {
+                is QueueTransition.Enqueue -> {
+                    episodeDao.setReadyForDownload(transition.episodeToWorkerUuids)
+                    userEpisodeDao.setReadyForDownload(transition.episodeToWorkerUuids)
+                }
+
+                is QueueTransition.Remove -> {
+                    episodeDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
+                    userEpisodeDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
+                }
+            }
+        }
+        when (transition) {
+            is QueueTransition.Enqueue -> {}
+
+            is QueueTransition.Remove -> {
+                deleteAllDownloadFiles(transition.episodeUuids)
+            }
+        }
+    }
+
+    private fun deleteAllDownloadFiles(episodeUuids: Collection<String>) {
+        coroutineScope.launch {
+            val podcastEpisodes = episodeDao.findByUuids(episodeUuids)
+            val userEpisodes = userEpisodeDao.findEpisodesByUuids(episodeUuids)
+            val episodes = podcastEpisodes + userEpisodes
+
+            for (episode in episodes) {
+                launch {
+                    runCatching {
+                        DownloadHelper.pathForEpisode(episode, fileStorage)
+                            ?.let(::File)
+                            ?.delete()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun canDownload(episode: BaseEpisode, downloadType: DownloadType): Boolean {
+        val isFileAvailable = when (episode) {
+            is PodcastEpisode -> true
+            is UserEpisode -> episode.isUploaded
+        }
+        val isDownloadTypeAllowed = when (downloadType) {
+            DownloadType.UserTriggered -> true
+            DownloadType.Automatic -> !episode.isExemptFromAutoDownload
+        }
+        return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed
+    }
+
+    private fun BaseEpisode.toDownloadCommand(
+        downloadType: DownloadType,
+        pendingWorks: Map<String, DownloadWorkInfo.Pending>,
+    ): DownloadCommand {
+        val pendingWork = pendingWorks[uuid]
+        val args = toDownloadArgs(downloadType)
+        val (request, constraints) = DownloadEpisodeWorker.createWorkRequest(args)
+        val policy = when {
+            pendingWork == null -> ExistingWorkPolicy.KEEP
+            !args.waitForWifi && pendingWork.isWifiRequired -> ExistingWorkPolicy.REPLACE
+            !args.waitForPower && pendingWork.isPowerRequired -> ExistingWorkPolicy.REPLACE
+            else -> ExistingWorkPolicy.KEEP
+        }
+
+        return DownloadCommand(
+            episode = this,
+            request = request,
+            constraints = constraints,
+            policy = policy,
+        )
     }
 
     private fun BaseEpisode.toDownloadArgs(downloadType: DownloadType) = when (this) {
@@ -203,6 +286,38 @@ private class DownloadQueueController(
             is UserEpisode -> Unit
         }
     }
+
+    private data class DownloadCommand(
+        val episode: BaseEpisode,
+        val request: OneTimeWorkRequest,
+        val constraints: Constraints,
+        val policy: ExistingWorkPolicy,
+    ) {
+        val episodeUuid get() = episode.uuid
+
+        fun enqueue(manager: WorkManager): Operation {
+            return manager.enqueueUniqueWork(
+                uniqueWorkName = DownloadEpisodeWorker.episodeTag(episode.uuid),
+                existingWorkPolicy = policy,
+                request = request,
+            )
+        }
+    }
+
+    private sealed interface QueueTransition {
+        val episodeUuids: Collection<String>
+
+        data class Enqueue(
+            val episodeToWorkerUuids: Map<String, UUID>,
+        ) : QueueTransition {
+            override val episodeUuids get() = episodeToWorkerUuids.keys
+        }
+
+        data class Remove(
+            override val episodeUuids: Collection<String>,
+            val disableAutoDownload: Boolean,
+        ) : QueueTransition
+    }
 }
 
 private class DownloadStatusController(
@@ -211,8 +326,6 @@ private class DownloadStatusController(
 ) {
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
-
-    private val pendingStatuses = EpisodeDownloadStatus.entries.filter { it.isPending }
 
     suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadPrerequisites) {
         val tooManyAttemptsError = context.getString(LR.string.error_download_too_many_attempts)
@@ -227,12 +340,7 @@ private class DownloadStatusController(
         }
 
         appDatabase.withTransaction {
-            val staleEpisodeUuids = episodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - statusUpdates.keys
-            episodeDao.updateDownloadStatuses(staleEpisodeUuids.associateWith { DownloadStatusUpdate.Idle })
             episodeDao.updateDownloadStatuses(statusUpdates)
-
-            val staleUserEpisodeUuids = userEpisodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - statusUpdates.keys
-            userEpisodeDao.updateDownloadStatuses(staleUserEpisodeUuids.associateWith { DownloadStatusUpdate.Idle })
             userEpisodeDao.updateDownloadStatuses(statusUpdates)
         }
     }
@@ -245,7 +353,7 @@ private class DownloadStatusController(
         return when (this) {
             is DownloadWorkInfo.Cancelled -> {
                 if (runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT) {
-                    DownloadStatusUpdate.Failure(tooManyAttemptsErrorMessage)
+                    DownloadStatusUpdate.Failure(id, tooManyAttemptsErrorMessage)
                 } else {
                     DownloadStatusUpdate.Idle
                 }
@@ -253,24 +361,24 @@ private class DownloadStatusController(
 
             is DownloadWorkInfo.Pending -> {
                 when {
-                    !constraints.isNetworkAvailable -> DownloadStatusUpdate.WaitingForWifi
-                    isWifiRequired && !constraints.isUnmeteredAvailable -> DownloadStatusUpdate.WaitingForWifi
-                    isPowerRequired && !constraints.isPowerAvailable -> DownloadStatusUpdate.WaitingForPower
-                    isStorageRequired && !constraints.isStorageAvailable -> DownloadStatusUpdate.WaitingForStorage
-                    else -> DownloadStatusUpdate.Enqueued
+                    !constraints.isNetworkAvailable -> DownloadStatusUpdate.WaitingForWifi(id)
+                    isWifiRequired && !constraints.isUnmeteredAvailable -> DownloadStatusUpdate.WaitingForWifi(id)
+                    isPowerRequired && !constraints.isPowerAvailable -> DownloadStatusUpdate.WaitingForPower(id)
+                    isStorageRequired && !constraints.isStorageAvailable -> DownloadStatusUpdate.WaitingForStorage(id)
+                    else -> DownloadStatusUpdate.Enqueued(id)
                 }
             }
 
             is DownloadWorkInfo.InProgress -> {
-                DownloadStatusUpdate.InProgress
+                DownloadStatusUpdate.InProgress(id)
             }
 
             is DownloadWorkInfo.Success -> {
-                DownloadStatusUpdate.Success(downloadFile)
+                DownloadStatusUpdate.Success(id, downloadFile)
             }
 
             is DownloadWorkInfo.Failure -> {
-                DownloadStatusUpdate.Failure(errorMessage ?: defaultErrorMessage)
+                DownloadStatusUpdate.Failure(id, errorMessage ?: defaultErrorMessage)
             }
         }
     }
@@ -347,3 +455,11 @@ private class DownloadPrerequisitesProvider(
         }
     }
 }
+
+private suspend inline fun <reified T : DownloadWorkInfo> WorkManager.getDownloadWorkInfos() = getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
+    .firstOrNull()
+    ?.asSequence()
+    ?.mapNotNull(DownloadEpisodeWorker::mapToDownloadWorkInfo)
+    ?.filterIsInstance<T>()
+    ?.associateBy(DownloadWorkInfo::episodeUuid)
+    .orEmpty()

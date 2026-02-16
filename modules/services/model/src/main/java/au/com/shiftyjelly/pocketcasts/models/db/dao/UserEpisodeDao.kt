@@ -17,6 +17,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -103,6 +104,9 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
 
+    @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
+    abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
+
     @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
     abstract fun updateServerStatusRxCompletable(uuid: String, serverStatus: UserEpisodeServerStatus): Completable
 
@@ -154,22 +158,99 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
+    @Query("SELECT uuid FROM user_episodes WHERE episode_status IN (:statuses)")
+    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
+
     @Query(
         """
         UPDATE user_episodes 
-        SET episode_status = :status, downloaded_file_path = :downloadPath, downloaded_error_details = :downloadError 
-        WHERE uuid = :episodeUuid
+        SET
+          episode_status = :status,
+          downloaded_file_path = :downloadPath,
+          downloaded_error_details = :downloadError,
+          download_task_id = CASE
+            -- Clear out task ID when download finishes
+            -- 0: DownloadNotRequested
+            -- 3: DownloadFailed
+            -- 4: Downloaded
+            WHEN :status IN (0, 3, 4) THEN NULL
+            ELSE download_task_id
+          END
+        WHERE
+          uuid = :episodeUuid
+          -- Allow to transition to states other than DownloadNotRequested only if there is an associated task
+          AND (:status = 0 OR download_task_id = :taskId)
         """,
     )
-    protected abstract suspend fun updateDownloadStatus(episodeUuid: String, status: EpisodeDownloadStatus, downloadPath: String?, downloadError: String?)
+    protected abstract suspend fun updateDownloadStatus(
+        episodeUuid: String,
+        status: EpisodeDownloadStatus,
+        taskId: String?,
+        downloadPath: String?,
+        downloadError: String?,
+    )
 
     @Transaction
     open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
         for ((episodeUuid, statusUpdate) in entries) {
-            updateDownloadStatus(episodeUuid, statusUpdate.episodeStatus, statusUpdate.outputFile?.path, statusUpdate.errorMessage)
+            updateDownloadStatus(
+                episodeUuid = episodeUuid,
+                status = statusUpdate.episodeStatus,
+                taskId = statusUpdate.taskId?.toString(),
+                downloadPath = statusUpdate.outputFile?.path,
+                downloadError = statusUpdate.errorMessage,
+            )
         }
     }
 
-    @Query("SELECT uuid FROM user_episodes WHERE episode_status IN (:statuses)")
-    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
+    @Query(
+        """
+        UPDATE user_episodes
+        SET
+          archived = 0,
+          episode_status = 1,
+          download_task_id = :downloadTaskId,
+          auto_download_status = 0
+        WHERE
+          uuid = :episodeUuid
+          AND download_task_id IS NULL
+        """,
+    )
+    protected abstract suspend fun setReadyForDownload(episodeUuid: String, downloadTaskId: String)
+
+    @Transaction
+    open suspend fun setReadyForDownload(entries: Map<String, UUID>) {
+        for ((episodeUuid, downloadTaskId) in entries) {
+            setReadyForDownload(episodeUuid, downloadTaskId.toString())
+        }
+    }
+
+    @Query(
+        """
+        UPDATE user_episodes
+        SET
+          episode_status = 0,
+          download_task_id = null,
+          auto_download_status = CASE
+            WHEN :disableAutoDownload THEN 1
+            ELSE auto_download_status
+          END
+        WHERE
+          uuid IN (:episodeUuids)
+        """,
+    )
+    protected abstract suspend fun setDownloadCancelledUnsafe(
+        episodeUuids: Collection<String>,
+        disableAutoDownload: Boolean,
+    )
+
+    @Transaction
+    open suspend fun setDownloadCancelled(
+        episodeUuids: Collection<String>,
+        disableAutoDownload: Boolean,
+    ) {
+        episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            setDownloadCancelledUnsafe(chunk, disableAutoDownload)
+        }
+    }
 }
