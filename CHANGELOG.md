@@ -13,6 +13,8 @@
         ([#4973](https://github.com/Automattic/pocket-casts-android/pull/4973))
     *   Fix Up Next not syncing for free users when a custom file is added to it
         ([#4991](https://github.com/Automattic/pocket-casts-android/pull/4991))
+    *   Fix user file status not updating
+        ([#4998](https://github.com/Automattic/pocket-casts-android/pull/4998))
 
 8.5
 -----
