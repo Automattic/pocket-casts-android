@@ -79,4 +79,12 @@ class WatchListScreenViewModel @Inject constructor(
     fun onSettingsClicked() {
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
     }
+
+    fun refreshPodcasts() {
+        // Prevent multiple simultaneous refresh requests
+        if (_state.value.refreshState is RefreshState.Refreshing) {
+            return
+        }
+        podcastManager.refreshPodcasts("watch - list screen")
+    }
 }
