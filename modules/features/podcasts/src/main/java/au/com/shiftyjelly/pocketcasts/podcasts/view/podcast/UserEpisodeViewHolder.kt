@@ -95,8 +95,8 @@ class UserEpisodeViewHolder(
 
         if (previousUuid != episode.uuid || !isObservingRowData) {
             observeRowData()
-            observeFileStatus()
         }
+        observeFileStatus()
         bindArtwork(useEpisodeArtwork)
         bindPlaybackButton()
         bindTitle()
