@@ -43,7 +43,7 @@ fun TimeTextWithConnectivity(
                     painter = painterResource(IR.drawable.ic_cloud_off),
                     contentDescription = "Offline",
                     tint = textColor,
-                    modifier = Modifier.size(12.dp).padding(end = 1.dp),
+                    modifier = Modifier.size(16.dp).padding(end = 2.dp),
                 )
             }
             curvedText(
