@@ -28,10 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.material.CircularProgressIndicator
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Pull-to-refresh component for Wear OS that wraps content and shows a circular progress indicator
@@ -65,53 +63,28 @@ fun PullToRefresh(
     val refreshThresholdPx = with(density) { refreshThreshold.toPx() }
     val scope = rememberCoroutineScope()
 
-    // Track the current pull offset
     var pullOffset by remember { mutableFloatStateOf(0f) }
     var isRefreshing by remember { mutableStateOf(false) }
-
-    // Animation for the indicator offset
+    var gestureStartedAtTop by remember { mutableStateOf(false) }
     val indicatorOffsetAnim = remember { Animatable(0f) }
 
-    // Update isRefreshing based on state
     LaunchedEffect(state) {
         isRefreshing = state is RefreshState.Refreshing
         if (!isRefreshing) {
-            // Reset pull offset when refresh completes
-            indicatorOffsetAnim.animateTo(0f, animationSpec = tween(200))
+            pullOffset = 0f
+            indicatorOffsetAnim.animateTo(0f, animationSpec = tween(300))
         }
     }
 
-    // Nested scroll connection to detect pull-to-refresh gesture
-    val nestedScrollConnection = remember(listState, isRefreshing) {
+    val nestedScrollConnection = remember(listState) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // Check if we can scroll backward (up) - if not, we're at the top
-                val atTop = !listState.canScrollBackward
-
-                Timber.d("PullToRefresh onPreScroll: available=$available, atTop=$atTop, canScrollBackward=${listState.canScrollBackward}, pullOffset=$pullOffset, isRefreshing=$isRefreshing")
-
-                // Only intercept if at top, not refreshing, and pulling down
-                if (!atTop || isRefreshing) {
-                    // If we're pulling but no longer at top, reset
-                    if (pullOffset > 0 && !atTop) {
-                        scope.launch {
-                            pullOffset = 0f
-                            indicatorOffsetAnim.animateTo(0f, animationSpec = tween(200))
-                        }
-                    }
-                    return Offset.Zero
+                if (pullOffset > 0 && available.y < 0) {
+                    val consumed = available.y.coerceAtLeast(-pullOffset)
+                    pullOffset = (pullOffset + consumed).coerceAtLeast(0f)
+                    scope.launch { indicatorOffsetAnim.snapTo(pullOffset) }
+                    return Offset(0f, consumed)
                 }
-
-                // If pulling down (positive y) when at top, intercept the gesture
-                if (available.y > 0) {
-                    val newOffset = (pullOffset + available.y).coerceAtMost(refreshThresholdPx * 1.5f)
-                    pullOffset = newOffset
-                    scope.launch {
-                        indicatorOffsetAnim.snapTo(newOffset)
-                    }
-                    return Offset(0f, available.y)
-                }
-
                 return Offset.Zero
             }
 
@@ -120,39 +93,49 @@ fun PullToRefresh(
                 available: Offset,
                 source: NestedScrollSource,
             ): Offset {
-                // Check if we can scroll backward (up) - if not, we're at the top
-                val atTop = !listState.canScrollBackward
-
-                if (!atTop || isRefreshing) {
-                    return Offset.Zero
-                }
-
-                // If there's remaining scroll after consumption and we're pulling down
-                if (available.y > 0) {
+                if (
+                    available.y > 0 &&
+                    !listState.canScrollBackward &&
+                    gestureStartedAtTop &&
+                    !isRefreshing
+                ) {
                     val newOffset = (pullOffset + available.y).coerceAtMost(refreshThresholdPx * 1.5f)
                     pullOffset = newOffset
-                    scope.launch {
-                        indicatorOffsetAnim.snapTo(newOffset)
-                    }
+                    scope.launch { indicatorOffsetAnim.snapTo(newOffset) }
                     return Offset(0f, available.y)
+                }
+
+                if (source == NestedScrollSource.UserInput && available.y == 0f && consumed.y < 0f) {
+                    gestureStartedAtTop = !listState.canScrollBackward
                 }
 
                 return Offset.Zero
             }
 
             override suspend fun onPreFling(available: Velocity): Velocity {
-                // When user releases, check if we should trigger refresh
+                gestureStartedAtTop = !listState.canScrollBackward
+
                 if (pullOffset >= refreshThresholdPx && !isRefreshing) {
                     onRefresh()
                     pullOffset = 0f
-                    indicatorOffsetAnim.snapTo(refreshThresholdPx / 2) // Keep indicator visible during refresh
+                    indicatorOffsetAnim.snapTo(refreshThresholdPx * 0.6f)
                 } else if (pullOffset > 0) {
-                    // Animate back to 0 if threshold not reached
                     pullOffset = 0f
                     indicatorOffsetAnim.animateTo(0f, animationSpec = tween(200))
                 }
                 return Velocity.Zero
             }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                gestureStartedAtTop = !listState.canScrollBackward
+                return Velocity.Zero
+            }
+        }
+    }
+
+    LaunchedEffect(listState.canScrollBackward) {
+        if (!listState.canScrollBackward) {
+            gestureStartedAtTop = true
         }
     }
 
@@ -161,13 +144,16 @@ fun PullToRefresh(
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection),
     ) {
-        // Main content
         content()
 
-        // Pull-to-refresh indicator
-        if (isRefreshing || indicatorOffsetAnim.value.absoluteValue > 0.1f) {
+        if (isRefreshing || indicatorOffsetAnim.value > 0.1f) {
             val progress = min(1f, indicatorOffsetAnim.value / refreshThresholdPx)
             val alpha = if (isRefreshing) 1f else progress
+            val indicatorTopDp = with(LocalDensity.current) {
+                val maxTopPx = (indicatorSize + 8.dp).toPx()
+                val topPx = (indicatorOffsetAnim.value / refreshThresholdPx) * maxTopPx
+                topPx.toDp()
+            }
 
             Box(
                 modifier = Modifier
@@ -176,18 +162,16 @@ fun PullToRefresh(
                 contentAlignment = Alignment.TopCenter,
             ) {
                 if (isRefreshing) {
-                    // Indeterminate progress during refresh
                     CircularProgressIndicator(
                         modifier = Modifier
                             .size(indicatorSize)
-                            .offset(y = 8.dp),
+                            .offset(y = indicatorSize + 8.dp),
                     )
                 } else {
-                    // Determinate progress based on pull distance
                     CircularProgressIndicator(
                         modifier = Modifier
                             .size(indicatorSize)
-                            .offset(y = (indicatorOffsetAnim.value / 3).dp),
+                            .offset(y = indicatorTopDp),
                         progress = progress,
                     )
                 }

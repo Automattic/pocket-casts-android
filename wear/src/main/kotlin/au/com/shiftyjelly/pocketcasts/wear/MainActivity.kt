@@ -380,7 +380,6 @@ private fun WearApp(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
-
         }
 
         if (showConnectivityNotification) {
