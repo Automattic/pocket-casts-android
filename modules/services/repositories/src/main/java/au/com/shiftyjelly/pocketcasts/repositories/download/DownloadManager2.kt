@@ -12,6 +12,7 @@ import androidx.work.WorkManager
 import androidx.work.impl.WorkManagerImpl
 import androidx.work.impl.constraints.ConstraintListener
 import androidx.work.impl.constraints.trackers.ConstraintTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -56,21 +57,21 @@ class DownloadManager2 @Inject constructor(
 
     private val workManager = WorkManager.getInstance(context)
     private val prerequisitesProvider = DownloadPrerequisitesProvider(workManager, context)
-    private val queueController = DownloadQueueController(appDatabase, settings, workManager, context, scope)
     private val statusController = DownloadStatusController(appDatabase, context)
+    private val queueController = DownloadQueueController(appDatabase, settings, workManager, context, scope)
 
     private val isMonitoring = AtomicBoolean()
 
-    override fun enqueueAll(episodeUuids: Collection<String>, downloadType: DownloadType) {
-        scope.launch { queueController.addToQueue(episodeUuids, downloadType) }
+    override fun enqueueAll(episodeUuids: Collection<String>, downloadType: DownloadType, sourceView: SourceView) {
+        scope.launch { queueController.addToQueue(episodeUuids, downloadType, sourceView) }
     }
 
-    override fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean) {
-        scope.launch { queueController.removeFromQueue(episodeUuids, disableAutoDownload) }
+    override fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean, sourceView: SourceView) {
+        scope.launch { queueController.removeFromQueue(episodeUuids, disableAutoDownload, sourceView) }
     }
 
-    override fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean) {
-        scope.launch { queueController.removeFromQueue(podcastUuid, disableAutoDownload) }
+    override fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean, sourceView: SourceView) {
+        scope.launch { queueController.removeFromQueue(podcastUuid, disableAutoDownload, sourceView) }
     }
 
     @OptIn(FlowPreview::class)
@@ -117,7 +118,7 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType) {
+    suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType, sourceView: SourceView) {
         val podcastEpisodes = episodeDao.findByUuids(episodeUuids)
         val userEpisodes = userEpisodeDao.findEpisodesByUuids(episodeUuids)
         val episodes = (podcastEpisodes + userEpisodes).filter { episode -> canDownload(episode, downloadType) }
@@ -126,10 +127,9 @@ private class DownloadQueueController(
         }
 
         val pendingWorks = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>()
-        val downloadCommands = episodes.map { episode -> episode.toDownloadCommand(downloadType, pendingWorks) }
-
+        val downloadCommands = episodes.map { episode -> episode.toDownloadCommand(pendingWorks, downloadType, sourceView) }
         val associatedWorkers = downloadCommands.associate { command -> command.episodeUuid to command.request.id }
-        applyQueueTransition(QueueTransition.Enqueue(associatedWorkers))
+        applyQueueTransition(QueueTransition.Enqueue(associatedWorkers, sourceView))
 
         downloadCommands.forEach { command ->
             val operation = command.enqueue(workManager)
@@ -140,8 +140,8 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun removeFromQueue(episodeUuids: Collection<String>, disableAutoDownload: Boolean) {
-        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload))
+    suspend fun removeFromQueue(episodeUuids: Collection<String>, disableAutoDownload: Boolean, sourceView: SourceView) {
+        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload, sourceView))
 
         episodeUuids.forEach { episodeUuid ->
             workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
@@ -149,9 +149,9 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun removeFromQueue(podcastUuid: String, disableAutoDownload: Boolean) {
+    suspend fun removeFromQueue(podcastUuid: String, disableAutoDownload: Boolean, sourceView: SourceView) {
         val episodeUuids = episodeDao.findByPodcastUuid(podcastUuid)
-        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload))
+        applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload, sourceView))
 
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.podcastTag(podcastUuid))
@@ -175,7 +175,7 @@ private class DownloadQueueController(
                 ?.takeIf { it.runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT }
                 ?.episodeUuid
         }
-        removeFromQueue(episodesToCancel, disableAutoDownload = false)
+        removeFromQueue(episodesToCancel, disableAutoDownload = false, sourceView = SourceView.AUTO_DOWNLOAD)
     }
 
     private suspend fun applyQueueTransition(transition: QueueTransition) {
@@ -236,11 +236,12 @@ private class DownloadQueueController(
     }
 
     private fun BaseEpisode.toDownloadCommand(
-        downloadType: DownloadType,
         pendingWorks: Map<String, DownloadWorkInfo.Pending>,
+        downloadType: DownloadType,
+        sourceView: SourceView,
     ): DownloadCommand {
         val pendingWork = pendingWorks[uuid]
-        val args = toDownloadArgs(downloadType)
+        val args = toDownloadArgs(downloadType, sourceView)
         val (request, constraints) = DownloadEpisodeWorker.createWorkRequest(args)
         val policy = when {
             pendingWork == null -> ExistingWorkPolicy.KEEP
@@ -257,7 +258,10 @@ private class DownloadQueueController(
         )
     }
 
-    private fun BaseEpisode.toDownloadArgs(downloadType: DownloadType) = when (this) {
+    private fun BaseEpisode.toDownloadArgs(
+        downloadType: DownloadType,
+        sourceView: SourceView,
+    ) = when (this) {
         is PodcastEpisode -> DownloadEpisodeWorker.Args(
             episodeUuid = uuid,
             podcastUuid = podcastUuid,
@@ -269,6 +273,7 @@ private class DownloadQueueController(
                 DownloadType.UserTriggered -> false
                 DownloadType.Automatic -> settings.autoDownloadOnlyWhenCharging.value
             },
+            sourceView = sourceView,
         )
 
         is UserEpisode -> DownloadEpisodeWorker.Args(
@@ -279,6 +284,7 @@ private class DownloadQueueController(
                 DownloadType.Automatic -> settings.cloudDownloadOnlyOnWifi.value
             },
             waitForPower = false,
+            sourceView = sourceView,
         )
     }
 
@@ -308,9 +314,11 @@ private class DownloadQueueController(
 
     private sealed interface QueueTransition {
         val episodeUuids: Collection<String>
+        val sourceView: SourceView
 
         data class Enqueue(
             val episodeToWorkerUuids: Map<String, UUID>,
+            override val sourceView: SourceView,
         ) : QueueTransition {
             override val episodeUuids get() = episodeToWorkerUuids.keys
         }
@@ -318,6 +326,7 @@ private class DownloadQueueController(
         data class Remove(
             override val episodeUuids: Collection<String>,
             val disableAutoDownload: Boolean,
+            override val sourceView: SourceView,
         ) : QueueTransition
     }
 }
