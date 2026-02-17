@@ -181,7 +181,16 @@ private class DownloadQueueController(
     }
 
     private suspend fun applyQueueTransition(transition: QueueTransition) {
-        appDatabase.withTransaction {
+        if (transition.episodeUuids.isEmpty()) {
+            return
+        }
+
+        val episodes = appDatabase.withTransaction {
+            // Read the episodes data to have access to their file paths.
+            // Applying remove transition clears it in the database.
+            val podcastEpisodes = episodeDao.findByUuids(transition.episodeUuids)
+            val userEpisodes = userEpisodeDao.findEpisodesByUuids(transition.episodeUuids)
+
             when (transition) {
                 is QueueTransition.Enqueue -> {
                     episodeDao.setReadyForDownload(transition.episodeToWorkerUuids)
@@ -193,29 +202,24 @@ private class DownloadQueueController(
                     userEpisodeDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
                 }
             }
+
+            podcastEpisodes + userEpisodes
         }
+
         when (transition) {
-            is QueueTransition.Enqueue -> {}
+            is QueueTransition.Enqueue -> Unit
 
             is QueueTransition.Remove -> {
-                deleteAllDownloadFiles(transition.episodeUuids)
+                deleteAllDownloadFiles(episodes)
             }
         }
     }
 
-    private fun deleteAllDownloadFiles(episodeUuids: Collection<String>) {
+    private fun deleteAllDownloadFiles(episodes: Collection<BaseEpisode>) {
         coroutineScope.launch {
-            val podcastEpisodes = episodeDao.findByUuids(episodeUuids)
-            val userEpisodes = userEpisodeDao.findEpisodesByUuids(episodeUuids)
-            val episodes = podcastEpisodes + userEpisodes
-
             for (episode in episodes) {
-                launch {
-                    runCatching {
-                        DownloadHelper.pathForEpisode(episode, fileStorage)
-                            ?.let(::File)
-                            ?.delete()
-                    }
+                runCatching {
+                    episode.downloadedFilePath?.let(::File)?.delete()
                 }
             }
         }
