@@ -46,7 +46,6 @@ fun WatchListScreen(
 
     PullToRefresh(
         state = state.refreshState,
-        listState = columnState.state,
         onRefresh = { viewModel.refreshPodcasts() },
         modifier = modifier,
     ) {
