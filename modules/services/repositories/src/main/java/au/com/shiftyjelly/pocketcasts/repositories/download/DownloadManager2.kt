@@ -116,7 +116,7 @@ private class DownloadQueueController(
                 val work = pendingWorks[episode.uuid]
                 val taskId = episode.downloadTaskId?.toUuidOrNull()
                 if (work == null && taskId != null) {
-                    updateDownloadStatus(episode, DownloadStatusUpdate.Cancelled(taskId))
+                    clearStaleDownload(episode, taskId)
                 }
             }
             clearStaleDownloads(cancellableStatuses)
@@ -410,11 +410,6 @@ private class EpisodeDownloadDao(
         is UserEpisode -> userEpisodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload)
     }
 
-    suspend fun updateDownloadStatus(episode: BaseEpisode, update: DownloadStatusUpdate) = when (episode) {
-        is PodcastEpisode -> episodeDao.updateDownloadStatus(episode.uuid, update)
-        is UserEpisode -> userEpisodeDao.updateDownloadStatus(episode.uuid, update)
-    }
-
     suspend fun updateDownloadStatuses(updates: Map<String, DownloadStatusUpdate>) = withTransaction {
         updates.forEach { (uuid, update) ->
             episodeDao.updateDownloadStatus(uuid, update)
@@ -422,9 +417,14 @@ private class EpisodeDownloadDao(
         }
     }
 
+    suspend fun clearStaleDownload(episode: BaseEpisode, taskId: UUID) = when (episode) {
+        is PodcastEpisode -> episodeDao.clearDownloadForEpisode(episode.uuid, taskId.toString())
+        is UserEpisode -> userEpisodeDao.clearDownloadForEpisode(episode.uuid, taskId.toString())
+    }
+
     suspend fun clearStaleDownloads(statuses: Collection<EpisodeDownloadStatus>) = withTransaction {
-        episodeDao.clearStaleDownloads(statuses)
-        userEpisodeDao.clearStaleDownloads(statuses)
+        episodeDao.clearDownloadsWithoutTaskId(statuses)
+        userEpisodeDao.clearDownloadsWithoutTaskId(statuses)
     }
 }
 

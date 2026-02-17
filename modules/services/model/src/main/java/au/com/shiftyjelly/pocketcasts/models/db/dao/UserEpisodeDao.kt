@@ -293,15 +293,32 @@ abstract class UserEpisodeDao {
 
     @Query(
         """
+        UPDATE user_episodes 
+        SET
+          episode_status = 0,
+          downloaded_file_path = NULL,
+          downloaded_error_details = NULL,
+          download_task_id = NULL,
+          auto_download_status = 0
+        WHERE
+          uuid = :episodeUuid
+          AND download_task_id = :taskId
+        """,
+    )
+    abstract suspend fun clearDownloadForEpisode(episodeUuid: String, taskId: String)
+
+    @Query(
+        """
         UPDATE user_episodes
         SET
           episode_status = 0,
           downloaded_file_path = NULL,
-          downloaded_error_details = NULL
+          downloaded_error_details = NULL,
+          auto_download_status = 0
         WHERE
           download_task_id IS NULL
           AND episode_status IN (:statuses)
         """,
     )
-    abstract suspend fun clearStaleDownloads(statuses: Collection<EpisodeDownloadStatus>)
+    abstract suspend fun clearDownloadsWithoutTaskId(statuses: Collection<EpisodeDownloadStatus>)
 }
