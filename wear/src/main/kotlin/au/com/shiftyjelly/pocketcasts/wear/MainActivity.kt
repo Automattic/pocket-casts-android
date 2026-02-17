@@ -129,7 +129,9 @@ private fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.ROUTE else RequirePlusScreen.ROUTE
 
-    AppScaffold {
+    AppScaffold(
+        timeText = { TimeTextWithConnectivity(isConnected = isConnected) },
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             SwipeDismissableNavHost(
                 startDestination = startDestination,
@@ -379,7 +381,6 @@ private fun WearApp(
                 )
             }
 
-            TimeTextWithConnectivity(isConnected = isConnected)
         }
 
         if (showConnectivityNotification) {
