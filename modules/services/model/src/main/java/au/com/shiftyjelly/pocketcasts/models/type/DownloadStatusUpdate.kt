@@ -4,14 +4,15 @@ import java.io.File
 import java.util.UUID
 
 sealed interface DownloadStatusUpdate {
+    val taskId: UUID
     val episodeStatus: EpisodeDownloadStatus
-    val taskId: UUID?
     val outputFile: File?
     val errorMessage: String?
 
-    data object Idle : DownloadStatusUpdate {
+    data class Cancelled(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.DownloadNotRequested
-        override val taskId get() = null
         override val outputFile get() = null
         override val errorMessage get() = null
     }
