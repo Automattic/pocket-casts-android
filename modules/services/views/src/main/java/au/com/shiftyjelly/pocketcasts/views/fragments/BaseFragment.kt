@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.views.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -40,6 +42,48 @@ open class BaseFragment :
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
+
+    /**
+     * OnBackPressedCallback that bridges the [HasBackstack] protocol into the
+     * [androidx.activity.OnBackPressedDispatcher] so that predictive back gesture support works
+     * correctly. Enabled whenever [getBackstackCount] > 0.
+     *
+     * Subclasses that push or pop their own backstack must call [notifyBackstackChanged] after
+     * each change so the enabled state stays in sync with the actual backstack depth.
+     */
+    private var backPressedCallback: OnBackPressedCallback? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val callback = object : OnBackPressedCallback(getBackstackCount() > 0) {
+            override fun handleOnBackPressed() {
+                val handled = onBackPressed()
+                // Re-sync enabled state after handling — the backstack may have changed.
+                isEnabled = getBackstackCount() > 0
+                if (!handled) {
+                    // Nothing to handle; disable ourselves so the next callback can fire.
+                    isEnabled = false
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        backPressedCallback = callback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        backPressedCallback?.remove()
+        backPressedCallback = null
+    }
+
+    /**
+     * Call this from subclasses whenever the internal backstack changes (push or pop) so the
+     * [OnBackPressedCallback] enabled state is kept up-to-date. This is required for the
+     * predictive back gesture to appear and disappear at the right times.
+     */
+    protected fun notifyBackstackChanged() {
+        backPressedCallback?.isEnabled = getBackstackCount() > 0
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -121,6 +165,7 @@ open class BaseFragment :
 
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStackImmediate()
+            notifyBackstackChanged()
             return true
         }
 

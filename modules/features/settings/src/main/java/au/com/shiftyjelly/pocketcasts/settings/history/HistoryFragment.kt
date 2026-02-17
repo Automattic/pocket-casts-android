@@ -132,9 +132,8 @@ class HistoryFragment :
             .show(childFragmentManager, "up-next-restore-confirmation-dialog")
     }
 
-    @Suppress("DEPRECATION")
     private fun onBackPress() {
-        activity?.onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     override fun onBackPressed() = if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {

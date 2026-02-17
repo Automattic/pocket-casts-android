@@ -54,8 +54,7 @@ class ChangeEmailFragment : BaseFragment() {
                 updateEmail = viewModel::updateEmail,
                 updatePassword = viewModel::updatePassword,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 changeEmail = viewModel::changeEmail,
                 clearServerError = viewModel::clearServerError,
@@ -68,8 +67,7 @@ class ChangeEmailFragment : BaseFragment() {
 
                     val activity = requireActivity()
 
-                    @Suppress("DEPRECATION")
-                    activity.onBackPressed() // done fragment needs to back to profile page
+                    activity.onBackPressedDispatcher.onBackPressed()
 
                     val fragment = ChangeDoneFragment.newInstance()
                     (activity as FragmentHostListener).addFragment(fragment)

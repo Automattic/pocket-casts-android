@@ -56,8 +56,7 @@ internal class SettingsFragment : BaseFragment() {
                         openDeleteConfirmation()
                     },
                     onClickBack = {
-                        @Suppress("DEPRECATION")
-                        requireActivity().onBackPressed()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     },
                     modifier = Modifier.padding(
                         bottom = LocalDensity.current.run { bottomPadding.toDp() },

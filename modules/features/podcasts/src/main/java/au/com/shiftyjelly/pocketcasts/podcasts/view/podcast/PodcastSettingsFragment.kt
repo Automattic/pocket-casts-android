@@ -106,8 +106,7 @@ class PodcastSettingsFragment :
                 onRemovePodcastFromPlaylists = viewModel::removePodcastFromPlaylists,
                 onUnfollow = ::showUnfollowDialog,
                 onDismiss = {
-                    @Suppress("DEPRECATION")
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 },
                 modifier = Modifier.padding(
                     bottom = miniPlayerInset.pxToDp(requireContext()).dp,
@@ -196,7 +195,9 @@ class PodcastSettingsFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return navController?.popBackStack() == true || super.onBackPressed()
+        val handled = navController?.popBackStack() == true || super.onBackPressed()
+        if (handled) notifyBackstackChanged()
+        return handled
     }
 
     @Parcelize

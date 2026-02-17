@@ -72,8 +72,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                     settings.artworkConfiguration.set(configuration, updateModifiedAt = true)
                 },
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
             )
         }

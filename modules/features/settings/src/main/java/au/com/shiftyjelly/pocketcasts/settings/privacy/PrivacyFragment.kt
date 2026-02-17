@@ -82,8 +82,7 @@ class PrivacyFragment : BaseFragment() {
                     context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
                 },
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
