@@ -5,8 +5,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,25 +12,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
-import androidx.wear.compose.material.CircularProgressIndicator
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import androidx.wear.tooling.preview.devices.WearDevices
-import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
@@ -80,7 +73,6 @@ class MainActivity : ComponentActivity() {
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
                     syncState = state.syncState,
-                    refreshState = state.refreshState,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     onRetrySync = viewModel::retrySync,
                     signOut = viewModel::signOut,
@@ -103,7 +95,6 @@ private fun WearApp(
     signInState: SignInState,
     showLoggingInScreen: Boolean,
     syncState: WatchSyncState,
-    refreshState: RefreshState,
     onShowLoginScreen: () -> Unit,
     onRetrySync: () -> Unit,
     signOut: () -> Unit,
@@ -132,252 +123,241 @@ private fun WearApp(
     AppScaffold(
         timeText = { TimeTextWithConnectivity(isConnected = isConnected) },
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            SwipeDismissableNavHost(
-                startDestination = startDestination,
-                navController = navController,
-                state = navState,
+        SwipeDismissableNavHost(
+            startDestination = startDestination,
+            navController = navController,
+            state = navState,
+        ) {
+            composable(
+                route = RequirePlusScreen.ROUTE,
             ) {
-                composable(
-                    route = RequirePlusScreen.ROUTE,
-                ) {
-                    RequirePlusScreen(
-                        onContinueToLogin = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
-                        syncState = syncState,
-                    )
-                }
+                RequirePlusScreen(
+                    onContinueToLogin = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
+                    syncState = syncState,
+                )
+            }
 
-                composable(
-                    route = WatchListScreen.ROUTE,
-                ) {
-                    NowPlayingPager(
-                        allowSwipeToDismiss = false,
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        val scope = rememberCoroutineScope()
-                        WatchListScreen(
-                            columnState = columnState,
-                            navigateToRoute = navController::navigate,
-                            toNowPlaying = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(NowPlayingScreen.PAGER_INDEX)
-                                }
-                            },
-                        )
-                    }
-                }
-
-                composable(
-                    route = PodcastsScreen.ROUTE_HOME_FOLDER,
-                ) {
-                    PodcastsScreenContent(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    )
-                }
-
-                composable(
-                    route = PodcastsScreen.ROUTE_FOLDER,
-                    arguments = listOf(
-                        navArgument(PodcastsScreen.ARGUMENT_FOLDER_UUID) {
-                            type = NavType.StringType
-                        },
-                    ),
-                ) {
-                    PodcastsScreenContent(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    )
-                }
-
-                composable(
-                    route = PodcastScreen.ROUTE,
-                    arguments = listOf(
-                        navArgument(PodcastScreen.ARGUMENT) {
-                            type = NavType.StringType
-                        },
-                    ),
-                ) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        PodcastScreen(
-                            columnState = columnState,
-                            onEpisodeTap = { episode ->
-                                navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
-                            },
-                        )
-                    }
-                }
-
-                episodeGraph(
-                    navigateToPodcast = { podcastUuid ->
-                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                    },
+            composable(
+                route = WatchListScreen.ROUTE,
+            ) {
+                NowPlayingPager(
+                    allowSwipeToDismiss = false,
                     navController = navController,
                     swipeToDismissState = swipeToDismissState,
-                )
-
-                composable(PlaylistsScreen.ROUTE) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        PlaylistsScreen(
-                            onClickPlaylist = { playlist ->
-                                navController.navigate(PlaylistScreen.navigateRoute(playlist.uuid, playlist.type))
-                            },
-                            columnState = columnState,
-                        )
-                    }
-                }
-
-                composable(
-                    route = PlaylistScreen.ROUTE,
-                    arguments = listOf(
-                        navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_UUID) {
-                            type = NavType.StringType
-                        },
-                        navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_TYPE) {
-                            type = NavType.StringType
-                        },
-                    ),
                 ) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        PlaylistScreen(
-                            onEpisodeTap = { episode ->
-                                navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
-                            },
-                            columnState = columnState,
-                        )
-                    }
-                }
-
-                composable(DownloadsScreen.ROUTE) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        DownloadsScreen(
-                            columnState = columnState,
-                            onItemClick = { episode ->
-                                val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
-                                navController.navigate(route)
-                            },
-                        )
-                    }
-                }
-
-                composable(FilesScreen.ROUTE) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        FilesScreen(
-                            columnState = columnState,
-                            navigateToEpisode = { episodeUuid ->
-                                navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                            },
-                        )
-                    }
-                }
-
-                composable(StarredScreen.ROUTE) {
-                    NowPlayingPager(
-                        navController = navController,
-                        swipeToDismissState = swipeToDismissState,
-                    ) {
-                        StarredScreen(
-                            columnState = columnState,
-                            onItemClick = { episode ->
-                                val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
-                                navController.navigate(route)
-                            },
-                        )
-                    }
-                }
-
-                settingsRoutes(navController)
-
-                authenticationNavGraph(
-                    navController = navController,
-                    onEmailSignInSuccess = {
-                        navController.navigate(LoggingInScreen.ROUTE)
-                    },
-                    googleSignInSuccessScreen = { googleAccount ->
-                        LoggingInScreen(
-                            avatarUrl = googleAccount.avatarUrl,
-                            name = googleAccount.name,
-                            onClose = {},
-                        )
-                    },
-                    syncState = syncState,
-                    onRetrySync = onRetrySync,
-                )
-
-                loggingInScreens(
-                    onClose = {
-                        when (startDestination) {
-                            WatchListScreen.ROUTE -> {
-                                val popped = navController.popBackStack(
-                                    route = WatchListScreen.ROUTE,
-                                    inclusive = false,
-                                )
-                                if (popped) {
-                                    ScrollToTop.initiate(navController)
-                                }
+                    val scope = rememberCoroutineScope()
+                    WatchListScreen(
+                        columnState = columnState,
+                        navigateToRoute = navController::navigate,
+                        toNowPlaying = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(NowPlayingScreen.PAGER_INDEX)
                             }
-
-                            RequirePlusScreen.ROUTE -> {
-                                navController.popBackStack(
-                                    route = RequirePlusScreen.ROUTE,
-                                    inclusive = false,
-                                )
-                            }
-
-                            else -> throw IllegalStateException("Unexpected start destination $startDestination")
-                        }
-                    },
-                )
-
-                composable(
-                    route = PCVolumeScreen.ROUTE,
-                ) {
-                    PCVolumeScreen()
-                }
-
-                composable(
-                    route = EffectsScreen.ROUTE,
-                ) {
-                    EffectsScreen()
-                }
-
-                composable(
-                    route = StreamingConfirmationScreen.ROUTE,
-                ) {
-                    StreamingConfirmationScreen(
-                        onFinish = { result ->
-                            navController.previousBackStackEntry?.savedStateHandle?.set(
-                                StreamingConfirmationScreen.RESULT_KEY,
-                                result,
-                            )
-                            navController.popBackStack()
                         },
                     )
                 }
             }
 
-            if (refreshState is RefreshState.Refreshing) {
-                CircularProgressIndicator(
-                    indicatorColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.9f),
-                    trackColor = Color.Transparent,
-                    strokeWidth = 3.dp,
-                    modifier = Modifier.fillMaxSize(),
+            composable(
+                route = PodcastsScreen.ROUTE_HOME_FOLDER,
+            ) {
+                PodcastsScreenContent(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                )
+            }
+
+            composable(
+                route = PodcastsScreen.ROUTE_FOLDER,
+                arguments = listOf(
+                    navArgument(PodcastsScreen.ARGUMENT_FOLDER_UUID) {
+                        type = NavType.StringType
+                    },
+                ),
+            ) {
+                PodcastsScreenContent(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                )
+            }
+
+            composable(
+                route = PodcastScreen.ROUTE,
+                arguments = listOf(
+                    navArgument(PodcastScreen.ARGUMENT) {
+                        type = NavType.StringType
+                    },
+                ),
+            ) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    PodcastScreen(
+                        columnState = columnState,
+                        onEpisodeTap = { episode ->
+                            navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                        },
+                    )
+                }
+            }
+
+            episodeGraph(
+                navigateToPodcast = { podcastUuid ->
+                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                },
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            )
+
+            composable(PlaylistsScreen.ROUTE) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    PlaylistsScreen(
+                        onClickPlaylist = { playlist ->
+                            navController.navigate(PlaylistScreen.navigateRoute(playlist.uuid, playlist.type))
+                        },
+                        columnState = columnState,
+                    )
+                }
+            }
+
+            composable(
+                route = PlaylistScreen.ROUTE,
+                arguments = listOf(
+                    navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_UUID) {
+                        type = NavType.StringType
+                    },
+                    navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_TYPE) {
+                        type = NavType.StringType
+                    },
+                ),
+            ) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    PlaylistScreen(
+                        onEpisodeTap = { episode ->
+                            navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                        },
+                        columnState = columnState,
+                    )
+                }
+            }
+
+            composable(DownloadsScreen.ROUTE) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    DownloadsScreen(
+                        columnState = columnState,
+                        onItemClick = { episode ->
+                            val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                            navController.navigate(route)
+                        },
+                    )
+                }
+            }
+
+            composable(FilesScreen.ROUTE) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    FilesScreen(
+                        columnState = columnState,
+                        navigateToEpisode = { episodeUuid ->
+                            navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                        },
+                    )
+                }
+            }
+
+            composable(StarredScreen.ROUTE) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    StarredScreen(
+                        columnState = columnState,
+                        onItemClick = { episode ->
+                            val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                            navController.navigate(route)
+                        },
+                    )
+                }
+            }
+
+            settingsRoutes(navController)
+
+            authenticationNavGraph(
+                navController = navController,
+                onEmailSignInSuccess = {
+                    navController.navigate(LoggingInScreen.ROUTE)
+                },
+                googleSignInSuccessScreen = { googleAccount ->
+                    LoggingInScreen(
+                        avatarUrl = googleAccount.avatarUrl,
+                        name = googleAccount.name,
+                        onClose = {},
+                    )
+                },
+                syncState = syncState,
+                onRetrySync = onRetrySync,
+            )
+
+            loggingInScreens(
+                onClose = {
+                    when (startDestination) {
+                        WatchListScreen.ROUTE -> {
+                            val popped = navController.popBackStack(
+                                route = WatchListScreen.ROUTE,
+                                inclusive = false,
+                            )
+                            if (popped) {
+                                ScrollToTop.initiate(navController)
+                            }
+                        }
+
+                        RequirePlusScreen.ROUTE -> {
+                            navController.popBackStack(
+                                route = RequirePlusScreen.ROUTE,
+                                inclusive = false,
+                            )
+                        }
+
+                        else -> throw IllegalStateException("Unexpected start destination $startDestination")
+                    }
+                },
+            )
+
+            composable(
+                route = PCVolumeScreen.ROUTE,
+            ) {
+                PCVolumeScreen()
+            }
+
+            composable(
+                route = EffectsScreen.ROUTE,
+            ) {
+                EffectsScreen()
+            }
+
+            composable(
+                route = StreamingConfirmationScreen.ROUTE,
+            ) {
+                StreamingConfirmationScreen(
+                    onFinish = { result ->
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            StreamingConfirmationScreen.RESULT_KEY,
+                            result,
+                        )
+                        navController.popBackStack()
+                    },
                 )
             }
         }
@@ -470,7 +450,6 @@ private fun DefaultPreview() {
         signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
         syncState = WatchSyncState.Syncing,
-        refreshState = RefreshState.Never,
         onShowLoginScreen = {},
         onRetrySync = {},
         signOut = {},

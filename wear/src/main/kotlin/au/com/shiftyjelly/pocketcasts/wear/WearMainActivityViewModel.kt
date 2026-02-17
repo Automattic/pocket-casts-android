@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
-import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -57,7 +56,6 @@ class WearMainActivityViewModel @Inject constructor(
         val syncState: WatchSyncState = WatchSyncState.Syncing,
         val showConnectivityNotification: Boolean = false,
         val isConnected: Boolean = false,
-        val refreshState: RefreshState = RefreshState.Never,
     )
 
     private val _state = MutableStateFlow(State())
@@ -96,11 +94,6 @@ class WearMainActivityViewModel @Inject constructor(
                 }
         }
 
-        viewModelScope.launch {
-            settings.refreshStateFlow.collect { refreshState ->
-                _state.update { it.copy(refreshState = refreshState) }
-            }
-        }
     }
 
     private fun startSyncFlow() {
