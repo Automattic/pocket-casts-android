@@ -5,11 +5,11 @@ interface DownloadQueue {
 
     fun enqueueAll(episodeUuids: Collection<String>, downloadType: DownloadType)
 
-    fun cancel(episodeUuid: String) = cancelAll(setOf(episodeUuid))
+    fun cancel(episodeUuid: String, disableAutoDownload: Boolean) = cancelAll(setOf(episodeUuid), disableAutoDownload)
 
-    fun cancelAll(episodeUuids: Collection<String>)
+    fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean)
 
-    fun cancelAll(podcastUuid: String)
+    fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean)
 }
 
 enum class DownloadType {
