@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -21,13 +23,15 @@ import kotlinx.coroutines.rx2.asFlow
 @HiltViewModel
 class WatchListScreenViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
+    private val settings: Settings,
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
-    podcastManager: PodcastManager,
+    private val podcastManager: PodcastManager,
 ) : ViewModel() {
 
     data class State(
         val upNextQueue: UpNextQueue.State? = null,
+        val refreshState: RefreshState = RefreshState.Never,
     )
 
     private val _state = MutableStateFlow(State())
@@ -45,6 +49,14 @@ class WatchListScreenViewModel @Inject constructor(
                         it.copy(upNextQueue = upNextQueue)
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            settings.refreshStateFlow.collect { refreshState ->
+                _state.update {
+                    it.copy(refreshState = refreshState)
+                }
+            }
         }
     }
 
