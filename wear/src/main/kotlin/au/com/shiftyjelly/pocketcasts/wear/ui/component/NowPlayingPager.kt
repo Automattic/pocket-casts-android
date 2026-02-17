@@ -39,7 +39,6 @@ fun NowPlayingPager(
     navController: NavController,
     swipeToDismissState: SwipeToDismissBoxState,
     modifier: Modifier = Modifier,
-    showTimeText: Boolean = true,
     allowSwipeToDismiss: Boolean = true,
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
 ) {
@@ -49,7 +48,6 @@ fun NowPlayingPager(
 
     ScreenScaffold(
         scrollState = columState,
-        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
