@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.CurvedDirection
@@ -15,6 +16,8 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.curvedText
+import androidx.wear.tooling.preview.devices.WearDevices
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 /**
@@ -57,5 +60,21 @@ fun TimeTextWithConnectivity(
         curvedComposable {
             TimeText()
         }
+    }
+}
+
+@Preview(device = WearDevices.SMALL_ROUND)
+@Composable
+private fun TimeTextWithConnectivityConnectedPreview() {
+    WearAppTheme {
+        TimeTextWithConnectivity(isConnected = true)
+    }
+}
+
+@Preview(device = WearDevices.SMALL_ROUND)
+@Composable
+private fun TimeTextWithConnectivityDisconnectedPreview() {
+    WearAppTheme {
+        TimeTextWithConnectivity(isConnected = false)
     }
 }
