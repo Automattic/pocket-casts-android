@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
-import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -104,7 +103,6 @@ private class DownloadQueueController(
 ) {
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
-    private val fileStorage = FileStorage(settings, context)
 
     private val pendingStatuses = EpisodeDownloadStatus.entries.filter { it.isPending }
 
