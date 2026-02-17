@@ -9,7 +9,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -160,15 +159,15 @@ private fun String?.isInvalidContentType(): Boolean {
         returns(true) implies (this@isInvalidContentType != null)
     }
     return if (this != null) {
-        startsWith("text", ignoreCase = true) ||
-            startsWith("image", ignoreCase = true) ||
-            INVALID_CONTENT_TYPES.any { it.equals(this, ignoreCase = true) }
+        INVALID_CONTENT_TYPES.any { invalid -> startsWith(invalid, ignoreCase = true) }
     } else {
         false
     }
 }
 
 private val INVALID_CONTENT_TYPES = setOf(
+    "text/",
+    "image/",
     "application/json",
     "application/xml",
     "application/xhtml+xml",

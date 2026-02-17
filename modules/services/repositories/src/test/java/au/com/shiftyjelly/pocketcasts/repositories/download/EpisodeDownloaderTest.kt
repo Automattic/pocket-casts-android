@@ -181,7 +181,7 @@ class EpisodeDownloaderTest {
     @Test
     fun `fail to download episode with application content type`() {
         val response = MockResponse.Builder()
-            .addHeader("Content-Type", "application/json")
+            .addHeader("Content-Type", "application/json; charset=utf-8")
             .build()
 
         server.enqueue(response)
@@ -191,7 +191,7 @@ class EpisodeDownloaderTest {
             tempFile = tempDir.newFile("file.tmp"),
         )
 
-        assertEquals(Result.InvalidContentType("application/json"), result)
+        assertEquals(Result.InvalidContentType("application/json; charset=utf-8"), result)
     }
 
     @Test
