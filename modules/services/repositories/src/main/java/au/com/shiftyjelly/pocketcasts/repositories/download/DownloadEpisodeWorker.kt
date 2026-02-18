@@ -512,6 +512,8 @@ sealed interface DownloadWorkInfo {
     val runAttemptCount: Int
     val sourceView: SourceView
 
+    val isCancellable: Boolean
+
     data class Pending(
         override val id: UUID,
         override val episodeUuid: String,
@@ -521,7 +523,9 @@ sealed interface DownloadWorkInfo {
         val isWifiRequired: Boolean,
         val isPowerRequired: Boolean,
         val isStorageRequired: Boolean,
-    ) : DownloadWorkInfo
+    ) : DownloadWorkInfo {
+        override val isCancellable get() = true
+    }
 
     data class InProgress(
         override val id: UUID,
@@ -529,7 +533,9 @@ sealed interface DownloadWorkInfo {
         override val podcastUuid: String,
         override val runAttemptCount: Int,
         override val sourceView: SourceView,
-    ) : DownloadWorkInfo
+    ) : DownloadWorkInfo {
+        override val isCancellable get() = true
+    }
 
     data class Success(
         override val id: UUID,
@@ -538,7 +544,9 @@ sealed interface DownloadWorkInfo {
         override val runAttemptCount: Int,
         override val sourceView: SourceView,
         val downloadFile: File,
-    ) : DownloadWorkInfo
+    ) : DownloadWorkInfo {
+        override val isCancellable get() = false
+    }
 
     data class Failure(
         override val id: UUID,
@@ -548,7 +556,9 @@ sealed interface DownloadWorkInfo {
         override val sourceView: SourceView,
         val error: EpisodeDownloadError,
         val errorMessage: String?,
-    ) : DownloadWorkInfo
+    ) : DownloadWorkInfo {
+        override val isCancellable get() = false
+    }
 
     data class Cancelled(
         override val id: UUID,
@@ -556,7 +566,9 @@ sealed interface DownloadWorkInfo {
         override val podcastUuid: String,
         override val runAttemptCount: Int,
         override val sourceView: SourceView,
-    ) : DownloadWorkInfo
+    ) : DownloadWorkInfo {
+        override val isCancellable get() = false
+    }
 }
 
 private fun Data.toArgs() = DownloadEpisodeWorker.Args(
