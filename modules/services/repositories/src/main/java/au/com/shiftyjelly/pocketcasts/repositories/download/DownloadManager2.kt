@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toUuidOrNull
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -51,15 +52,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class DownloadManager2 @Inject constructor(
     appDatabase: AppDatabase,
     settings: Settings,
+    clock: Clock,
     @ApplicationContext context: Context,
     @ApplicationScope private val scope: CoroutineScope,
 ) : DownloadQueue,
     DownloadStatusObserver {
 
     private val workManager = WorkManager.getInstance(context)
-    private val downloadDao = EpisodeDownloadDao(appDatabase)
+    private val downloadDao = EpisodeDownloadDao(appDatabase, clock)
     private val prerequisitesProvider = DownloadPrerequisitesProvider(workManager, context)
-    private val statusController = DownloadStatusController(downloadDao, context)
+    private val statusController = DownloadStatusController(downloadDao, clock, context)
     private val queueController = DownloadQueueController(downloadDao, settings, workManager, context, scope)
 
     private val isMonitoring = AtomicBoolean()
@@ -320,6 +322,7 @@ private class DownloadQueueController(
 
 private class DownloadStatusController(
     private val downloadDao: EpisodeDownloadDao,
+    private val clock: Clock,
     private val context: Context,
 ) {
     suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadPrerequisites) {
@@ -342,35 +345,73 @@ private class DownloadStatusController(
         tooManyAttemptsErrorMessage: String,
         defaultErrorMessage: String,
     ): DownloadStatusUpdate {
+        val now = clock.instant()
         return when (this) {
             is DownloadWorkInfo.Cancelled -> {
                 if (runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT) {
-                    DownloadStatusUpdate.Failure(id, tooManyAttemptsErrorMessage)
+                    DownloadStatusUpdate.Failure(
+                        taskId = id,
+                        issuedAt = now,
+                        errorMessage = tooManyAttemptsErrorMessage,
+                    )
                 } else {
-                    DownloadStatusUpdate.Cancelled(id)
+                    DownloadStatusUpdate.Cancelled(
+                        taskId = id,
+                        issuedAt = now,
+                    )
                 }
             }
 
             is DownloadWorkInfo.Pending -> {
                 when {
-                    !constraints.isNetworkAvailable -> DownloadStatusUpdate.WaitingForWifi(id)
-                    isWifiRequired && !constraints.isUnmeteredAvailable -> DownloadStatusUpdate.WaitingForWifi(id)
-                    isPowerRequired && !constraints.isPowerAvailable -> DownloadStatusUpdate.WaitingForPower(id)
-                    isStorageRequired && !constraints.isStorageAvailable -> DownloadStatusUpdate.WaitingForStorage(id)
-                    else -> DownloadStatusUpdate.Enqueued(id)
+                    !constraints.isNetworkAvailable -> DownloadStatusUpdate.WaitingForWifi(
+                        taskId = id,
+                        issuedAt = now,
+                    )
+
+                    isWifiRequired && !constraints.isUnmeteredAvailable -> DownloadStatusUpdate.WaitingForWifi(
+                        taskId = id,
+                        issuedAt = now,
+                    )
+
+                    isPowerRequired && !constraints.isPowerAvailable -> DownloadStatusUpdate.WaitingForPower(
+                        taskId = id,
+                        issuedAt = now,
+                    )
+
+                    isStorageRequired && !constraints.isStorageAvailable -> DownloadStatusUpdate.WaitingForStorage(
+                        taskId = id,
+                        issuedAt = now,
+                    )
+
+                    else -> DownloadStatusUpdate.Enqueued(
+                        taskId = id,
+                        issuedAt = now,
+                    )
                 }
             }
 
             is DownloadWorkInfo.InProgress -> {
-                DownloadStatusUpdate.InProgress(id)
+                DownloadStatusUpdate.InProgress(
+                    taskId = id,
+                    issuedAt = now,
+                )
             }
 
             is DownloadWorkInfo.Success -> {
-                DownloadStatusUpdate.Success(id, downloadFile)
+                DownloadStatusUpdate.Success(
+                    taskId = id,
+                    issuedAt = now,
+                    outputFile = downloadFile,
+                )
             }
 
             is DownloadWorkInfo.Failure -> {
-                DownloadStatusUpdate.Failure(id, errorMessage ?: defaultErrorMessage)
+                DownloadStatusUpdate.Failure(
+                    taskId = id,
+                    issuedAt = now,
+                    errorMessage = errorMessage ?: defaultErrorMessage,
+                )
             }
         }
     }
@@ -378,6 +419,7 @@ private class DownloadStatusController(
 
 private class EpisodeDownloadDao(
     private val appDatabase: AppDatabase,
+    private val clock: Clock,
 ) {
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
@@ -400,9 +442,12 @@ private class EpisodeDownloadDao(
 
     suspend fun findPodcastEpisodesUuids(podcastUuid: String) = episodeDao.findByPodcastUuid(podcastUuid)
 
-    suspend fun setReadyForDownload(episode: BaseEpisode, taskId: UUID, forceNewDownload: Boolean) = when (episode) {
-        is PodcastEpisode -> episodeDao.setReadyForDownload(episode.uuid, taskId, forceNewDownload)
-        is UserEpisode -> userEpisodeDao.setReadyForDownload(episode.uuid, taskId, forceNewDownload)
+    suspend fun setReadyForDownload(episode: BaseEpisode, taskId: UUID, forceNewDownload: Boolean): Boolean {
+        val now = clock.instant()
+        return when (episode) {
+            is PodcastEpisode -> episodeDao.setReadyForDownload(episode.uuid, taskId, now, forceNewDownload)
+            is UserEpisode -> userEpisodeDao.setReadyForDownload(episode.uuid, taskId, now, forceNewDownload)
+        }
     }
 
     suspend fun setDownloadCancelled(episode: BaseEpisode, disableAutoDownload: Boolean) = when (episode) {

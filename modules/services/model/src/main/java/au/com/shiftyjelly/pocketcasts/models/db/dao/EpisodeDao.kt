@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -530,16 +531,23 @@ abstract class EpisodeDao {
           download_task_id = CASE
             WHEN :status IN (0, 3, 4) THEN NULL
             ELSE download_task_id
+          END,
+          -- Update the timestamps only if we're changing to downloading state
+          last_download_attempt_date = CASE
+            WHEN :status = 2 THEN :issuedAt
+            ELSE last_download_attempt_date
           END
         WHERE
           uuid = :episodeUuid
           AND download_task_id = :taskId
+          AND episode_status != :status
         """,
     )
     protected abstract suspend fun updateDownloadStatus(
         episodeUuid: String,
         status: EpisodeDownloadStatus,
-        taskId: String?,
+        taskId: String,
+        issuedAt: Date,
         downloadPath: String?,
         downloadError: String?,
     ): Int
@@ -549,6 +557,7 @@ abstract class EpisodeDao {
             episodeUuid = episodeUuid,
             status = statusUpdate.episodeStatus,
             taskId = statusUpdate.taskId.toString(),
+            issuedAt = Date.from(statusUpdate.issuedAt),
             downloadPath = statusUpdate.outputFile?.path,
             downloadError = statusUpdate.errorMessage,
         )
@@ -577,7 +586,8 @@ abstract class EpisodeDao {
           archived = 0,
           episode_status = 1,
           download_task_id = :downloadTaskId,
-          auto_download_status = 0
+          auto_download_status = 0,
+          last_download_attempt_date = :issuedAt
         WHERE
           uuid = :episodeUuid
           AND (:forceNewDownload OR download_task_id IS NULL)
@@ -586,15 +596,22 @@ abstract class EpisodeDao {
     protected abstract suspend fun setReadyForDownloadRaw(
         episodeUuid: String,
         downloadTaskId: String,
+        issuedAt: Date,
         forceNewDownload: Boolean,
     ): Int
 
     suspend fun setReadyForDownload(
         episodeUuid: String,
         downloadTaskId: UUID,
+        issuedAt: Instant,
         forceNewDownload: Boolean,
     ): Boolean {
-        val rowUpdateCount = setReadyForDownloadRaw(episodeUuid, downloadTaskId.toString(), forceNewDownload)
+        val rowUpdateCount = setReadyForDownloadRaw(
+            episodeUuid = episodeUuid,
+            downloadTaskId = downloadTaskId.toString(),
+            issuedAt = Date.from(issuedAt),
+            forceNewDownload = forceNewDownload,
+        )
         return rowUpdateCount == 1
     }
 
