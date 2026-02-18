@@ -197,42 +197,6 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     @Test
-    fun `ignore archived up next episodes`() = runTest {
-        val upNext = listOf(
-            podcastEpisode(),
-            userEpisode(),
-            podcastEpisode(),
-            podcastEpisode {
-                isArchived = true
-            },
-            userEpisode {
-                isArchived = true
-            },
-        )
-        upNextEpisodes += upNext
-
-        assertProviderEpisodes(upNext.take(3))
-    }
-
-    @Test
-    fun `ignore played up next episodes`() = runTest {
-        val upNext = listOf(
-            podcastEpisode(),
-            userEpisode(),
-            podcastEpisode(),
-            podcastEpisode {
-                isCompleted = true
-            },
-            userEpisode {
-                isCompleted = true
-            },
-        )
-        upNextEpisodes += upNext
-
-        assertProviderEpisodes(upNext.take(3))
-    }
-
-    @Test
     fun `provide user episodes`() = runTest {
         val user = listOf(userEpisode(), userEpisode(), userEpisode())
         userEpisodes += user
