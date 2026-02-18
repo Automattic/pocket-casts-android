@@ -22,31 +22,33 @@ class AutoDownloadEpisodeProvider @Inject constructor(
     private val settings: Settings,
 ) {
     // Set dispatcher to default because some users follow thousands of podcasts
-    suspend fun getAll() = withContext(Dispatchers.Default) {
+    suspend fun getAll(newPodcastEpisodeUuids: Collection<String>) = withContext(Dispatchers.Default) {
         buildSet {
-            addAll(getPodcastEpisodes())
+            addAll(getPodcastEpisodes(newPodcastEpisodeUuids))
             addAll(getPlaylistEpisodes())
             addAll(getUpNextAutoEpisodes())
             addAll(getUserEpisodes())
         }
     }
 
-    private suspend fun getPodcastEpisodes(): Set<String> {
+    private suspend fun getPodcastEpisodes(newEpisodeUuids: Collection<String>): Set<String> {
         val globalEnabled = settings.autoDownloadNewEpisodes.value == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
         return if (globalEnabled) {
             val perPodcastLimit = settings.autoDownloadLimit.value.episodeCount
+            val newEpisodeUuidSet = newEpisodeUuids.toSet()
             podcastManager
                 .findSubscribedNoOrder()
                 .asSequence()
                 .filter(Podcast::isAutoDownloadNewEpisodes)
                 .flatMapTo(mutableSetOf()) { podcast ->
-                    episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
+                    episodeManager
+                        .findEpisodesByPodcastOrderedSuspend(podcast)
                         .asSequence()
                         .filter(BaseEpisode::canDownload)
                         .map(BaseEpisode::uuid)
+                        .filter(newEpisodeUuidSet::contains)
                         .take(perPodcastLimit)
                 }
-
         } else {
             emptySet()
         }
