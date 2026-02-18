@@ -71,6 +71,7 @@ class HistoryFragment :
                         },
                         onUpNextHistoryClick = {
                             navController.navigate(HistoryNavRoutes.UP_NEXT_HISTORY)
+                            notifyBackstackChanged()
                         },
                         bottomInset = bottomInsetDp,
                     )
@@ -83,6 +84,7 @@ class HistoryFragment :
                                     date.time,
                                 ),
                             )
+                            notifyBackstackChanged()
                         },
                         onBackPress = navController::popBackStack,
                         bottomInset = bottomInsetDp,

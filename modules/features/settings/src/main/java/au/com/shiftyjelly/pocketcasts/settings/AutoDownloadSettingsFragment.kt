@@ -64,6 +64,7 @@ class AutoDownloadSettingsFragment :
                     if (route != null) {
                         viewModel.trackPageShown(route)
                     }
+                    notifyBackstackChanged()
                 }
             }
 

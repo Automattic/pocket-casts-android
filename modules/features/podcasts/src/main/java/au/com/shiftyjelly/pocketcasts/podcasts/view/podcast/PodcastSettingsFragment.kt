@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -73,6 +74,12 @@ class PodcastSettingsFragment :
             }
             val navController = rememberNavController()
             this.navController = navController
+
+            LaunchedEffect(navController) {
+                navController.currentBackStackEntryFlow.collect {
+                    notifyBackstackChanged()
+                }
+            }
 
             PodcastSettingsPage(
                 podcastTitle = args.title,

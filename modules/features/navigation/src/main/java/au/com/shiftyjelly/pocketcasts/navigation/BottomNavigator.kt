@@ -47,10 +47,8 @@ open class BottomNavigator internal constructor() : ViewModel() {
     private val resetRootFragmentSubject = UnicastWorkSubject.create<Fragment>()
 
     /**
-     * Emits `true` when the navigator has entries that can be popped (i.e. back navigation is
-     * possible), `false` when at the root of the current tab with no modal showing.
-     * Observe this in the Activity to enable/disable the OnBackPressedCallback that drives
-     * predictive back gesture support.
+     * Emits `true` when the navigator has entries that can be popped, `false` when at the root
+     * of the current tab with no modal showing.
      */
     private val _canGoBack = MutableStateFlow(false)
     open val canGoBack: StateFlow<Boolean> = _canGoBack.asStateFlow()
