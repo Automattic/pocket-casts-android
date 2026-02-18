@@ -348,24 +348,28 @@ private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
     if (isInstallment) {
-        return when (config.pricePerPeriod) {
-            PricePerPeriod.PRICE_PER_WEEK -> {
-                val currencyCode = recurringPrice.currencyCode
-                if (currencyCode == "USD") {
-                    stringResource(LR.string.price_per_week_usd, pricePerWeek)
-                } else {
-                    stringResource(LR.string.price_per_week, pricePerWeek, currencyCode)
+        return when (this) {
+            is SubscriptionPlan.WithOffer -> when (config.pricePerPeriod) {
+                PricePerPeriod.PRICE_PER_WEEK -> {
+                    val currencyCode = recurringPrice.currencyCode
+                    if (currencyCode == "USD") {
+                        stringResource(LR.string.price_per_week_usd, pricePerWeek)
+                    } else {
+                        stringResource(LR.string.price_per_week, pricePerWeek, currencyCode)
+                    }
+                }
+
+                PricePerPeriod.PRICE_PER_MONTH -> {
+                    val currencyCode = recurringPrice.currencyCode
+                    if (currencyCode == "USD") {
+                        stringResource(LR.string.price_per_month_usd, pricePerMonth)
+                    } else {
+                        stringResource(LR.string.price_per_month, pricePerMonth, currencyCode)
+                    }
                 }
             }
 
-            PricePerPeriod.PRICE_PER_MONTH -> {
-                val currencyCode = recurringPrice.currencyCode
-                if (currencyCode == "USD") {
-                    stringResource(LR.string.price_per_month_usd, pricePerMonth)
-                } else {
-                    stringResource(LR.string.price_per_month, pricePerMonth, currencyCode)
-                }
-            }
+            is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
         }
     }
 
@@ -419,7 +423,10 @@ private fun SubscriptionPlan.displayName(): String {
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
     if (isInstallment) {
-        return stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+        return when (this) {
+            is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_month, recurringPrice.formattedPrice)
+            is SubscriptionPlan.WithOffer -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+        }
     }
 
     val formattedPrice = recurringPrice.formattedPrice
