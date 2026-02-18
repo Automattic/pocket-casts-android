@@ -490,11 +490,11 @@ class PodcastManagerImpl @Inject constructor(
         val status = if (isEnabled) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
         podcastDao.updateAutoDownloadStatus(podcastUuids, status)
         if (isEnabled) {
-            settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
+            settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = true)
         } else {
             val podcasts = podcastDao.findSubscribedNoOrder()
             if (podcasts.none { it.isAutoDownloadNewEpisodes }) {
-                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_OFF, updateModifiedAt = false)
+                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_OFF, updateModifiedAt = true)
             }
         }
     }
@@ -509,11 +509,11 @@ class PodcastManagerImpl @Inject constructor(
     override fun updateAutoDownloadStatusBlocking(podcast: Podcast, autoDownloadStatus: Int) {
         podcastDao.updateAutoDownloadStatusBlocking(autoDownloadStatus, podcast.uuid)
         if (autoDownloadStatus == Podcast.AUTO_DOWNLOAD_NEW_EPISODES) {
-            settings.autoDownloadNewEpisodes.set(autoDownloadStatus, updateModifiedAt = false)
+            settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = true)
         } else {
             val podcasts = podcastDao.findSubscribedBlocking()
             if (podcasts.none { it.isAutoDownloadNewEpisodes }) {
-                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_OFF, updateModifiedAt = false)
+                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_OFF, updateModifiedAt = true)
             }
         }
     }
