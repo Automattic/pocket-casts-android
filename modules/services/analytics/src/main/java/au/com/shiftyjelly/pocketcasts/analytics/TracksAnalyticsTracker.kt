@@ -75,9 +75,9 @@ class TracksAnalyticsTracker @Inject constructor(
         val isLoggedIn = accountStatusInfo.isLoggedIn()
         val hasSubscription = subscription != null
         val isPocketCastsChampion = subscription?.isChampion == true
-        val subscriptionTier = subscription?.tier?.analyticsValue ?: INVALID_OR_NULL_VALUE
-        val subscriptionPlatform = subscription?.platform?.analyticsValue ?: INVALID_OR_NULL_VALUE
-        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: INVALID_OR_NULL_VALUE
+        val subscriptionTier = subscription?.tier?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
+        val subscriptionPlatform = subscription?.platform?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
+        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
 
         predefinedEventProperties = mapOf(
             PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),
@@ -139,6 +139,5 @@ class TracksAnalyticsTracker @Inject constructor(
     companion object {
         private const val ID = "Tracks"
         private const val EVENTS_PREFIX = "pcandroid_"
-        const val INVALID_OR_NULL_VALUE = "none"
     }
 }
