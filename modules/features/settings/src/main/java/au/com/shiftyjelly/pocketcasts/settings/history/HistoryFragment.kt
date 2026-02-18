@@ -136,10 +136,19 @@ class HistoryFragment :
         requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
-    override fun onBackPressed() = if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {
-        super.onBackPressed()
-    } else {
-        navController.popBackStack()
+    override fun getBackstackCount(): Int {
+        val isAtHistoryRoot = navController.currentDestination?.route == HistoryNavRoutes.HISTORY
+        return if (isAtHistoryRoot) super.getBackstackCount() else super.getBackstackCount() + 1
+    }
+
+    override fun onBackPressed(): Boolean {
+        return if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {
+            super.onBackPressed()
+        } else {
+            navController.popBackStack()
+            notifyBackstackChanged()
+            true
+        }
     }
 
     object HistoryNavRoutes {

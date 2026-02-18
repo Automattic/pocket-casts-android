@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -211,6 +212,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
@@ -549,6 +551,8 @@ class MainActivity :
             })
             .addTo(disposables)
 
+        setupBackPressedCallbacks()
+
         setupPlayerViews(
             animateMiniPlayer = savedInstanceState == null,
         )
@@ -724,72 +728,153 @@ class MainActivity :
         mediaRouter?.removeCallback(mediaRouterCallback)
     }
 
-    @SuppressLint("GestureBackNavigation")
-    @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
-    override fun onBackPressed() {
-        if (isUpNextShowing()) {
-            val fragment = supportFragmentManager.findFragmentByTag(UpNextFragment::class.java.name)
-            if ((fragment as UpNextFragment).multiSelectHelper.isMultiSelecting) {
-                fragment.multiSelectHelper.isMultiSelecting = false
-                return
+    /**
+     * Registers all back-press callbacks on the [OnBackPressedDispatcher] in order to support
+     * the predictive back gesture (android:enableOnBackInvokedCallback="true").
+     *
+     * Callbacks are registered in reverse priority order: the last-registered callback with
+     * isEnabled=true wins. Therefore we register lowest-priority first and highest-priority last.
+     *
+     * Must be called after [navigator] is initialised.
+     */
+    private fun setupBackPressedCallbacks() {
+        // Priority 7 (lowest): BottomNavigator pop — enabled when navigator can go back.
+        // We observe navigator.canGoBack as a StateFlow to reactively enable/disable this callback.
+        val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                navigator.pop()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                navigator.canGoBack.collectLatest { canGoBack ->
+                    bottomNavigatorCallback.isEnabled = canGoBack
+                }
             }
         }
 
-        if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
-            frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            return
-        }
+        // Priority 6: childrenWithBackStack — enabled when any visible HasBackstack fragment has entries.
+        // This callback's enabled state is updated lazily on each back press attempt via the
+        // per-fragment OnBackPressedCallbacks registered in BaseFragment (Phase 2).
+        // The callback here is only a fallback for the modal case where navigator.isShowingModal().
+        // Note: actual per-fragment dispatch is handled in BaseFragment via its own registered callback.
 
-        if (navigator.isShowingModal()) {
-            val currentFragment = navigator.currentFragment()
-            if (currentFragment is HasBackstack) {
-                val handled = currentFragment.onBackPressed()
-                if (!handled) {
+        // Priority 5: Player bottom sheet — enabled while player is open.
+        val playerBottomSheetCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                binding.playerBottomSheet.closePlayer()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)
+
+        // Track player open/closed state to keep callback enabled state in sync.
+        // PlayerBottomSheet notifies us via onPlayerOpen/onPlayerClosed listener overrides below,
+        // so we also update there. But we need an initial state sync after setup.
+        // We use a dedicated updater that both onPlayerOpen and onPlayerClosed call.
+        playerBottomSheetCallback.isEnabled = binding.playerBottomSheet.isPlayerOpen
+
+        // Priority 4: PlayerContainerFragment internal backstack (UpNext expanded inside player,
+        // bookmarks multi-select, transcript).
+        val playerContainerBackstackCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                val playerContainerFragment =
+                    supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
+                playerContainerFragment?.onBackPressed()
+                updatePlayerContainerCallback(this)
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, playerContainerBackstackCallback)
+
+        fun syncPlayerContainerCallback() {
+            val playerContainerFragment =
+                supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
+            playerContainerBackstackCallback.isEnabled =
+                playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
+        }
+        // Store updater so player events can trigger it.
+        playerContainerCallbackUpdater = ::syncPlayerContainerCallback
+
+        // Priority 3: Modal fragment — enabled when navigator is showing a modal.
+        val modalFragmentCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                val currentFragment = navigator.currentFragment()
+                if (currentFragment is HasBackstack) {
+                    val handled = currentFragment.onBackPressed()
+                    if (!handled) {
+                        navigator.pop()
+                    }
+                } else {
                     navigator.pop()
                 }
-                return
-            } else {
-                navigator.pop()
-                return
             }
         }
+        onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
 
-        // Check for embedded up next fragment being shown in player container
+        // Priority 2: Frame bottom sheet (UpNext / WhatsNew) — enabled while sheet is not collapsed.
+        val frameBottomSheetCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, frameBottomSheetCallback)
+
+        frameBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                frameBottomSheetCallback.isEnabled = newState != BottomSheetBehavior.STATE_COLLAPSED
+                // Also update modal callback since UpNext sheet state affects it indirectly.
+                modalFragmentCallback.isEnabled = navigator.isShowingModal()
+            }
+        })
+
+        // Priority 1 (highest): UpNext multi-select — enabled while UpNext is showing AND multi-select is active.
+        val upNextMultiSelectCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                val fragment = supportFragmentManager.findFragmentByTag(UpNextFragment::class.java.name)
+                (fragment as? UpNextFragment)?.multiSelectHelper?.isMultiSelecting = false
+                isEnabled = false
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, upNextMultiSelectCallback)
+
+        // Observe navigator info stream to update modal callback enabled state.
+        navigator.infoStream()
+            .subscribe {
+                modalFragmentCallback.isEnabled = navigator.isShowingModal()
+                syncPlayerContainerCallback()
+            }
+            .also { disposables.add(it) }
+
+        // Store references so that onPlayerOpen/onPlayerClosed/showBottomSheet can update callbacks.
+        this.playerBottomSheetBackCallback = playerBottomSheetCallback
+        this.upNextMultiSelectBackCallback = upNextMultiSelectCallback
+        this.playerContainerBackCallback = playerContainerBackstackCallback
+        this.modalFragmentBackCallback = modalFragmentCallback
+    }
+
+    // Mutable callback references updated after setupBackPressedCallbacks() runs.
+    private var playerBottomSheetBackCallback: OnBackPressedCallback? = null
+    private var upNextMultiSelectBackCallback: OnBackPressedCallback? = null
+    private var playerContainerBackCallback: OnBackPressedCallback? = null
+    private var modalFragmentBackCallback: OnBackPressedCallback? = null
+    private var playerContainerCallbackUpdater: (() -> Unit)? = null
+
+    /**
+     * Called from [showUpNextFragment] and [showBottomSheet] to update multi-select callback state.
+     */
+    private fun updateUpNextMultiSelectCallbackIfNeeded() {
+        val fragment = supportFragmentManager.findFragmentByTag(UpNextFragment::class.java.name)
+        val isMultiSelecting = (fragment as? UpNextFragment)?.multiSelectHelper?.isMultiSelecting == true
+        upNextMultiSelectBackCallback?.isEnabled = isUpNextShowing() && isMultiSelecting
+    }
+
+    private fun updatePlayerContainerCallback(callback: OnBackPressedCallback? = null) {
+        val cb = callback ?: playerContainerBackCallback ?: return
         val playerContainerFragment =
             supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
-        if (playerContainerFragment != null) {
-            if (playerContainerFragment.getBackstackCount() > 0) {
-                if (playerContainerFragment.onBackPressed()) {
-                    return
-                }
-            }
-        }
-
-        if (binding.playerBottomSheet.isPlayerOpen) {
-            binding.playerBottomSheet.closePlayer()
-            return
-        }
-
-        // Some fragments have child fragments that require a back stack, we need to check for those
-        // before popping the main back stack
-        if (childrenWithBackStack.count() > 0) {
-            var handled = false
-            var index = 0
-            do {
-                val child = childrenWithBackStack[index++]
-                if (child is Fragment && child.userVisibleHint) {
-                    handled = child.onBackPressed()
-                }
-            } while (!handled && index < childrenWithBackStack.count())
-            if (handled) {
-                return
-            }
-        }
-
-        if (navigator.isAtRootOfStack() || !navigator.pop()) {
-            super.onBackPressed()
-        }
+        cb.isEnabled = playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
     }
 
     override fun updateStatusBar() {
@@ -1065,8 +1150,14 @@ class MainActivity :
                     frameBottomSheetBehavior.swipeEnabled = false
 
                     updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, playingPodcast = viewModel.lastPlaybackState?.podcast)
+                    // UpNext sheet closed: disable multi-select callback.
+                    upNextMultiSelectBackCallback?.isEnabled = false
                 } else {
                     binding.playerBottomSheet.isDragEnabled = false
+                    // Sheet opened or settling: sync multi-select callback state.
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        updateUpNextMultiSelectCallbackIfNeeded()
+                    }
                 }
             }
         })
@@ -1177,6 +1268,7 @@ class MainActivity :
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
+        playerBottomSheetBackCallback?.isEnabled = true
 
         val playerContainerFragment = supportFragmentManager.fragments
             .find { it is PlayerContainerFragment } as? PlayerContainerFragment
@@ -1188,6 +1280,8 @@ class MainActivity :
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
+        playerBottomSheetBackCallback?.isEnabled = false
+        playerContainerCallbackUpdater?.invoke()
 
         val playerContainerFragment = supportFragmentManager.fragments
             .find { it is PlayerContainerFragment } as? PlayerContainerFragment
@@ -1207,6 +1301,8 @@ class MainActivity :
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         frameBottomSheetBehavior.swipeEnabled = true
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        // UpNext multi-select callback: re-evaluate when the sheet changes to a new fragment.
+        updateUpNextMultiSelectCallbackIfNeeded()
     }
 
     override fun closeBottomSheet() {
@@ -1325,9 +1421,8 @@ class MainActivity :
         }
     }
 
-    @Suppress("DEPRECATION")
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return true
     }
 
