@@ -1362,7 +1362,7 @@
     <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
-    <string name="plus_trial_yearly_installments">Plus yearly trial (installments)</string>
+    <string name="plus_yearly_installments">Annual plan - pay monthly</string>
 
     <!-- Trial -->
 

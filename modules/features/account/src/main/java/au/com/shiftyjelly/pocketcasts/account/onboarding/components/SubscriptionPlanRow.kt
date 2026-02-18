@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -404,17 +403,7 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @ReadOnlyComposable
 private fun SubscriptionPlan.displayName(): String {
     return when {
-        this is SubscriptionPlan.WithOffer && offer == SubscriptionOffer.Trial && isInstallment -> {
-            when (tier) {
-                SubscriptionTier.Plus -> when (billingCycle) {
-                    BillingCycle.Yearly -> stringResource(LR.string.plus_trial_yearly_installments)
-                    BillingCycle.Monthly -> name
-                }
-
-                SubscriptionTier.Patron -> name
-            }
-        }
-
+        isInstallment -> stringResource(LR.string.plus_yearly_installments)
         else -> name
     }
 }
