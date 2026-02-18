@@ -33,18 +33,23 @@ class AutoDownloadEpisodeProvider @Inject constructor(
 
     private suspend fun getPodcastEpisodes(): Set<String> {
         val globalEnabled = settings.autoDownloadNewEpisodes.value == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
-        val perPodcastLimit = settings.autoDownloadLimit.value.episodeCount
-        return podcastManager
-            .findSubscribedNoOrder()
-            .asSequence()
-            .filter { podcast -> globalEnabled || podcast.isAutoDownloadNewEpisodes }
-            .flatMapTo(mutableSetOf()) { podcast ->
-                episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
-                    .asSequence()
-                    .filter(BaseEpisode::canDownload)
-                    .map(BaseEpisode::uuid)
-                    .take(perPodcastLimit)
-            }
+        return if (globalEnabled) {
+            val perPodcastLimit = settings.autoDownloadLimit.value.episodeCount
+            podcastManager
+                .findSubscribedNoOrder()
+                .asSequence()
+                .filter(Podcast::isAutoDownloadNewEpisodes)
+                .flatMapTo(mutableSetOf()) { podcast ->
+                    episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
+                        .asSequence()
+                        .filter(BaseEpisode::canDownload)
+                        .map(BaseEpisode::uuid)
+                        .take(perPodcastLimit)
+                }
+
+        } else {
+            emptySet()
+        }
     }
 
     private suspend fun getPlaylistEpisodes(): Set<String> {

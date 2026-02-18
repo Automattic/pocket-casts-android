@@ -310,7 +310,7 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     @Test
-    fun `override global podcast auto download setting`() = runTest {
+    fun `do not override global podcast auto download setting`() = runTest {
         val podcast1 = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         val podcast2 = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         podcastEpisodes += mapOf(
@@ -320,7 +320,7 @@ class AutoDownloadEpisodeProviderTest {
 
         isAutoDownloadEnabled.set(Podcast.AUTO_DOWNLOAD_OFF)
 
-        assertProviderEpisodes(podcast2)
+        assertProviderEpisodes(emptySet())
     }
 
     @Test
@@ -484,7 +484,7 @@ private fun userEpisode(block: EpisodeDsl.() -> Unit = {}): UserEpisode {
 @TestingDsl
 private class PodcastDsl {
     val uuid = UUID.randomUUID().toString()
-    var isAutoDownloadEnabled = false
+    var isAutoDownloadEnabled = true
 
     fun toPodcast() = Podcast(
         uuid = uuid,
