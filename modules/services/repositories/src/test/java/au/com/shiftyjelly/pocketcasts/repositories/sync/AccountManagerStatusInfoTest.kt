@@ -11,6 +11,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +30,7 @@ class AccountManagerStatusInfoTest {
 
     @Before
     fun setup() {
-        sharedPrefs.edit().clear()
+        sharedPrefs.edit { clear() }
     }
 
     @Test
@@ -87,5 +88,17 @@ class AccountManagerStatusInfoTest {
         val userIds = accountManagerStatusInfo.getUserIds()
 
         assertEquals(userIds.anonId, sharedPrefs.getString(AccountManagerStatusInfo.ANON_ID_KEY))
+    }
+
+    @Test
+    fun `test recreateAnonId`() {
+        whenever(accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE)).thenReturn(emptyArray())
+
+        val userIds1 = accountManagerStatusInfo.getUserIds()
+        val newAnonId = accountManagerStatusInfo.recreateAnonId()
+        val userIds2 = accountManagerStatusInfo.getUserIds()
+
+        assertNotEquals(newAnonId, userIds1.anonId)
+        assertEquals(newAnonId, userIds2.anonId)
     }
 }

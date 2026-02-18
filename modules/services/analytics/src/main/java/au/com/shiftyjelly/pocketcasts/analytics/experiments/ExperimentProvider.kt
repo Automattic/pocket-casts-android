@@ -24,7 +24,9 @@ class ExperimentProvider @Inject constructor(
     }
 
     fun initialize() {
-        initialize(accountStatusInfo.getUserIds().id)
+        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
+            initialize(accountStatusInfo.getUserIds().id)
+        }
     }
 
     fun initialize(uuid: String) {
@@ -35,9 +37,11 @@ class ExperimentProvider @Inject constructor(
     }
 
     suspend fun refreshExperiments(uuid: String? = null) = withContext(ioDispatcher) {
-        clear()
-        // This will update the repository with the current user ID
-        initialize(uuid ?: accountStatusInfo.getUserIds().id)
+        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
+            clear()
+            // This will update the repository with the current user ID
+            initialize(uuid ?: accountStatusInfo.getUserIds().id)
+        }
     }
 
     fun getVariation(experiment: ExperimentType): Variation? {
