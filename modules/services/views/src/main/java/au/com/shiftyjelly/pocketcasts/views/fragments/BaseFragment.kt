@@ -50,10 +50,7 @@ open class BaseFragment :
         val callback = object : OnBackPressedCallback(getBackstackCount() > 0) {
             override fun handleOnBackPressed() {
                 val handled = onBackPressed()
-                isEnabled = getBackstackCount() > 0
-                if (!handled) {
-                    isEnabled = false
-                }
+                isEnabled = handled && getBackstackCount() > 0
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)

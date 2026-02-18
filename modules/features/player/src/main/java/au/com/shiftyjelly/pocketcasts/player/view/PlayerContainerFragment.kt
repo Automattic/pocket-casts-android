@@ -132,8 +132,9 @@ class PlayerContainerFragment :
             it.isGone = true
             (activity as? FragmentHostListener)?.addPlayerBottomSheetCallback(closeUpNextCallback)
         }
-        upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
-        upNextBottomSheetBehavior!!.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        val upNextBehavior: BottomSheetBehavior<View> = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
+        upNextBottomSheetBehavior = upNextBehavior
+        upNextBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
@@ -158,7 +159,7 @@ class PlayerContainerFragment :
                 }
             }
         })
-        upNextBottomSheetBehavior!!.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.upNextFrameBottomSheet))
+        upNextBehavior.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.upNextFrameBottomSheet))
 
         val viewPager = binding.viewPager
 
@@ -244,6 +245,7 @@ class PlayerContainerFragment :
         bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             binding.multiSelectToolbar.isVisible = isMultiSelecting
             binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
+            notifyBackstackChanged()
         }
         bookmarksViewModel.multiSelectHelper.context = context
         binding.multiSelectToolbar.setup(
@@ -263,6 +265,7 @@ class PlayerContainerFragment :
     fun updateTabsVisibility(show: Boolean) {
         binding?.tabHolder?.isVisible = show
         binding?.viewPager?.isUserInputEnabled = show
+        notifyBackstackChanged()
     }
 
     fun onPlayerOpen() {
