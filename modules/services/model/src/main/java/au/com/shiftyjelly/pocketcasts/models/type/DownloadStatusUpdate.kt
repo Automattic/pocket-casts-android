@@ -1,49 +1,63 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import java.io.File
+import java.util.UUID
 
 sealed interface DownloadStatusUpdate {
     val episodeStatus: EpisodeDownloadStatus
+    val taskId: UUID?
     val outputFile: File?
     val errorMessage: String?
 
     data object Idle : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.DownloadNotRequested
+        override val taskId get() = null
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
-    data object WaitingForWifi : DownloadStatusUpdate {
+    data class WaitingForWifi(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.WaitingForWifi
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
-    data object WaitingForPower : DownloadStatusUpdate {
+    data class WaitingForPower(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.WaitingForPower
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
-    data object WaitingForStorage : DownloadStatusUpdate {
+    data class WaitingForStorage(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.WaitingForStorage
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
-    data object Enqueued : DownloadStatusUpdate {
+    data class Enqueued(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.Queued
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
-    data object InProgress : DownloadStatusUpdate {
+    data class InProgress(
+        override val taskId: UUID,
+    ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.Downloading
         override val outputFile get() = null
         override val errorMessage get() = null
     }
 
     data class Success(
+        override val taskId: UUID,
         override val outputFile: File,
     ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.Downloaded
@@ -51,6 +65,7 @@ sealed interface DownloadStatusUpdate {
     }
 
     data class Failure(
+        override val taskId: UUID,
         override val errorMessage: String,
     ) : DownloadStatusUpdate {
         override val episodeStatus get() = EpisodeDownloadStatus.DownloadFailed

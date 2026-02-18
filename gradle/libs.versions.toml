@@ -17,7 +17,7 @@
 
 [versions]
 aboutlibraries = "14.0.0-b02"
-android-gradle-plugin = "9.0.0"
+android-gradle-plugin = "9.0.1"
 billing = "8.3.0"
 coil = "3.3.0"
 compose = "2025.12.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -41,7 +41,7 @@ lottie = "6.7.1"
 measure-builds = "3.2.2"
 media3 = "1.9.2"
 mockito = "5.21.0"
-mockito-kotlin = "6.2.2"
+mockito-kotlin = "6.2.3"
 moshi = "1.15.2"
 navigation = "2.9.7"
 okhttp = "5.3.2"
@@ -76,7 +76,7 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" 
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 # Compose
-compose-activity = "androidx.activity:activity-compose:1.12.3"
+compose-activity = "androidx.activity:activity-compose:1.12.4"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
@@ -291,7 +291,7 @@ material = "com.google.android.material:material:1.13.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 play-auth = "com.google.android.gms:play-services-auth:21.5.0"
-play-cast = "com.google.android.gms:play-services-cast-framework:22.2.0"
+play-cast = "com.google.android.gms:play-services-cast-framework:22.3.0"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:3.0.0"
