@@ -127,7 +127,7 @@ private class DownloadQueueController(
 
     suspend fun cleanUpStaleDownloads() {
         val cancellableEpisodes = downloadDao.findCancellableEpisodes()
-        val pendingWorks = WorkManager.getInstance(context)
+        val pendingWorks = workManager
             .getDownloadWorkInfos<DownloadWorkInfo>()
             .filterValues(DownloadWorkInfo::isCancellable)
 
@@ -234,6 +234,7 @@ private class DownloadQueueController(
         val episodeUuids = downloadDao.findCancellableEpisodes().map(BaseEpisode::uuid)
         removeFromQueue(episodeUuids, disableAutoDownload, sourceView)
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.WORKER_TAG)
+        workManager.cancelAllWorkByTag(UpdateShowNotesTask.WORKER_TAG)
     }
 
     suspend fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
