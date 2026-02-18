@@ -513,7 +513,7 @@ class PodcastManagerImpl @Inject constructor(
         } else {
             val podcasts = podcastDao.findSubscribedBlocking()
             if (podcasts.none { it.isAutoDownloadNewEpisodes }) {
-                settings.autoDownloadNewEpisodes.set(autoDownloadStatus, updateModifiedAt = false)
+                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_OFF, updateModifiedAt = false)
             }
         }
     }
