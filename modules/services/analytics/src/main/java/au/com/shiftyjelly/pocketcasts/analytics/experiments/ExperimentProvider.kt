@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -15,31 +14,30 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ExperimentProvider @Inject constructor(
-    private val tracksAnalyticsTracker: TracksAnalyticsTracker,
     private val repository: VariationsRepository,
     private val accountStatusInfo: AccountStatusInfo,
-    private val iODispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     companion object {
         const val TAG = "ExperimentsProvider"
         const val PLATFORM = "pocketcasts"
     }
 
-    fun initialize(newUuid: String? = null) {
+    fun initialize() {
+        initialize(accountStatusInfo.getUserIds().id)
+    }
+
+    fun initialize(uuid: String) {
         if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            // We need to attempt to retrieve the UUID from accountStatusInfo instead of tracksAnalyticsTracker due to a race condition
-            // that delays UUID refresh after logging in.
-            val uuid = newUuid ?: accountStatusInfo.getUuid() ?: tracksAnalyticsTracker.anonID ?: tracksAnalyticsTracker.generateNewAnonID()
-
             LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
-
             repository.initialize(anonymousId = uuid, oAuthToken = null)
         }
     }
 
-    suspend fun refreshExperiments(newUuid: String? = null) = withContext(iODispatcher) {
+    suspend fun refreshExperiments(uuid: String? = null) = withContext(ioDispatcher) {
         clear()
-        initialize(newUuid)
+        // This will update the repository with the current user ID
+        initialize(uuid ?: accountStatusInfo.getUserIds().id)
     }
 
     fun getVariation(experiment: ExperimentType): Variation? {

@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
-import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -19,17 +17,14 @@ import timber.log.Timber
 
 class TracksAnalyticsTracker @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : IdentifyingTracker(preferences),
+) : Tracker,
     CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
 
     private var predefinedEventProperties = emptyMap<String, Any>()
-
-    override val anonIdPrefKey: String = TRACKS_ANON_ID
 
     override val coroutineContext: CoroutineContext = Dispatchers.IO
 
@@ -43,8 +38,12 @@ class TracksAnalyticsTracker @Inject constructor(
         if (tracksClient != null) {
             launch {
                 val eventKey = event.key
-                val user = userId ?: anonID ?: generateNewAnonID()
-                val userType = userId?.let { TracksClient.NosaraUserType.POCKETCASTS } ?: TracksClient.NosaraUserType.ANON
+                val userIds = accountStatusInfo.getUserIds()
+                val userType = if (userIds.accountId != null) {
+                    TracksClient.NosaraUserType.POCKETCASTS
+                } else {
+                    TracksClient.NosaraUserType.ANON
+                }
 
                 // Create the merged JSON Object of properties.
                 // Properties defined by the user have precedence over the default ones pre-defined at "event level"
@@ -58,7 +57,7 @@ class TracksAnalyticsTracker @Inject constructor(
                     }
                 }
 
-                tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
+                tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, userIds.id, userType)
             }
         }
 
@@ -100,22 +99,16 @@ class TracksAnalyticsTracker @Inject constructor(
         ).mapKeys { it.key.analyticsKey }
     }
 
+    private var lastAliasedAnonId: String? = null
+
     override fun refreshMetadata() {
-        val uuid = accountStatusInfo.getUuid()
-        if (!uuid.isNullOrEmpty()) {
-            userId = uuid
-            // Re-unify the user
-            if (anonID != null) {
-                tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
-                clearAnonID()
-            }
-        } else {
-            userId = null
-            if (anonID == null) {
-                generateNewAnonID()
+        val userIds = accountStatusInfo.getUserIds()
+        if (!userIds.accountId.isNullOrEmpty()) {
+            if (lastAliasedAnonId != userIds.anonId) {
+                lastAliasedAnonId = userIds.anonId
+                tracksClient?.trackAliasUser(userIds.accountId, userIds.anonId, TracksClient.NosaraUserType.POCKETCASTS)
             }
         }
-
         updatePredefinedEventProperties()
     }
 
@@ -124,7 +117,6 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     override fun clearAllData() {
-        super.clearAllData()
         tracksClient?.clearUserProperties()
         tracksClient?.clearQueues()
     }
@@ -146,7 +138,6 @@ class TracksAnalyticsTracker @Inject constructor(
 
     companion object {
         private const val ID = "Tracks"
-        private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
         const val INVALID_OR_NULL_VALUE = "none"
     }
