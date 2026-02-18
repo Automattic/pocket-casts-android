@@ -93,7 +93,6 @@ class WearMainActivityViewModel @Inject constructor(
                     previousConnectivityState = isConnected
                 }
         }
-
     }
 
     private fun startSyncFlow() {

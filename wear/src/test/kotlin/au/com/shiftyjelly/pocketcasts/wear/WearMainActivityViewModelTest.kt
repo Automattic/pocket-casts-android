@@ -95,7 +95,7 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `initial state has correct default values`() = runTest {
+    fun `initial state has correct default values`() = runTest(coroutineRule.testDispatcher) {
         // Given
         setupPhoneConnectionMock()
 
@@ -112,7 +112,7 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest {
+    fun `onSignInConfirmationActionHandled sets showLoggingInScreen to false`() = runTest(coroutineRule.testDispatcher) {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
@@ -133,7 +133,7 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `signOut delegates to UserManager`() = runTest {
+    fun `signOut delegates to UserManager`() = runTest(coroutineRule.testDispatcher) {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
@@ -148,7 +148,7 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `retrySync can be called without error`() = runTest {
+    fun `retrySync can be called without error`() = runTest(coroutineRule.testDispatcher) {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()
@@ -163,7 +163,7 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
-    fun `onConnectivityNotificationDismissed sets showConnectivityNotification to false`() = runTest {
+    fun `onConnectivityNotificationDismissed sets showConnectivityNotification to false`() = runTest(coroutineRule.testDispatcher) {
         // Given
         setupPhoneConnectionMock()
         viewModel = createViewModel()

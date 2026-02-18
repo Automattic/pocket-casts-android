@@ -24,13 +24,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(MockitoJUnitRunner.Silent::class)
 class PodcastViewModelTest {
 
     @get:Rule
@@ -52,14 +50,13 @@ class PodcastViewModelTest {
     private lateinit var artworkConfigurationSetting: UserSetting<ArtworkConfiguration>
 
     private lateinit var savedStateHandle: SavedStateHandle
-    private lateinit var viewModel: PodcastViewModel
 
     private val testPodcastUuid = "test-podcast-uuid"
 
     @Before
     fun setup() {
+        MockitoAnnotations.openMocks(this)
         savedStateHandle = SavedStateHandle(mapOf(PodcastScreen.ARGUMENT to testPodcastUuid))
-
         val artworkFlow = MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
         whenever(artworkConfigurationSetting.flow).thenReturn(artworkFlow)
         whenever(settings.artworkConfiguration).thenReturn(artworkConfigurationSetting)
