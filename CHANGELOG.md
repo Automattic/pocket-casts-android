@@ -1,6 +1,8 @@
 8.7
 -----
-
+*   New Features
+    *   Support predictive back navigation
+        ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
 
 8.6
 -----
