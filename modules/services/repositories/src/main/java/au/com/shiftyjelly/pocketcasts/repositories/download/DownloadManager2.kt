@@ -68,6 +68,7 @@ class DownloadManager2 @Inject constructor(
 
     private val isMonitoring = AtomicBoolean()
 
+    @Volatile
     override var size: Int = 0
         private set
 
