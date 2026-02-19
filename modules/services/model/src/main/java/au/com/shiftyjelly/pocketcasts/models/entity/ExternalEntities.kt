@@ -112,7 +112,7 @@ sealed interface ExternalEpisode {
         val artworkUrl: String?,
         val tintColorIndex: Int,
     ) : ExternalEpisode {
-        override val coverUrl get() = artworkUrl?.takeIf { tintColorIndex == 0 } ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/artwork/dark/960/$tintColorIndex.png"
+        override val coverUrl get() = artworkUrl?.takeIf { tintColorIndex == 0 } ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/artwork/dark/960/$tintColorIndex.webp"
     }
 }
 
