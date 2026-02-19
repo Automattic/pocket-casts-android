@@ -475,7 +475,7 @@ enum class SubscriptionOffer(
                 BillingCycle.Monthly -> null
 
                 BillingCycle.Yearly -> if (isInstallment) {
-                    null
+                    "plus-yearly-installments-referral-two-months-free"
                 } else {
                     "plus-yearly-referral-two-months-free"
                 }
