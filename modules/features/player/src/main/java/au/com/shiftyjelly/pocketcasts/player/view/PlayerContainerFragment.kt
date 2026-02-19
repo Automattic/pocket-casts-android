@@ -67,7 +67,7 @@ class PlayerContainerFragment :
     lateinit var analyticsTracker: AnalyticsTracker
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
-    lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
+    var upNextBottomSheetBehavior: BottomSheetBehavior<View>? = null
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -84,7 +84,7 @@ class PlayerContainerFragment :
     private val closeUpNextCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             if (newState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)) {
-                upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
 
@@ -111,6 +111,7 @@ class PlayerContainerFragment :
         super.onDestroyView()
         (activity as? FragmentHostListener)?.removePlayerBottomSheetCallback(closeUpNextCallback)
         binding = null
+        upNextBottomSheetBehavior = null
         bookmarksViewModel.multiSelectHelper.context = null
     }
 
@@ -132,12 +133,13 @@ class PlayerContainerFragment :
             (activity as? FragmentHostListener)?.addPlayerBottomSheetCallback(closeUpNextCallback)
         }
         upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
-        upNextBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        upNextBottomSheetBehavior!!.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 updateUpNextVisibility(newState != BottomSheetBehavior.STATE_COLLAPSED)
+                notifyBackstackChanged()
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
@@ -156,7 +158,7 @@ class PlayerContainerFragment :
                 }
             }
         })
-        upNextBottomSheetBehavior.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.upNextFrameBottomSheet))
+        upNextBottomSheetBehavior!!.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.upNextFrameBottomSheet))
 
         val viewPager = binding.viewPager
 
@@ -255,7 +257,7 @@ class PlayerContainerFragment :
 
     fun openUpNext() {
         updateUpNextVisibility(true)
-        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     fun updateTabsVisibility(show: Boolean) {
@@ -314,7 +316,7 @@ class PlayerContainerFragment :
     }
 
     override fun getBackstackCount(): Int {
-        return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+        return if (upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED ||
             bookmarksViewModel.multiSelectHelper.isMultiSelecting ||
             isTranscriptVisible
         ) {
@@ -326,8 +328,8 @@ class PlayerContainerFragment :
 
     override fun onBackPressed(): Boolean {
         return when {
-            upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
-                upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED -> {
+                upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
                 true
             }
 
