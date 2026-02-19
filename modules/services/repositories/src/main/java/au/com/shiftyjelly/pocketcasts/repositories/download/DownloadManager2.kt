@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -56,9 +55,10 @@ class DownloadManager2 @Inject constructor(
     DownloadStatusObserver {
 
     private val workManager = WorkManager.getInstance(context)
+    private val downloadDao = EpisodeDownloadDao(appDatabase)
     private val prerequisitesProvider = DownloadPrerequisitesProvider(workManager, context)
-    private val statusController = DownloadStatusController(appDatabase, context)
-    private val queueController = DownloadQueueController(appDatabase, settings, workManager, context, scope)
+    private val statusController = DownloadStatusController(downloadDao, context)
+    private val queueController = DownloadQueueController(downloadDao, settings, workManager, context, scope)
 
     private val isMonitoring = AtomicBoolean()
 
@@ -81,8 +81,6 @@ class DownloadManager2 @Inject constructor(
         }
 
         scope.launch {
-            queueController.clearStaleTasks()
-
             val constraintsFlow = prerequisitesProvider.getConstraintsFlow()
             val workInfosFlow = workManager.getWorkInfosByTagFlow(DownloadEpisodeWorker.WORKER_TAG)
                 .conflate()
@@ -96,32 +94,17 @@ class DownloadManager2 @Inject constructor(
 }
 
 private class DownloadQueueController(
-    private val appDatabase: AppDatabase,
+    private val downloadDao: EpisodeDownloadDao,
     private val settings: Settings,
     private val workManager: WorkManager,
     private val context: Context,
     private val coroutineScope: CoroutineScope,
 ) {
-    private val episodeDao = appDatabase.episodeDao()
-    private val userEpisodeDao = appDatabase.userEpisodeDao()
-
-    private val pendingStatuses = EpisodeDownloadStatus.entries.filter { it.isPending }
-
-    suspend fun clearStaleTasks() {
-        val pendingEpisodes = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>().keys
-        appDatabase.withTransaction {
-            val staleEpisodes = episodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - pendingEpisodes
-            episodeDao.updateDownloadStatuses(staleEpisodes.associateWith { DownloadStatusUpdate.Idle })
-
-            val staleUserEpisodes = userEpisodeDao.getEpisodeUuidsWithDownloadStatus(pendingStatuses) - pendingEpisodes
-            userEpisodeDao.updateDownloadStatuses(staleUserEpisodes.associateWith { DownloadStatusUpdate.Idle })
-        }
-    }
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType, sourceView: SourceView) {
-        val podcastEpisodes = episodeDao.findByUuids(episodeUuids)
-        val userEpisodes = userEpisodeDao.findEpisodesByUuids(episodeUuids)
-        val episodes = (podcastEpisodes + userEpisodes).filter { episode -> canDownload(episode, downloadType) }
+        val episodes = downloadDao
+            .findEpisodes(episodeUuids)
+            .filter { episode -> canDownload(episode, downloadType) }
         if (episodes.isEmpty()) {
             return
         }
@@ -150,7 +133,7 @@ private class DownloadQueueController(
     }
 
     suspend fun removeFromQueue(podcastUuid: String, disableAutoDownload: Boolean, sourceView: SourceView) {
-        val episodeUuids = episodeDao.findByPodcastUuid(podcastUuid)
+        val episodeUuids = downloadDao.findPodcastEpisodeUuids(podcastUuid)
         applyQueueTransition(QueueTransition.Remove(episodeUuids, disableAutoDownload, sourceView))
 
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
@@ -183,25 +166,21 @@ private class DownloadQueueController(
             return
         }
 
-        val episodes = appDatabase.withTransaction {
+        val episodes = downloadDao.withTransaction {
             // Read the episodes data to have access to their file paths.
             // Applying remove transition clears it in the database.
-            val podcastEpisodes = episodeDao.findByUuids(transition.episodeUuids)
-            val userEpisodes = userEpisodeDao.findEpisodesByUuids(transition.episodeUuids)
+            val episodes = findEpisodes(transition.episodeUuids)
 
             when (transition) {
                 is QueueTransition.Enqueue -> {
-                    episodeDao.setReadyForDownload(transition.episodeToWorkerUuids)
-                    userEpisodeDao.setReadyForDownload(transition.episodeToWorkerUuids)
+                    downloadDao.setReadyForDownload(transition.episodeToWorkerUuids)
                 }
 
                 is QueueTransition.Remove -> {
-                    episodeDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
-                    userEpisodeDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
+                    downloadDao.setDownloadCancelled(transition.episodeUuids, transition.disableAutoDownload)
                 }
             }
-
-            podcastEpisodes + userEpisodes
+            episodes
         }
 
         when (transition) {
@@ -332,15 +311,13 @@ private class DownloadQueueController(
 }
 
 private class DownloadStatusController(
-    private val appDatabase: AppDatabase,
+    private val downloadDao: EpisodeDownloadDao,
     private val context: Context,
 ) {
-    private val episodeDao = appDatabase.episodeDao()
-    private val userEpisodeDao = appDatabase.userEpisodeDao()
-
     suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadPrerequisites) {
         val tooManyAttemptsError = context.getString(LR.string.error_download_too_many_attempts)
         val defaultErrorMessage = context.getString(LR.string.error_download_generic_failure, "").trim()
+
         val statusUpdates = infos.associate { info ->
             val update = info.toStatusUpdate(
                 constraints = constraints,
@@ -349,11 +326,7 @@ private class DownloadStatusController(
             )
             info.episodeUuid to update
         }
-
-        appDatabase.withTransaction {
-            episodeDao.updateDownloadStatuses(statusUpdates)
-            userEpisodeDao.updateDownloadStatuses(statusUpdates)
-        }
+        downloadDao.updateDownloadStatuses(statusUpdates)
     }
 
     private fun DownloadWorkInfo.toStatusUpdate(
@@ -392,6 +365,42 @@ private class DownloadStatusController(
                 DownloadStatusUpdate.Failure(id, errorMessage ?: defaultErrorMessage)
             }
         }
+    }
+}
+
+private class EpisodeDownloadDao(
+    private val appDatabase: AppDatabase,
+) {
+    private val episodeDao = appDatabase.episodeDao()
+    private val userEpisodeDao = appDatabase.userEpisodeDao()
+
+    suspend fun <R> withTransaction(block: suspend EpisodeDownloadDao.() -> R) = appDatabase.withTransaction {
+        block()
+    }
+
+    suspend fun findPodcastEpisodes(uuids: Collection<String>) = episodeDao.findByUuids(uuids)
+
+    suspend fun findUserEpisodes(uuids: Collection<String>) = userEpisodeDao.findEpisodesByUuids(uuids)
+
+    suspend fun findEpisodes(uuids: Collection<String>) = withTransaction<List<BaseEpisode>> {
+        findPodcastEpisodes(uuids) + findUserEpisodes(uuids)
+    }
+
+    suspend fun findPodcastEpisodeUuids(podcastUuid: String) = episodeDao.findByPodcastUuid(podcastUuid)
+
+    suspend fun setReadyForDownload(episodeToWorkerUuids: Map<String, UUID>) = withTransaction {
+        episodeDao.setReadyForDownload(episodeToWorkerUuids)
+        userEpisodeDao.setReadyForDownload(episodeToWorkerUuids)
+    }
+
+    suspend fun setDownloadCancelled(uuids: Collection<String>, disableAutoDownload: Boolean) = withTransaction {
+        episodeDao.setDownloadCancelled(uuids, disableAutoDownload)
+        userEpisodeDao.setDownloadCancelled(uuids, disableAutoDownload)
+    }
+
+    suspend fun updateDownloadStatuses(updates: Map<String, DownloadStatusUpdate>) = withTransaction {
+        episodeDao.updateDownloadStatuses(updates)
+        userEpisodeDao.updateDownloadStatuses(updates)
     }
 }
 
