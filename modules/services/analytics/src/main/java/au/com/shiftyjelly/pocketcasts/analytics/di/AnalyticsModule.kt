@@ -2,19 +2,26 @@ package au.com.shiftyjelly.pocketcasts.analytics.di
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsLoggingListener
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.NoOpTracker
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +31,30 @@ import okhttp3.OkHttpClient
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ExperimentModule {
+object AnalyticsModule {
+    // Necessary to satisfy Dagger injection
+    @Provides
+    @IntoSet
+    fun provideNoOpTracker(): Tracker = NoOpTracker
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsTracker(
+        trackers: Set<@JvmSuppressWildcards Tracker>,
+        listeners: Set<@JvmSuppressWildcards AnalyticsTracker.Listener>,
+    ): AnalyticsTracker = AnalyticsTracker(trackers, listeners)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalyticsWrapper {
+        return FirebaseAnalyticsWrapper(FirebaseAnalytics.getInstance(context))
+    }
+
+    @Provides
+    @IntoSet
+    fun provideLoggingListener(): AnalyticsTracker.Listener {
+        return AnalyticsLoggingListener()
+    }
 
     @Provides
     @Singleton
