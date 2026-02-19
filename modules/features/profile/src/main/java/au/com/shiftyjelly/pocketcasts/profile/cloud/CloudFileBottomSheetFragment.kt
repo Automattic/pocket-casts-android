@@ -49,6 +49,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -90,6 +93,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     private var pocketCastsImageRequestFactory: PocketCastsImageRequestFactory? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
     private var binding: BottomSheetCloudFileBinding? = null
+    private val disposables = CompositeDisposable()
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
@@ -120,6 +124,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        disposables.clear()
         binding = null
     }
 
@@ -251,8 +256,13 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     episode = episode,
                     tintColor = tintColor,
                     hideErrorDetails = true,
-                    rowDataObservable = rowDataProvider.episodeRowDataObservable(episode.uuid),
                 )
+
+                disposables.clear()
+                disposables += rowDataProvider.userEpisodeRowDataObservable(episode.uuid)
+                    .subscribeBy(onNext = { data ->
+                        binding.fileStatusIconsView.update(data)
+                    })
 
                 binding.lblCloud.text = when (episode.serverStatus) {
                     UserEpisodeServerStatus.LOCAL -> getString(LR.string.profile_cloud_upload)
