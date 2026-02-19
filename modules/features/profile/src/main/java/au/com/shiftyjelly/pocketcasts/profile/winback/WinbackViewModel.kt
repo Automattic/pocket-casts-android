@@ -253,15 +253,39 @@ class WinbackViewModel @Inject constructor(
         val plan = plans.finMatchingWinbackPlan(offer) ?: return null
         val (discountPhase, regularPhase) = plan.pricingPhases.takeIf { it.size == 2 } ?: return null
 
+        val formattedPrice: String
+        val formattedTotalSavings: String?
+
+        when {
+            plan.billingCycle == BillingCycle.Monthly -> {
+                formattedPrice = regularPhase.price.formattedPrice
+                formattedTotalSavings = null
+            }
+
+            plan.isInstallment -> {
+                formattedPrice = discountPhase.price.formattedPrice
+                // Calculate total savings: (regular monthly price * 12) - (discounted monthly price * 12)
+                val regularYearlyAmount = regularPhase.price.amount * 12.toBigDecimal()
+                val discountedYearlyAmount = discountPhase.price.amount * 12.toBigDecimal()
+                val savingsAmount = regularYearlyAmount - discountedYearlyAmount
+                formattedTotalSavings = java.text.NumberFormat.getCurrencyInstance().apply {
+                    currency = java.util.Currency.getInstance(discountPhase.price.currencyCode)
+                }.format(savingsAmount)
+            }
+
+            else -> {
+                formattedPrice = discountPhase.price.formattedPrice
+                formattedTotalSavings = null
+            }
+        }
+
         return WinbackOffer(
             redeemCode = redeemCode,
-            formattedPrice = when (plan.billingCycle) {
-                BillingCycle.Monthly -> regularPhase.price.formattedPrice
-                BillingCycle.Yearly -> discountPhase.price.formattedPrice
-            },
+            formattedPrice = formattedPrice,
             tier = plan.tier,
             billingCycle = plan.billingCycle,
             isInstallment = plan.isInstallment,
+            formattedTotalSavings = formattedTotalSavings,
         )
     }
 
@@ -474,6 +498,7 @@ internal data class WinbackOffer(
     val tier: SubscriptionTier,
     val billingCycle: BillingCycle,
     val isInstallment: Boolean,
+    val formattedTotalSavings: String? = null,
 ) {
     val productId get() = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
 }

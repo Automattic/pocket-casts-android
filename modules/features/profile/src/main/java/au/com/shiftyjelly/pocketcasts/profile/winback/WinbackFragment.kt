@@ -129,13 +129,18 @@ class WinbackFragment : BaseDialogFragment() {
                         navArgument(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT) {
                             type = NavType.EnumType(BillingCycle::class.java)
                         },
+                        navArgument(WinbackNavRoutes.OFFER_CLAIMED_IS_INSTALLMENT_ARGUMENT) {
+                            type = NavType.BoolType
+                        },
                     ),
                 ) { backStackEntry ->
                     val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                     val billingCycle = arguments.requireSerializable<BillingCycle>(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT)
+                    val isInstallment = arguments.getBoolean(WinbackNavRoutes.OFFER_CLAIMED_IS_INSTALLMENT_ARGUMENT)
 
                     OfferClaimedPage(
                         billingCycle = billingCycle,
+                        isInstallment = isInstallment,
                         onConfirm = {
                             viewModel.trackOfferClaimedConfirmationTapped()
                             dismiss()
@@ -236,7 +241,8 @@ class WinbackFragment : BaseDialogFragment() {
                 LaunchedEffect(Unit) {
                     viewModel.consumeClaimedOffer()
                     val billingCycle = offerState.offer.billingCycle
-                    navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle)) {
+                    val isInstallment = offerState.offer.isInstallment
+                    navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle, isInstallment)) {
                         popUpTo(WinbackNavRoutes.MAIN) {
                             inclusive = true
                         }
@@ -365,10 +371,11 @@ private object WinbackNavRoutes {
     private const val OFFER_CLAIMED = "offer_claimed"
 
     const val OFER_CLAIMED_BILLING_CYCLE_ARGUMENT = "billingCycle"
+    const val OFFER_CLAIMED_IS_INSTALLMENT_ARGUMENT = "isInstallment"
 
-    fun offerClaimedRoute() = "$OFFER_CLAIMED/{$OFER_CLAIMED_BILLING_CYCLE_ARGUMENT}"
+    fun offerClaimedRoute() = "$OFFER_CLAIMED/{$OFER_CLAIMED_BILLING_CYCLE_ARGUMENT}/{$OFFER_CLAIMED_IS_INSTALLMENT_ARGUMENT}"
 
-    fun offerClaimedDestination(billingCycle: BillingCycle) = "$OFFER_CLAIMED/$billingCycle"
+    fun offerClaimedDestination(billingCycle: BillingCycle, isInstallment: Boolean) = "$OFFER_CLAIMED/$billingCycle/$isInstallment"
 }
 
 private val intOffsetAnimationSpec = tween<IntOffset>(350)
