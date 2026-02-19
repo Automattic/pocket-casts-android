@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -56,11 +58,44 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     private fun loadReferralClaimOffer() {
         viewModelScope.launch {
-            val referralPlan = paymentClient.loadSubscriptionPlans()
-                .flatMap { plans -> plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral) }
+            val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
+
+            // Try installment offer first if feature flag is enabled
+            val installmentPlan = if (isInstallmentEnabled) {
+                paymentClient.loadSubscriptionPlans()
+                    .flatMap { plans ->
+                        plans.findOfferPlan(
+                            SubscriptionTier.Plus,
+                            BillingCycle.Yearly,
+                            SubscriptionOffer.Referral,
+                            isInstallment = true,
+                        )
+                    }
+                    .flatMap(ReferralSubscriptionPlan::create)
+                    .onFailure { code, message ->
+                        LogBuffer.i(LogBuffer.TAG_SUBSCRIPTIONS, "Installment referral not available: $code, $message")
+                    }
+                    .getOrNull()
+            } else {
+                null
+            }
+
+            // Fallback to regular offer if installment not available
+            val referralPlan = installmentPlan ?: paymentClient.loadSubscriptionPlans()
+                .flatMap { plans ->
+                    plans.findOfferPlan(
+                        SubscriptionTier.Plus,
+                        BillingCycle.Yearly,
+                        SubscriptionOffer.Referral,
+                        isInstallment = false,
+                    )
+                }
                 .flatMap(ReferralSubscriptionPlan::create)
-                .onFailure { code, message -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message") }
+                .onFailure { code, message ->
+                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message")
+                }
                 .getOrNull()
+
             _state.value = if (referralPlan != null) {
                 UiState.Loaded(referralPlan)
             } else {
@@ -118,12 +153,22 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         referralPlan: ReferralSubscriptionPlan,
         activity: Activity,
     ) {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)
+        analyticsTracker.track(
+            AnalyticsEvent.REFERRAL_PURCHASE_SHOWN,
+            mapOf(
+                "is_installment" to referralPlan.key.isInstallment.toString(),
+            ),
+        )
         viewModelScope.launch {
             val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, purchaseSource = "referrals", activity)
             when (purchaseResult) {
                 PurchaseResult.Purchased -> {
-                    analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
+                    analyticsTracker.track(
+                        AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS,
+                        mapOf(
+                            "is_installment" to referralPlan.key.isInstallment.toString(),
+                        ),
+                    )
                     redeemReferralCode(settings.referralClaimCode.value)
                 }
 
