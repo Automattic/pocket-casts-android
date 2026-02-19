@@ -1,6 +1,8 @@
 8.7
 -----
-
+*   Bug Fixes
+    *   Respect global auto download setting
+        ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
 
 8.6
 -----
