@@ -559,15 +559,14 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `offerId returns null for installment referral offer`() {
+    fun `offerId returns correct ID for installment referral offer`() {
         val offerId = SubscriptionOffer.Referral.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
             isInstallment = true,
         )
 
-        // Referral is not supported for installment plans
-        assertNull(offerId)
+        assertEquals("plus-yearly-installments-referral-two-months-free", offerId)
     }
 
     @Test
@@ -611,6 +610,28 @@ class SubscriptionPlansTest {
         assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
         assertEquals("p1y-installments", plan.basePlanId)
         assertEquals("plus-yearly-installments-winback", plan.offerId)
+        assertEquals(infinitePricingPhase.price, plan.recurringPrice)
+    }
+
+    @Test
+    fun `find plus yearly installment referral plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.Referral,
+            isInstallment = true,
+        ).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(SubscriptionOffer.Referral, plan.offer)
+        assertTrue(plan.isInstallment)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
+        assertEquals("p1y-installments", plan.basePlanId)
+        assertEquals("plus-yearly-installments-referral-two-months-free", plan.offerId)
         assertEquals(infinitePricingPhase.price, plan.recurringPrice)
     }
 
@@ -691,7 +712,7 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `referral offer is not supported for installment plans`() {
+    fun `referral offer is supported for installment plans`() {
         val installmentOfferId = SubscriptionOffer.Referral.offerId(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
@@ -704,7 +725,7 @@ class SubscriptionPlansTest {
             isInstallment = false,
         )
 
-        assertNull(installmentOfferId)
+        assertEquals("plus-yearly-installments-referral-two-months-free", installmentOfferId)
         assertEquals("plus-yearly-referral-two-months-free", regularOfferId)
     }
 }
