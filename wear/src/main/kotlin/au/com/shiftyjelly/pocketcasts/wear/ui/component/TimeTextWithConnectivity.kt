@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -36,7 +37,7 @@ fun TimeTextWithConnectivity(
     val textColor = MaterialTheme.colors.onBackground
 
     CurvedLayout(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         anchor = 270f,
         angularDirection = CurvedDirection.Angular.Clockwise,
     ) {
