@@ -16,14 +16,17 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadNotificationObserver.NotificationJob
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
+import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
@@ -31,14 +34,15 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.IOException
-import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.UUID
 import javax.net.ssl.SSLException
+import kotlin.time.measureTimedValue
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
 
@@ -77,7 +81,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Re
 class DownloadEpisodeWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    @Downloads httpClient: Lazy<OkHttpClient>,
+    @Downloads httpClient: Lazy<Call.Factory>,
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val fileStorage: FileStorage,
@@ -85,36 +89,60 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val notificationObserver: DownloadNotificationObserver,
 ) : Worker(context, params) {
     private val args = inputData.toArgs()
-    private val downloader = EpisodeDownloader(httpClient, progressCache)
+
+    private val downloadError = EpisodeDownloadError().apply {
+        episodeUuid = args.episodeUuid
+        podcastUuid = args.podcastUuid
+    }
+
+    private val downloader = EpisodeDownloader(
+        httpClient = httpClient,
+        progressCache = progressCache,
+        onResponse = { response ->
+            downloadError.httpStatusCode = response.code
+            downloadError.contentType = response.header("Content-Type") ?: "missing"
+            downloadError.tlsCipherSuite = response.handshake?.cipherSuite?.javaName?.uppercase() ?: "missing"
+            downloadError.isCellular = Network.isCellularConnection(context)
+            downloadError.isProxy = Network.isVpnConnection(context)
+        },
+        onComplete = { downloadProgress, fileSize ->
+            downloadError.expectedContentLength = downloadProgress?.contentLength
+            downloadError.responseBodyBytesReceived = downloadProgress?.downloadedByteCount
+            downloadError.fileSize = fileSize
+        },
+    )
+
     private var notificationJob: NotificationJob? = null
 
     override fun doWork(): Result {
-        val result = try {
-            // Block the work until the state is dispatched
-            // to keep the state consistent
-            dispatchProgressData(isWorkExecuting = true).get()
+        val timedValue = measureTimedValue {
+            try {
+                // Block the work until the state is dispatched to keep it consistent
+                dispatchProgressData(isWorkExecuting = true).get()
 
-            var episode = getEpisodeOrThrow()
-            prepareForegroundNotification(episode)
+                var episode = getEpisodeOrThrow()
+                prepareForegroundNotification(episode)
 
-            episode = refreshDownloadUrlOrThrow(episode)
-            val downloadFile = getDownloadFileOrThrow(episode)
-            val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
+                episode = refreshDownloadUrlOrThrow(episode)
+                val downloadFile = getDownloadFileOrThrow(episode)
+                val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
 
-            val downloadResult = downloader.download(
-                episode = episode,
-                downloadFile = downloadFile,
-                tempFile = tempFile,
-            )
-            downloadResult
-        } catch (e: Throwable) {
-            DownloadResult.ExceptionFailure(e)
+                val downloadResult = downloader.download(
+                    episode = episode,
+                    downloadFile = downloadFile,
+                    tempFile = tempFile,
+                )
+                downloadResult
+            } catch (e: Throwable) {
+                DownloadResult.ExceptionFailure(e)
+            }
         }
+        downloadError.taskDuration = timedValue.duration.inWholeMilliseconds
 
         notificationJob?.cancel()
         dispatchProgressData(isWorkExecuting = false)
 
-        return when (result) {
+        return when (val result = timedValue.value) {
             is DownloadResult.Success -> {
                 val data = Data.Builder()
                     .putString(DOWNLOAD_FILE_PATH_KEY, result.file.path)
@@ -178,11 +206,23 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private fun processFailure(result: DownloadResult.Failure): Pair<String, Boolean> {
         return when (result) {
             is DownloadResult.InvalidDownloadUrl -> {
+                downloadError.reason = EpisodeDownloadError.Reason.MalformedHost
                 context.getString(LR.string.error_download_invalid_url) to false
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                context.getString(LR.string.error_download_http_failure, result.code) to true
+                downloadError.reason = EpisodeDownloadError.Reason.StatusCode
+                context.getString(LR.string.error_download_http_failure, result.code.toHumanReadable()) to true
+            }
+
+            is DownloadResult.InvalidContentType -> {
+                downloadError.reason = EpisodeDownloadError.Reason.ContentType
+                context.getString(LR.string.error_download_invalid_content_type, result.contentType) to true
+            }
+
+            is DownloadResult.SuspiciousFileSize -> {
+                downloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
+                context.getString(LR.string.error_download_suspicious_content_size) to true
             }
 
             is DownloadResult.ExceptionFailure -> {
@@ -192,31 +232,42 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
                 when {
                     throwable.isOutOfStorage() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.NotEnoughStorage
                         context.getString(LR.string.error_download_no_storage) to false
                     }
 
                     throwable.isChartableBlocked() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.ChartableBlocked
                         context.getString(LR.string.error_download_chartable) to false
                     }
 
                     throwable.isAnyCause<UnknownHostException>() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.UnknownHost
                         context.getString(LR.string.error_download_unknown_host) to true
                     }
 
-                    throwable.isAnyCause<ConnectException>() -> {
+                    throwable.isAnyCause<SocketException>() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.SocketIssue
                         context.getString(LR.string.error_download_connection_error) to true
                     }
 
                     throwable.isAnyCause<SocketTimeoutException>() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.ConnectionTimeout
                         context.getString(LR.string.error_download_socket_timeout) to true
                     }
 
                     throwable.isAnyCause<SSLException>() -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.NoSSl
                         context.getString(LR.string.error_download_ssl_failure) to true
                     }
 
                     throwable is IOException -> {
                         context.getString(LR.string.error_download_io_failure) to true
+                    }
+
+                    throwable is StorageException -> {
+                        downloadError.reason = EpisodeDownloadError.Reason.StorageIssue
+                        context.getString(LR.string.error_download_generic_failure, throwable.message) to false
                     }
 
                     else -> {
@@ -277,6 +328,32 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             ForegroundInfo(id, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         } else {
             ForegroundInfo(id, notification)
+        }
+    }
+
+    private fun Int.toHumanReadable() = buildString {
+        append(this@toHumanReadable)
+        val text = when (this@toHumanReadable) {
+            400 -> "Bad Request"
+            401 -> "Unauthorized"
+            402 -> "Payment Required"
+            403 -> "Forbidden"
+            404 -> "Not Found"
+            406 -> "Not Acceptable"
+            408 -> "Request Timeout"
+            410 -> "Gone"
+            429 -> "Too Many Requests"
+            500 -> "Internal Server Error"
+            501 -> "Not Implemented"
+            502 -> "Bad Gateway"
+            503 -> "Service Unavailable"
+            504 -> "Gateway Timeout"
+            else -> null
+        }
+        if (text != null) {
+            append(" (")
+            append(text)
+            append(')')
         }
     }
 
