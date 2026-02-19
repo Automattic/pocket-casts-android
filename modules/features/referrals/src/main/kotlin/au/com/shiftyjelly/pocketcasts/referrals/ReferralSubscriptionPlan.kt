@@ -51,6 +51,39 @@ data class ReferralSubscriptionPlan private constructor(
 
     val priceAfterOffer get() = paidPricingPhase.price
 
+    val isInstallment get() = key.isInstallment
+
+    val monthlyPaymentAmount: String
+        @Composable get() = if (isInstallment) {
+            paidPricingPhase.price.formattedPrice
+        } else {
+            ""
+        }
+
+    val commitmentPaymentsCount: Int
+        get() = if (isInstallment && paidPricingPhase.schedule.period == Period.Monthly) {
+            paidPricingPhase.schedule.periodCount
+        } else {
+            0
+        }
+
+    val totalCommitmentAmount: BigDecimal
+        get() = if (isInstallment) {
+            paidPricingPhase.price.amount * commitmentPaymentsCount.toBigDecimal()
+        } else {
+            BigDecimal.ZERO
+        }
+
+    val formattedTotalCommitmentAmount: String
+        get() = if (isInstallment && totalCommitmentAmount > BigDecimal.ZERO) {
+            // Format the total using the same currency as the monthly payment
+            val currencySymbol = paidPricingPhase.price.currencyCode
+            val amount = String.format("%.2f", totalCommitmentAmount)
+            "$currencySymbol$amount"
+        } else {
+            ""
+        }
+
     companion object {
         fun create(plan: SubscriptionPlan.WithOffer): PaymentResult<ReferralSubscriptionPlan> {
             return when {
