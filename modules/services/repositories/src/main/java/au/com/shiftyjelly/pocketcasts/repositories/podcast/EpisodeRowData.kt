@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.rxMaybe
 
@@ -31,7 +33,7 @@ data class EpisodeRowData(
 
 class EpisodeRowDataProvider @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val downloadManager: DownloadManager,
+    private val downloadProgressCache: DownloadProgressCache,
     private val playbackManager: PlaybackManager,
     private val upNextQueue: UpNextQueue,
     private val bookmarkManager: BookmarkManager,
@@ -58,12 +60,10 @@ class EpisodeRowDataProvider @Inject constructor(
     }
 
     private fun downloadProgressObservable(episodeUuid: String): Observable<Int> {
-        return downloadManager.episodeDownloadProgressFlow(episodeUuid)
-            .asObservable()
-            .map { (it.downloadProgress * 100).roundToInt() }
-            .throttleLatest(1, TimeUnit.SECONDS)
-            .startWith(0)
+        return downloadProgressCache.progressFlow(episodeUuid)
+            .map { progress -> progress?.percentage ?: 0 }
             .distinctUntilChanged()
+            .asObservable()
     }
 
     private fun uploadProgressObservable(episodeUuid: String): Observable<Int> {

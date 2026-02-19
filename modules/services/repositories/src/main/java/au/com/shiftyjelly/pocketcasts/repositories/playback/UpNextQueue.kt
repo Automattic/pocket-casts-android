@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import io.reactivex.Observable
@@ -33,18 +32,18 @@ interface UpNextQueue {
     val allEpisodes get(): List<BaseEpisode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: BaseEpisode): Boolean
     suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutoPlaySource?, onAdd: (() -> Unit)?)
-    suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
-    suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun playNextBlocking(episode: BaseEpisode, onAdd: (() -> Unit)?)
+    suspend fun playLast(episode: BaseEpisode, onAdd: (() -> Unit)?)
+    suspend fun playAllNext(episodes: List<BaseEpisode>)
+    suspend fun playAllLast(episodes: List<BaseEpisode>)
     suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)
-    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>)
     fun moveEpisode(from: Int, to: Int)
     fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
     fun removeAll()
     suspend fun removeAllIncludingChanges()
-    suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
+    suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager)
     fun contains(uuid: String): Boolean
     fun updateCurrentEpisodeState(state: State)
     fun sortUpNext(sortType: UpNextSortType)

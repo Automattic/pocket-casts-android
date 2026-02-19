@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupConfirmationDialog
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -16,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class ManualCleanupViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val playbackManager: PlaybackManager,
+    private val downloadQueue: DownloadQueue,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     data class State(
@@ -119,12 +122,12 @@ class ManualCleanupViewModel
     private fun onDeleteConfirmed() {
         if (episodesToDelete.isNotEmpty()) {
             trackCleanupCompleted()
-            viewModelScope.launch {
-                episodeManager.deleteEpisodeFiles(
-                    episodes = episodesToDelete,
-                    playbackManager = playbackManager,
-                )
+            val episodeUuids = episodesToDelete.map(BaseEpisode::uuid)
+
+            viewModelScope.launch(NonCancellable) {
                 _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
+                downloadQueue.cancelAll(episodeUuids, SourceView.DOWNLOADS).join()
+                episodeManager.disableAutoDownload(episodesToDelete)
             }
         }
     }

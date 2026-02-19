@@ -31,8 +31,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
@@ -83,7 +83,7 @@ class PlayerViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
@@ -538,15 +538,11 @@ class PlayerViewModel @Inject constructor(
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
 
         if (episode.isDownloadNotRequested) {
+            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
             onDownloadStart.invoke()
-            launch {
-                DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, source = source)
-            }
         } else {
+            downloadQueue.cancel(episode.uuid, source)
             onDeleteStart.invoke()
-            launch {
-                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false)
-            }
         }
     }
 

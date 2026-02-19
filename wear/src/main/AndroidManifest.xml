@@ -88,10 +88,6 @@
         </service>
 
         <service
-            android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
             android:name="au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsJob"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />

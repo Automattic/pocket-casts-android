@@ -340,7 +340,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun unfollow() {
         viewModelScope.launch(NonCancellable) {
-            podcastManager.unsubscribe(podcastUuid, playbackManager)
+            podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SETTINGS)
             tracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
                 mapOf(

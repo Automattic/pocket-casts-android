@@ -44,7 +44,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                     episodeManager
                         .findEpisodesByPodcastOrderedSuspend(podcast)
                         .asSequence()
-                        .filter(BaseEpisode::canDownload)
+                        .filter(BaseEpisode::canQueueForAutoDownload)
                         .map(BaseEpisode::uuid)
                         .filter(newEpisodeUuidSet::contains)
                         .take(perPodcastLimit)
@@ -61,7 +61,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                 playlist.episodes
                     .asSequence()
                     .mapNotNull(PlaylistEpisode::toPodcastEpisode)
-                    .filter(BaseEpisode::canDownload)
+                    .filter(BaseEpisode::canQueueForAutoDownload)
                     .map(BaseEpisode::uuid)
                     .take(playlist.settings.autoDownloadLimit)
             }
@@ -71,7 +71,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
         return if (settings.autoDownloadUpNext.value) {
             upNextQueue.allEpisodes
                 .asSequence()
-                .filter(BaseEpisode::canDownload)
+                .filter(BaseEpisode::canQueueForAutoDownload)
                 .map(BaseEpisode::uuid)
                 .toSet()
         } else {
@@ -84,7 +84,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
             userEpisodeManager
                 .findUserEpisodes()
                 .asSequence()
-                .filter(BaseEpisode::canDownload)
+                .filter(BaseEpisode::canQueueForAutoDownload)
                 .map(BaseEpisode::uuid)
                 .toSet()
         } else {
@@ -92,5 +92,3 @@ class AutoDownloadEpisodeProvider @Inject constructor(
         }
     }
 }
-
-private fun BaseEpisode.canDownload() = !isArchived && !isFinished

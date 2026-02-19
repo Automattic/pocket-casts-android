@@ -26,13 +26,14 @@ class UploadEpisodeTask @AssistedInject constructor(
 
     companion object {
         const val INPUT_EPISODE_UUID = "episode_uuid"
+        const val OUTPUT_EPISODE_UUID = "episode_uuid"
         const val OUTPUT_ERROR_MESSAGE = "error_message"
     }
 
     private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
 
     override fun createWork(): Single<Result> {
-        var outputData = Data.Builder().putString(DownloadEpisodeTask.OUTPUT_EPISODE_UUID, episodeUUID)
+        var outputData = Data.Builder().putString(OUTPUT_EPISODE_UUID, episodeUUID)
 
         if (episodeUUID == null) {
             outputData = outputData.putString(OUTPUT_ERROR_MESSAGE, "Could not find episode $episodeUUID for upload")

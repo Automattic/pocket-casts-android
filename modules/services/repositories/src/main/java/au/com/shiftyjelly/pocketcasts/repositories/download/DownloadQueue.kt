@@ -20,24 +20,20 @@ interface DownloadQueue {
 
     fun cancel(
         episodeUuid: String,
-        disableAutoDownload: Boolean,
         sourceView: SourceView,
-    ): Job = cancelAll(setOf(episodeUuid), disableAutoDownload, sourceView)
+    ): Job = cancelAll(setOf(episodeUuid), sourceView)
 
     fun cancelAll(
         episodeUuids: Collection<String>,
-        disableAutoDownload: Boolean,
         sourceView: SourceView,
     ): Job
 
     fun cancelAll(
         podcastUuid: String,
-        disableAutoDownload: Boolean,
         sourceView: SourceView,
     ): Job
 
     fun cancelAll(
-        disableAutoDownload: Boolean,
         sourceView: SourceView,
     ): Job
 
