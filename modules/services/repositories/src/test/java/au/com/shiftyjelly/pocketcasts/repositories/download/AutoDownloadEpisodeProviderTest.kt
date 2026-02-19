@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.TestSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -35,6 +36,7 @@ class AutoDownloadEpisodeProviderTest {
     private val autoDownloadLimit = TestSetting(AutoDownloadLimitSetting.TEN_LATEST_EPISODE)
     private val isUpNextAutoDownloadEnabled = TestSetting(true)
     private val isCloudAutoDownloadEnabled = TestSetting(true)
+    private val cachedSubscription = TestSetting<Subscription?>(Subscription.PlusPreview)
 
     private val podcastManager = mock<PodcastManager> {
         on { findSubscribedNoOrder() } doAnswer { podcastEpisodes.keys.toList() }
@@ -63,6 +65,7 @@ class AutoDownloadEpisodeProviderTest {
         on { autoDownloadLimit } doAnswer { autoDownloadLimit }
         on { autoDownloadUpNext } doAnswer { isUpNextAutoDownloadEnabled }
         on { cloudAutoDownload } doAnswer { isCloudAutoDownloadEnabled }
+        on { cachedSubscription } doAnswer { cachedSubscription }
     }
 
     private val provider = AutoDownloadEpisodeProvider(
@@ -247,6 +250,16 @@ class AutoDownloadEpisodeProviderTest {
         userEpisodes += user
 
         assertProviderEpisodes(user)
+    }
+
+    @Test
+    fun `do not provide user episodes for unsigned user`() = runTest {
+        val user = listOf(userEpisode(), userEpisode(), userEpisode())
+        userEpisodes += user
+
+        cachedSubscription.set(value = null)
+
+        assertProviderEpisodes(emptySet())
     }
 
     @Test

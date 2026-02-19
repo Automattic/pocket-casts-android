@@ -80,7 +80,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
     }
 
     private suspend fun getUserEpisodes(): Set<String> {
-        return if (settings.cloudAutoDownload.value) {
+        return if (settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
             userEpisodeManager
                 .findUserEpisodes()
                 .asSequence()
