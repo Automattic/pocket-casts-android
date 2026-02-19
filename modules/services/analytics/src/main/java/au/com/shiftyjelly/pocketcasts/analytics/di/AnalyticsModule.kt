@@ -32,6 +32,7 @@ import okhttp3.OkHttpClient
 @Module
 @InstallIn(SingletonComponent::class)
 object AnalyticsModule {
+    // Necessary to satisfy Dagger injection
     @Provides
     @IntoSet
     fun provideNoOpTracker(): Tracker = NoOpTracker
