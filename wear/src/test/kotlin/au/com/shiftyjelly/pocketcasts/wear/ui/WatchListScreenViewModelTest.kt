@@ -2,21 +2,25 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Observable
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.After
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -26,6 +30,9 @@ class WatchListScreenViewModelTest {
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
+
+    @Mock
+    private lateinit var settings: Settings
 
     @Mock
     private lateinit var episodeManager: EpisodeManager
@@ -40,6 +47,7 @@ class WatchListScreenViewModelTest {
     private lateinit var upNextQueue: UpNextQueue
 
     private lateinit var viewModel: WatchListScreenViewModel
+    private lateinit var refreshStateFlow: MutableStateFlow<RefreshState>
 
     @Before
     fun setup() {
@@ -47,12 +55,9 @@ class WatchListScreenViewModelTest {
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
             .thenReturn(Observable.never())
-        viewModel = WatchListScreenViewModel(analyticsTracker, episodeManager, playbackManager, podcastManager)
-    }
-
-    @After
-    fun tearDown() = runTest {
-        testScheduler.advanceUntilIdle()
+        refreshStateFlow = MutableStateFlow(RefreshState.Never)
+        whenever(settings.refreshStateFlow).thenReturn(refreshStateFlow)
+        viewModel = WatchListScreenViewModel(analyticsTracker, settings, episodeManager, playbackManager, podcastManager)
     }
 
     @Test
@@ -95,5 +100,34 @@ class WatchListScreenViewModelTest {
     fun `test onSettingsClicked tapped`() {
         viewModel.onSettingsClicked()
         verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
+    }
+
+    @Test
+    fun `refreshPodcasts calls podcastManager with correct source string`() {
+        viewModel.refreshPodcasts()
+
+        verify(podcastManager).refreshPodcasts("watch - list screen")
+    }
+
+    @Test
+    fun `refreshPodcasts does not call podcastManager when already refreshing`() {
+        refreshStateFlow.value = RefreshState.Refreshing
+
+        viewModel.refreshPodcasts()
+
+        verifyNoInteractions(podcastManager)
+    }
+
+    @Test
+    fun `refreshPodcasts calls podcastManager when refresh state is not Refreshing`() {
+        val nonRefreshingStates = listOf(RefreshState.Never, RefreshState.Success(Date()), RefreshState.Failed("error"))
+
+        nonRefreshingStates.forEach { state ->
+            refreshStateFlow.value = state
+
+            viewModel.refreshPodcasts()
+        }
+
+        verify(podcastManager, times(nonRefreshingStates.size)).refreshPodcasts("watch - list screen")
     }
 }

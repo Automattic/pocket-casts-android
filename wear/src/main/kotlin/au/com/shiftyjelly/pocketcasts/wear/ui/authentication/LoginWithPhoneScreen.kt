@@ -121,7 +121,7 @@ private fun LoginWithPhoneInstructionsContent(
 @Composable
 private fun SyncingContent(modifier: Modifier = Modifier) {
     ScreenScaffold(
-        timeText = null,
+        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         Column(
@@ -150,7 +150,7 @@ private fun SyncingContent(modifier: Modifier = Modifier) {
 @Composable
 private fun SuccessContent(modifier: Modifier = Modifier) {
     ScreenScaffold(
-        timeText = null,
+        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         Column(

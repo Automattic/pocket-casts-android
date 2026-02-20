@@ -74,7 +74,7 @@ fun ConnectivityNotificationOverlay(
     }
 
     ScreenScaffold(
-        timeText = null,
+        timeText = {}, // Hide default TimeText, using global one
         modifier = modifier,
     ) {
         Column(

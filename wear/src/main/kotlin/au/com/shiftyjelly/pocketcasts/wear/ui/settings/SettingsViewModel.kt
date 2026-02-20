@@ -86,6 +86,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refresh() {
+        val refreshState = _state.value.refreshState
+        if (refreshState is RefreshState.Refreshing) {
+            return
+        }
         podcastManager.refreshPodcasts("watch - settings")
     }
 }
