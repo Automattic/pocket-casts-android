@@ -12,6 +12,9 @@ import androidx.work.WorkManager
 import androidx.work.impl.WorkManagerImpl
 import androidx.work.impl.constraints.ConstraintListener
 import androidx.work.impl.constraints.trackers.ConstraintTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -57,6 +60,7 @@ class DownloadManager2 @Inject constructor(
     settings: Settings,
     clock: Clock,
     progressCache: DownloadProgressCache,
+    tracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val scope: CoroutineScope,
 ) : DownloadQueue,
@@ -64,13 +68,24 @@ class DownloadManager2 @Inject constructor(
     private val workManager by lazy { WorkManager.getInstance(context) }
 
     private val downloadDao = EpisodeDownloadDao(appDatabase, clock)
+
+    private val analytics = DownloadAnalytics(tracker)
+
     private val prerequisitesProvider = DownloadPrerequisitesProvider(context)
-    private val statusController = DownloadStatusController(downloadDao, clock, context)
+
+    private val statusController = DownloadStatusController(
+        downloadDao = downloadDao,
+        analytics = analytics,
+        clock = clock,
+        context = context,
+    )
+
     private val queueController = DownloadQueueController(
         downloadDao = downloadDao,
         transcriptDao = appDatabase.transcriptDao(),
         progressCache = progressCache,
         settings = settings,
+        analytics = analytics,
         context = context,
         coroutineScope = scope,
     )
@@ -119,7 +134,7 @@ class DownloadManager2 @Inject constructor(
                 size = infos.count(DownloadWorkInfo::isCancellable)
 
                 statusController.updateStatuses(infos, constraints)
-                queueController.cancelDownloadsExceedingMaxAttempts(infos)
+                queueController.cancelExcessiveDownloads(infos)
             }
         }
     }
@@ -130,6 +145,7 @@ private class DownloadQueueController(
     private val transcriptDao: TranscriptDao,
     private val progressCache: DownloadProgressCache,
     private val settings: Settings,
+    private val analytics: DownloadAnalytics,
     private val context: Context,
     private val coroutineScope: CoroutineScope,
 ) {
@@ -164,6 +180,7 @@ private class DownloadQueueController(
         val pendingWorks = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>()
         val downloadCommands = episodes.map { episode -> episode.toDownloadCommand(pendingWorks, downloadType, sourceView) }
         val appliedCommands = saveDownloadCommands(downloadCommands)
+        analytics.trackDownloadQueued(appliedCommands.map(DownloadCommand::episode), sourceView)
 
         appliedCommands.forEach { command ->
             val operation = command.enqueue(workManager)
@@ -200,18 +217,20 @@ private class DownloadQueueController(
             return
         }
 
-        val cancelledEpisodes = downloadDao.withTransaction {
+        val resetEpisodes = downloadDao.withTransaction {
             val episodes = findEpisodes(episodeUuids)
             buildMap {
                 episodes.forEach { episode ->
-                    val isCancelled = setDownloadCancelled(episode)
-                    if (isCancelled) {
+                    val isReset = resetDownloadStatus(episode)
+                    if (isReset) {
                         put(episode.uuid, episode)
                     }
                 }
             }
         }
-        cleanUpDownloads(cancelledEpisodes)
+        val cancelledEpisodes = resetEpisodes.values.filter { it.downloadStatus.isCancellable }
+        analytics.trackDownloadCancelled(cancelledEpisodes, sourceView)
+        cleanUpDownloads(resetEpisodes, sourceView)
 
         // Use provided episode UUIDs directly in case our DB is desynchronized
         // with the WorkManager's DB. After cancellation from Work Manager
@@ -222,20 +241,23 @@ private class DownloadQueueController(
         }
     }
 
-    private fun cleanUpDownloads(episodes: Map<String, BaseEpisode>) {
+    private fun cleanUpDownloads(episodes: Map<String, BaseEpisode>, sourceView: SourceView) {
         coroutineScope.launch {
             progressCache.clearProgress(episodes.keys)
             transcriptDao.deleteForEpisodes(episodes.keys)
-            episodes.forEach { (_, episode) ->
-                runCatching {
-                    episode.downloadedFilePath?.let(::File)?.delete()
+            val deletedEpisodes = episodes.mapNotNull { (_, episode) ->
+                val deletedEpisode = runCatching {
+                    val isFileDeleted = episode.downloadedFilePath?.let(::File)?.delete() == true
+                    if (isFileDeleted) episode else null
                 }
                 if (episode is UserEpisode) {
                     episode.artworkUrl
                         ?.takeIf { it.startsWith('/') }
                         ?.let(FileUtil::deleteFileByPath)
                 }
+                deletedEpisode.getOrNull()
             }
+            analytics.trackDownloadDeleted(deletedEpisodes, sourceView)
         }
     }
 
@@ -253,7 +275,7 @@ private class DownloadQueueController(
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.WORKER_TAG)
     }
 
-    fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
+    fun cancelExcessiveDownloads(workInfos: Collection<DownloadWorkInfo>) {
         // We normally check the retry/attempt count inside the download worker.
         // However, the worker may never actually reach doWork().
         //
@@ -266,14 +288,13 @@ private class DownloadQueueController(
         //
         // With exponential backoff enabled, the delay grows after each attempt,
         // making the problem progressively worse.
-        val episodesToCancel = workInfos.mapNotNull { info ->
-            (info as? DownloadWorkInfo.Pending)
-                ?.takeIf { it.runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT }
-                ?.episodeUuid
-        }
-        for (episodeUuid in episodesToCancel) {
-            workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
-            workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(episodeUuid))
+        val infos = workInfos
+            .filterIsInstance<DownloadWorkInfo.Pending>()
+            .filter(DownloadWorkInfo::isTooManyAttempts)
+
+        for (info in infos) {
+            workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(info.episodeUuid))
+            workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(info.episodeUuid))
         }
     }
 
@@ -367,6 +388,7 @@ private class DownloadQueueController(
 
 private class DownloadStatusController(
     private val downloadDao: EpisodeDownloadDao,
+    private val analytics: DownloadAnalytics,
     private val clock: Clock,
     private val context: Context,
 ) {
@@ -374,15 +396,22 @@ private class DownloadStatusController(
         val tooManyAttemptsError = context.getString(LR.string.error_download_too_many_attempts)
         val defaultErrorMessage = context.getString(LR.string.error_download_generic_failure, "").trim()
 
-        val statusUpdates = infos.associate { info ->
-            val update = info.toStatusUpdate(
-                constraints = constraints,
-                tooManyAttemptsErrorMessage = tooManyAttemptsError,
-                defaultErrorMessage = defaultErrorMessage,
-            )
-            info.episodeUuid to update
+        val results = DownloadWorkResults(infos.size, context)
+        downloadDao.withTransaction {
+            infos.forEach { info ->
+                val update = info.toStatusUpdate(
+                    constraints = constraints,
+                    tooManyAttemptsErrorMessage = tooManyAttemptsError,
+                    defaultErrorMessage = defaultErrorMessage,
+                )
+                val isStatusUpdated = updateDownloadStatus(info.episodeUuid, update)
+                if (isStatusUpdated) {
+                    results.add(info)
+                }
+            }
         }
-        downloadDao.updateDownloadStatuses(statusUpdates)
+        analytics.trackDownloadFinished(results.successes)
+        analytics.trackDownloadFailed(results.failures)
     }
 
     suspend fun clearAllErrors() {
@@ -397,7 +426,7 @@ private class DownloadStatusController(
         val now = clock.instant()
         return when (this) {
             is DownloadWorkInfo.Cancelled -> {
-                if (runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT) {
+                if (isTooManyAttempts) {
                     DownloadStatusUpdate.Failure(
                         taskId = id,
                         issuedAt = now,
@@ -464,6 +493,49 @@ private class DownloadStatusController(
             }
         }
     }
+
+    private class DownloadWorkResults(initialCapacity: Int, context: Context) {
+        private val _successes = ArrayList<DownloadWorkInfo.Success>(initialCapacity)
+        val successes: List<DownloadWorkInfo.Success> get() = _successes
+
+        private val _failures = ArrayList<DownloadWorkInfo.Failure>(initialCapacity)
+        val failures: List<DownloadWorkInfo.Failure> get() = _failures
+
+        private val isCellularConnection = Network.isCellularConnection(context)
+        private val isProxyConnection = Network.isVpnConnection(context)
+
+        fun add(info: DownloadWorkInfo) {
+            when (info) {
+                is DownloadWorkInfo.Success -> _successes.add(info)
+
+                is DownloadWorkInfo.Failure -> _failures.add(info)
+
+                is DownloadWorkInfo.Cancelled -> {
+                    if (info.isTooManyAttempts) {
+                        _failures.add(info.synthesizeFailure())
+                    }
+                }
+
+                is DownloadWorkInfo.InProgress, is DownloadWorkInfo.Pending -> Unit
+            }
+        }
+
+        private fun DownloadWorkInfo.Cancelled.synthesizeFailure() = DownloadWorkInfo.Failure(
+            id = id,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+            runAttemptCount = runAttemptCount,
+            sourceView = sourceView,
+            error = EpisodeDownloadError(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                reason = EpisodeDownloadError.Reason.TooManyAttempts,
+                isCellular = isCellularConnection,
+                isProxy = isProxyConnection,
+            ),
+            errorMessage = null,
+        )
+    }
 }
 
 private class EpisodeDownloadDao(
@@ -503,16 +575,19 @@ private class EpisodeDownloadDao(
         }
     }
 
-    suspend fun setDownloadCancelled(episode: BaseEpisode) = when (episode) {
-        is PodcastEpisode -> episodeDao.setDownloadCancelled(episode.uuid)
-        is UserEpisode -> userEpisodeDao.setDownloadCancelled(episode.uuid)
+    suspend fun resetDownloadStatus(episode: BaseEpisode) = when (episode) {
+        is PodcastEpisode -> episodeDao.resetDownloadStatus(episode.uuid)
+        is UserEpisode -> userEpisodeDao.resetDownloadStatus(episode.uuid)
     }
 
-    suspend fun updateDownloadStatuses(updates: Map<String, DownloadStatusUpdate>) = withTransaction {
-        updates.forEach { (uuid, update) ->
-            episodeDao.updateDownloadStatus(uuid, update)
-            userEpisodeDao.updateDownloadStatus(uuid, update)
+    suspend fun updateDownloadStatus(episodeUuid: String, update: DownloadStatusUpdate) = withTransaction {
+        val isPodcastEpisodeUpdated = episodeDao.updateDownloadStatus(episodeUuid, update)
+        val isUserEpisodeUpdated = if (!isPodcastEpisodeUpdated) {
+            userEpisodeDao.updateDownloadStatus(episodeUuid, update)
+        } else {
+            false
         }
+        isPodcastEpisodeUpdated || isUserEpisodeUpdated
     }
 
     suspend fun clearStaleDownload(episode: BaseEpisode, taskId: UUID) = when (episode) {
@@ -529,6 +604,109 @@ private class EpisodeDownloadDao(
         val statuses = setOf(EpisodeDownloadStatus.DownloadFailed)
         episodeDao.clearDownloadsWithoutTaskId(statuses)
         userEpisodeDao.clearDownloadsWithoutTaskId(statuses)
+    }
+}
+
+private class DownloadAnalytics(
+    private val tracker: AnalyticsTracker,
+) {
+    fun trackDownloadQueued(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+        when (episodes.size) {
+            0 -> Unit
+
+            1 -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
+                    mapOf(
+                        "episode_uuid" to episodes.first().uuid,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+
+            else -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED,
+                    mapOf(
+                        "count" to episodes.size,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun trackDownloadFinished(infos: Collection<DownloadWorkInfo.Success>) {
+        for (info in infos) {
+            tracker.track(
+                AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED,
+                mapOf(
+                    "episode_uuid" to info.episodeUuid,
+                    "source" to info.sourceView.analyticsValue,
+                ),
+            )
+        }
+    }
+
+    fun trackDownloadFailed(infos: Collection<DownloadWorkInfo.Failure>) {
+        for (info in infos) {
+            tracker.track(
+                AnalyticsEvent.EPISODE_DOWNLOAD_FAILED,
+                info.error.toProperties(),
+            )
+        }
+    }
+
+    fun trackDownloadCancelled(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+        when (episodes.size) {
+            0 -> Unit
+
+            1 -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
+                    mapOf(
+                        "episode_uuid" to episodes.first().uuid,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+
+            else -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_DOWNLOAD_BULK_CANCELLED,
+                    mapOf(
+                        "count" to episodes.size,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun trackDownloadDeleted(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+        when (episodes.size) {
+            0 -> Unit
+
+            1 -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    mapOf(
+                        "episode_uuid" to episodes.first().uuid,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+
+            else -> {
+                tracker.track(
+                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED,
+                    mapOf(
+                        "count" to episodes.size,
+                        "source" to sourceView.analyticsValue,
+                    ),
+                )
+            }
+        }
     }
 }
 

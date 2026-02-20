@@ -517,6 +517,7 @@ sealed interface DownloadWorkInfo {
     val sourceView: SourceView
 
     val isCancellable: Boolean
+    val isTooManyAttempts get() = runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT
 
     data class Pending(
         override val id: UUID,
@@ -606,5 +607,5 @@ internal const val DOWNLOAD_FILE_PATH_KEY = "${WORKER_TAG}download_file_path"
 internal const val ERROR_MESSAGE_KEY = "${WORKER_TAG}error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-internal const val MAX_DOWNLOAD_ATTEMPT_COUNT = 3
+private const val MAX_DOWNLOAD_ATTEMPT_COUNT = 3
 internal const val MISSING_DOWNLOADED_FILE_PATH_ERROR = "Unable to find the downloaded file path. This should never happen. Please contact support."

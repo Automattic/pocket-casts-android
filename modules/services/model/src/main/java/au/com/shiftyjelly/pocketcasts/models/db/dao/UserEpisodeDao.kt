@@ -276,7 +276,7 @@ abstract class UserEpisodeDao {
     }
 
     /**
-     * Atomically cancels an in-progress download and releases ownership.
+     * Atomically resets a download and releases ownership.
      *
      * This query resets the episode to `DownloadNotRequested` (status = 0)
      * and clears `download_task_id`. It also resets episodes currently in
@@ -304,10 +304,10 @@ abstract class UserEpisodeDao {
           AND (download_task_id IS NOT NULL OR episode_status = 4)
         """,
     )
-    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String): Int
+    protected abstract suspend fun resetDownloadStatusRaw(episodeUuid: String): Int
 
-    suspend fun setDownloadCancelled(episodeUuid: String): Boolean {
-        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid)
+    suspend fun resetDownloadStatus(episodeUuid: String): Boolean {
+        val rowUpdateCount = resetDownloadStatusRaw(episodeUuid)
         return rowUpdateCount == 1
     }
 
