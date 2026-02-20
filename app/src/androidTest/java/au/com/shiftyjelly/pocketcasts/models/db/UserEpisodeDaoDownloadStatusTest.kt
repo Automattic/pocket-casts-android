@@ -253,7 +253,7 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun resetDownloadStatusWithWithWorkerId() = runTest {
+    fun resetDownloadStatusWithWorkerId() = runTest {
         val episode = episode.copy(
             downloadStatus = EpisodeDownloadStatus.Downloading,
         )

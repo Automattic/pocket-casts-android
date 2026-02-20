@@ -661,10 +661,11 @@ private class DownloadAnalytics(
 
     fun trackDownloadFailed(infos: Collection<DownloadWorkInfo.Failure>) {
         for (info in infos) {
-            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download failed. Episode: ${info.episodeUuid}, Error: ${info.error.toProperties()}, Source: ${info.sourceView}.")
+            val errorProperties = info.error.toProperties()
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download failed. Episode: ${info.episodeUuid}, Error: $errorProperties, Source: ${info.sourceView}.")
             tracker.track(
                 AnalyticsEvent.EPISODE_DOWNLOAD_FAILED,
-                info.error.toProperties(),
+                errorProperties,
             )
         }
     }
@@ -688,7 +689,7 @@ private class DownloadAnalytics(
 
             else -> {
                 tracker.track(
-                    AnalyticsEvent.EPISODE_DOWNLOAD_BULK_CANCELLED,
+                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_CANCELLED,
                     mapOf(
                         "count" to episodes.size,
                         "source" to sourceView.analyticsValue,

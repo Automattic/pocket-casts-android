@@ -445,7 +445,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
     EPISODE_DOWNLOAD_FAILED("episode_download_failed"),
     EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
-    EPISODE_DOWNLOAD_BULK_CANCELLED("episode_bulk_download_cancelled"),
+    EPISODE_BULK_DOWNLOAD_CANCELLED("episode_bulk_download_cancelled"),
     EPISODE_DOWNLOAD_DELETED("episode_download_deleted"),
     EPISODE_BULK_DOWNLOAD_DELETED("episode_bulk_download_deleted"),
     EPISODE_DELETED_FROM_CLOUD("episode_deleted_from_cloud"),
