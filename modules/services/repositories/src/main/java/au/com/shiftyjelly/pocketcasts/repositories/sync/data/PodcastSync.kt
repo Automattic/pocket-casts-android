@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -138,7 +139,7 @@ internal class PodcastSync(
             localPodcast.applyServerPodcast(serverPodcast)
             podcastManager.updatePodcast(localPodcast)
         } else if (localPodcast.isSubscribed) {
-            podcastManager.unsubscribe(localPodcast.uuid, playbackManager)
+            podcastManager.unsubscribe(localPodcast.uuid, SourceView.UNKNOWN)
         }
     }
 

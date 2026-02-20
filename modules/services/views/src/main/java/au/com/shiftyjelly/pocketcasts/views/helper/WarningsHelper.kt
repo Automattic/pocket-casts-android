@@ -9,10 +9,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class WarningsHelper @Inject constructor(
     @ActivityContext private val activity: Context,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
@@ -71,7 +71,7 @@ class WarningsHelper @Inject constructor(
             .setOnConfirm(onConfirm)
     }
 
-    fun downloadWarning(episodeUuid: String, from: String): ConfirmationDialog {
+    fun downloadWarning(episodeUuid: String, source: SourceView): ConfirmationDialog {
         val titleRes =
             if (Network.isWifiConnection(activity)) LR.string.download_warning_title_metered_wifi else LR.string.download_warning_title_on_wifi
         return ConfirmationDialog()
@@ -79,9 +79,9 @@ class WarningsHelper @Inject constructor(
             .setTitle(activity.getString(titleRes))
             .setSummary(activity.getString(LR.string.download_warning_on_wifi_summary))
             .setButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.download_warning_on_wifi_button)))
-            .setOnConfirm { download(episodeUuid, waitForWifi = false, from = from) }
+            .setOnConfirm { download(episodeUuid, waitForWifi = false, source = source) }
             .setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.download_warning_on_wifi_later)))
-            .setOnSecondary { download(episodeUuid, waitForWifi = true, from = from) }
+            .setOnSecondary { download(episodeUuid, waitForWifi = true, source = source) }
     }
 
     fun uploadWarning(episodeUuid: String, source: SourceView): ConfirmationDialog {
@@ -110,19 +110,13 @@ class WarningsHelper @Inject constructor(
         }
     }
 
-    private fun download(episodeUuid: String, waitForWifi: Boolean, from: String) {
+    private fun download(episodeUuid: String, waitForWifi: Boolean, source: SourceView) {
         applicationScope.launch {
-            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
-                if (it.isDownloading) {
-                    episodeManager.stopDownloadAndCleanUp(episodeUuid, from)
-                } else if (!it.isDownloaded) {
-                    if (!waitForWifi) {
-                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    }
-                    downloadManager.addEpisodeToQueue(it, from, fireEvent = true, source = SourceView.UNKNOWN)
-                    launch {
-                        episodeManager.unarchiveBlocking(it)
-                    }
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                if (episode.isDownloadCancellable) {
+                    downloadQueue.cancel(episodeUuid, source)
+                } else if (!episode.isDownloaded) {
+                    downloadQueue.enqueue(episodeUuid, DownloadType.UserTriggered(waitForWifi = waitForWifi), source)
                 }
             }
         }

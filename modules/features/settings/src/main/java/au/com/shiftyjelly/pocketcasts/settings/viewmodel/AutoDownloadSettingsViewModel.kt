@@ -4,11 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -32,7 +33,7 @@ import kotlinx.coroutines.withContext
 class AutoDownloadSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playlistManager: PlaylistManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val settings: Settings,
     private val tracker: AnalyticsTracker,
 ) : ViewModel() {
@@ -243,8 +244,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun stopAllDownloads() {
         tracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS)
-
-        downloadManager.stopAllDownloads()
+        downloadQueue.cancelAll(SourceView.DOWNLOADS)
     }
 
     fun clearDownloadErrors() {

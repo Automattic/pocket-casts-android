@@ -39,7 +39,7 @@ class UserEpisodeManagerImplTest {
             appDatabase = appDatabase,
             settings = mock(),
             syncManager = mock(),
-            downloadManager = mock(),
+            downloadQueue = mock(),
             context = mock(),
             episodeAnalytics = mock(),
         )

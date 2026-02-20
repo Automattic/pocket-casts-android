@@ -2,13 +2,11 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -22,13 +20,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PlayButtonListener @Inject constructor(
-    val downloadManager: DownloadManager,
+    val downloadQueue: DownloadQueue,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     val settings: Settings,
     private val warningsHelper: WarningsHelper,
     @ActivityContext private val activity: Context,
-    private val episodeAnalytics: EpisodeAnalytics,
 ) : PlayButton.OnClickListener,
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -92,33 +89,21 @@ class PlayButtonListener @Inject constructor(
 
     override fun onDownload(episodeUuid: String) {
         if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(activity) && activity is AppCompatActivity) {
-            warningsHelper.downloadWarning(episodeUuid, "play button")
+            warningsHelper
+                .downloadWarning(episodeUuid, source)
                 .show(activity.supportFragmentManager, "download warning")
         } else {
             download(episodeUuid, waitForWifi = settings.warnOnMeteredNetwork.value)
         }
     }
 
-    private fun download(episodeUuid: String, waitForWifi: Boolean = false) {
+    private fun download(episodeUuid: String, waitForWifi: Boolean) {
         launch {
-            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
-                if (it.isDownloading) {
-                    episodeManager.stopDownloadAndCleanUp(episodeUuid, "play button")
-                } else if (!it.isDownloaded) {
-                    if (!waitForWifi) {
-                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    } else {
-                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
-                    }
-                    downloadManager.addEpisodeToQueue(it, "play button", fireEvent = true, source = source)
-                    episodeAnalytics.trackEvent(
-                        AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
-                        source = source,
-                        uuid = episodeUuid,
-                    )
-                    launch {
-                        episodeManager.unarchiveBlocking(it)
-                    }
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                if (episode.isDownloadCancellable) {
+                    downloadQueue.cancel(episode.uuid, source)
+                } else if (!episode.isDownloaded) {
+                    downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi), source)
                 }
             }
         }
@@ -126,9 +111,9 @@ class PlayButtonListener @Inject constructor(
 
     override fun onStopDownloading(episodeUuid: String) {
         launch {
-            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
-                if (it.isDownloadCancellable) {
-                    downloadManager.removeEpisodeFromQueue(it, "play button")
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                if (episode.isDownloadCancellable) {
+                    downloadQueue.cancel(episode.uuid, source)
                 }
             }
         }

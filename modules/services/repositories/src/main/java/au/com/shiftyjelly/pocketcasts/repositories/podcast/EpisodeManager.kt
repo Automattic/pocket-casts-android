@@ -69,12 +69,11 @@ interface EpisodeManager {
     fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus)
     suspend fun updateImageUrls(updates: List<ImageUrlUpdate>)
     suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeDownloadStatus)
-    suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
+    suspend fun disableAutoDownload(episode: BaseEpisode) = disableAutoDownload(setOf(episode))
+    suspend fun disableAutoDownload(episodes: Collection<BaseEpisode>)
     fun updateDownloadFilePathBlocking(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileTypeBlocking(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytesBlocking(episode: BaseEpisode?, sizeInBytes: Long)
-    suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
-    fun updateLastDownloadAttemptDateBlocking(episode: BaseEpisode?)
     fun updateDownloadErrorDetailsBlocking(episode: BaseEpisode?, message: String?)
 
     fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeDownloadStatus)
@@ -91,7 +90,6 @@ interface EpisodeManager {
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackErrorBlocking(episode: BaseEpisode?)
-    fun clearDownloadErrorBlocking(episode: PodcastEpisode?)
     fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchiveBlocking(episode: BaseEpisode)
@@ -102,16 +100,10 @@ interface EpisodeManager {
     suspend fun clearAllEpisodeHistory()
     suspend fun clearEpisodeHistory(episodes: List<PodcastEpisode>)
     fun markPlaybackHistorySyncedBlocking()
-    fun stopDownloadAndCleanUp(episodeUuid: String, from: String)
-    suspend fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String)
 
     /** Remove methods  */
-    suspend fun deleteAll()
-    fun deleteEpisodesWithoutSyncBlocking(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
-    suspend fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
-
-    fun deleteEpisodeWithoutSyncBlocking(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true)
+    suspend fun deleteAll(sourceView: SourceView)
+    suspend fun deleteAllEpisodes(episodes: Collection<PodcastEpisode>, sourceView: SourceView)
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int
@@ -119,21 +111,16 @@ interface EpisodeManager {
     fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
     suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
-    fun deleteEpisodeFilesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
-    suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
-
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)
     fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>
     suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
     fun checkPodcastForEpisodeLimitBlocking(podcast: Podcast, playbackManager: PlaybackManager?)
-    fun checkPodcastForAutoArchiveBlocking(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun markAsUnplayed(episodes: List<BaseEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
     fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
-    fun setDownloadFailedBlocking(episode: BaseEpisode, errorMessage: String)
     fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun findStaleDownloads(): List<PodcastEpisode>

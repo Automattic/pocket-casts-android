@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
@@ -14,9 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -25,7 +22,6 @@ class ManualCleanupViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
     private lateinit var episodeManager: EpisodeManager
-    private lateinit var playbackManager: PlaybackManager
     private lateinit var viewModel: ManualCleanupViewModel
 
     private val episode: PodcastEpisode = PodcastEpisode(uuid = "1", publishedDate = Date())
@@ -36,10 +32,9 @@ class ManualCleanupViewModelTest {
     @Before
     fun setUp() {
         episodeManager = mock()
-        playbackManager = mock()
         whenever(episodeManager.findDownloadedEpisodesRxFlowable())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, AnalyticsTracker.test())
+        viewModel = ManualCleanupViewModel(episodeManager, mock(), AnalyticsTracker.test())
     }
 
     @Test
@@ -77,18 +72,5 @@ class ManualCleanupViewModelTest {
         viewModel.onDeleteButtonClicked()
 
         verify(deleteButtonClickAction).invoke()
-    }
-
-    @Test
-    fun `given episodes not selected, when delete button clicked, then episodes are not deleted`() {
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
-            .thenReturn(Flowable.generate { listOf(episode) })
-        viewModel.onDiskSpaceCheckedChanged(isChecked = false, diskSpaceView = diskSpaceView)
-
-        viewModel.onDeleteButtonClicked()
-
-        verifyBlocking(episodeManager, never()) {
-            deleteEpisodeFiles(episodes, playbackManager)
-        }
     }
 }

@@ -102,11 +102,15 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
     abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeDownloadStatus)
 
-    @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
-    abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
+    @Query("UPDATE user_episodes SET auto_download_status = 1 WHERE uuid IN (:uuids)")
+    protected abstract suspend fun disableAutoDownloadUnsafe(uuids: Collection<String>)
 
-    @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
-    abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
+    @Transaction
+    open suspend fun disableAutoDownload(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            disableAutoDownloadUnsafe(chunk)
+        }
+    }
 
     @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
     abstract fun updateServerStatusRxCompletable(uuid: String, serverStatus: UserEpisodeServerStatus): Completable
@@ -274,13 +278,14 @@ abstract class UserEpisodeDao {
     /**
      * Atomically cancels an in-progress download and releases ownership.
      *
-     * This query resets the episode to `DownloadNotRequested` (status = 0),
-     * clears `download_task_id`, and optionally updates `auto_download_status`
-     * when [disableAutoDownload] is true.
+     * This query resets the episode to `DownloadNotRequested` (status = 0)
+     * and clears `download_task_id`. It also resets episodes currently in
+     * `Downloaded` state (status = 4) back to `DownloadNotRequested`.
      *
      * `download_task_id` is treated as an ownership token for the active
-     * download attempt. The `AND download_task_id IS NOT NULL` guard ensures
-     * cancellation only applies if a task currently owns the episode.
+     * download attempt. The `AND (download_task_id IS NOT NULL OR episode_status = 4)`
+     * guard ensures cancellation only applies if a task currently owns the episode
+     * or if the episode is already marked as Downloaded.
      *
      * This prevents unnecessary writes and avoids interfering with episodes
      * that are already idle. Clearing `download_task_id` releases ownership
@@ -291,20 +296,18 @@ abstract class UserEpisodeDao {
         UPDATE user_episodes
         SET
           episode_status = 0,
-          download_task_id = null,
-          auto_download_status = CASE
-            WHEN :disableAutoDownload THEN 1
-            ELSE auto_download_status
-          END
+          downloaded_file_path = NULL,
+          downloaded_error_details = NULL,
+          download_task_id = null
         WHERE
           uuid = :episodeUuid
-          AND download_task_id IS NOT NULL
+          AND (download_task_id IS NOT NULL OR episode_status = 4)
         """,
     )
-    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String, disableAutoDownload: Boolean): Int
+    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String): Int
 
-    suspend fun setDownloadCancelled(episodeUuid: String, disableAutoDownload: Boolean): Boolean {
-        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid, disableAutoDownload)
+    suspend fun setDownloadCancelled(episodeUuid: String): Boolean {
+        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid)
         return rowUpdateCount == 1
     }
 
@@ -315,8 +318,7 @@ abstract class UserEpisodeDao {
           episode_status = 0,
           downloaded_file_path = NULL,
           downloaded_error_details = NULL,
-          download_task_id = NULL,
-          auto_download_status = 0
+          download_task_id = NULL
         WHERE
           uuid = :episodeUuid
           AND download_task_id = :taskId
@@ -330,8 +332,7 @@ abstract class UserEpisodeDao {
         SET
           episode_status = 0,
           downloaded_file_path = NULL,
-          downloaded_error_details = NULL,
-          auto_download_status = 0
+          downloaded_error_details = NULL
         WHERE
           download_task_id IS NULL
           AND episode_status IN (:statuses)

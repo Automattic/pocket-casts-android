@@ -195,7 +195,7 @@ class UserManagerImpl @Inject constructor(
             userEpisodeManager.findUserEpisodes().forEach {
                 userEpisodeManager.delete(episode = it, playbackManager = playbackManager)
             }
-            episodeManager.deleteAll()
+            episodeManager.deleteAll(SourceView.UNKNOWN)
         }
     }
 }

@@ -1,16 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.res.Resources
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -35,17 +35,18 @@ object CloudDeleteHelper {
 
     fun deleteEpisode(
         episode: UserEpisode,
-        deleteState: DeleteState = getDeleteState(episode),
+        sourceView: SourceView,
+        downloadQueue: DownloadQueue,
         playbackManager: PlaybackManager,
-        episodeManager: EpisodeManager,
         userEpisodeManager: UserEpisodeManager,
         applicationScope: CoroutineScope,
+        deleteState: DeleteState = getDeleteState(episode),
     ) {
-        applicationScope.launch(Dispatchers.Default) {
+        applicationScope.launch {
             when (deleteState) {
                 is DeleteState.DeviceOnly -> {
                     if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
-                        episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false)
+                        downloadQueue.cancel(episode.uuid, sourceView)
                     } else {
                         userEpisodeManager.delete(episode, playbackManager)
                     }

@@ -318,7 +318,7 @@ abstract class EpisodeDao {
     abstract fun deleteBlocking(episode: PodcastEpisode)
 
     @Delete
-    abstract suspend fun deleteAll(episode: List<PodcastEpisode>)
+    abstract suspend fun deleteAll(episode: Collection<PodcastEpisode>)
 
     @Query("DELETE FROM podcast_episodes")
     abstract suspend fun deleteAll()
@@ -344,26 +344,21 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET download_url = :url WHERE uuid = :uuid")
     abstract suspend fun updateDownloadUrl(url: String, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET download_task_id = :taskId WHERE uuid = :uuid")
-    abstract suspend fun updateDownloadTaskId(uuid: String, taskId: String?)
-
-    @Query("UPDATE podcast_episodes SET last_download_attempt_date = :lastDownloadAttemptDate WHERE uuid = :uuid")
-    abstract fun updateLastDownloadAttemptDateBlocking(lastDownloadAttemptDate: Date, uuid: String)
-
-    @Query("UPDATE podcast_episodes SET downloaded_error_details = :errorMessage, episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateDownloadErrorBlocking(uuid: String, errorMessage: String?, episodeStatus: EpisodeDownloadStatus)
-
     @Query("UPDATE podcast_episodes SET downloaded_file_path = :downloadedFilePath WHERE uuid = :uuid")
     abstract fun updateDownloadedFilePathBlocking(downloadedFilePath: String, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
-    abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
+    @Query("UPDATE podcast_episodes SET auto_download_status = 1 WHERE uuid IN (:uuids)")
+    protected abstract suspend fun disableAutoDownloadUnsafe(uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun disableAutoDownload(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            disableAutoDownloadUnsafe(chunk)
+        }
+    }
 
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
     abstract fun updatePlayErrorDetailsBlocking(playErrorDetails: String?, uuid: String)
-
-    @Query("UPDATE podcast_episodes SET downloaded_error_details = :downloadErrorDetails WHERE uuid = :uuid")
-    abstract fun updateDownloadErrorDetailsBlocking(downloadErrorDetails: String?, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
     abstract suspend fun updateEpisodeStatus(episodeStatus: EpisodeDownloadStatus, uuid: String)
@@ -586,7 +581,6 @@ abstract class EpisodeDao {
           archived = 0,
           episode_status = 1,
           download_task_id = :downloadTaskId,
-          auto_download_status = 0,
           last_download_attempt_date = :issuedAt
         WHERE
           uuid = :episodeUuid
@@ -618,13 +612,14 @@ abstract class EpisodeDao {
     /**
      * Atomically cancels an in-progress download and releases ownership.
      *
-     * This query resets the episode to `DownloadNotRequested` (status = 0),
-     * clears `download_task_id`, and optionally updates `auto_download_status`
-     * when [disableAutoDownload] is true.
+     * This query resets the episode to `DownloadNotRequested` (status = 0)
+     * and clears `download_task_id`. It also resets episodes currently in
+     * `Downloaded` state (status = 4) back to `DownloadNotRequested`.
      *
      * `download_task_id` is treated as an ownership token for the active
-     * download attempt. The `AND download_task_id IS NOT NULL` guard ensures
-     * cancellation only applies if a task currently owns the episode.
+     * download attempt. The `AND (download_task_id IS NOT NULL OR episode_status = 4)`
+     * guard ensures cancellation only applies if a task currently owns the episode
+     * or if the episode is already marked as Downloaded.
      *
      * This prevents unnecessary writes and avoids interfering with episodes
      * that are already idle. Clearing `download_task_id` releases ownership
@@ -635,20 +630,18 @@ abstract class EpisodeDao {
         UPDATE podcast_episodes
         SET
           episode_status = 0,
-          download_task_id = null,
-          auto_download_status = CASE
-            WHEN :disableAutoDownload THEN 1
-            ELSE auto_download_status
-          END
+          downloaded_file_path = NULL,
+          downloaded_error_details = NULL,
+          download_task_id = null
         WHERE
           uuid = :episodeUuid
-          AND download_task_id IS NOT NULL
+          AND (download_task_id IS NOT NULL OR episode_status = 4)
         """,
     )
-    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String, disableAutoDownload: Boolean): Int
+    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String): Int
 
-    suspend fun setDownloadCancelled(episodeUuid: String, disableAutoDownload: Boolean): Boolean {
-        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid, disableAutoDownload)
+    suspend fun setDownloadCancelled(episodeUuid: String): Boolean {
+        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid)
         return rowUpdateCount == 1
     }
 
@@ -659,8 +652,7 @@ abstract class EpisodeDao {
           episode_status = 0,
           downloaded_file_path = NULL,
           downloaded_error_details = NULL,
-          download_task_id = NULL,
-          auto_download_status = 0
+          download_task_id = NULL
         WHERE
           uuid = :episodeUuid
           AND download_task_id = :taskId
@@ -674,8 +666,7 @@ abstract class EpisodeDao {
         SET
           episode_status = 0,
           downloaded_file_path = NULL,
-          downloaded_error_details = NULL,
-          auto_download_status = 0
+          downloaded_error_details = NULL
         WHERE
           download_task_id IS NULL
           AND episode_status IN (:statuses)

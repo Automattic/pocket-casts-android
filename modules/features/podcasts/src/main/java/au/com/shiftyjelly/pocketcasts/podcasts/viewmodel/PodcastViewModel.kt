@@ -31,7 +31,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -75,7 +76,7 @@ class PodcastViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val theme: Theme,
     private val castManager: CastManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -246,7 +247,7 @@ class PodcastViewModel @Inject constructor(
 
     fun unsubscribeFromPodcast() {
         podcast.value?.let {
-            podcastManager.unsubscribeAsync(podcastUuid = it.uuid, playbackManager = playbackManager)
+            podcastManager.unsubscribeAsync(podcastUuid = it.uuid, SourceView.PODCAST_SCREEN)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
                 AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN),
@@ -404,12 +405,8 @@ class PodcastViewModel @Inject constructor(
 
     fun downloadAll() {
         val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return
-        val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
-        launch {
-            trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, source = SourceView.PODCAST_SCREEN)
-            }
-        }
+        val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count())).map(PodcastEpisode::uuid)
+        downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi = false), SourceView.PODCAST_SCREEN)
     }
 
     suspend fun getFolder(): Folder? {

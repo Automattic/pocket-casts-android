@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.os.SystemClock
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -106,7 +107,7 @@ class PodcastRefresherImpl @Inject constructor(
                     it.addedDate.before(twoWeeksAgo) && episodeManager.episodeCanBeCleanedUp(it, playbackManager) && it.uuid !in episodesInPlaylists
                 }
             if (episodesToDelete.isNotEmpty()) {
-                episodeManager.deleteEpisodesWithoutSync(episodesToDelete, playbackManager)
+                episodeManager.deleteAllEpisodes(episodesToDelete, SourceView.UNKNOWN)
             }
 
             updatePodcastIfRequired(existingPodcast, updatedPodcast)

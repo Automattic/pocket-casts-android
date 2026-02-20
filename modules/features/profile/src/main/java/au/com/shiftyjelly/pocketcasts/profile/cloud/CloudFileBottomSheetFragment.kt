@@ -374,7 +374,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
         viewModel.trackOptionTapped(DOWNLOAD)
         if (settings.warnOnMeteredNetwork.value && !isOnWifi) {
-            warningsHelper.downloadWarning(args.episodeId, "user episode sheet")
+            warningsHelper.downloadWarning(args.episodeId, SourceView.FILES)
                 .show(parentFragmentManager, "download_warning")
         } else {
             viewModel.download(episode)

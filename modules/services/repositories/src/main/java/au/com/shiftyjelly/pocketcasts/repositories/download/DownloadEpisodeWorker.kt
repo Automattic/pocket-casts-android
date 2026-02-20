@@ -100,6 +100,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val downloader = EpisodeDownloader(
         httpClient = httpClient,
         progressCache = progressCache,
+        onCall = { call ->
+            downloadCall = call
+        },
         onResponse = { response ->
             downloadError.httpStatusCode = response.code
             downloadError.contentType = response.header("Content-Type") ?: "missing"
@@ -115,6 +118,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     )
 
     private var notificationJob: NotificationJob? = null
+    private var downloadCall: Call? = null
 
     override fun doWork(): Result {
         val timedValue = measureTimedValue {
@@ -127,7 +131,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                 episode = refreshDownloadUrlOrThrow(episode)
                 val downloadFile = getDownloadFileOrThrow(episode)
-                val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
+                val tempFile = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
 
                 val downloadResult = downloader.download(
                     episode = episode,
@@ -168,6 +172,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     }
 
     override fun onStopped() {
+        downloadCall?.cancel()
         notificationJob?.cancel()
         dispatchProgressData(isWorkExecuting = false)
     }
@@ -200,8 +205,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     }
 
     private fun getDownloadFileOrThrow(episode: BaseEpisode): File {
-        val file = DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File)
-        return requireNotNull(file) {
+        return requireNotNull(fileStorage.getOrCreatePodcastEpisodeFile(episode)) {
             context.getString(LR.string.error_download_no_episode_file)
         }
     }

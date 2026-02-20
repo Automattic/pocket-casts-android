@@ -13,9 +13,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -50,12 +50,12 @@ class ShelfSharedViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val chromeCastAnalytics: ChromeCastAnalytics,
     private val episodeManager: EpisodeManager,
-    private val chapterManager: ChapterManager,
     private val playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
     private val settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
+    private val downloadQueue: DownloadQueue,
 ) : ViewModel() {
     private val upNextStateObservable: Observable<UpNextQueue.State> =
         playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -245,16 +245,21 @@ class ShelfSharedViewModel @Inject constructor(
                 _navigationState.emit(
                     NavigationState.ShowPodcastEpisodeArchiveConfirmation(
                         episode,
-                    ) { onArchiveConfirmed(episode) },
+                    ) {
+                        launch { episodeManager.disableAutoDownload(episode) }
+                        onArchiveConfirmed(episode)
+                    },
                 )
             } else if (episode is UserEpisode) {
                 val deleteState = CloudDeleteHelper.getDeleteState(episode)
-                val deleteFunction: (UserEpisode, DeleteState) -> Unit = { ep, delState ->
+                val deleteFunction: (UserEpisode, DeleteState) -> Unit = { episode, deleteState ->
+                    launch { episodeManager.disableAutoDownload(episode) }
                     CloudDeleteHelper.deleteEpisode(
-                        episode = ep,
-                        deleteState = delState,
+                        episode = episode,
+                        deleteState = deleteState,
+                        sourceView = SourceView.PLAYER,
+                        downloadQueue = downloadQueue,
                         playbackManager = playbackManager,
-                        episodeManager = episodeManager,
                         userEpisodeManager = userEpisodeManager,
                         applicationScope = applicationScope,
                     )

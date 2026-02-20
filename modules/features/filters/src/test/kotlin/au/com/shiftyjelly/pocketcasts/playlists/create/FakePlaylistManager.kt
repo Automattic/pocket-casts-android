@@ -52,10 +52,6 @@ class FakePlaylistManager : PlaylistManager {
 
     override suspend fun refreshEpisodeCount(playlistUuid: String) = Unit
 
-    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
-        return emptyList()
-    }
-
     override suspend fun sortPlaylists(sortedUuids: List<String>) = Unit
 
     override suspend fun updateName(uuid: String, name: String) = Unit

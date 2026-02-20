@@ -170,29 +170,6 @@ class PlaylistManagerImpl(
         }.first().episodeCount
     }
 
-    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
-        return appDatabase.withTransaction {
-            val playlists = playlistDao.getAllAutoDownloadPlaylists()
-            withContext(computationContext) {
-                playlists
-                    .flatMap { playlist ->
-                        val playlistFlow = if (playlist.manual) {
-                            manualPlaylistFlow(playlist.uuid)
-                        } else {
-                            smartPlaylistFlow(playlist.uuid)
-                        }
-                        playlistFlow.first()
-                            ?.episodes
-                            ?.toPodcastEpisodes()
-                            ?.filterNot { it.isExemptFromAutoDownload }
-                            ?.take(playlist.autodownloadLimit)
-                            .orEmpty()
-                    }
-                    .distinctBy(PodcastEpisode::uuid)
-            }
-        }
-    }
-
     override suspend fun sortPlaylists(sortedUuids: List<String>) {
         appDatabase.withTransaction {
             var missingPlaylistIndex = sortedUuids.size

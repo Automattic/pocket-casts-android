@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytic
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -85,9 +84,6 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var userEpisodeManager: UserEpisodeManager
-
-    @Mock
-    private lateinit var chapterManager: ChapterManager
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
@@ -339,7 +335,7 @@ class ShelfSharedViewModelTest {
             settings = settings,
             userEpisodeManager = userEpisodeManager,
             transcriptManager = mock(),
-            chapterManager = chapterManager,
+            downloadQueue = mock(),
         )
     }
 }

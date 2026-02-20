@@ -4,13 +4,8 @@ import android.content.Context
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import java.io.File
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -23,9 +18,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.doReturnConsecutively
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
@@ -43,15 +36,6 @@ class EpisodeManagerImplTest {
     lateinit var episodeDao: EpisodeDao
 
     @Mock
-    lateinit var transcriptDao: TranscriptDao
-
-    @Mock
-    lateinit var downloadManager: DownloadManager
-
-    @Mock
-    lateinit var fileStorage: FileStorage
-
-    @Mock
     lateinit var context: Context
 
     private lateinit var episodeManagerImpl: EpisodeManagerImpl
@@ -59,14 +43,11 @@ class EpisodeManagerImplTest {
     @Before
     fun setUp() = runTest {
         whenever(appDatabase.episodeDao()).thenReturn(episodeDao)
-        whenever(appDatabase.transcriptDao()).thenReturn(transcriptDao)
         whenever(appDatabase.userEpisodeDao()).thenReturn(mock())
-        whenever(fileStorage.getOrCreatePodcastEpisodeTempFile(any())).thenReturn(File("/tmp/test"))
         episodeManagerImpl = EpisodeManagerImpl(
             appDatabase = appDatabase,
             settings = mock(),
-            fileStorage = fileStorage,
-            downloadManager = downloadManager,
+            downloadQueue = mock(),
             context = context,
             podcastCacheServiceManager = mock(),
             userEpisodeManager = mock(),
@@ -93,37 +74,5 @@ class EpisodeManagerImplTest {
         verify(episodeDao).getAllPodcastEpisodes(10, 0)
         verify(episodeDao).getAllPodcastEpisodes(10, 10)
         verify(episodeDao).getAllPodcastEpisodes(10, 20)
-    }
-
-    @Test
-    fun `deleteEpisodesWithoutSync cleans up transcripts`() = runTest {
-        val episode1 = PodcastEpisode(uuid = "episode-1", publishedDate = Date()).apply {
-            downloadedFilePath = null
-        }
-        val episode2 = PodcastEpisode(uuid = "episode-2", publishedDate = Date()).apply {
-            downloadedFilePath = null
-        }
-        val episodes = listOf(episode1, episode2)
-        val playbackManager = mock<PlaybackManager>()
-
-        episodeManagerImpl.deleteEpisodesWithoutSync(episodes, playbackManager)
-
-        // Verify transcript deletion happens for each episode (via cleanUpDownloadFiles)
-        verify(transcriptDao).deleteForEpisode("episode-1")
-        verify(transcriptDao).deleteForEpisode("episode-2")
-        verify(episodeDao).deleteAll(episodes)
-    }
-
-    @Test
-    fun `deleteEpisodeWithoutSyncBlocking cleans up transcripts`() = runTest {
-        val episode = PodcastEpisode(uuid = "episode-1", publishedDate = Date()).apply {
-            downloadedFilePath = null
-        }
-        val playbackManager = mock<PlaybackManager>()
-
-        episodeManagerImpl.deleteEpisodeWithoutSyncBlocking(episode, playbackManager)
-
-        verify(transcriptDao).deleteForEpisode("episode-1")
-        verify(episodeDao).deleteBlocking(episode)
     }
 }

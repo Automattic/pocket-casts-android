@@ -29,6 +29,10 @@ class DownloadProgressCache @Inject constructor() {
     fun clearProgress(episodeUuid: String) {
         _cache.update { data -> data - episodeUuid }
     }
+
+    fun clearProgress(episodeUuids: Set<String>) {
+        _cache.update { data -> data - episodeUuids }
+    }
 }
 
 data class DownloadProgress(

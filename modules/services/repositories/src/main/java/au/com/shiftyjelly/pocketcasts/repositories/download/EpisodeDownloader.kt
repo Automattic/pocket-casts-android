@@ -45,6 +45,7 @@ internal class EpisodeDownloader(
     private val httpClient: Lazy<Call.Factory>,
     private val progressCache: DownloadProgressCache,
     private val minContentLength: Long = SUSPICIOUS_FILE_SIZE,
+    private val onCall: (Call) -> Unit = {},
     private val onResponse: (Response) -> Unit = {},
     private val onComplete: (DownloadProgress?, fileSize: Long) -> Unit = { _, _ -> },
 ) {
@@ -76,6 +77,7 @@ internal class EpisodeDownloader(
 
         val request = Request.Builder().url(downloadUrl).build()
         val call = httpClient.get().newCall(request)
+        onCall(call)
 
         progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
         return call.blockingEnqueue().use { response ->

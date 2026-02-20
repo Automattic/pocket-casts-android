@@ -17,7 +17,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -39,9 +40,9 @@ import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -52,7 +53,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val userEpisodeManager: UserEpisodeManager,
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
-    val downloadManager: DownloadManager,
+    val downloadQueue: DownloadQueue,
     val analyticsTracker: AnalyticsTracker,
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -360,12 +361,9 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
 
         val list = selectedList.toList()
-        val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).toList()
+        val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).map(BaseEpisode::uuid)
         ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
-            trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, source = source)
-            }
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED, source, trimmedList)
+            downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi = false), source)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
             showSnackBar(snackText)
             closeMultiSelect()
@@ -389,24 +387,14 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun performDeleteDownload(list: List<BaseEpisode>) {
-        launch {
-            val episodes = list.filterIsInstance<PodcastEpisode>()
-            episodeManager.deleteEpisodeFiles(episodes, playbackManager)
+        closeMultiSelect()
+        launch(NonCancellable) {
+            val episodes = list.filterIsInstance<PodcastEpisode>().map(BaseEpisode::uuid)
+            downloadQueue.cancelAll(episodes, source)
 
             val userEpisodes = list.filterIsInstance<UserEpisode>()
             userEpisodeManager.deleteAll(userEpisodes, playbackManager)
-
-            if (episodes.isNotEmpty()) {
-                episodeAnalytics.trackBulkEvent(
-                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED,
-                    source = source,
-                    count = if (episodes.isNotEmpty()) episodes.size else userEpisodes.size,
-                )
-            }
-
-            withContext(Dispatchers.Main) {
-                closeMultiSelect()
-            }
+            episodeManager.disableAutoDownload(list)
         }
     }
 
@@ -456,12 +444,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val deleteState = CloudDeleteHelper.getDeleteState(isDownloaded = onDevice > 0, isBoth = onServer > 0 && onDevice > 0)
         val deleteFunction: (List<UserEpisode>, DeleteState) -> Unit = { episodesToDelete, state ->
             episodesToDelete.forEach {
-                Timber.d("Deleting $it")
                 CloudDeleteHelper.deleteEpisode(
                     episode = it,
                     deleteState = state,
+                    sourceView = source,
+                    downloadQueue = downloadQueue,
                     playbackManager = playbackManager,
-                    episodeManager = episodeManager,
                     userEpisodeManager = userEpisodeManager,
                     applicationScope = applicationScope,
                 )

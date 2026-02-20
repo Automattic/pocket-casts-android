@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toUuidOrNull
@@ -55,6 +56,7 @@ class DownloadManager2 @Inject constructor(
     appDatabase: AppDatabase,
     settings: Settings,
     clock: Clock,
+    progressCache: DownloadProgressCache,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val scope: CoroutineScope,
 ) : DownloadQueue,
@@ -64,7 +66,14 @@ class DownloadManager2 @Inject constructor(
     private val downloadDao = EpisodeDownloadDao(appDatabase, clock)
     private val prerequisitesProvider = DownloadPrerequisitesProvider(context)
     private val statusController = DownloadStatusController(downloadDao, clock, context)
-    private val queueController = DownloadQueueController(downloadDao, appDatabase.transcriptDao(), settings, context, scope)
+    private val queueController = DownloadQueueController(
+        downloadDao = downloadDao,
+        transcriptDao = appDatabase.transcriptDao(),
+        progressCache = progressCache,
+        settings = settings,
+        context = context,
+        coroutineScope = scope,
+    )
 
     private val isMonitoring = AtomicBoolean()
 
@@ -76,16 +85,16 @@ class DownloadManager2 @Inject constructor(
         return scope.launch { queueController.addToQueue(episodeUuids, downloadType, sourceView) }
     }
 
-    override fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean, sourceView: SourceView): Job {
-        return scope.launch { queueController.removeFromQueue(episodeUuids, disableAutoDownload, sourceView) }
+    override fun cancelAll(episodeUuids: Collection<String>, sourceView: SourceView): Job {
+        return scope.launch { queueController.removeFromQueue(episodeUuids, sourceView) }
     }
 
-    override fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean, sourceView: SourceView): Job {
-        return scope.launch { queueController.removeFromQueue(podcastUuid, disableAutoDownload, sourceView) }
+    override fun cancelAll(podcastUuid: String, sourceView: SourceView): Job {
+        return scope.launch { queueController.removeFromQueue(podcastUuid, sourceView) }
     }
 
-    override fun cancelAll(disableAutoDownload: Boolean, sourceView: SourceView): Job {
-        return scope.launch { queueController.clearQueue(disableAutoDownload, sourceView) }
+    override fun cancelAll(sourceView: SourceView): Job {
+        return scope.launch { queueController.clearQueue(sourceView) }
     }
 
     override fun clearAllDownloadErrors(): Job {
@@ -119,6 +128,7 @@ class DownloadManager2 @Inject constructor(
 private class DownloadQueueController(
     private val downloadDao: EpisodeDownloadDao,
     private val transcriptDao: TranscriptDao,
+    private val progressCache: DownloadProgressCache,
     private val settings: Settings,
     private val context: Context,
     private val coroutineScope: CoroutineScope,
@@ -185,23 +195,23 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun removeFromQueue(episodeUuids: Collection<String>, disableAutoDownload: Boolean, sourceView: SourceView) {
+    suspend fun removeFromQueue(episodeUuids: Collection<String>, sourceView: SourceView) {
         if (episodeUuids.isEmpty()) {
             return
         }
 
         val cancelledEpisodes = downloadDao.withTransaction {
             val episodes = findEpisodes(episodeUuids)
-            buildList {
+            buildMap {
                 episodes.forEach { episode ->
-                    val isCancelled = setDownloadCancelled(episode, disableAutoDownload)
+                    val isCancelled = setDownloadCancelled(episode)
                     if (isCancelled) {
-                        add(episode)
+                        put(episode.uuid, episode)
                     }
                 }
             }
         }
-        deleteAllDownloadFiles(cancelledEpisodes)
+        cleanUpDownloads(cancelledEpisodes)
 
         // Use provided episode UUIDs directly in case our DB is desynchronized
         // with the WorkManager's DB. After cancellation from Work Manager
@@ -212,32 +222,38 @@ private class DownloadQueueController(
         }
     }
 
-    private fun deleteAllDownloadFiles(episodes: Collection<BaseEpisode>) {
+    private fun cleanUpDownloads(episodes: Map<String, BaseEpisode>) {
         coroutineScope.launch {
-            episodes.forEach { episode ->
+            progressCache.clearProgress(episodes.keys)
+            transcriptDao.deleteForEpisodes(episodes.keys)
+            episodes.forEach { (_, episode) ->
                 runCatching {
                     episode.downloadedFilePath?.let(::File)?.delete()
                 }
+                if (episode is UserEpisode) {
+                    episode.artworkUrl
+                        ?.takeIf { it.startsWith('/') }
+                        ?.let(FileUtil::deleteFileByPath)
+                }
             }
-            transcriptDao.deleteForEpisodes(episodes.map(BaseEpisode::uuid))
         }
     }
 
-    suspend fun removeFromQueue(podcastUuid: String, disableAutoDownload: Boolean, sourceView: SourceView) {
+    suspend fun removeFromQueue(podcastUuid: String, sourceView: SourceView) {
         val episodeUuids = downloadDao.findPodcastEpisodesUuids(podcastUuid)
-        removeFromQueue(episodeUuids, disableAutoDownload, sourceView)
+        removeFromQueue(episodeUuids, sourceView)
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.podcastTag(podcastUuid))
     }
 
-    suspend fun clearQueue(disableAutoDownload: Boolean, sourceView: SourceView) {
+    suspend fun clearQueue(sourceView: SourceView) {
         val episodeUuids = downloadDao.findCancellableEpisodes().map(BaseEpisode::uuid)
-        removeFromQueue(episodeUuids, disableAutoDownload, sourceView)
+        removeFromQueue(episodeUuids, sourceView)
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.WORKER_TAG)
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.WORKER_TAG)
     }
 
-    suspend fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
+    fun cancelDownloadsExceedingMaxAttempts(workInfos: Collection<DownloadWorkInfo>) {
         // We normally check the retry/attempt count inside the download worker.
         // However, the worker may never actually reach doWork().
         //
@@ -255,7 +271,10 @@ private class DownloadQueueController(
                 ?.takeIf { it.runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT }
                 ?.episodeUuid
         }
-        removeFromQueue(episodesToCancel, disableAutoDownload = false, sourceView = SourceView.AUTO_DOWNLOAD)
+        for (episodeUuid in episodesToCancel) {
+            workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
+            workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(episodeUuid))
+        }
     }
 
     private fun canDownload(episode: BaseEpisode, downloadType: DownloadType): Boolean {
@@ -265,7 +284,7 @@ private class DownloadQueueController(
         }
         val isDownloadTypeAllowed = when (downloadType) {
             is DownloadType.UserTriggered -> true
-            is DownloadType.Automatic -> !episode.isExemptFromAutoDownload && !episode.isDownloadFailure
+            is DownloadType.Automatic -> !episode.isAutoDownloadDisabled && !episode.isDownloadFailure
         }
         return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed
     }
@@ -484,9 +503,9 @@ private class EpisodeDownloadDao(
         }
     }
 
-    suspend fun setDownloadCancelled(episode: BaseEpisode, disableAutoDownload: Boolean) = when (episode) {
-        is PodcastEpisode -> episodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload)
-        is UserEpisode -> userEpisodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload)
+    suspend fun setDownloadCancelled(episode: BaseEpisode) = when (episode) {
+        is PodcastEpisode -> episodeDao.setDownloadCancelled(episode.uuid)
+        is UserEpisode -> userEpisodeDao.setDownloadCancelled(episode.uuid)
     }
 
     suspend fun updateDownloadStatuses(updates: Map<String, DownloadStatusUpdate>) = withTransaction {

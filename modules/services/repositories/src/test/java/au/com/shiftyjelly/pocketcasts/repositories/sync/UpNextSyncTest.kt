@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -62,9 +61,6 @@ class UpNextSyncTest {
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
-    private lateinit var downloadManager: DownloadManager
-
-    @Mock
     private lateinit var playbackManager: PlaybackManager
 
     @Mock
@@ -97,7 +93,6 @@ class UpNextSyncTest {
         upNextSync = UpNextSync(
             appDatabase = appDatabase,
             episodeManager = episodeManager,
-            downloadManager = downloadManager,
             playbackManager = playbackManager,
             podcastManager = podcastManager,
             settings = settings,
@@ -307,7 +302,7 @@ class UpNextSyncTest {
 
         upNextSync.sync()
 
-        verify(upNextQueue, never()).importServerChangesBlocking(any(), any(), any())
+        verify(upNextQueue, never()).importServerChangesBlocking(any(), any())
         verify(playbackManager, never()).loadQueue()
     }
 
@@ -347,7 +342,7 @@ class UpNextSyncTest {
 
         upNextSync.sync()
 
-        verify(upNextQueue, never()).importServerChangesBlocking(any(), any(), any())
+        verify(upNextQueue, never()).importServerChangesBlocking(any(), any())
         verify(playbackManager, never()).loadQueue()
     }
 
