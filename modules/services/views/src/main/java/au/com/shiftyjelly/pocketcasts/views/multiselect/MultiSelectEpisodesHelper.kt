@@ -454,8 +454,6 @@ class MultiSelectEpisodesHelper @Inject constructor(
                     applicationScope = applicationScope,
                 )
             }
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED, source, episodesToDelete.size)
-
             val snackText = resources.getStringPlural(episodesToDelete.size, LR.string.episodes_deleted_singular, LR.string.episodes_deleted_plural)
             showSnackBar(snackText)
             closeMultiSelect()

@@ -253,13 +253,13 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun setDownloadCancelledWithWithWorkerId() = runTest {
+    fun resetDownloadStatusWithWorkerId() = runTest {
         val episode = episode.copy(
             downloadStatus = EpisodeDownloadStatus.Downloading,
         )
         userEpisodeDao.update(episode)
 
-        val isStatusUpdated = userEpisodeDao.setDownloadCancelled(episode.uuid)
+        val isStatusUpdated = userEpisodeDao.resetDownloadStatus(episode.uuid)
         assertEquals(true, isStatusUpdated)
 
         val updatedEpisode = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
@@ -268,14 +268,14 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun setDownloadCancelledWithoutWorkerId() = runTest {
+    fun resetDownloadStatusWithoutWorkerId() = runTest {
         val episode = episode.copy(
             downloadStatus = EpisodeDownloadStatus.Downloading,
             downloadTaskId = null,
         )
         userEpisodeDao.update(episode)
 
-        val isStatusUpdated = userEpisodeDao.setDownloadCancelled(episode.uuid)
+        val isStatusUpdated = userEpisodeDao.resetDownloadStatus(episode.uuid)
         assertEquals(false, isStatusUpdated)
 
         val updatedEpisode = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
@@ -283,14 +283,14 @@ class UserEpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun setDownloadCancelledWithoutWorkerIdForDownloadedEpisode() = runTest {
+    fun resetDownloadStatusWithoutWorkerIdForDownloadedEpisode() = runTest {
         val episode = episode.copy(
             downloadStatus = EpisodeDownloadStatus.Downloaded,
             downloadTaskId = null,
         )
         userEpisodeDao.update(episode)
 
-        val isStatusUpdated = userEpisodeDao.setDownloadCancelled(episode.uuid)
+        val isStatusUpdated = userEpisodeDao.resetDownloadStatus(episode.uuid)
         assertEquals(true, isStatusUpdated)
 
         val updatedEpisode = userEpisodeDao.findEpisodeByUuid(episode.uuid)!!
