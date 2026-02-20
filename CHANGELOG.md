@@ -4,6 +4,9 @@
 
 8.6
 -----
+*   Updates
+    *   Move playlist toolbar action to be in the overflow menu by default
+        ([#4905](https://github.com/Automattic/pocket-casts-android/pull/4905))
 *   Bug Fixes
     *   Fix up next queue episode ordering on the large widget
         ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
