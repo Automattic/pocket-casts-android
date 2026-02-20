@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun OfferClaimedPage(
     billingCycle: BillingCycle,
+    isInstallment: Boolean,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,9 +62,10 @@ internal fun OfferClaimedPage(
             modifier = Modifier.height(20.dp),
         )
         Text(
-            text = when (billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_claimed_offer_message_1)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_claimed_offer_message_3)
+            text = when {
+                billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_claimed_offer_message_1)
+                isInstallment -> stringResource(LR.string.winback_claimed_offer_message_5)
+                else -> stringResource(LR.string.winback_claimed_offer_message_3)
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
@@ -76,9 +78,10 @@ internal fun OfferClaimedPage(
             modifier = Modifier.height(16.dp),
         )
         TextP30(
-            text = when (billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_claimed_offer_message_2)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_claimed_offer_message_4)
+            text = when {
+                billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_claimed_offer_message_2)
+                isInstallment -> stringResource(LR.string.winback_claimed_offer_message_6)
+                else -> stringResource(LR.string.winback_claimed_offer_message_4)
             },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
@@ -100,13 +103,14 @@ internal fun OfferClaimedPage(
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun WinbackOfferPageBillingPeriodPreview(
-    @PreviewParameter(BillingPeriodParameterProvider::class) billingPeriod: BillingCycle,
+    @PreviewParameter(OfferClaimedParameterProvider::class) params: OfferClaimedParams,
 ) {
     AppThemeWithBackground(
         themeType = ThemeType.ROSE,
     ) {
         OfferClaimedPage(
-            billingCycle = billingPeriod,
+            billingCycle = params.billingCycle,
+            isInstallment = params.isInstallment,
             onConfirm = {},
         )
     }
@@ -122,14 +126,21 @@ private fun WinbackOfferPageThemePreview(
     ) {
         OfferClaimedPage(
             billingCycle = BillingCycle.Monthly,
+            isInstallment = false,
             onConfirm = {},
         )
     }
 }
 
-private class BillingPeriodParameterProvider : PreviewParameterProvider<BillingCycle> {
+private data class OfferClaimedParams(
+    val billingCycle: BillingCycle,
+    val isInstallment: Boolean,
+)
+
+private class OfferClaimedParameterProvider : PreviewParameterProvider<OfferClaimedParams> {
     override val values = sequenceOf(
-        BillingCycle.Monthly,
-        BillingCycle.Yearly,
+        OfferClaimedParams(BillingCycle.Monthly, false),
+        OfferClaimedParams(BillingCycle.Yearly, false),
+        OfferClaimedParams(BillingCycle.Yearly, true),
     )
 }

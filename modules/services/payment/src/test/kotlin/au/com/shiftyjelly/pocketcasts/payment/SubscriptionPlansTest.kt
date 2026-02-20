@@ -47,7 +47,7 @@ class SubscriptionPlansTest {
             }
         }.forEach { add(it) }
 
-        // Add Plus Yearly Installment product
+        // Add Plus Yearly Installment product with offers
         val installmentProductId = SubscriptionPlan.productId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
         val installmentBasePlanId = SubscriptionPlan.basePlanId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
         add(
@@ -64,7 +64,16 @@ class SubscriptionPlansTest {
                             subsequentCommitmentPaymentsCount = 12,
                         ),
                     ),
-                    offerPlans = emptyList(),
+                    offerPlans = SubscriptionOffer.entries
+                        .mapNotNull { offer -> offer.offerId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true) }
+                        .map { offerId ->
+                            PricingPlan.Offer(
+                                offerId = offerId,
+                                planId = installmentBasePlanId,
+                                pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
+                                tags = emptyList(),
+                            )
+                        },
                 ),
             ),
         )
@@ -489,5 +498,213 @@ class SubscriptionPlansTest {
         val result = plans.findInstallmentPlan(SubscriptionTier.Plus, BillingCycle.Yearly)
 
         assertTrue(result is PaymentResult.Failure)
+    }
+
+    // Installment Offer Tests
+
+    @Test
+    fun `offerId returns correct ID for installment trial offer`() {
+        val offerId = SubscriptionOffer.Trial.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        assertEquals("plus-yearly-installments-trial-30days", offerId)
+    }
+
+    @Test
+    fun `offerId returns correct ID for non-installment trial offer`() {
+        val offerId = SubscriptionOffer.Trial.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = false,
+        )
+
+        assertEquals("plus-yearly-trial-30days", offerId)
+    }
+
+    @Test
+    fun `offerId returns correct ID for installment winback offer`() {
+        val offerId = SubscriptionOffer.Winback.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        assertEquals("plus-yearly-installments-winback", offerId)
+    }
+
+    @Test
+    fun `offerId returns correct ID for non-installment winback offer`() {
+        val offerId = SubscriptionOffer.Winback.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = false,
+        )
+
+        assertEquals("plus-yearly-winback", offerId)
+    }
+
+    @Test
+    fun `offerId returns null for installment intro offer`() {
+        val offerId = SubscriptionOffer.IntroOffer.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        // IntroOffer is not supported for installment plans
+        assertNull(offerId)
+    }
+
+    @Test
+    fun `offerId returns null for installment referral offer`() {
+        val offerId = SubscriptionOffer.Referral.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        // Referral is not supported for installment plans
+        assertNull(offerId)
+    }
+
+    @Test
+    fun `find plus yearly installment trial plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.Trial,
+            isInstallment = true,
+        ).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(SubscriptionOffer.Trial, plan.offer)
+        assertTrue(plan.isInstallment)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
+        assertEquals("p1y-installments", plan.basePlanId)
+        assertEquals("plus-yearly-installments-trial-30days", plan.offerId)
+        assertEquals(infinitePricingPhase.price, plan.recurringPrice)
+    }
+
+    @Test
+    fun `find plus yearly installment winback plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.Winback,
+            isInstallment = true,
+        ).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(SubscriptionOffer.Winback, plan.offer)
+        assertTrue(plan.isInstallment)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, plan.productId)
+        assertEquals("p1y-installments", plan.basePlanId)
+        assertEquals("plus-yearly-installments-winback", plan.offerId)
+        assertEquals(infinitePricingPhase.price, plan.recurringPrice)
+    }
+
+    @Test
+    fun `subscription plan key generates correct installment offer ID`() {
+        val key = SubscriptionPlan.Key(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            offer = SubscriptionOffer.Trial,
+            isInstallment = true,
+        )
+
+        assertEquals("plus-yearly-installments-trial-30days", key.offerId)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, key.productId)
+        assertEquals("p1y-installments", key.basePlanId)
+    }
+
+    @Test
+    fun `subscription plan key generates correct non-installment offer ID`() {
+        val key = SubscriptionPlan.Key(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            offer = SubscriptionOffer.Trial,
+            isInstallment = false,
+        )
+
+        assertEquals("plus-yearly-trial-30days", key.offerId)
+        assertEquals(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID, key.productId)
+        assertEquals("p1y", key.basePlanId)
+    }
+
+    @Test
+    fun `allow creating key with both offer and installment`() {
+        val key = SubscriptionPlan.Key(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            offer = SubscriptionOffer.Trial,
+            isInstallment = true,
+        )
+
+        assertEquals(SubscriptionOffer.Trial, key.offer)
+        assertTrue(key.isInstallment)
+        assertEquals("plus-yearly-installments-trial-30days", key.offerId)
+    }
+
+    @Test
+    fun `installment offer plan has correct pricing phases`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.Trial,
+            isInstallment = true,
+        ).getOrNull()!!
+
+        assertEquals(2, plan.pricingPhases.size)
+        assertEquals(initialPricingPhase, plan.pricingPhases[0])
+        assertEquals(infinitePricingPhase, plan.pricingPhases[1])
+    }
+
+    @Test
+    fun `intro offer is not supported for installment plans`() {
+        val installmentOfferId = SubscriptionOffer.IntroOffer.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        val regularOfferId = SubscriptionOffer.IntroOffer.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = false,
+        )
+
+        assertNull(installmentOfferId)
+        assertEquals("plus-yearly-intro-50percent", regularOfferId)
+    }
+
+    @Test
+    fun `referral offer is not supported for installment plans`() {
+        val installmentOfferId = SubscriptionOffer.Referral.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = true,
+        )
+
+        val regularOfferId = SubscriptionOffer.Referral.offerId(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            isInstallment = false,
+        )
+
+        assertNull(installmentOfferId)
+        assertEquals("plus-yearly-referral-two-months-free", regularOfferId)
     }
 }

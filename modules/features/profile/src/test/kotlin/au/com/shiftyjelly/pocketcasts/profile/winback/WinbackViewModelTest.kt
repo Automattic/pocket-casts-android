@@ -284,6 +284,7 @@ class WinbackViewModelTest {
                     formattedPrice = "$3.99",
                     tier = SubscriptionTier.Plus,
                     billingCycle = BillingCycle.Monthly,
+                    isInstallment = false,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -301,6 +302,7 @@ class WinbackViewModelTest {
                     formattedPrice = "$20.00",
                     tier = SubscriptionTier.Plus,
                     billingCycle = BillingCycle.Yearly,
+                    isInstallment = false,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -325,6 +327,7 @@ class WinbackViewModelTest {
                     formattedPrice = "$9.99",
                     tier = SubscriptionTier.Patron,
                     billingCycle = BillingCycle.Monthly,
+                    isInstallment = false,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -349,6 +352,7 @@ class WinbackViewModelTest {
                     formattedPrice = "$50.00",
                     tier = SubscriptionTier.Patron,
                     billingCycle = BillingCycle.Yearly,
+                    isInstallment = false,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -389,6 +393,7 @@ class WinbackViewModelTest {
                 formattedPrice = "$50.00",
                 tier = SubscriptionTier.Patron,
                 billingCycle = BillingCycle.Yearly,
+                isInstallment = false,
             ),
             viewModel.uiState.value.winbackOfferState?.offer,
         )
@@ -625,6 +630,7 @@ class WinbackViewModelTest {
                     "row" to "claim_offer",
                     "tier" to "plus",
                     "frequency" to "monthly",
+                    "is_installment" to "false",
                 ),
             ),
             event,
@@ -648,6 +654,7 @@ class WinbackViewModelTest {
                     "row" to "claim_offer",
                     "tier" to "plus",
                     "frequency" to "yearly",
+                    "is_installment" to "false",
                 ),
             ),
             event,
@@ -671,6 +678,7 @@ class WinbackViewModelTest {
                     "row" to "claim_offer",
                     "tier" to "patron",
                     "frequency" to "monthly",
+                    "is_installment" to "false",
                 ),
             ),
             event,
@@ -694,6 +702,7 @@ class WinbackViewModelTest {
                     "row" to "claim_offer",
                     "tier" to "patron",
                     "frequency" to "yearly",
+                    "is_installment" to "false",
                 ),
             ),
             event,
