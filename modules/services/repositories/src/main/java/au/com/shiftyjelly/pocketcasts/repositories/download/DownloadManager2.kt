@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toUuidOrNull
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.Clock
@@ -180,7 +181,7 @@ private class DownloadQueueController(
         val pendingWorks = workManager.getDownloadWorkInfos<DownloadWorkInfo.Pending>()
         val downloadCommands = episodes.map { episode -> episode.toDownloadCommand(pendingWorks, downloadType, sourceView) }
         val appliedCommands = saveDownloadCommands(downloadCommands)
-        analytics.trackDownloadQueued(appliedCommands.map(DownloadCommand::episode), sourceView)
+        analytics.trackDownloadQueued(appliedCommands.map(DownloadCommand::episode), downloadType, sourceView)
 
         appliedCommands.forEach { command ->
             val operation = command.enqueue(workManager)
@@ -610,7 +611,10 @@ private class EpisodeDownloadDao(
 private class DownloadAnalytics(
     private val tracker: AnalyticsTracker,
 ) {
-    fun trackDownloadQueued(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+    fun trackDownloadQueued(episodes: Collection<BaseEpisode>, downloadType: DownloadType, sourceView: SourceView) {
+        for (episode in episodes) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download queued. Episode: ${episode.uuid}, Download type: $downloadType, Source: $sourceView.")
+        }
         when (episodes.size) {
             0 -> Unit
 
@@ -638,6 +642,7 @@ private class DownloadAnalytics(
 
     fun trackDownloadFinished(infos: Collection<DownloadWorkInfo.Success>) {
         for (info in infos) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download finished. Episode: ${info.episodeUuid}, Source: ${info.sourceView}.")
             tracker.track(
                 AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED,
                 mapOf(
@@ -650,6 +655,7 @@ private class DownloadAnalytics(
 
     fun trackDownloadFailed(infos: Collection<DownloadWorkInfo.Failure>) {
         for (info in infos) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download failed. Episode: ${info.episodeUuid}, Error: ${info.error.toProperties()}, Source: ${info.sourceView}.")
             tracker.track(
                 AnalyticsEvent.EPISODE_DOWNLOAD_FAILED,
                 info.error.toProperties(),
@@ -658,6 +664,9 @@ private class DownloadAnalytics(
     }
 
     fun trackDownloadCancelled(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+        for (episode in episodes) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download cancelled. Episode: ${episode.uuid}, Source: $sourceView.")
+        }
         when (episodes.size) {
             0 -> Unit
 
@@ -684,6 +693,9 @@ private class DownloadAnalytics(
     }
 
     fun trackDownloadDeleted(episodes: Collection<BaseEpisode>, sourceView: SourceView) {
+        for (episode in episodes) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download deleted. Episode: ${episode.uuid}, Source: $sourceView.")
+        }
         when (episodes.size) {
             0 -> Unit
 
