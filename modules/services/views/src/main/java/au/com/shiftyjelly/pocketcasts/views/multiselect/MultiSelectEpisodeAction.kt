@@ -125,7 +125,7 @@ sealed class MultiSelectEpisodeAction(
     )
 
     companion object {
-        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, AddToPlaylist, PlayNext, PlayLast, Star, Share, RemoveListeningHistory)
+        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, AddToPlaylist, PlayLast, Star, Share, RemoveListeningHistory)
         private val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
         private val STANDARD_BY_GROUP_ID = STANDARD.associateBy { it.groupId }
         val ALL_BY_ACTION_ID = ALL.associateBy { it.actionId }
