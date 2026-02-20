@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -19,11 +18,20 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.rxMaybe
 
 data class EpisodeRowData(
+    val downloadProgress: Int,
+    val playbackState: PlaybackState,
+    val isInUpNext: Boolean,
+    val hasBookmarks: Boolean,
+)
+
+data class UserEpisodeRowData(
+    val episode: UserEpisode,
     val downloadProgress: Int,
     val uploadProgress: Int,
     val playbackState: PlaybackState,
@@ -37,18 +45,29 @@ class EpisodeRowDataProvider @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val upNextQueue: UpNextQueue,
     private val bookmarkManager: BookmarkManager,
+    private val userEpisodeManager: UserEpisodeManager,
     private val settings: Settings,
 ) {
+
+    fun userEpisodeRowDataObservable(episodeUuid: String): Observable<UserEpisodeRowData> {
+        return Observables.combineLatest(
+            userEpisodeManager.episodeFlow(episodeUuid).filterNotNull().asObservable(),
+            downloadProgressObservable(episodeUuid),
+            uploadProgressObservable(episodeUuid),
+            playbackStatusObservable(episodeUuid),
+            isInUpNextObservable(episodeUuid),
+            hasBookmarksObservable(episodeUuid),
+            ::UserEpisodeRowData,
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun episodeRowDataObservable(episodeUuid: String): Observable<EpisodeRowData> {
-        return rxMaybe { episodeManager.findEpisodeByUuid(episodeUuid) }
-            .toObservable()
-            .flatMap { episode ->
+        return rxMaybe { episodeManager.findEpisodeByUuid(episodeUuid) }.toObservable()
+            .switchMap { episode ->
                 Observables.combineLatest(
                     downloadProgressObservable(episodeUuid),
-                    when (episode) {
-                        is PodcastEpisode -> Observable.just(0)
-                        is UserEpisode -> uploadProgressObservable(episodeUuid)
-                    },
                     playbackStatusObservable(episodeUuid),
                     isInUpNextObservable(episodeUuid),
                     hasBookmarksObservable(episodeUuid),

@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeRowData
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -95,8 +96,8 @@ class UserEpisodeViewHolder(
 
         if (previousUuid != episode.uuid || !isObservingRowData) {
             observeRowData()
-            observeFileStatus()
         }
+        bindFileStatus()
         bindArtwork(useEpisodeArtwork)
         bindPlaybackButton()
         bindTitle()
@@ -133,13 +134,12 @@ class UserEpisodeViewHolder(
 
     fun unbind() {
         disposable.clear()
-        binding.fileStatusIconsView.clearObservers()
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
         disposable.clear()
-        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid)
+        disposable += rowDataProvider.userEpisodeRowDataObservable(episode.uuid)
             .doOnSubscribe { isObservingRowData = true }
             .doOnDispose { isObservingRowData = false }
             .subscribeBy(onNext = { data ->
@@ -147,17 +147,17 @@ class UserEpisodeViewHolder(
                 bindDate()
                 bindSwipeActions()
                 bindContentDescription()
+                bindFileStatusUpdate(data)
             })
     }
 
-    private fun observeFileStatus() {
+    private fun bindFileStatus() {
         binding.video.isVisible = episode.isVideo
-        binding.fileStatusIconsView.clearObservers()
-        binding.fileStatusIconsView.setup(
-            episode = episode,
-            tintColor = tint,
-            rowDataObservable = rowDataProvider.episodeRowDataObservable(episode.uuid),
-        )
+        binding.fileStatusIconsView.setup(episode = episode, tintColor = tint)
+    }
+
+    private fun bindFileStatusUpdate(data: UserEpisodeRowData) {
+        binding.fileStatusIconsView.update(data)
     }
 
     private fun bindArtwork(useEpisodeArtwork: Boolean) {
