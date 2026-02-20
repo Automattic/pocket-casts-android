@@ -300,8 +300,7 @@ class PodcastFragment : BaseFragment() {
                     successCallback()
                     viewModel.unsubscribeFromPodcast()
 
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 }
             dialog.show(parentFragmentManager, "unsubscribe")
         }
@@ -689,8 +688,7 @@ class PodcastFragment : BaseFragment() {
                 share()
             },
             onNavigateBack = {
-                @Suppress("DEPRECATION")
-                activity?.onBackPressed()
+                activity?.onBackPressedDispatcher?.onBackPressed()
             },
             onLongClick = {
                 theme.toggleDarkLightThemeActivity(activity as AppCompatActivity)

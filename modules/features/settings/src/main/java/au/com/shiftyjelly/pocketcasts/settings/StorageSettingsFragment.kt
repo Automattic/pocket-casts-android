@@ -54,8 +54,7 @@ class StorageSettingsFragment : BaseFragment() {
             StorageSettingsPage(
                 viewModel = viewModel,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,

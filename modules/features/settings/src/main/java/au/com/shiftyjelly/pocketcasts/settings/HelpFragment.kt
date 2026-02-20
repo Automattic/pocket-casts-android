@@ -61,8 +61,7 @@ class HelpFragment :
                     (requireActivity() as FragmentHostListener).addFragment(StatusFragment())
                 },
                 onGoBack = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onWebViewCreate = { webView = it },
                 onWebViewDispose = { webView = null },

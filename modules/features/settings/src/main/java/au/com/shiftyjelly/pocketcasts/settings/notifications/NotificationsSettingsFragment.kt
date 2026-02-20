@@ -84,8 +84,7 @@ internal class NotificationsSettingsFragment :
                     state = state,
                     onPreferenceChange = viewModel::onPreferenceChanged,
                     onBackPress = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
+                        activity?.onBackPressedDispatcher?.onBackPressed()
                     },
                     bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                     onAdvancedSettingsClick = { preference ->

@@ -194,8 +194,8 @@ class PlayerHeaderFragment :
         }
 
         private fun isUpNextCollapsed(): Boolean {
-            val upNextSheetState = (requireParentFragment() as PlayerContainerFragment).upNextBottomSheetBehavior.state
-            return upNextSheetState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)
+            val upNextSheetState = (requireParentFragment() as PlayerContainerFragment).upNextBottomSheetBehavior?.state
+            return upNextSheetState == null || upNextSheetState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)
         }
     }
 

@@ -121,8 +121,7 @@ class BookmarksContainerFragment : BaseDialogFragment() {
             },
             onNavigationClick = {
                 if (dialog == null) {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 } else {
                     dismiss()
                 }

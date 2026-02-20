@@ -86,8 +86,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             PlaybackSettings(
                 settings = settings,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 scrollToSleepTimer = scrollToSleepTimer,
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,

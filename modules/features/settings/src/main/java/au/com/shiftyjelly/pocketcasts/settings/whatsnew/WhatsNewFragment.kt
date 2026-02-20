@@ -47,8 +47,7 @@ class WhatsNewFragment : BaseFragment() {
             }
 
             val onClose: () -> Unit = {
-                @Suppress("DEPRECATION")
-                activity?.onBackPressed()
+                activity?.onBackPressedDispatcher?.onBackPressed()
             }
             var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
             WhatsNewPage(
@@ -88,8 +87,7 @@ class WhatsNewFragment : BaseFragment() {
             is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
 
             is NavigationState.ForceClose -> {
-                @Suppress("DEPRECATION")
-                activity?.onBackPressed()
+                activity?.onBackPressedDispatcher?.onBackPressed()
             }
         }
     }
