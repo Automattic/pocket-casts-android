@@ -39,6 +39,10 @@
 # https://issuetracker.google.com/issues/374691245
 -dontwarn com.google.android.gms.common.annotation.**
 
+# R8 shipped with AGP 9 broke Glance actions and they stopped triggering.
+# https://github.com/Automattic/pocket-casts-android/issues/5005
+-keep class au.com.shiftyjelly.pocketcasts.widget.action.** { *; }
+
 #
 # ██      ███████  ██████   █████   ██████ ██    ██      ██████  ██████  ███    ██ ███████ ██  ██████
 # ██      ██      ██       ██   ██ ██       ██  ██      ██      ██    ██ ████   ██ ██      ██ ██

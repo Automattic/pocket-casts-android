@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -62,7 +62,7 @@ class UserManagerImpl @Inject constructor(
     private val playlistDao: PlaylistDao,
     private val playlistsInitializer: DefaultPlaylistsInitializer,
     private val analyticsTracker: AnalyticsTracker,
-    private val tracker: TracksAnalyticsTracker,
+    private val accountStatusInfo: AccountStatusInfo,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
@@ -150,8 +150,8 @@ class UserManagerImpl @Inject constructor(
                     analyticsTracker.clearAllData()
                     analyticsTracker.refreshMetadata()
 
-                    // Force experiments to refresh after signing out with an anonymous UUID
-                    experimentProvider.refreshExperiments(tracker.anonID)
+                    val anonId = accountStatusInfo.recreateAnonId()
+                    experimentProvider.refreshExperiments(anonId)
 
                     settings.setEndOfYearShowModal(true)
                     endOfYearSync.reset()

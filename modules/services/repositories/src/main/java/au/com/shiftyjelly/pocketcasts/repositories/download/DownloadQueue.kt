@@ -1,18 +1,53 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import kotlinx.coroutines.Job
+
 interface DownloadQueue {
-    fun enqueue(episodeUuid: String, downloadType: DownloadType) = enqueueAll(setOf(episodeUuid), downloadType)
+    val size: Int
 
-    fun enqueueAll(episodeUuids: Collection<String>, downloadType: DownloadType)
+    fun enqueue(
+        episodeUuid: String,
+        downloadType: DownloadType,
+        sourceView: SourceView,
+    ): Job = enqueueAll(setOf(episodeUuid), downloadType, sourceView)
 
-    fun cancel(episodeUuid: String, disableAutoDownload: Boolean) = cancelAll(setOf(episodeUuid), disableAutoDownload)
+    fun enqueueAll(
+        episodeUuids: Collection<String>,
+        downloadType: DownloadType,
+        sourceView: SourceView,
+    ): Job
 
-    fun cancelAll(episodeUuids: Collection<String>, disableAutoDownload: Boolean)
+    fun cancel(
+        episodeUuid: String,
+        disableAutoDownload: Boolean,
+        sourceView: SourceView,
+    ): Job = cancelAll(setOf(episodeUuid), disableAutoDownload, sourceView)
 
-    fun cancelAll(podcastUuid: String, disableAutoDownload: Boolean)
+    fun cancelAll(
+        episodeUuids: Collection<String>,
+        disableAutoDownload: Boolean,
+        sourceView: SourceView,
+    ): Job
+
+    fun cancelAll(
+        podcastUuid: String,
+        disableAutoDownload: Boolean,
+        sourceView: SourceView,
+    ): Job
+
+    fun cancelAll(
+        disableAutoDownload: Boolean,
+        sourceView: SourceView,
+    ): Job
+
+    fun clearAllDownloadErrors(): Job
 }
 
-enum class DownloadType {
-    UserTriggered,
-    Automatic,
+sealed interface DownloadType {
+    data class UserTriggered(
+        val waitForWifi: Boolean,
+    ) : DownloadType
+
+    data object Automatic : DownloadType
 }

@@ -3,6 +3,11 @@
 *   New Features
     *   Support predictive back navigation
         ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
+*   Bug Fixes
+    *   Respect global auto download setting
+        ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
+    *   Fix user file status not updating
+        ([#4998](https://github.com/Automattic/pocket-casts-android/pull/4998))
 
 8.6
 -----

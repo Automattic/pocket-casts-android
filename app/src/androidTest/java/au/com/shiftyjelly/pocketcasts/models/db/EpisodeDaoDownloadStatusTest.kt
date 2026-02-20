@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import com.squareup.moshi.Moshi
 import java.io.File
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
@@ -26,6 +27,9 @@ class EpisodeDaoDownloadStatusTest {
     lateinit var testDb: AppDatabase
 
     private val workerId = UUID.randomUUID()
+    private val now = Instant.now()
+    private val nowDate = Date.from(now)
+    private val previousDate = Date.from(now.minusSeconds(100))
     private val episode = PodcastEpisode(
         uuid = "episode-id",
         publishedDate = Date(),
@@ -34,6 +38,7 @@ class EpisodeDaoDownloadStatusTest {
         downloadedFilePath = "invalid_path",
         downloadErrorDetails = "invalid_details",
         downloadTaskId = workerId.toString(),
+        lastDownloadAttemptDate = previousDate,
     )
 
     @Before
@@ -52,192 +57,143 @@ class EpisodeDaoDownloadStatusTest {
     }
 
     @Test
-    fun updateDownloadStatusToIdle() = runTest {
-        episodeDao.updateEpisodeStatus(EpisodeDownloadStatus.Downloading, episode.uuid)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Idle))
+    fun updateDownloadStatusToCancelled() = runTest {
+        episodeDao.update(episode.copy(downloadStatus = EpisodeDownloadStatus.Downloading))
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, DownloadStatusUpdate.Cancelled(workerId, now))
+        assertEquals(true, isStatusUpdated)
 
-        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(null, result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(null, updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToWaitingForWifi() = runTest {
-        val update = DownloadStatusUpdate.WaitingForWifi(workerId)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.WaitingForWifi(workerId, now)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.WaitingForWifi, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(workerId.toString(), result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.WaitingForWifi, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToWaitingForPower() = runTest {
-        val update = DownloadStatusUpdate.WaitingForPower(workerId)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.WaitingForPower(workerId, now)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.WaitingForPower, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(workerId.toString(), result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.WaitingForPower, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToWaitingForStorage() = runTest {
-        val update = DownloadStatusUpdate.WaitingForStorage(workerId)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.WaitingForStorage(workerId, now)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.WaitingForStorage, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(workerId.toString(), result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.WaitingForStorage, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToEnqueued() = runTest {
-        val update = DownloadStatusUpdate.Enqueued(workerId)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.Enqueued(workerId, now)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.Queued, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(workerId.toString(), result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.Queued, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToInProgress() = runTest {
-        val update = DownloadStatusUpdate.InProgress(workerId)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.InProgress(workerId, now)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.Downloading, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(workerId.toString(), result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.Downloading, updatedEpisode.downloadStatus)
+        assertEquals(nowDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToSuccess() = runTest {
         val file = File("podcast.mp3")
-        val update = DownloadStatusUpdate.Success(workerId, file)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.Success(workerId, now, file)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.Downloaded, result.downloadStatus)
-        assertEquals(file.path, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(null, result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.Downloaded, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(file.path, updatedEpisode.downloadedFilePath)
+        assertEquals(null, updatedEpisode.downloadErrorDetails)
+        assertEquals(null, updatedEpisode.downloadTaskId)
     }
 
     @Test
     fun updateDownloadStatusToFailure() = runTest {
         val errorMessage = "Download failed"
-        val update = DownloadStatusUpdate.Failure(workerId, errorMessage)
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
+        val update = DownloadStatusUpdate.Failure(workerId, now, errorMessage)
+        val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+        assertEquals(true, isStatusUpdated)
 
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.DownloadFailed, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(errorMessage, result.downloadErrorDetails)
-        assertEquals(null, result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.DownloadFailed, updatedEpisode.downloadStatus)
+        assertEquals(previousDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(null, updatedEpisode.downloadedFilePath)
+        assertEquals(errorMessage, updatedEpisode.downloadErrorDetails)
+        assertEquals(null, updatedEpisode.downloadTaskId)
     }
 
     @Test
-    fun updateMultipleEpisodes() = runTest {
-        val workerId1 = UUID.randomUUID()
-        val workerId2 = UUID.randomUUID()
-
-        episodeDao.insertAllBlocking(
-            listOf(
-                PodcastEpisode(
-                    uuid = "id-1",
-                    publishedDate = Date(),
-                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
-                    downloadedFilePath = "invalid_path",
-                    downloadErrorDetails = "invalid_details",
-                    downloadTaskId = workerId1.toString(),
-                ),
-                PodcastEpisode(
-                    uuid = "id-2",
-                    publishedDate = Date(),
-                    downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
-                    downloadedFilePath = "invalid_path",
-                    downloadErrorDetails = "invalid_details",
-                    downloadTaskId = workerId2.toString(),
-                ),
-            ),
-        )
-
-        episodeDao.updateDownloadStatuses(
-            mapOf(
-                "id-1" to DownloadStatusUpdate.InProgress(workerId1),
-                "id-2" to DownloadStatusUpdate.Success(workerId2, File("audio.mp3")),
-            ),
-        )
-
-        val result1 = episodeDao.findByUuid("id-1")!!
-        val result2 = episodeDao.findByUuid("id-2")!!
-
-        assertEquals(EpisodeDownloadStatus.Downloading, result1.downloadStatus)
-        assertEquals(null, result1.downloadedFilePath)
-        assertEquals(null, result1.downloadErrorDetails)
-        assertEquals(workerId1.toString(), result1.downloadTaskId)
-
-        assertEquals(EpisodeDownloadStatus.Downloaded, result2.downloadStatus)
-        assertEquals("audio.mp3", result2.downloadedFilePath)
-        assertEquals(null, result2.downloadErrorDetails)
-        assertEquals(null, result2.downloadTaskId)
-    }
-
-    @Test
-    fun doNotUpdateToNonIdleStatesWithDifferentWorkerId() = runTest {
+    fun doNotUpdateStatesWithDifferentWorkerId() = runTest {
         val episode = episode.copy(downloadTaskId = UUID.randomUUID().toString())
         episodeDao.update(episode)
 
         val updates = listOf(
-            DownloadStatusUpdate.WaitingForWifi(workerId),
-            DownloadStatusUpdate.WaitingForPower(workerId),
-            DownloadStatusUpdate.WaitingForStorage(workerId),
-            DownloadStatusUpdate.Enqueued(workerId),
-            DownloadStatusUpdate.InProgress(workerId),
-            DownloadStatusUpdate.Success(workerId, File("audio.mp3")),
-            DownloadStatusUpdate.Failure(workerId, "error_message"),
+            DownloadStatusUpdate.Cancelled(workerId, now),
+            DownloadStatusUpdate.WaitingForWifi(workerId, now),
+            DownloadStatusUpdate.WaitingForPower(workerId, now),
+            DownloadStatusUpdate.WaitingForStorage(workerId, now),
+            DownloadStatusUpdate.Enqueued(workerId, now),
+            DownloadStatusUpdate.InProgress(workerId, now),
+            DownloadStatusUpdate.Success(workerId, now, File("audio.mp3")),
+            DownloadStatusUpdate.Failure(workerId, now, "error_message"),
         )
 
         for (update in updates) {
-            episodeDao.updateDownloadStatuses(mapOf(episode.uuid to update))
-            val result = episodeDao.findByUuid(episode.uuid)!!
+            val isStatusUpdated = episodeDao.updateDownloadStatus(episode.uuid, update)
+            assertEquals(false, isStatusUpdated)
 
-            assertEquals(episode, result)
+            val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+            assertEquals(episode, updatedEpisode)
         }
-    }
-
-    @Test
-    fun updateToIdleStatesWithoutWorkerId() = runTest {
-        episodeDao.update(episode.copy(downloadTaskId = null))
-
-        episodeDao.updateDownloadStatuses(mapOf(episode.uuid to DownloadStatusUpdate.Idle))
-        val result = episodeDao.findByUuid(episode.uuid)!!
-
-        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
-        assertEquals(null, result.downloadedFilePath)
-        assertEquals(null, result.downloadErrorDetails)
-        assertEquals(null, result.downloadTaskId)
     }
 
     @Test
@@ -251,13 +207,15 @@ class EpisodeDaoDownloadStatusTest {
             ),
         )
 
-        episodeDao.setReadyForDownload(mapOf(episode.uuid to workerId))
-        val result = episodeDao.findByUuid(episode.uuid)!!
+        val isStatusUpdated = episodeDao.setReadyForDownload(episode.uuid, workerId, now, forceNewDownload = false)
+        assertEquals(true, isStatusUpdated)
 
-        assertEquals(false, result.isArchived)
-        assertEquals(EpisodeDownloadStatus.Queued, result.downloadStatus)
-        assertEquals(workerId.toString(), result.downloadTaskId)
-        assertEquals(false, result.isExemptFromAutoDownload)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(false, updatedEpisode.isArchived)
+        assertEquals(EpisodeDownloadStatus.Queued, updatedEpisode.downloadStatus)
+        assertEquals(nowDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
+        assertEquals(false, updatedEpisode.isExemptFromAutoDownload)
     }
 
     @Test
@@ -270,10 +228,32 @@ class EpisodeDaoDownloadStatusTest {
         )
         episodeDao.update(episode)
 
-        episodeDao.setReadyForDownload(mapOf(episode.uuid to workerId))
-        val result = episodeDao.findByUuid(episode.uuid)!!
+        val isStatusUpdated = episodeDao.setReadyForDownload(episode.uuid, workerId, now, forceNewDownload = false)
+        assertEquals(false, isStatusUpdated)
 
-        assertEquals(episode, result)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(episode, updatedEpisode)
+    }
+
+    @Test
+    fun setReadyForDownloadWithWorkerIdWhenForced() = runTest {
+        val episode = episode.copy(
+            isArchived = true,
+            downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
+            downloadTaskId = UUID.randomUUID().toString(),
+            autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE,
+        )
+        episodeDao.update(episode)
+
+        val isStatusUpdated = episodeDao.setReadyForDownload(episode.uuid, workerId, now, forceNewDownload = true)
+        assertEquals(true, isStatusUpdated)
+
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(false, updatedEpisode.isArchived)
+        assertEquals(nowDate, updatedEpisode.lastDownloadAttemptDate)
+        assertEquals(EpisodeDownloadStatus.Queued, updatedEpisode.downloadStatus)
+        assertEquals(workerId.toString(), updatedEpisode.downloadTaskId)
+        assertEquals(false, updatedEpisode.isExemptFromAutoDownload)
     }
 
     @Test
@@ -284,12 +264,13 @@ class EpisodeDaoDownloadStatusTest {
         )
         episodeDao.update(episode)
 
-        episodeDao.setDownloadCancelled(setOf(episode.uuid), disableAutoDownload = true)
-        val result = episodeDao.findByUuid(episode.uuid)!!
+        val isStatusUpdated = episodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload = true)
+        assertEquals(true, isStatusUpdated)
 
-        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
-        assertEquals(true, result.isExemptFromAutoDownload)
-        assertEquals(null, result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, updatedEpisode.downloadStatus)
+        assertEquals(true, updatedEpisode.isExemptFromAutoDownload)
+        assertEquals(null, updatedEpisode.downloadTaskId)
     }
 
     @Test
@@ -300,11 +281,28 @@ class EpisodeDaoDownloadStatusTest {
         )
         episodeDao.update(episode)
 
-        episodeDao.setDownloadCancelled(setOf(episode.uuid), disableAutoDownload = false)
-        val result = episodeDao.findByUuid(episode.uuid)!!
+        val isStatusUpdated = episodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload = false)
+        assertEquals(true, isStatusUpdated)
 
-        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, result.downloadStatus)
-        assertEquals(false, result.isExemptFromAutoDownload)
-        assertEquals(null, result.downloadTaskId)
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(EpisodeDownloadStatus.DownloadNotRequested, updatedEpisode.downloadStatus)
+        assertEquals(false, updatedEpisode.isExemptFromAutoDownload)
+        assertEquals(null, updatedEpisode.downloadTaskId)
+    }
+
+    @Test
+    fun setDownloadCancelledWithoutWorkerId() = runTest {
+        val episode = episode.copy(
+            downloadStatus = EpisodeDownloadStatus.Downloading,
+            autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED,
+            downloadTaskId = null,
+        )
+        episodeDao.update(episode)
+
+        val isStatusUpdated = episodeDao.setDownloadCancelled(episode.uuid, disableAutoDownload = true)
+        assertEquals(false, isStatusUpdated)
+
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(episode, updatedEpisode)
     }
 }

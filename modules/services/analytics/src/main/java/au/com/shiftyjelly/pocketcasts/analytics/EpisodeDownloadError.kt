@@ -47,6 +47,7 @@ data class EpisodeDownloadError(
         NotEnoughStorage("not_enough_storage"),
         NoSavePath("no_save_path"),
         StorageIssue("storage_issue"),
+        TooManyAttempts("too_many_attempts"),
     }
 
     companion object {

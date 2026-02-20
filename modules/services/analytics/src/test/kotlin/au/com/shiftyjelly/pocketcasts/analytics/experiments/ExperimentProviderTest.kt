@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.UserIds
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Control
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Treatment
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -22,16 +22,14 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExperimentProviderTest {
-
     private lateinit var repository: VariationsRepository
     private lateinit var experimentProvider: ExperimentProvider
-    private lateinit var tracksAnalyticsTracker: TracksAnalyticsTracker
     private lateinit var accountStatusInfo: AccountStatusInfo
 
     @get:Rule
@@ -43,9 +41,8 @@ class ExperimentProviderTest {
     @Before
     fun setUp() {
         repository = mock(VariationsRepository::class.java)
-        tracksAnalyticsTracker = mock(TracksAnalyticsTracker::class.java)
         accountStatusInfo = mock(AccountStatusInfo::class.java)
-        experimentProvider = ExperimentProvider(tracksAnalyticsTracker, repository, accountStatusInfo, coroutineRule.testDispatcher)
+        experimentProvider = ExperimentProvider(repository, accountStatusInfo, coroutineRule.testDispatcher)
     }
 
     @Test
@@ -53,12 +50,12 @@ class ExperimentProviderTest {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
         val uuid = "test-uuid"
-        `when`(accountStatusInfo.getUuid()).thenReturn(uuid)
+        whenever(accountStatusInfo.getUserIds()).thenReturn(UserIds(accountId = uuid, anonId = "invalid"))
 
         experimentProvider.initialize()
 
-        verify(repository).initialize(uuid)
-        verify(accountStatusInfo).getUuid()
+        verify(repository).initialize(uuid, null)
+        verify(accountStatusInfo).getUserIds()
     }
 
     @Test
@@ -67,40 +64,12 @@ class ExperimentProviderTest {
 
         val uuid = "test-anonID"
 
-        `when`(accountStatusInfo.getUuid()).thenReturn(null)
-        `when`(tracksAnalyticsTracker.anonID).thenReturn(uuid)
+        whenever(accountStatusInfo.getUserIds()).thenReturn(UserIds(accountId = null, anonId = uuid))
 
         experimentProvider.initialize()
 
-        verify(repository).initialize(uuid)
-        verify(accountStatusInfo).getUuid()
-        verify(tracksAnalyticsTracker).anonID
-    }
-
-    @Test
-    fun `should initialize with non null uuid`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
-
-        val uuid = "non-null-uuid"
-
-        `when`(accountStatusInfo.getUuid()).thenReturn(null)
-        `when`(tracksAnalyticsTracker.anonID).thenReturn(null)
-        `when`(tracksAnalyticsTracker.generateNewAnonID()).thenReturn(uuid)
-
-        experimentProvider.initialize()
-
-        verify(repository).initialize(uuid)
-    }
-
-    @Test
-    fun `should initialize with provided uuid`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
-
-        val uuid = "uuid"
-
-        experimentProvider.initialize(uuid)
-
-        verify(repository).initialize(uuid)
+        verify(repository).initialize(uuid, null)
+        verify(accountStatusInfo).getUserIds()
     }
 
     @Test
@@ -108,7 +77,7 @@ class ExperimentProviderTest {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
         val experiment = DummyExperiment.DUMMY_EXPERIMENT
-        `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
+        whenever(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
 
         val variation = experimentProvider.getVariation(experiment)
 
@@ -120,7 +89,7 @@ class ExperimentProviderTest {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
         val experiment = DummyExperiment.DUMMY_EXPERIMENT
-        `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Treatment(experiment.identifier))
+        whenever(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Treatment(experiment.identifier))
 
         val variation = experimentProvider.getVariation(experiment)
 
@@ -132,8 +101,6 @@ class ExperimentProviderTest {
     fun `should not initialize when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
-        `when`(accountStatusInfo.getUuid()).thenReturn(null)
-
         experimentProvider.initialize()
 
         verify(repository, never()).initialize(anyString(), eq(null))
@@ -144,7 +111,7 @@ class ExperimentProviderTest {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
         val experiment = DummyExperiment.DUMMY_EXPERIMENT
-        `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
+        whenever(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
 
         val variation = experimentProvider.getVariation(experiment)
 
@@ -156,7 +123,7 @@ class ExperimentProviderTest {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
         val uuid = "test-uuid"
-        `when`(accountStatusInfo.getUuid()).thenReturn(uuid)
+        whenever(accountStatusInfo.getUserIds()).thenReturn(UserIds(accountId = uuid, anonId = "invalid"))
 
         experimentProvider.refreshExperiments()
 

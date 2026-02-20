@@ -266,7 +266,7 @@ GEM
     nanaimo (0.4.0)
     nap (1.1.0)
     naturally (2.3.0)
-    nokogiri (1.18.10)
+    nokogiri (1.19.1)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     octokit (6.1.1)

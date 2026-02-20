@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -158,9 +159,24 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-    @Query("SELECT uuid FROM user_episodes WHERE episode_status IN (:statuses)")
-    abstract suspend fun getEpisodeUuidsWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<String>
+    @Transaction
+    @Query("SELECT * FROM user_episodes WHERE episode_status IN (:statuses)")
+    abstract suspend fun getEpisodesWithDownloadStatus(statuses: Collection<EpisodeDownloadStatus>): List<UserEpisode>
 
+    /**
+     * Atomically updates the download-related fields for a single episode, with an optimistic-ownership guard
+     * based on [taskId] to avoid race conditions between overlapping WorkManager runs (or enqueue/cancel flows).
+     *
+     * WorkManager jobs for the same episode can overlap in time:
+     * - A new download is enqueued while an older worker is still running.
+     * - A cancel/remove-from-queue happens while a worker is finishing.
+     * - WorkManager retries / reschedules a work request and an "old" attempt reports completion late.
+     *
+     * Without a guard, a stale worker could “win” and overwrite the episode row with out-of-date state:
+     * - Old worker marks the episode as Downloaded/Failed after a newer worker has already started.
+     * - Old worker clears `download_task_id`, breaking the newer worker’s ability to report progress.
+     * - A late failure overwrites a successful newer download path, or vice versa.
+     */
     @Query(
         """
         UPDATE user_episodes 
@@ -169,40 +185,56 @@ abstract class UserEpisodeDao {
           downloaded_file_path = :downloadPath,
           downloaded_error_details = :downloadError,
           download_task_id = CASE
-            -- Clear out task ID when download finishes
-            -- 0: DownloadNotRequested
-            -- 3: DownloadFailed
-            -- 4: Downloaded
             WHEN :status IN (0, 3, 4) THEN NULL
             ELSE download_task_id
+          END,
+          -- Update the timestamps only if we're changing to downloading state
+          last_download_attempt_date = CASE
+            WHEN :status = 2 THEN :issuedAt
+            ELSE last_download_attempt_date
           END
         WHERE
           uuid = :episodeUuid
-          -- Allow to transition to states other than DownloadNotRequested only if there is an associated task
-          AND (:status = 0 OR download_task_id = :taskId)
+          AND download_task_id = :taskId
+          AND episode_status != :status
         """,
     )
     protected abstract suspend fun updateDownloadStatus(
         episodeUuid: String,
         status: EpisodeDownloadStatus,
-        taskId: String?,
+        taskId: String,
+        issuedAt: Date,
         downloadPath: String?,
         downloadError: String?,
-    )
+    ): Int
 
-    @Transaction
-    open suspend fun updateDownloadStatuses(entries: Map<String, DownloadStatusUpdate>) {
-        for ((episodeUuid, statusUpdate) in entries) {
-            updateDownloadStatus(
-                episodeUuid = episodeUuid,
-                status = statusUpdate.episodeStatus,
-                taskId = statusUpdate.taskId?.toString(),
-                downloadPath = statusUpdate.outputFile?.path,
-                downloadError = statusUpdate.errorMessage,
-            )
-        }
+    suspend fun updateDownloadStatus(episodeUuid: String, statusUpdate: DownloadStatusUpdate): Boolean {
+        val rowUpdateCount = updateDownloadStatus(
+            episodeUuid = episodeUuid,
+            status = statusUpdate.episodeStatus,
+            taskId = statusUpdate.taskId.toString(),
+            issuedAt = Date.from(statusUpdate.issuedAt),
+            downloadPath = statusUpdate.outputFile?.path,
+            downloadError = statusUpdate.errorMessage,
+        )
+        return rowUpdateCount == 1
     }
 
+    /**
+     * Atomically attempts to acquire download ownership for a single episode.
+     *
+     * `download_task_id` acts as an ownership token for the currently active download attempt.
+     * This query sets a new [downloadTaskId] only if no task currently owns the episode
+     * (`download_task_id IS NULL`).
+     *
+     * This prevents races where:
+     * - The user taps download multiple times.
+     * - Auto-download and manual download overlap.
+     * - A retry is scheduled while a previous attempt is still finishing.
+     *
+     * Without the guard, multiple workers could believe they own the episode and
+     * overwrite each other’s state.
+     */
     @Query(
         """
         UPDATE user_episodes
@@ -210,21 +242,50 @@ abstract class UserEpisodeDao {
           archived = 0,
           episode_status = 1,
           download_task_id = :downloadTaskId,
-          auto_download_status = 0
+          auto_download_status = 0,
+          last_download_attempt_date = :issuedAt
         WHERE
           uuid = :episodeUuid
-          AND download_task_id IS NULL
+          AND (:forceNewDownload OR download_task_id IS NULL)
         """,
     )
-    protected abstract suspend fun setReadyForDownload(episodeUuid: String, downloadTaskId: String)
+    protected abstract suspend fun setReadyForDownloadRaw(
+        episodeUuid: String,
+        downloadTaskId: String,
+        issuedAt: Date,
+        forceNewDownload: Boolean,
+    ): Int
 
-    @Transaction
-    open suspend fun setReadyForDownload(entries: Map<String, UUID>) {
-        for ((episodeUuid, downloadTaskId) in entries) {
-            setReadyForDownload(episodeUuid, downloadTaskId.toString())
-        }
+    suspend fun setReadyForDownload(
+        episodeUuid: String,
+        downloadTaskId: UUID,
+        issuedAt: Instant,
+        forceNewDownload: Boolean,
+    ): Boolean {
+        val rowUpdateCount = setReadyForDownloadRaw(
+            episodeUuid = episodeUuid,
+            downloadTaskId = downloadTaskId.toString(),
+            issuedAt = Date.from(issuedAt),
+            forceNewDownload = forceNewDownload,
+        )
+        return rowUpdateCount == 1
     }
 
+    /**
+     * Atomically cancels an in-progress download and releases ownership.
+     *
+     * This query resets the episode to `DownloadNotRequested` (status = 0),
+     * clears `download_task_id`, and optionally updates `auto_download_status`
+     * when [disableAutoDownload] is true.
+     *
+     * `download_task_id` is treated as an ownership token for the active
+     * download attempt. The `AND download_task_id IS NOT NULL` guard ensures
+     * cancellation only applies if a task currently owns the episode.
+     *
+     * This prevents unnecessary writes and avoids interfering with episodes
+     * that are already idle. Clearing `download_task_id` releases ownership
+     * so a future enqueue can safely acquire it.
+     */
     @Query(
         """
         UPDATE user_episodes
@@ -236,21 +297,45 @@ abstract class UserEpisodeDao {
             ELSE auto_download_status
           END
         WHERE
-          uuid IN (:episodeUuids)
+          uuid = :episodeUuid
+          AND download_task_id IS NOT NULL
         """,
     )
-    protected abstract suspend fun setDownloadCancelledUnsafe(
-        episodeUuids: Collection<String>,
-        disableAutoDownload: Boolean,
-    )
+    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String, disableAutoDownload: Boolean): Int
 
-    @Transaction
-    open suspend fun setDownloadCancelled(
-        episodeUuids: Collection<String>,
-        disableAutoDownload: Boolean,
-    ) {
-        episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
-            setDownloadCancelledUnsafe(chunk, disableAutoDownload)
-        }
+    suspend fun setDownloadCancelled(episodeUuid: String, disableAutoDownload: Boolean): Boolean {
+        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid, disableAutoDownload)
+        return rowUpdateCount == 1
     }
+
+    @Query(
+        """
+        UPDATE user_episodes 
+        SET
+          episode_status = 0,
+          downloaded_file_path = NULL,
+          downloaded_error_details = NULL,
+          download_task_id = NULL,
+          auto_download_status = 0
+        WHERE
+          uuid = :episodeUuid
+          AND download_task_id = :taskId
+        """,
+    )
+    abstract suspend fun clearDownloadForEpisode(episodeUuid: String, taskId: String)
+
+    @Query(
+        """
+        UPDATE user_episodes
+        SET
+          episode_status = 0,
+          downloaded_file_path = NULL,
+          downloaded_error_details = NULL,
+          auto_download_status = 0
+        WHERE
+          download_task_id IS NULL
+          AND episode_status IN (:statuses)
+        """,
+    )
+    abstract suspend fun clearDownloadsWithoutTaskId(statuses: Collection<EpisodeDownloadStatus>)
 }

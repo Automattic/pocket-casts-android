@@ -176,7 +176,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
                 updatePodcastAutoDownloadStatus(enable)
                 podcastsFlow.value?.map(Podcast::uuid)
             }
-            if (podcastUuids != null) {
+            if (podcastUuids != null && podcastUuids.isNotEmpty()) {
                 podcastManager.updateAutoDownload(podcastUuids, isEnabled = enable)
             }
         }

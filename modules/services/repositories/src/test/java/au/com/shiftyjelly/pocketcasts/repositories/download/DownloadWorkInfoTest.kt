@@ -4,20 +4,38 @@ import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.WorkInfo
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import java.io.File
 import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class DownloadWorkInfoTest {
+    private val episodeTag = DownloadEpisodeWorker.episodeTag("episode-id")
+    private val podcastTag = DownloadEpisodeWorker.podcastTag("podcast-id")
+    private val sourceViewTag = DownloadEpisodeWorker.sourceViewTag(SourceView.PLAYER)
+
     @Test
     fun `ignore work without episode tag`() {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
-            tags = setOf("episode-id"),
+            tags = setOf("episode-id", podcastTag),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertNull(downloadInfo)
+    }
+
+    @Test
+    fun `ignore work without podcast tag`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            tags = setOf(episodeTag, "podcast-id"),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -30,7 +48,20 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
-            tags = setOf(DownloadEpisodeWorker.WORKER_EPISODE_TAG_PREFIX),
+            tags = setOf(DownloadEpisodeWorker.WORKER_EPISODE_TAG_PREFIX, podcastTag),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertNull(downloadInfo)
+    }
+
+    @Test
+    fun `ignore work with partial podcast tag`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            tags = setOf(episodeTag, DownloadEpisodeWorker.WORKER_PODCAST_TAG_PREFIX),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -43,7 +74,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -52,7 +83,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -66,7 +99,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.BLOCKED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -75,7 +108,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -89,8 +124,8 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, true).build(),
+            tags = setOf(episodeTag, podcastTag),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING_KEY, true).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -99,7 +134,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.InProgress(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
             ),
             downloadInfo,
         )
@@ -110,8 +147,8 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
-            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING, false).build(),
+            tags = setOf(episodeTag, podcastTag),
+            progress = Data.Builder().putBoolean(IS_WORK_EXECUTING_KEY, false).build(),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -120,7 +157,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -134,7 +173,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.RUNNING,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -143,7 +182,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -157,7 +198,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.SUCCEEDED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
             outputData = Data.Builder().putString(DOWNLOAD_FILE_PATH_KEY, "file.mp3").build(),
         )
 
@@ -167,7 +208,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Success(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 downloadFile = File("file.mp3"),
             ),
             downloadInfo,
@@ -179,12 +222,23 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.SUCCEEDED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
-        assertThrows("Output file path is missing for the episode episode-id download", IllegalArgumentException::class.java) {
-            DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
-        }
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertEquals(
+            DownloadWorkInfo.Failure(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+                runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
+                error = EpisodeDownloadError(),
+                errorMessage = MISSING_DOWNLOADED_FILE_PATH_ERROR,
+            ),
+            downloadInfo,
+        )
     }
 
     @Test
@@ -192,7 +246,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.FAILED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
             outputData = Data.Builder().putString(ERROR_MESSAGE_KEY, "Whoops!").build(),
         )
 
@@ -202,7 +256,10 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Failure(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
+                error = EpisodeDownloadError(),
                 errorMessage = "Whoops!",
             ),
             downloadInfo,
@@ -214,7 +271,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.FAILED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -223,7 +280,10 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Failure(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
+                error = EpisodeDownloadError(),
                 errorMessage = null,
             ),
             downloadInfo,
@@ -235,7 +295,7 @@ class DownloadWorkInfoTest {
         val workInfo = WorkInfo(
             id = UUID.randomUUID(),
             state = WorkInfo.State.CANCELLED,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -244,7 +304,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Cancelled(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
             ),
             downloadInfo,
         )
@@ -256,7 +318,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
             constraints = Constraints(requiredNetworkType = NetworkType.UNMETERED),
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -265,7 +327,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = true,
                 isPowerRequired = false,
                 isStorageRequired = false,
@@ -280,7 +344,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
             constraints = Constraints(requiresCharging = true),
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -289,7 +353,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = true,
                 isStorageRequired = false,
@@ -304,7 +370,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
             constraints = Constraints(requiresStorageNotLow = true),
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -313,7 +379,9 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 0,
+                sourceView = SourceView.UNKNOWN,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = true,
@@ -328,7 +396,7 @@ class DownloadWorkInfoTest {
             id = UUID.randomUUID(),
             state = WorkInfo.State.ENQUEUED,
             runAttemptCount = 10,
-            tags = setOf(DownloadEpisodeWorker.episodeTag("episode-id")),
+            tags = setOf(episodeTag, podcastTag),
         )
 
         val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
@@ -337,7 +405,34 @@ class DownloadWorkInfoTest {
             DownloadWorkInfo.Pending(
                 id = workInfo.id,
                 episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
                 runAttemptCount = 10,
+                sourceView = SourceView.UNKNOWN,
+                isWifiRequired = false,
+                isPowerRequired = false,
+                isStorageRequired = false,
+            ),
+            downloadInfo,
+        )
+    }
+
+    @Test
+    fun `map work info's source view`() {
+        val workInfo = WorkInfo(
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.ENQUEUED,
+            tags = setOf(episodeTag, podcastTag, sourceViewTag),
+        )
+
+        val downloadInfo = DownloadEpisodeWorker.mapToDownloadWorkInfo(workInfo)
+
+        assertEquals(
+            DownloadWorkInfo.Pending(
+                id = workInfo.id,
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+                runAttemptCount = 0,
+                sourceView = SourceView.PLAYER,
                 isWifiRequired = false,
                 isPowerRequired = false,
                 isStorageRequired = false,

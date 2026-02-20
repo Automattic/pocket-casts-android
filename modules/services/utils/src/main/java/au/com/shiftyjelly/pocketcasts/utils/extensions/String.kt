@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.UUID
 import net.gcardone.junidecode.Junidecode
 import timber.log.Timber
 
@@ -110,6 +111,8 @@ fun String.escapeLike(escapeChar: Char, unidecode: Boolean = true): String {
         }
     }
 }
+
+fun String.toUuidOrNull() = runCatching { UUID.fromString(this) }.getOrNull()
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")
