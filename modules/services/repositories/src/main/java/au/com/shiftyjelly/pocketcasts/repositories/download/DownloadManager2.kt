@@ -419,7 +419,6 @@ private class DownloadStatusController(
         }
         analytics.trackDownloadFinished(results.successes)
         analytics.trackDownloadFailed(results.failures)
-
     }
 
     suspend fun clearAllErrors() {
