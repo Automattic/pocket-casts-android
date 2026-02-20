@@ -394,17 +394,22 @@ private class DownloadStatusController(
     private val context: Context,
 ) {
     suspend fun updateStatuses(infos: List<DownloadWorkInfo>, constraints: DownloadPrerequisites) {
+        if (infos.isEmpty()) {
+            return
+        }
+
         val tooManyAttemptsError = context.getString(LR.string.error_download_too_many_attempts)
         val defaultErrorMessage = context.getString(LR.string.error_download_generic_failure, "").trim()
-
+        val workUpdates = infos.associateWith { info ->
+            info.toStatusUpdate(
+                constraints = constraints,
+                tooManyAttemptsErrorMessage = tooManyAttemptsError,
+                defaultErrorMessage = defaultErrorMessage,
+            )
+        }
         val results = DownloadWorkResults(infos.size, context)
         downloadDao.withTransaction {
-            infos.forEach { info ->
-                val update = info.toStatusUpdate(
-                    constraints = constraints,
-                    tooManyAttemptsErrorMessage = tooManyAttemptsError,
-                    defaultErrorMessage = defaultErrorMessage,
-                )
+            workUpdates.forEach { (info, update) ->
                 val isStatusUpdated = updateDownloadStatus(info.episodeUuid, update)
                 if (isStatusUpdated) {
                     results.add(info)
@@ -413,6 +418,7 @@ private class DownloadStatusController(
         }
         analytics.trackDownloadFinished(results.successes)
         analytics.trackDownloadFailed(results.failures)
+
     }
 
     suspend fun clearAllErrors() {
