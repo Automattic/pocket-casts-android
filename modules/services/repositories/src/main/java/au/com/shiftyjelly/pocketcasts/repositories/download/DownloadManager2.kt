@@ -407,6 +407,7 @@ private class DownloadStatusController(
                 defaultErrorMessage = defaultErrorMessage,
             )
         }
+
         val results = DownloadWorkResults(infos.size, context)
         downloadDao.withTransaction {
             workUpdates.forEach { (info, update) ->
