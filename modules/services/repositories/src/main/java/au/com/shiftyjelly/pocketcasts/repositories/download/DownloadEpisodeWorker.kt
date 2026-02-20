@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
 import dagger.assisted.Assisted
@@ -121,6 +122,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private var downloadCall: Call? = null
 
     override fun doWork(): Result {
+        if (!isStopped) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download started. Episode: ${args.episodeUuid}")
+        }
         val timedValue = measureTimedValue {
             try {
                 // Block the work until the state is dispatched to keep it consistent
@@ -234,6 +238,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
             is DownloadResult.ExceptionFailure -> {
                 val throwable = result.throwable
+                if (!isStopped) {
+                    LogBuffer.i(LogBuffer.TAG_DOWNLOAD, throwable, "Download failed: ${args.episodeUuid}")
+                }
                 // Order of checks here is important. Wrong order will result in mapping to wrong messages or states.
                 // For example SocketTimeoutException inherits from InterruptedIOException. Checking for isCancelled
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
