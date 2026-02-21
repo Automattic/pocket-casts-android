@@ -11,6 +11,9 @@
 
 8.6
 -----
+*   Updates
+    *   Improve the design of podcasts missing artwork on the podcasts tab
+        ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
 *   Bug Fixes
     *   Fix up next queue episode ordering on the large widget
         ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
