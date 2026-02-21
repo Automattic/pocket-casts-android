@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,6 +81,7 @@ class MainActivity : ComponentActivity() {
                     showConnectivityNotification = state.showConnectivityNotification,
                     isConnected = state.isConnected,
                     dismissConnectivityNotification = viewModel::onConnectivityNotificationDismissed,
+                    reportFullyDraw = ::reportFullyDrawn,
                 )
             }
         }
@@ -102,10 +104,19 @@ private fun WearApp(
     showConnectivityNotification: Boolean,
     isConnected: Boolean,
     dismissConnectivityNotification: () -> Unit,
+    reportFullyDraw: () -> Unit = {},
 ) {
     val navController = rememberSwipeDismissableNavController()
     val swipeToDismissState = rememberSwipeToDismissBoxState()
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
+
+    // Report fully drawn once UI is rendered and user is signed in
+    val reportFullyDrawn = remember { reportFullyDraw }
+    LaunchedEffect(signInState) {
+        if (signInState != SignInState.SignedOut) {
+            reportFullyDrawn()
+        }
+    }
 
     if (showLoggingInScreen) {
         navController.navigate(LoggingInScreen.ROUTE_WITH_DELAY)
@@ -463,5 +474,6 @@ private fun DefaultPreview() {
         showConnectivityNotification = false,
         isConnected = true,
         dismissConnectivityNotification = {},
+        reportFullyDraw = {},
     )
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,7 +39,7 @@ fun UpNextScreen(
     modifier: Modifier = Modifier,
     viewModel: UpNextViewModel = hiltViewModel(),
 ) {
-    val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
+    val queueState by viewModel.upNextQueue.collectAsState(initial = null)
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     when (queueState) {

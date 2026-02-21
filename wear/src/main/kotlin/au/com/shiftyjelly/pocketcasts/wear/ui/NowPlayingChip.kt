@@ -29,14 +29,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.ui.di.WearImageLoader
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingAnimation
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -59,6 +58,7 @@ fun NowPlayingChip(
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
         useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
+        imageLoader = viewModel.imageLoader,
         onClick = onClick,
     )
 }
@@ -69,6 +69,7 @@ private fun Content(
     episode: BaseEpisode?,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
+    imageLoader: ImageLoader,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -111,6 +112,7 @@ private fun Content(
 
                 rememberAsyncImagePainter(
                     model = imageRequest,
+                    imageLoader = imageLoader,
                     contentScale = ContentScale.Crop,
                 )
             } else {
@@ -144,13 +146,7 @@ private val nothingPainter = object : Painter() {
 
 @Composable
 private fun PlayingAnimation() {
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(IR.raw.nowplaying),
-    )
-    LottieAnimation(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-    )
+    NowPlayingAnimation()
 }
 
 @Composable
@@ -168,6 +164,7 @@ private fun PlayIcon() {
 )
 @Composable
 private fun Preview() {
+    val context = LocalContext.current
     WearAppTheme {
         Content(
             podcast = Podcast(
@@ -181,6 +178,7 @@ private fun Preview() {
             ),
             useEpisodeArtwork = false,
             isPlaying = false,
+            imageLoader = ImageLoader(context),
             onClick = {},
         )
     }

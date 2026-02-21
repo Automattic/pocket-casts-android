@@ -186,5 +186,6 @@ class WearMainActivityViewModelTest {
         watchSync = watchSync,
         phoneConnectionMonitor = phoneConnectionMonitor,
         connectivityStateManager = connectivityStateManager,
+        ioDispatcher = coroutineRule.testDispatcher,
     )
 }

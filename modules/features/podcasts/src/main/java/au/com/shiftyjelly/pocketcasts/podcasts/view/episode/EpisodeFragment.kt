@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.ui.R
+import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener

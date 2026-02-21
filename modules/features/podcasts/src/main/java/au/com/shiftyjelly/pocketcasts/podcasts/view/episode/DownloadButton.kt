@@ -11,6 +11,7 @@ import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import au.com.shiftyjelly.pocketcasts.podcasts.R
+import au.com.shiftyjelly.pocketcasts.ui.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground

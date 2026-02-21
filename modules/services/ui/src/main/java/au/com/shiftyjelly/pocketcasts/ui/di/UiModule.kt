@@ -22,6 +22,7 @@ class UiModule {
 
     @Provides
     @Singleton
+    @SharedImageLoader
     internal fun provideCoilImageLoader(
         @ApplicationContext context: Context,
         @Artwork httpClient: Lazy<OkHttpClient>,
@@ -42,4 +43,10 @@ class UiModule {
             }
             .build()
     }
+
+    @Provides
+    @Singleton
+    internal fun provideDefaultImageLoader(
+        @SharedImageLoader imageLoader: ImageLoader,
+    ): ImageLoader = imageLoader
 }

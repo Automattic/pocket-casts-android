@@ -7,8 +7,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Observable
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class UpNextViewModel @Inject constructor(
@@ -18,7 +19,9 @@ class UpNextViewModel @Inject constructor(
     settings: Settings,
 ) : ViewModel() {
 
-    val upNextQueue: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+    val upNextQueue: Flow<UpNextQueue.State> = playbackManager.upNextQueue
+        .getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+        .asFlow()
 
     val artworkConfiguration = settings.artworkConfiguration.flow
 }
