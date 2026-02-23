@@ -747,6 +747,10 @@ class MainActivity :
                     PredictiveBackAnimator.animateToEnd(currentView) { navigator.pop() }
                 } ?: navigator.pop()
             }
+
+            override fun handleOnBackCancelled() {
+                navigator.resetBackGestureState()
+            }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
 
@@ -770,6 +774,10 @@ class MainActivity :
                 ) {
                     binding.playerBottomSheet.closePlayer()
                 }
+            }
+
+            override fun handleOnBackCancelled() {
+                PredictiveBackAnimator.reset(binding.playerBottomSheet)
             }
         }
         onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)

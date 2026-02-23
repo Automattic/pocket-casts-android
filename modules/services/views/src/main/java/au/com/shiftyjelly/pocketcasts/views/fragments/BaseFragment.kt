@@ -70,11 +70,19 @@ open class BaseFragment :
                             targetAlpha = 0.7f,
                             duration = 100,
                         ) {
-                            performBackNavigation()
+                            if (isAdded) {
+                                performBackNavigation()
+                            }
                         }
                     } ?: performBackNavigation()
                 } else {
                     performBackNavigation()
+                }
+            }
+
+            override fun handleOnBackCancelled() {
+                if (enableDefaultBackAnimation()) {
+                    view?.let { PredictiveBackAnimator.reset(it) }
                 }
             }
 
@@ -108,6 +116,12 @@ open class BaseFragment :
         }
         view.isClickable = true
         view.isFocusable = true
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Clean up any ongoing back animations to prevent crashes
+        view?.let { PredictiveBackAnimator.reset(it) }
     }
 
     override fun onResume() {

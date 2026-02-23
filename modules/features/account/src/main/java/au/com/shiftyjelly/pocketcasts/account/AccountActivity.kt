@@ -62,7 +62,13 @@ class AccountActivity : AppCompatActivity() {
 
             override fun handleOnBackPressed() {
                 transition?.finish()
+                transition = null
                 handleBackPressed()
+            }
+
+            override fun handleOnBackCancelled() {
+                transition?.cancel()
+                transition = null
             }
         }
 
