@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -55,25 +56,23 @@ open class BaseFragment :
 
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {
                 if (enableDefaultBackAnimation()) {
-                    applyDefaultBackAnimation(backEvent.progress)
+                    view?.let { PredictiveBackAnimator.applyProgress(it, backEvent.progress, scaleAmount = 0.05f, alphaAmount = 0.2f) }
                 }
                 onBackGestureProgressed(backEvent)
             }
 
             override fun handleOnBackPressed() {
                 if (enableDefaultBackAnimation()) {
-                    view?.animate()
-                        ?.scaleX(0.9f)
-                        ?.scaleY(0.9f)
-                        ?.alpha(0.7f)
-                        ?.setDuration(100)
-                        ?.withEndAction {
-                            view?.scaleX = 1f
-                            view?.scaleY = 1f
-                            view?.alpha = 1f
+                    view?.let {
+                        PredictiveBackAnimator.animateToEnd(
+                            view = it,
+                            targetScale = 0.9f,
+                            targetAlpha = 0.7f,
+                            duration = 100,
+                        ) {
                             performBackNavigation()
                         }
-                        ?.start()
+                    } ?: performBackNavigation()
                 } else {
                     performBackNavigation()
                 }
@@ -82,15 +81,6 @@ open class BaseFragment :
             private fun performBackNavigation() {
                 val handled = onBackPressed()
                 isEnabled = handled && getBackstackCount() > 0
-            }
-
-            private fun applyDefaultBackAnimation(progress: Float) {
-                view?.let {
-                    val scale = 1f - (0.05f * progress)
-                    it.scaleX = scale
-                    it.scaleY = scale
-                    it.alpha = 1f - (0.2f * progress)
-                }
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)

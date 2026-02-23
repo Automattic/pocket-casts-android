@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.Remo
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.RemoveAllAndShowExisting
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowAndRemove
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowExisting
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
@@ -288,29 +289,15 @@ open class BottomNavigator internal constructor() : ViewModel() {
      * @param progress The back gesture progress from 0.0 (start) to 1.0 (complete)
      */
     open fun handleBackGestureProgress(progress: Float) {
-        val currentFrag = currentFragment()
-        val previousFrag = previousFragment()
-
-        currentFrag?.view?.let { currentView ->
-            val scale = 1f - (0.1f * progress)
-            val alpha = 1f - (0.3f * progress)
-
-            currentView.scaleX = scale
-            currentView.scaleY = scale
-            currentView.alpha = alpha
+        currentFragment()?.view?.let { currentView ->
+            PredictiveBackAnimator.applyProgress(currentView, progress)
         }
 
-        previousFrag?.view?.let { previousView ->
+        previousFragment()?.view?.let { previousView ->
             if (previousView.visibility != android.view.View.VISIBLE) {
                 previousView.visibility = android.view.View.VISIBLE
             }
-
-            val scale = 0.95f + (0.05f * progress)
-            val alpha = 0.5f + (0.5f * progress)
-
-            previousView.scaleX = scale
-            previousView.scaleY = scale
-            previousView.alpha = alpha
+            PredictiveBackAnimator.applyProgressReverse(previousView, progress)
         }
     }
 
@@ -318,16 +305,10 @@ open class BottomNavigator internal constructor() : ViewModel() {
      * Reset fragment views to their default state after back gesture is cancelled.
      */
     open fun resetBackGestureState() {
-        currentFragment()?.view?.let {
-            it.scaleX = 1f
-            it.scaleY = 1f
-            it.alpha = 1f
-        }
+        currentFragment()?.view?.let { PredictiveBackAnimator.reset(it) }
 
         previousFragment()?.view?.let {
-            it.scaleX = 1f
-            it.scaleY = 1f
-            it.alpha = 1f
+            PredictiveBackAnimator.reset(it)
             it.visibility = android.view.View.GONE
         }
     }

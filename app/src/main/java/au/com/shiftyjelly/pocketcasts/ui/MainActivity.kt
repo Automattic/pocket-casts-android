@@ -191,6 +191,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -742,19 +743,9 @@ class MainActivity :
             }
 
             override fun handleOnBackPressed() {
-                val currentView = navigator.currentFragment()?.view
-                currentView?.animate()
-                    ?.scaleX(0.85f)
-                    ?.scaleY(0.85f)
-                    ?.alpha(0f)
-                    ?.setDuration(150)
-                    ?.withEndAction {
-                        currentView.scaleX = 1f
-                        currentView.scaleY = 1f
-                        currentView.alpha = 1f
-                        navigator.pop()
-                    }
-                    ?.start() ?: navigator.pop()
+                navigator.currentFragment()?.view?.let { currentView ->
+                    PredictiveBackAnimator.animateToEnd(currentView) { navigator.pop() }
+                } ?: navigator.pop()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -769,28 +760,16 @@ class MainActivity :
 
         val playerBottomSheetCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-                val progress = backEvent.progress
-                val scale = 1f - (0.1f * progress)
-                val alpha = 1f - (0.3f * progress)
-
-                binding.playerBottomSheet.scaleX = scale
-                binding.playerBottomSheet.scaleY = scale
-                binding.playerBottomSheet.alpha = alpha
+                PredictiveBackAnimator.applyProgress(binding.playerBottomSheet, backEvent.progress)
             }
 
             override fun handleOnBackPressed() {
-                binding.playerBottomSheet.animate()
-                    .scaleX(0.8f)
-                    .scaleY(0.8f)
-                    .alpha(0f)
-                    .setDuration(150)
-                    .withEndAction {
-                        binding.playerBottomSheet.scaleX = 1f
-                        binding.playerBottomSheet.scaleY = 1f
-                        binding.playerBottomSheet.alpha = 1f
-                        binding.playerBottomSheet.closePlayer()
-                    }
-                    .start()
+                PredictiveBackAnimator.animateToEnd(
+                    view = binding.playerBottomSheet,
+                    targetScale = 0.8f,
+                ) {
+                    binding.playerBottomSheet.closePlayer()
+                }
             }
         }
         onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)
