@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.views.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -41,6 +43,34 @@ open class BaseFragment :
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
+    private var backPressedCallback: OnBackPressedCallback? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val callback = object : OnBackPressedCallback(getBackstackCount() > 0) {
+            override fun handleOnBackPressed() {
+                val handled = onBackPressed()
+                isEnabled = handled && getBackstackCount() > 0
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        backPressedCallback = callback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        backPressedCallback?.remove()
+        backPressedCallback = null
+    }
+
+    /**
+     * Call whenever the internal backstack changes so the [OnBackPressedCallback] enabled state
+     * stays in sync. Required for predictive back gesture support.
+     */
+    protected fun notifyBackstackChanged() {
+        backPressedCallback?.isEnabled = getBackstackCount() > 0
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (view.background == null && !backgroundTransparent) {
@@ -52,8 +82,6 @@ open class BaseFragment :
 
     override fun onResume() {
         super.onResume()
-
-        // Need to make sure we are the top fragment before updating the status bar
         val fragmentManager = activity?.supportFragmentManager
         if (fragmentManager != null && (fragmentManager.backStackEntryCount == 0 || fragmentManager.fragments.last() == this)) {
             updateStatusBar()
@@ -103,8 +131,6 @@ open class BaseFragment :
 
     override fun onBackPressed(): Boolean {
         val childrenWithBackstack: List<HasBackstack> = childFragmentManager.fragments.filterIsInstance<HasBackstack>()
-        // Some fragments have child fragments that require a back stack, we need to check for those
-        // before popping the main back stack
         if (childrenWithBackstack.count() > 0) {
             var handled = false
             var index = 0
@@ -121,6 +147,7 @@ open class BaseFragment :
 
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStackImmediate()
+            notifyBackstackChanged()
             return true
         }
 

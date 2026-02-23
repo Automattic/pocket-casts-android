@@ -48,8 +48,7 @@ internal class EditPlaylistFragment : BaseFragment() {
                 },
                 onReorderEpisodes = viewModel::updateEpisodesOrder,
                 onClickBack = {
-                    @Suppress("DEPRECATION")
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 },
             )
         }
