@@ -5,6 +5,22 @@ import android.view.View
 /**
  * Utility for applying predictive back gesture animations to views.
  * Provides standard Material Design animation patterns for back gestures.
+ *
+ * ## API Level Requirements
+ * Predictive back gestures are only available on **Android 13 (API 33) and above**.
+ * On older versions:
+ * - `handleOnBackProgressed()` callbacks are never invoked
+ * - `handleOnBackStarted()` callbacks are never invoked
+ * - `handleOnBackCancelled()` callbacks are never invoked
+ * - Only `handleOnBackPressed()` is called when back is pressed
+ *
+ * This gracefully degrades - your animation code won't run on older Android versions,
+ * but standard back navigation will still work.
+ *
+ * ## Usage
+ * Call [applyProgress] from `handleOnBackProgressed()` callbacks,
+ * call [animateToEnd] from `handleOnBackPressed()` callbacks,
+ * and call [reset] from `handleOnBackCancelled()` callbacks.
  */
 object PredictiveBackAnimator {
     /**
@@ -40,6 +56,8 @@ object PredictiveBackAnimator {
     /**
      * Applies a scale and fade animation during back gesture progress.
      *
+     * Uses hardware layer for better performance by caching view rendering on GPU.
+     *
      * @param view The view to animate
      * @param progress Back gesture progress (0.0 to 1.0)
      * @param scaleAmount How much to scale down (e.g., 0.1f scales from 100% to 90%)
@@ -51,6 +69,11 @@ object PredictiveBackAnimator {
         scaleAmount: Float = Defaults.SCALE_AMOUNT,
         alphaAmount: Float = Defaults.ALPHA_AMOUNT,
     ) {
+        // Enable hardware layer on first progress update for better performance
+        if (progress > 0f && view.layerType != View.LAYER_TYPE_HARDWARE) {
+            view.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        }
+
         val scale = 1f - (scaleAmount * progress)
         val alpha = 1f - (alphaAmount * progress)
 
@@ -61,6 +84,8 @@ object PredictiveBackAnimator {
 
     /**
      * Applies an inverse scale and fade animation (for revealing previous content).
+     *
+     * Uses hardware layer for better performance by caching view rendering on GPU.
      *
      * @param view The view to animate
      * @param progress Back gesture progress (0.0 to 1.0)
@@ -73,6 +98,11 @@ object PredictiveBackAnimator {
         scaleAmount: Float = Defaults.SCALE_AMOUNT_REVERSE,
         alphaAmount: Float = Defaults.ALPHA_AMOUNT_REVERSE,
     ) {
+        // Enable hardware layer on first progress update for better performance
+        if (progress > 0f && view.layerType != View.LAYER_TYPE_HARDWARE) {
+            view.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        }
+
         val baseScale = 1f - scaleAmount
         val baseAlpha = 1f - alphaAmount
 
@@ -86,6 +116,9 @@ object PredictiveBackAnimator {
 
     /**
      * Animates the view to a final state, then executes a callback.
+     *
+     * Uses hardware layer during animation for better performance.
+     * Automatically resets view state and disables hardware layer when done.
      *
      * @param view The view to animate
      * @param targetScale Target scale (e.g., 0.8f for 80%)
@@ -105,6 +138,7 @@ object PredictiveBackAnimator {
             .scaleY(targetScale)
             .alpha(targetAlpha)
             .setDuration(duration)
+            .withLayer() // Enable hardware layer during animation
             .withEndAction {
                 reset(view)
                 onEnd()
@@ -114,6 +148,7 @@ object PredictiveBackAnimator {
 
     /**
      * Resets a view to its default state (scale 100%, alpha 100%).
+     * Also disables hardware layer to free GPU resources.
      *
      * @param view The view to reset
      */
@@ -121,5 +156,6 @@ object PredictiveBackAnimator {
         view.scaleX = 1f
         view.scaleY = 1f
         view.alpha = 1f
+        view.setLayerType(View.LAYER_TYPE_NONE, null)
     }
 }

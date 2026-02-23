@@ -70,6 +70,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
     /**
      * Override to disable the default predictive back animation.
      * Default is true, showing a scale + fade animation.
+     *
+     * **Note:** Predictive back is only available on Android 13+ (API 33).
+     * On older versions, animations won't run but dismiss() still works.
      */
     protected open fun enableDefaultBackAnimation(): Boolean = true
 
@@ -116,6 +119,8 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
             }
 
             override fun handleOnBackPressed() {
+                if (!isAdded) return
+
                 if (enableDefaultBackAnimation()) {
                     bottomSheetView()?.let {
                         PredictiveBackAnimator.animateToEnd(
@@ -124,7 +129,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
                             targetAlpha = 0.7f,
                             duration = PredictiveBackAnimator.Defaults.SHORT_ANIMATION_DURATION_MS,
                         ) {
-                            dismiss()
+                            if (isAdded) {
+                                dismiss()
+                            }
                         }
                     } ?: dismiss()
                 } else {
@@ -144,9 +151,7 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Clean up any ongoing back animations to prevent crashes
         bottomSheetView()?.let { PredictiveBackAnimator.reset(it) }
-        backPressedCallback?.remove()
         backPressedCallback = null
     }
 

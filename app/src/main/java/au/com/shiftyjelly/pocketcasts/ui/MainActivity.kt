@@ -125,7 +125,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksDialogFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
@@ -769,20 +769,28 @@ class MainActivity :
 
         val playerBottomSheetCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-                PredictiveBackAnimator.applyProgress(binding.playerBottomSheet, backEvent.progress)
+                if (::binding.isInitialized) {
+                    PredictiveBackAnimator.applyProgress(binding.playerBottomSheet, backEvent.progress)
+                }
             }
 
             override fun handleOnBackPressed() {
+                if (!::binding.isInitialized) return
+
                 PredictiveBackAnimator.animateToEnd(
                     view = binding.playerBottomSheet,
                     targetScale = 0.8f,
                 ) {
-                    binding.playerBottomSheet.closePlayer()
+                    if (::binding.isInitialized) {
+                        binding.playerBottomSheet.closePlayer()
+                    }
                 }
             }
 
             override fun handleOnBackCancelled() {
-                PredictiveBackAnimator.reset(binding.playerBottomSheet)
+                if (::binding.isInitialized) {
+                    PredictiveBackAnimator.reset(binding.playerBottomSheet)
+                }
             }
         }
         onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)
@@ -1130,9 +1138,8 @@ class MainActivity :
                         }
 
                         is NavigationState.BookmarksForUserEpisode -> {
-                            // Bookmarks container is directly shown for user episode
-                            val fragment = BookmarksContainerFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
-                            fragment.show(supportFragmentManager, "bookmarks_container")
+                            val fragment = BookmarksDialogFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
+                            fragment.show(supportFragmentManager, "bookmarks_dialog")
                         }
                     }
                 }
@@ -1409,11 +1416,7 @@ class MainActivity :
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {
-        // BookmarksContainerFragment extends BaseDialogFragment (designed for dialogs)
-        // but is used as a regular fragment from Profile. Making it non-detachable
-        // prevents view lifecycle issues with predictive back animations.
-        val detachable = fragment !is BookmarksContainerFragment
-        navigator.addFragment(fragment, detachable = detachable, onTop = onTop)
+        navigator.addFragment(fragment, detachable = true, onTop = onTop)
     }
 
     override fun replaceFragment(fragment: Fragment) {
