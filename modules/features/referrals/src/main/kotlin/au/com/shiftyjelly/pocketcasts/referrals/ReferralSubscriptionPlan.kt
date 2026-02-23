@@ -76,10 +76,10 @@ data class ReferralSubscriptionPlan private constructor(
 
     val formattedTotalCommitmentAmount: String
         get() = if (isInstallment && totalCommitmentAmount > BigDecimal.ZERO) {
-            // Format the total using the same currency as the monthly payment
-            val currencySymbol = paidPricingPhase.price.currencyCode
-            val amount = String.format("%.2f", totalCommitmentAmount)
-            "$currencySymbol$amount"
+            // Format the total using the same currency as the monthly payment, respecting locale
+            java.text.NumberFormat.getCurrencyInstance().apply {
+                currency = java.util.Currency.getInstance(paidPricingPhase.price.currencyCode)
+            }.format(totalCommitmentAmount)
         } else {
             ""
         }
