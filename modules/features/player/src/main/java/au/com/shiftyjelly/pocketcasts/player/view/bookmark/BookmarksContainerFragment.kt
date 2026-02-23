@@ -58,6 +58,12 @@ class BookmarksContainerFragment : BaseDialogFragment() {
     var binding: FragmentBookmarksContainerBinding? = null
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
+    override fun enableDefaultBackAnimation(): Boolean {
+        // Disable BaseDialogFragment's back callback when used as regular fragment
+        // It calls dismiss() which does nothing, preventing back navigation
+        return dialog != null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,6 +75,59 @@ class BookmarksContainerFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // When used as regular fragment (dialog == null), BaseDialogFragment's back callback
+        // calls dismiss() even when enableDefaultBackAnimation() returns false, blocking proper
+        // back navigation. We need to disable it completely and use our own callback.
+        if (dialog == null) {
+            // Disable BaseDialogFragment's back callback using reflection
+            // Need to search through class hierarchy because Hilt wraps the class
+            try {
+                var clazz: Class<*>? = javaClass
+                var field: java.lang.reflect.Field? = null
+
+                while (clazz != null && field == null) {
+                    try {
+                        field = clazz.getDeclaredField("backPressedCallback")
+                    } catch (e: NoSuchFieldException) {
+                        clazz = clazz.superclass
+                    }
+                }
+
+                field?.let {
+                    it.isAccessible = true
+                    (it.get(this) as? androidx.activity.OnBackPressedCallback)?.isEnabled = false
+                }
+            } catch (e: Exception) {
+                // Reflection failed, back button might not work correctly
+            }
+
+            // Add our own callback to pass back presses through to MainActivity
+            // No child backstack to handle since we don't add BookmarksFragment to it
+            requireActivity().onBackPressedDispatcher.addCallback(
+                viewLifecycleOwner,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackProgressed(backEvent: androidx.activity.BackEventCompat) {
+                        // Pass through to MainActivity for predictive back animation
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.dispatchOnBackProgressed(backEvent)
+                        isEnabled = true
+                    }
+
+                    override fun handleOnBackPressed() {
+                        // Pass through to MainActivity
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        isEnabled = true
+                    }
+
+                    override fun handleOnBackCancelled() {
+                        // Can't forward cancellation events, just no-op
+                    }
+                },
+            )
+        }
+
         val bottomSheetDialog = dialog as? BottomSheetDialog
         bottomSheetDialog?.onBackPressedDispatcher?.addCallback(
             this,
@@ -101,7 +160,7 @@ class BookmarksContainerFragment : BaseDialogFragment() {
 
         binding.setupMultiSelectHelper()
 
-        childFragmentManager.beginTransaction()
+        val transaction = childFragmentManager.beginTransaction()
             .replace(
                 binding.fragmentContainer.id,
                 BookmarksFragment.newInstance(
@@ -109,8 +168,14 @@ class BookmarksContainerFragment : BaseDialogFragment() {
                     episodeUuid = episodeUUID,
                 ),
             )
-            .addToBackStack(null)
-            .commit()
+
+        // Only add to backstack when used as dialog
+        // When used as regular fragment, the container itself is in the backstack
+        if (dialog != null) {
+            transaction.addToBackStack(null)
+        }
+
+        transaction.commit()
 
         binding.toolbar.setup(
             title = getString(LR.string.bookmarks),

@@ -499,7 +499,7 @@ class MainActivity :
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
             put(VR.id.navigation_filters) { FragmentInfo(PlaylistsFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
-            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
+            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), false) }
             put(VR.id.navigation_upnext) {
                 FragmentInfo(
                     UpNextFragment.newInstance(
@@ -1409,7 +1409,11 @@ class MainActivity :
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {
-        navigator.addFragment(fragment, onTop = onTop)
+        // BookmarksContainerFragment extends BaseDialogFragment (designed for dialogs)
+        // but is used as a regular fragment from Profile. Making it non-detachable
+        // prevents view lifecycle issues with predictive back animations.
+        val detachable = fragment !is BookmarksContainerFragment
+        navigator.addFragment(fragment, detachable = detachable, onTop = onTop)
     }
 
     override fun replaceFragment(fragment: Fragment) {
