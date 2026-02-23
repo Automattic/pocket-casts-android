@@ -8,6 +8,36 @@ import android.view.View
  */
 object PredictiveBackAnimator {
     /**
+     * Default animation constants for predictive back gestures.
+     * These values follow Material Design guidelines for smooth, intuitive back navigation.
+     */
+    object Defaults {
+        /** Default scale reduction for current view (10% = 0.9 scale) */
+        const val SCALE_AMOUNT = 0.1f
+
+        /** Default alpha reduction for current view (30% = 0.7 alpha) */
+        const val ALPHA_AMOUNT = 0.3f
+
+        /** Default scale increase for previous view (5% = starts at 0.95 scale) */
+        const val SCALE_AMOUNT_REVERSE = 0.05f
+
+        /** Default alpha increase for previous view (50% = starts at 0.5 alpha) */
+        const val ALPHA_AMOUNT_REVERSE = 0.5f
+
+        /** Default target scale for animation end (85%) */
+        const val TARGET_SCALE = 0.85f
+
+        /** Default target alpha for animation end (fully transparent) */
+        const val TARGET_ALPHA = 0f
+
+        /** Default animation duration in milliseconds */
+        const val ANIMATION_DURATION_MS = 150L
+
+        /** Short animation duration for quick transitions */
+        const val SHORT_ANIMATION_DURATION_MS = 100L
+    }
+
+    /**
      * Applies a scale and fade animation during back gesture progress.
      *
      * @param view The view to animate
@@ -18,8 +48,8 @@ object PredictiveBackAnimator {
     fun applyProgress(
         view: View,
         progress: Float,
-        scaleAmount: Float = 0.1f,
-        alphaAmount: Float = 0.3f,
+        scaleAmount: Float = Defaults.SCALE_AMOUNT,
+        alphaAmount: Float = Defaults.ALPHA_AMOUNT,
     ) {
         val scale = 1f - (scaleAmount * progress)
         val alpha = 1f - (alphaAmount * progress)
@@ -40,8 +70,8 @@ object PredictiveBackAnimator {
     fun applyProgressReverse(
         view: View,
         progress: Float,
-        scaleAmount: Float = 0.05f,
-        alphaAmount: Float = 0.5f,
+        scaleAmount: Float = Defaults.SCALE_AMOUNT_REVERSE,
+        alphaAmount: Float = Defaults.ALPHA_AMOUNT_REVERSE,
     ) {
         val baseScale = 1f - scaleAmount
         val baseAlpha = 1f - alphaAmount
@@ -65,9 +95,9 @@ object PredictiveBackAnimator {
      */
     fun animateToEnd(
         view: View,
-        targetScale: Float = 0.85f,
-        targetAlpha: Float = 0f,
-        duration: Long = 150,
+        targetScale: Float = Defaults.TARGET_SCALE,
+        targetAlpha: Float = Defaults.TARGET_ALPHA,
+        duration: Long = Defaults.ANIMATION_DURATION_MS,
         onEnd: () -> Unit,
     ) {
         view.animate()

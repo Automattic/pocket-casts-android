@@ -68,7 +68,7 @@ open class BaseFragment :
                             view = it,
                             targetScale = 0.9f,
                             targetAlpha = 0.7f,
-                            duration = 100,
+                            duration = PredictiveBackAnimator.Defaults.SHORT_ANIMATION_DURATION_MS,
                         ) {
                             if (isAdded) {
                                 performBackNavigation()
