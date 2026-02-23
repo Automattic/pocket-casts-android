@@ -314,7 +314,7 @@ class EpisodeViewModel @Inject constructor(
     private fun play() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch {
-            if (episode.playErrorDetails != null || episode.downloadErrorDetails != null) {
+            if (episode.playErrorDetails != null) {
                 episodeManager.clearPlaybackErrorBlocking(episode)
             }
             playbackManager.playNowSync(
