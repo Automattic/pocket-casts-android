@@ -710,6 +710,93 @@ class WinbackViewModelTest {
     }
 
     @Test
+    fun `plus yearly installment winback offer`() = runTest {
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID)),
+        )
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!,
+        )
+
+        viewModel.loadWinbackData()
+
+        viewModel.uiState.test {
+            val offer = awaitItem().winbackOfferState?.offer
+            assertEquals(
+                WinbackOffer(
+                    redeemCode = "ABC",
+                    formattedPrice = "$1.67",
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = BillingCycle.Yearly,
+                    isInstallment = true,
+                    formattedTotalSavings = "$19.98",
+                ),
+                offer,
+            )
+        }
+    }
+
+    @Test
+    fun `claim plus yearly installment offer successfully`() = runTest {
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID)),
+        )
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!,
+        )
+
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
+
+        viewModel.uiState.test {
+            val claimedState = awaitOfferState()
+            assertTrue(claimedState.isOfferClaimed)
+        }
+    }
+
+    @Test
+    fun `track claim plus yearly installment offer tapped`() = runTest {
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID)),
+        )
+        whenever { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!,
+        )
+
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackedEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf(
+                    "row" to "claim_offer",
+                    "tier" to "plus",
+                    "frequency" to "yearly",
+                    "is_installment" to "true",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `verify installment plan details are loaded`() = runTest {
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID)),
+        )
+
+        viewModel.loadWinbackData()
+
+        viewModel.uiState.test {
+            val state = awaitLoadedState()
+            assertTrue(state.currentSubscription.isInstallment)
+            assertEquals(SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID, state.currentSubscription.productId)
+        }
+    }
+
+    @Test
     fun `track available plans tapped`() = runTest {
         viewModel.trackAvailablePlansTapped()
 
