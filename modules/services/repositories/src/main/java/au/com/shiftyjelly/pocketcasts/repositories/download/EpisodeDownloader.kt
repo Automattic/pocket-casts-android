@@ -5,6 +5,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import dagger.Lazy
+import java.io.File
+import java.io.IOException
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -15,12 +21,6 @@ import okhttp3.Response
 import okio.Source
 import okio.buffer
 import okio.sink
-import java.io.File
-import java.io.IOException
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * **Note:** This class is intended to be used exclusively from a `WorkManager` `Worker`’s
