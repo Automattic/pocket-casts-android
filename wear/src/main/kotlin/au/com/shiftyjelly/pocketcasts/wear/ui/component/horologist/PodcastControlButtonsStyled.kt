@@ -1,13 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
@@ -15,6 +13,7 @@ import androidx.wear.compose.material.MaterialTheme
 import com.google.android.horologist.media.ui.components.controls.MediaButtonDefaults
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun PodcastControlButtonsStyled(
@@ -33,8 +32,8 @@ fun PodcastControlButtonsStyled(
     colors: ButtonColors = MediaButtonDefaults.mediaButtonDefaultColors,
     seekBackIcon: ImageVector = MediaButtonDefaults.seekBackIcon(seekBackButtonIncrement),
     seekForwardIcon: ImageVector = MediaButtonDefaults.seekForwardIcon(seekForwardButtonIncrement),
-    playIcon: ImageVector = Icons.Default.PlayArrow,
-    pauseIcon: ImageVector = Icons.Default.Pause,
+    playIcon: ImageVector = ImageVector.vectorResource(IR.drawable.wear_play),
+    pauseIcon: ImageVector = ImageVector.vectorResource(IR.drawable.wear_pause),
     seekIconSize: Dp = 30.dp,
     seekIconAlign: Alignment.Horizontal = Alignment.Start,
     progressColor: Color = MaterialTheme.colors.primary,

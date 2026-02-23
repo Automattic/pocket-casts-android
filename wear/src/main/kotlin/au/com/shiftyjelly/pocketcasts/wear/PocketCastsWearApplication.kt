@@ -6,6 +6,9 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.MainDispatcher
+import au.com.shiftyjelly.pocketcasts.coroutines.di.WearDefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -28,8 +31,10 @@ import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -38,19 +43,19 @@ class PocketCastsWearApplication :
     Application(),
     Configuration.Provider {
 
-    @Inject lateinit var moshi: Moshi
+    @Inject lateinit var moshi: dagger.Lazy<Moshi>
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Inject lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var episodeManager: dagger.Lazy<EpisodeManager>
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var podcastManager: dagger.Lazy<PodcastManager>
 
     @Inject lateinit var settings: Settings
 
@@ -58,23 +63,37 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var analyticsTracker: dagger.Lazy<AnalyticsTracker>
 
-    @Inject lateinit var experimentProvider: ExperimentProvider
+    @Inject lateinit var experimentProvider: dagger.Lazy<ExperimentProvider>
 
-    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
+    @Inject lateinit var downloadStatisticsReporter: dagger.Lazy<DownloadStatisticsReporter>
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var connectivityLogger: ConnectivityLogger
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
+    @Inject @WearDefaultDispatcher
+    lateinit var defaultDispatcher: CoroutineDispatcher
+
+    @Inject @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()
-        setupAnalytics()
-        setupApp()
+
+        // Launch initialization asynchronously with parallel optimization.
+        // Parallel execution of independent operations reduces total initialization time.
+        applicationScope.launch {
+            setupApp()
+            setupAnalytics()
+        }
     }
 
     private fun setupCrashLogging() {
@@ -91,14 +110,20 @@ class PocketCastsWearApplication :
         connectivityLogger.startMonitoring()
     }
 
-    private fun setupApp() {
-        runBlocking {
-            notificationHelper.setupNotificationChannels()
-            appLifecycleObserver.setup()
+    private suspend fun setupApp() {
+        // Parallelize independent initialization to reduce total time.
+        // Group operations by thread requirement to minimize context switches.
+        coroutineScope {
+            // Parallel track 1: Main thread operations
+            val mainThreadJob = launch(mainDispatcher) {
+                notificationHelper.setupNotificationChannels()
+                appLifecycleObserver.setup()
+            }
 
-            withContext(Dispatchers.Default) {
+            // Parallel track 2: Background operations
+            val backgroundJob = launch(defaultDispatcher) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playbackManager)
+                downloadManager.setup(episodeManager.get(), podcastManager.get(), playbackManager)
 
                 val storageChoice = settings.getStorageChoice()
                 if (storageChoice == null) {
@@ -113,22 +138,42 @@ class PocketCastsWearApplication :
                 }
             }
 
-            VersionMigrationsWorker.performMigrations(
-                context = this@PocketCastsWearApplication,
-                settings = settings,
-                moshi = moshi,
-            )
+            // Wait for parallel operations to complete
+            mainThreadJob.join()
+            backgroundJob.join()
         }
 
-        userManager.beginMonitoringAccountManager(playbackManager)
+        // Sequential operations that depend on previous setup
+        VersionMigrationsWorker.performMigrations(
+            context = this@PocketCastsWearApplication,
+            settings = settings,
+            moshi = moshi.get(),
+        )
+
+        // Final main thread setup
+        withContext(mainDispatcher) {
+            userManager.beginMonitoringAccountManager(playbackManager)
+        }
+
         downloadManager.beginMonitoringWorkManager(applicationContext)
     }
 
-    private fun setupAnalytics() {
-        analyticsTracker.clearAllData()
-        analyticsTracker.refreshMetadata()
-        experimentProvider.initialize()
-        downloadStatisticsReporter.setup()
+    private suspend fun setupAnalytics() {
+        // Analytics operations can run in parallel with main thread reporter setup
+        coroutineScope {
+            val analyticsJob = launch(defaultDispatcher) {
+                analyticsTracker.get().clearAllData()
+                analyticsTracker.get().refreshMetadata()
+                experimentProvider.get().initialize()
+            }
+
+            val reporterJob = launch(mainDispatcher) {
+                downloadStatisticsReporter.get().setup()
+            }
+
+            analyticsJob.join()
+            reporterJob.join()
+        }
     }
 
     override val workManagerConfiguration: Configuration
