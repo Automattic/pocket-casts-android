@@ -191,13 +191,11 @@ class SearchFragment : BaseFragment() {
         val binding = binding ?: return
 
         view.setOnClickListener {
-            @Suppress("DEPRECATION")
-            activity?.onBackPressed()
+            activity?.onBackPressedDispatcher?.onBackPressed()
         }
 
         binding.backButton.setOnClickListener {
-            @Suppress("DEPRECATION")
-            activity?.onBackPressed()
+            activity?.onBackPressedDispatcher?.onBackPressed()
         }
         viewModel.setSource(source)
 

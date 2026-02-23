@@ -46,8 +46,7 @@ class ChangePwdFragment : BaseFragment() {
             ChangePasswordPage(
                 viewModel = viewModel,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 changePassword = {
                     viewModel.changePassword()

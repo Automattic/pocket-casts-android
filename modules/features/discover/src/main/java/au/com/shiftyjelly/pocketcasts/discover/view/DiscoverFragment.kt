@@ -285,8 +285,7 @@ class DiscoverFragment :
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
 
-        @Suppress("DEPRECATION")
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
 
         binding?.recyclerView?.scrollToPosition(0)
     }

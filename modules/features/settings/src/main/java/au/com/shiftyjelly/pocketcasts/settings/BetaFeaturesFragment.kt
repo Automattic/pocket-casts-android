@@ -58,8 +58,7 @@ class BetaFeaturesFragment : BaseFragment() {
                 state = state,
                 onFeatureChange = viewModel::setFeatureEnabled,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
