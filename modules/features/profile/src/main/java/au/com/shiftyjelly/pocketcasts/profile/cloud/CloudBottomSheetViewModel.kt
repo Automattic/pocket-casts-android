@@ -70,7 +70,7 @@ class CloudBottomSheetViewModel @Inject constructor(
             applicationScope = applicationScope,
         )
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DELETED)
-        if (state == DeleteState.Cloud) {
+        if (deleteState == DeleteState.Cloud) {
             episodeAnalytics.trackEvent(
                 event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
                 source = source,
