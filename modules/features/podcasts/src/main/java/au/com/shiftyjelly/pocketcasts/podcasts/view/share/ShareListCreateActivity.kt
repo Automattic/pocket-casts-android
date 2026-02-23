@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.helper.setupPredictiveBackWithAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,6 +23,8 @@ class ShareListCreateActivity : AppCompatActivity() {
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
 
         setContentView(R.layout.activity_blank_fragment)
+
+        setupPredictiveBackWithAnimation()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

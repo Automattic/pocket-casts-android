@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.commitNow
+import au.com.shiftyjelly.pocketcasts.views.helper.setupPredictiveBackWithAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -28,6 +29,8 @@ class BookmarkActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(VR.layout.activity_blank_fragment)
+
+        setupPredictiveBackWithAnimation()
 
         if (savedInstanceState == null) {
             supportFragmentManager.commitNow {

@@ -10,6 +10,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
@@ -53,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.utils.ScreenshotCaptureDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.File
@@ -157,16 +161,34 @@ class StoriesActivity : ComponentActivity() {
         val captureController = rememberStoryCaptureController()
         var showScreenshotDialog by remember { mutableStateOf(false) }
 
-        BackHandler {
-            val story = state.stories.getOrNull(pagerState.currentPage)
-            viewModel.trackStoriesClosed(source = "back_button", story = story)
-            finish()
+        var scale by remember { mutableFloatStateOf(1f) }
+        var alpha by remember { mutableFloatStateOf(1f) }
+
+        PredictiveBackHandler { progress ->
+            try {
+                progress.collect { backEvent ->
+                    scale = 1f - (PredictiveBackAnimator.Defaults.SCALE_AMOUNT * backEvent.progress)
+                    alpha = 1f - (PredictiveBackAnimator.Defaults.ALPHA_AMOUNT * backEvent.progress)
+                }
+                val story = state.stories.getOrNull(pagerState.currentPage)
+                viewModel.trackStoriesClosed(source = "back_button", story = story)
+                finish()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                scale = 1f
+                alpha = 1f
+                throw e
+            }
         }
 
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                },
         ) {
             StoriesPage(
                 state = state,
