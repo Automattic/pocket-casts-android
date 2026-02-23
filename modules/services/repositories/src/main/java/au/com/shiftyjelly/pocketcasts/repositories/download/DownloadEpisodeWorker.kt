@@ -524,7 +524,7 @@ sealed interface DownloadWorkInfo {
     val sourceView: SourceView
 
     val isCancellable: Boolean
-    val isTooManyAttempts get() = runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT
+    val isTooManyAttempts get() = runAttemptCount > MAX_DOWNLOAD_ATTEMPT_COUNT
 
     data class Pending(
         override val id: UUID,
