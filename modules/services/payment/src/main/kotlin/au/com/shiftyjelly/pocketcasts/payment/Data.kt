@@ -228,10 +228,16 @@ data class SubscriptionPlans private constructor(
 
         private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.WithOffer> {
             val matchingOfferPlan = pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }
+            val hasInstallmentDetails = pricingPlans.basePlan.installmentPlanDetails != null
             return when {
                 key.offer == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing offer for $id")
 
                 matchingOfferPlan == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching offer plan for $id")
+
+                key.isInstallment && !hasInstallmentDetails -> PaymentResult.Failure(
+                    PaymentResultCode.DeveloperError,
+                    "Key expects installment plan but product $id has no installmentPlanDetails",
+                )
 
                 else -> PaymentResult.Success(
                     SubscriptionPlan.WithOffer(
@@ -240,7 +246,7 @@ data class SubscriptionPlans private constructor(
                         key.billingCycle,
                         key.offer,
                         matchingOfferPlan.pricingPhases,
-                        key.isInstallment,
+                        hasInstallmentDetails,
                     ),
                 )
             }
@@ -266,6 +272,12 @@ sealed interface SubscriptionPlan {
         is Base -> pricingPhase.price
         is WithOffer -> pricingPhases.last().price
     }
+
+    val isInstallmentPlan: Boolean
+        get() = when (this) {
+            is Base -> this.isInstallment
+            is WithOffer -> this.isInstallment
+        }
 
     data class Base(
         override val name: String,

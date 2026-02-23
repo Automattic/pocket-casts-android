@@ -75,7 +75,7 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
-    val calculatedSavingPercent = if (plan.isInstallment && plan.offer == null) {
+    val calculatedSavingPercent = if (plan.isInstallmentPlan && plan.offer == null) {
         null
     } else {
         priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) }
@@ -288,7 +288,7 @@ private fun CheckMark(
 
 private val SubscriptionPlan.pricePerMonth: Float
     get() {
-        val totalYearlyAmount = if (isInstallment) {
+        val totalYearlyAmount = if (isInstallmentPlan) {
             recurringPrice.amount * monthsInYear
         } else {
             when (billingCycle) {
@@ -306,7 +306,7 @@ private val SubscriptionPlan.pricePerMonth: Float
 
 private val SubscriptionPlan.pricePerWeek: Float
     get() {
-        val totalYearlyAmount = if (isInstallment) {
+        val totalYearlyAmount = if (isInstallmentPlan) {
             recurringPrice.amount * monthsInYear
         } else {
             when (billingCycle) {
@@ -320,12 +320,6 @@ private val SubscriptionPlan.pricePerWeek: Float
 
 private val monthsInYear = 12.toBigDecimal()
 private val weeksInYear = 52.toBigDecimal()
-
-private val SubscriptionPlan.isInstallment: Boolean
-    get() = when (this) {
-        is SubscriptionPlan.Base -> this.isInstallment
-        is SubscriptionPlan.WithOffer -> this.isInstallment
-    }
 
 private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
     val totalAmount = recurringPrice.amount * monthsInYear
@@ -346,7 +340,7 @@ private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
 
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
-    if (isInstallment) {
+    if (isInstallmentPlan) {
         return when (this) {
             is SubscriptionPlan.WithOffer -> when (config.pricePerPeriod) {
                 PricePerPeriod.PRICE_PER_WEEK -> {
@@ -403,7 +397,7 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @ReadOnlyComposable
 private fun SubscriptionPlan.displayName(): String {
     return when {
-        isInstallment -> stringResource(LR.string.plus_yearly_installments)
+        isInstallmentPlan -> stringResource(LR.string.plus_yearly_installments)
         else -> name
     }
 }
@@ -411,7 +405,7 @@ private fun SubscriptionPlan.displayName(): String {
 @Composable
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
-    if (isInstallment) {
+    if (isInstallmentPlan) {
         return when (this) {
             is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_month, recurringPrice.formattedPrice)
             is SubscriptionPlan.WithOffer -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())

@@ -268,9 +268,13 @@ class WinbackViewModel @Inject constructor(
                 val regularYearlyAmount = regularPhase.price.amount * 12.toBigDecimal()
                 val discountedYearlyAmount = discountPhase.price.amount * 12.toBigDecimal()
                 val savingsAmount = regularYearlyAmount - discountedYearlyAmount
-                formattedTotalSavings = java.text.NumberFormat.getCurrencyInstance().apply {
-                    currency = java.util.Currency.getInstance(discountPhase.price.currencyCode)
-                }.format(savingsAmount)
+                formattedTotalSavings = try {
+                    java.text.NumberFormat.getCurrencyInstance().apply {
+                        currency = java.util.Currency.getInstance(discountPhase.price.currencyCode)
+                    }.format(savingsAmount)
+                } catch (_: IllegalArgumentException) {
+                    "${discountPhase.price.currencyCode} $savingsAmount"
+                }
             }
 
             else -> {

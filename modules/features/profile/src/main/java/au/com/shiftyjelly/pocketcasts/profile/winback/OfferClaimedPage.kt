@@ -139,8 +139,8 @@ private data class OfferClaimedParams(
 
 private class OfferClaimedParameterProvider : PreviewParameterProvider<OfferClaimedParams> {
     override val values = sequenceOf(
-        OfferClaimedParams(BillingCycle.Monthly, false),
-        OfferClaimedParams(BillingCycle.Yearly, false),
-        OfferClaimedParams(BillingCycle.Yearly, true),
+        OfferClaimedParams(billingCycle = BillingCycle.Monthly, isInstallment = false),
+        OfferClaimedParams(billingCycle = BillingCycle.Yearly, isInstallment = false),
+        OfferClaimedParams(billingCycle = BillingCycle.Yearly, isInstallment = true),
     )
 }

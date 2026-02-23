@@ -82,7 +82,7 @@ internal fun WinbackOfferPage(
         Text(
             text = when {
                 offer.billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
-                offer.isInstallment -> stringResource(LR.string.winback_offer_free_offer_installment_title, offer.formattedPrice, offer.formattedTotalSavings ?: "")
+                offer.isInstallment && offer.formattedTotalSavings != null -> stringResource(LR.string.winback_offer_free_offer_installment_title, offer.formattedPrice, offer.formattedTotalSavings)
                 else -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
             },
             fontWeight = FontWeight.Bold,

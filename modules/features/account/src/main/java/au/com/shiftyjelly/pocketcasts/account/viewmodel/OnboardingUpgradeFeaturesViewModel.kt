@@ -154,11 +154,14 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
             analyticsTracker.track(
                 AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
-                analyticsProps(
-                    flow = flow,
-                    source = source,
-                    variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
-                ).toMutableMap().apply {
+                buildMap {
+                    putAll(
+                        analyticsProps(
+                            flow = flow,
+                            source = source,
+                            variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
+                        ),
+                    )
                     put("is_installment", plan.isInstallment.toString())
                 },
             )

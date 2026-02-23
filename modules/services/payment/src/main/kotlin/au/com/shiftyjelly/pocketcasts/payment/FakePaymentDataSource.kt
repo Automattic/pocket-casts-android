@@ -67,32 +67,66 @@ class FakePaymentDataSource : PaymentDataSource {
 
     companion object {
         val DefaultLoadedProducts
-            get() = SubscriptionTier.entries.flatMap { tier ->
-                BillingCycle.entries.mapNotNull { billingCycle ->
-                    val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
-                    val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
-                    Product(
-                        productId,
-                        productName(tier, billingCycle),
-                        PricingPlans(
-                            PricingPlan.Base(
-                                basePlanId,
-                                pricingPhases(tier, billingCycle, offer = null),
-                                emptyList(),
+            get() = buildList {
+                // Add regular (non-installment) products for all tiers and billing cycles
+                SubscriptionTier.entries.flatMap { tier ->
+                    BillingCycle.entries.mapNotNull { billingCycle ->
+                        val productId = SubscriptionPlan.productId(tier, billingCycle) ?: return@mapNotNull null
+                        val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle) ?: return@mapNotNull null
+                        Product(
+                            productId,
+                            productName(tier, billingCycle),
+                            PricingPlans(
+                                PricingPlan.Base(
+                                    basePlanId,
+                                    pricingPhases(tier, billingCycle, offer = null),
+                                    emptyList(),
+                                ),
+                                SubscriptionOffer.entries
+                                    .mapNotNull { offer -> offer.offerId(tier, billingCycle)?.let { offer to it } }
+                                    .map { (offer, offerId) ->
+                                        PricingPlan.Offer(
+                                            offerId,
+                                            basePlanId,
+                                            pricingPhases(tier, billingCycle, offer),
+                                            emptyList(),
+                                        )
+                                    },
                             ),
-                            SubscriptionOffer.entries
-                                .mapNotNull { offer -> offer.offerId(tier, billingCycle)?.let { offer to it } }
+                        )
+                    }
+                }.forEach { add(it) }
+
+                // Add Plus Yearly Installment product with offers
+                val installmentProductId = SubscriptionPlan.productId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+                val installmentBasePlanId = SubscriptionPlan.basePlanId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)!!
+                add(
+                    Product(
+                        id = installmentProductId,
+                        name = productName(SubscriptionTier.Plus, BillingCycle.Yearly),
+                        pricingPlans = PricingPlans(
+                            basePlan = PricingPlan.Base(
+                                planId = installmentBasePlanId,
+                                pricingPhases = pricingPhases(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null, isInstallment = true),
+                                tags = emptyList(),
+                                installmentPlanDetails = InstallmentPlanDetails(
+                                    commitmentPaymentsCount = 12,
+                                    subsequentCommitmentPaymentsCount = 12,
+                                ),
+                            ),
+                            offerPlans = SubscriptionOffer.entries
+                                .mapNotNull { offer -> offer.offerId(SubscriptionTier.Plus, BillingCycle.Yearly, isInstallment = true)?.let { offer to it } }
                                 .map { (offer, offerId) ->
                                     PricingPlan.Offer(
-                                        offerId,
-                                        basePlanId,
-                                        pricingPhases(tier, billingCycle, offer),
-                                        emptyList(),
+                                        offerId = offerId,
+                                        planId = installmentBasePlanId,
+                                        pricingPhases = pricingPhases(SubscriptionTier.Plus, BillingCycle.Yearly, offer, isInstallment = true),
+                                        tags = emptyList(),
                                     )
                                 },
                         ),
-                    )
-                }
+                    ),
+                )
             }
 
         val DefaultLoadedPurchase
@@ -141,85 +175,120 @@ private fun productName(
     billingCycle: BillingCycle,
 ) = "$tier $billingCycle (Fake)"
 
+private val PlusYearlyInstallmentPricingPhase
+    get() = PricingPhase(
+        Price(3.33.toBigDecimal(), "USD", "$3.33"),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 0),
+    )
+
 private fun pricingPhases(
     tier: SubscriptionTier,
     billingCycle: BillingCycle,
     offer: SubscriptionOffer?,
-): List<PricingPhase> = when (offer) {
-    SubscriptionOffer.IntroOffer -> when (billingCycle) {
-        BillingCycle.Yearly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(
-                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
-                PlusYearlyPricingPhase,
-            )
+    isInstallment: Boolean = false,
+): List<PricingPhase> = when {
+    // Installment plans have monthly pricing
+    isInstallment && tier == SubscriptionTier.Plus && billingCycle == BillingCycle.Yearly -> when (offer) {
+        SubscriptionOffer.Winback -> listOf(
+            PlusYearlyInstallmentPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Monthly),
+            PlusYearlyInstallmentPricingPhase,
+        )
 
-            SubscriptionTier.Patron -> emptyList()
-        }
+        SubscriptionOffer.Trial -> listOf(
+            PlusYearlyInstallmentPricingPhase.withDiscount(priceFraction = 0.0),
+            PlusYearlyInstallmentPricingPhase,
+        )
 
-        BillingCycle.Monthly -> emptyList()
+        SubscriptionOffer.IntroOffer -> listOf(
+            PlusYearlyInstallmentPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Monthly),
+            PlusYearlyInstallmentPricingPhase,
+        )
+
+        SubscriptionOffer.Referral -> listOf(
+            PlusYearlyInstallmentPricingPhase.withDiscount(priceFraction = 0.0, intervalCount = 2),
+            PlusYearlyInstallmentPricingPhase,
+        )
+
+        null -> listOf(PlusYearlyInstallmentPricingPhase)
     }
 
-    SubscriptionOffer.Trial -> when (billingCycle) {
-        BillingCycle.Yearly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(
-                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0),
-                PlusYearlyPricingPhase,
-            )
+    // Regular (non-installment) plans
+    else -> when (offer) {
+        SubscriptionOffer.IntroOffer -> when (billingCycle) {
+            BillingCycle.Yearly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(
+                    PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
+                    PlusYearlyPricingPhase,
+                )
 
-            SubscriptionTier.Patron -> emptyList()
+                SubscriptionTier.Patron -> emptyList()
+            }
+
+            BillingCycle.Monthly -> emptyList()
         }
 
-        BillingCycle.Monthly -> emptyList()
-    }
+        SubscriptionOffer.Trial -> when (billingCycle) {
+            BillingCycle.Yearly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(
+                    PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0),
+                    PlusYearlyPricingPhase,
+                )
 
-    SubscriptionOffer.Referral -> when (billingCycle) {
-        BillingCycle.Yearly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(
-                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0, intervalCount = 2),
-                PlusYearlyPricingPhase,
-            )
+                SubscriptionTier.Patron -> emptyList()
+            }
 
-            SubscriptionTier.Patron -> emptyList()
+            BillingCycle.Monthly -> emptyList()
         }
 
-        BillingCycle.Monthly -> emptyList()
-    }
+        SubscriptionOffer.Referral -> when (billingCycle) {
+            BillingCycle.Yearly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(
+                    PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0, intervalCount = 2),
+                    PlusYearlyPricingPhase,
+                )
 
-    SubscriptionOffer.Winback -> when (billingCycle) {
-        BillingCycle.Monthly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(
-                PlusMonthlyPricingPhase.withDiscount(priceFraction = 0.5),
-                PlusMonthlyPricingPhase,
-            )
+                SubscriptionTier.Patron -> emptyList()
+            }
 
-            SubscriptionTier.Patron -> listOf(
-                PatronMonthlyPricingPhase.withDiscount(priceFraction = 0.5),
-                PatronMonthlyPricingPhase,
-            )
+            BillingCycle.Monthly -> emptyList()
         }
 
-        BillingCycle.Yearly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(
-                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
-                PlusYearlyPricingPhase,
-            )
+        SubscriptionOffer.Winback -> when (billingCycle) {
+            BillingCycle.Monthly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(
+                    PlusMonthlyPricingPhase.withDiscount(priceFraction = 0.5),
+                    PlusMonthlyPricingPhase,
+                )
 
-            SubscriptionTier.Patron -> listOf(
-                PatronYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
-                PatronYearlyPricingPhase,
-            )
+                SubscriptionTier.Patron -> listOf(
+                    PatronMonthlyPricingPhase.withDiscount(priceFraction = 0.5),
+                    PatronMonthlyPricingPhase,
+                )
+            }
+
+            BillingCycle.Yearly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(
+                    PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
+                    PlusYearlyPricingPhase,
+                )
+
+                SubscriptionTier.Patron -> listOf(
+                    PatronYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
+                    PatronYearlyPricingPhase,
+                )
+            }
         }
-    }
 
-    null -> when (billingCycle) {
-        BillingCycle.Monthly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(PlusMonthlyPricingPhase)
-            SubscriptionTier.Patron -> listOf(PatronMonthlyPricingPhase)
-        }
+        null -> when (billingCycle) {
+            BillingCycle.Monthly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(PlusMonthlyPricingPhase)
+                SubscriptionTier.Patron -> listOf(PatronMonthlyPricingPhase)
+            }
 
-        BillingCycle.Yearly -> when (tier) {
-            SubscriptionTier.Plus -> listOf(PlusYearlyPricingPhase)
-            SubscriptionTier.Patron -> listOf(PatronYearlyPricingPhase)
+            BillingCycle.Yearly -> when (tier) {
+                SubscriptionTier.Plus -> listOf(PlusYearlyPricingPhase)
+                SubscriptionTier.Patron -> listOf(PatronYearlyPricingPhase)
+            }
         }
     }
 }
