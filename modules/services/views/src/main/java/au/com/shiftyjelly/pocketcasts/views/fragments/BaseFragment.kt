@@ -46,6 +46,7 @@ open class BaseFragment :
         get() = Dispatchers.Main
 
     private var backPressedCallback: OnBackPressedCallback? = null
+    private var currentBackAnimation: androidx.core.view.ViewPropertyAnimatorCompat? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,7 +57,14 @@ open class BaseFragment :
 
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {
                 if (enableDefaultBackAnimation()) {
-                    view?.let { PredictiveBackAnimator.applyProgress(it, backEvent.progress, scaleAmount = 0.05f, alphaAmount = 0.2f) }
+                    view?.let {
+                        PredictiveBackAnimator.applyProgress(
+                            it,
+                            backEvent.progress,
+                            scaleAmount = 0.05f,
+                            alphaAmount = 0.2f,
+                        )
+                    }
                 }
                 onBackGestureProgressed(backEvent)
             }

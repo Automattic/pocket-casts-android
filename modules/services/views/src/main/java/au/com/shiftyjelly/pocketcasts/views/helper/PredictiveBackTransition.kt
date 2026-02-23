@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.view.ViewGroup
 import androidx.activity.BackEventCompat
+import androidx.annotation.MainThread
 import androidx.transition.Fade
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
@@ -12,6 +13,8 @@ import timber.log.Timber
 /**
  * Manages AndroidX Transition-based predictive back animations using TransitionSeekController.
  * Use this for more complex animations that require seekable transitions.
+ *
+ * All methods must be called from the main thread.
  */
 class PredictiveBackTransition(
     private val container: ViewGroup,
@@ -22,6 +25,7 @@ class PredictiveBackTransition(
     /**
      * Starts a seekable transition with scale and fade effects.
      */
+    @MainThread
     fun start(backEvent: BackEventCompat) {
         val transitionSet = TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
@@ -40,6 +44,7 @@ class PredictiveBackTransition(
     /**
      * Updates the transition progress based on back gesture.
      */
+    @MainThread
     fun updateProgress(backEvent: BackEventCompat) {
         seekController?.let { controller ->
             if (controller.isReady) {
@@ -51,11 +56,24 @@ class PredictiveBackTransition(
     /**
      * Completes the transition animation.
      */
+    @MainThread
     fun finish() {
         try {
             seekController?.animateToEnd()
         } catch (e: Exception) {
             Timber.e(e, "Failed to animate predictive back to end")
+        }
+    }
+
+    /**
+     * Cancels the transition and resets to the initial state.
+     */
+    @MainThread
+    fun cancel() {
+        try {
+            seekController?.currentFraction = 0f
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to cancel predictive back transition")
         }
     }
 }
