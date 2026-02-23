@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
@@ -48,9 +49,48 @@ open class BaseFragment :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val callback = object : OnBackPressedCallback(getBackstackCount() > 0) {
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                onBackGestureStarted(backEvent)
+            }
+
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                if (enableDefaultBackAnimation()) {
+                    applyDefaultBackAnimation(backEvent.progress)
+                }
+                onBackGestureProgressed(backEvent)
+            }
+
             override fun handleOnBackPressed() {
+                if (enableDefaultBackAnimation()) {
+                    view?.animate()
+                        ?.scaleX(0.9f)
+                        ?.scaleY(0.9f)
+                        ?.alpha(0.7f)
+                        ?.setDuration(100)
+                        ?.withEndAction {
+                            view?.scaleX = 1f
+                            view?.scaleY = 1f
+                            view?.alpha = 1f
+                            performBackNavigation()
+                        }
+                        ?.start()
+                } else {
+                    performBackNavigation()
+                }
+            }
+
+            private fun performBackNavigation() {
                 val handled = onBackPressed()
                 isEnabled = handled && getBackstackCount() > 0
+            }
+
+            private fun applyDefaultBackAnimation(progress: Float) {
+                view?.let {
+                    val scale = 1f - (0.05f * progress)
+                    it.scaleX = scale
+                    it.scaleY = scale
+                    it.alpha = 1f - (0.2f * progress)
+                }
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
@@ -156,5 +196,37 @@ open class BaseFragment :
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    /**
+     * Override to enable/disable default predictive back animation.
+     * Default: true (animations enabled)
+     *
+     * Return false if you want to implement custom animations via
+     * [onBackGestureStarted] and [onBackGestureProgressed].
+     */
+    protected open fun enableDefaultBackAnimation(): Boolean = true
+
+    /**
+     * Called when a predictive back gesture is started.
+     * Override to implement custom animation setup.
+     *
+     * @param backEvent Contains information about the back gesture (touch position, swipe edge)
+     */
+    protected open fun onBackGestureStarted(backEvent: BackEventCompat) {
+        // Override in subclasses for custom behavior
+    }
+
+    /**
+     * Called as a predictive back gesture progresses.
+     * Override to implement custom animations based on gesture progress.
+     *
+     * If [enableDefaultBackAnimation] returns true, the default scale/fade animation
+     * will be applied before this is called.
+     *
+     * @param backEvent Contains progress (0.0 to 1.0) and other gesture information
+     */
+    protected open fun onBackGestureProgressed(backEvent: BackEventCompat) {
+        // Override in subclasses for custom behavior
     }
 }

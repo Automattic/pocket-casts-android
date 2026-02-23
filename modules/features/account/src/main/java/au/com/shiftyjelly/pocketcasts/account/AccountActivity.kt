@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +18,11 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.transition.Fade
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
+import androidx.transition.TransitionValues
 import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
@@ -26,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @AndroidEntryPoint
@@ -45,14 +54,48 @@ class AccountActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
+        val predictiveBackCallback = object : OnBackPressedCallback(true) {
+            private var seekController: androidx.transition.TransitionSeekController? = null
+            private var navHostView: View? = null
+
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                navHostView = findViewById(R.id.nav_host_fragment)
+                val container = navHostView?.parent as? ViewGroup ?: return
+
+                val transitionSet = TransitionSet().apply {
+                    ordering = TransitionSet.ORDERING_TOGETHER
+                    addTransition(ScaleTransition())
+                    addTransition(Fade(Fade.OUT))
+                    duration = 300
+                }
+
+                try {
+                    seekController = TransitionManager.controlDelayedTransition(container, transitionSet)
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to start predictive back transition")
+                }
+            }
+
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                seekController?.let { controller ->
+                    if (controller.isReady) {
+                        controller.currentFraction = backEvent.progress
+                    }
+                }
+            }
+
+            override fun handleOnBackPressed() {
+                try {
+                    seekController?.animateToEnd()
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to animate predictive back to end")
+                } finally {
                     handleBackPressed()
                 }
-            },
-        )
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(this, predictiveBackCallback)
 
         val navController = findNavController(R.id.nav_host_fragment)
         binding.carHeader?.btnClose?.setOnClickListener {
@@ -218,5 +261,58 @@ class AccountActivity : AppCompatActivity() {
         CONFIRM_PAYMENT("confirm_payment"),
         CHANGE_EMAIL("change_email"),
         CHANGE_PASSWORD("change_password"),
+    }
+}
+
+/**
+ * Custom transition that scales down views during predictive back gestures.
+ * Scales from 100% to 90% for a subtle preview effect.
+ */
+private class ScaleTransition : Transition() {
+    companion object {
+        private const val PROPNAME_SCALE_X = "au.com.shiftyjelly.pocketcasts:scale:scaleX"
+        private const val PROPNAME_SCALE_Y = "au.com.shiftyjelly.pocketcasts:scale:scaleY"
+        private const val SCALE_END = 0.9f
+    }
+
+    override fun captureStartValues(transitionValues: TransitionValues) {
+        captureValues(transitionValues, transitionValues.view.scaleX, transitionValues.view.scaleY)
+    }
+
+    override fun captureEndValues(transitionValues: TransitionValues) {
+        captureValues(transitionValues, SCALE_END, SCALE_END)
+    }
+
+    private fun captureValues(transitionValues: TransitionValues, scaleX: Float, scaleY: Float) {
+        transitionValues.values[PROPNAME_SCALE_X] = scaleX
+        transitionValues.values[PROPNAME_SCALE_Y] = scaleY
+    }
+
+    override fun createAnimator(
+        sceneRoot: ViewGroup,
+        startValues: TransitionValues?,
+        endValues: TransitionValues?,
+    ): android.animation.Animator? {
+        if (startValues == null || endValues == null) {
+            return null
+        }
+
+        val view = endValues.view
+        val startScaleX = startValues.values[PROPNAME_SCALE_X] as Float
+        val startScaleY = startValues.values[PROPNAME_SCALE_Y] as Float
+        val endScaleX = endValues.values[PROPNAME_SCALE_X] as Float
+        val endScaleY = endValues.values[PROPNAME_SCALE_Y] as Float
+
+        view.scaleX = startScaleX
+        view.scaleY = startScaleY
+
+        val animator = android.animation.ValueAnimator.ofFloat(0f, 1f)
+        animator.addUpdateListener { animation ->
+            val fraction = animation.animatedValue as Float
+            view.scaleX = startScaleX + (endScaleX - startScaleX) * fraction
+            view.scaleY = startScaleY + (endScaleY - startScaleY) * fraction
+        }
+
+        return animator
     }
 }

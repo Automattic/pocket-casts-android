@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -736,8 +737,24 @@ class MainActivity :
      */
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                navigator.handleBackGestureProgress(backEvent.progress)
+            }
+
             override fun handleOnBackPressed() {
-                navigator.pop()
+                val currentView = navigator.currentFragment()?.view
+                currentView?.animate()
+                    ?.scaleX(0.85f)
+                    ?.scaleY(0.85f)
+                    ?.alpha(0f)
+                    ?.setDuration(150)
+                    ?.withEndAction {
+                        currentView.scaleX = 1f
+                        currentView.scaleY = 1f
+                        currentView.alpha = 1f
+                        navigator.pop()
+                    }
+                    ?.start() ?: navigator.pop()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -751,8 +768,29 @@ class MainActivity :
         }
 
         val playerBottomSheetCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                val progress = backEvent.progress
+                val scale = 1f - (0.1f * progress)
+                val alpha = 1f - (0.3f * progress)
+
+                binding.playerBottomSheet.scaleX = scale
+                binding.playerBottomSheet.scaleY = scale
+                binding.playerBottomSheet.alpha = alpha
+            }
+
             override fun handleOnBackPressed() {
-                binding.playerBottomSheet.closePlayer()
+                binding.playerBottomSheet.animate()
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction {
+                        binding.playerBottomSheet.scaleX = 1f
+                        binding.playerBottomSheet.scaleY = 1f
+                        binding.playerBottomSheet.alpha = 1f
+                        binding.playerBottomSheet.closePlayer()
+                    }
+                    .start()
             }
         }
         onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)

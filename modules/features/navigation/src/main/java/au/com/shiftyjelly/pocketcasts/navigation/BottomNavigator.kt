@@ -274,6 +274,65 @@ open class BottomNavigator internal constructor() : ViewModel() {
     }
 
     /**
+     * Returns the previous fragment in the stack (the one that would be shown after a back press).
+     * Returns null if there is no previous fragment.
+     */
+    open fun previousFragment(): Fragment? {
+        val previousTag = tabStackMap.peekValueBelowTop() ?: return null
+        return activityDelegate?.fragmentManager?.findFragmentByTag(previousTag.toString())
+    }
+
+    /**
+     * Handle predictive back gesture progress for smooth animations.
+     *
+     * @param progress The back gesture progress from 0.0 (start) to 1.0 (complete)
+     */
+    open fun handleBackGestureProgress(progress: Float) {
+        val currentFrag = currentFragment()
+        val previousFrag = previousFragment()
+
+        currentFrag?.view?.let { currentView ->
+            val scale = 1f - (0.1f * progress)
+            val alpha = 1f - (0.3f * progress)
+
+            currentView.scaleX = scale
+            currentView.scaleY = scale
+            currentView.alpha = alpha
+        }
+
+        previousFrag?.view?.let { previousView ->
+            if (previousView.visibility != android.view.View.VISIBLE) {
+                previousView.visibility = android.view.View.VISIBLE
+            }
+
+            val scale = 0.95f + (0.05f * progress)
+            val alpha = 0.5f + (0.5f * progress)
+
+            previousView.scaleX = scale
+            previousView.scaleY = scale
+            previousView.alpha = alpha
+        }
+    }
+
+    /**
+     * Reset fragment views to their default state after back gesture is cancelled.
+     */
+    open fun resetBackGestureState() {
+        currentFragment()?.view?.let {
+            it.scaleX = 1f
+            it.scaleY = 1f
+            it.alpha = 1f
+        }
+
+        previousFragment()?.view?.let {
+            it.scaleX = 1f
+            it.scaleY = 1f
+            it.alpha = 1f
+            it.visibility = android.view.View.GONE
+        }
+    }
+
+    /**
      * Returns the currently shown tab
      */
     open fun currentTab(): Int {
