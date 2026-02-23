@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import androidx.annotation.WorkerThread
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import dagger.Lazy
 import java.io.File
 import java.io.IOException
@@ -9,6 +11,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.math.min
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -94,7 +97,11 @@ internal class EpisodeDownloader(
 
             response.downloadProgressSource(episode).readTo(tempFile)
             val fileSize = tempFile.length()
-            if (fileSize < minContentLength) {
+            val isValidFileSize = when (episode) {
+                is PodcastEpisode -> fileSize >= minContentLength
+                is UserEpisode -> true
+            }
+            if (!isValidFileSize) {
                 return Result.SuspiciousFileSize(fileSize)
             }
 
