@@ -268,7 +268,7 @@ private class DownloadQueueController(
         // making the problem progressively worse.
         val episodesToCancel = workInfos.mapNotNull { info ->
             (info as? DownloadWorkInfo.Pending)
-                ?.takeIf { it.runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT }
+                ?.takeIf { it.runAttemptCount > MAX_DOWNLOAD_ATTEMPT_COUNT }
                 ?.episodeUuid
         }
         for (episodeUuid in episodesToCancel) {
@@ -397,7 +397,7 @@ private class DownloadStatusController(
         val now = clock.instant()
         return when (this) {
             is DownloadWorkInfo.Cancelled -> {
-                if (runAttemptCount >= MAX_DOWNLOAD_ATTEMPT_COUNT) {
+                if (runAttemptCount > MAX_DOWNLOAD_ATTEMPT_COUNT) {
                     DownloadStatusUpdate.Failure(
                         taskId = id,
                         issuedAt = now,
