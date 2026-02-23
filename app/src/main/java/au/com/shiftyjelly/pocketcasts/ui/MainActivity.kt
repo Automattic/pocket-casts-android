@@ -743,8 +743,13 @@ class MainActivity :
             }
 
             override fun handleOnBackPressed() {
+                val previousView = navigator.previousFragment()?.view
                 navigator.currentFragment()?.view?.let { currentView ->
-                    PredictiveBackAnimator.animateToEnd(currentView) { navigator.pop() }
+                    PredictiveBackAnimator.animateToEnd(currentView) {
+                        navigator.pop()
+                        // Reset the previous fragment (now current) to ensure it's fully visible
+                        previousView?.let { PredictiveBackAnimator.reset(it) }
+                    }
                 } ?: navigator.pop()
             }
 
