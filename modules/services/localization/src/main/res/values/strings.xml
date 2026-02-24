@@ -1362,6 +1362,7 @@
     <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
+    <string name="plus_yearly_installments">Annual plan - pay monthly</string>
 
     <!-- Trial -->
 
@@ -2549,6 +2550,8 @@
     <string name="winback_offer_free_offer_yearly_title">Get 50%% off your next year and save %1$s</string>
     <string name="winback_offer_free_offer_description">Enjoy one month of Pocket Casts Plus on us! The offer will be added to your current subscription.</string>
     <string name="winback_offer_free_offer_yearly_description">Pay %1$s now to lock in a year of Pocket Casts Plus at half price. Your discounted year begins after your current plan ends.</string>
+    <string name="winback_offer_free_offer_installment_title">Get 50%% off your next year — pay just %1$s/month and save %2$s</string>
+    <string name="winback_offer_free_offer_installment_description">Lock in a year of Pocket Casts Plus at half price with 12 monthly payments of %1$s. Your discounted installment plan begins after your current plan ends.</string>
     <string name="winback_offer_free_offer_button_label">Claim offer</string>
     <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
     <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
@@ -2559,6 +2562,8 @@
     <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Your free month will be added to your current subscription.</string>
     <string name="winback_claimed_offer_message_3">50% off your next year!</string>
     <string name="winback_claimed_offer_message_4">Thanks for choosing Pocket&#160;Casts. Your discounted year begins after your current billing period.</string>
+    <string name="winback_claimed_offer_message_5">50% off your next year with monthly payments!</string>
+    <string name="winback_claimed_offer_message_6">Thanks for choosing Pocket&#160;Casts. Your discounted 12-month installment plan begins after your current billing period.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
     <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>
