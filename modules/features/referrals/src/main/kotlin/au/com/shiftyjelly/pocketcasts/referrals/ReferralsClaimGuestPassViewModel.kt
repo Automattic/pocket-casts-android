@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
@@ -40,6 +43,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val paymentClient: PaymentClient,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val experimentProvider: ExperimentProvider,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -58,9 +62,11 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     private fun loadReferralClaimOffer() {
         viewModelScope.launch {
-            val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
+            val isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
+            val experimentVariation = experimentProvider.getVariation(Experiment.YearlyInstallments)
+            val isInstallmentEnabled = isFeatureEnabled && experimentVariation is Variation.Treatment
 
-            // Try installment offer first if feature flag is enabled
+            // Try installment offer first if feature flag AND experiment treatment are enabled
             val installmentPlan = if (isInstallmentEnabled) {
                 paymentClient.loadSubscriptionPlans()
                     .flatMap { plans ->

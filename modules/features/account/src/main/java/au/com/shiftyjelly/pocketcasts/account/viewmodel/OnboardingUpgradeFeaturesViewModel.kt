@@ -61,6 +61,12 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             } else {
                 OnboardingUpgradeFeaturesState.LoadedPlansFilter.BOTH
             }
+
+        // Determine if installment plans should be used based on feature flag and experiment
+        val isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
+        val experimentVariation = experimentProvider.getVariation(Experiment.YearlyInstallments)
+        val shouldUseInstallmentPlans = isFeatureEnabled && experimentVariation is Variation.Treatment
+
         return OnboardingUpgradeFeaturesState.Loaded(
             subscriptionPlans,
             selectedBillingCycle = flow.preselectedBillingCycle,
@@ -68,6 +74,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             plansFilter = plansFilter,
             purchaseFailed = false,
             onboardingVariant = variant,
+            shouldUseInstallmentPlans = shouldUseInstallmentPlans,
         )
     }
 
@@ -267,6 +274,7 @@ sealed class OnboardingUpgradeFeaturesState {
         val plansFilter: LoadedPlansFilter,
         val purchaseFailed: Boolean,
         val onboardingVariant: NewOnboardingVariant,
+        val shouldUseInstallmentPlans: Boolean = false,
     ) : OnboardingUpgradeFeaturesState() {
         val availableBasePlans = listOfNotNull(
             plusYearlyPlanWithOffer().takeUnless { plansFilter == LoadedPlansFilter.PATRON_ONLY },
@@ -297,8 +305,6 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlanWithOffer(): SubscriptionPlan {
-            val isInstallmentEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
-
             val offer = if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
                 SubscriptionOffer.IntroOffer
             } else {
@@ -309,7 +315,7 @@ sealed class OnboardingUpgradeFeaturesState {
                 SubscriptionTier.Plus,
                 BillingCycle.Yearly,
                 offer,
-                isInstallment = isInstallmentEnabled,
+                isInstallment = shouldUseInstallmentPlans,
             ).getOrNull()
             return if (offerPlan == null || OnboardingSubscriptionPlan.create(offerPlan).getOrNull() == null) {
                 plusYearlyPlan()
@@ -319,8 +325,8 @@ sealed class OnboardingUpgradeFeaturesState {
         }
 
         private fun plusYearlyPlan(): SubscriptionPlan.Base {
-            // Use installment plan when feature flag is enabled
-            return subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+            // Use installment plan based on feature flag and experiment
+            return subscriptionPlans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus, shouldUseInstallmentPlans)
         }
 
         private fun patronYearlyPlan(): SubscriptionPlan.Base {
