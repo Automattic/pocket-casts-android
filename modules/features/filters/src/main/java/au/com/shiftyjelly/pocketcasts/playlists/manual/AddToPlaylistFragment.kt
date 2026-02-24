@@ -189,10 +189,16 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     @Composable
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
-            val playlistUuid = viewModel.createdPlaylist.await()
+            val playlist = viewModel.createdPlaylist.await()
+
+            val hostListener = requireActivity() as FragmentHostListener
+            val snackbarView = hostListener.snackBarView()
+            val message = getString(LR.string.added_to_playlist_single, playlist.title)
 
             dismiss()
-            (requireActivity() as FragmentHostListener).openManualPlaylist(playlistUuid)
+            Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+                .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
+                .show()
         }
     }
 
