@@ -12,6 +12,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -347,7 +348,7 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET downloaded_file_path = :downloadedFilePath WHERE uuid = :uuid")
     abstract fun updateDownloadedFilePathBlocking(downloadedFilePath: String, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET auto_download_status = 1 WHERE uuid IN (:uuids)")
+    @Query("UPDATE podcast_episodes SET auto_download_status = ${BaseEpisode.AUTO_DOWNLOAD_STATUS_IGNORE} WHERE uuid IN (:uuids)")
     protected abstract suspend fun disableAutoDownloadUnsafe(uuids: Collection<String>)
 
     @Transaction
@@ -610,7 +611,7 @@ abstract class EpisodeDao {
     }
 
     /**
-     * Atomically cancels an in-progress download and releases ownership.
+     * Atomically resets a download and releases ownership.
      *
      * This query resets the episode to `DownloadNotRequested` (status = 0)
      * and clears `download_task_id`. It also resets episodes currently in
@@ -638,10 +639,10 @@ abstract class EpisodeDao {
           AND (download_task_id IS NOT NULL OR episode_status = 4)
         """,
     )
-    protected abstract suspend fun setDownloadCancelledRaw(episodeUuid: String): Int
+    protected abstract suspend fun resetDownloadStatusRaw(episodeUuid: String): Int
 
-    suspend fun setDownloadCancelled(episodeUuid: String): Boolean {
-        val rowUpdateCount = setDownloadCancelledRaw(episodeUuid)
+    suspend fun resetDownloadStatus(episodeUuid: String): Boolean {
+        val rowUpdateCount = resetDownloadStatusRaw(episodeUuid)
         return rowUpdateCount == 1
     }
 

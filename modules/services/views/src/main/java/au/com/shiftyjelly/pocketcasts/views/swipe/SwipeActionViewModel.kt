@@ -165,15 +165,13 @@ class SwipeActionViewModel @AssistedInject constructor(
                     userEpisodeManager = userEpisodeManager,
                     applicationScope = applicationScope,
                 )
-                episodeAnalytics.trackEvent(
-                    event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
-                        AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD
-                    } else {
-                        AnalyticsEvent.EPISODE_DOWNLOAD_DELETED
-                    },
-                    source = swipeSource.toSourceView(),
-                    uuid = episode.uuid,
-                )
+                if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
+                    episodeAnalytics.trackEvent(
+                        event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
+                        source = swipeSource.toSourceView(),
+                        uuid = episode.uuid,
+                    )
+                }
                 viewModelScope.launch {
                     episodeManager.disableAutoDownload(episode)
                 }

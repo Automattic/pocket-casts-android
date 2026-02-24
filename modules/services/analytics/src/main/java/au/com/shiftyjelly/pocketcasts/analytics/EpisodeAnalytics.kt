@@ -9,26 +9,17 @@ import javax.inject.Singleton
 class EpisodeAnalytics @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) {
-    private val downloadEpisodeUuidQueue = mutableListOf<String>()
     private val uploadEpisodeUuidQueue = mutableListOf<String>()
 
     fun trackEvent(event: AnalyticsEvent, source: SourceView, uuid: String) {
-        if (event == AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED) {
-            downloadEpisodeUuidQueue.add(uuid)
-        } else if (event == AnalyticsEvent.EPISODE_UPLOAD_QUEUED) {
+        if (event == AnalyticsEvent.EPISODE_UPLOAD_QUEUED) {
             uploadEpisodeUuidQueue.add(uuid)
         }
         analyticsTracker.track(event, AnalyticsProp.sourceAndUuidMap(source, uuid))
     }
 
     fun trackEvent(event: AnalyticsEvent, uuid: String, source: SourceView? = null) {
-        if (event == AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED || event == AnalyticsEvent.EPISODE_DOWNLOAD_FAILED) {
-            if (downloadEpisodeUuidQueue.contains(uuid)) {
-                downloadEpisodeUuidQueue.remove(uuid)
-            } else {
-                return
-            }
-        } else if (event == AnalyticsEvent.EPISODE_UPLOAD_FINISHED || event == AnalyticsEvent.EPISODE_UPLOAD_FAILED) {
+        if (event == AnalyticsEvent.EPISODE_UPLOAD_FINISHED || event == AnalyticsEvent.EPISODE_UPLOAD_FAILED) {
             if (uploadEpisodeUuidQueue.contains(uuid)) {
                 uploadEpisodeUuidQueue.remove(uuid)
             } else {
@@ -59,14 +50,6 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.bulkMap(source, count))
     }
 
-    fun trackBulkEvent(event: AnalyticsEvent, source: SourceView, episodes: List<BaseEpisode>) {
-        if (event == AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED) {
-            downloadEpisodeUuidQueue.clear()
-            downloadEpisodeUuidQueue.addAll(downloadEpisodeUuidQueue.union(episodes.map { it.uuid }))
-        }
-        analyticsTracker.track(event, AnalyticsProp.bulkMap(source, episodes.size))
-    }
-
     fun trackBulkEvent(
         event: AnalyticsEvent,
         source: SourceView,
@@ -74,15 +57,6 @@ class EpisodeAnalytics @Inject constructor(
         toTop: Boolean,
     ) {
         analyticsTracker.track(event, AnalyticsProp.bulkToTopMap(source, count, toTop))
-    }
-
-    fun trackEpisodeDownloadFailure(error: EpisodeDownloadError) {
-        if (downloadEpisodeUuidQueue.contains(error.episodeUuid)) {
-            downloadEpisodeUuidQueue.remove(error.episodeUuid)
-        } else {
-            return
-        }
-        analyticsTracker.track(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, error.toProperties())
     }
 
     fun trackStaleEpisodeDownloads(data: EpisodeDownloadFailureStatistics) {
