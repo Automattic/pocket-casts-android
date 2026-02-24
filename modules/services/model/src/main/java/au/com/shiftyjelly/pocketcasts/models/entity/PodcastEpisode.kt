@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode.Companion.AUTO_DOWNLOAD_STATUS_ALLOW
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -40,7 +41,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "playing_status") override var playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED,
     @ColumnInfo(name = "podcast_id") var podcastUuid: String = "",
     @ColumnInfo(name = "added_date") override var addedDate: Date = Date(),
-    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = 0,
+    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = AUTO_DOWNLOAD_STATUS_ALLOW,
     @ColumnInfo(name = "starred") override var isStarred: Boolean = false,
     @ColumnInfo(name = "thumbnail_status") var thumbnailStatus: Int = THUMBNAIL_STATUS_UNKNOWN,
     @ColumnInfo(name = "last_download_attempt_date") override var lastDownloadAttemptDate: Date? = null,

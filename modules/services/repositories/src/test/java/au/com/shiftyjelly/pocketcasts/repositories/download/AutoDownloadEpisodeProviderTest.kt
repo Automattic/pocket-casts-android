@@ -18,14 +18,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import java.util.Date
-import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import java.util.Date
+import java.util.UUID
 
 class AutoDownloadEpisodeProviderTest {
     private val podcastEpisodes = mutableMapOf<Podcast, List<PodcastEpisode>>()
@@ -130,6 +130,22 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     @Test
+    fun `ignore disallowed podcast episodes`() = runTest {
+        val podcast = listOf(
+            podcastEpisode(),
+            podcastEpisode {
+                isAutoDownloadDisabled = true
+            },
+        )
+        podcastEpisodes += podcast() to podcast
+
+        assertProviderEpisodes(
+            expectedEpisodes = podcast.take(1),
+            newPodcastEpisodes = podcast,
+        )
+    }
+
+    @Test
     fun `provide playlist episodes`() = runTest {
         val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
         val playlist = playlist {
@@ -161,6 +177,20 @@ class AutoDownloadEpisodeProviderTest {
             addEpisodes(playlistEpisodes)
             addEpisode {
                 isCompleted = true
+            }
+        }
+        playlists += playlist
+
+        assertProviderEpisodes(playlistEpisodes)
+    }
+
+    @Test
+    fun `ignore disallowed playlist episodes`() = runTest {
+        val playlistEpisodes = listOf(podcastEpisode(), podcastEpisode(), podcastEpisode())
+        val playlist = playlist {
+            addEpisodes(playlistEpisodes)
+            addEpisode {
+                isAutoDownloadDisabled = true
             }
         }
         playlists += playlist
@@ -245,6 +275,24 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     @Test
+    fun `ignore disallowed up next episodes`() = runTest {
+        val upNext = listOf(
+            podcastEpisode(),
+            userEpisode(),
+            podcastEpisode(),
+            podcastEpisode {
+                isAutoDownloadDisabled = true
+            },
+            userEpisode {
+                isAutoDownloadDisabled = true
+            },
+        )
+        upNextEpisodes += upNext
+
+        assertProviderEpisodes(upNext.take(3))
+    }
+
+    @Test
     fun `provide user episodes`() = runTest {
         val user = listOf(userEpisode(), userEpisode(), userEpisode())
         userEpisodes += user
@@ -281,6 +329,19 @@ class AutoDownloadEpisodeProviderTest {
             userEpisode(),
             userEpisode {
                 isCompleted = true
+            },
+        )
+        userEpisodes += user
+
+        assertProviderEpisodes(user.take(1))
+    }
+
+    @Test
+    fun `ignore disallowed user episodes`() = runTest {
+        val user = listOf(
+            userEpisode(),
+            userEpisode {
+                isAutoDownloadDisabled = true
             },
         )
         userEpisodes += user
@@ -601,6 +662,7 @@ private class EpisodeDsl {
     var isArchived = false
     var isCompleted = false
     var isPlaylistAvailable = true
+    var isAutoDownloadDisabled = false
 
     fun toPodcastEpisode() = PodcastEpisode(
         uuid = uuid,
@@ -610,6 +672,11 @@ private class EpisodeDsl {
             EpisodePlayingStatus.COMPLETED
         } else {
             EpisodePlayingStatus.NOT_PLAYED
+        },
+        autoDownloadStatus = if (isAutoDownloadDisabled) {
+            BaseEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
+        } else {
+            BaseEpisode.AUTO_DOWNLOAD_STATUS_ALLOW
         },
     )
 
@@ -621,6 +688,11 @@ private class EpisodeDsl {
             EpisodePlayingStatus.COMPLETED
         } else {
             EpisodePlayingStatus.NOT_PLAYED
+        },
+        autoDownloadStatus = if (isAutoDownloadDisabled) {
+            BaseEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
+        } else {
+            BaseEpisode.AUTO_DOWNLOAD_STATUS_ALLOW
         },
     )
 

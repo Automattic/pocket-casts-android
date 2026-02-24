@@ -7,7 +7,8 @@ import java.util.UUID
 
 sealed interface BaseEpisode {
     companion object {
-        private const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
+        const val AUTO_DOWNLOAD_STATUS_ALLOW = 0
+        const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
 
         /**
          * Used to reduce the changes sent out by the media session.
@@ -104,7 +105,7 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus

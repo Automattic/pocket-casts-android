@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode.Companion.AUTO_DOWNLOAD_STATUS_ALLOW
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
@@ -32,7 +33,7 @@ data class UserEpisode(
     @ColumnInfo(name = "played_up_to") override var playedUpTo: Double = 0.0,
     @ColumnInfo(name = "playing_status") override var playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED,
     @ColumnInfo(name = "added_date") override var addedDate: Date = Date(),
-    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = 0,
+    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = AUTO_DOWNLOAD_STATUS_ALLOW,
     @ColumnInfo(name = "last_download_attempt_date") override var lastDownloadAttemptDate: Date? = null,
     @ColumnInfo(name = "archived") override var isArchived: Boolean = false,
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
