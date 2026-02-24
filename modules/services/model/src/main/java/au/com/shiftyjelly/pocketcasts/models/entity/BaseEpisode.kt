@@ -7,6 +7,9 @@ import java.util.UUID
 
 sealed interface BaseEpisode {
     companion object {
+        const val AUTO_DOWNLOAD_STATUS_ALLOW = 0
+        const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
+
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
@@ -98,6 +101,12 @@ sealed interface BaseEpisode {
     val isDownloadFailure
         get() = downloadStatus == EpisodeDownloadStatus.DownloadFailed
 
+    val isAutoDownloadDisabled: Boolean
+        get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
+
+    val canQueueForAutoDownload
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
+
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
 
@@ -109,15 +118,6 @@ sealed interface BaseEpisode {
 
     val isAudio: Boolean
         get() = !isVideo
-
-    val isManualDownloadOverridingWifiSettings: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-
-    val isAutoDownloaded: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-
-    val isExemptFromAutoDownload: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid

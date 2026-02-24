@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -89,7 +89,7 @@ class PocketCastsApplication :
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject lateinit var downloadStatusObserver: DownloadStatusObserver
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
@@ -212,7 +212,6 @@ class PocketCastsApplication :
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playbackManager)
 
                 val isRestoreFromBackup = settings.isRestoreFromBackup()
                 // as this may be a different device clear the storage location on a restore
@@ -281,7 +280,7 @@ class PocketCastsApplication :
         applicationScope.launch(Dispatchers.IO) { fileStorage.fixBrokenFiles(episodeManager) }
 
         userEpisodeManager.monitorUploads(applicationContext)
-        downloadManager.beginMonitoringWorkManager(applicationContext)
+        downloadStatusObserver.monitorDownloadStatus()
         userManager.beginMonitoringAccountManager(playbackManager)
         CuratedPodcastsSyncWorker.enqueuePeriodicWork(this)
         engageSdkBridge.registerIntegration()

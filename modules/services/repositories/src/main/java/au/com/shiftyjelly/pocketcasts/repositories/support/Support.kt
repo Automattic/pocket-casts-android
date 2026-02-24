@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadEpisodeWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -313,7 +313,7 @@ class Support @Inject constructor(
             output.append(eol)
             output.append("Work Manager Tasks").append(eol)
             val workInfos = WorkManager.getInstance(context)
-                .getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
+                .getWorkInfosByTagLiveData(DownloadEpisodeWorker.WORKER_TAG)
                 .toPublisher(ProcessLifecycleOwner.get())
                 .awaitFirst()
             workInfos.forEach { workInfo ->

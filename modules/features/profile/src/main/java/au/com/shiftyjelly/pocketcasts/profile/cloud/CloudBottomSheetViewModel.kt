@@ -10,8 +10,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -33,7 +33,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -63,17 +63,23 @@ class CloudBottomSheetViewModel @Inject constructor(
         CloudDeleteHelper.deleteEpisode(
             episode = episode,
             deleteState = deleteState,
+            sourceView = source,
+            downloadQueue = downloadQueue,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             userEpisodeManager = userEpisodeManager,
             applicationScope = applicationScope,
         )
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DELETED)
-        episodeAnalytics.trackEvent(
-            event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD else AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-            source = source,
-            uuid = episode.uuid,
-        )
+        if (deleteState == DeleteState.Cloud) {
+            episodeAnalytics.trackEvent(
+                event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
+                source = source,
+                uuid = episode.uuid,
+            )
+        }
+        viewModelScope.launch {
+            episodeManager.disableAutoDownload(episode)
+        }
     }
 
     fun uploadEpisode(episode: UserEpisode) {
@@ -94,14 +100,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun cancelDownload(episode: UserEpisode) {
-        downloadManager.removeEpisodeFromQueue(episode, "cloud bottom sheet")
+        downloadQueue.cancel(episode.uuid, source)
         trackOptionTapped(CANCEL_DOWNLOAD)
     }
 
     fun download(episode: UserEpisode) {
-        viewModelScope.launch(Dispatchers.Default) {
-            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager, source = source)
-        }
+        downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
     }
 
     fun removeFromUpNext(episode: UserEpisode) {

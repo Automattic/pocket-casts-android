@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.ActivityAddFileBinding
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -506,8 +505,7 @@ class AddFileActivity :
                 try {
                     val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
 
-                    val savePath = DownloadHelper.pathForEpisode(userEpisode, fileStorage) ?: throw Exception("File path empty")
-                    val outFile = File(savePath)
+                    val outFile = fileStorage.getOrCreatePodcastEpisodeFile(userEpisode) ?: throw Exception("File path empty")
 
                     contentResolver.openInputStream(uri).use { inputStream ->
                         saveInputStreamToFile(outFile, inputStream)

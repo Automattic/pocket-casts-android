@@ -12,11 +12,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -44,13 +42,9 @@ class AutomotiveApplication :
 
     @Inject lateinit var moshi: Moshi
 
-    @Inject lateinit var podcastManager: PodcastManager
-
-    @Inject lateinit var episodeManager: EpisodeManager
-
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject lateinit var downloadStatusObserver: DownloadStatusObserver
 
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
@@ -92,7 +86,6 @@ class AutomotiveApplication :
         runBlocking {
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playbackManager)
                 RefreshPodcastsTask.runNow(this@AutomotiveApplication, applicationScope)
             }
 
@@ -107,7 +100,7 @@ class AutomotiveApplication :
         Log.i(Settings.LOG_TAG_AUTO, "Play services $playServices")
 
         userEpisodeManager.monitorUploads(applicationContext)
-        downloadManager.beginMonitoringWorkManager(applicationContext)
+        downloadStatusObserver.monitorDownloadStatus()
         userManager.beginMonitoringAccountManager(playbackManager)
 
         // force the Automotive app into car mode as some car companies send the UI mode as normal, this makes sure the car resources such as layout-car are used.

@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -43,7 +42,6 @@ import com.pocketcasts.service.api.UpNextSyncRequest as UpNextProtobufSyncReques
 class UpNextSync @Inject constructor(
     private val appDatabase: AppDatabase,
     private val episodeManager: EpisodeManager,
-    private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
@@ -285,7 +283,7 @@ class UpNextSync @Inject constructor(
         // snapshot local up next queue before making changes
         upNextHistoryManager.snapshotUpNext()
         // import the server Up Next into the database
-        upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
+        upNextQueue.importServerChangesBlocking(episodes, playbackManager)
         // reload the queue to ensure it reflects the imported server changes
         playbackManager.loadQueue()
     }

@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,7 +17,6 @@ class AutoDownloadEpisodeProvider @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playlistManager: PlaylistManager,
     private val upNextQueue: UpNextQueue,
-    private val userEpisodeManager: UserEpisodeManager,
     private val settings: Settings,
 ) {
     // Set dispatcher to default because some users follow thousands of podcasts
@@ -26,8 +24,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
         buildSet {
             addAll(getPodcastEpisodes(newPodcastEpisodeUuids))
             addAll(getPlaylistEpisodes())
-            addAll(getUpNextAutoEpisodes())
-            addAll(getUserEpisodes())
+            addAll(getUpNextEpisodes())
         }
     }
 
@@ -44,7 +41,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                     episodeManager
                         .findEpisodesByPodcastOrderedSuspend(podcast)
                         .asSequence()
-                        .filter(BaseEpisode::canDownload)
+                        .filter(BaseEpisode::canQueueForAutoDownload)
                         .map(BaseEpisode::uuid)
                         .filter(newEpisodeUuidSet::contains)
                         .take(perPodcastLimit)
@@ -61,30 +58,17 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                 playlist.episodes
                     .asSequence()
                     .mapNotNull(PlaylistEpisode::toPodcastEpisode)
-                    .filter(BaseEpisode::canDownload)
+                    .filter(BaseEpisode::canQueueForAutoDownload)
                     .map(BaseEpisode::uuid)
                     .take(playlist.settings.autoDownloadLimit)
             }
     }
 
-    private fun getUpNextAutoEpisodes(): Set<String> {
+    private fun getUpNextEpisodes(): Set<String> {
         return if (settings.autoDownloadUpNext.value) {
             upNextQueue.allEpisodes
                 .asSequence()
-                .filter(BaseEpisode::canDownload)
-                .map(BaseEpisode::uuid)
-                .toSet()
-        } else {
-            emptySet()
-        }
-    }
-
-    private suspend fun getUserEpisodes(): Set<String> {
-        return if (settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
-            userEpisodeManager
-                .findUserEpisodes()
-                .asSequence()
-                .filter(BaseEpisode::canDownload)
+                .filter(BaseEpisode::canQueueForAutoDownload)
                 .map(BaseEpisode::uuid)
                 .toSet()
         } else {
@@ -92,5 +76,3 @@ class AutoDownloadEpisodeProvider @Inject constructor(
         }
     }
 }
-
-private fun BaseEpisode.canDownload() = !isArchived && !isFinished

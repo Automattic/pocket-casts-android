@@ -126,7 +126,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         val uuid = podcastResult.podcast.uuid
         if (podcastResult.isSubscribed) {
             event = AnalyticsEvent.PODCAST_UNSUBSCRIBED
-            podcastManager.unsubscribeAsync(podcastUuid = uuid, playbackManager = playbackManager)
+            podcastManager.unsubscribeAsync(podcastUuid = uuid, SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH)
         } else {
             event = AnalyticsEvent.PODCAST_SUBSCRIBED
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)

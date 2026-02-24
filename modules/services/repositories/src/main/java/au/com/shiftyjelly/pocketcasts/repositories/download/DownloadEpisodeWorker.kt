@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
 import dagger.assisted.Assisted
@@ -100,6 +101,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val downloader = EpisodeDownloader(
         httpClient = httpClient,
         progressCache = progressCache,
+        onCall = { call ->
+            downloadCall = call
+        },
         onResponse = { response ->
             downloadError.httpStatusCode = response.code
             downloadError.contentType = response.header("Content-Type") ?: "missing"
@@ -115,8 +119,12 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     )
 
     private var notificationJob: NotificationJob? = null
+    private var downloadCall: Call? = null
 
     override fun doWork(): Result {
+        if (!isStopped) {
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download started. Episode: ${args.episodeUuid}")
+        }
         val timedValue = measureTimedValue {
             try {
                 // Block the work until the state is dispatched to keep it consistent
@@ -127,7 +135,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
                 episode = refreshDownloadUrlOrThrow(episode)
                 val downloadFile = getDownloadFileOrThrow(episode)
-                val tempFile = File(DownloadHelper.tempPathForEpisode(episode, fileStorage))
+                val tempFile = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
 
                 val downloadResult = downloader.download(
                     episode = episode,
@@ -168,6 +176,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     }
 
     override fun onStopped() {
+        downloadCall?.cancel()
         notificationJob?.cancel()
         dispatchProgressData(isWorkExecuting = false)
     }
@@ -200,8 +209,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     }
 
     private fun getDownloadFileOrThrow(episode: BaseEpisode): File {
-        val file = DownloadHelper.pathForEpisode(episode, fileStorage)?.let(::File)
-        return requireNotNull(file) {
+        return requireNotNull(fileStorage.getOrCreatePodcastEpisodeFile(episode)) {
             context.getString(LR.string.error_download_no_episode_file)
         }
     }
@@ -220,16 +228,19 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
             is DownloadResult.InvalidContentType -> {
                 downloadError.reason = EpisodeDownloadError.Reason.ContentType
-                context.getString(LR.string.error_download_invalid_content_type, result.contentType) to true
+                context.getString(LR.string.error_download_invalid_content_type, result.contentType) to false
             }
 
             is DownloadResult.SuspiciousFileSize -> {
                 downloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
-                context.getString(LR.string.error_download_suspicious_content_size) to true
+                context.getString(LR.string.error_download_suspicious_content_size) to false
             }
 
             is DownloadResult.ExceptionFailure -> {
                 val throwable = result.throwable
+                if (!isStopped) {
+                    LogBuffer.i(LogBuffer.TAG_DOWNLOAD, throwable, "Download failed: ${args.episodeUuid}")
+                }
                 // Order of checks here is important. Wrong order will result in mapping to wrong messages or states.
                 // For example SocketTimeoutException inherits from InterruptedIOException. Checking for isCancelled
                 // and consequently InterruptedIOException would result in mapping timeouts to cancellations.
@@ -513,6 +524,7 @@ sealed interface DownloadWorkInfo {
     val sourceView: SourceView
 
     val isCancellable: Boolean
+    val isTooManyAttempts get() = runAttemptCount > MAX_DOWNLOAD_ATTEMPT_COUNT
 
     data class Pending(
         override val id: UUID,
@@ -602,5 +614,5 @@ internal const val DOWNLOAD_FILE_PATH_KEY = "${WORKER_TAG}download_file_path"
 internal const val ERROR_MESSAGE_KEY = "${WORKER_TAG}error_message"
 
 private val OUT_OF_STORAGE_MESSAGES = setOf("no space", "not enough space", "disk full", "quota")
-internal const val MAX_DOWNLOAD_ATTEMPT_COUNT = 3
+private const val MAX_DOWNLOAD_ATTEMPT_COUNT = 3
 internal const val MISSING_DOWNLOADED_FILE_PATH_ERROR = "Unable to find the downloaded file path. This should never happen. Please contact support."

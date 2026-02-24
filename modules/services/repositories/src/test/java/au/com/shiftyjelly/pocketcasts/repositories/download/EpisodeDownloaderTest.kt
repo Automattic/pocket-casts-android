@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result
 import java.util.Date
 import junit.framework.TestCase.assertEquals
@@ -32,6 +33,8 @@ class EpisodeDownloaderTest {
 
     private lateinit var episode: PodcastEpisode
 
+    private lateinit var userEpisode: UserEpisode
+
     private val minContentLength = 10L
 
     private val downloader = EpisodeDownloader(
@@ -45,6 +48,11 @@ class EpisodeDownloaderTest {
         server.start()
         episode = PodcastEpisode(
             uuid = "episode-uuid",
+            downloadUrl = server.url("/episode.mp3").toString(),
+            publishedDate = Date(),
+        )
+        userEpisode = UserEpisode(
+            uuid = "user-episode-uuid",
             downloadUrl = server.url("/episode.mp3").toString(),
             publishedDate = Date(),
         )
@@ -247,7 +255,7 @@ class EpisodeDownloaderTest {
     }
 
     @Test
-    fun `fail to download episode with too suspicious file size content`() {
+    fun `fail to download episode with suspicious file size content`() {
         server.enqueue(MockResponse(body = "a".repeat(minContentLength.toInt() - 1)))
         val result = downloader.download(
             episode = episode,
@@ -256,6 +264,24 @@ class EpisodeDownloaderTest {
         )
 
         assertEquals(Result.SuspiciousFileSize(minContentLength - 1), result)
+    }
+
+    @Test
+    fun `do not fail to download user episode with suspicious file size content`() {
+        val downloadFile = tempDir.newFile("file.mp3")
+
+        val content = "a".repeat(minContentLength.toInt() - 1)
+        server.enqueue(MockResponse(body = content))
+        val result = downloader.download(
+            episode = userEpisode,
+            downloadFile = downloadFile,
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.Success(downloadFile), result)
+        assertEquals(100, progressCache.progressFlow(userEpisode.uuid).value?.percentage)
+        assertEquals(server.takeRequest().url, userEpisode.downloadUrl?.toHttpUrl())
+        assertEquals(content, downloadFile.readText())
     }
 
     @Test

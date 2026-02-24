@@ -6,12 +6,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -46,7 +48,7 @@ class PlaylistViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     private val settings: Settings,
     playAllHandlerFactory: PlayAllHandler.Factory,
     private val analyticsTracker: AnalyticsTracker,
@@ -136,11 +138,11 @@ class PlaylistViewModel @AssistedInject constructor(
     fun downloadAll() {
         val episodes = uiState.value.playlist
             ?.episodes
-            ?.take(DOWNLOAD_ALL_LIMIT)
             ?.toPodcastEpisodes()
-        episodes?.forEach { episode ->
-            downloadManager.addEpisodeToQueue(episode, "filter download all", fireEvent = false, source = SourceView.FILTERS)
-        }
+            ?.take(DOWNLOAD_ALL_LIMIT)
+            ?.map(PodcastEpisode::uuid)
+            .orEmpty()
+        downloadQueue.enqueueAll(episodes, DownloadType.UserTriggered(waitForWifi = false), SourceView.FILTERS)
     }
 
     fun deleteEpisode(episodeUuid: String) {

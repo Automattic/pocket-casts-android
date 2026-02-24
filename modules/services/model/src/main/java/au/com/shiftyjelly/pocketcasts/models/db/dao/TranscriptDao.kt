@@ -23,11 +23,8 @@ abstract class TranscriptDao {
         insertAll(transcripts)
     }
 
-    @Query("DELETE FROM episode_transcript WHERE episode_uuid = :episodeUuid")
-    abstract suspend fun deleteForEpisode(episodeUuid: String)
-
     @Transaction
-    open suspend fun deleteForEpisodes(episodeUuids: List<String>) {
+    open suspend fun deleteForEpisodes(episodeUuids: Collection<String>) {
         episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
             deleteForEpisodesUnsafe(chunk)
         }

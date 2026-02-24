@@ -29,8 +29,6 @@ interface PlaylistManager {
 
     suspend fun refreshEpisodeCount(playlistUuid: String)
 
-    suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode>
-
     suspend fun sortPlaylists(sortedUuids: List<String>)
 
     suspend fun updateName(uuid: String, name: String)

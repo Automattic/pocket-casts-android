@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode.Companion.AUTO_DOWNLOAD_STATUS_ALLOW
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -40,7 +41,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "playing_status") override var playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED,
     @ColumnInfo(name = "podcast_id") var podcastUuid: String = "",
     @ColumnInfo(name = "added_date") override var addedDate: Date = Date(),
-    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = 0,
+    @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = AUTO_DOWNLOAD_STATUS_ALLOW,
     @ColumnInfo(name = "starred") override var isStarred: Boolean = false,
     @ColumnInfo(name = "thumbnail_status") var thumbnailStatus: Int = THUMBNAIL_STATUS_UNKNOWN,
     @ColumnInfo(name = "last_download_attempt_date") override var lastDownloadAttemptDate: Date? = null,
@@ -87,42 +88,12 @@ data class PodcastEpisode(
     }
 
     companion object {
-
-        /**
-         * Auto Download Status
-         *
-         * AUTO_DOWNLOAD_STATUS_IGNORE
-         * - user swipes to mark as played (with delete file on)
-         * - user deletes file from episode popup card
-         * - user bulk deletes file
-         * - clean up deletes the file
-         *
-         * AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-         * - episode is either in auto download settings for the podcast or a playlist
-         *
-         * AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
-         * - user pressed later on the dialog warning they are not on WiFi
-         * - user pressed download all on a page
-         * - user pressed retry download
-         * - user pressed add to Up Next
-         *
-         * AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-         * - user pressed download now and use my mobile data
-         */
-        const val AUTO_DOWNLOAD_STATUS_NOT_SPECIFIED = 0
-        const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
-        const val AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED = 2
-        const val AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED = 3
-        const val AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI = 4
-
         const val THUMBNAIL_STATUS_UNKNOWN = 0
         const val THUMBNAIL_STATUS_EMBEDDED_AVAILABLE = 1
         const val THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE = 2
 
         const val LAST_PLAYBACK_INTERACTION_NOT_SYNCED = 0L
         const val LAST_PLAYBACK_INTERACTION_SYNCED = 1L
-
-        private const val MIN_BYTES_FOR_PLAYBACK_DURING_DOWNLOAD: Long = 15360
 
         fun seasonPrefix(episodeType: EpisodeType, season: Long?, number: Long?, resources: Resources): String? {
             return if (episodeType !is EpisodeType.Bonus && (season ?: 0 > 0 || number ?: 0 > 0)) {

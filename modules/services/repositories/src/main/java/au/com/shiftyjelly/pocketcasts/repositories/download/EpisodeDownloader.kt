@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import androidx.annotation.WorkerThread
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import dagger.Lazy
 import java.io.File
 import java.io.IOException
@@ -45,6 +47,7 @@ internal class EpisodeDownloader(
     private val httpClient: Lazy<Call.Factory>,
     private val progressCache: DownloadProgressCache,
     private val minContentLength: Long = SUSPICIOUS_FILE_SIZE,
+    private val onCall: (Call) -> Unit = {},
     private val onResponse: (Response) -> Unit = {},
     private val onComplete: (DownloadProgress?, fileSize: Long) -> Unit = { _, _ -> },
 ) {
@@ -76,6 +79,7 @@ internal class EpisodeDownloader(
 
         val request = Request.Builder().url(downloadUrl).build()
         val call = httpClient.get().newCall(request)
+        onCall(call)
 
         progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
         return call.blockingEnqueue().use { response ->
@@ -92,7 +96,11 @@ internal class EpisodeDownloader(
 
             response.downloadProgressSource(episode).readTo(tempFile)
             val fileSize = tempFile.length()
-            if (fileSize < minContentLength) {
+            val isValidFileSize = when (episode) {
+                is PodcastEpisode -> fileSize >= minContentLength
+                is UserEpisode -> true
+            }
+            if (!isValidFileSize) {
                 return Result.SuspiciousFileSize(fileSize)
             }
 

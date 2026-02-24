@@ -440,14 +440,15 @@ enum class AnalyticsEvent(val key: String) {
     MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_FINISHED("multi_select_view_overflow_menu_rearrange_finished"),
 
     /* Episode */
-    EPISODE_DOWNLOAD_DELETED("episode_download_deleted"),
-    EPISODE_BULK_DOWNLOAD_DELETED("episode_bulk_download_deleted"),
-    EPISODE_DELETED_FROM_CLOUD("episode_deleted_from_cloud"),
     EPISODE_DOWNLOAD_QUEUED("episode_download_queued"),
     EPISODE_BULK_DOWNLOAD_QUEUED("episode_bulk_download_queued"),
     EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
     EPISODE_DOWNLOAD_FAILED("episode_download_failed"),
     EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
+    EPISODE_BULK_DOWNLOAD_CANCELLED("episode_bulk_download_cancelled"),
+    EPISODE_DOWNLOAD_DELETED("episode_download_deleted"),
+    EPISODE_BULK_DOWNLOAD_DELETED("episode_bulk_download_deleted"),
+    EPISODE_DELETED_FROM_CLOUD("episode_deleted_from_cloud"),
     EPISODE_DOWNLOAD_STALE("episode_downloads_stale"),
     EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
     EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
