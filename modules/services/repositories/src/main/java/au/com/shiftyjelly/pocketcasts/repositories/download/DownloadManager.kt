@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
-class DownloadManager2 @Inject constructor(
+class DownloadManager @Inject constructor(
     appDatabase: AppDatabase,
     settings: Settings,
     clock: Clock,
