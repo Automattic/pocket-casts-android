@@ -3,6 +3,9 @@
 *   New Features
     *   Support predictive back navigation
         ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
+*   Updates
+    *   Improve the design of podcasts missing artwork on the podcasts tab
+        ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
 *   Bug Fixes
     *   Respect global auto download setting
         ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
@@ -11,9 +14,6 @@
 
 8.6
 -----
-*   Updates
-    *   Improve the design of podcasts missing artwork on the podcasts tab
-        ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
 *   Bug Fixes
     *   Fix up next queue episode ordering on the large widget
         ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
