@@ -211,8 +211,14 @@ data class SubscriptionPlans private constructor(
 
         private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.Base> {
             val pricingPhase = pricingPlans.basePlan.pricingPhases.getOrNull(0)
+            val hasInstallmentDetails = pricingPlans.basePlan.installmentPlanDetails != null
             return when {
                 pricingPhase == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing pricing phase for $id")
+
+                key.isInstallment && !hasInstallmentDetails -> PaymentResult.Failure(
+                    PaymentResultCode.DeveloperError,
+                    "Key expects installment plan but product $id has no installmentPlanDetails",
+                )
 
                 else -> PaymentResult.Success(
                     SubscriptionPlan.Base(
@@ -246,7 +252,7 @@ data class SubscriptionPlans private constructor(
                         key.billingCycle,
                         key.offer,
                         matchingOfferPlan.pricingPhases,
-                        hasInstallmentDetails,
+                        pricingPlans.basePlan.installmentPlanDetails,
                     ),
                 )
             }
@@ -272,22 +278,17 @@ sealed interface SubscriptionPlan {
         is Base -> pricingPhase.price
         is WithOffer -> pricingPhases.last().price
     }
-
-    val isInstallmentPlan: Boolean
-        get() = when (this) {
-            is Base -> this.isInstallment
-            is WithOffer -> this.isInstallment
-        }
+    val installmentPlanDetails: InstallmentPlanDetails?
+    val isInstallment get() = installmentPlanDetails != null
 
     data class Base(
         override val name: String,
         override val tier: SubscriptionTier,
         override val billingCycle: BillingCycle,
         val pricingPhase: PricingPhase,
-        val installmentPlanDetails: InstallmentPlanDetails? = null,
+        override val installmentPlanDetails: InstallmentPlanDetails? = null,
     ) : SubscriptionPlan {
         override val offer get() = null
-        val isInstallment: Boolean get() = installmentPlanDetails != null
         override val key get() = Key(tier, billingCycle, offer = null, isInstallment)
     }
 
@@ -297,7 +298,7 @@ sealed interface SubscriptionPlan {
         override val billingCycle: BillingCycle,
         override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
-        val isInstallment: Boolean = false,
+        override val installmentPlanDetails: InstallmentPlanDetails? = null,
     ) : SubscriptionPlan {
         override val key get() = Key(tier, billingCycle, offer, isInstallment)
     }

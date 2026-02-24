@@ -75,7 +75,7 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
-    val calculatedSavingPercent = if (plan.isInstallmentPlan && plan.offer == null) {
+    val calculatedSavingPercent = if (plan.isInstallment && plan.offer == null) {
         null
     } else {
         priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) }
@@ -288,7 +288,7 @@ private fun CheckMark(
 
 private val SubscriptionPlan.pricePerMonth: Float
     get() {
-        val totalYearlyAmount = if (isInstallmentPlan) {
+        val totalYearlyAmount = if (isInstallment) {
             recurringPrice.amount * monthsInYear
         } else {
             when (billingCycle) {
@@ -306,7 +306,7 @@ private val SubscriptionPlan.pricePerMonth: Float
 
 private val SubscriptionPlan.pricePerWeek: Float
     get() {
-        val totalYearlyAmount = if (isInstallmentPlan) {
+        val totalYearlyAmount = if (isInstallment) {
             recurringPrice.amount * monthsInYear
         } else {
             when (billingCycle) {
@@ -340,7 +340,7 @@ private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
 
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
-    if (isInstallmentPlan) {
+    if (isInstallment) {
         return when (this) {
             is SubscriptionPlan.WithOffer -> when (config.pricePerPeriod) {
                 PricePerPeriod.PRICE_PER_WEEK -> {
@@ -397,7 +397,7 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @ReadOnlyComposable
 private fun SubscriptionPlan.displayName(): String {
     return when {
-        isInstallmentPlan -> stringResource(LR.string.plus_yearly_installments)
+        isInstallment -> stringResource(LR.string.plus_yearly_installments)
         else -> name
     }
 }
@@ -405,7 +405,7 @@ private fun SubscriptionPlan.displayName(): String {
 @Composable
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
-    if (isInstallmentPlan) {
+    if (isInstallment) {
         return when (this) {
             is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_month, recurringPrice.formattedPrice)
             is SubscriptionPlan.WithOffer -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
