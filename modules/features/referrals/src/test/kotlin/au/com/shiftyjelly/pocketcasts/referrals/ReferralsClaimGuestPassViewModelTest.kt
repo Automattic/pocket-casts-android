@@ -50,7 +50,7 @@ class ReferralsClaimGuestPassViewModelTest {
     private lateinit var viewModel: ReferralsClaimGuestPassViewModel
     private val referralCode = "referral_code"
     private val referralPlan = SubscriptionPlans.Preview
-        .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+        .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral, isInstallment = true)
         .flatMap(ReferralSubscriptionPlan::create)
         .getOrNull()!!
 

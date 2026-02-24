@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.InstallmentPlanDetails
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
 import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
@@ -128,6 +129,7 @@ class ReferralSubscriptionPlanTest {
     @Test
     fun `installment plan calculates properties correctly`() {
         // Create an installment plan with monthly billing
+        // Real installment plans have periodCount = 0 (infinite) and store commitment in installmentPlanDetails
         val monthlyPrice = Price(
             amount = 4.99.toBigDecimal(),
             currencyCode = "USD",
@@ -138,24 +140,29 @@ class ReferralSubscriptionPlanTest {
             schedule = PricingSchedule(
                 recurrenceMode = RecurrenceMode.Infinite,
                 period = Period.Monthly,
-                periodCount = 12,
+                periodCount = 0, // Infinite recurrence, commitment is in installmentPlanDetails
             ),
         )
         val installmentPlan = rawPlan.copy(
             billingCycle = BillingCycle.Monthly,
             pricingPhases = listOf(rawPlan.pricingPhases[0], paidPhase),
-            isInstallment = true,
+            installmentPlanDetails = InstallmentPlanDetails(
+                commitmentPaymentsCount = 12, // Total 1-year commitment
+                subsequentCommitmentPaymentsCount = 12,
+            ),
         )
 
         val plan = ReferralSubscriptionPlan.create(installmentPlan).getOrNull()
 
         assertNotNull(plan)
         assertTrue(plan!!.isInstallment)
-        assertEquals(12, plan.commitmentPaymentsCount)
-        assertEquals(0, plan.totalCommitmentAmount.compareTo(59.88.toBigDecimal()))
+        // commitmentPaymentsCount = total commitment (12) - free months (2) = 10 paid months
+        assertEquals(10, plan.commitmentPaymentsCount)
+        // totalCommitmentAmount = 10 months × $4.99 = $49.90
+        assertEquals(0, plan.totalCommitmentAmount.compareTo(49.90.toBigDecimal()))
         assertTrue(plan.formattedTotalCommitmentAmount.isNotEmpty())
         // Verify the formatted amount contains the expected value (currency formatting may vary by locale)
-        assertTrue(plan.formattedTotalCommitmentAmount.contains("59.88"))
+        assertTrue(plan.formattedTotalCommitmentAmount.contains("49.90"))
     }
 
     @Test
@@ -172,6 +179,7 @@ class ReferralSubscriptionPlanTest {
     @Test
     fun `installment plan with non-monthly period returns zero commitment count`() {
         // Create an installment plan with yearly billing (not monthly)
+        // This is an edge case that shouldn't happen in reality, but we test defensive behavior
         val yearlyPrice = Price(
             amount = 39.99.toBigDecimal(),
             currencyCode = "USD",
@@ -182,13 +190,16 @@ class ReferralSubscriptionPlanTest {
             schedule = PricingSchedule(
                 recurrenceMode = RecurrenceMode.Infinite,
                 period = Period.Yearly,
-                periodCount = 2,
+                periodCount = 0,
             ),
         )
         val installmentPlan = rawPlan.copy(
             billingCycle = BillingCycle.Yearly,
             pricingPhases = listOf(rawPlan.pricingPhases[0], paidPhase),
-            isInstallment = true,
+            installmentPlanDetails = InstallmentPlanDetails(
+                commitmentPaymentsCount = 2,
+                subsequentCommitmentPaymentsCount = 2,
+            ),
         )
 
         val plan = ReferralSubscriptionPlan.create(installmentPlan).getOrNull()
@@ -215,20 +226,24 @@ class ReferralSubscriptionPlanTest {
             schedule = PricingSchedule(
                 recurrenceMode = RecurrenceMode.Infinite,
                 period = Period.Monthly,
-                periodCount = 12,
+                periodCount = 0,
             ),
         )
         val installmentPlan = rawPlan.copy(
             billingCycle = BillingCycle.Monthly,
             pricingPhases = listOf(rawPlan.pricingPhases[0], paidPhase),
-            isInstallment = true,
+            installmentPlanDetails = InstallmentPlanDetails(
+                commitmentPaymentsCount = 12,
+                subsequentCommitmentPaymentsCount = 12,
+            ),
         )
 
         val plan = ReferralSubscriptionPlan.create(installmentPlan).getOrNull()
 
         assertNotNull(plan)
         assertTrue(plan!!.isInstallment)
-        assertEquals(12, plan.commitmentPaymentsCount)
+        // commitmentPaymentsCount = 12 - 2 free months = 10
+        assertEquals(10, plan.commitmentPaymentsCount)
         assertEquals(0, plan.totalCommitmentAmount.compareTo(BigDecimal.ZERO))
         // formattedTotalCommitmentAmount should be empty because totalCommitmentAmount is zero
         assertEquals("", plan.formattedTotalCommitmentAmount)
