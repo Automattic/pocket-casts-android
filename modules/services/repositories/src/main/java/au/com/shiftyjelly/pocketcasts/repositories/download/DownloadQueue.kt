@@ -45,5 +45,7 @@ sealed interface DownloadType {
         val waitForWifi: Boolean,
     ) : DownloadType
 
-    data object Automatic : DownloadType
+    data class Automatic(
+        val bypassAutoDownloadStatus: Boolean,
+    ) : DownloadType
 }

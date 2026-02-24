@@ -191,6 +191,7 @@ class UpNextQueueImpl @Inject constructor(
     override suspend fun playNow(
         episode: BaseEpisode,
         automaticUpNextSource: AutoPlaySource?,
+        isUserInitiated: Boolean,
         onAdd: (() -> Unit)?,
     ) = withContext(coroutineContext) {
         // Don't build an Up Next if it is already empty
@@ -202,24 +203,36 @@ class UpNextQueueImpl @Inject constructor(
             saveChangesBlocking(UpNextAction.ClearAll)
         }
         saveChangesBlocking(UpNextAction.PlayNow(episode, onAdd))
+        downloadIfPossible(episode, isUserInitiated)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override suspend fun playNextBlocking(episode: BaseEpisode, onAdd: (() -> Unit)?) {
-        playNextNowBlocking(episode, onAdd)
+    override suspend fun playNextBlocking(
+        episode: BaseEpisode,
+        isUserInitiated: Boolean,
+        onAdd: (() -> Unit)?,
+    ) {
+        playNextNowBlocking(episode, isUserInitiated, onAdd)
     }
 
-    private suspend fun playNextNowBlocking(episode: BaseEpisode, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    private suspend fun playNextNowBlocking(
+        episode: BaseEpisode,
+        isUserInitiated: Boolean,
+        onAdd: (() -> Unit)?,
+    ) = withContext(coroutineContext) {
         saveChangesBlocking(UpNextAction.PlayNext(episode, onAdd))
-        downloadIfPossible(episode)
+        downloadIfPossible(episode, isUserInitiated)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override suspend fun playAllNext(episodes: List<BaseEpisode>) = withContext(coroutineContext) {
+    override suspend fun playAllNext(
+        episodes: List<BaseEpisode>,
+        isUserInitiated: Boolean,
+    ) = withContext(coroutineContext) {
         appDatabase.runInTransaction {
             val current = currentEpisode
             val queued = queueEpisodes
@@ -235,41 +248,57 @@ class UpNextQueueImpl @Inject constructor(
                     }
                 }
             }
-            replaceAll(prependedEpisodes)
+            replaceAll(prependedEpisodes, isUserInitiated)
         }
     }
 
-    override suspend fun clearAndPlayAll(episodes: List<BaseEpisode>) = withContext(coroutineContext) {
-        clearAndPlayAllBlocking(episodes)
+    override suspend fun clearAndPlayAll(
+        episodes: List<BaseEpisode>,
+        isUserInitiated: Boolean,
+    ) = withContext(coroutineContext) {
+        clearAndPlayAllBlocking(episodes, isUserInitiated)
     }
 
-    private fun clearAndPlayAllBlocking(episodes: List<BaseEpisode>) {
+    private fun clearAndPlayAllBlocking(
+        episodes: List<BaseEpisode>,
+        isUserInitiated: Boolean,
+    ) {
         changeList(episodes)
         episodes.forEach { episode ->
-            downloadIfPossible(episode)
+            downloadIfPossible(episode, isUserInitiated)
             if (episode.isFinished) {
                 episodeManager.markAsNotPlayedBlocking(episode)
             }
         }
     }
 
-    private fun replaceAll(episodes: List<BaseEpisode>) {
+    private fun replaceAll(
+        episodes: List<BaseEpisode>,
+        isUserInitiated: Boolean,
+    ) {
         saveChangesBlocking(UpNextAction.ReplaceAll(episodes))
         episodes.forEach { episode ->
-            downloadIfPossible(episode)
+            downloadIfPossible(episode, isUserInitiated)
             if (episode.isFinished) {
                 episodeManager.markAsNotPlayedBlocking(episode)
             }
         }
     }
 
-    override suspend fun playLast(episode: BaseEpisode, onAdd: (() -> Unit)?) {
+    override suspend fun playLast(
+        episode: BaseEpisode,
+        isUserInitiated: Boolean,
+        onAdd: (() -> Unit)?,
+    ) {
         withContext(coroutineContext) {
-            playLastNowBlocking(episode, onAdd)
+            playLastNowBlocking(episode, isUserInitiated, onAdd)
         }
     }
 
-    override suspend fun playAllLast(episodes: List<BaseEpisode>) = withContext(coroutineContext) {
+    override suspend fun playAllLast(
+        episodes: List<BaseEpisode>,
+        isUserInitiated: Boolean,
+    ) = withContext(coroutineContext) {
         appDatabase.runInTransaction {
             val current = currentEpisode
             val queued = queueEpisodes
@@ -285,13 +314,17 @@ class UpNextQueueImpl @Inject constructor(
                 }
                 addAll(episodes)
             }
-            replaceAll(appendedEpisodes)
+            replaceAll(appendedEpisodes, isUserInitiated)
         }
     }
 
-    private fun playLastNowBlocking(episode: BaseEpisode, onAdd: (() -> Unit)?) {
+    private fun playLastNowBlocking(
+        episode: BaseEpisode,
+        isUserInitiated: Boolean,
+        onAdd: (() -> Unit)?,
+    ) {
         saveChangesBlocking(UpNextAction.PlayLast(episode, onAdd))
-        downloadIfPossible(episode)
+        downloadIfPossible(episode, isUserInitiated)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
@@ -351,7 +384,7 @@ class UpNextQueueImpl @Inject constructor(
             if (firstEpisode != null && firstEpisode.uuid == playingEpisode.uuid) {
                 saveChangesBlocking(UpNextAction.Import(episodes))
 
-                downloadIfPossible(episodes)
+                downloadIfPossible(episodes, isUserInitiated = false)
             } else {
                 // move the playing episode to the top
                 val modifiedList = episodes.filterNot { it.uuid == playingEpisode.uuid }.toMutableList()
@@ -360,12 +393,12 @@ class UpNextQueueImpl @Inject constructor(
                 saveChangesBlocking(UpNextAction.Import(modifiedList))
                 upNextChangeDao.savePlayNowBlocking(playingEpisode)
 
-                downloadIfPossible(modifiedList)
+                downloadIfPossible(modifiedList, isUserInitiated = false)
             }
         } else {
             saveChangesBlocking(UpNextAction.Import(episodes))
 
-            downloadIfPossible(episodes)
+            downloadIfPossible(episodes, isUserInitiated = false)
         }
     }
 
@@ -398,14 +431,15 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun downloadIfPossible(episode: BaseEpisode) {
-        downloadIfPossible(setOf(episode))
+    private fun downloadIfPossible(episode: BaseEpisode, isUserInitiated: Boolean) {
+        downloadIfPossible(setOf(episode), isUserInitiated)
     }
 
-    private fun downloadIfPossible(episodes: Collection<BaseEpisode>) {
+    private fun downloadIfPossible(episodes: Collection<BaseEpisode>, isUserInitiated: Boolean) {
         if (settings.autoDownloadUpNext.value) {
             val uuids = episodes.map(BaseEpisode::uuid)
-            downloadQueue.enqueueAll(uuids, DownloadType.Automatic, SourceView.UP_NEXT)
+            val type = DownloadType.Automatic(bypassAutoDownloadStatus = isUserInitiated)
+            downloadQueue.enqueueAll(uuids, type, SourceView.UP_NEXT)
         }
     }
 

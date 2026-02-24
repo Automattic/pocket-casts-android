@@ -306,7 +306,7 @@ private class DownloadQueueController(
         }
         val isDownloadTypeAllowed = when (downloadType) {
             is DownloadType.UserTriggered -> true
-            is DownloadType.Automatic -> !episode.isAutoDownloadDisabled && !episode.isDownloadFailure
+            is DownloadType.Automatic -> !episode.isDownloadFailure && (downloadType.bypassAutoDownloadStatus || !episode.isAutoDownloadDisabled)
         }
         return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed
     }

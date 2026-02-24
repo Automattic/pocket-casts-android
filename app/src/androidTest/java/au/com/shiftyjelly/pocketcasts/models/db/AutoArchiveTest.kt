@@ -534,7 +534,7 @@ class AutoArchiveTest {
         val updatedNewEpisode = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should be archived as it was archive modified 8 day ago (inactive setting = 7d)", updatedNewEpisode.isArchived)
 
-        runBlocking { upNext.playLast(updatedNewEpisode, null) }
+        runBlocking { upNext.playLast(updatedNewEpisode, onAdd = null) }
 
         val updatedNewEpisodeInUpNext = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next", !updatedNewEpisodeInUpNext.isArchived)
