@@ -17,10 +17,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UserEpisodeDao {

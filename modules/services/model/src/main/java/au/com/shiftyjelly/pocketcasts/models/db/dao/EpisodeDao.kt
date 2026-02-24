@@ -23,11 +23,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Dao
 abstract class EpisodeDao {
