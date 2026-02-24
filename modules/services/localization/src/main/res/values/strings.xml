@@ -2510,6 +2510,8 @@
     <string name="referrals_claim_guess_pass_banner_card_title">Claim your %1$s Guest Pass to Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Unlock the full listening experience</string>
     <string name="referrals_claim_guest_pass_description">Membership will automatically renew to a paid annual membership at %s.</string>
+    <!-- Referrals claim guest pass description for installment plans, `%1$s' is offer duration, `%2$s' is monthly price, `%3$d' is number of months, `%4$s' is total commitment amount -->
+    <string name="referrals_claim_guest_pass_description_installment">Free for %1$s, then %2$s/month for %3$d months. Total commitment: %4$s over 1 year.</string>
     <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your %1$s\nGuest Pass</string>
     <!-- Referrals claim guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_claim_guest_pass_title">Claim your %1$s Guest Pass</string>

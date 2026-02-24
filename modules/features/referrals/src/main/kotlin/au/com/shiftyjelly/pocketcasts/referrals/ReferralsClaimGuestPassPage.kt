@@ -307,8 +307,20 @@ private fun ClaimGuestPassContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val descriptionText = if (referralPlan.isInstallment) {
+            stringResource(
+                LR.string.referrals_claim_guest_pass_description_installment,
+                referralPlan.offerDurationText,
+                referralPlan.monthlyPaymentAmount,
+                referralPlan.commitmentPaymentsCount,
+                referralPlan.formattedTotalCommitmentAmount,
+            )
+        } else {
+            stringResource(LR.string.referrals_claim_guest_pass_description, price)
+        }
+
         TextP60(
-            text = stringResource(LR.string.referrals_claim_guest_pass_description, price),
+            text = descriptionText,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(guestPassCardWidth),
         )
