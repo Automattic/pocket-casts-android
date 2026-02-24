@@ -223,7 +223,7 @@ class RefreshPodcastsThread(
 
         startTime = SystemClock.elapsedRealtime()
         val episodes = runBlocking { autoDownloadProvider.getAll(addedEpisodes.episodeUuidsAdded) }
-        downloadQueue.enqueueAll(episodes, DownloadType.Automatic, SourceView.AUTO_DOWNLOAD)
+        downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToDownload - ${SystemClock.elapsedRealtime() - startTime} ms}")
 
         if (syncRefreshState is RefreshState.Failed) {

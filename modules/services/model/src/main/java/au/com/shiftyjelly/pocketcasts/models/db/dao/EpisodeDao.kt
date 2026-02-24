@@ -12,6 +12,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -347,7 +348,7 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET downloaded_file_path = :downloadedFilePath WHERE uuid = :uuid")
     abstract fun updateDownloadedFilePathBlocking(downloadedFilePath: String, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET auto_download_status = 1 WHERE uuid IN (:uuids)")
+    @Query("UPDATE podcast_episodes SET auto_download_status = ${BaseEpisode.AUTO_DOWNLOAD_STATUS_IGNORE} WHERE uuid IN (:uuids)")
     protected abstract suspend fun disableAutoDownloadUnsafe(uuids: Collection<String>)
 
     @Transaction

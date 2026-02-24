@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 
 interface DownloadQueue {
@@ -31,11 +33,11 @@ interface DownloadQueue {
     fun cancelAll(
         podcastUuid: String,
         sourceView: SourceView,
-    ): Job
+    ): Deferred<Collection<BaseEpisode>>
 
     fun cancelAll(
         sourceView: SourceView,
-    ): Job
+    ): Deferred<Collection<BaseEpisode>>
 
     fun clearAllDownloadErrors(): Job
 }
@@ -45,5 +47,7 @@ sealed interface DownloadType {
         val waitForWifi: Boolean,
     ) : DownloadType
 
-    data object Automatic : DownloadType
+    data class Automatic(
+        val bypassAutoDownloadStatus: Boolean,
+    ) : DownloadType
 }

@@ -380,7 +380,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 add(newEpisode, playbackManager)
 
                 if (newEpisode.canQueueForAutoDownload && settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
-                    downloadQueue.enqueue(newEpisode.uuid, DownloadType.Automatic, SourceView.UNKNOWN)
+                    downloadQueue.enqueue(newEpisode.uuid, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.UNKNOWN)
                 }
             }
         }

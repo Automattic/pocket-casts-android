@@ -595,7 +595,7 @@ class ProfileEpisodeListFragment :
 
     private fun stopAllDownloads() {
         analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to STOP_ALL_DOWNLOADS))
-        downloadQueue.cancelAll(SourceView.DOWNLOADS)
+        viewModel.cancelAllDownloads()
     }
 
     private fun showCleanupSettings() {

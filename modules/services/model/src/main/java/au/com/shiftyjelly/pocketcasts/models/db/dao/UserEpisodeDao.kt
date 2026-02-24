@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -102,7 +103,7 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
     abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeDownloadStatus)
 
-    @Query("UPDATE user_episodes SET auto_download_status = 1 WHERE uuid IN (:uuids)")
+    @Query("UPDATE user_episodes SET auto_download_status = ${BaseEpisode.AUTO_DOWNLOAD_STATUS_IGNORE} WHERE uuid IN (:uuids)")
     protected abstract suspend fun disableAutoDownloadUnsafe(uuids: Collection<String>)
 
     @Transaction

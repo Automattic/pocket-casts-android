@@ -118,7 +118,7 @@ class SubscribeManager @Inject constructor(
                             .filter(PodcastEpisode::canQueueForAutoDownload)
                             .map(PodcastEpisode::uuid)
                             .toSet()
-                        downloadQueue.enqueueAll(episodeUuids, DownloadType.Automatic, SourceView.DOWNLOADS)
+                        downloadQueue.enqueueAll(episodeUuids, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.DOWNLOADS)
                     }
                 }
             }

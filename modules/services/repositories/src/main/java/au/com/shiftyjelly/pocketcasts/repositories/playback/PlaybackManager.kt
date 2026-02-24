@@ -623,7 +623,7 @@ open class PlaybackManager @Inject constructor(
         userInitiated: Boolean = true,
     ) = withContext(Dispatchers.Default) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playNextBlocking(episode, onAdd = null)
+        upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -639,7 +639,7 @@ open class PlaybackManager @Inject constructor(
         userInitiated: Boolean = true,
     ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playLast(episode, onAdd = null)
+        upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
