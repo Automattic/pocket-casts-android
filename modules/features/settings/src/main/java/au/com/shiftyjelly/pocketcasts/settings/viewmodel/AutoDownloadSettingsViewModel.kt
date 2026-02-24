@@ -14,10 +14,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPrevie
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,11 +28,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @HiltViewModel
 class AutoDownloadSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playlistManager: PlaylistManager,
+    private val episodeManager: EpisodeManager,
     private val downloadQueue: DownloadQueue,
     private val settings: Settings,
     private val tracker: AnalyticsTracker,
@@ -244,7 +246,10 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun stopAllDownloads() {
         tracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS)
-        downloadQueue.cancelAll(SourceView.DOWNLOADS)
+        viewModelScope.launch {
+            val cancelledDownloads = downloadQueue.cancelAll(SourceView.DOWNLOADS).await()
+            episodeManager.disableAutoDownload(cancelledDownloads)
+        }
     }
 
     fun clearDownloadErrors() {

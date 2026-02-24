@@ -32,16 +32,11 @@ import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toUuidOrNull
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
-import java.time.Clock
-import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +48,13 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.io.File
+import java.time.Clock
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -105,12 +107,12 @@ class DownloadManager2 @Inject constructor(
         return scope.launch { queueController.removeFromQueue(episodeUuids, sourceView) }
     }
 
-    override fun cancelAll(podcastUuid: String, sourceView: SourceView): Job {
-        return scope.launch { queueController.removeFromQueue(podcastUuid, sourceView) }
+    override fun cancelAll(podcastUuid: String, sourceView: SourceView): Deferred<Collection<BaseEpisode>> {
+        return scope.async { queueController.removeFromQueue(podcastUuid, sourceView) }
     }
 
-    override fun cancelAll(sourceView: SourceView): Job {
-        return scope.launch { queueController.clearQueue(sourceView) }
+    override fun cancelAll(sourceView: SourceView): Deferred<Collection<BaseEpisode>> {
+        return scope.async { queueController.clearQueue(sourceView) }
     }
 
     override fun clearAllDownloadErrors(): Job {
@@ -213,9 +215,9 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun removeFromQueue(episodeUuids: Collection<String>, sourceView: SourceView) {
+    suspend fun removeFromQueue(episodeUuids: Collection<String>, sourceView: SourceView): Collection<BaseEpisode> {
         if (episodeUuids.isEmpty()) {
-            return
+            return emptySet()
         }
 
         val resetEpisodes = downloadDao.withTransaction {
@@ -240,6 +242,7 @@ private class DownloadQueueController(
             workManager.cancelAllWorkByTag(DownloadEpisodeWorker.episodeTag(episodeUuid))
             workManager.cancelAllWorkByTag(UpdateShowNotesTask.episodeTag(episodeUuid))
         }
+        return resetEpisodes.values
     }
 
     private fun cleanUpDownloads(episodes: Map<String, BaseEpisode>, sourceView: SourceView) {
@@ -262,18 +265,20 @@ private class DownloadQueueController(
         }
     }
 
-    suspend fun removeFromQueue(podcastUuid: String, sourceView: SourceView) {
+    suspend fun removeFromQueue(podcastUuid: String, sourceView: SourceView): Collection<BaseEpisode> {
         val episodeUuids = downloadDao.findPodcastEpisodesUuids(podcastUuid)
-        removeFromQueue(episodeUuids, sourceView)
+        val removedEpisodes = removeFromQueue(episodeUuids, sourceView)
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.podcastTag(podcastUuid))
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.podcastTag(podcastUuid))
+        return removedEpisodes
     }
 
-    suspend fun clearQueue(sourceView: SourceView) {
+    suspend fun clearQueue(sourceView: SourceView): Collection<BaseEpisode> {
         val episodeUuids = downloadDao.findCancellableEpisodes().map(BaseEpisode::uuid)
-        removeFromQueue(episodeUuids, sourceView)
+        val removedEpisodes = removeFromQueue(episodeUuids, sourceView)
         workManager.cancelAllWorkByTag(DownloadEpisodeWorker.WORKER_TAG)
         workManager.cancelAllWorkByTag(UpdateShowNotesTask.WORKER_TAG)
+        return removedEpisodes
     }
 
     fun cancelExcessiveDownloads(workInfos: Collection<DownloadWorkInfo>) {

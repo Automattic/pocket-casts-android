@@ -6,15 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,13 +28,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ProfileEpisodeListViewModel @Inject constructor(
-    val episodeManager: EpisodeManager,
-    val playbackManager: PlaybackManager,
+    private val episodeManager: EpisodeManager,
+    private val downloadQueue: DownloadQueue,
     private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     private val userManager: UserManager,
@@ -183,5 +184,12 @@ class ProfileEpisodeListViewModel @Inject constructor(
         analyticsEvent: AnalyticsEvent,
     ) {
         mode?.let { analyticsTracker.track(analyticsEvent, mapOf("source" to it.source.analyticsValue)) }
+    }
+
+    fun cancelAllDownloads() {
+        viewModelScope.launch {
+            val cancelledEpisodes = downloadQueue.cancelAll(SourceView.DOWNLOADS).await()
+            episodeManager.disableAutoDownload(cancelledEpisodes)
+        }
     }
 }
