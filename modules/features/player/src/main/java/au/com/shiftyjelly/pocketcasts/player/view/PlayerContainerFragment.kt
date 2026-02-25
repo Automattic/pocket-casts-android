@@ -140,7 +140,7 @@ class PlayerContainerFragment :
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 updateUpNextVisibility(newState != BottomSheetBehavior.STATE_COLLAPSED)
-                notifyBackstackChanged()
+                notifyBackstackChangedToHost()
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
@@ -245,7 +245,7 @@ class PlayerContainerFragment :
         bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             binding.multiSelectToolbar.isVisible = isMultiSelecting
             binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
-            notifyBackstackChanged()
+            notifyBackstackChangedToHost()
         }
         bookmarksViewModel.multiSelectHelper.context = context
         binding.multiSelectToolbar.setup(
@@ -265,7 +265,7 @@ class PlayerContainerFragment :
     fun updateTabsVisibility(show: Boolean) {
         binding?.tabHolder?.isVisible = show
         binding?.viewPager?.isUserInputEnabled = show
-        notifyBackstackChanged()
+        notifyBackstackChangedToHost()
     }
 
     fun onPlayerOpen() {
@@ -316,6 +316,11 @@ class PlayerContainerFragment :
     fun updateUpNextVisibility(show: Boolean) {
         binding?.upNextFrameBottomSheet?.isVisible = show
         (activity as? FragmentHostListener)?.lockPlayerBottomSheet(show)
+    }
+
+    private fun notifyBackstackChangedToHost() {
+        notifyBackstackChanged()
+        (activity as? FragmentHostListener)?.onPlayerBackstackChanged()
     }
 
     override fun getBackstackCount(): Int {

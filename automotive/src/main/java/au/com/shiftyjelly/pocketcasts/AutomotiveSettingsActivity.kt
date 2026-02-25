@@ -170,4 +170,6 @@ class AutomotiveSettingsActivity :
 
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
     }
+
+    override fun onPlayerBackstackChanged() = Unit
 }
