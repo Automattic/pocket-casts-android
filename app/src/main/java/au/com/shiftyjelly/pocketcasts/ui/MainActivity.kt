@@ -772,8 +772,9 @@ class MainActivity :
             val playerContainerFragment =
                 supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
             val hasBackstack = playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
-            playerContainerBackstackCallback.isEnabled = hasBackstack
-            if (binding.playerBottomSheet.isPlayerOpen) {
+            val isPlayerOpen = binding.playerBottomSheet.isPlayerOpen
+            playerContainerBackstackCallback.isEnabled = isPlayerOpen && hasBackstack
+            if (isPlayerOpen) {
                 playerBottomSheetCallback.isEnabled = !hasBackstack
             }
         }
