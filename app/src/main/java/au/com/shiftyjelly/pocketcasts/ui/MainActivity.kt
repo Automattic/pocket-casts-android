@@ -794,7 +794,7 @@ class MainActivity :
         }
         onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
 
-        val frameBottomSheetCallback = object : OnBackPressedCallback(false) {
+        val frameBottomSheetCallback = object : OnBackPressedCallback(bottomSheetTag != null) {
             override fun handleOnBackPressed() {
                 frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
@@ -829,12 +829,14 @@ class MainActivity :
         this.upNextMultiSelectBackCallback = upNextMultiSelectCallback
         this.playerContainerBackCallback = playerContainerBackstackCallback
         this.modalFragmentBackCallback = modalFragmentCallback
+        this.frameBottomSheetBackCallback = frameBottomSheetCallback
     }
 
     private var playerBottomSheetBackCallback: OnBackPressedCallback? = null
     private var upNextMultiSelectBackCallback: OnBackPressedCallback? = null
     private var playerContainerBackCallback: OnBackPressedCallback? = null
     private var modalFragmentBackCallback: OnBackPressedCallback? = null
+    private var frameBottomSheetBackCallback: OnBackPressedCallback? = null
     private var playerContainerCallbackUpdater: (() -> Unit)? = null
 
     private var upNextMultiSelectObserver: Observer<Boolean>? = null
@@ -1277,6 +1279,7 @@ class MainActivity :
         }
 
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        frameBottomSheetBackCallback?.isEnabled = true
         frameBottomSheetBehavior.swipeEnabled = true
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         if (fragment is UpNextFragment) {
@@ -1288,6 +1291,7 @@ class MainActivity :
 
     override fun closeBottomSheet() {
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        frameBottomSheetBackCallback?.isEnabled = false
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
