@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistTooltip
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -11,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
+import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -30,6 +34,7 @@ class PlaylistsViewModel @Inject constructor(
     private val userManager: UserManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val showFreeAccountBanner = combine(
         settings.isFreeAccountFiltersBannerDismissed.flow,
@@ -153,11 +158,19 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun trackFreeAccountCtaClicked() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "filters"))
+        eventHorizon.track(
+            InformationalBannerViewCreateAccountTapEvent(
+                source = SourceView.FILTERS.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackFreeAccountBannerDismissed() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "filters"))
+        eventHorizon.track(
+            InformationalBannerViewDismissedEvent(
+                source = SourceView.FILTERS.eventHorizonValue,
+            ),
+        )
     }
 
     private fun shouldShowPremadePlaylistsTooltip(
