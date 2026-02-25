@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ConnectivityNotificationOverlay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.TimeTextWithConnectivity
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph

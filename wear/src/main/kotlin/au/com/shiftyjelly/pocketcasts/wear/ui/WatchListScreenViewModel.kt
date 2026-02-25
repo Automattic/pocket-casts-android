@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 
 @HiltViewModel
 class WatchListScreenViewModel @Inject constructor(
@@ -24,10 +26,12 @@ class WatchListScreenViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
+    connectivityStateManager: ConnectivityStateManager,
 ) : ViewModel() {
 
     data class State(
         val upNextQueue: UpNextQueue.State? = null,
+        val isConnected: Boolean = true,
     )
 
     private val _state = MutableStateFlow(State())
@@ -45,6 +49,14 @@ class WatchListScreenViewModel @Inject constructor(
                         it.copy(upNextQueue = upNextQueue)
                     }
                 }
+        }
+        viewModelScope.launch {
+            connectivityStateManager.isConnected.collect { isConnected ->
+                Timber.d("WatchListScreenViewModel: connectivity changed to $isConnected")
+                _state.update {
+                    it.copy(isConnected = isConnected)
+                }
+            }
         }
     }
 
