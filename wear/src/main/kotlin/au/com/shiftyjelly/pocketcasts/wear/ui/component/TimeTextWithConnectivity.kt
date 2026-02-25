@@ -7,17 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.foundation.CurvedDirection
-import androidx.wear.compose.foundation.CurvedLayout
-import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.foundation.curvedComposable
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.TimeText
-import androidx.wear.compose.material.curvedText
 import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import com.google.android.horologist.compose.layout.ResponsiveTimeText
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 /**
@@ -33,34 +28,33 @@ fun TimeTextWithConnectivity(
     isConnected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val textColor = MaterialTheme.colors.onBackground
-
-    CurvedLayout(
+    ResponsiveTimeText(
         modifier = modifier,
-        anchor = 270f,
-        angularDirection = CurvedDirection.Angular.Clockwise,
-    ) {
-        if (!isConnected) {
-            curvedComposable {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_cloud_off),
-                    contentDescription = "Offline",
-                    tint = textColor,
-                    modifier = Modifier.size(16.dp).padding(end = 2.dp),
-                )
+        startCurvedContent = if (isConnected) null else {
+            {
+                curvedComposable {
+                    OfflineIcon()
+                }
             }
-            curvedText(
-                text = " · ",
-                style = CurvedTextStyle(
-                    fontSize = 16.sp,
-                    color = textColor,
-                ),
-            )
-        }
-        curvedComposable {
-            TimeText()
-        }
-    }
+        },
+        startLinearContent = if (isConnected) null else {
+            {
+                OfflineIcon()
+            }
+        },
+    )
+}
+
+@Composable
+private fun OfflineIcon() {
+    Icon(
+        painter = painterResource(IR.drawable.ic_cloud_off),
+        contentDescription = "Offline icon",
+        tint = MaterialTheme.colors.onBackground,
+        modifier = Modifier
+            .size(16.dp)
+            .padding(end = 2.dp),
+    )
 }
 
 @Preview(device = WearDevices.SMALL_ROUND)
