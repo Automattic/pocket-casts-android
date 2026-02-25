@@ -3,6 +3,8 @@
 *   New Features
     *   Support predictive back navigation
         ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
+    *   Show offline indicator next to time on wear
+        ([#5036](https://github.com/Automattic/pocket-casts-android/pull/5036))
 *   Updates
     *   Improve the design of podcasts missing artwork on the podcasts tab
         ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
