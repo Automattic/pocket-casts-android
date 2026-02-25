@@ -30,14 +30,18 @@ fun TimeTextWithConnectivity(
 ) {
     ResponsiveTimeText(
         modifier = modifier,
-        startCurvedContent = if (isConnected) null else {
+        startCurvedContent = if (isConnected) {
+            null
+        } else {
             {
                 curvedComposable {
                     OfflineIcon()
                 }
             }
         },
-        startLinearContent = if (isConnected) null else {
+        startLinearContent = if (isConnected) {
+            null
+        } else {
             {
                 OfflineIcon()
             }

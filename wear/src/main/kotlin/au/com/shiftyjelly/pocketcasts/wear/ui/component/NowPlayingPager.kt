@@ -2,12 +2,17 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.edgeSwipeToDismiss
@@ -22,6 +27,8 @@ import com.google.android.horologist.compose.layout.rememberResponsiveColumnStat
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+val LocalSetTimeTextVisible = compositionLocalOf<(Boolean) -> Unit> { {} }
 
 object NowPlayingPager {
     const val PAGE_COUNT = 3
@@ -45,6 +52,18 @@ fun NowPlayingPager(
     val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
     val columState = rememberResponsiveColumnState()
     val pagerScope = remember(pagerState, columState) { NowPlayingPagerScope(pagerState, columState) }
+
+    val setTimeTextVisible = LocalSetTimeTextVisible.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(pagerState, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            snapshotFlow { pagerState.currentPage }
+                .collect { page ->
+                    setTimeTextVisible(page == 0)
+                }
+        }
+    }
 
     ScreenScaffold(
         scrollState = columState,
