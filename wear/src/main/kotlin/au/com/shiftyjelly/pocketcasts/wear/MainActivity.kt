@@ -378,12 +378,6 @@ private fun WearApp(
                     )
 
                     composable(
-                        route = PCVolumeScreen.ROUTE,
-                    ) {
-                        PCVolumeScreen()
-                    }
-
-                    composable(
                         route = EffectsScreen.ROUTE,
                     ) {
                         EffectsScreen()
