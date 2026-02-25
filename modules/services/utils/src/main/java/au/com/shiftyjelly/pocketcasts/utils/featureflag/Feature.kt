@@ -193,7 +193,7 @@ enum class Feature(
         title = "New Installment Plan",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 
