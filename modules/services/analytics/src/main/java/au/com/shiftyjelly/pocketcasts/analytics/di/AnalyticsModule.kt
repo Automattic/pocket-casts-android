@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsLoggingListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
+import au.com.shiftyjelly.pocketcasts.analytics.EventSink
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.NoOpTracker
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
+import com.automattic.eventhorizon.EventHorizon
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Lazy
 import dagger.Module
@@ -36,6 +38,18 @@ object AnalyticsModule {
     @Provides
     @IntoSet
     fun provideNoOpTracker(): Tracker = NoOpTracker
+
+    @Provides
+    fun provideEventSink(
+        trackers: Set<@JvmSuppressWildcards Tracker>,
+        listeners: Set<@JvmSuppressWildcards AnalyticsTracker.Listener>,
+    ): EventSink = EventSink(trackers, listeners)
+
+    @Provides
+    @Singleton
+    fun provideEventHorizon(eventSink: EventSink): EventHorizon {
+        return EventHorizon(eventSink)
+    }
 
     @Provides
     @Singleton
