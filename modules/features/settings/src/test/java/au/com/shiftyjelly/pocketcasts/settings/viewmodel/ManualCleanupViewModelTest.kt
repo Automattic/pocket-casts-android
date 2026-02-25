@@ -1,9 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.util.Date
 import junit.framework.TestCase.assertFalse
@@ -34,7 +35,7 @@ class ManualCleanupViewModelTest {
         episodeManager = mock()
         whenever(episodeManager.findDownloadedEpisodesRxFlowable())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, mock(), AnalyticsTracker.test())
+        viewModel = ManualCleanupViewModel(episodeManager, mock(), EventHorizon(TestEventSink()))
     }
 
     @Test
