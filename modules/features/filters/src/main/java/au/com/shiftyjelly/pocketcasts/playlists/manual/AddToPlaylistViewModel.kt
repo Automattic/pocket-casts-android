@@ -56,8 +56,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    private val _createdPlaylist = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
-    val createdPlaylist: Deferred<String> get() = _createdPlaylist
+    private val _createdPlaylist = CompletableDeferred<CreatedPlaylist>(viewModelScope.coroutineContext[Job])
+    val createdPlaylist: Deferred<CreatedPlaylist> get() = _createdPlaylist
 
     val newPlaylistNameState = TextFieldState(
         initialText = initialPlaylistTitle,
@@ -125,7 +125,9 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
             playlistManager.addManualEpisodes(playlistUuid, uuids)
             tracker.track(AnalyticsEvent.FILTER_CREATED)
-            _createdPlaylist.complete(playlistUuid)
+
+            val playlist = CreatedPlaylist(uuid = playlistUuid, title = sanitizedName)
+            _createdPlaylist.complete(playlist)
         }
     }
 
@@ -277,6 +279,11 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         val playlistPreviews: List<PlaylistPreviewForEpisode>,
         val unfilteredPlaylistsCount: Int,
         val episodeLimit: Int,
+    )
+
+    data class CreatedPlaylist(
+        val uuid: String,
+        val title: String,
     )
 
     @AssistedFactory
