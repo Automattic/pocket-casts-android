@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.account
 import android.accounts.AccountManager
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
 import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
@@ -52,7 +53,7 @@ internal class SyncAccountTest {
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,
@@ -142,6 +143,7 @@ internal class SyncAccountTest {
             syncManager.createUserWithEmailAndPassword(
                 email = "support+register@pocketcasts.com",
                 password = "password_register",
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Success)
@@ -187,6 +189,7 @@ internal class SyncAccountTest {
             syncManager.createUserWithEmailAndPassword(
                 email = "support@pocketcasts.com",
                 password = "password",
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Failed)
