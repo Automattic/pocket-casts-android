@@ -21,7 +21,9 @@ class ConnectivityStateManager @Inject constructor(
     val isConnected: StateFlow<Boolean> = networkRepository.networkStatus
         .map { networks ->
             val networkTypes = networks.networks.mapTo(mutableSetOf()) { it.networkInfo.type }
-            networkTypes.contains(NetworkType.Wifi) || networkTypes.contains(NetworkType.Cell)
+            networkTypes.contains(NetworkType.Wifi) ||
+                networkTypes.contains(NetworkType.Cell) ||
+                networkTypes.contains(NetworkType.BT)
         }
         .stateIn(
             scope = coroutineScope,

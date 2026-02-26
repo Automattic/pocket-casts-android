@@ -2414,9 +2414,6 @@
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
-    <string name="wear_connectivity_lost">Connection lost</string>
-    <string name="wear_connectivity_restored">Connected</string>
-    <string name="wear_connectivity_streaming_warning">Streaming may be affected</string>
 
     <!-- Nova Launcher -->
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
