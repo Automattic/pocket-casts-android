@@ -22,20 +22,20 @@ sealed interface CardType {
     }
 
     companion object {
-        val entires by lazy(LazyThreadSafetyMode.NONE) {
+        val entries by lazy(LazyThreadSafetyMode.NONE) {
             listOf(
-                CardType.Vertical,
-                CardType.Horizontal,
-                CardType.Square,
-                CardType.Audio,
+                Vertical,
+                Horizontal,
+                Square,
+                Audio,
             )
         }
 
         val visualEntries by lazy(LazyThreadSafetyMode.NONE) {
             listOf(
-                CardType.Vertical,
-                CardType.Horizontal,
-                CardType.Square,
+                Vertical,
+                Horizontal,
+                Square,
             )
         }
     }

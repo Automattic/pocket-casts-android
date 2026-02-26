@@ -364,7 +364,7 @@ class SharingClient(
 @ConsistentCopyVisibility
 data class SharingRequest internal constructor(
     val data: Data,
-    val trackable: Trackable?,
+    val trackable: Trackable,
     val platform: SocialPlatform,
     val cardType: CardType?,
     val backgroundImage: File?,
