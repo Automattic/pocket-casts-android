@@ -3,6 +3,8 @@
 *   New Features
     *   Support predictive back navigation
         ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
+    *   Add pull to refresh on wear main screen
+        ([#5037](https://github.com/Automattic/pocket-casts-android/pull/5037))
 *   Updates
     *   Improve the design of podcasts missing artwork on the podcasts tab
         ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
