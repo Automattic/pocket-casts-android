@@ -44,6 +44,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import com.automattic.eventhorizon.BookmarkShareTappedEvent
+import com.automattic.eventhorizon.BookmarksEmptyGoToHeadphoneSettingsEvent
+import com.automattic.eventhorizon.BookmarksGetBookmarksButtonTappedEvent
+import com.automattic.eventhorizon.BookmarksSortByChangedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -79,6 +84,7 @@ class PodcastViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val episodeAnalytics: EpisodeAnalytics,
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
@@ -424,11 +430,10 @@ class PodcastViewModel @Inject constructor(
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
         settings.podcastBookmarksSortType.set(order, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
-            mapOf(
-                "sort_order" to order.key,
-                "source" to SourceView.PODCAST_SCREEN.analyticsValue,
+        eventHorizon.track(
+            BookmarksSortByChangedEvent(
+                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                sortOrder = order.eventHorizonValue,
             ),
         )
     }
@@ -585,7 +590,13 @@ class PodcastViewModel @Inject constructor(
     }
 
     fun onBookmarkShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
+        eventHorizon.track(
+            BookmarkShareTappedEvent(
+                source = source.eventHorizonValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
     }
 
     suspend fun onRefreshPodcast(refreshType: RefreshType) {
@@ -616,16 +627,18 @@ class PodcastViewModel @Inject constructor(
     private fun getCurrentTab() = (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
     fun onHeadsetSettingsClicked() {
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
-            mapOf("source" to SourceView.PODCAST_SCREEN.analyticsValue),
+        eventHorizon.track(
+            BookmarksEmptyGoToHeadphoneSettingsEvent(
+                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+            ),
         )
     }
 
     fun onGetBookmarksClicked() {
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
-            mapOf("source" to SourceView.PODCAST_SCREEN.analyticsValue),
+        eventHorizon.track(
+            BookmarksGetBookmarksButtonTappedEvent(
+                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+            ),
         )
     }
 

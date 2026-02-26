@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -22,8 +20,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import com.automattic.eventhorizon.BookmarkDeletedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import java.time.Instant
@@ -50,8 +49,7 @@ class MainActivityViewModel
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
-    private val theme: Theme,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
@@ -193,9 +191,10 @@ class MainActivityViewModel
             } else {
                 _snackbarMessage.emit(LR.string.bookmarks_deleted_singular)
                 bookmarkManager.deleteToSync(bookmarkUuid)
-                analyticsTracker.track(
-                    AnalyticsEvent.BOOKMARK_DELETED,
-                    mapOf("source" to SourceView.NOTIFICATION_BOOKMARK.analyticsValue),
+                eventHorizon.track(
+                    BookmarkDeletedEvent(
+                        source = SourceView.NOTIFICATION_BOOKMARK.eventHorizonValue,
+                    ),
                 )
             }
         }
