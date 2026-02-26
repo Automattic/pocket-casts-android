@@ -768,29 +768,8 @@ class MainActivity :
         }
 
         val playerBottomSheetCallback = object : OnBackPressedCallback(false) {
-            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-                if (::binding.isInitialized) {
-                    PredictiveBackAnimator.applyProgress(binding.playerBottomSheet, backEvent.progress)
-                }
-            }
-
             override fun handleOnBackPressed() {
-                if (!::binding.isInitialized) return
-
-                PredictiveBackAnimator.animateToEnd(
-                    view = binding.playerBottomSheet,
-                    targetScale = 0.8f,
-                ) {
-                    if (::binding.isInitialized) {
-                        binding.playerBottomSheet.closePlayer()
-                    }
-                }
-            }
-
-            override fun handleOnBackCancelled() {
-                if (::binding.isInitialized) {
-                    PredictiveBackAnimator.reset(binding.playerBottomSheet)
-                }
+                binding.playerBottomSheet.closePlayer()
             }
         }
         onBackPressedDispatcher.addCallback(this, playerBottomSheetCallback)
