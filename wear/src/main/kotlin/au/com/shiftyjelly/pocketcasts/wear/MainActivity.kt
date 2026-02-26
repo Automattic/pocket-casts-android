@@ -137,7 +137,6 @@ private fun WearApp(
                 ) {
                     RequirePlusScreen(
                         onContinueToLogin = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
-                        syncState = currentSyncState.value,
                     )
                 }
 
