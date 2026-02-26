@@ -64,9 +64,21 @@ class PredictiveBackAnimatorTest {
     fun `applyProgressReverse at 0 progress starts at reduced scale and alpha`() {
         PredictiveBackAnimator.applyProgressReverse(mockView, progress = 0f)
 
-        verify(mockView).scaleX = 0.95f
-        verify(mockView).scaleY = 0.95f
-        verify(mockView).alpha = 0.5f
+        verify(mockView).scaleX = 0.98f
+        verify(mockView).scaleY = 0.98f
+        verify(mockView).alpha = 0.85f
+    }
+
+    @Test
+    fun `applyProgressReverse at 0_25 progress applies decelerate easing`() {
+        // sqrt(0.25) = 0.5, so easedProgress = 0.5
+        // scale = 0.98 + (0.02 * 0.5) = 0.99
+        // alpha = 0.85 + (0.15 * 0.5) = 0.925
+        PredictiveBackAnimator.applyProgressReverse(mockView, progress = 0.25f)
+
+        verify(mockView).scaleX = 0.99f
+        verify(mockView).scaleY = 0.99f
+        verify(mockView).alpha = 0.925f
     }
 
     @Test
@@ -105,8 +117,8 @@ class PredictiveBackAnimatorTest {
     fun `default constants have expected values`() {
         assertEquals(0.1f, PredictiveBackAnimator.Defaults.SCALE_AMOUNT)
         assertEquals(0.3f, PredictiveBackAnimator.Defaults.ALPHA_AMOUNT)
-        assertEquals(0.05f, PredictiveBackAnimator.Defaults.SCALE_AMOUNT_REVERSE)
-        assertEquals(0.5f, PredictiveBackAnimator.Defaults.ALPHA_AMOUNT_REVERSE)
+        assertEquals(0.02f, PredictiveBackAnimator.Defaults.SCALE_AMOUNT_REVERSE)
+        assertEquals(0.15f, PredictiveBackAnimator.Defaults.ALPHA_AMOUNT_REVERSE)
         assertEquals(0.85f, PredictiveBackAnimator.Defaults.TARGET_SCALE)
         assertEquals(0f, PredictiveBackAnimator.Defaults.TARGET_ALPHA)
         assertEquals(150L, PredictiveBackAnimator.Defaults.ANIMATION_DURATION_MS)

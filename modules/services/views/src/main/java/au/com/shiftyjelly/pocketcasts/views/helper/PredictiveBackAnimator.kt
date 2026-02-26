@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.view.View
+import kotlin.math.sqrt
 
 /**
  * Utility for applying predictive back gesture animations to views.
@@ -34,11 +35,11 @@ object PredictiveBackAnimator {
         /** Default alpha reduction for current view (30% = 0.7 alpha) */
         const val ALPHA_AMOUNT = 0.3f
 
-        /** Default scale increase for previous view (5% = starts at 0.95 scale) */
-        const val SCALE_AMOUNT_REVERSE = 0.05f
+        /** Default scale increase for previous view (2% = starts at 0.98 scale) */
+        const val SCALE_AMOUNT_REVERSE = 0.02f
 
-        /** Default alpha increase for previous view (50% = starts at 0.5 alpha) */
-        const val ALPHA_AMOUNT_REVERSE = 0.5f
+        /** Default alpha increase for previous view (15% = starts at 0.85 alpha) */
+        const val ALPHA_AMOUNT_REVERSE = 0.15f
 
         /** Default target scale for animation end (85%) */
         const val TARGET_SCALE = 0.85f
@@ -103,11 +104,13 @@ object PredictiveBackAnimator {
             view.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         }
 
+        val easedProgress = sqrt(progress)
+
         val baseScale = 1f - scaleAmount
         val baseAlpha = 1f - alphaAmount
 
-        val scale = baseScale + (scaleAmount * progress)
-        val alpha = baseAlpha + (alphaAmount * progress)
+        val scale = baseScale + (scaleAmount * easedProgress)
+        val alpha = baseAlpha + (alphaAmount * easedProgress)
 
         view.scaleX = scale
         view.scaleY = scale
