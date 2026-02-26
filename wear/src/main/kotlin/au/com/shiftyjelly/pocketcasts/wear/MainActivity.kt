@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -119,6 +120,9 @@ private fun WearApp(
         waitingForSignIn.value = true
     }
 
+    // Wrap in a State so that composable destinations inside the NavHost can read the latest value even though the nav graph is cached.
+    val currentSyncState = rememberUpdatedState(syncState)
+
     val startDestination = if (userCanAccessWatch) WatchListScreen.ROUTE else RequirePlusScreen.ROUTE
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -133,7 +137,7 @@ private fun WearApp(
                 ) {
                     RequirePlusScreen(
                         onContinueToLogin = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
-                        syncState = syncState,
+                        syncState = currentSyncState.value,
                     )
                 }
 
@@ -326,7 +330,7 @@ private fun WearApp(
                             onClose = {},
                         )
                     },
-                    syncState = syncState,
+                    syncState = currentSyncState,
                     onRetrySync = onRetrySync,
                 )
 
