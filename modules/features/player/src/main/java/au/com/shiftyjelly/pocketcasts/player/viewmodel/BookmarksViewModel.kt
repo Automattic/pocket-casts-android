@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -29,10 +27,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import com.automattic.eventhorizon.BookmarkPlayTappedEvent
+import com.automattic.eventhorizon.BookmarkShareTappedEvent
+import com.automattic.eventhorizon.BookmarksEmptyGoToHeadphoneSettingsEvent
+import com.automattic.eventhorizon.BookmarksGetBookmarksButtonTappedEvent
+import com.automattic.eventhorizon.BookmarksSearchbarClearButtonTappedEvent
+import com.automattic.eventhorizon.BookmarksSortByChangedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -52,14 +56,13 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class BookmarksViewModel
 @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
-    private val theme: Theme,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
 ) : ViewModel() {
@@ -280,11 +283,10 @@ class BookmarksViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         sourceView.mapToBookmarksSortTypeUserSetting().set(order, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
-            mapOf(
-                "sort_order" to order.key,
-                "source" to sourceView.analyticsValue,
+        eventHorizon.track(
+            BookmarksSortByChangedEvent(
+                source = sourceView.eventHorizonValue,
+                sortOrder = order.eventHorizonValue,
             ),
         )
     }
@@ -304,11 +306,11 @@ class BookmarksViewModel
             }
             _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
-            analyticsTracker.track(
-                AnalyticsEvent.BOOKMARK_PLAY_TAPPED,
-                mapOf(
-                    "source" to sourceView.analyticsValue,
-                    "episode_uuid" to bookmark.episodeUuid,
+            eventHorizon.track(
+                BookmarkPlayTappedEvent(
+                    source = sourceView.eventHorizonValue,
+                    episodeUuid = bookmark.episodeUuid,
+                    podcastUuid = bookmark.podcastUuid,
                 ),
             )
         }
@@ -337,25 +339,33 @@ class BookmarksViewModel
     }
 
     fun searchBarClearButtonTapped() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
+        eventHorizon.track(BookmarksSearchbarClearButtonTappedEvent)
     }
 
     fun onHeadphoneControlsButtonTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
-            mapOf("source" to sourceView.analyticsValue),
+        eventHorizon.track(
+            BookmarksEmptyGoToHeadphoneSettingsEvent(
+                source = sourceView.eventHorizonValue,
+            ),
         )
     }
 
     fun onGetBookmarksButtonTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
-            mapOf("source" to sourceView.analyticsValue),
+        eventHorizon.track(
+            BookmarksGetBookmarksButtonTappedEvent(
+                source = sourceView.eventHorizonValue,
+            ),
         )
     }
 
     fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
+        eventHorizon.track(
+            BookmarkShareTappedEvent(
+                source = source.eventHorizonValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
     }
 
     sealed class UiState {

@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -11,6 +9,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import com.automattic.eventhorizon.BookmarkCreatedEvent
+import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
+import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -25,7 +27,7 @@ import kotlinx.coroutines.flow.flowOf
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : BookmarkManager,
     CoroutineScope {
 
@@ -43,7 +45,7 @@ class BookmarkManagerImpl @Inject constructor(
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        creationSource: BookmarkManager.CreationSource,
+        creationSource: BookmarkSource,
         addedAt: Instant,
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
@@ -66,13 +68,12 @@ class BookmarkManagerImpl @Inject constructor(
         )
         bookmarkDao.insert(bookmark)
         val podcastUuid = if (episode is PodcastEpisode) episode.podcastOrSubstituteUuid else "user_file"
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARK_CREATED,
-            mapOf(
-                "source" to creationSource.analyticsValue,
-                "time" to addedAtMs,
-                "episode_uuid" to episode.uuid,
-                "podcast_uuid" to podcastUuid,
+        eventHorizon.track(
+            BookmarkCreatedEvent(
+                source = creationSource,
+                time = timeSecs.toLong(),
+                episodeUuid = episode.uuid,
+                podcastUuid = podcastUuid,
             ),
         )
         return bookmark
@@ -85,9 +86,10 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = System.currentTimeMillis(),
             syncStatus = SyncStatus.NOT_SYNCED,
         )
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARK_UPDATE_TITLE,
-            mapOf("source" to sourceView.analyticsValue),
+        eventHorizon.track(
+            BookmarkUpdateTitleEvent(
+                source = sourceView.eventHorizonValue,
+            ),
         )
     }
 
