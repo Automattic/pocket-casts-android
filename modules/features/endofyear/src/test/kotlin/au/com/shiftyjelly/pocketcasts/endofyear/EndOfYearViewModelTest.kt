@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
+import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
 import java.time.Year
 import java.util.Date
@@ -122,6 +123,7 @@ class EndOfYearViewModelTest {
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
             analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon {},
             accessibilityManager = FakeAccessibilityManager(isTalkBackEnabled = false),
         )
     }

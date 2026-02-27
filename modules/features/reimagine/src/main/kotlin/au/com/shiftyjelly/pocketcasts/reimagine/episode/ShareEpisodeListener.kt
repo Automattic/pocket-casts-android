@@ -21,10 +21,7 @@ internal class ShareEpisodeListener @AssistedInject constructor(
     private val sharingClient: SharingClient,
 ) : ShareEpisodePageListener {
     override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: VisualCardType): SharingResponse {
-        val builder = SharingRequest.episode(podcast, episode)
-            .setPlatform(platform)
-            .setCardType(cardType)
-            .setSourceView(sourceView)
+        val builder = SharingRequest.episode(podcast, episode, sourceView, platform, cardType)
         val request = if (platform == SocialPlatform.Instagram) {
             assetController.capture(cardType).map { builder.setBackgroundImage(it).build() }
         } else {

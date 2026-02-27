@@ -1,20 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.reimagine.timestamp
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.reimagine.FakeTracker
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ShareActionMediaType
+import com.automattic.eventhorizon.ShareScreenShownEvent
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,13 +26,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
 
 @ExperimentalCoroutinesApi
 class ShareEpisodeTimestampViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val tracker = FakeTracker()
+    private val eventSink = TestEventSink()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
     private val settings = mock<Settings>()
@@ -57,7 +58,7 @@ class ShareEpisodeTimestampViewModelTest {
             episodeManager,
             podcastManager,
             settings,
-            AnalyticsTracker.test(tracker),
+            EventHorizon(eventSink),
         )
     }
 
@@ -79,17 +80,14 @@ class ShareEpisodeTimestampViewModelTest {
     fun `track screen show event`() = runTest {
         viewModel.onScreenShown()
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_SHOWN,
-                mapOf(
-                    "type" to "episode_timestamp",
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "source" to "player",
-                ),
+            ShareScreenShownEvent(
+                type = ShareActionMediaType.EpisodeTimestamp,
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                source = EventHorizonSourceView.Player,
             ),
             event,
         )

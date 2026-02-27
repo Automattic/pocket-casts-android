@@ -1,16 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.reimagine.clip
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.reimagine.FakeTracker
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.FakeClipPlayer.PlaybackState
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.SharingState.Step
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -20,6 +17,14 @@ import au.com.shiftyjelly.pocketcasts.sharing.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ShareActionCardType
+import com.automattic.eventhorizon.ShareActionClipType
+import com.automattic.eventhorizon.ShareActionMediaType
+import com.automattic.eventhorizon.ShareScreenClipSharedEvent
+import com.automattic.eventhorizon.ShareScreenPauseTappedEvent
+import com.automattic.eventhorizon.ShareScreenPlayTappedEvent
+import com.automattic.eventhorizon.ShareScreenShownEvent
 import java.util.Date
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,6 +40,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
 
 @ExperimentalCoroutinesApi
 class ShareClipViewModelTest {
@@ -43,7 +49,7 @@ class ShareClipViewModelTest {
 
     private val clipPlayer = FakeClipPlayer()
     private val sharingClient = FakeClipSharingClient()
-    private val tracker = FakeTracker()
+    private val eventSink = TestEventSink()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
     private val settings = mock<Settings>()
@@ -73,7 +79,7 @@ class ShareClipViewModelTest {
                 clipId = "clip-id",
                 source = SourceView.PLAYER,
                 initialClipRange = clipRange,
-                analyticsTracker = AnalyticsTracker.test(tracker),
+                EventHorizon(eventSink),
             ),
             episodeManager,
             podcastManager,
@@ -174,17 +180,14 @@ class ShareClipViewModelTest {
         viewModel.uiState.test {
             viewModel.playClip()
 
-            val event = tracker.events.last()
+            val event = eventSink.pollEvent()
 
             assertEquals(
-                TrackedEvent(
-                    AnalyticsEvent.SHARE_SCREEN_PLAY_TAPPED,
-                    mapOf(
-                        "episode_uuid" to "episode-id",
-                        "podcast_uuid" to "podcast-id",
-                        "clip_uuid" to "clip-id",
-                        "source" to "player",
-                    ),
+                ShareScreenPlayTappedEvent(
+                    podcastUuid = "podcast-id",
+                    episodeUuid = "episode-id",
+                    clipUuid = "clip-id",
+                    source = EventHorizonSourceView.Player,
                 ),
                 event,
             )
@@ -197,19 +200,17 @@ class ShareClipViewModelTest {
     fun `pausing clip tracks analytics event`() = runTest {
         viewModel.uiState.test {
             viewModel.playClip()
-            viewModel.pauseClip()
+            eventSink.skipEvent()
 
-            val event = tracker.events.last()
+            viewModel.pauseClip()
+            val event = eventSink.pollEvent()
 
             assertEquals(
-                TrackedEvent(
-                    AnalyticsEvent.SHARE_SCREEN_PAUSE_TAPPED,
-                    mapOf(
-                        "episode_uuid" to "episode-id",
-                        "podcast_uuid" to "podcast-id",
-                        "clip_uuid" to "clip-id",
-                        "source" to "player",
-                    ),
+                ShareScreenPauseTappedEvent(
+                    podcastUuid = "podcast-id",
+                    episodeUuid = "episode-id",
+                    clipUuid = "clip-id",
+                    source = EventHorizonSourceView.Player,
                 ),
                 event,
             )
@@ -222,18 +223,15 @@ class ShareClipViewModelTest {
     fun `track screen show event`() = runTest {
         viewModel.onScreenShown()
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_SHOWN,
-                mapOf(
-                    "type" to "clip",
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                ),
+            ShareScreenShownEvent(
+                type = ShareActionMediaType.Clip,
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
             ),
             event,
         )
@@ -251,23 +249,20 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 15,
-                    "end" to 30,
-                    "start_modified" to false,
-                    "end_modified" to false,
-                    "type" to "link",
-                    "card_type" to "vertical",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 15,
+                startModified = false,
+                end = 30,
+                endModified = false,
+                type = ShareActionClipType.Link,
+                cardType = ShareActionCardType.Vertical,
             ),
             event,
         )
@@ -285,23 +280,20 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 15,
-                    "end" to 30,
-                    "start_modified" to false,
-                    "end_modified" to false,
-                    "type" to "audio",
-                    "card_type" to "audio",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 15,
+                startModified = false,
+                end = 30,
+                endModified = false,
+                type = ShareActionClipType.Audio,
+                cardType = ShareActionCardType.Audio,
             ),
             event,
         )
@@ -319,30 +311,27 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 15,
-                    "end" to 30,
-                    "start_modified" to false,
-                    "end_modified" to false,
-                    "type" to "link",
-                    "card_type" to "square",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 15,
+                startModified = false,
+                end = 30,
+                endModified = false,
+                type = ShareActionClipType.Link,
+                cardType = ShareActionCardType.Square,
             ),
             event,
         )
     }
 
     @Test
-    fun `track sharink clip with different start timestamp`() = runTest {
+    fun `track sharing clip with different start timestamp`() = runTest {
         viewModel.shareClip(
             podcast,
             episode,
@@ -353,23 +342,20 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 7,
-                    "end" to 30,
-                    "start_modified" to true,
-                    "end_modified" to false,
-                    "type" to "link",
-                    "card_type" to "vertical",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 7,
+                startModified = true,
+                end = 30,
+                endModified = false,
+                type = ShareActionClipType.Link,
+                cardType = ShareActionCardType.Vertical,
             ),
             event,
         )
@@ -387,23 +373,20 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 15,
-                    "end" to 20,
-                    "start_modified" to false,
-                    "end_modified" to true,
-                    "type" to "link",
-                    "card_type" to "vertical",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 15,
+                startModified = false,
+                end = 20,
+                endModified = true,
+                type = ShareActionClipType.Link,
+                cardType = ShareActionCardType.Vertical,
             ),
             event,
         )
@@ -421,23 +404,20 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        val event = tracker.events.last()
+        val event = eventSink.pollEvent()
 
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
-                mapOf(
-                    "episode_uuid" to "episode-id",
-                    "podcast_uuid" to "podcast-id",
-                    "clip_uuid" to "clip-id",
-                    "source" to "player",
-                    "start" to 17,
-                    "end" to 34,
-                    "start_modified" to true,
-                    "end_modified" to true,
-                    "type" to "link",
-                    "card_type" to "vertical",
-                ),
+            ShareScreenClipSharedEvent(
+                podcastUuid = "podcast-id",
+                episodeUuid = "episode-id",
+                clipUuid = "clip-id",
+                source = EventHorizonSourceView.Player,
+                start = 17,
+                startModified = true,
+                end = 34,
+                endModified = true,
+                type = ShareActionClipType.Link,
+                cardType = ShareActionCardType.Vertical,
             ),
             event,
         )
@@ -455,7 +435,7 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        assertTrue(tracker.events.isEmpty())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -470,7 +450,7 @@ class ShareClipViewModelTest {
             createBackgroundAsset = { error("Unexpected operation") },
         )
 
-        assertTrue(tracker.events.isEmpty())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

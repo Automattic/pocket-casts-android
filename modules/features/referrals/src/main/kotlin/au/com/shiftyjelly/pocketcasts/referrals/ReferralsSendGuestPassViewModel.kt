@@ -86,8 +86,8 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
         offerDuration: String,
     ) {
         viewModelScope.launch {
-            val request = SharingRequest.referralLink(referralCode, offerName, offerDuration)
-                .setSourceView(SourceView.REFERRALS)
+            val request = SharingRequest
+                .referralLink(referralCode, offerName, offerDuration, SourceView.REFERRALS)
                 .build()
             sharingClient.share(request)
         }
