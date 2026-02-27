@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.curvedComposable
@@ -14,6 +14,7 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import com.google.android.horologist.compose.layout.ResponsiveTimeText
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
  * Custom TimeText composable that displays the system time along with
@@ -53,11 +54,10 @@ fun TimeTextWithConnectivity(
 private fun OfflineIcon() {
     Icon(
         painter = painterResource(IR.drawable.ic_cloud_off),
-        contentDescription = "Offline icon",
+        contentDescription = stringResource(LR.string.offline_icon_content_description),
         tint = MaterialTheme.colors.onBackground,
         modifier = Modifier
-            .size(16.dp)
-            .padding(end = 2.dp),
+            .size(16.dp),
     )
 }
 
