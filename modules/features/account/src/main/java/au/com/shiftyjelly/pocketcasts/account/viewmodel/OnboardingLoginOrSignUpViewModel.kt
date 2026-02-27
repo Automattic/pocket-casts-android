@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
-import au.com.shiftyjelly.pocketcasts.settings.privacy.UserAnalyticsSettings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,8 +26,6 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
-    private val userAnalyticsSettings: UserAnalyticsSettings,
-    settings: Settings,
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =

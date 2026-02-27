@@ -60,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
 import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -73,8 +72,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -129,26 +126,9 @@ fun OnboardingRecommendationsStartPage(
             onComplete()
         },
         modifier = modifier,
-        importColor = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
-            MaterialTheme.theme.colors.primaryInteractive01
-        } else {
-            MaterialTheme.theme.colors.primaryText01
-        },
-        title = stringResource(
-            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
-                LR.string.onboarding_recommendations_title
-            } else {
-                LR.string.onboarding_recommendations_find_favorite_podcasts
-            },
-        ),
-        message = stringResource(
-            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
-                LR.string.onboarding_recommendations_message
-            } else {
-                LR.string.onboarding_recommendations_make_pocket_casts_yours
-            },
-        ),
-        showSectionLoadMore = !FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS),
+        importColor = MaterialTheme.theme.colors.primaryInteractive01,
+        title = stringResource(LR.string.onboarding_recommendations_title),
+        message = stringResource(LR.string.onboarding_recommendations_message),
     )
 }
 
@@ -163,7 +143,6 @@ private fun Content(
     title: String,
     message: String,
     importColor: Color,
-    showSectionLoadMore: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -229,15 +208,15 @@ private fun Content(
                     TextH10(
                         text = title,
                         modifier = Modifier.padding(bottom = 16.dp),
-                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
+                        textAlign = TextAlign.Center,
                     )
 
                     TextP40(
                         text = message,
                         modifier = Modifier.padding(bottom = 16.dp),
-                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
-                        color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) MaterialTheme.theme.colors.primaryText02 else MaterialTheme.theme.colors.primaryText01,
-                        fontWeight = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) FontWeight.W500 else null,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        fontWeight = FontWeight.W500,
                     )
 
                     SearchBarButton(
@@ -252,7 +231,6 @@ private fun Content(
                 section(
                     section = section,
                     onSubscribeClick = onSubscribeClick,
-                    showLoadMore = showSectionLoadMore,
                 )
             }
 
@@ -284,7 +262,6 @@ private fun Content(
 private fun LazyGridScope.section(
     section: Section,
     onSubscribeClick: (Podcast) -> Unit,
-    showLoadMore: Boolean = true,
 ) {
     if (section.visiblePodcasts.isEmpty()) return
 
@@ -327,22 +304,13 @@ private fun LazyGridScope.section(
     }
 
     header {
-        if (showLoadMore) {
-            RowOutlinedButton(
-                text = stringResource(LR.string.onboarding_recommendations_more, section.title),
-                includePadding = false,
-                onClick = section::onShowMore,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-        } else {
-            Spacer(modifier = Modifier.fillMaxWidth())
-        }
+        Spacer(modifier = Modifier.fillMaxWidth())
     }
 }
 
 @Preview
 @Composable
-private fun Preview(
+private fun OnboardingPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     fun podcast(isSubscribed: Boolean = false) = Podcast(
@@ -368,53 +336,6 @@ private fun Preview(
                             podcast(),
                             podcast(),
                         ),
-                        onShowMoreFun = {},
-                    ),
-                ),
-                showLoadingSpinner = true,
-            ),
-            buttonRes = LR.string.not_now,
-            onImportClick = {},
-            onSubscribeClick = {},
-            onSearch = {},
-            onComplete = {},
-            title = "Screen title",
-            message = "Screen message",
-            importColor = MaterialTheme.theme.colors.primaryText01,
-            showSectionLoadMore = true,
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewNewOnboarding(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    fun podcast(isSubscribed: Boolean = false) = Podcast(
-        uuid = "5168e260-372e-013b-efad-0acc26574db2",
-        title = "Why Do We Do That?",
-        isSubscribed = isSubscribed,
-    )
-
-    AppThemeWithBackground(themeType) {
-        Content(
-            state = OnboardingRecommendationsStartPageViewModel.State(
-                sections = listOf(
-                    Section(
-                        title = "A Very Special Section",
-                        sectionId = SectionId(""),
-                        numToShow = 6,
-                        podcasts = listOf(
-                            podcast(),
-                            podcast(isSubscribed = true),
-                            podcast(),
-                            podcast(),
-                            podcast(),
-                            podcast(),
-                            podcast(),
-                        ),
-                        onShowMoreFun = {},
                     ),
                 ),
                 showLoadingSpinner = true,
@@ -427,7 +348,6 @@ private fun PreviewNewOnboarding(
             title = stringResource(LR.string.onboarding_recommendations_title),
             message = stringResource(LR.string.onboarding_recommendations_message),
             importColor = MaterialTheme.theme.colors.primaryInteractive01,
-            showSectionLoadMore = false,
         )
     }
 }

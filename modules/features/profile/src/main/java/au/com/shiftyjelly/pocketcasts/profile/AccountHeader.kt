@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,8 +40,6 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -74,32 +71,17 @@ internal fun AccountHeader(
                 config = config.avatarConfig,
                 showBadge = false,
             )
-            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                TextH70(
-                    text = state.email,
-                    fontScale = config.infoFontScale,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                )
-            } else {
-                TextH50(
-                    text = state.email,
-                    fontScale = config.infoFontScale,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                )
-            }
+            TextH70(
+                text = state.email,
+                fontScale = config.infoFontScale,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.theme.colors.primaryText01,
+            )
         }
         val tier = state.subscription.tier
         if (tier != null) {
             Spacer(
-                modifier = Modifier.height(
-                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                        8.dp
-                    } else {
-                        16.dp
-                    },
-                ),
+                modifier = Modifier.height(8.dp),
             )
             SubscriptionBadgeForTier(
                 tier = tier,
@@ -113,13 +95,7 @@ internal fun AccountHeader(
             )
         }
         Spacer(
-            modifier = Modifier.height(
-                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                    8.dp
-                } else {
-                    16.dp
-                },
-            ),
+            modifier = Modifier.height(8.dp),
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -127,7 +103,7 @@ internal fun AccountHeader(
         ) {
             val labels = state.subscription.labels()
             if (labels.start != null) {
-                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE) && labels.end == null) {
+                if (labels.end == null) {
                     TextH70(
                         text = labels.start.text,
                         fontScale = config.infoFontScale,

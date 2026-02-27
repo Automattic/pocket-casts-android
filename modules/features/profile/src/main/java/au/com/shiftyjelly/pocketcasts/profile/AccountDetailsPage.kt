@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.Divider
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
@@ -34,8 +33,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
@@ -51,12 +48,9 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -66,8 +60,6 @@ internal fun AccountDetailsPage(
     theme: Theme.ThemeType,
     onNavigateBack: () -> Unit,
     onClickHeader: () -> Unit,
-    onClickSubscribe: (SubscriptionPlan.Key) -> Unit,
-    onChangeFeatureCard: (SubscriptionPlan.Key) -> Unit,
     onChangeAvatar: (String) -> Unit,
     onChangeEmail: () -> Unit,
     onChangePassword: () -> Unit,
@@ -122,20 +114,14 @@ internal fun AccountDetailsPage(
             state.sectionsState
         }
     }
-    val bannerState = remember(state.isAutomotive, state.upgradeBannerState) {
-        state.upgradeBannerState.takeIf { !state.isAutomotive }
+    val recommendedPlan = remember(state.isAutomotive, state.recommendedPlan) {
+        state.recommendedPlan.takeIf { !state.isAutomotive }
     }
     AppTheme(theme) {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(
-                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                        MaterialTheme.theme.colors.primaryUi03
-                    } else {
-                        MaterialTheme.theme.colors.primaryUi02
-                    },
-                ),
+                .background(MaterialTheme.theme.colors.primaryUi03),
         ) {
             if (!state.isAutomotive) {
                 ThemedTopAppBar(
@@ -145,20 +131,8 @@ internal fun AccountDetailsPage(
             }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
             ) {
-                item {
-                    Spacer(
-                        Modifier.height(
-                            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                                0.dp
-                            } else {
-                                16.dp
-                            },
-                        ),
-                    )
-                }
                 item {
                     AccountHeader(
                         state = state.headerState,
@@ -172,30 +146,12 @@ internal fun AccountDetailsPage(
                 }
 
                 item {
-                    AnimatedNonNullVisibility(bannerState) { bannerState ->
-                        when (bannerState) {
-                            is ProfileUpgradeBannerState.OldProfileUpgradeBannerState -> {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                                ) {
-                                    Divider()
-                                    ProfileUpgradeBanner(
-                                        state = bannerState,
-                                        onClickSubscribe = onClickSubscribe,
-                                        onChangeFeatureCard = onChangeFeatureCard,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
-                            }
-
-                            is ProfileUpgradeBannerState.NewOnboardingUpgradeState -> {
-                                Box(modifier = Modifier.padding(horizontal = 24.dp)) {
-                                    NewUpgradeAccountCard(
-                                        onClickSubscribe = onAccountUpgradeClick,
-                                        recommendedPlan = bannerState.recommendedSubscription,
-                                    )
-                                }
-                            }
+                    AnimatedNonNullVisibility(recommendedPlan) { plan ->
+                        Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                            NewUpgradeAccountCard(
+                                onClickSubscribe = onAccountUpgradeClick,
+                                recommendedPlan = plan,
+                            )
                         }
                     }
                 }
@@ -290,7 +246,7 @@ internal data class AccountDetailsPageState(
     val isAutomotive: Boolean,
     val miniPlayerPadding: Dp,
     val headerState: AccountHeaderState,
-    val upgradeBannerState: ProfileUpgradeBannerState?,
+    val recommendedPlan: OnboardingSubscriptionPlan?,
     val sectionsState: AccountSectionsState,
 )
 
@@ -302,8 +258,13 @@ private fun AccountDetailsPagePreview() {
 
 @Preview
 @Composable
-private fun AccountDetailsPageNoUpgradePreview() {
-    AccountDetailsPageStub(Theme.ThemeType.ELECTRIC, upgradeBannerState = null)
+private fun AccountDetailsPageRecommendedPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AccountDetailsPageStub(
+        theme = theme,
+        recommendedPlan = OnboardingSubscriptionPlan.create(SubscriptionPlan.PlusMonthlyPreview),
+    )
 }
 
 @PreviewAutomotive
@@ -320,29 +281,11 @@ private fun AccountDetailsPageThemePreview(
     AccountDetailsPageStub(theme)
 }
 
-@Preview
-@Composable
-private fun AccountDetailsPageNewUpgradePreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
-) {
-    AccountDetailsPageStub(
-        theme = theme,
-        upgradeBannerState = ProfileUpgradeBannerState.NewOnboardingUpgradeState(
-            recommendedSubscription = OnboardingSubscriptionPlan.create(SubscriptionPlan.PlusMonthlyPreview),
-        ),
-    )
-}
-
 @Composable
 private fun AccountDetailsPageStub(
     theme: Theme.ThemeType,
     isAutomotive: Boolean = false,
-    upgradeBannerState: ProfileUpgradeBannerState? = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
-        subscriptionPlans = SubscriptionPlans.Preview,
-        selectedFeatureCard = null,
-        currentSubscription = null,
-        isRenewingSubscription = false,
-    ),
+    recommendedPlan: OnboardingSubscriptionPlan? = null,
 ) {
     AccountDetailsPage(
         state = AccountDetailsPageState(
@@ -357,7 +300,7 @@ private fun AccountDetailsPageStub(
                     billingCycle = BillingCycle.Monthly,
                 ),
             ),
-            upgradeBannerState = upgradeBannerState,
+            recommendedPlan = recommendedPlan,
             sectionsState = AccountSectionsState(
                 isSubscribedToNewsLetter = false,
                 email = "noreplay@pocketcasts.com",
@@ -370,8 +313,6 @@ private fun AccountDetailsPageStub(
         theme = theme,
         onNavigateBack = {},
         onClickHeader = {},
-        onClickSubscribe = {},
-        onChangeFeatureCard = {},
         onChangeAvatar = {},
         onChangeEmail = {},
         onChangePassword = {},
