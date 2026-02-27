@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -37,6 +38,7 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val shareDialogFactory: ShareDialogFactory,
+    private val downloadQueue: DownloadQueue,
     private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
     private val tracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -84,6 +86,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) as? PodcastEpisode ?: return@launch
             withContext(Dispatchers.IO) {
+                episodeManager.disableAutoDownload(episode)
                 episodeManager.archiveBlocking(episode, playbackManager)
             }
         }
@@ -136,7 +139,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return
 
         shareDialogFactory
-            .shareEpisode(podcast, episode, SourceView.EPISODE_SWIPE_ACTION)
+            .shareEpisode(podcast, episode, swipeSource.toSourceView())
             .show(fragmentManager, "share_dialog")
     }
 
@@ -156,20 +159,22 @@ class SwipeActionViewModel @AssistedInject constructor(
                 CloudDeleteHelper.deleteEpisode(
                     episode = userEpisode,
                     deleteState = deleteState,
+                    sourceView = swipeSource.toSourceView(),
+                    downloadQueue = downloadQueue,
                     playbackManager = playbackManager,
-                    episodeManager = episodeManager,
                     userEpisodeManager = userEpisodeManager,
                     applicationScope = applicationScope,
                 )
-                episodeAnalytics.trackEvent(
-                    event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
-                        AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD
-                    } else {
-                        AnalyticsEvent.EPISODE_DOWNLOAD_DELETED
-                    },
-                    source = SourceView.FILES,
-                    uuid = episode.uuid,
-                )
+                if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
+                    episodeAnalytics.trackEvent(
+                        event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
+                        source = swipeSource.toSourceView(),
+                        uuid = episode.uuid,
+                    )
+                }
+                viewModelScope.launch {
+                    episodeManager.disableAutoDownload(episode)
+                }
             },
             resources = context.resources,
         ).show(fragmentManager, "delete_confirm")

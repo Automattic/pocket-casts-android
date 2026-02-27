@@ -12,13 +12,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UploadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
-import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -64,7 +63,7 @@ import timber.log.Timber
 interface UserEpisodeManager {
     suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun update(episode: UserEpisode)
-    suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager)
+    suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager) = deleteAll(listOf(episode), playbackManager)
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun findUserEpisodes(): List<UserEpisode>
     fun episodeRxFlowable(uuid: String): Flowable<UserEpisode>
@@ -127,7 +126,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     val syncManager: SyncManager,
     val settings: Settings,
-    val downloadManager: DownloadManager,
+    val downloadQueue: DownloadQueue,
     @ApplicationContext val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
 ) : UserEpisodeManager,
@@ -192,24 +191,13 @@ class UserEpisodeManagerImpl @Inject constructor(
         userEpisodeDao.update(episode)
     }
 
-    override suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager) {
-        deleteFilesForEpisode(episode)
-        playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES, userInitiated = false)
-        cancelUpload(episode)
-        userEpisodeDao.delete(episode)
-    }
-
-    private fun deleteFilesForEpisode(episode: UserEpisode) {
-        episode.downloadedFilePath?.let(FileUtil::deleteFileByPath)
-        episode.artworkUrl
-            ?.takeIf { it.startsWith('/') }
-            ?.let(FileUtil::deleteFileByPath)
-    }
-
     override suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
-        episodes.forEach {
-            playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.FILES, userInitiated = false)
+        episodes.forEach { episode ->
+            cancelUpload(episode)
+            playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES, userInitiated = false)
         }
+        val uuids = episodes.map(UserEpisode::uuid)
+        downloadQueue.cancelAll(uuids, SourceView.FILES).join()
         userEpisodeDao.deleteAll(episodes)
     }
 
@@ -225,7 +213,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             Settings.CloudSortOrder.Z_TO_A -> userEpisodeDao.findUserEpisodesTitleDescRxFlowable()
             Settings.CloudSortOrder.SHORT_LONG -> userEpisodeDao.findUserEpisodesDurationAscRxFlowable()
             Settings.CloudSortOrder.LONG_SHORT -> userEpisodeDao.findUserEpisodesDurationDescRxFlowable()
-        }.map { it.filterNot { it.serverStatus == UserEpisodeServerStatus.MISSING } }
+        }.map { it.filterNot { episode -> episode.serverStatus == UserEpisodeServerStatus.MISSING } }
     }
 
     override fun downloadUserEpisodesRxFlowable(): Flowable<List<UserEpisode>> {
@@ -391,10 +379,8 @@ class UserEpisodeManagerImpl @Inject constructor(
                 val newEpisode = it.toUserEpisode()
                 add(newEpisode, playbackManager)
 
-                if (settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
-                    userEpisodeDao.updateAutoDownloadStatusBlocking(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
-                    newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-                    downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, source = SourceView.UNKNOWN)
+                if (newEpisode.canQueueForAutoDownload && settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
+                    downloadQueue.enqueue(newEpisode.uuid, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.UNKNOWN)
                 }
             }
         }
@@ -453,11 +439,10 @@ class UserEpisodeManagerImpl @Inject constructor(
         Timber.d("Starting upload of ${userEpisode.uuid}")
         val artworkUrl = userEpisode.artworkUrl
         val imageFile = if (artworkUrl != null && userEpisode.artworkUrl?.startsWith("/") == true) File(artworkUrl) else null
-        val imageUploadTask: Completable
-        if (imageFile != null) {
-            imageUploadTask = uploadImageToServerRxCompletable(userEpisode, imageFile)
+        val imageUploadTask = if (imageFile != null) {
+            uploadImageToServerRxCompletable(userEpisode, imageFile)
         } else {
-            imageUploadTask = Completable.complete()
+            Completable.complete()
         }
 
         return userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
@@ -562,8 +547,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
         if (settings.deleteLocalFileAfterPlaying.value) {
-            deleteFilesForEpisode(episode)
-            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeDownloadStatus.DownloadNotRequested)
+            downloadQueue.cancel(episode.uuid, SourceView.PLAYER).join()
 
             if (episode.serverStatus == UserEpisodeServerStatus.LOCAL) {
                 userEpisodeDao.delete(episode)
@@ -653,7 +637,7 @@ fun UserEpisode.toUploadData(): FileUploadData {
         title = this.title,
         colour = this.tintColorIndex,
         duration = this.duration.roundToInt(),
-        contentType = "${fileType ?: "audio/mp3"}",
+        contentType = fileType ?: "audio/mp3",
     )
 }
 

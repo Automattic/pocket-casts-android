@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -13,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -107,8 +107,8 @@ interface PodcastManager {
     fun checkForUnusedPodcastsBlocking(playbackManager: PlaybackManager)
     fun deletePodcastIfUnusedBlocking(podcast: Podcast, playbackManager: PlaybackManager): Boolean
     suspend fun deleteAllPodcasts()
-    suspend fun unsubscribe(podcastUuid: String, playbackManager: PlaybackManager)
-    fun unsubscribeAsync(podcastUuid: String, playbackManager: PlaybackManager)
+    suspend fun unsubscribe(podcastUuid: String, sourceView: SourceView)
+    fun unsubscribeAsync(podcastUuid: String, sourceView: SourceView)
 
     /** Utility methods  */
     fun countPodcastsBlocking(): Int
@@ -122,8 +122,6 @@ interface PodcastManager {
     fun refreshPodcasts(fromLog: String)
     suspend fun refreshPodcastsAfterSignIn()
     suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager)
-
-    fun checkForEpisodesToDownloadBlocking(episodeUuidsAdded: List<String>, downloadManager: DownloadManager)
 
     fun countEpisodesInPodcastWithStatusBlocking(podcastUuid: String, episodeStatus: EpisodeDownloadStatus): Int
     fun updateGroupingForAllBlocking(grouping: PodcastGrouping)

@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
@@ -35,6 +36,10 @@ class FakePlaylistManager : PlaylistManager {
         return emptyList()
     }
 
+    override suspend fun getAutoDownloadPlaylists(): List<Playlist> {
+        return emptyList()
+    }
+
     override fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return MutableStateFlow(null)
     }
@@ -46,10 +51,6 @@ class FakePlaylistManager : PlaylistManager {
     override suspend fun refreshArtworkUuids(playlistUuid: String) = Unit
 
     override suspend fun refreshEpisodeCount(playlistUuid: String) = Unit
-
-    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
-        return emptyList()
-    }
 
     override suspend fun sortPlaylists(sortedUuids: List<String>) = Unit
 

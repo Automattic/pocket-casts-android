@@ -12,8 +12,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
@@ -48,7 +48,7 @@ class SubscribeManager @Inject constructor(
     private val staticServiceManager: StaticServiceManager,
     private val syncManager: SyncManager,
     private val episodeManager: EpisodeManager,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
     @ApplicationContext val context: Context,
     val settings: Settings,
 ) {
@@ -111,24 +111,14 @@ class SubscribeManager @Inject constructor(
 
                 if (canDownloadEpisodesAfterFollowPodcast(subscribed, shouldAutoDownload)) {
                     podcastDao.findByUuidBlocking(podcastUuid)?.let { podcast ->
-                        val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
-                        val numberOfEpisodes = settings.autoDownloadLimit.value.episodeCount
-
-                        episodes.take(numberOfEpisodes).forEach { episode ->
-                            if (episode.isDownloadPending || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
-                                return@forEach
-                            }
-
-                            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto Downloading $numberOfEpisodes episodes after subscribing to $podcastUuid")
-
-                            DownloadHelper.addAutoDownloadedEpisodeToQueue(
-                                episode,
-                                "Auto Download after subscribing to $podcastUuid",
-                                downloadManager,
-                                episodeManager,
-                                source = SourceView.DOWNLOADS,
-                            )
-                        }
+                        val episodeUuids = episodeManager
+                            .findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
+                            .asSequence()
+                            .take(settings.autoDownloadLimit.value.episodeCount)
+                            .filter(PodcastEpisode::canQueueForAutoDownload)
+                            .map(PodcastEpisode::uuid)
+                            .toSet()
+                        downloadQueue.enqueueAll(episodeUuids, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.DOWNLOADS)
                     }
                 }
             }

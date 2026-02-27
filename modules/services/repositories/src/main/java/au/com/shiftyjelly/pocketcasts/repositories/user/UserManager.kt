@@ -3,10 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -29,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UserSignedOutEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -62,7 +63,8 @@ class UserManagerImpl @Inject constructor(
     private val playlistDao: PlaylistDao,
     private val playlistsInitializer: DefaultPlaylistsInitializer,
     private val analyticsTracker: AnalyticsTracker,
-    private val tracker: TracksAnalyticsTracker,
+    private val eventHorizon: EventHorizon,
+    private val accountStatusInfo: AccountStatusInfo,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
@@ -142,16 +144,17 @@ class UserManagerImpl @Inject constructor(
 
                     settings.marketingOptIn.set(false, updateModifiedAt = false)
 
-                    analyticsTracker.track(
-                        AnalyticsEvent.USER_SIGNED_OUT,
-                        mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
+                    eventHorizon.track(
+                        UserSignedOutEvent(
+                            userInitiated = wasInitiatedByUser,
+                        ),
                     )
                     analyticsTracker.flush()
                     analyticsTracker.clearAllData()
                     analyticsTracker.refreshMetadata()
 
-                    // Force experiments to refresh after signing out with an anonymous UUID
-                    experimentProvider.refreshExperiments(tracker.anonID)
+                    val anonId = accountStatusInfo.recreateAnonId()
+                    experimentProvider.refreshExperiments(anonId)
 
                     settings.setEndOfYearShowModal(true)
                     endOfYearSync.reset()
@@ -195,7 +198,7 @@ class UserManagerImpl @Inject constructor(
             userEpisodeManager.findUserEpisodes().forEach {
                 userEpisodeManager.delete(episode = it, playbackManager = playbackManager)
             }
-            episodeManager.deleteAll()
+            episodeManager.deleteAll(SourceView.UNKNOWN)
         }
     }
 }

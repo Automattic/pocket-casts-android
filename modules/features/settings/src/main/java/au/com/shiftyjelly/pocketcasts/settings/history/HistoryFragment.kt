@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ class HistoryFragment :
 
     @Inject
     lateinit var settings: Settings
-    private lateinit var navController: NavHostController
+    private var navController: NavHostController? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +53,11 @@ class HistoryFragment :
         AppThemeWithBackground(theme.activeTheme) {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             val bottomInsetDp = bottomInset.value.pxToDp(LocalContext.current).dp
-            navController = rememberNavController()
+            val navController = rememberNavController().also { navController = it }
+
+            LaunchedEffect(navController) {
+                navController.currentBackStackEntryFlow.collect { notifyBackstackChanged() }
+            }
 
             NavHost(
                 navController = navController,
@@ -132,15 +137,23 @@ class HistoryFragment :
             .show(childFragmentManager, "up-next-restore-confirmation-dialog")
     }
 
-    @Suppress("DEPRECATION")
     private fun onBackPress() {
-        activity?.onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
-    override fun onBackPressed() = if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {
-        super.onBackPressed()
-    } else {
-        navController.popBackStack()
+    override fun getBackstackCount(): Int {
+        val isAtHistoryRoot = navController?.currentDestination?.route == HistoryNavRoutes.HISTORY
+        return if (isAtHistoryRoot) super.getBackstackCount() else super.getBackstackCount() + 1
+    }
+
+    override fun onBackPressed(): Boolean {
+        val navController = navController ?: return super.onBackPressed()
+        return if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {
+            super.onBackPressed()
+        } else {
+            navController.popBackStack()
+            true
+        }
     }
 
     object HistoryNavRoutes {

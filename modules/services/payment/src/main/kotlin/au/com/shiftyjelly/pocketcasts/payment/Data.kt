@@ -102,8 +102,9 @@ data class SubscriptionPlans private constructor(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
         offer: SubscriptionOffer,
+        isInstallment: Boolean = false,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
-        val key = SubscriptionPlan.Key(tier, billingCycle, offer)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer, isInstallment)
         return offerPlans[key] ?: missingPlanResult(key)
     }
 
@@ -202,7 +203,7 @@ data class SubscriptionPlans private constructor(
 
         private fun isValidInstallment(key: SubscriptionPlan.Key) = { product: Product ->
             if (key.isInstallment) {
-                key.offer == null && product.pricingPlans.basePlan.installmentPlanDetails != null
+                product.pricingPlans.basePlan.installmentPlanDetails != null
             } else {
                 true
             }
@@ -210,8 +211,14 @@ data class SubscriptionPlans private constructor(
 
         private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.Base> {
             val pricingPhase = pricingPlans.basePlan.pricingPhases.getOrNull(0)
+            val hasInstallmentDetails = pricingPlans.basePlan.installmentPlanDetails != null
             return when {
                 pricingPhase == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing pricing phase for $id")
+
+                key.isInstallment && !hasInstallmentDetails -> PaymentResult.Failure(
+                    PaymentResultCode.DeveloperError,
+                    "Key expects installment plan but product $id has no installmentPlanDetails",
+                )
 
                 else -> PaymentResult.Success(
                     SubscriptionPlan.Base(
@@ -227,10 +234,16 @@ data class SubscriptionPlans private constructor(
 
         private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan.WithOffer> {
             val matchingOfferPlan = pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }
+            val hasInstallmentDetails = pricingPlans.basePlan.installmentPlanDetails != null
             return when {
                 key.offer == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Missing offer for $id")
 
                 matchingOfferPlan == null -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching offer plan for $id")
+
+                key.isInstallment && !hasInstallmentDetails -> PaymentResult.Failure(
+                    PaymentResultCode.DeveloperError,
+                    "Key expects installment plan but product $id has no installmentPlanDetails",
+                )
 
                 else -> PaymentResult.Success(
                     SubscriptionPlan.WithOffer(
@@ -239,6 +252,7 @@ data class SubscriptionPlans private constructor(
                         key.billingCycle,
                         key.offer,
                         matchingOfferPlan.pricingPhases,
+                        pricingPlans.basePlan.installmentPlanDetails,
                     ),
                 )
             }
@@ -264,16 +278,17 @@ sealed interface SubscriptionPlan {
         is Base -> pricingPhase.price
         is WithOffer -> pricingPhases.last().price
     }
+    val installmentPlanDetails: InstallmentPlanDetails?
+    val isInstallment get() = installmentPlanDetails != null
 
     data class Base(
         override val name: String,
         override val tier: SubscriptionTier,
         override val billingCycle: BillingCycle,
         val pricingPhase: PricingPhase,
-        val installmentPlanDetails: InstallmentPlanDetails? = null,
+        override val installmentPlanDetails: InstallmentPlanDetails? = null,
     ) : SubscriptionPlan {
         override val offer get() = null
-        val isInstallment: Boolean get() = installmentPlanDetails != null
         override val key get() = Key(tier, billingCycle, offer = null, isInstallment)
     }
 
@@ -283,8 +298,9 @@ sealed interface SubscriptionPlan {
         override val billingCycle: BillingCycle,
         override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
+        override val installmentPlanDetails: InstallmentPlanDetails? = null,
     ) : SubscriptionPlan {
-        override val key get() = Key(tier, billingCycle, offer)
+        override val key get() = Key(tier, billingCycle, offer, isInstallment)
     }
 
     data class Key(
@@ -295,7 +311,7 @@ sealed interface SubscriptionPlan {
     ) {
         val productId: String? = productId(tier, billingCycle, isInstallment)
         val basePlanId: String? = basePlanId(tier, billingCycle, isInstallment)
-        val offerId = offer?.offerId(tier, billingCycle)
+        val offerId = offer?.offerId(tier, billingCycle, isInstallment)
     }
 
     companion object {
@@ -424,11 +440,17 @@ enum class SubscriptionOffer(
     fun offerId(
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
+        isInstallment: Boolean = false,
     ) = when (this) {
         IntroOffer -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-intro-50percent"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    null
+                } else {
+                    "plus-yearly-intro-50percent"
+                }
             }
 
             SubscriptionTier.Patron -> null
@@ -437,7 +459,12 @@ enum class SubscriptionOffer(
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-trial-30days"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    "plus-yearly-installments-trial-30days"
+                } else {
+                    "plus-yearly-trial-30days"
+                }
             }
 
             SubscriptionTier.Patron -> null
@@ -446,7 +473,12 @@ enum class SubscriptionOffer(
         Referral -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
-                BillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    "plus-yearly-installments-referral-two-months-free"
+                } else {
+                    "plus-yearly-referral-two-months-free"
+                }
             }
 
             SubscriptionTier.Patron -> null
@@ -455,7 +487,12 @@ enum class SubscriptionOffer(
         Winback -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> "plus-monthly-winback"
-                BillingCycle.Yearly -> "plus-yearly-winback"
+
+                BillingCycle.Yearly -> if (isInstallment) {
+                    "plus-yearly-installments-winback"
+                } else {
+                    "plus-yearly-winback"
+                }
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {

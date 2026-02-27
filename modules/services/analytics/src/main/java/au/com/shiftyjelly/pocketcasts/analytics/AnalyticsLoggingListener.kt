@@ -9,6 +9,7 @@ internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
         trackedEvents: Map<String, TrackedEvent?>,
     ) {
         if (BuildConfig.DEBUG) {
+            val realEvents = trackedEvents.filterKeys { id -> id != NoOpTracker.id }
             Timber.tag("Analytics").i(
                 buildString {
                     append("\uD83D\uDD35 Event: ")
@@ -18,8 +19,8 @@ internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
                         append(properties.toSortedMap())
                     }
 
-                    if (trackedEvents.isNotEmpty()) {
-                        val (usedTrackers, skippedTrackers) = trackedEvents.toList().partition { (_, trackedEvent) -> trackedEvent != null }
+                    if (realEvents.isNotEmpty()) {
+                        val (usedTrackers, skippedTrackers) = realEvents.toList().partition { (_, trackedEvent) -> trackedEvent != null }
                         append(", ")
                         if (usedTrackers.isNotEmpty()) {
                             append("Used: ")
@@ -36,7 +37,7 @@ internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
                 },
             )
 
-            trackedEvents.forEach { (trackerId, trackedEvent) ->
+            realEvents.forEach { (trackerId, trackedEvent) ->
                 if (trackedEvent != null) {
                     Timber.tag(trackerId).i(
                         buildString {

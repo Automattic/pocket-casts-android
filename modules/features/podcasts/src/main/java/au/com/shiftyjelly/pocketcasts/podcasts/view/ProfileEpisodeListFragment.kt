@@ -52,8 +52,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.repositories.sync.StarredSyncWorker
@@ -80,6 +79,25 @@ import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
+import com.automattic.eventhorizon.DownloadModalOption
+import com.automattic.eventhorizon.DownloadsMultiSelectEnteredEvent
+import com.automattic.eventhorizon.DownloadsMultiSelectExitedEvent
+import com.automattic.eventhorizon.DownloadsOptionsButtonTappedEvent
+import com.automattic.eventhorizon.DownloadsOptionsModalOptionTappedEvent
+import com.automattic.eventhorizon.DownloadsSelectAllAboveTappedEvent
+import com.automattic.eventhorizon.DownloadsSelectAllBelowTappedEvent
+import com.automattic.eventhorizon.DownloadsSelectAllTappedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ListeningHistoryMultiSelectEnteredEvent
+import com.automattic.eventhorizon.ListeningHistoryMultiSelectExitedEvent
+import com.automattic.eventhorizon.ListeningHistorySelectAllAboveTappedEvent
+import com.automattic.eventhorizon.ListeningHistorySelectAllBelowTappedEvent
+import com.automattic.eventhorizon.ListeningHistorySelectAllTappedEvent
+import com.automattic.eventhorizon.StarredMultiSelectEnteredEvent
+import com.automattic.eventhorizon.StarredMultiSelectExitedEvent
+import com.automattic.eventhorizon.StarredSelectAllAboveTappedEvent
+import com.automattic.eventhorizon.StarredSelectAllBelowTappedEvent
+import com.automattic.eventhorizon.StarredSelectAllTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -110,10 +128,6 @@ class ProfileEpisodeListFragment :
 
     companion object {
         const val OPTION_KEY = "option"
-        const val CLEAN_UP = "clean_up"
-        private const val SELECT_ALL_KEY = "select_all"
-        private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
-        private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
         private const val CLEAR_HISTORY = "clear_history"
 
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
@@ -127,7 +141,7 @@ class ProfileEpisodeListFragment :
     }
 
     @Inject
-    lateinit var downloadManager: DownloadManager
+    lateinit var downloadQueue: DownloadQueue
 
     @Inject
     lateinit var playButtonListener: PlayButton.OnClickListener
@@ -142,7 +156,7 @@ class ProfileEpisodeListFragment :
     lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
-    lateinit var bookmarkManager: BookmarkManager
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
@@ -569,9 +583,9 @@ class ProfileEpisodeListFragment :
         return if (item.itemId == R.id.more_options) {
             val dialog = OptionsDialog()
             if (mode is Mode.Downloaded) {
-                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_BUTTON_TAPPED)
+                eventHorizon.track(DownloadsOptionsButtonTappedEvent)
                 dialog.addTextOption(LR.string.profile_auto_download_settings, imageId = R.drawable.ic_settings_small, click = this::showAutodownloadSettings)
-                if (downloadManager.hasPendingOrRunningDownloads()) {
+                if (downloadQueue.size > 0) {
                     dialog.addTextOption(LR.string.settings_auto_download_stop_all, imageId = IR.drawable.ic_stop, click = this::stopAllDownloads)
                 }
                 dialog.addTextOption(LR.string.profile_clean_up, imageId = VR.drawable.ic_delete, click = this::showCleanupSettings)
@@ -589,17 +603,29 @@ class ProfileEpisodeListFragment :
     private fun showAutodownloadSettings() {
         val fragment = AutoDownloadSettingsFragment()
         showFragment(fragment)
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to AUTO_DOWNLOAD_SETTINGS))
+        eventHorizon.track(
+            DownloadsOptionsModalOptionTappedEvent(
+                option = DownloadModalOption.AutoDownloadSettings,
+            ),
+        )
         (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.profile_auto_download_settings)
     }
 
     private fun stopAllDownloads() {
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to STOP_ALL_DOWNLOADS))
-        downloadManager.stopAllDownloads()
+        eventHorizon.track(
+            DownloadsOptionsModalOptionTappedEvent(
+                option = DownloadModalOption.StopAllDownloads,
+            ),
+        )
+        viewModel.cancelAllDownloads()
     }
 
     private fun showCleanupSettings() {
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
+        eventHorizon.track(
+            DownloadsOptionsModalOptionTappedEvent(
+                option = DownloadModalOption.CleanUp,
+            ),
+        )
         val fragment = ManualCleanupFragment.newInstance()
         showFragment(fragment)
     }
@@ -640,47 +666,47 @@ class ProfileEpisodeListFragment :
     }
 
     private fun trackSelectAll(selectAll: Boolean) {
-        val analyticsEvent = when (mode) {
-            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_TAPPED
-            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_TAPPED
-            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_TAPPED
+        val event = when (mode) {
+            Mode.Downloaded -> DownloadsSelectAllTappedEvent(selectAll = selectAll)
+            Mode.History -> ListeningHistorySelectAllTappedEvent(selectAll = selectAll)
+            Mode.Starred -> StarredSelectAllTappedEvent(selectAll = selectAll)
         }
-        analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll))
+        eventHorizon.track(event)
     }
 
     private fun trackSelectAllAbove() {
-        val analyticsEvent = when (mode) {
-            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_ABOVE_TAPPED
-            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_ABOVE_TAPPED
-            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_ABOVE_TAPPED
+        val event = when (mode) {
+            Mode.Downloaded -> DownloadsSelectAllAboveTappedEvent
+            Mode.History -> ListeningHistorySelectAllAboveTappedEvent
+            Mode.Starred -> StarredSelectAllAboveTappedEvent
         }
-        analyticsTracker.track(analyticsEvent)
+        eventHorizon.track(event)
     }
 
     private fun trackSelectAllBelow() {
-        val analyticsEvent = when (mode) {
-            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_BELOW_TAPPED
-            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED
-            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_BELOW_TAPPED
+        val event = when (mode) {
+            Mode.Downloaded -> DownloadsSelectAllBelowTappedEvent
+            Mode.History -> ListeningHistorySelectAllBelowTappedEvent
+            Mode.Starred -> StarredSelectAllBelowTappedEvent
         }
-        analyticsTracker.track(analyticsEvent)
+        eventHorizon.track(event)
     }
 
     private fun trackMultiSelectEntered() {
-        val analyticsEvent = when (mode) {
-            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_ENTERED
-            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_ENTERED
-            Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_ENTERED
+        val event = when (mode) {
+            Mode.Downloaded -> DownloadsMultiSelectEnteredEvent
+            Mode.History -> ListeningHistoryMultiSelectEnteredEvent
+            Mode.Starred -> StarredMultiSelectEnteredEvent
         }
-        analyticsTracker.track(analyticsEvent)
+        eventHorizon.track(event)
     }
 
     private fun trackMultiSelectExited() {
-        val analyticsEvent = when (mode) {
-            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_EXITED
-            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_EXITED
-            Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_EXITED
+        val event = when (mode) {
+            Mode.Downloaded -> DownloadsMultiSelectExitedEvent
+            Mode.History -> ListeningHistoryMultiSelectExitedEvent
+            Mode.Starred -> StarredMultiSelectExitedEvent
         }
-        analyticsTracker.track(analyticsEvent)
+        eventHorizon.track(event)
     }
 }

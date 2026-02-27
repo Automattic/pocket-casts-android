@@ -9,8 +9,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -32,7 +32,7 @@ class NotificationBroadcastReceiver :
 
     @Inject lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject lateinit var downloadQueue: DownloadQueue
 
     @Inject lateinit var playbackManager: PlaybackManager
 
@@ -116,11 +116,7 @@ class NotificationBroadcastReceiver :
     }
 
     private fun downloadEpisode(episodeUuid: String) {
-        launch {
-            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager, source = source)
-            }
-        }
+        downloadQueue.enqueue(episodeUuid, DownloadType.UserTriggered(waitForWifi = false), source)
     }
 
     private fun markAsPlayed(episodeUuid: String) {

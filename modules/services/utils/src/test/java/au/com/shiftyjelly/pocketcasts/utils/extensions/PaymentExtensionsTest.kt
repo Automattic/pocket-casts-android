@@ -74,15 +74,14 @@ class PaymentExtensionsTest {
     )
 
     @Test
-    fun `returns regular yearly plan when feature flag is disabled for Plus tier`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, false)
+    fun `returns regular yearly plan when shouldUseInstallmentPlan is false for Plus tier`() {
         val productsWithInstallment = baseProducts + installmentProduct
         val result = SubscriptionPlans.create(productsWithInstallment)
         assertNotNull(result)
         assertTrue(result is PaymentResult.Success)
         val plans = (result as PaymentResult.Success).value
 
-        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus, shouldUseInstallmentPlan = false)
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
@@ -92,10 +91,9 @@ class PaymentExtensionsTest {
     }
 
     @Test
-    fun `returns regular yearly plan when feature flag is disabled for Patron tier`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, false)
+    fun `returns regular yearly plan when shouldUseInstallmentPlan is false for Patron tier`() {
         val plans = SubscriptionPlans.create(baseProducts).getOrNull()!!
-        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron)
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron, shouldUseInstallmentPlan = false)
 
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
@@ -105,11 +103,10 @@ class PaymentExtensionsTest {
     }
 
     @Test
-    fun `returns installment plan when feature flag is enabled and installment available for Plus tier`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, true)
+    fun `returns installment plan when shouldUseInstallmentPlan is true and installment available for Plus tier`() {
         val productsWithInstallment = baseProducts + installmentProduct
         val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
-        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus, shouldUseInstallmentPlan = true)
 
         assertEquals("Plus Yearly Installment", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
@@ -120,11 +117,10 @@ class PaymentExtensionsTest {
     }
 
     @Test
-    fun `returns regular yearly plan when feature flag is enabled but installment not available for Plus tier`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, true)
+    fun `returns regular yearly plan when shouldUseInstallmentPlan is true but installment not available for Plus tier`() {
         val plans = SubscriptionPlans.create(baseProducts).getOrNull()!!
 
-        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus, shouldUseInstallmentPlan = true)
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
@@ -134,12 +130,11 @@ class PaymentExtensionsTest {
     }
 
     @Test
-    fun `returns regular yearly plan when feature flag is enabled for Patron tier`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, true)
+    fun `returns regular yearly plan when shouldUseInstallmentPlan is true for Patron tier`() {
         val productsWithInstallment = baseProducts + installmentProduct
         val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
 
-        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron)
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron, shouldUseInstallmentPlan = true)
 
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
@@ -149,17 +144,28 @@ class PaymentExtensionsTest {
     }
 
     @Test
-    fun `installment plan is only available for Plus yearly subscription`() {
-        FeatureFlag.setEnabled(Feature.NEW_INSTALLMENT_PLAN, true)
+    fun `installment plan is only available for Plus yearly subscription when shouldUseInstallmentPlan is true`() {
         val productsWithInstallment = baseProducts + installmentProduct
         val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
 
-        // Plus Yearly should get installment
-        val plusYearlyPlan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+        // Plus Yearly should get installment when flag is true
+        val plusYearlyPlan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus, shouldUseInstallmentPlan = true)
         assertTrue(plusYearlyPlan.isInstallment)
 
-        // Patron Yearly should NOT get installment
-        val patronYearlyPlan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron)
+        // Patron Yearly should NOT get installment even when flag is true (not available for Patron)
+        val patronYearlyPlan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Patron, shouldUseInstallmentPlan = true)
         assertFalse(patronYearlyPlan.isInstallment)
+    }
+
+    @Test
+    fun `returns regular plan when shouldUseInstallmentPlan defaults to false`() {
+        val productsWithInstallment = baseProducts + installmentProduct
+        val plans = SubscriptionPlans.create(productsWithInstallment).getOrNull()!!
+
+        // When not providing the parameter, it should default to false
+        val plan = plans.getYearlyPlanWithFeatureFlag(SubscriptionTier.Plus)
+
+        assertEquals("Plus Yearly", plan.name)
+        assertFalse(plan.isInstallment)
     }
 }

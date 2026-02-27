@@ -21,7 +21,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -53,6 +55,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
@@ -62,7 +65,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -72,7 +74,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class EpisodeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val downloadManager: DownloadManager,
+    private val downloadQueue: DownloadQueue,
+    private val downloadProgressCache: DownloadProgressCache,
     private val episodeAnalytics: EpisodeAnalytics,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
@@ -149,9 +152,10 @@ class EpisodeViewModel @Inject constructor(
 
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
 
-        val downloadProgressFlow = downloadManager
-            .episodeDownloadProgressFlow(episodeUuid)
-            .map { it.downloadProgress }
+        val downloadProgressFlow = downloadProgressCache
+            .progressFlow(episodeUuid)
+            .map { progress -> (progress?.percentage?.toFloat() ?: 0f) / 100 }
+            .distinctUntilChanged()
 
         val showNotesFlow = episodeFlow
             .flatMapLatest {
@@ -172,7 +176,7 @@ class EpisodeViewModel @Inject constructor(
             podcastFlow.onStart { emit(null) },
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
-            downloadProgressFlow.onStart { emit(0f) },
+            downloadProgressFlow,
             showNotesFlow,
         ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
 
@@ -258,75 +262,35 @@ class EpisodeViewModel @Inject constructor(
     fun downloadEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            val fromString = "wear episode screen"
-            clearErrors(episode)
-            if (episode.downloadTaskId != null) {
-                when (episode) {
-                    is PodcastEpisode -> {
-                        episodeManager.stopDownloadAndCleanUp(episode, fromString)
-                    }
-
-                    is UserEpisode -> {
-                        downloadManager.removeEpisodeFromQueue(episode, fromString)
-                    }
-                }
-
-                episodeAnalytics.trackEvent(
-                    event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
-                    source = sourceView,
-                    uuid = episode.uuid,
-                )
-            } else if (!episode.isDownloaded) {
-                episode.autoDownloadStatus =
-                    PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                downloadManager.addEpisodeToQueue(episode, fromString, fireEvent = true, source = sourceView)
-
-                episodeAnalytics.trackEvent(
-                    event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
-                    source = sourceView,
-                    uuid = episode.uuid,
-                )
-            }
-        }
-    }
-
-    private suspend fun clearErrors(episode: BaseEpisode) {
-        withContext(Dispatchers.IO) {
-            if (episode is PodcastEpisode) {
-                episodeManager.clearDownloadErrorBlocking(episode)
-            }
             episodeManager.clearPlaybackErrorBlocking(episode)
+            if (episode.isDownloadCancellable) {
+                downloadQueue.cancel(episode.uuid, sourceView)
+            } else if (!episode.isDownloaded) {
+                downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), sourceView)
+            }
         }
     }
 
     fun deleteDownloadedEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            episodeManager.disableAutoDownload(episode)
             when (episode) {
                 is PodcastEpisode -> {
-                    episodeManager.deleteEpisodeFile(
-                        episode,
-                        playbackManager,
-                        disableAutoDownload = true,
-                    )
+                    downloadQueue.cancel(episode.uuid, sourceView)
                 }
 
                 is UserEpisode -> {
                     CloudDeleteHelper.deleteEpisode(
                         episode = episode,
+                        sourceView = sourceView,
                         playbackManager = playbackManager,
-                        episodeManager = episodeManager,
+                        downloadQueue = downloadQueue,
                         userEpisodeManager = userEpisodeManager,
                         applicationScope = applicationScope,
                     )
                 }
             }
-
-            episodeAnalytics.trackEvent(
-                event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                source = sourceView,
-                uuid = episode.uuid,
-            )
         }
     }
 
@@ -348,11 +312,10 @@ class EpisodeViewModel @Inject constructor(
     }
 
     private fun play() {
-        val episode = (stateFlow.value as? State.Loaded)?.episode
-            ?: return
+        val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch {
-            if (episode.playErrorDetails != null || episode.downloadErrorDetails != null) {
-                clearErrors(episode)
+            if (episode.playErrorDetails != null) {
+                episodeManager.clearPlaybackErrorBlocking(episode)
             }
             playbackManager.playNowSync(
                 episode = episode,

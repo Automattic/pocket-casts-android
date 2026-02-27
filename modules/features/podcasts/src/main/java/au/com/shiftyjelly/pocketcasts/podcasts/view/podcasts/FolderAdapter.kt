@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -25,10 +26,9 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
-import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -38,7 +38,9 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
-import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import coil3.imageLoader
+import coil3.request.target
+import kotlin.math.abs
 import kotlin.math.min
 
 class FolderAdapter(
@@ -173,6 +175,7 @@ class FolderAdapter(
         val podcastTitle: TextView = view.findViewById<TextView>(R.id.library_podcast_title).apply {
             textSize = if (podcastGridLayout == PodcastGridLayoutType.SMALL_ARTWORK) 10f else 14f
         }
+        val podcastOverlay: View? = view.findViewById(R.id.podcast_artwork_overlay)
         val author: TextView? = view.findViewById(R.id.podcast_author)
         val cardElevation: Float = 1.dpToPx(view.resources.displayMetrics).toFloat()
         val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()
@@ -183,11 +186,9 @@ class FolderAdapter(
             button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
-            podcastTitle.show()
+            podcastTitle.hide()
             author?.text = podcast.author
-            if (!isListLayout) {
-                UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
-            }
+
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
                 BadgeType.OFF -> 0
@@ -201,15 +202,40 @@ class FolderAdapter(
             }
             podcastCardView?.cardElevation = cardElevation
             podcastCardView?.radius = cardCornerRadius
+            podcastCardView?.setCardBackgroundColor(Color.TRANSPARENT)
+            podcastOverlay?.hide()
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
             val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
             button?.contentDescription = contentDescription
             podcastCardView?.contentDescription = contentDescription
 
-            imageRequestFactory
-                .create(podcast, onSuccess = { if (!isListLayout) podcastTitle.hide() })
-                .loadInto(podcastThumbnail)
+            // Load image with custom listener to handle error state
+            val imageRequest = imageRequestFactory
+                .create(podcast)
+                .newBuilder()
+                .listener(
+                    onSuccess = { _, _ ->
+                        podcastTitle.hide()
+                        podcastOverlay?.hide()
+                    },
+                    onError = { _, _ ->
+                        if (!isListLayout) {
+                            // Show the fallback podcast title and artwork color
+                            podcastTitle.show()
+                            podcastOverlay?.show()
+                            // Set color background using UUID hash so the same podcast gets the same color each time
+                            val colorIndex = abs(podcast.uuid.hashCode()) % Theme.folderColors.size
+                            val folderColorAttr = Theme.folderColors.getOrElse(colorIndex) { Theme.folderColors.first() }
+                            val folderColor = view.context.getThemeColor(folderColorAttr)
+                            podcastCardView?.setCardBackgroundColor(folderColor)
+                        }
+                    },
+                )
+                .target(podcastThumbnail)
+                .build()
+
+            view.context.imageLoader.enqueue(imageRequest)
         }
 
         private fun ComposeView.setBadgeContent(

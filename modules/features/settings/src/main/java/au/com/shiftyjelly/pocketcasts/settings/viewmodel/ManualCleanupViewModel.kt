@@ -4,18 +4,23 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupConfirmationDialog
+import com.automattic.eventhorizon.DownloadsCleanUpButtonTappedEvent
+import com.automattic.eventhorizon.DownloadsCleanUpCompletedEvent
+import com.automattic.eventhorizon.DownloadsCleanUpShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +33,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class ManualCleanupViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val downloadQueue: DownloadQueue,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     data class State(
         val diskSpaceViews: List<DiskSpaceView> = listOf(
@@ -40,6 +45,10 @@ class ManualCleanupViewModel
         val totalSelectedDownloadSize: Long = 0L,
         val deleteButton: DeleteButton = DeleteButton(),
     ) {
+        val unplayed get() = diskSpaceViews.find { it.title == LR.string.unplayed }
+        val inProgress get() = diskSpaceViews.find { it.title == LR.string.in_progress }
+        val played get() = diskSpaceViews.find { it.title == LR.string.played }
+
         data class DiskSpaceView(
             @StringRes val title: Int,
             val isChecked: Boolean = false,
@@ -94,7 +103,7 @@ class ManualCleanupViewModel
     fun setup(deleteButtonClickAction: () -> Unit) {
         this.deleteButtonAction = deleteButtonClickAction
         if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_SHOWN)
+            eventHorizon.track(DownloadsCleanUpShownEvent)
         }
     }
 
@@ -112,19 +121,19 @@ class ManualCleanupViewModel
     }
 
     fun onDeleteButtonClicked() {
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_BUTTON_TAPPED)
+        eventHorizon.track(DownloadsCleanUpButtonTappedEvent)
         deleteButtonAction?.invoke()
     }
 
     private fun onDeleteConfirmed() {
         if (episodesToDelete.isNotEmpty()) {
             trackCleanupCompleted()
-            viewModelScope.launch {
-                episodeManager.deleteEpisodeFiles(
-                    episodes = episodesToDelete,
-                    playbackManager = playbackManager,
-                )
+            val episodeUuids = episodesToDelete.map(BaseEpisode::uuid)
+
+            viewModelScope.launch(NonCancellable) {
                 _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
+                downloadQueue.cancelAll(episodeUuids, SourceView.DOWNLOADS).join()
+                episodeManager.disableAutoDownload(episodesToDelete)
             }
         }
     }
@@ -179,22 +188,13 @@ class ManualCleanupViewModel
     }
 
     private fun trackCleanupCompleted() {
-        val properties = HashMap<String, Boolean>()
-        state.value.diskSpaceViews.forEach {
-            when (it.title) {
-                LR.string.unplayed -> properties[UNPLAYED_KEY] = it.isChecked
-                LR.string.played -> properties[PLAYED_KEY] = it.isChecked
-                LR.string.in_progress -> properties[IN_PROGRESS_KEY] = it.isChecked
-            }
-        }
-        properties[INCLUDE_STARRED_KEY] = switchState.value ?: false
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_COMPLETED, properties)
-    }
-
-    companion object {
-        private const val INCLUDE_STARRED_KEY = "include_starred"
-        private const val PLAYED_KEY = "played"
-        private const val IN_PROGRESS_KEY = "in_progress"
-        private const val UNPLAYED_KEY = "unplayed"
+        eventHorizon.track(
+            DownloadsCleanUpCompletedEvent(
+                unplayed = state.value.unplayed?.isChecked == true,
+                inProgress = state.value.inProgress?.isChecked == true,
+                played = state.value.played?.isChecked == true,
+                includeStarred = switchState.value == true,
+            ),
+        )
     }
 }

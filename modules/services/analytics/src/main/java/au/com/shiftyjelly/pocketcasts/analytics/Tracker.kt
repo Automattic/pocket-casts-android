@@ -12,4 +12,22 @@ interface Tracker {
     fun flush()
 
     fun clearAllData()
+
+    companion object {
+        const val INVALID_OR_NULL_VALUE = "none"
+    }
+}
+
+internal object NoOpTracker : Tracker {
+    override val id = "no-op"
+
+    override fun shouldTrack(event: AnalyticsEvent) = false
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) = TrackedEvent(event, properties)
+
+    override fun refreshMetadata() = Unit
+
+    override fun flush() = Unit
+
+    override fun clearAllData() = Unit
 }

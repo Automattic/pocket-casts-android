@@ -514,7 +514,7 @@ private fun ColumnScope.PagingContent(
         userScrollEnabled = sharingState.step == Step.ClipSelection && !sharingState.iSharing,
         modifier = Modifier.height(coordiantes.size.height),
     ) { pageIndex ->
-        val cardType = CardType.entires[pageIndex]
+        val cardType = CardType.entries[pageIndex]
         val offset by animateIntOffsetAsState(
             targetValue = coordiantes.offset(cardType),
         )

@@ -436,8 +436,7 @@ class PlaylistFragment :
                     ContentState.HasEpisode -> ToolbarConfig.ForAlpha(toolbarAlpha)
                 },
                 onClickBack = {
-                    @Suppress("DEPRECATION")
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 },
                 onClickOptions = {
                     viewModel.trackFilterOptionsButtonTapped()

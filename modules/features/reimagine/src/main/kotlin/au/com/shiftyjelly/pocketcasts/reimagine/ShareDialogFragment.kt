@@ -203,8 +203,8 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                         textColor = textColor,
                         onClick = {
                             lifecycleScope.launch(NonCancellable) {
-                                val request = SharingRequest.episodeFile(podcast, episode)
-                                    .setSourceView(args.source)
+                                val request = SharingRequest
+                                    .episodeFile(podcast, episode, args.source)
                                     .build()
                                 sharingClient.share(request)
                             }

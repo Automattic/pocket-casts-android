@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.download
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result
 import java.util.Date
 import junit.framework.TestCase.assertEquals
@@ -32,9 +33,14 @@ class EpisodeDownloaderTest {
 
     private lateinit var episode: PodcastEpisode
 
+    private lateinit var userEpisode: UserEpisode
+
+    private val minContentLength = 10L
+
     private val downloader = EpisodeDownloader(
         httpClient = ::OkHttpClient,
         progressCache = progressCache,
+        minContentLength = minContentLength,
     )
 
     @Before
@@ -42,6 +48,11 @@ class EpisodeDownloaderTest {
         server.start()
         episode = PodcastEpisode(
             uuid = "episode-uuid",
+            downloadUrl = server.url("/episode.mp3").toString(),
+            publishedDate = Date(),
+        )
+        userEpisode = UserEpisode(
+            uuid = "user-episode-uuid",
             downloadUrl = server.url("/episode.mp3").toString(),
             publishedDate = Date(),
         )
@@ -164,6 +175,121 @@ class EpisodeDownloaderTest {
             .build()
 
         server.enqueue(response)
+        downloader.download(
+            episode = episode,
+            downloadFile = downloadFile,
+            tempFile = tempFile,
+        )
+
+        assertFalse(downloadFile.exists())
+        assertFalse(tempFile.exists())
+        assertNull(progressCache.progressFlow(episode.uuid).value)
+    }
+
+    @Test
+    fun `fail to download episode with application content type`() {
+        val response = MockResponse.Builder()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .build()
+
+        server.enqueue(response)
+        val result = downloader.download(
+            episode = episode,
+            downloadFile = tempDir.newFile("file.mp3"),
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.InvalidContentType("application/json; charset=utf-8"), result)
+    }
+
+    @Test
+    fun `fail to download episode with image content type`() {
+        val response = MockResponse.Builder()
+            .addHeader("Content-Type", "image/jpeg")
+            .build()
+
+        server.enqueue(response)
+        val result = downloader.download(
+            episode = episode,
+            downloadFile = tempDir.newFile("file.mp3"),
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.InvalidContentType("image/jpeg"), result)
+    }
+
+    @Test
+    fun `fail to download episode with text content type`() {
+        val response = MockResponse.Builder()
+            .addHeader("Content-Type", "text/html")
+            .build()
+
+        server.enqueue(response)
+        val result = downloader.download(
+            episode = episode,
+            downloadFile = tempDir.newFile("file.mp3"),
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.InvalidContentType("text/html"), result)
+    }
+
+    @Test
+    fun `clean up resources on invalid content type failure`() {
+        val downloadFile = tempDir.newFile("file.mp3")
+        val tempFile = tempDir.newFile("file.tmp")
+        val response = MockResponse.Builder()
+            .addHeader("Content-Type", "text/html")
+            .build()
+
+        server.enqueue(response)
+        downloader.download(
+            episode = episode,
+            downloadFile = downloadFile,
+            tempFile = tempFile,
+        )
+
+        assertFalse(downloadFile.exists())
+        assertFalse(tempFile.exists())
+        assertNull(progressCache.progressFlow(episode.uuid).value)
+    }
+
+    @Test
+    fun `fail to download episode with suspicious file size content`() {
+        server.enqueue(MockResponse(body = "a".repeat(minContentLength.toInt() - 1)))
+        val result = downloader.download(
+            episode = episode,
+            downloadFile = tempDir.newFile("file.mp3"),
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.SuspiciousFileSize(minContentLength - 1), result)
+    }
+
+    @Test
+    fun `do not fail to download user episode with suspicious file size content`() {
+        val downloadFile = tempDir.newFile("file.mp3")
+
+        val content = "a".repeat(minContentLength.toInt() - 1)
+        server.enqueue(MockResponse(body = content))
+        val result = downloader.download(
+            episode = userEpisode,
+            downloadFile = downloadFile,
+            tempFile = tempDir.newFile("file.tmp"),
+        )
+
+        assertEquals(Result.Success(downloadFile), result)
+        assertEquals(100, progressCache.progressFlow(userEpisode.uuid).value?.percentage)
+        assertEquals(server.takeRequest().url, userEpisode.downloadUrl?.toHttpUrl())
+        assertEquals(content, downloadFile.readText())
+    }
+
+    @Test
+    fun `clean up resources on suspicious file size content`() {
+        val downloadFile = tempDir.newFile("file.mp3")
+        val tempFile = tempDir.newFile("file.tmp")
+
+        server.enqueue(MockResponse(body = "a"))
         downloader.download(
             episode = episode,
             downloadFile = downloadFile,

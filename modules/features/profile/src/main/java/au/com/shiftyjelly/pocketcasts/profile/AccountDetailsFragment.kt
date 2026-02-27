@@ -102,8 +102,7 @@ class AccountDetailsFragment : BaseFragment() {
             state = state,
             theme = theme.activeTheme,
             onNavigateBack = {
-                @Suppress("DEPRECATION")
-                requireActivity().onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             },
             onClickHeader = {
                 if (state.headerState.subscription.isChampion) {
@@ -284,7 +283,6 @@ class AccountDetailsFragment : BaseFragment() {
     private fun performSignOut() {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "User requested to sign out")
         userManager.signOut(playbackManager, wasInitiatedByUser = true)
-        @Suppress("DEPRECATION")
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
     }
 }

@@ -147,6 +147,7 @@ dependencies {
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)
+    testImplementation(projects.modules.services.analytics.testing)
 
     androidTestImplementation(libs.androidx.preference.ktx)
     androidTestImplementation(libs.androidx.recyclerview)
@@ -175,4 +176,5 @@ dependencies {
     androidTestImplementation(libs.work.test)
 
     androidTestImplementation(projects.modules.services.sharedtest)
+    androidTestImplementation(projects.modules.services.analytics.testing)
 }

@@ -1161,8 +1161,11 @@
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_help_support">Help support Pocket Casts by upgrading your account</string>
     <string name="profile_joined">Joined:</string>
+    <string name="profile_just_now">Just now</string>
     <string name="profile_just_sign_out">Just sign out</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
+    <!-- WearOS uses absolute time format (e.g., "3:45 PM") instead of relative time. Will be translated via GlotPress. -->
+    <string name="profile_last_refresh_at">Last refresh: %s</string>
     <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account, and don&#x2019;t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you&#x2019;re welcome to view prior to submission.</string>
     <string name="profile_monthly">Monthly</string>
     <string name="profile_navigation_downloads" translatable="false">@string/downloads</string>
@@ -1362,6 +1365,7 @@
     <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
+    <string name="plus_yearly_installments">Annual plan - pay monthly</string>
 
     <!-- Trial -->
 
@@ -1858,19 +1862,21 @@
     <string name="error_login_failed">Unable to login to your sync account, sorry. Please try again later.</string>
     <string name="error_search_failed">Search Failed</string>
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
-    <string name="error_download_missing_episode">Failed to find the episode data on the device. Please contact support.</string>
-    <string name="error_download_no_episode_file">Failed to create a download file for the episode. Please check that you have enough space on your device.</string>
-    <string name="error_download_invalid_url">The episode has an invalid URL. Please contact the podcast’s author.</string>
-    <string name="error_download_http_failure">Failed to download the episode. Error code: %1$s.</string>
-    <string name="error_download_no_storage">Failed to download the episode. Please check that you have enough space on your device.</string>
+    <string name="error_download_missing_episode">Unable to find the episode data on this device. Please contact support.</string>
+    <string name="error_download_no_episode_file">Unable to create a download file for the episode. Please check that you have enough storage space on your device.</string>
+    <string name="error_download_invalid_url">The episode URL is invalid. Please contact the podcast author.</string>
+    <string name="error_download_http_failure">Failed to download the episode. Received HTTP status code %1$s. Please contact the podcast author.</string>
+    <string name="error_download_invalid_content_type">Failed to download the episode. Received content type %1$s. Please contact the podcast author.</string>
+    <string name="error_download_suspicious_content_size">Failed to download the episode. The downloaded file is too small. Please contact the podcast author.</string>
+    <string name="error_download_no_storage">Failed to download the episode. Please check that you have enough storage space on your device.</string>
     <string name="error_download_chartable" translatable="false">@string/error_chartable</string>
-    <string name="error_download_unknown_host">Failed to find the podcast author’s server. Please check your internet connection.</string>
-    <string name="error_download_connection_error">Failed to establish a connection with the podcast author’s server. Please check your internet connection.</string>
-    <string name="error_download_ssl_failure">Failed to establish a secure connection with the podcast author’s server. Please check if your device is up-to-date.</string>
-    <string name="error_download_socket_timeout">Failed to establish a connection with the podcast author’s server in time. Please check your internet connection.</string>
-    <string name="error_download_io_failure">Failed to download the episode. Please check your internet connection and that you have enough space on your device.</string>
+    <string name="error_download_unknown_host">Unable to reach the podcast author’s server. Please check your internet connection.</string>
+    <string name="error_download_connection_error">Failed to connect to the podcast author’s server. Please check your internet connection.</string>
+    <string name="error_download_ssl_failure">Failed to establish a secure connection to the podcast author’s server. Please check that your device is up to date.</string>
+    <string name="error_download_socket_timeout">Connection to the podcast author’s server timed out. Please check your internet connection.</string>
+    <string name="error_download_io_failure">Failed to download the episode. Please check your internet connection and storage.</string>
     <string name="error_download_generic_failure">Failed to download the episode. %1$s</string>
-    <string name="error_download_too_many_attempts">Failed to download due to too many attempts. Please try again.</string>
+    <string name="error_download_too_many_attempts">Download cancelled after multiple attempts. Please check your internet connection and storage, then try again.</string>
 
     <!-- Discover -->
 
@@ -2504,6 +2510,8 @@
     <string name="referrals_claim_guess_pass_banner_card_title">Claim your %1$s Guest Pass to Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Unlock the full listening experience</string>
     <string name="referrals_claim_guest_pass_description">Membership will automatically renew to a paid annual membership at %s.</string>
+    <!-- Referrals claim guest pass description for installment plans, `%1$s' is offer duration, `%2$s' is monthly price, `%3$d' is number of months, `%4$s' is total commitment amount -->
+    <string name="referrals_claim_guest_pass_description_installment">Free for %1$s, then %2$s/month for %3$d months. Total commitment: %4$s over 1 year.</string>
     <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your %1$s\nGuest Pass</string>
     <!-- Referrals claim guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_claim_guest_pass_title">Claim your %1$s Guest Pass</string>
@@ -2544,6 +2552,8 @@
     <string name="winback_offer_free_offer_yearly_title">Get 50%% off your next year and save %1$s</string>
     <string name="winback_offer_free_offer_description">Enjoy one month of Pocket Casts Plus on us! The offer will be added to your current subscription.</string>
     <string name="winback_offer_free_offer_yearly_description">Pay %1$s now to lock in a year of Pocket Casts Plus at half price. Your discounted year begins after your current plan ends.</string>
+    <string name="winback_offer_free_offer_installment_title">Get 50%% off your next year — pay just %1$s/month and save %2$s</string>
+    <string name="winback_offer_free_offer_installment_description">Lock in a year of Pocket Casts Plus at half price with 12 monthly payments of %1$s. Your discounted installment plan begins after your current plan ends.</string>
     <string name="winback_offer_free_offer_button_label">Claim offer</string>
     <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
     <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
@@ -2554,6 +2564,8 @@
     <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Your free month will be added to your current subscription.</string>
     <string name="winback_claimed_offer_message_3">50% off your next year!</string>
     <string name="winback_claimed_offer_message_4">Thanks for choosing Pocket&#160;Casts. Your discounted year begins after your current billing period.</string>
+    <string name="winback_claimed_offer_message_5">50% off your next year with monthly payments!</string>
+    <string name="winback_claimed_offer_message_6">Thanks for choosing Pocket&#160;Casts. Your discounted 12-month installment plan begins after your current billing period.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
     <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>

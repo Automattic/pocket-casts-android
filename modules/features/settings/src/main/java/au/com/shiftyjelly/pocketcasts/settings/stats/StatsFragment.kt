@@ -87,8 +87,7 @@ class StatsFragment : BaseFragment() {
             StatsPage(
                 state = state,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onRetryClick = { viewModel.loadStats() },
                 launchReviewDialog = { viewModel.launchAppReviewDialog(it) },

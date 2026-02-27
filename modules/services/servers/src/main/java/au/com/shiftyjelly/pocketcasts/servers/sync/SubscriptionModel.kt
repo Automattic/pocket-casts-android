@@ -25,6 +25,7 @@ data class SubscriptionStatusResponse(
     @Json(name = "index") val index: Int,
     @Json(name = "createdAt") val createdAt: Instant?,
     @Json(name = "features") val features: SubscriptionFeatures?,
+    @Json(name = "installmentBased") val isInstallment: Boolean = false,
 )
 
 @JsonClass(generateAdapter = true)
@@ -87,7 +88,7 @@ fun SubscriptionStatusResponse.toMembership(): Membership {
             expiryDate = subscriptionResponse.expiryDate?.toInstant() ?: Instant.MAX,
             isAutoRenewing = subscriptionResponse.autoRenewing,
             giftDays = subscriptionResponse.giftDays,
-            isInstallment = subscriptionResponse.isInstallment,
+            isInstallment = subscriptionResponse.isInstallment || isInstallment,
         )
     }
 
@@ -107,6 +108,7 @@ private val SubscriptionStatusResponse.fallbackSubscription
         expiryDate = expiryDate,
         autoRenewing = autoRenewing,
         giftDays = giftDays,
+        isInstallment = isInstallment,
     )
 
 private fun SubscriptionFeatures.toMembershipFeatures() = buildList {

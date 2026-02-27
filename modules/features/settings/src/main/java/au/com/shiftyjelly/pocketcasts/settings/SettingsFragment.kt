@@ -66,8 +66,7 @@ class SettingsFragment : BaseFragment() {
                     SettingsFragmentPage(
                         signInState = signInState,
                         onBackPress = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
+                            activity?.onBackPressedDispatcher?.onBackPressed()
                         },
                         isDebug = BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE,
                         isUnrestrictedBattery = isUnrestrictedBattery,

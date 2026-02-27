@@ -127,6 +127,20 @@ class PlaylistManagerImpl(
         }
     }
 
+    override suspend fun getAutoDownloadPlaylists(): List<Playlist> {
+        val playlists = playlistDao.getAllAutoDownloadPlaylists()
+        return withContext(computationContext) {
+            playlists.mapNotNull { playlist ->
+                val playlistFlow = if (playlist.manual) {
+                    manualPlaylistFlow(playlist.uuid)
+                } else {
+                    smartPlaylistFlow(playlist.uuid)
+                }
+                playlistFlow.first()
+            }
+        }
+    }
+
     private val artworkCache = ConcurrentHashMap<String, MutableStateFlow<List<String>?>>()
     private val episodeCountCache = ConcurrentHashMap<String, MutableStateFlow<Int?>>()
 
@@ -154,29 +168,6 @@ class PlaylistManagerImpl(
             is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
             is SmartPlaylistPreview -> playlistDao.smartPlaylistMetadataFlow(clock, playlistPreview.smartRules)
         }.first().episodeCount
-    }
-
-    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
-        return appDatabase.withTransaction {
-            val playlists = playlistDao.getAllAutoDownloadPlaylists()
-            withContext(computationContext) {
-                playlists
-                    .flatMap { playlist ->
-                        val playlistFlow = if (playlist.manual) {
-                            manualPlaylistFlow(playlist.uuid)
-                        } else {
-                            smartPlaylistFlow(playlist.uuid)
-                        }
-                        playlistFlow.first()
-                            ?.episodes
-                            ?.toPodcastEpisodes()
-                            ?.filterNot { it.isExemptFromAutoDownload }
-                            ?.take(playlist.autodownloadLimit)
-                            .orEmpty()
-                    }
-                    .distinctBy(PodcastEpisode::uuid)
-            }
-        }
     }
 
     override suspend fun sortPlaylists(sortedUuids: List<String>) {

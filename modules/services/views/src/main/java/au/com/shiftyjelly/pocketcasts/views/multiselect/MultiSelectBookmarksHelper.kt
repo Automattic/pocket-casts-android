@@ -6,8 +6,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.liveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -16,6 +14,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import com.automattic.eventhorizon.BookmarkDeleteFormShownEvent
+import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkDeletedEvent
+import com.automattic.eventhorizon.EventHorizon
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     var episodeManager: EpisodeManager,
 ) : MultiSelectHelper<Bookmark>() {
     override val maxToolbarIcons = 3
@@ -114,10 +116,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
             closeMultiSelect()
             return
         }
-
-        analyticsTracker.track(
-            AnalyticsEvent.BOOKMARK_DELETE_FORM_SHOWN,
-            mapOf("source" to source.analyticsValue),
+        eventHorizon.track(
+            BookmarkDeleteFormShownEvent(
+                source = source.eventHorizonValue,
+            ),
         )
 
         val count = bookmarks.size
@@ -144,16 +146,18 @@ class MultiSelectBookmarksHelper @Inject constructor(
             .setIconTint(UR.attr.support_05)
             .setOnConfirm {
                 launch {
-                    analyticsTracker.track(
-                        AnalyticsEvent.BOOKMARK_DELETE_FORM_SUBMITTED,
-                        mapOf("source" to source.analyticsValue),
+                    eventHorizon.track(
+                        BookmarkDeleteFormSubmittedEvent(
+                            source = source.eventHorizonValue,
+                        ),
                     )
 
                     bookmarks.forEach {
                         bookmarkManager.deleteToSync(it.uuid)
-                        analyticsTracker.track(
-                            AnalyticsEvent.BOOKMARK_DELETED,
-                            mapOf("source" to source.analyticsValue),
+                        eventHorizon.track(
+                            BookmarkDeletedEvent(
+                                source = source.eventHorizonValue,
+                            ),
                         )
                     }
 

@@ -80,9 +80,10 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(20.dp),
         )
         Text(
-            text = when (offer.billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
+            text = when {
+                offer.billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
+                offer.isInstallment && offer.formattedTotalSavings != null -> stringResource(LR.string.winback_offer_free_offer_installment_title, offer.formattedPrice, offer.formattedTotalSavings)
+                else -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
@@ -95,9 +96,10 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(16.dp),
         )
         TextP30(
-            text = when (offer.billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
+            text = when {
+                offer.billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
+                offer.isInstallment -> stringResource(LR.string.winback_offer_free_offer_installment_description, offer.formattedPrice)
+                else -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
             },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
@@ -260,6 +262,8 @@ private fun WinbackOfferPageThemePreview(
                 formattedPrice = "\$3.99",
                 tier = SubscriptionTier.Plus,
                 billingCycle = BillingCycle.Monthly,
+                isInstallment = false,
+                formattedTotalSavings = null,
             ),
         )
     }
@@ -272,12 +276,24 @@ private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOf
             formattedPrice = "\$3.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Monthly,
+            isInstallment = false,
+            formattedTotalSavings = null,
         ),
         WinbackOffer(
             redeemCode = "",
             formattedPrice = "\$19.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Yearly,
+            isInstallment = false,
+            formattedTotalSavings = null,
+        ),
+        WinbackOffer(
+            redeemCode = "",
+            formattedPrice = "\$2.49",
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            isInstallment = true,
+            formattedTotalSavings = "\$29.88",
         ),
     )
 }

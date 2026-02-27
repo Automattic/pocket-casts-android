@@ -75,8 +75,7 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
-    // Don't show savings percent for installment plans
-    val calculatedSavingPercent = if (plan is SubscriptionPlan.Base && plan.isInstallment) {
+    val calculatedSavingPercent = if (plan.isInstallment && plan.offer == null) {
         null
     } else {
         priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) }
@@ -202,7 +201,7 @@ private fun SubscriptionPlanRow(
                 verticalArrangement = Arrangement.spacedBy(rowConfig.labelSpacing),
             ) {
                 TextH30(
-                    text = plan.name,
+                    text = plan.displayName(),
                     fontSize = rowConfig.mainTextSize,
                 )
                 TextP40(
@@ -289,26 +288,40 @@ private fun CheckMark(
 
 private val SubscriptionPlan.pricePerMonth: Float
     get() {
+        val totalYearlyAmount = if (isInstallment) {
+            recurringPrice.amount * monthsInYear
+        } else {
+            when (billingCycle) {
+                BillingCycle.Monthly -> recurringPrice.amount
+                BillingCycle.Yearly -> recurringPrice.amount
+            }
+        }
+
         val pricePerMonth = when (billingCycle) {
-            BillingCycle.Monthly -> recurringPrice.amount
-            BillingCycle.Yearly -> recurringPrice.amount / monthsInYear
+            BillingCycle.Monthly -> totalYearlyAmount
+            BillingCycle.Yearly -> totalYearlyAmount / monthsInYear
         }
         return pricePerMonth.toFloat()
     }
 
 private val SubscriptionPlan.pricePerWeek: Float
     get() {
-        val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> recurringPrice.amount * monthsInYear
-            BillingCycle.Yearly -> recurringPrice.amount
-        } / weeksInYear
-        return pricePerWeek.toFloat()
+        val totalYearlyAmount = if (isInstallment) {
+            recurringPrice.amount * monthsInYear
+        } else {
+            when (billingCycle) {
+                BillingCycle.Monthly -> recurringPrice.amount * monthsInYear
+                BillingCycle.Yearly -> recurringPrice.amount
+            }
+        }
+
+        return (totalYearlyAmount / weeksInYear).toFloat()
     }
 
 private val monthsInYear = 12.toBigDecimal()
 private val weeksInYear = 52.toBigDecimal()
 
-private fun SubscriptionPlan.Base.formattedTotalYearlyPrice(): String {
+private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
     val totalAmount = recurringPrice.amount * monthsInYear
     val currencyCode = recurringPrice.currencyCode
 
@@ -327,8 +340,30 @@ private fun SubscriptionPlan.Base.formattedTotalYearlyPrice(): String {
 
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
-    if (this is SubscriptionPlan.Base && isInstallment) {
-        return stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+    if (isInstallment) {
+        return when (this) {
+            is SubscriptionPlan.WithOffer -> when (config.pricePerPeriod) {
+                PricePerPeriod.PRICE_PER_WEEK -> {
+                    val currencyCode = recurringPrice.currencyCode
+                    if (currencyCode == "USD") {
+                        stringResource(LR.string.price_per_week_usd, pricePerWeek)
+                    } else {
+                        stringResource(LR.string.price_per_week, pricePerWeek, currencyCode)
+                    }
+                }
+
+                PricePerPeriod.PRICE_PER_MONTH -> {
+                    val currencyCode = recurringPrice.currencyCode
+                    if (currencyCode == "USD") {
+                        stringResource(LR.string.price_per_month_usd, pricePerMonth)
+                    } else {
+                        stringResource(LR.string.price_per_month, pricePerMonth, currencyCode)
+                    }
+                }
+            }
+
+            is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+        }
     }
 
     return if (this.billingCycle == BillingCycle.Yearly) {
@@ -360,14 +395,24 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 
 @Composable
 @ReadOnlyComposable
-private fun SubscriptionPlan.price(): String {
-    val formattedPrice = recurringPrice.formattedPrice
+private fun SubscriptionPlan.displayName(): String {
+    return when {
+        isInstallment -> stringResource(LR.string.plus_yearly_installments)
+        else -> name
+    }
+}
 
-    // For installment plans, show price per month with duration
-    if (this is SubscriptionPlan.Base && isInstallment) {
-        return stringResource(LR.string.price_per_month_for_months, formattedPrice, monthsInYear.toInt())
+@Composable
+@ReadOnlyComposable
+private fun SubscriptionPlan.price(): String {
+    if (isInstallment) {
+        return when (this) {
+            is SubscriptionPlan.Base -> stringResource(LR.string.plus_per_month, recurringPrice.formattedPrice)
+            is SubscriptionPlan.WithOffer -> stringResource(LR.string.plus_per_year, formattedTotalYearlyPrice())
+        }
     }
 
+    val formattedPrice = recurringPrice.formattedPrice
     return when (billingCycle) {
         BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)
         BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, formattedPrice)

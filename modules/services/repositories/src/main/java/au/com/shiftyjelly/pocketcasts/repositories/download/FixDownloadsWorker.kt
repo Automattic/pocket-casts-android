@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.File
 import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.onEach
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -62,10 +61,9 @@ class FixDownloadsWorker @AssistedInject constructor(
             }
         }
 
-    private fun findExpectedDownloadPath(episode: PodcastEpisode) = DownloadHelper.pathForEpisode(episode, fileStorage)?.takeIf {
-        val file = File(it)
-        file.exists() && file.isFile
-    }
+    private fun findExpectedDownloadPath(episode: PodcastEpisode) = fileStorage.getOrCreatePodcastEpisodeFile(episode)
+        ?.takeIf { file -> file.exists() && file.isFile }
+        ?.absolutePath
 
     private suspend fun initializeForegroundInfo(totalEpisodeCount: Int) {
         val notificationId = Settings.NotificationId.FIX_DOWNLOADS.value

@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -119,11 +120,11 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             val result = syncManager.createUserWithEmailAndPassword(
                 email = state.email,
                 password = state.password,
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
             when (result) {
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
-                    experimentProvider.refreshExperiments()
                     analyticsTracker.refreshMetadata()
                     experimentProvider.refreshExperiments()
                     onAccountCreated()
