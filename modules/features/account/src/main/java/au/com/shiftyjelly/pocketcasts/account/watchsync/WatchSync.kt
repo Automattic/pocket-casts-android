@@ -68,7 +68,11 @@ constructor(
         }
     }
 
-    suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
+    suspend fun processAuthDataChange(
+        data: WatchSyncAuthData?,
+        onResult: (LoginResult) -> Unit,
+        onAlreadyLoggedIn: () -> Unit = {},
+    ) {
         if (data == null) {
             // The user either was never logged in on their phone or just logged out.
             // Either way, leave the user's login state on the watch unchanged.
@@ -87,6 +91,7 @@ constructor(
                 onResult(result)
             } else {
                 Timber.i("Already logged in, skipping login")
+                onAlreadyLoggedIn()
             }
         } catch (e: CancellationException) {
             throw e

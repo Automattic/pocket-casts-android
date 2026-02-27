@@ -70,9 +70,10 @@ class WatchSyncTest {
         ).thenReturn(expectedResult)
 
         // When
-        watchSync.processAuthDataChange(authData) { result ->
-            callbackResult = result
-        }
+        watchSync.processAuthDataChange(
+            data = authData,
+            onResult = { result -> callbackResult = result },
+        )
 
         // Then
         verify(syncManager).loginWithToken(
@@ -87,18 +88,22 @@ class WatchSyncTest {
     fun `processAuthDataChange does not call loginWithToken when already logged in`() = runTest {
         // Given
         val authData = WatchSyncAuthData(testRefreshToken, testLoginIdentity)
-        var callbackInvoked = false
+        var onResultInvoked = false
+        var onAlreadyLoggedInInvoked = false
 
         whenever(syncManager.isLoggedIn()).thenReturn(true)
 
         // When
-        watchSync.processAuthDataChange(authData) {
-            callbackInvoked = true
-        }
+        watchSync.processAuthDataChange(
+            data = authData,
+            onResult = { onResultInvoked = true },
+            onAlreadyLoggedIn = { onAlreadyLoggedInInvoked = true },
+        )
 
         // Then
         verify(syncManager, never()).loginWithToken(any(), any(), any())
-        assertTrue("Callback should not be invoked when already logged in", !callbackInvoked)
+        assertTrue("onResult should not be invoked when already logged in", !onResultInvoked)
+        assertTrue("onAlreadyLoggedIn should be invoked when already logged in", onAlreadyLoggedInInvoked)
     }
 
     @Test
@@ -121,9 +126,10 @@ class WatchSyncTest {
         ).thenReturn(expectedFailure)
 
         // When
-        watchSync.processAuthDataChange(authData) { result ->
-            callbackResult = result
-        }
+        watchSync.processAuthDataChange(
+            data = authData,
+            onResult = { result -> callbackResult = result },
+        )
 
         // Then
         assertTrue(callbackResult is LoginResult.Failed)
@@ -147,9 +153,10 @@ class WatchSyncTest {
         ).thenThrow(exception)
 
         // When
-        watchSync.processAuthDataChange(authData) { result ->
-            callbackResult = result
-        }
+        watchSync.processAuthDataChange(
+            data = authData,
+            onResult = { result -> callbackResult = result },
+        )
 
         // Then
         assertTrue(callbackResult is LoginResult.Failed)
@@ -162,9 +169,10 @@ class WatchSyncTest {
         var callbackInvoked = false
 
         // When
-        watchSync.processAuthDataChange(null) {
-            callbackInvoked = true
-        }
+        watchSync.processAuthDataChange(
+            data = null,
+            onResult = { callbackInvoked = true },
+        )
 
         // Then
         verify(syncManager, never()).isLoggedIn()

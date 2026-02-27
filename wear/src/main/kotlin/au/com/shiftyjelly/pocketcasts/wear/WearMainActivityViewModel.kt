@@ -94,8 +94,9 @@ class WearMainActivityViewModel @Inject constructor(
         syncJob?.cancel()
 
         syncJob = viewModelScope.launch {
+            val phoneConnected = phoneConnectionMonitor.isPhoneConnected()
             // Check phone connectivity before starting sync
-            if (!phoneConnectionMonitor.isPhoneConnected()) {
+            if (!phoneConnected) {
                 LogBuffer.e(TAG, "Phone not connected - cannot sync")
                 _state.update {
                     it.copy(syncState = WatchSyncState.Failed(WatchSyncError.NoPhoneConnection))
@@ -108,9 +109,16 @@ class WearMainActivityViewModel @Inject constructor(
             try {
                 withTimeout(SYNC_TIMEOUT_MS) {
                     tokenBundleRepository.flow.collect { watchSyncAuthData ->
-                        watchSync.processAuthDataChange(watchSyncAuthData) { result ->
-                            onLoginFromPhoneResult(result)
-                        }
+                        LogBuffer.i(TAG, "Received DataLayer emission: ${if (watchSyncAuthData != null) "non-null" else "null"}")
+                        watchSync.processAuthDataChange(
+                            data = watchSyncAuthData,
+                            onResult = { result -> onLoginFromPhoneResult(result) },
+                            onAlreadyLoggedIn = {
+                                LogBuffer.i(TAG, "Already logged in - treating as sync success")
+                                _state.update { it.copy(syncState = WatchSyncState.Success, showLoggingInScreen = true) }
+                                syncJob?.cancel()
+                            },
+                        )
                     }
                 }
             } catch (e: TimeoutCancellationException) {
@@ -126,6 +134,14 @@ class WearMainActivityViewModel @Inject constructor(
                     it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Unknown(e.message)))
                 }
             }
+        }
+    }
+
+    fun restartSyncIfNeeded() {
+        val currentState = _state.value.syncState
+        if (currentState is WatchSyncState.Failed) {
+            LogBuffer.i(TAG, "Restarting sync on screen navigation (previous state: $currentState)")
+            startSyncFlow()
         }
     }
 
