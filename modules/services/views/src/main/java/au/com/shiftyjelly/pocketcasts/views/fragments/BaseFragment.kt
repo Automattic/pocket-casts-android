@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,22 +47,63 @@ open class BaseFragment :
 
     private var backPressedCallback: OnBackPressedCallback? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (view.background == null && !backgroundTransparent) {
+            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
+        }
+        view.isClickable = true
+        view.isFocusable = true
+
         val callback = object : OnBackPressedCallback(getBackstackCount() > 0) {
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                onBackGestureStarted(backEvent)
+            }
+
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                if (enableDefaultBackAnimation()) {
+                    PredictiveBackAnimator.applyProgress(
+                        view,
+                        backEvent.progress,
+                        scaleAmount = 0.05f,
+                        alphaAmount = 0.2f,
+                    )
+                }
+                onBackGestureProgressed(backEvent)
+            }
+
             override fun handleOnBackPressed() {
+                if (!isAdded) return
+
+                if (enableDefaultBackAnimation()) {
+                    PredictiveBackAnimator.animateToEnd(
+                        view = view,
+                        targetScale = 0.9f,
+                        targetAlpha = 0.7f,
+                        duration = PredictiveBackAnimator.Defaults.SHORT_ANIMATION_DURATION_MS,
+                    ) {
+                        if (isAdded) {
+                            performBackNavigation()
+                        }
+                    }
+                } else {
+                    performBackNavigation()
+                }
+            }
+
+            override fun handleOnBackCancelled() {
+                if (enableDefaultBackAnimation()) {
+                    PredictiveBackAnimator.reset(view)
+                }
+            }
+
+            private fun performBackNavigation() {
                 val handled = onBackPressed()
                 isEnabled = handled && getBackstackCount() > 0
             }
         }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
         backPressedCallback = callback
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        backPressedCallback?.remove()
-        backPressedCallback = null
     }
 
     /**
@@ -71,13 +114,10 @@ open class BaseFragment :
         backPressedCallback?.isEnabled = getBackstackCount() > 0
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        if (view.background == null && !backgroundTransparent) {
-            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
-        }
-        view.isClickable = true
-        view.isFocusable = true
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.let { PredictiveBackAnimator.reset(it) }
+        backPressedCallback = null
     }
 
     override fun onResume() {
@@ -156,5 +196,46 @@ open class BaseFragment :
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    /**
+     * Override to enable/disable default predictive back animation.
+     * Default: true (animations enabled)
+     *
+     * Return false if you want to implement custom animations via
+     * [onBackGestureStarted] and [onBackGestureProgressed].
+     *
+     * **Note:** Predictive back is only available on Android 13+ (API 33).
+     * On older versions, animations won't run but navigation still works.
+     */
+    protected open fun enableDefaultBackAnimation(): Boolean = true
+
+    /**
+     * Called when a predictive back gesture is started (Android 13+ only).
+     * Override to implement custom animation setup.
+     *
+     * **API Level:** This method is only invoked on **Android 13 (API 33) and above**.
+     * On older Android versions, this will never be called.
+     *
+     * @param backEvent Contains information about the back gesture (touch position, swipe edge)
+     */
+    protected open fun onBackGestureStarted(backEvent: BackEventCompat) {
+        // Override in subclasses for custom behavior
+    }
+
+    /**
+     * Called as a predictive back gesture progresses (Android 13+ only).
+     * Override to implement custom animations based on gesture progress.
+     *
+     * If [enableDefaultBackAnimation] returns true, the default scale/fade animation
+     * will be applied before this is called.
+     *
+     * **API Level:** This method is only invoked on **Android 13 (API 33) and above**.
+     * On older Android versions, this will never be called.
+     *
+     * @param backEvent Contains progress (0.0 to 1.0) and other gesture information
+     */
+    protected open fun onBackGestureProgressed(backEvent: BackEventCompat) {
+        // Override in subclasses for custom behavior
     }
 }

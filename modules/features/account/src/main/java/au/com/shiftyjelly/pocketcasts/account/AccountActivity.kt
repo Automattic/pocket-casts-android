@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackTransition
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,14 +48,31 @@ class AccountActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
-            },
-        )
+        val predictiveBackCallback = object : OnBackPressedCallback(true) {
+            private var transition: PredictiveBackTransition? = null
+
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                val container = findViewById<ViewGroup>(R.id.nav_host_fragment)?.parent as? ViewGroup ?: return
+                transition = PredictiveBackTransition(container).apply { start(backEvent) }
+            }
+
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                transition?.updateProgress(backEvent)
+            }
+
+            override fun handleOnBackPressed() {
+                transition?.finish()
+                transition = null
+                handleBackPressed()
+            }
+
+            override fun handleOnBackCancelled() {
+                transition?.cancel()
+                transition = null
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(this, predictiveBackCallback)
 
         val navController = findNavController(R.id.nav_host_fragment)
         binding.carHeader?.btnClose?.setOnClickListener {

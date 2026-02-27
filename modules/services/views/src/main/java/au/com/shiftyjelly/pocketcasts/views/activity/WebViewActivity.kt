@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.databinding.ActivityWebViewBinding
 import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -70,12 +72,22 @@ class WebViewActivity :
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(false) {
+                override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                    PredictiveBackAnimator.applyProgress(binding.root, backEvent.progress)
+                }
+
                 override fun handleOnBackPressed() {
-                    if (binding.webview.canGoBack()) {
-                        binding.webview.goBack()
-                    } else {
-                        onBackPressedDispatcher.onBackPressed()
+                    PredictiveBackAnimator.animateToEnd(binding.root) {
+                        if (binding.webview.canGoBack()) {
+                            binding.webview.goBack()
+                        } else {
+                            finish()
+                        }
                     }
+                }
+
+                override fun handleOnBackCancelled() {
+                    PredictiveBackAnimator.reset(binding.root)
                 }
             },
         )

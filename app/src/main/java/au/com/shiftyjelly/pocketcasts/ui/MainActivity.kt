@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -124,7 +125,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksDialogFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
@@ -190,6 +191,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -497,7 +499,7 @@ class MainActivity :
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
             put(VR.id.navigation_filters) { FragmentInfo(PlaylistsFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
-            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
+            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), false) }
             put(VR.id.navigation_upnext) {
                 FragmentInfo(
                     UpNextFragment.newInstance(
@@ -736,8 +738,23 @@ class MainActivity :
      */
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                navigator.handleBackGestureProgress(backEvent.progress)
+            }
+
             override fun handleOnBackPressed() {
-                navigator.pop()
+                val previousView = navigator.previousFragment()?.view
+                navigator.currentFragment()?.view?.let { currentView ->
+                    PredictiveBackAnimator.animateToEnd(currentView) {
+                        navigator.pop()
+                        // Reset the previous fragment (now current) to ensure it's fully visible
+                        previousView?.let { PredictiveBackAnimator.reset(it) }
+                    }
+                } ?: navigator.pop()
+            }
+
+            override fun handleOnBackCancelled() {
+                navigator.resetBackGestureState()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -1100,9 +1117,8 @@ class MainActivity :
                         }
 
                         is NavigationState.BookmarksForUserEpisode -> {
-                            // Bookmarks container is directly shown for user episode
-                            val fragment = BookmarksContainerFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
-                            fragment.show(supportFragmentManager, "bookmarks_container")
+                            val fragment = BookmarksDialogFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
+                            fragment.show(supportFragmentManager, "bookmarks_dialog")
                         }
                     }
                 }
@@ -1379,7 +1395,7 @@ class MainActivity :
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {
-        navigator.addFragment(fragment, onTop = onTop)
+        navigator.addFragment(fragment, detachable = true, onTop = onTop)
     }
 
     override fun replaceFragment(fragment: Fragment) {

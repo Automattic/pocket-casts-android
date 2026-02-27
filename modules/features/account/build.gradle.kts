@@ -46,6 +46,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.transition.ktx)
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
