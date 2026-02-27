@@ -12,7 +12,6 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Singleton
 @SuppressLint("VisibleForTests") // https://issuetracker.google.com/issues/239451111
@@ -51,6 +50,8 @@ constructor(
 
                 if (watchSyncAuthData == null) {
                     LogBuffer.i(TAG, "Removing auth token from Wear: Phone not logged in to Pocket Casts")
+                } else {
+                    LogBuffer.i(TAG, "Sending auth token to Wear Data Layer (identity: ${watchSyncAuthData.loginIdentity})")
                 }
 
                 tokenBundleRepository.update(watchSyncAuthData)
@@ -76,21 +77,23 @@ constructor(
         if (data == null) {
             // The user either was never logged in on their phone or just logged out.
             // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
+            LogBuffer.i(TAG, "Received null WatchSyncAuthData (no login from phone yet)")
             return
         }
         try {
-            Timber.i("Received WatchSyncAuthData change from phone")
+            LogBuffer.i(TAG, "Received WatchSyncAuthData change from phone (identity: ${data.loginIdentity})")
 
             if (!syncManager.isLoggedIn()) {
+                LogBuffer.i(TAG, "Not logged in - attempting login with token")
                 val result = syncManager.loginWithToken(
                     token = data.refreshToken,
                     loginIdentity = data.loginIdentity,
                     signInSource = SignInSource.WatchPhoneSync,
                 )
+                LogBuffer.i(TAG, "Login result: ${result::class.simpleName}")
                 onResult(result)
             } else {
-                Timber.i("Already logged in, skipping login")
+                LogBuffer.i(TAG, "Already logged in, skipping login")
                 onAlreadyLoggedIn()
             }
         } catch (e: CancellationException) {

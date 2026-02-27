@@ -95,6 +95,8 @@ class WearMainActivityViewModel @Inject constructor(
 
         syncJob = viewModelScope.launch {
             val phoneConnected = phoneConnectionMonitor.isPhoneConnected()
+            LogBuffer.i(TAG, "Starting sync flow (phone connected: $phoneConnected, timeout: ${SYNC_TIMEOUT_MS / 1000}s)")
+
             // Check phone connectivity before starting sync
             if (!phoneConnected) {
                 LogBuffer.e(TAG, "Phone not connected - cannot sync")
@@ -127,6 +129,7 @@ class WearMainActivityViewModel @Inject constructor(
                     it.copy(syncState = WatchSyncState.Failed(WatchSyncError.Timeout))
                 }
             } catch (e: CancellationException) {
+                LogBuffer.i(TAG, "Sync flow cancelled")
                 throw e
             } catch (e: Exception) {
                 LogBuffer.e(TAG, "Watch sync error: ${e.message}")
