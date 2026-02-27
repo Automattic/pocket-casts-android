@@ -6,6 +6,6 @@ internal class SharingAnalytics(
     private val eventHorizon: EventHorizon,
 ) : SharingClient.Listener {
     override fun onShare(request: SharingRequest) {
-        request.trackable?.let(eventHorizon::track)
+        eventHorizon.track(request.trackable)
     }
 }
