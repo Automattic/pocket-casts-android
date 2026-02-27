@@ -61,7 +61,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun NewOnboardingCreateAccountPage(
+internal fun OnboardingCreateAccountPage(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     onBackPress: () -> Unit,

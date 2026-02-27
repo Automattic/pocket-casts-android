@@ -1,3 +1,5 @@
+package au.com.shiftyjelly.pocketcasts.account.onboarding.components
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable

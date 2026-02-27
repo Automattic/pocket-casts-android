@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -11,16 +13,20 @@ import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingCreateAccountPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingForgotPasswordPage
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingGetStartedPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLoginOrSignUpPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLoginPage
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingWelcomePage
-import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
@@ -29,14 +35,17 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireBoolean
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object OldOnboardingFlow {
+object OnboardingFlowRoutes {
     const val CREATE_FREE_ACCOUNT = "create_free_account"
     const val ENCOURAGE_FREE_ACCOUNT = "encourage_free_account"
     const val FORGOT_PASSWORD = "forgot_password"
     const val LOG_IN = "log_in"
     const val LOG_IN_OR_SIGN_UP = "log_in_or_sign_up"
-    const val WELCOME = "welcome"
+    const val ROUTE_INTRO_CAROUSEL = "new_intro_carousel"
+    const val ROUTE_LOG_IN = "new_log_in"
+    const val ROUTE_SIGN_UP = "new_sign_up"
 
     object PlusUpgrade {
         private const val ROUTE_BASE = "plus_upgrade"
@@ -58,28 +67,29 @@ object OldOnboardingFlow {
     }
 
     fun startDestination(flow: OnboardingFlow) = when (flow) {
-        is OnboardingFlow.LoggedOut,
+        is OnboardingFlow.Welcome,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.EngageSdk,
         is OnboardingFlow.ReferralLoginOrSignUp,
-        -> LOG_IN_OR_SIGN_UP
+        -> ROUTE_INTRO_CAROUSEL
 
-        // Cannot use PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
+        is OnboardingFlow.AccountEncouragement -> ENCOURAGE_FREE_ACCOUNT
+
+        is OnboardingFlow.LoggedOut,
+        -> ROUTE_SIGN_UP
+
+        // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
-        is OnboardingFlow.NewOnboardingAccountUpgrade,
+        is OnboardingFlow.AccountUpgrade,
         -> PlusUpgrade.ROUTE
-
-        is OnboardingFlow.Welcome -> WELCOME
-
-        is OnboardingFlow.AccountEncouragement -> ENCOURAGE_FREE_ACCOUNT
     }
 
-    fun NavGraphBuilder.oldOnboardingFlowGraph(
+    fun NavGraphBuilder.flowGraph(
         theme: Theme.ThemeType,
         flow: OnboardingFlow,
         navController: NavController,
@@ -90,46 +100,8 @@ object OldOnboardingFlow {
         finishOnboardingFlow: () -> Unit,
         exitOnboarding: (OnboardingExitInfo) -> Unit,
         onAccountCreated: () -> Unit,
-        completeOnboardingToDiscover: () -> Unit,
         onLoginToExistingAccount: (OnboardingFlow, Subscription?, (OnboardingExitInfo) -> Unit) -> Unit,
     ) {
-        composable(ENCOURAGE_FREE_ACCOUNT) {
-            val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
-
-            CallOnce {
-                viewModel.onScreenShown()
-            }
-
-            AppTheme(theme) {
-                AccountBenefitsPage(
-                    onGetStartedClick = {
-                        viewModel.onGetStartedClick()
-                        navController.navigate(LOG_IN_OR_SIGN_UP) {
-                            popUpTo(ENCOURAGE_FREE_ACCOUNT) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    onLogIn = {
-                        viewModel.onLogInClick()
-                        navController.navigate(LOG_IN_OR_SIGN_UP) {
-                            popUpTo(ENCOURAGE_FREE_ACCOUNT) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    onClose = {
-                        viewModel.onDismissClick()
-                        exitOnboarding(OnboardingExitInfo.Simple)
-                    },
-                    onShowBenefit = { benefit ->
-                        viewModel.onBenefitShown(benefit.analyticsValue)
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-        }
-
         composable(LOG_IN_OR_SIGN_UP) {
             OnboardingLoginOrSignUpPage(
                 theme = theme,
@@ -146,7 +118,7 @@ object OldOnboardingFlow {
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.Upsell,
                         is OnboardingFlow.UpsellSuggestedFolder,
-                        is OnboardingFlow.NewOnboardingAccountUpgrade,
+                        is OnboardingFlow.AccountUpgrade,
                         -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
@@ -174,16 +146,6 @@ object OldOnboardingFlow {
             )
         }
 
-        composable(CREATE_FREE_ACCOUNT) {
-            OnboardingCreateAccountPage(
-                theme = theme,
-                flow = flow,
-                onBackPress = { navController.popBackStack() },
-                onCreateAccount = onAccountCreated,
-                onUpdateSystemBars = onUpdateSystemBars,
-            )
-        }
-
         composable(LOG_IN) {
             OnboardingLoginPage(
                 theme = theme,
@@ -196,6 +158,94 @@ object OldOnboardingFlow {
             )
         }
 
+        composable(ROUTE_INTRO_CAROUSEL) {
+            val viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
+            OnboardingGetStartedPage(
+                viewModel = viewModel,
+                displayTheme = theme,
+                flow = flow,
+                onGetStartedClick = {
+                    viewModel.onGetStartedClicked(flow)
+                    if (flow is OnboardingFlow.Upsell || flow is OnboardingFlow.LoggedOut) {
+                        navController.navigate(ROUTE_SIGN_UP)
+                    } else {
+                        navController.navigate(OnboardingRecommendationsFlow.ROUTE)
+                    }
+                },
+                onLoginClick = {
+                    viewModel.onLoginClicked(flow)
+                    navController.navigate(ROUTE_LOG_IN)
+                },
+                onUpdateSystemBars = onUpdateSystemBars,
+            )
+        }
+
+        composable(ROUTE_SIGN_UP) {
+            val viewModel: OnboardingCreateAccountViewModel = hiltViewModel()
+            OnboardingCreateAccountPage(
+                viewModel = viewModel,
+                theme = theme,
+                flow = flow,
+                onBackPress = {
+                    val hasPopped = navController.popBackStack()
+                    if (!hasPopped) {
+                        finishOnboardingFlow()
+                    }
+                },
+                onSkip = finishOnboardingFlow,
+                onCreateAccount = {
+                    viewModel.onSignUpEmailPressed(flow)
+                    navController.navigate(CREATE_FREE_ACCOUNT)
+                },
+                onUpdateSystemBars = onUpdateSystemBars,
+                onContinueWithGoogleComplete = { state, subscription ->
+                    if (state.isNewAccount) {
+                        onAccountCreated()
+                    } else {
+                        onLoginToExistingAccount(flow, subscription, exitOnboarding)
+                    }
+                },
+                onClickLogin = {
+                    viewModel.onLogInPressed(flow)
+                    navController.navigate(ROUTE_LOG_IN)
+                },
+            )
+        }
+
+        composable(CREATE_FREE_ACCOUNT) {
+            OnboardingCreateAccountPage(
+                theme = theme,
+                flow = flow,
+                onBackPress = { navController.popBackStack() },
+                onCreateAccount = onAccountCreated,
+                onUpdateSystemBars = onUpdateSystemBars,
+            )
+        }
+
+        composable(ROUTE_LOG_IN) {
+            val viewModel: OnboardingLogInViewModel = hiltViewModel()
+            OnboardingLoginPage(
+                viewModel = viewModel,
+                theme = theme,
+                flow = flow,
+                onBackPress = {
+                    navController.popBackStack()
+                },
+                onLoginComplete = { subscription ->
+                    onLoginToExistingAccount(flow, subscription, exitOnboarding)
+                },
+                onForgotPasswordClick = { navController.navigate(FORGOT_PASSWORD) },
+                onUpdateSystemBars = onUpdateSystemBars,
+                onContinueWithGoogleComplete = { state, subscription ->
+                    if (state.isNewAccount) {
+                        onAccountCreated()
+                    } else {
+                        onLoginToExistingAccount(flow, subscription, exitOnboarding)
+                    }
+                },
+            )
+        }
+
         composable(FORGOT_PASSWORD) {
             OnboardingForgotPasswordPage(
                 theme = theme,
@@ -203,6 +253,37 @@ object OldOnboardingFlow {
                 onComplete = { exitOnboarding(OnboardingExitInfo.Simple) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
+        }
+
+        composable(ENCOURAGE_FREE_ACCOUNT) {
+            val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
+
+            CallOnce {
+                viewModel.onScreenShown()
+            }
+
+            AppTheme(theme) {
+                AccountBenefitsPage(
+                    mainCtaColor = MaterialTheme.theme.colors.primaryInteractive01,
+                    mainCtaLabel = stringResource(LR.string.onboarding_create_account),
+                    onGetStartedClick = {
+                        viewModel.onGetStartedClick()
+                        navController.navigate(ROUTE_SIGN_UP)
+                    },
+                    onLogIn = {
+                        viewModel.onLogInClick()
+                        navController.navigate(ROUTE_LOG_IN)
+                    },
+                    onClose = {
+                        viewModel.onDismissClick()
+                        exitOnboarding(OnboardingExitInfo.Simple)
+                    },
+                    onShowBenefit = { benefit ->
+                        viewModel.onBenefitShown(benefit.analyticsValue)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
 
         composable(
@@ -216,7 +297,7 @@ object OldOnboardingFlow {
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.Upsell,
                         is OnboardingFlow.UpsellSuggestedFolder,
-                        is OnboardingFlow.NewOnboardingAccountUpgrade,
+                        is OnboardingFlow.AccountUpgrade,
                         -> {
                             defaultValue = flow.source
                         }
@@ -267,8 +348,8 @@ object OldOnboardingFlow {
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.DEEP_LINK,
-                OnboardingUpgradeSource.UNKNOWN,
                 OnboardingUpgradeSource.FINISHED_ONBOARDING,
+                OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
@@ -288,36 +369,8 @@ object OldOnboardingFlow {
                         exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
-                onNeedLogin = { navController.navigate(LOG_IN_OR_SIGN_UP) },
-                onProceed = {
-                    if (userCreatedNewAccount || forcePurchase) {
-                        navController.navigate(WELCOME)
-                    } else {
-                        finishOnboardingFlow()
-                    }
-                },
-                onUpdateSystemBars = onUpdateSystemBars,
-            )
-        }
-
-        composable(WELCOME) {
-            OnboardingWelcomePage(
-                theme = theme,
-                flow = flow,
-                isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
-                onComplete = {
-                    finishOnboardingFlow()
-                },
-                onContinueToDiscover = completeOnboardingToDiscover,
-                onImportclick = { navController.navigate(OnboardingImportFlow.ROUTE) },
-                onBackPress = {
-                    // Don't allow navigation back to the upgrade screen after the user upgrades
-                    if (signInState.isSignedInAsPlusOrPatron) {
-                        finishOnboardingFlow()
-                    } else {
-                        navController.popBackStack()
-                    }
-                },
+                onNeedLogin = { navController.navigate(ROUTE_SIGN_UP) },
+                onProceed = { finishOnboardingFlow() },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }

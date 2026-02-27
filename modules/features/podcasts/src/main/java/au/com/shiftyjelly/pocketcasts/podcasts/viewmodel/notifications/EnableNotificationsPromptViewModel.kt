@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,15 +32,13 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     val messagesFlow: SharedFlow<UiMessage> = _messagesFlow
 
     init {
-        if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            viewModelScope.launch {
-                _stateFlow.update {
-                    UiState.NewOnboarding(
-                        showNewsletterOptIn = userManager.getSignInState().asFlow().first().isSignedIn && !settings.marketingOptIn.value,
-                        notificationsEnabled = true,
-                        subscribedToNewsletter = true,
-                    )
-                }
+        viewModelScope.launch {
+            _stateFlow.update {
+                UiState.NewOnboarding(
+                    showNewsletterOptIn = userManager.getSignInState().asFlow().first().isSignedIn && !settings.marketingOptIn.value,
+                    notificationsEnabled = true,
+                    subscribedToNewsletter = true,
+                )
             }
         }
     }

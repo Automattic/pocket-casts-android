@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -76,7 +75,6 @@ class OnboardingActivity : AppCompatActivity() {
                     theme = theme.activeTheme,
                     flow = onboardingFlow,
                     exitOnboarding = { viewModel.onExitOnboarding(it) },
-                    completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.DoneGoToDiscover) },
                     signInState = currentSignInState,
                     onUpdateSystemBars = { value ->
                         enableEdgeToEdge(value.statusBarStyle, value.navigationBarStyle)
@@ -93,7 +91,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun finishWithResult(result: OnboardingFinish) {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().putExtra(OnboardingActivityContract.FINISH_KEY, result),
         )
         finish()
