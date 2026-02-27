@@ -38,7 +38,7 @@ fun formatRefreshTime(date: Date, context: Context): String {
     val now = System.currentTimeMillis()
     val timeDiff = now - date.time
 
-    if (timeDiff < 2 * DateUtils.MINUTE_IN_MILLIS) {
+    if (timeDiff >= 0 && timeDiff < 2 * DateUtils.MINUTE_IN_MILLIS) {
         return context.getString(LR.string.profile_just_now)
     }
 
