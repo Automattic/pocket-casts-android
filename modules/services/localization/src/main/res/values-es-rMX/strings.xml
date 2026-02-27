@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-04 11:54:03+0000
+Translation-Revision-Date: 2026-02-26 15:54:58+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis durante %1$sunos meses y %2$sal mes durante %3$d meses. Compromiso total: %4$s más de 1 año.</string>
+    <string name="winback_claimed_offer_message_6">Gracias por elegir Pocket Casts. Tu año con descuento empezará después de tu periodo de facturación actual.</string>
+    <string name="winback_claimed_offer_message_5">¡50 % de descuento en tu próximo año con pagos mensuales!</string>
+    <string name="winback_offer_free_offer_installment_description">Consigue un año de Pocket Casts Plus a mitad de precio con 12 pagos mensuales de %1$s. Tu año con descuento empezará cuando finalice tu plan actual.</string>
+    <string name="plus_yearly_installments">Plan anual: paga mensualmente</string>
+    <string name="error_download_too_many_attempts">Descarga cancelada después de varios intentos. Revisa tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="error_download_io_failure">Error al descargar el episodio. Por favor, revisa tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="error_download_socket_timeout">Se ha agotado el tiempo de espera de la conexión con el servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_suspicious_content_size">Error al descargar el episodio. El archivo descargado es demasiado pequeño. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_invalid_content_type">Error al descargar el episodio. Tipo de contenido recibido %1$s. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_http_failure">Error al descargar el episodio. Se ha recibido el código de estado HTTP %1$s. Ponte en contacto con el autor del podcast.</string>
+    <string name="wear_connectivity_streaming_warning">La transmisión puede verse afectada</string>
+    <string name="wear_connectivity_restored">Se ha conectado</string>
+    <string name="wear_connectivity_lost">Se ha perdido la conexión</string>
+    <string name="episode_row_waiting_for_storage">Esperando espacio de almacenamiento</string>
+    <string name="podcasts_download_storage">Descarga esperando espacio de almacenamiento</string>
+    <string name="watch_sync_failed">No se ha podido sincronizar con el reloj</string>
+    <string name="watch_synced_successfully">El reloj se ha sincronizado correctamente</string>
+    <string name="watch_sync_waiting_for_phone">Esperando a que el teléfono se sincronice…</string>
+    <string name="watch_sync_retry">Inténtalo de nuevo</string>
+    <string name="watch_sync_error_unknown_help">Inténtalo de nuevo o accede manualmente</string>
+    <string name="watch_sync_error_login_failed_help">Prueba a acceder manualmente</string>
+    <string name="watch_sync_error_no_connection_help">Comprueba la conexión Bluetooth con el teléfono</string>
+    <string name="watch_sync_error_timeout_help">Asegúrate de que el teléfono esté cerca y conectado por Bluetooth</string>
+    <string name="watch_sync_error_unknown">Se ha producido un error</string>
+    <string name="watch_sync_error_login_failed">No se ha podido acceder</string>
+    <string name="watch_sync_error_no_connection">El teléfono no está conectado</string>
+    <string name="watch_sync_error_timeout">No se ha podido conectar al teléfono</string>
+    <string name="watch_sync_success">Has accedido desde el teléfono.</string>
+    <string name="watch_sync_syncing">Sincronizando con el teléfono…</string>
+    <string name="error_download_generic_failure">No se ha podido descargar el episodio. %1$s</string>
+    <string name="error_download_ssl_failure">No se ha podido establecer una conexión segura con el servidor del autor del podcast. Comprueba que tu dispositivo esté actualizado.</string>
+    <string name="error_download_connection_error">No se ha podido conectar al servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_unknown_host">No se ha podido acceder al servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_no_storage">Error al descargar el episodio. Comprueba que tienes suficiente espacio de almacenamiento en tu dispositivo.</string>
+    <string name="error_download_invalid_url">La url del sitio no es válida. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_no_episode_file">No se ha podido crear un archivo de descarga para el episodio. Comprueba que tienes suficiente espacio de almacenamiento en tu dispositivo.</string>
+    <string name="error_download_missing_episode">No se han podido encontrar los datos del episodio en este dispositivo. Ponte en contacto con el servicio de soporte.</string>
+    <string name="downloading">Descargando %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Las listas de reproducción solo pueden contener episodios de podcasts.</string>
     <string name="playlist_limit_reached">Las listas de reproducción solo pueden contener hasta %d episodios.</string>
     <string name="playlist_limit_almost_full">La lista de reproducción está casi completa. Prueba a añadir menos episodios.</string>
@@ -649,6 +688,7 @@ Language: es
     <string name="widget_preview_episode_in_up_next_title">Episodio en \"A continuación\"</string>
     <string name="widget_preview_episode_title">Título del episodio</string>
     <string name="hour_and_minutes">1 hora y %d minutos</string>
+    <string name="hours_and_minutes">%1$d horas y %2$d minutos</string>
     <string name="player_sleep_in_chapters">En suspensión dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Dentro de 1 capítulo</string>

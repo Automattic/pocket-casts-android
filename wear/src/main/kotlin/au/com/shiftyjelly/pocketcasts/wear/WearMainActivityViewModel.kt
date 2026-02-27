@@ -54,7 +54,6 @@ class WearMainActivityViewModel @Inject constructor(
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState = SignInState.SignedOut,
         val syncState: WatchSyncState = WatchSyncState.Syncing,
-        val showConnectivityNotification: Boolean = false,
         val isConnected: Boolean = false,
     )
 
@@ -81,13 +80,9 @@ class WearMainActivityViewModel @Inject constructor(
             connectivityStateManager.isConnected
                 .debounce(CONNECTIVITY_DEBOUNCE_MS)
                 .collect { isConnected ->
-                    val shouldShowNotification = previousConnectivityState != null &&
-                        previousConnectivityState != isConnected &&
-                        !isConnected
                     _state.update {
                         it.copy(
                             isConnected = isConnected,
-                            showConnectivityNotification = shouldShowNotification,
                         )
                     }
                     previousConnectivityState = isConnected
@@ -179,12 +174,6 @@ class WearMainActivityViewModel @Inject constructor(
     fun onSignInConfirmationActionHandled() {
         _state.update {
             it.copy(showLoggingInScreen = false)
-        }
-    }
-
-    fun onConnectivityNotificationDismissed() {
-        _state.update {
-            it.copy(showConnectivityNotification = false)
         }
     }
 
