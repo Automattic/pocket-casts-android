@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 09:54:03+0000
+Translation-Revision-Date: 2026-02-26 09:56:26+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">%1$s 무료, 이후 %3$d개월 동안 월 %2$s의 금액으로 이용 가능. 총 약정: 1년 간 %4$s.</string>
+    <string name="winback_claimed_offer_message_6">Pocket Casts를 선택해 주셔서 감사합니다. 할인된 12개월 할부 요금제는 현재 청구 기간 후에 시작됩니다.</string>
+    <string name="winback_claimed_offer_message_5">월간 결제로 내년에 50% 할인을 받으세요!</string>
+    <string name="winback_offer_free_offer_installment_description">Pocket Casts Plus를 1년 동안 절반인 %1$s의 가격으로 월 12회 결제하여 이용하세요. 할인된 할부 요금제는 현재 요금제가 종료된 후에 시작됩니다.</string>
+    <string name="winback_offer_free_offer_installment_title">내년에 50%% 할인 - 월 %1$s의 비용으로 %2$s의 금액 절감</string>
+    <string name="plus_yearly_installments">연간 요금제 - 월간 결제</string>
+    <string name="error_download_too_many_attempts">여러 번 시도한 후 다운로드가 취소되었습니다. 인터넷 연결과 저장 공간을 확인하고 다시 시도하세요.</string>
+    <string name="error_download_io_failure">에피소드를 다운로드하지 못했습니다. 인터넷 연결과 저장 공간을 확인하세요.</string>
+    <string name="error_download_socket_timeout">팟캐스트 제작자의 서버 연결 시간이 초과되었습니다. 인터넷 연결을 확인하세요.</string>
+    <string name="error_download_suspicious_content_size">에피소드를 다운로드하지 못했습니다. 다운로드한 파일이 너무 작습니다. 팟캐스트 제작자에게 문의하세요.</string>
+    <string name="error_download_invalid_content_type">에피소드를 다운로드하지 못했습니다. %1$s 콘텐츠 유형을 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
+    <string name="error_download_http_failure">에피소드를 다운로드하지 못했습니다. %1$s HTTP 상태 코드를 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
+    <string name="wear_connectivity_streaming_warning">스트리밍이 영향을 받을 수 있음</string>
+    <string name="wear_connectivity_restored">연결됨</string>
+    <string name="wear_connectivity_lost">연결 끊김</string>
+    <string name="episode_row_waiting_for_storage">저장 공간 대기 중</string>
+    <string name="podcasts_download_storage">저장 공간 다운로드 대기 중</string>
+    <string name="watch_sync_failed">시계와 동기화할 수 없음</string>
+    <string name="watch_synced_successfully">시계 동기화됨</string>
+    <string name="watch_sync_waiting_for_phone">스마트폰 동기화 대기 중…</string>
+    <string name="watch_sync_retry">다시 시도</string>
+    <string name="watch_sync_error_unknown_help">다시 시도하거나 수동으로 로그인</string>
+    <string name="watch_sync_error_login_failed_help">수동으로 로그인 시도</string>
+    <string name="watch_sync_error_no_connection_help">스마트폰의 블루투스 연결 확인</string>
+    <string name="watch_sync_error_timeout_help">스마트폰이 근처에 있고 블루투스로 연결되었는지 확인</string>
+    <string name="watch_sync_error_unknown">문제가 발생했음</string>
+    <string name="watch_sync_error_login_failed">로그인 실패</string>
+    <string name="watch_sync_error_no_connection">스마트폰 연결 안 됨</string>
+    <string name="watch_sync_error_timeout">스마트폰에 연결할 수 없음</string>
+    <string name="watch_sync_success">스마트폰에서 로그인했습니다!</string>
+    <string name="watch_sync_syncing">스마트폰과 동기화 중…</string>
+    <string name="error_download_generic_failure">에피소드를 다운로드하지 못했습니다. %1$s</string>
+    <string name="error_download_ssl_failure">팟캐스트 제작자 서버로의 보안 연결을 설정하지 못했습니다. 기기가 최신 상태인지 확인하세요.</string>
+    <string name="error_download_connection_error">팟캐스트 제작자 서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요.</string>
+    <string name="error_download_unknown_host">팟캐스트 제작자 서버에 연결할 수 없습니다. 인터넷 연결을 확인하세요.</string>
+    <string name="error_download_no_storage">에피소드를 다운로드하지 못했습니다. 기기의 저장 공간이 충분한지 확인하세요.</string>
+    <string name="error_download_invalid_url">에피소드 URL이 유효하지 않습니다. 팟캐스트 제작자에게 문의하세요.</string>
+    <string name="error_download_no_episode_file">에피소드의 다운로드 파일을 생성할 수 없습니다. 기기의 저장 공간이 충분한지 확인하세요.</string>
+    <string name="error_download_missing_episode">이 기기에서 에피소드 데이터를 찾을 수 없습니다. 지원팀에 문의하세요.</string>
+    <string name="downloading">%s 다운로드 중</string>
     <string name="playlist_only_podcast_episodes_allowed">재생목록에는 팟캐스트 에피소드만 포함할 수 있습니다.</string>
     <string name="playlist_limit_reached">재생목록에는 최대 %d개 에피소드만 포함할 수 있습니다.</string>
     <string name="playlist_limit_almost_full">재생목록이 거의 가득 찼습니다. 에피소드를 더 적게 추가해 보세요.</string>
@@ -649,6 +689,7 @@ Language: ko_KR
     <string name="widget_preview_episode_in_up_next_title">다음 에피소드</string>
     <string name="widget_preview_episode_title">에피소드 제목</string>
     <string name="hour_and_minutes">1시간 %d분</string>
+    <string name="hours_and_minutes">%1$d시간 %2$d분</string>
     <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
     <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>

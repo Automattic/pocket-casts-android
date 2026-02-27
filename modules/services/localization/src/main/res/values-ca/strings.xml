@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-09 23:18:27+0000
+Translation-Revision-Date: 2026-02-18 23:53:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
@@ -129,19 +129,19 @@ Language: ca
     <string name="add_to_playlist_episode_desc">Afegeix %1$s a la llista de reproducció</string>
     <string name="add_to_playlist">Afegeix a “%1$s”</string>
     <string name="your_podcasts">Els teus pòdcasts</string>
-    <string name="onboarding_recommendations_message">Aquí tens alguns pòdcasts fantàstics per començar. Toca per seguir-los, cercar-ne més o importar-ne des d’altres aplicacions.</string>
-    <string name="onboarding_recommendations_title">Esperem que t\'agradin aquestes suggeriments!</string>
+    <string name="onboarding_recommendations_message">Aquí tens alguns pòdcasts fantàstics per començar. Selecciona\'ls per seguir-los, cercar-ne més o importar-ne des d’altres aplicacions.</string>
     <string name="add_episodes">Afegir episodis</string>
+    <string name="onboarding_recommendations_title">Esperem que t\'agradin aquests suggeriments!</string>
     <string name="onboarding_interests_select_at_least_label">Selecciona’n almenys 3.</string>
     <string name="onboarding_interests_show_more">Mostra més categories</string>
     <string name="onboarding_interests_description">Arriben grans pòdcasts, triats a mà per persones reals!</string>
     <string name="onboarding_interests_title">Explica’ns quins són els teus temes preferits</string>
     <string name="onboarding_create_account_sign_up_google">Registra\'t amb Google</string>
     <string name="onboarding_create_account_sign_up_email">Registra\'t amb un correu electrònic</string>
-    <string name="onboarding_create_account_message">Els teus pòdcasts, sempre sincronitzats. Mantingues la teva biblioteca segura i gaudeix de Pocket\u00A0Casts a la web i a l\'escriptori.</string>
-    <string name="onboarding_create_account_title">Crear el teu compte de Pocket\u00A0Casts</string>
     <string name="onboarding_login_or">O</string>
     <string name="onboarding_login_continue_with_email">Continua amb el correu electrònic</string>
+    <string name="onboarding_create_account_title">Crea el teu compte de Pocket\u00A0Casts</string>
+    <string name="onboarding_create_account_message">Els teus pòdcasts, sempre sincronitzats. Mantén la teva biblioteca segura i gaudeix de Pocket\u00A0Casts a la web i a l\'escriptori.</string>
     <string name="playlist_artwork_description">Caràtula de la llista de reproducció</string>
     <string name="onboarding_intro_get_started">Començar</string>
     <string name="onboarding_intro_carousel_pc_user">Usuari de Pocket Casts</string>
@@ -191,16 +191,16 @@ Language: ca
     <string name="clear">Esborrar</string>
     <string name="create_playlist">Crear una llista de reproducció</string>
     <string name="new_smart_playlist_banner_body">Afegeix episodis automàticament segons les regles</string>
-    <string name="new_smart_playlist_banner_title">Fes-ho en una llista de reproducció intel·ligent</string>
     <string name="new_playlists_title_placeholder">Títol de la llista de reproducció</string>
+    <string name="new_smart_playlist_banner_title">Converteix-ho en una llista de reproducció intel·ligent</string>
     <string name="onboarding_folders_title_3">Esports</string>
     <string name="onboarding_folders_title_2">Preferits</string>
     <string name="onboarding_folders_title_1">Llibres</string>
     <string name="onboarding_folders_title">Carpetes: els teus pòdcasts, perfectament col·locats</string>
     <string name="encourage_account_playlists_banner_description">Crea un compte gratuït per a sincronitzar les teves llistes de reproducció a qualsevol dispositiu.</string>
-    <string name="encourage_account_playlists_banner_title">Mantingues les llistes de reproducció sincronitzades</string>
     <string name="premade_playlists_tooltip_body">Ho hem fet per ajudar-te a començar. S\'actualitzen automàticament segons la teva escolta.</string>
     <string name="premade_playlists_tooltip_title">Llistes intel·ligents, llestes per començar</string>
+    <string name="encourage_account_playlists_banner_title">Mantén les llistes de reproducció sincronitzades</string>
     <string name="onboarding_upgrade_account_message">Desbloqueja totes les funcions de pagament com ara les carpetes, mode aleatori, marques de temps i moltes més</string>
     <string name="new_playlist">Nova llista de reproducció</string>
     <string name="playlists_empty_state_body">Les llistes de reproducció permeten organitzar els episodis manualment o automàticament amb regles intel·ligents.</string>
@@ -721,7 +721,7 @@ Language: ca
     <string name="go_to_top">Ves a l\'inici</string>
     <string name="support">Ajuda</string>
     <string name="bookmark_notification_action_change_title">Canviar el títol</string>
-    <string name="bookmark_notification_content_tap_to_view">Toca per veure</string>
+    <string name="bookmark_notification_content_tap_to_view">Prem per veure</string>
     <string name="bookmark_notification_title_added">Marcador afegit</string>
     <string name="notification_channel_description_playback">Mostra mentre Pocket Casts està reproduint àudio</string>
     <string name="notification_channel_description_playback_error">Errors durant la reproducció</string>
@@ -1729,10 +1729,10 @@ Language: ca
     <string name="profile_not_signed_in">NO HAS INICIAT SESSIÓ</string>
     <string name="profile_next_payment">Proper pagament: %s</string>
     <string name="profile_last_refresh">Darrera actualització: fa %s</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_joined">S\'ha unit:</string>
     <string name="profile_files_remove_image">Canviar la imatge</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per obrir-los a Pocket Casts, i apareixeran aquí.</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_file_locked">bloquejat</string>
     <string name="profile_file">Arxiu</string>
     <string name="profile_ends">Acaba %s</string>
@@ -1934,7 +1934,6 @@ Language: ca
     <string name="podcast_group_episodes">Agrupar episodis</string>
     <string name="podcast_group_episode_length">Durada de l\'episodi</string>
     <string name="podcast_feed_issue_dialog_button">Intenta actualitzar-lo</string>
-    <string name="podcast_feed_issue_detected_summary">Toca per arreglar-ho</string>
     <string name="podcast_feed_issue_detected">S\'ha detectat un problema amb el feed</string>
     <string name="podcast_episodes_limited">Limitat a %d episodis més recents</string>
     <string name="podcast_episode_unstarred">Episodi no destacat</string>
@@ -2049,6 +2048,7 @@ Language: ca
     <string name="search_podcasts">Cercar pòdcasts </string>
     <string name="podcast_unsubscribe_warning">Si deixes de seguir aquest pòdcast, s\'esborraran tots els arxius descarregats.</string>
     <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
+    <string name="podcast_feed_issue_detected_summary">Prem per arreglar-ho</string>
     <string name="pause">Pausar</string>
     <string name="play">Reproduir</string>
     <string name="search">Cercar</string>

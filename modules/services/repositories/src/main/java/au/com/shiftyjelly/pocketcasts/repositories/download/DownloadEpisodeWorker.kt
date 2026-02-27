@@ -178,7 +178,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is DownloadResult.UnsuccessfulHttpCall -> {
-                context.getString(LR.string.error_download_http_failure, result.code) to true
+                context.getString(LR.string.error_download_http_failure, result.code.toString()) to true
             }
 
             is DownloadResult.ExceptionFailure -> {

@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 13:54:07+0000
+Translation-Revision-Date: 2026-02-25 12:55:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">مجاني لمدة ⁦%1$s⁩، ثم ⁦%2$s⁩شهريًا لمدة ⁦%3$d⁩ من الأشهر. إجمالي الالتزام: ⁦%4$s⁩ خلال عام واحد.</string>
+    <string name="winback_claimed_offer_message_6">شكرًا لاختيارك Pocket Casts. تبدأ خطة التقسيط المخفَّضة لمدة 12 شهرًا بعد فترة الفوترة الحالية الخاصة بك.</string>
+    <string name="winback_claimed_offer_message_5">خصم 50% على اشتراكك السنوي القادم باستخدام المدفوعات الشهرية!</string>
+    <string name="winback_offer_free_offer_installment_description">استمتع بسنة كاملة من Pocket Casts Plus بنصف السعر من خلال 12 دفعة شهرية بقيمة ⁦%1$s⁩. تبدأ خطة التقسيط المخفَّضة بعد انتهاء خطتك الحالية.</string>
+    <string name="winback_offer_free_offer_installment_title">احصل على خصم قدره 50%% على عامك القادم — ادفع فقط ⁦%1$s⁩شهريًا ووفر ⁦%2$s⁩</string>
+    <string name="plus_yearly_installments">الخطة السنوية - الدفع شهريًا</string>
+    <string name="error_download_too_many_attempts">تم إلغاء التنزيل بعد عدة محاولات. يُرجى التحقق من اتصالك بالإنترنت ومساحة التخزين، ثم إعادة المحاولة مرة أخرى.</string>
+    <string name="error_download_io_failure">فشل تنزيل الحلقة. يُرجى التحقق من اتصالك بالإنترنت ومساحة التخزين.</string>
+    <string name="error_download_socket_timeout">انتهت مهلة الاتصال بخادم مؤلف البث الصوتي. يُرجى التحقق من اتصالك بالإنترنت.</string>
+    <string name="error_download_suspicious_content_size">فشل تنزيل الحلقة. الملف الذي تم تنزيله صغير للغاية. يُرجى الاتصال بمؤلف البث الصوتي.</string>
+    <string name="error_download_invalid_content_type">فشل تنزيل الحلقة. تم استلام نوع المحتوى ⁦%1$s⁩. يُرجى الاتصال بمؤلف البث الصوتي.</string>
+    <string name="error_download_http_failure">فشل تنزيل الحلقة. تم تلقي كود حالة HTTP %1$s. يُرجى الاتصال بمؤلف البث الصوتي.</string>
+    <string name="wear_connectivity_streaming_warning">قد يتأثر البث</string>
+    <string name="wear_connectivity_restored">متصل</string>
+    <string name="wear_connectivity_lost">انقطع الاتصال</string>
+    <string name="episode_row_waiting_for_storage">بانتظار توفر مساحة تخزين</string>
+    <string name="podcasts_download_storage">التنزيل متوقف بانتظار توفر مساحة تخزين</string>
+    <string name="watch_sync_failed">تعذّرت المزامنة مع الساعة</string>
+    <string name="watch_synced_successfully">اكتملت مزامنة الساعة بنجاح</string>
+    <string name="watch_sync_waiting_for_phone">بانتظار مزامنة الهاتف…</string>
+    <string name="watch_sync_retry">إعادة المحاولة</string>
+    <string name="watch_sync_error_unknown_help">يُرجى المحاولة مرة أخرى أو تسجيل الدخول يدويًا</string>
+    <string name="watch_sync_error_login_failed_help">تسجيل الدخول يدويًا</string>
+    <string name="watch_sync_error_no_connection_help">تحقق من اتصال البلوتوث بالهاتف</string>
+    <string name="watch_sync_error_timeout_help">تأكد من أن الهاتف قريب ومتصّل عبر البلوتوث</string>
+    <string name="watch_sync_error_unknown">حدث خطأ ما</string>
+    <string name="watch_sync_error_login_failed">فشل تسجيل الدخول</string>
+    <string name="watch_sync_error_no_connection">الهاتف غير متصل</string>
+    <string name="watch_sync_error_timeout">تعذّر الاتصال بالهاتف</string>
+    <string name="watch_sync_success">جرت عملية تسجيل الدخول من الهاتف!</string>
+    <string name="watch_sync_syncing">جارٍ المزامنة مع الهاتف…</string>
+    <string name="error_download_generic_failure">فشل تنزيل الحلقة. %1$s</string>
+    <string name="error_download_ssl_failure">فشل إنشاء اتصال آمن بخادم مؤلف البث الصوتي. يُرجى التحقق من أن جهازك محدث.</string>
+    <string name="error_download_connection_error">فشل إنشاء الاتصال بخادم مؤلف البث الصوتي. يُرجى التحقق من اتصالك بالإنترنت.</string>
+    <string name="error_download_unknown_host">تعذر الوصول إلى خادم مؤلف البث الصوتي. يُرجى التحقق من اتصالك بالإنترنت.</string>
+    <string name="error_download_no_storage">فشل تنزيل الحلقة. يُرجى التحقق من أن لديك مساحة تخزين كافية على جهازك.</string>
+    <string name="error_download_invalid_url">عنوان الحلقة غير صالح. يُرجى الاتصال بمؤلف البث الصوتي.</string>
+    <string name="error_download_no_episode_file">يتعذر إنشاء ملف تنزيل للحلقة. يُرجى التحقق من أن لديك مساحة تخزين كافية على جهازك.</string>
+    <string name="error_download_missing_episode">يتعذر العثور على بيانات الحلقة على هذا الجهاز. يُرجى الاتصال بالدعم.</string>
+    <string name="downloading">جارٍ التنزيل %s</string>
     <string name="playlist_only_podcast_episodes_allowed">لا يمكن أن تحتوي قوائم التشغيل إلا على حلقات بودكاست.</string>
     <string name="playlist_limit_reached">يمكن أن تحتوي قائمة التشغيل على ما يصل إلى %d حلقة فقط.</string>
     <string name="playlist_limit_almost_full">قائمة التشغيل أوشكت على الامتلاء. حاول إضافة عدد أقل من الحلقات.</string>
@@ -649,6 +689,7 @@ Language: ar
     <string name="widget_preview_episode_in_up_next_title">الحلقة التالية</string>
     <string name="widget_preview_episode_title">عنوان الحلقة</string>
     <string name="hour_and_minutes">ساعة واحدة و %d من الدقائق</string>
+    <string name="hours_and_minutes">⁦%1$d⁩ ساعات و⁦%2$d⁩ دقائق</string>
     <string name="player_sleep_time_fired_end_of_chapter">توقفَ مؤقت السكون في نهاية الفصل الخاص بك.</string>
     <string name="player_sleep_in_chapters">السكون في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>
