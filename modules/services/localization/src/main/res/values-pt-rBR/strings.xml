@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-04 13:54:04+0000
+Translation-Revision-Date: 2026-02-26 15:55:39+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratuito por %1$s, depois %2$s/mês por %3$d meses. Compromisso total: %4$s por 1 ano.</string>
+    <string name="winback_claimed_offer_message_6">Agradecemos por escolher o Pocket Casts. O desconto do plano parcelado em 12 meses começa a contar após o período de cobrança atual.</string>
+    <string name="winback_claimed_offer_message_5">50% de desconto no próximo ano, com pagamentos mensais.</string>
+    <string name="winback_offer_free_offer_installment_description">Garanta um ano do Pocket Casts Plus pela metade do preço com 12 pagamentos mensais de %1$s. O desconto do plano parcelado começará a contar depois que seu plano atual terminar.</string>
+    <string name="winback_offer_free_offer_installment_title">Obtenha 50%% de desconto no próximo ano: pague apenas %1$s/mês e economize %2$s</string>
+    <string name="plus_yearly_installments">Plano anual - pagamento mensal</string>
+    <string name="error_download_too_many_attempts">Download cancelado após várias tentativas. Verifique a conexão com a Internet e seu armazenamento e tente novamente.</string>
+    <string name="error_download_io_failure">Falha ao baixar o episódio. Verifique sua conexão com a Internet e seu armazenamento.</string>
+    <string name="error_download_socket_timeout">A conexão com o servidor do autor do podcast expirou. Verifique sua conexão com a Internet.</string>
+    <string name="error_download_suspicious_content_size">Falha ao baixar o episódio. O arquivo baixado é muito pequeno. Entre em contato com o autor do podcast.</string>
+    <string name="error_download_invalid_content_type">Falha ao baixar o episódio. Tipo de conteúdo recebido %1$s. Entre em contato com o autor do podcast.</string>
+    <string name="error_download_http_failure">Falha ao baixar o episódio. Código de status HTTP recebido %1$s. Entre em contato com o autor do podcast.</string>
+    <string name="wear_connectivity_streaming_warning">A transmissão pode ser afetada</string>
+    <string name="wear_connectivity_restored">Conectado</string>
+    <string name="wear_connectivity_lost">Conexão perdida</string>
+    <string name="episode_row_waiting_for_storage">Aguardando espaço de armazenamento</string>
+    <string name="podcasts_download_storage">Download aguardando espaço de armazenamento</string>
+    <string name="watch_sync_failed">Não foi possível sincronizar com o relógio</string>
+    <string name="watch_synced_successfully">Relógio sincronizado com sucesso</string>
+    <string name="watch_sync_waiting_for_phone">Aguardando sincronização do telefone…</string>
+    <string name="watch_sync_retry">Tentar novamente</string>
+    <string name="watch_sync_error_unknown_help">Tente de novo ou faça login manualmente</string>
+    <string name="watch_sync_error_login_failed_help">Tente fazer login manualmente</string>
+    <string name="watch_sync_error_no_connection_help">Verifique a conexão Bluetooth com seu telefone</string>
+    <string name="watch_sync_error_timeout_help">Fique com seu telefone por perto conectado via Bluetooth</string>
+    <string name="watch_sync_error_unknown">Ocorreu um erro</string>
+    <string name="watch_sync_error_login_failed">Falha ao fazer login</string>
+    <string name="watch_sync_error_no_connection">Telefone não conectado</string>
+    <string name="watch_sync_error_timeout">Não foi possível conectar o telefone</string>
+    <string name="watch_sync_success">Login feito pelo telefone!</string>
+    <string name="watch_sync_syncing">Sincronizando com o telefone…</string>
+    <string name="error_download_generic_failure">Falha ao baixar o episódio. %1$s</string>
+    <string name="error_download_ssl_failure">Falha ao estabelecer uma conexão segura com o servidor do autor do podcast. Verifique se o seu dispositivo está atualizado.</string>
+    <string name="error_download_connection_error">Falha na conexão com o servidor. Verifique sua conexão com a Internet.</string>
+    <string name="error_download_unknown_host">Não foi possível acessar o servidor do autor do podcast. Verifique sua conexão com a Internet.</string>
+    <string name="error_download_no_storage">Falha ao baixar o episódio. Verifique se você tem espaço de armazenamento suficiente em seu dispositivo.</string>
+    <string name="error_download_invalid_url">A URL do episódio é inválida. Entre em contato com o autor do podcast.</string>
+    <string name="error_download_no_episode_file">Não foi possível criar um arquivo de download para o episódio. Verifique se você tem espaço de armazenamento suficiente em seu dispositivo.</string>
+    <string name="error_download_missing_episode">Não foi possível encontrar os dados do episódio neste dispositivo. Entre em contato com o suporte.</string>
+    <string name="downloading">Fazendo download de %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Playlists só podem conter episódios de podcast.</string>
     <string name="playlist_limit_reached">Playlists só podem conter até %d episódios.</string>
     <string name="playlist_limit_almost_full">A playlist está quase cheia. Tente adicionar menos episódios.</string>
@@ -649,6 +689,7 @@ Language: pt_BR
     <string name="widget_preview_episode_in_up_next_title">Episódio em Próximos</string>
     <string name="widget_preview_episode_title">Título do episódio</string>
     <string name="hour_and_minutes">1 hora e %d minutos</string>
+    <string name="hours_and_minutes">%1$d horas e %2$d minutos</string>
     <string name="player_sleep_time_fired_end_of_chapter">O temporizador parou no fim do seu capítulo.</string>
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Em %d capítulos</string>

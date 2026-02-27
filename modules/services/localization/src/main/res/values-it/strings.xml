@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 11:54:08+0000
+Translation-Revision-Date: 2026-02-26 11:55:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratuito per %1$s, poi %2$s al mese per %3$d mesi. Impegno totale: %4$s per 1 anno.</string>
+    <string name="winback_claimed_offer_message_6">Grazie per aver scelto Pocket Casts. Il tuo piano rateale di 12 mesi a un prezzo scontato inizierà al termine del periodo di fatturazione attuale.</string>
+    <string name="winback_claimed_offer_message_5">50% di sconto per il prossimo anno con pagamenti mensili!</string>
+    <string name="winback_offer_free_offer_installment_description">Assicurati un anno di Pocket Casts Plus a metà prezzo con 12 pagamenti mensili di %1$s. Il tuo piano rateale a un prezzo scontato inizierà alla scadenza del piano attuale.</string>
+    <string name="winback_offer_free_offer_installment_title">Ottieni uno sconto del 50%% sul prossimo anno: paga solo %1$s al mese e risparmia %2$s </string>
+    <string name="plus_yearly_installments">Piano annuale - paga mensilmente</string>
+    <string name="error_download_too_many_attempts">Download annullato dopo più tentativi. Controlla la connessione a Internet e lo spazio di archiviazione, quindi riprova.</string>
+    <string name="error_download_io_failure">Impossibile scaricare l\'episodio. Controlla la connessione a Internet e lo spazio di archiviazione.</string>
+    <string name="error_download_socket_timeout">Timeout della connessione al server dell\'autore del podcast. Controlla la connessione a Internet.</string>
+    <string name="error_download_suspicious_content_size">Impossibile scaricare l\'episodio. Il file scaricato è troppo piccolo. Contatta l\'autore del podcast.</string>
+    <string name="error_download_invalid_content_type">Impossibile scaricare l\'episodio. Tipo di contenuto ricevuto %1$s. Contatta l\'autore del podcast.</string>
+    <string name="error_download_http_failure">Impossibile scaricare l\'episodio. Codice dello stato HTTP ricevuto %1$s. Contatta l\'autore del podcast.</string>
+    <string name="wear_connectivity_streaming_warning">Lo streaming potrebbe subire delle interruzioni</string>
+    <string name="wear_connectivity_restored">Connesso</string>
+    <string name="wear_connectivity_lost">Connessione persa</string>
+    <string name="episode_row_waiting_for_storage">In attesa dello spazio di archiviazione</string>
+    <string name="podcasts_download_storage">Download in attesa dello spazio di archiviazione</string>
+    <string name="watch_sync_failed">Impossibile sincronizzare l\'orologio</string>
+    <string name="watch_synced_successfully">Sincronizzazione dell\'orologio riuscita</string>
+    <string name="watch_sync_waiting_for_phone">In attesa della sincronizzazione del telefono…</string>
+    <string name="watch_sync_retry">Riprova</string>
+    <string name="watch_sync_error_unknown_help">Riprova o accedi manualmente</string>
+    <string name="watch_sync_error_login_failed_help">Prova ad accedere manualmente</string>
+    <string name="watch_sync_error_no_connection_help">Controlla la connessione Bluetooth del telefono</string>
+    <string name="watch_sync_error_timeout_help">Assicurati che il telefono sia nelle vicinanze e connesso tramite Bluetooth</string>
+    <string name="watch_sync_error_unknown">Si è verificato un problema</string>
+    <string name="watch_sync_error_login_failed">Accesso non riuscito</string>
+    <string name="watch_sync_error_no_connection">Telefono non connesso</string>
+    <string name="watch_sync_error_timeout">Impossibile connettersi al telefono</string>
+    <string name="watch_sync_success">Accesso effettuato dal telefono!</string>
+    <string name="watch_sync_syncing">Sincronizzazione con il telefono…</string>
+    <string name="error_download_generic_failure">Impossibile scaricare l\'episodio. %1$s</string>
+    <string name="error_download_ssl_failure">Impossibile stabilire una connessione sicura al server dell\'autore del podcast. Verifica che il dispositivo sia aggiornato.</string>
+    <string name="error_download_connection_error">Impossibile connettersi al server dell\'autore del podcast. Controlla la connessione a Internet.</string>
+    <string name="error_download_unknown_host">Impossibile raggiungere il server dell\'autore del podcast. Controlla la connessione a Internet.</string>
+    <string name="error_download_no_storage">Impossibile scaricare l\'episodio. Verifica di avere abbastanza spazio di archiviazione sul dispositivo.</string>
+    <string name="error_download_invalid_url">L\'URL dell\'episodio non è valido. Contatta l\'autore del podcast.</string>
+    <string name="error_download_no_episode_file">Impossibile creare un file di download per l\'episodio. Verifica di avere abbastanza spazio di archiviazione sul dispositivo.</string>
+    <string name="error_download_missing_episode">Impossibile trovare i dati dell\'episodio su questo dispositivo. Contatta il supporto.</string>
+    <string name="downloading">Download in corso %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Le playlist possono contenere solo episodi di podcast.</string>
     <string name="playlist_limit_reached">Le playlist possono contenere solo un massimo di %d episodi.</string>
     <string name="playlist_limit_almost_full">Playlist quasi piena. Prova ad aggiungere meno episodi.</string>
@@ -648,6 +688,7 @@ Language: it
     <string name="widget_preview_episode_in_up_next_title">Episodio in Successivo</string>
     <string name="widget_preview_episode_title">Titolo episodio</string>
     <string name="hour_and_minutes">1 ora e %d minuti</string>
+    <string name="hours_and_minutes">%1$d ore e %2$d minuti</string>
     <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>

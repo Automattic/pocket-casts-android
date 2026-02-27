@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-06 09:54:04+0000
+Translation-Revision-Date: 2026-02-27 09:56:00+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">%1$s 免費，之後每月 %2$s，持續 %3$d 個月。 合約期：1 年 %4$s。</string>
+    <string name="winback_claimed_offer_message_6">感謝選用 Pocket Casts。 折扣的 12 個月分期付款方案會在目前的帳單週期結束後開始。</string>
+    <string name="winback_claimed_offer_message_5">每月付款可享次年 5 折優惠！</string>
+    <string name="winback_offer_free_offer_installment_description">鎖定一整年的 Pocket Casts Plus，12 個月分期付款只需半價 %1$s。 優惠分期付款方案會從目前方案結束後開始。</string>
+    <string name="winback_offer_free_offer_installment_title">次年享有 50%% 優惠，每月只需 %1$s，省下 %2$s</string>
+    <string name="plus_yearly_installments">年繳方案：每月付款</string>
+    <string name="error_download_too_many_attempts">多次嘗試下載後已取消。 請檢查你的網際網路連線和儲存空間，然後再試一次。</string>
+    <string name="error_download_io_failure">無法下載本集。 請檢查你的網際網路連線和儲存空間。</string>
+    <string name="error_download_socket_timeout">與 Podcast 作者伺服器的連線逾時。 請檢查你的網際網路連線。</string>
+    <string name="error_download_suspicious_content_size">無法下載本集。 下載的檔案太小。 請聯絡 Podcast 作者。</string>
+    <string name="error_download_invalid_content_type">無法下載本集。 已收到內容類型 %1$s。 請聯絡 Podcast 作者。</string>
+    <string name="error_download_http_failure">無法下載本集。 已收到 HTTP 狀態碼 %1$s。 請聯絡 Podcast 作者。</string>
+    <string name="wear_connectivity_streaming_warning">串流可能會受影響</string>
+    <string name="wear_connectivity_restored">已連線</string>
+    <string name="wear_connectivity_lost">連線遺失</string>
+    <string name="episode_row_waiting_for_storage">等待儲存空間</string>
+    <string name="podcasts_download_storage">等待儲存空間的下載</string>
+    <string name="watch_sync_failed">無法同步處理以觀看</string>
+    <string name="watch_synced_successfully">已成功同步觀看</string>
+    <string name="watch_sync_waiting_for_phone">正等待手機同步…</string>
+    <string name="watch_sync_retry">再試一次</string>
+    <string name="watch_sync_error_unknown_help">再試一次，或手動登入</string>
+    <string name="watch_sync_error_login_failed_help">嘗試手動登入</string>
+    <string name="watch_sync_error_no_connection_help">檢查與手機的藍牙連線</string>
+    <string name="watch_sync_error_timeout_help">確認手機在身邊，且已透過藍牙連線</string>
+    <string name="watch_sync_error_unknown">發生錯誤</string>
+    <string name="watch_sync_error_login_failed">登入失敗</string>
+    <string name="watch_sync_error_no_connection">手機未連線</string>
+    <string name="watch_sync_error_timeout">無法連線至手機</string>
+    <string name="watch_sync_success">已從手機登入！</string>
+    <string name="watch_sync_syncing">正與手機同步…</string>
+    <string name="error_download_generic_failure">無法下載本集。 %1$s</string>
+    <string name="error_download_ssl_failure">無法建立與 Podcast 作者伺服器的安全連線。 請檢查裝置是否為最新版本。</string>
+    <string name="error_download_connection_error">無法連線至 Podcast 作者的伺服器。 請檢查你的網際網路連線。</string>
+    <string name="error_download_unknown_host">無法連線到 Podcast 作者的伺服器。 請檢查你的網際網路連線。</string>
+    <string name="error_download_no_storage">無法下載本集。 請檢查裝置上是否有足夠的儲存空間。</string>
+    <string name="error_download_invalid_url">單集 URL 無效。 請聯絡 Podcast 作者。</string>
+    <string name="error_download_no_episode_file">無法建立本集的下載檔案。 請檢查裝置上是否有足夠的儲存空間。</string>
+    <string name="error_download_missing_episode">在此裝置上找不到單集資料。 請聯絡支援團隊。</string>
+    <string name="downloading">下載 %s</string>
     <string name="playlist_only_podcast_episodes_allowed">播放清單只能包含 Podcast 單集。</string>
     <string name="playlist_limit_reached">播放清單只能包含最多 %d 個單集。</string>
     <string name="playlist_limit_almost_full">播放清單快滿了。 嘗試新增較少單集。</string>
@@ -649,6 +689,7 @@ Language: zh_TW
     <string name="widget_preview_episode_title">單集標題</string>
     <string name="widget_preview_episode_in_up_next_title">「接下來播放」的單集</string>
     <string name="hour_and_minutes">1 小時 %d 分鐘</string>
+    <string name="hours_and_minutes">%1$d 小時 %2$d 分鐘</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠計時器於章節結尾停止。</string>
     <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>

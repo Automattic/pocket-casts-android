@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 18:54:03+0000
+Translation-Revision-Date: 2026-02-27 09:58:31+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Бесплатно в течение %1$s, затем %2$s в месяц в течение %3$d месяцев. Общая сумма выплат: %4$s в течение 1 года.</string>
+    <string name="winback_claimed_offer_message_6">Благодарим за то, что вы выбрали Pocket Casts. Ваш льготный тарифный план с рассрочкой на 12 месяцев начнёт действовать по окончании текущего расчётного периода.</string>
+    <string name="winback_claimed_offer_message_5">Скидка 50 % на следующий год с помесячной оплатой!</string>
+    <string name="winback_offer_free_offer_installment_description">Оформите годовую подписку на Pocket Casts Plus за полцены, совершив 12 ежемесячных платежей в размере %1$s. Ваш льготный тарифный план с рассрочкой начнёт действовать по истечении срока текущего тарифного плана.</string>
+    <string name="winback_offer_free_offer_installment_title">Получите скидку 50%% на следующий год — платите всего %1$s в месяц и сэкономьте %2$s</string>
+    <string name="plus_yearly_installments">Годовой тарифный план с помесячной оплатой</string>
+    <string name="error_download_too_many_attempts">Скачивание отменено после нескольких попыток. Проверьте подключение к Интернету и наличие свободного дискового пространства, а затем повторите попытку.</string>
+    <string name="error_download_io_failure">Не удалось загрузить выпуск. Проверьте подключение к Интернету и наличие свободного дискового пространства.</string>
+    <string name="error_download_socket_timeout">Время подключения к серверу автора подкаста истекло. Проверьте подключение к Интернету.</string>
+    <string name="error_download_suspicious_content_size">Не удалось загрузить выпуск. Загруженный файл слишком мал. Обратитесь к автору подкаста.</string>
+    <string name="error_download_invalid_content_type">Не удалось загрузить выпуск. Полученный тип контента %1$s. Обратитесь к автору подкаста.</string>
+    <string name="error_download_http_failure">Не удалось загрузить выпуск. Получен код статуса HTTP %1$s. Обратитесь к автору подкаста.</string>
+    <string name="wear_connectivity_streaming_warning">Это может повлиять на потоковую передачу</string>
+    <string name="wear_connectivity_restored">Подключено</string>
+    <string name="wear_connectivity_lost">Нет подключения</string>
+    <string name="episode_row_waiting_for_storage">Ожидание места для загрузки</string>
+    <string name="podcasts_download_storage">Для начала загрузки требуется свободное место</string>
+    <string name="watch_sync_failed">Не удалось синхронизировать с часами</string>
+    <string name="watch_synced_successfully">Часы синхронизированы</string>
+    <string name="watch_sync_waiting_for_phone">Ожидание синхронизации телефона…</string>
+    <string name="watch_sync_retry">Повторить попытку</string>
+    <string name="watch_sync_error_unknown_help">Повторите попытку или выполните вход вручную</string>
+    <string name="watch_sync_error_login_failed_help">Попробуйте выполнить вход вручную</string>
+    <string name="watch_sync_error_no_connection_help">Проверьте подключение Bluetooth к телефону</string>
+    <string name="watch_sync_error_timeout_help">Убедитесь, что ваш телефон находится поблизости и подключён через Bluetooth</string>
+    <string name="watch_sync_error_unknown">Что-то пошло не так</string>
+    <string name="watch_sync_error_login_failed">Вход не выполнен</string>
+    <string name="watch_sync_error_no_connection">Телефон не подключён</string>
+    <string name="watch_sync_error_timeout">Не удалось подключиться к телефону</string>
+    <string name="watch_sync_success">Выполнен вход с телефона.</string>
+    <string name="watch_sync_syncing">Синхронизация с телефоном…</string>
+    <string name="error_download_generic_failure">Не удалось скачать выпуск. %1$s</string>
+    <string name="error_download_ssl_failure">Не удалось установить безопасное соединение с сервером автора подкаста. Проверьте, не нуждается ли ваше устройство в обновлении.</string>
+    <string name="error_download_connection_error">Ошибка установки соединения с сервером автора подкаста. Проверьте подключение к Интернету.</string>
+    <string name="error_download_no_storage">Не удалось скачать выпуск. Убедитесь, что на устройстве достаточно свободного места.</string>
+    <string name="error_download_invalid_url">URL-адрес выпуска недействителен. Свяжитесь с автором подкаста.</string>
+    <string name="error_download_unknown_host">Не удалось установить соединение с сервером автора подкаста. Проверьте подключение к Интернету.</string>
+    <string name="error_download_no_episode_file">Не удалось создать файл выпуска для скачивания. Убедитесь, что на устройстве достаточно свободного места.</string>
+    <string name="error_download_missing_episode">Не удалось найти данные выпуска на устройстве. Обратитесь в службу поддержки.</string>
+    <string name="downloading">Скачивание %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Плейлисты могут содержать только выпуски подкастов.</string>
     <string name="playlist_limit_reached">Плейлисты могут содержать не более %d вып.</string>
     <string name="playlist_limit_almost_full">Плейлист почти заполнен. Попробуйте снизить число выпусков.</string>
@@ -649,6 +689,7 @@ Language: ru
     <string name="widget_preview_time_left_2">Ещё 12 мин</string>
     <string name="widget_preview_time_left_1">Ещё 25 мин</string>
     <string name="hour_and_minutes">1 ч %d мин</string>
+    <string name="hours_and_minutes">%1$d ч %2$d мин</string>
     <string name="player_sleep_time_fired_end_of_chapter">Таймер сна остановился в конце главы.</string>
     <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
     <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>
@@ -2190,8 +2231,8 @@ Language: ru
     </plurals>
     <plurals name="hour">
         <item quantity="one">час</item>
-        <item quantity="few">ч.</item>
-        <item quantity="many">ч.</item>
+        <item quantity="few">ч</item>
+        <item quantity="many">ч</item>
     </plurals>
     <plurals name="hour_short">
         <item quantity="one">ч.</item>

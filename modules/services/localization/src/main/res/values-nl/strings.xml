@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 11:54:08+0000
+Translation-Revision-Date: 2026-02-26 11:56:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis voor %1$s, daarna %2$s/maand voor %3$d maanden. Totale inzet: langer %4$s dan 1 jaar.</string>
+    <string name="winback_claimed_offer_message_6">Bedankt dat je voor Pocket Casts kiest. Je abonnement met een jaar lang korting gaat in na je huidige factuurperiode.</string>
+    <string name="winback_claimed_offer_message_5">50% korting op je volgende jaar met maandelijkse betalingen!</string>
+    <string name="winback_offer_free_offer_installment_description">Sluit een jaar Pocket Casts Plus af voor de helft van de prijs met 12 maandelijkse betalingen van %1$s. Je jaar met korting begint nadat je huidige abonnement is afgelopen.</string>
+    <string name="plus_yearly_installments">Jaarabonnement - betaal maandelijks</string>
+    <string name="error_download_too_many_attempts">Download geannuleerd na meerdere pogingen. Controleer je internetverbinding en probeer het opnieuw.</string>
+    <string name="error_download_io_failure">Downloaden van aflevering mislukt. Controleer je internet verbinding en probeer het opnieuw.</string>
+    <string name="error_download_socket_timeout">Time-out bij verbinding met de server van de podcastauteur. Controleer je internetverbinding.</string>
+    <string name="error_download_suspicious_content_size">Downloaden van aflevering mislukt. Het gedownloade bestand is te klein. Neem contact op met de auteur van de podcast.</string>
+    <string name="error_download_invalid_content_type">Downloaden van aflevering mislukt. Ontvangen contenttype %1$s. Neem contact op met de auteur van de podcast.</string>
+    <string name="error_download_http_failure">Downloaden van aflevering mislukt. HTTP-statuscode ontvangen %1$s. Neem contact op met de auteur van de podcast.</string>
+    <string name="wear_connectivity_streaming_warning">Streaming kan worden beïnvloed</string>
+    <string name="wear_connectivity_restored">Gekoppeld</string>
+    <string name="wear_connectivity_lost">Verbinding verloren</string>
+    <string name="episode_row_waiting_for_storage">Wachten op opslagruimte</string>
+    <string name="podcasts_download_storage">Download wacht op opslagruimte</string>
+    <string name="watch_sync_failed">Kon niet gesynchroniseerd worden om te bekijken</string>
+    <string name="watch_synced_successfully">Horloge is gesynchroniseerd</string>
+    <string name="watch_sync_waiting_for_phone">Wachten tot de telefoon is gesynchroniseerd …</string>
+    <string name="watch_sync_retry">Probeer opnieuw</string>
+    <string name="watch_sync_error_unknown_help">Probeer het opnieuw of log handmatig in</string>
+    <string name="watch_sync_error_login_failed_help">Probeer handmatig in te loggen</string>
+    <string name="watch_sync_error_no_connection_help">Controleer de Bluetooth-verbinding met je telefoon</string>
+    <string name="watch_sync_error_timeout_help">Zorg ervoor dat je telefoon in de buurt is en verbonden is via Bluetooth</string>
+    <string name="watch_sync_error_unknown">Er is iets fout gegaan</string>
+    <string name="watch_sync_error_login_failed">Inloggen is mislukt</string>
+    <string name="watch_sync_error_no_connection">Telefoon niet verbonden</string>
+    <string name="watch_sync_error_timeout">Kon niet verbinden met telefoon</string>
+    <string name="watch_sync_success">Ingelogd via telefoon!</string>
+    <string name="watch_sync_syncing">Synchroniseren met telefoon …</string>
+    <string name="error_download_generic_failure">Downloaden van aflevering is mislukt. %1$s</string>
+    <string name="error_download_ssl_failure">Kan geen veilige verbinding maken met de server van de podcast-auteur. Controleer of je apparaat up-to-date is.</string>
+    <string name="error_download_connection_error">Kon geen verbinding maken met de server. Controleer je internetverbinding.</string>
+    <string name="error_download_unknown_host">Kan de server van de podcast-auteur niet bereiken. Controleer je internetverbinding.</string>
+    <string name="error_download_no_storage">Downloaden van aflevering mislukt. Controleer of je genoeg opslagruimte op je apparaat hebt.</string>
+    <string name="error_download_invalid_url">De site url is ongeldig. Neem contact op met de auteur van de podcast.</string>
+    <string name="error_download_no_episode_file">Kan geen downloadbestand voor de aflevering aanmaken. Controleer of je genoeg opslagruimte op je apparaat hebt.</string>
+    <string name="error_download_missing_episode">Kan de afleveringgegevens niet vinden op dit apparaat. Neem contact op met de ondersteuning.</string>
+    <string name="downloading">%s downloaden</string>
     <string name="playlist_only_podcast_episodes_allowed">Afspeellijsten mogen alleen podcastafleveringen bevatten.</string>
     <string name="playlist_limit_reached">Afspeellijsten kunnen maximaal %d afleveringen bevatten.</string>
     <string name="playlist_limit_almost_full">Afspeellijst is bijna vol. Voeg minder afleveringen toe.</string>
@@ -648,6 +687,7 @@ Language: nl
     <string name="widget_preview_episode_in_up_next_title">Aflevering in Hierna</string>
     <string name="widget_preview_episode_title">Titel van aflevering</string>
     <string name="hour_and_minutes">1 uur en %d minuten</string>
+    <string name="hours_and_minutes">%1$d uur en %2$d minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Slaaptimer is gestopt aan het einde van het hoofdstuk.</string>
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>
