@@ -8,13 +8,14 @@ import android.content.Intent
 import androidx.core.os.BundleCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
 import java.io.File
 import java.net.HttpURLConnection
@@ -70,7 +71,7 @@ class PocketCastsAccountAuthenticatorTest {
         val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
 
         val syncManager = SyncManagerImpl(
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,

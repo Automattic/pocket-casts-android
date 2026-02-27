@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
+import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -24,9 +25,6 @@ import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
 class SyncManagerImplTest {
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     private lateinit var context: Context
@@ -53,7 +51,7 @@ class SyncManagerImplTest {
         MockitoAnnotations.openMocks(this)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             context = context,
             settings = settings,
             syncAccountManager = syncAccountManager,
@@ -67,7 +65,7 @@ class SyncManagerImplTest {
     fun `should update user interaction with sync feature on user registration with password`() = runTest {
         val response = createMockLoginResponse(isNew = true)
         whenever(syncServiceManager.register(any(), any())).thenReturn(response)
-        syncManager.createUserWithEmailAndPassword("test@example.com", "password123")
+        syncManager.createUserWithEmailAndPassword("test@example.com", "password123", SignInSource.UserInitiated.Onboarding)
         verifyNotificationCalled()
     }
 
