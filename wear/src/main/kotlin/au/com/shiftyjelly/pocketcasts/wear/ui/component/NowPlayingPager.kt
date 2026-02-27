@@ -2,17 +2,12 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.edgeSwipeToDismiss
@@ -27,8 +22,6 @@ import com.google.android.horologist.compose.layout.rememberResponsiveColumnStat
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-val LocalSetTimeTextVisible = compositionLocalOf<(Boolean) -> Unit> { {} }
 
 object NowPlayingPager {
     const val PAGE_COUNT = 3
@@ -50,23 +43,19 @@ fun NowPlayingPager(
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
 ) {
     val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
-    val columState = rememberResponsiveColumnState()
-    val pagerScope = remember(pagerState, columState) { NowPlayingPagerScope(pagerState, columState) }
+    val page0ColumnState = rememberResponsiveColumnState()
+    val page1ColumnState = rememberResponsiveColumnState()
+    val page2ColumnState = rememberResponsiveColumnState()
+    val pagerScope = remember(pagerState, page0ColumnState) { NowPlayingPagerScope(pagerState, page0ColumnState) }
 
-    val setTimeTextVisible = LocalSetTimeTextVisible.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(pagerState, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            snapshotFlow { pagerState.currentPage }
-                .collect { page ->
-                    setTimeTextVisible(page == 0)
-                }
-        }
+    val activeScrollState = when (pagerState.currentPage) {
+        0 -> page0ColumnState
+        2 -> page2ColumnState
+        else -> page1ColumnState
     }
 
     ScreenScaffold(
-        scrollState = columState,
+        scrollState = activeScrollState,
         modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
@@ -122,7 +111,7 @@ fun NowPlayingPager(
                         navigateToEpisode = { episodeUuid ->
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                         },
-                        columnState = rememberResponsiveColumnState(),
+                        columnState = page2ColumnState,
                     )
                 }
             }
