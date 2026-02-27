@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-06 13:54:03+0000
+Translation-Revision-Date: 2026-02-17 10:54:16+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="wear_connectivity_streaming_warning">Le streaming peut être affecté</string>
+    <string name="wear_connectivity_restored">Connecté</string>
+    <string name="wear_connectivity_lost">Connexion perdue</string>
+    <string name="episode_row_waiting_for_storage">En attente d’espace de stockage</string>
+    <string name="podcasts_download_storage">Téléchargement en attente d’espace de stockage</string>
+    <string name="watch_sync_failed">Échec de la synchronisation avec la montre</string>
+    <string name="watch_synced_successfully">La montre a bien été synchronisée</string>
+    <string name="watch_sync_waiting_for_phone">En attente de la synchronisation du téléphone…</string>
+    <string name="watch_sync_retry">Réessayer</string>
+    <string name="watch_sync_error_unknown_help">Réessayer ou se connecter manuellement</string>
+    <string name="watch_sync_error_login_failed_help">Essayez de vous connecter manuellement</string>
+    <string name="watch_sync_error_no_connection_help">Vérifier la connexion Bluetooth à votre téléphone</string>
+    <string name="watch_sync_error_timeout_help">Vérifiez que votre téléphone se trouve à proximité et qu’il est connecté via Bluetooth</string>
+    <string name="watch_sync_error_unknown">Un problème est survenu</string>
+    <string name="watch_sync_error_login_failed">La connexion a échoué</string>
+    <string name="watch_sync_error_no_connection">Téléphone non connecté</string>
+    <string name="watch_sync_error_timeout">Échec de la connexion au téléphone</string>
+    <string name="watch_sync_success">Connecté depuis le téléphone !</string>
+    <string name="watch_sync_syncing">Synchronisation avec le téléphone…</string>
+    <string name="error_download_generic_failure">Échec du téléchargement de l’épisode. %1$s</string>
+    <string name="downloading">%s en cours de téléchargement</string>
     <string name="playlist_only_podcast_episodes_allowed">Les playlists ne peuvent contenir que des épisodes de podcast.</string>
     <string name="playlist_limit_reached">Les playlists ne peuvent contenir que jusqu’à %d épisodes.</string>
     <string name="playlist_limit_almost_full">La playlist est presque pleine. Essayez d’ajouter moins d’épisodes.</string>
@@ -649,6 +670,7 @@ Language: fr
     <string name="widget_preview_time_left_2">12 min restantes</string>
     <string name="widget_preview_time_left_1">25 min restantes</string>
     <string name="hour_and_minutes">1 heure et %d minutes</string>
+    <string name="hours_and_minutes">%1$d heures et %2$d minutes</string>
     <string name="player_sleep_time_fired_end_of_chapter">Le minuteur de mise en veille s’est arrêté à la fin de votre chapitre.</string>
     <string name="player_sleep_in_chapters">Mise en veille dans %d chapitres</string>
     <string name="player_sleep_timer_in_chapter_plural">Dans %d chapitres</string>

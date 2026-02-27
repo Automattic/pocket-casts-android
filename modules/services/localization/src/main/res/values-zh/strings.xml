@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 11:54:09+0000
+Translation-Revision-Date: 2026-02-26 13:57:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">免费 %1$s，然后每月 %2$s，持续 %3$d 个月。 总承诺：%4$s，为期超过 1 年。</string>
+    <string name="winback_claimed_offer_message_6">感谢您选用 Pocket Casts。 您的 12 个月分期付款优惠计划将在当前计费周期结束后开始生效。</string>
+    <string name="winback_claimed_offer_message_5">按月付款即可享受次年半价优惠！</string>
+    <string name="winback_offer_free_offer_installment_description">以半价锁定 Pocket Casts Plus 一年使用权，分 12 期付款，每期 %1$s。 您的分期付款优惠计划将在当前套餐结束后开始生效。</string>
+    <string name="winback_offer_free_offer_installment_title">次年可享 50%% 优惠，每月仅需支付 %1$s，立省 %2$s</string>
+    <string name="plus_yearly_installments">年度套餐 - 按月付款</string>
+    <string name="error_download_too_many_attempts">多次尝试下载后已取消。 请检查您的互联网连接和存储空间，然后重试。</string>
+    <string name="error_download_io_failure">下载该集失败。 请检查您的互联网连接和存储空间。</string>
+    <string name="error_download_socket_timeout">与播客作者服务器的连接超时。 请检查您的互联网连接。</string>
+    <string name="error_download_suspicious_content_size">下载该集失败。 下载的文件过小。 请联系播客作者。</string>
+    <string name="error_download_invalid_content_type">下载该集失败。 已收到内容类型 %1$s。 请联系播客作者。</string>
+    <string name="error_download_http_failure">下载该集失败。 已收到 HTTP 状态代码 %1$s。 请联系播客作者。</string>
+    <string name="wear_connectivity_streaming_warning">流式传输可能会受到影响</string>
+    <string name="wear_connectivity_restored">已连接</string>
+    <string name="wear_connectivity_lost">连接丢失</string>
+    <string name="episode_row_waiting_for_storage">正在等待存储空间</string>
+    <string name="podcasts_download_storage">下载正在等待存储空间</string>
+    <string name="watch_sync_failed">无法同步至手表</string>
+    <string name="watch_synced_successfully">手表同步成功</string>
+    <string name="watch_sync_waiting_for_phone">正在等待手机同步…</string>
+    <string name="watch_sync_retry">重试</string>
+    <string name="watch_sync_error_unknown_help">重试或手动登录</string>
+    <string name="watch_sync_error_login_failed_help">尝试手动登录</string>
+    <string name="watch_sync_error_no_connection_help">检查与您手机的蓝牙连接</string>
+    <string name="watch_sync_error_timeout_help">确保您的手机在附近并已通过蓝牙连接</string>
+    <string name="watch_sync_error_unknown">出错了</string>
+    <string name="watch_sync_error_login_failed">登录失败</string>
+    <string name="watch_sync_error_no_connection">手机未连接</string>
+    <string name="watch_sync_error_timeout">无法连接到手机</string>
+    <string name="watch_sync_success">已从手机登录！</string>
+    <string name="watch_sync_syncing">正在与手机同步…</string>
+    <string name="error_download_generic_failure">下载剧集失败。 %1$s</string>
+    <string name="error_download_ssl_failure">与播客作者的服务器建立安全连接失败。 请检查您的设备是否已更新至最新版本。</string>
+    <string name="error_download_connection_error">连接到播客作者的服务器失败。 请检查您的互联网连接。</string>
+    <string name="error_download_unknown_host">无法访问播客作者的服务器。 请检查您的互联网连接。</string>
+    <string name="error_download_no_storage">下载该集失败。 请检查您的设备上是否有足够的存储空间。</string>
+    <string name="error_download_invalid_url">该剧集的 URL 无效。 请联系播客作者。</string>
+    <string name="error_download_no_episode_file">无法为该剧集创建下载文件。 请检查您的设备上是否有足够的存储空间。</string>
+    <string name="error_download_missing_episode">无法在此设备上找到该剧集数据。 请联系支持人员。</string>
+    <string name="downloading">正在下载 %s</string>
     <string name="playlist_only_podcast_episodes_allowed">播放列表只能包含播客剧集。</string>
     <string name="playlist_limit_reached">播放列表最多只能包含 %d 个剧集。</string>
     <string name="playlist_limit_almost_full">播放列表几乎已满。 尝试减少添加的剧集数量。</string>
@@ -649,6 +689,7 @@ Language: zh_CN
     <string name="widget_preview_episode_in_up_next_title">下集预告</string>
     <string name="widget_preview_episode_title">剧集标题</string>
     <string name="hour_and_minutes">1 小时 %d 分钟</string>
+    <string name="hours_and_minutes">%1$d 小时 %2$d 分钟</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠定时器在章节结束时停止。</string>
     <string name="player_sleep_in_chapters">%d 个章节后进入睡眠状态</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>

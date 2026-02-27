@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-05 09:54:03+0000
+Translation-Revision-Date: 2026-02-26 09:57:55+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">%1$sは無料、その後%3$dか月間月額%2$sでご利用いただけます。 コミットメント合計: 年間 %4$s。</string>
+    <string name="winback_claimed_offer_message_6">Pocket Casts をお選びいただきありがとうございます。 割引の12か月間分割払いプランは現在の請求期間の後に開始します。</string>
+    <string name="winback_claimed_offer_message_5">月額支払いで来年50% オフ !</string>
+    <string name="winback_offer_free_offer_installment_description">1年のPocket Casts Plusを半額で利用でき、月々12回の支払いが可能%1$sです。 年間割引は現在のプランが終了した後に開始します。</string>
+    <string name="winback_offer_free_offer_installment_title">次年度50%% オフ — 月額たったの%1$sで%2$s節約</string>
+    <string name="plus_yearly_installments">年間プラン – 月額支払い</string>
+    <string name="error_download_too_many_attempts">複数回試行した後、ダウンロードはキャンセルされました。 ネットワーク接続とストレージを確認して、もう一度お試しください。</string>
+    <string name="error_download_io_failure">エピソードをダウンロードできませんでした。 ネットワーク接続とストレージを確認してください。</string>
+    <string name="error_download_socket_timeout">ポッドキャスト投稿者のサーバーへの接続がタイムアウトしました。 インターネット接続を確認してください。</string>
+    <string name="error_download_suspicious_content_size">エピソードをダウンロードできませんでした。 ダウンロードしたファイルが小さすぎます。 ポッドキャスト投稿者に連絡してください。</string>
+    <string name="error_download_invalid_content_type">エピソードをダウンロードできませんでした。 受信したコンテンツタイプは %1$s です。 ポッドキャスト投稿者に連絡してください。</string>
+    <string name="error_download_http_failure">エピソードをダウンロードできませんでした。 HTTP ステータスコード %1$s を受信しました。 ポッドキャスト投稿者に連絡してください。</string>
+    <string name="wear_connectivity_streaming_warning">ストリーミングに影響する可能性があります</string>
+    <string name="wear_connectivity_restored">接続しました</string>
+    <string name="wear_connectivity_lost">接続が失われました</string>
+    <string name="episode_row_waiting_for_storage">保存スペース待ち</string>
+    <string name="podcasts_download_storage">ダウンロードが保存スペース待ち</string>
+    <string name="watch_sync_failed">同期して視聴できませんでした</string>
+    <string name="watch_synced_successfully">視聴の同期に成功しました</string>
+    <string name="watch_sync_waiting_for_phone">スマートフォンの同期を待機中…</string>
+    <string name="watch_sync_retry">もう一度試す</string>
+    <string name="watch_sync_error_unknown_help">もう一度試すか、手動でログインする</string>
+    <string name="watch_sync_error_login_failed_help">手動でログインを試す</string>
+    <string name="watch_sync_error_no_connection_help">スマートフォンへの Bluetooth 接続を確認する</string>
+    <string name="watch_sync_error_timeout_help">スマートフォンが近くにあり、Bluetooth 経由で接続されていることを確認してください</string>
+    <string name="watch_sync_error_unknown">エラーが発生しました</string>
+    <string name="watch_sync_error_login_failed">ログインに失敗しました</string>
+    <string name="watch_sync_error_no_connection">スマートフォンが接続されていません</string>
+    <string name="watch_sync_error_timeout">スマートフォンに接続できませんでした</string>
+    <string name="watch_sync_success">スマートフォンからログインしました</string>
+    <string name="watch_sync_syncing">スマートフォンと同期中…</string>
+    <string name="error_download_generic_failure">エピソードをダウンロードできませんでした。 %1$s</string>
+    <string name="error_download_ssl_failure">ポッドキャスト投稿者のサーバーとの間に、安全な接続を確立できませんでした。 端末が最新であることを確認してください。</string>
+    <string name="error_download_connection_error">ポッドキャスト投稿者のサーバーに接続できませんでした。 インターネット接続を確認してください。</string>
+    <string name="error_download_unknown_host">ポッドキャスト投稿者のサーバーにアクセスできません。 インターネット接続を確認してください。</string>
+    <string name="error_download_no_storage">エピソードをダウンロードできませんでした。 端末に十分なストレージ容量があることを確認してください。</string>
+    <string name="error_download_invalid_url">無効なエピソード URL です。 ポッドキャスト投稿者に連絡してください。</string>
+    <string name="error_download_no_episode_file">エピソードのダウンロードファイルを作成できません。 端末に十分なストレージ容量があることを確認してください。</string>
+    <string name="error_download_missing_episode">この端末のエピソードデータが見つかりません。 サポートにご連絡ください。</string>
+    <string name="downloading">%s をダウンロードしています</string>
     <string name="playlist_only_podcast_episodes_allowed">プレイリストに含められるのはポッドキャストのエピソードのみです。</string>
     <string name="playlist_limit_reached">プレイリストに含められるエピソードは最大%d件です。</string>
     <string name="playlist_limit_almost_full">プレイリストの残り容量がわずかです。 追加するエピソードの数を減らしてみてください。</string>
@@ -649,6 +689,7 @@ Language: ja_JP
     <string name="widget_preview_episode_in_up_next_title">次のエピソード</string>
     <string name="widget_preview_episode_title">エピソードのタイトル</string>
     <string name="hour_and_minutes">1時間%d分</string>
+    <string name="hours_and_minutes">%1$d時間%2$d分</string>
     <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>

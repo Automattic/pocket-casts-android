@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +29,6 @@ class NowPlayingViewModel @Inject constructor(
     private val theme: Theme,
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
-    private val connectivityStateManager: ConnectivityStateManager,
 ) : ViewModel() {
     private var playAttempt: Job? = null
 
@@ -46,7 +44,6 @@ class NowPlayingViewModel @Inject constructor(
             val seekForwardIncrement: SeekButtonIncrement,
             val trackPositionUiModel: TrackPositionUiModel.Actual,
             val error: Boolean = false,
-            val showConnectivityBanner: Boolean = false,
         ) : State()
         object Loading : State()
         object Empty : State()
@@ -57,8 +54,7 @@ class NowPlayingViewModel @Inject constructor(
             playbackManager.playbackStateRelay.asFlow(),
             settings.skipBackInSecs.flow,
             settings.skipForwardInSecs.flow,
-            connectivityStateManager.isConnected,
-        ) { playbackState, skipBackwardSecs, skipForwardSecs, isConnected ->
+        ) { playbackState, skipBackwardSecs, skipForwardSecs ->
 
             if (playbackState.isEmpty) {
                 State.Empty
@@ -78,8 +74,6 @@ class NowPlayingViewModel @Inject constructor(
                 )
 
                 val currentEpisode = playbackManager.getCurrentEpisode()
-                val isEpisodeDownloaded = currentEpisode?.isDownloaded == true
-                val showConnectivityBanner = !isConnected && !isEpisodeDownloaded
 
                 State.Loaded(
                     title = playbackState.title,
@@ -95,7 +89,6 @@ class NowPlayingViewModel @Inject constructor(
                     seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),
                     trackPositionUiModel = trackPositionUiModel,
                     error = playbackState.isError,
-                    showConnectivityBanner = showConnectivityBanner,
                 )
             }
         }.stateIn(
@@ -105,12 +98,7 @@ class NowPlayingViewModel @Inject constructor(
         )
 
     fun onPlayButtonClick(showStreamingConfirmation: () -> Unit) {
-        val currentEpisode = playbackManager.getCurrentEpisode()
-        val isEpisodeDownloaded = currentEpisode?.isDownloaded == true
-        val isConnected = connectivityStateManager.isConnected.value
-        val needsStreamingButDisconnected = !isEpisodeDownloaded && !isConnected
-
-        if (needsStreamingButDisconnected || playbackManager.shouldWarnAboutPlayback()) {
+        if (playbackManager.shouldWarnAboutPlayback()) {
             showStreamingConfirmation()
         } else {
             playAttempt?.cancel()

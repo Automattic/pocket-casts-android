@@ -161,21 +161,6 @@ class WearMainActivityViewModelTest {
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
     }
 
-    @Test
-    fun `onConnectivityNotificationDismissed sets showConnectivityNotification to false`() = runTest {
-        // Given
-        setupPhoneConnectionMock()
-        viewModel = createViewModel()
-        testScheduler.advanceTimeBy(2100)
-        testScheduler.runCurrent()
-
-        // When
-        viewModel.onConnectivityNotificationDismissed()
-
-        // Then
-        assertEquals(false, viewModel.state.value.showConnectivityNotification)
-    }
-
     private fun createViewModel() = WearMainActivityViewModel(
         playbackManager = playbackManager,
         podcastManager = podcastManager,

@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-06 13:54:03+0000
+Translation-Revision-Date: 2026-02-26 13:56:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Kostenlos für %1$s, danach %2$s pro Monat für %3$d Monate. Gesamtverpflichtung: %4$s über 1 Jahr.</string>
+    <string name="winback_claimed_offer_message_6">Vielen Dank, dass du dich für Pocket Casts entschieden hast. Dein vergünstigter 12-monatiger Ratenplan beginnt nach Ablauf deines aktuellen Abrechnungszeitraums.</string>
+    <string name="winback_claimed_offer_message_5">50 % Rabatt auf dein nächstes Jahr mit monatlichen Zahlungen!</string>
+    <string name="winback_offer_free_offer_installment_description">Sichere dir Pocket Casts Plus für ein Jahr zum halben Preis mit 12 monatlichen Zahlungen in Höhe von %1$s. Dein vergünstigter Ratenplan beginnt nach Ablauf deines aktuellen Tarifs.</string>
+    <string name="winback_offer_free_offer_installment_title">50 %% Rabatt auf das nächste Jahr – zahle nur %1$s im Monat und spare %2$s</string>
+    <string name="plus_yearly_installments">Jahrestarif – monatliche Zahlung</string>
+    <string name="error_download_too_many_attempts">Der Download wurde nach mehreren Versuchen abgebrochen. Bitte überprüfe deine Internetverbindung und deinen Speicherplatz und versuche es erneut.</string>
+    <string name="error_download_io_failure">Die Folge konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbindung und deinen Speicherplatz.</string>
+    <string name="error_download_socket_timeout">Zeitüberschreitung bei der Verbindung zum Server des Podcast-Autors. Bitte prüfe deine Internetverbindung.</string>
+    <string name="error_download_suspicious_content_size">Die Folge konnte nicht heruntergeladen werden. Die heruntergeladene Datei ist zu klein. Bitte wende dich an den Autor des Podcasts.</string>
+    <string name="error_download_invalid_content_type">Die Folge konnte nicht heruntergeladen werden. Inhaltstyp %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
+    <string name="error_download_http_failure">Die Folge konnte nicht heruntergeladen werden. HTTP-Statuscode %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
+    <string name="wear_connectivity_streaming_warning">Das Streaming kann beeinträchtigt sein</string>
+    <string name="wear_connectivity_restored">Verbunden</string>
+    <string name="wear_connectivity_lost">Verbindung unterbrochen</string>
+    <string name="episode_row_waiting_for_storage">Auf Speicherplatz warten</string>
+    <string name="podcasts_download_storage">Download wartet auf Speicherplatz</string>
+    <string name="watch_sync_failed">Synchronisierung mit Watch fehlgeschlagen</string>
+    <string name="watch_synced_successfully">Watch erfolgreich synchronisiert</string>
+    <string name="watch_sync_waiting_for_phone">Auf Synchronisierung des Mobiltelefons warten …</string>
+    <string name="watch_sync_retry">Erneut versuchen</string>
+    <string name="watch_sync_error_unknown_help">Versuche es erneut oder melde dich manuell an</string>
+    <string name="watch_sync_error_login_failed_help">Versuche, dich manuell anzumelden</string>
+    <string name="watch_sync_error_no_connection_help">Bluetooth-Verbindung zu deinem Mobiltelefon überprüfen</string>
+    <string name="watch_sync_error_timeout_help">Stelle sicher, dass sich dein Mobiltelefon in der Nähe befindet und über Bluetooth verbunden ist</string>
+    <string name="watch_sync_error_unknown">Es ist ein Fehler aufgetreten</string>
+    <string name="watch_sync_error_login_failed">Anmeldung fehlgeschlagen</string>
+    <string name="watch_sync_error_no_connection">Mobiltelefon nicht verbunden</string>
+    <string name="watch_sync_error_timeout">Verbindung zum Mobiltelefon fehlgeschlagen</string>
+    <string name="watch_sync_success">Über das Mobiltelefon angemeldet!</string>
+    <string name="watch_sync_syncing">Mobiltelefon wird synchronisiert… </string>
+    <string name="error_download_generic_failure">Die Folge konnte nicht heruntergeladen werden. %1$s</string>
+    <string name="error_download_ssl_failure">Es konnte keine sichere Verbindung zum Server des Podcast-Autors hergestellt werden. Bitte überprüfe, ob dein Gerät auf dem neuesten Stand ist.</string>
+    <string name="error_download_connection_error">Verbindung zum Server des Podcast-Autors fehlgeschlagen. Bitte prüfe deine Internetverbindung.</string>
+    <string name="error_download_unknown_host">Verbindung zum Server des Podcast-Autors nicht möglich. Bitte prüfe deine Internetverbindung.</string>
+    <string name="error_download_no_storage">Die Folge konnte nicht heruntergeladen werden. Bitte überprüfe, ob du genügend Speicherplatz auf deinem Gerät hast.</string>
+    <string name="error_download_invalid_url">Die URL der Folge ist ungültig. Bitte wende dich an den Autor des Podcasts.</string>
+    <string name="error_download_no_episode_file">Für die Folge kann keine Download-Datei erstellt werden. Bitte überprüfe, ob du genügend Speicherplatz auf deinem Gerät hast.</string>
+    <string name="error_download_missing_episode">Die Daten der Folge konnten auf diesem Gerät nicht gefunden werden. Bitte kontaktiere den Support.</string>
+    <string name="downloading">Wird heruntergeladen: %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Playlists dürfen nur Podcast-Folgen enthalten.</string>
     <string name="playlist_limit_reached">Playlists dürfen nur bis zu %d Folgen enthalten.</string>
     <string name="playlist_limit_almost_full">Playlist ist fast voll. Versuche, weniger Folgen hinzuzufügen.</string>
@@ -649,6 +689,7 @@ Language: de
     <string name="widget_preview_episode_in_up_next_title">Folge in „Als Nächstes“</string>
     <string name="widget_preview_episode_title">Titel der Folge</string>
     <string name="hour_and_minutes">1 Stunde und %d Minuten</string>
+    <string name="hours_and_minutes">%1$d Stunden und %2$d Minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deines Kapitels beendet.</string>
     <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
     <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>

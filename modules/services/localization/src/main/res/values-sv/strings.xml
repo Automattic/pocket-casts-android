@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-04 15:54:04+0000
+Translation-Revision-Date: 2026-02-26 09:56:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis %1$s, därefter %2$s/månad i %3$d månader. Totalt åtagande: över %4$s 1 år.</string>
+    <string name="winback_claimed_offer_message_6">Tack för att du väljer Pocket Casts. Din rabatterade år börjar efter din nuvarande faktureringsperiod.</string>
+    <string name="winback_claimed_offer_message_5">50 % rabatt på ditt nästa år med månadsbetalningar!</string>
+    <string name="winback_offer_free_offer_installment_description">Lås in ett år med Pocket Casts Plus till halva priset med 12 månadsbetalningar på %1$s. Ditt rabatterade år börjar efter att ditt nuvarande paket löper ut.</string>
+    <string name="plus_yearly_installments">Årligt paket – betala månadsvis</string>
+    <string name="error_download_too_many_attempts">Nedladdningen avbröts efter flera försök. Kontrollera din internetanslutning och försök igen.</string>
+    <string name="error_download_io_failure">Misslyckades att ladda ner avsnittet. Kontrollera din internet-anslutning och försök igen.</string>
+    <string name="error_download_socket_timeout">Tidsgränsen för anslutning till podcastförfattarens server uppnåddes. Kontrollera din internetanslutning.</string>
+    <string name="error_download_suspicious_content_size">Misslyckades att ladda ner avsnittet. Den nedladdade filen är för liten. Kontakta podcastens skapare.</string>
+    <string name="error_download_invalid_content_type">Misslyckades att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastens skapare.</string>
+    <string name="error_download_http_failure">Misslyckades att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastens skapare.</string>
+    <string name="wear_connectivity_restored">Ansluten</string>
+    <string name="wear_connectivity_lost">Anslutning förlorad</string>
+    <string name="wear_connectivity_streaming_warning">Streaming kan påverkas</string>
+    <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
+    <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
+    <string name="watch_sync_retry">Försök igen</string>
+    <string name="watch_sync_error_unknown_help">Försök igen eller logga in manuellt</string>
+    <string name="watch_sync_error_login_failed_help">Försök logga in manuellt</string>
+    <string name="watch_sync_error_unknown">Något gick fel</string>
+    <string name="watch_sync_error_login_failed">Inloggning misslyckades</string>
+    <string name="watch_sync_error_no_connection">Telefon inte ansluten</string>
+    <string name="watch_sync_error_timeout">Kunde inte ansluta till telefon</string>
+    <string name="watch_sync_success">Inloggad från telefon!</string>
+    <string name="watch_sync_syncing">Synkroniserar med telefon …</string>
+    <string name="error_download_generic_failure">Misslyckades att ladda ner avsnittet. %1$s</string>
+    <string name="watch_sync_error_timeout_help">Se till att din telefon är i närheten och ansluten via Bluetooth</string>
+    <string name="watch_sync_error_no_connection_help">Kontrollera Bluetooth-anslutning till din telefon</string>
+    <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
+    <string name="watch_synced_successfully">Klockan har synkroniserats</string>
+    <string name="watch_sync_waiting_for_phone">Väntar på att telefonen ska synkroniseras…</string>
+    <string name="error_download_ssl_failure">Misslyckades att upprätta en säker anslutning till podcastförfattarens server. Kontrollera att din enhet är uppdaterad.</string>
+    <string name="error_download_connection_error">Det gick inte att ansluta till servern. Kontrollera din internetanslutning.</string>
+    <string name="error_download_unknown_host">Det gick inte att nå podcastförfattarens server. Kontrollera din internetanslutning.</string>
+    <string name="error_download_no_storage">Misslyckades att ladda ner avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
+    <string name="error_download_invalid_url">Webbplatsens URL är ogiltig. Kontakta podcastens skapare.</string>
+    <string name="error_download_no_episode_file">Kan inte skapa en nedladdningsfil för avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
+    <string name="error_download_missing_episode">Kan inte hitta avsnittsdata på denna enhet. Kontakta supporten.</string>
+    <string name="downloading">Laddar ner %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Spellistor kan endast innehålla podcastavsnitt.</string>
     <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
@@ -649,6 +688,7 @@ Language: sv_SE
     <string name="widget_preview_episode_in_up_next_title">Avsnitt i Nästa</string>
     <string name="widget_preview_episode_title">Avsnittstitel</string>
     <string name="hour_and_minutes">1 timme och %d minuter</string>
+    <string name="hours_and_minutes">%1$d timmar och %2$d minuter</string>
     <string name="player_sleep_time_fired_end_of_chapter">Vilolägestimern stoppades i slutet av kapitlet.</string>
     <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>

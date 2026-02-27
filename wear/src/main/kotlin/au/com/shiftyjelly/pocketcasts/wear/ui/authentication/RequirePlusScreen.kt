@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -35,7 +34,6 @@ object RequirePlusScreen {
 fun RequirePlusScreen(
     onContinueToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    syncState: WatchSyncState? = null,
     viewModel: RequirePlusViewModel = hiltViewModel(),
 ) {
     val columnState = rememberResponsiveColumnState()
@@ -51,36 +49,6 @@ fun RequirePlusScreen(
         ScalingLazyColumn(
             columnState = columnState,
         ) {
-            if (syncState != null) {
-                item {
-                    val (statusText, statusColor) = when (syncState) {
-                        WatchSyncState.Syncing -> stringResource(LR.string.watch_sync_syncing) to MaterialTheme.colors.onPrimary.copy(alpha = 0.7f)
-
-                        WatchSyncState.Success -> "" to MaterialTheme.colors.onPrimary
-
-                        is WatchSyncState.Failed -> {
-                            val text = when (syncState.error) {
-                                WatchSyncError.NoPhoneConnection -> stringResource(LR.string.watch_sync_error_no_connection)
-                                WatchSyncError.Timeout -> stringResource(LR.string.watch_sync_error_timeout)
-                                is WatchSyncError.LoginFailed -> stringResource(LR.string.watch_sync_error_login_failed)
-                                is WatchSyncError.Unknown -> stringResource(LR.string.watch_sync_error_unknown)
-                            }
-                            text to MaterialTheme.colors.error.copy(alpha = 0.8f)
-                        }
-                    }
-
-                    if (statusText.isNotEmpty()) {
-                        Text(
-                            text = statusText,
-                            textAlign = TextAlign.Center,
-                            color = statusColor,
-                            style = MaterialTheme.typography.caption1,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                    }
-                }
-            }
-
             item {
                 SubscriptionBadge(
                     iconRes = IR.drawable.ic_plus,
