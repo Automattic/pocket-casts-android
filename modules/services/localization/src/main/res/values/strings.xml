@@ -1861,7 +1861,7 @@
     <string name="error_download_missing_episode">Failed to find the episode data on the device. Please contact support.</string>
     <string name="error_download_no_episode_file">Failed to create a download file for the episode. Please check that you have enough space on your device.</string>
     <string name="error_download_invalid_url">The episode has an invalid URL. Please contact the podcast’s author.</string>
-    <string name="error_download_http_failure">Failed to download the episode. Error code: %1$d.</string>
+    <string name="error_download_http_failure">Failed to download the episode. Error code: %1$s.</string>
     <string name="error_download_no_storage">Failed to download the episode. Please check that you have enough space on your device.</string>
     <string name="error_download_chartable" translatable="false">@string/error_chartable</string>
     <string name="error_download_unknown_host">Failed to find the podcast author’s server. Please check your internet connection.</string>
