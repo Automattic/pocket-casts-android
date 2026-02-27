@@ -2,11 +2,12 @@ package au.com.shiftyjelly.pocketcasts.reimagine.podcast
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ShareActionMediaType
+import com.automattic.eventhorizon.ShareScreenShownEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -20,7 +21,7 @@ class SharePodcastViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
     @Assisted private val sourceView: SourceView,
     private val podcastManager: PodcastManager,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     val uiState = combine(
         podcastManager.podcastByUuidFlow(podcastUuid),
@@ -29,12 +30,11 @@ class SharePodcastViewModel @AssistedInject constructor(
     ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState())
 
     fun onScreenShown() {
-        tracker.track(
-            AnalyticsEvent.SHARE_SCREEN_SHOWN,
-            mapOf(
-                "type" to "podcast",
-                "podcast_uuid" to podcastUuid,
-                "source" to sourceView.analyticsValue,
+        eventHorizon.track(
+            ShareScreenShownEvent(
+                podcastUuid = podcastUuid,
+                source = sourceView.eventHorizonValue,
+                type = ShareActionMediaType.Podcast,
             ),
         )
     }

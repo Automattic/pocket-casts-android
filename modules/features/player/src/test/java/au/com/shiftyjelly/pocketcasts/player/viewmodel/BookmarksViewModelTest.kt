@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -21,8 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -73,9 +73,6 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var playbackManager: PlaybackManager
 
-    @Mock
-    private lateinit var theme: Theme
-
     private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
@@ -119,14 +116,13 @@ class BookmarksViewModelTest {
         whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
         bookmarkSearchHandler = BookmarkSearchHandler(bookmarkManager)
         bookmarksViewModel = BookmarksViewModel(
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             bookmarkManager = bookmarkManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,
             multiSelectHelper = multiSelectHelper,
             settings = settings,
             playbackManager = playbackManager,
-            theme = theme,
             ioDispatcher = UnconfinedTestDispatcher(),
             bookmarkSearchHandler = bookmarkSearchHandler,
         )

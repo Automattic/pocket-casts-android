@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -63,6 +64,8 @@ import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.target.Target
 import coil3.toBitmap
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
@@ -145,6 +148,8 @@ class AddFileActivity :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val viewModel: AddFileViewModel by viewModels()
 
@@ -235,7 +240,11 @@ class AddFileActivity :
 
         val upgradeLayout = binding.upgradeLayout.root
         upgradeLayout.findViewById<View>(R.id.btnClose).setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to OnboardingUpgradeSource.FILES.analyticsValue))
+            eventHorizon.track(
+                UpgradeBannerDismissedEvent(
+                    source = SourceView.FILES.eventHorizonValue,
+                ),
+            )
             settings.setUpgradeClosedAddFile(true)
             upgradeLayout.isVisible = false
         }

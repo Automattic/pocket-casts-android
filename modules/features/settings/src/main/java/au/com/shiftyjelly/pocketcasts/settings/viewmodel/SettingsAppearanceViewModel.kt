@@ -8,15 +8,17 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -29,6 +31,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val theme: Theme,
     private val appIcon: AppIcon,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
 ) : ViewModel() {
 
@@ -163,8 +166,12 @@ class SettingsAppearanceViewModel @Inject constructor(
         )
     }
 
-    fun onUpgradeBannerDismissed(source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
+    fun onUpgradeBannerDismissed(sourceView: SourceView) {
+        eventHorizon.track(
+            UpgradeBannerDismissedEvent(
+                source = sourceView.eventHorizonValue,
+            ),
+        )
     }
 }
 

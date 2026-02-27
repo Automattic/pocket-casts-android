@@ -117,4 +117,96 @@ class SubscriptionModelTest {
         assertEquals(BillingCycle.Monthly, membership.subscription?.billingCycle)
         assertFalse(membership.subscription?.isInstallment == true)
     }
+
+    @Test
+    fun `toMembership uses top-level isInstallment as fallback when subscription-level is false`() {
+        val expiryDate = Date()
+        val subscriptionResponse = SubscriptionResponse(
+            type = 1,
+            tier = "plus",
+            platform = 2,
+            frequency = 2,
+            expiryDate = expiryDate,
+            autoRenewing = true,
+            giftDays = 0,
+            isInstallment = false,
+        )
+        val statusResponse = SubscriptionStatusResponse(
+            autoRenewing = true,
+            expiryDate = expiryDate,
+            giftDays = 0,
+            paid = 1,
+            platform = 2,
+            frequency = 2,
+            subscriptions = listOf(subscriptionResponse),
+            type = 1,
+            tier = "plus",
+            index = 0,
+            createdAt = Instant.now(),
+            features = null,
+            isInstallment = true,
+        )
+
+        val membership = statusResponse.toMembership()
+
+        assertTrue(membership.subscription?.isInstallment == true)
+    }
+
+    @Test
+    fun `toMembership uses top-level isInstallment in fallback subscription when subscriptions list is empty`() {
+        val expiryDate = Date()
+        val statusResponse = SubscriptionStatusResponse(
+            autoRenewing = true,
+            expiryDate = expiryDate,
+            giftDays = 0,
+            paid = 1,
+            platform = 2,
+            frequency = 2,
+            subscriptions = emptyList(),
+            type = 1,
+            tier = "plus",
+            index = 0,
+            createdAt = Instant.now(),
+            features = null,
+            isInstallment = true,
+        )
+
+        val membership = statusResponse.toMembership()
+
+        assertTrue(membership.subscription?.isInstallment == true)
+    }
+
+    @Test
+    fun `toMembership isInstallment is false when both top-level and subscription-level are false`() {
+        val expiryDate = Date()
+        val subscriptionResponse = SubscriptionResponse(
+            type = 1,
+            tier = "plus",
+            platform = 2,
+            frequency = 2,
+            expiryDate = expiryDate,
+            autoRenewing = true,
+            giftDays = 0,
+            isInstallment = false,
+        )
+        val statusResponse = SubscriptionStatusResponse(
+            autoRenewing = true,
+            expiryDate = expiryDate,
+            giftDays = 0,
+            paid = 1,
+            platform = 2,
+            frequency = 2,
+            subscriptions = listOf(subscriptionResponse),
+            type = 1,
+            tier = "plus",
+            index = 0,
+            createdAt = Instant.now(),
+            features = null,
+            isInstallment = false,
+        )
+
+        val membership = statusResponse.toMembership()
+
+        assertFalse(membership.subscription?.isInstallment == true)
+    }
 }

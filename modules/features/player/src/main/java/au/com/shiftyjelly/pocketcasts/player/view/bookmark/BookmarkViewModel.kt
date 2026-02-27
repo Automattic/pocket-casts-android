@@ -4,12 +4,15 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
+import com.automattic.eventhorizon.BookmarkEditFormShownEvent
+import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -26,7 +29,7 @@ class BookmarkViewModel
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val bookmarkManager: BookmarkManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -99,7 +102,7 @@ class BookmarkViewModel
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = state.title.text,
-                        creationSource = BookmarkManager.CreationSource.PLAYER,
+                        creationSource = BookmarkSource.Player,
                     )
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, state.title.text)
@@ -115,14 +118,14 @@ class BookmarkViewModel
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_SHOWN)
+        eventHorizon.track(BookmarkEditFormShownEvent)
     }
 
     fun onClose() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_DISMISSED)
+        eventHorizon.track(BookmarkEditFormDismissedEvent)
     }
 
     fun onSubmitBookmark() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_SUBMITTED)
+        eventHorizon.track(BookmarkEditFormSubmittedEvent)
     }
 }

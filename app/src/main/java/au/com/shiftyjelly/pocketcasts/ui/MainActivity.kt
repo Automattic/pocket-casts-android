@@ -763,7 +763,7 @@ class MainActivity :
                 val playerContainerFragment =
                     supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
                 playerContainerFragment?.onBackPressed()
-                updatePlayerContainerCallback(this)
+                playerContainerCallbackUpdater?.invoke()
             }
         }
         onBackPressedDispatcher.addCallback(this, playerContainerBackstackCallback)
@@ -771,8 +771,12 @@ class MainActivity :
         fun syncPlayerContainerCallback() {
             val playerContainerFragment =
                 supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
-            playerContainerBackstackCallback.isEnabled =
-                playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
+            val hasBackstack = playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
+            val isPlayerOpen = binding.playerBottomSheet.isPlayerOpen
+            playerContainerBackstackCallback.isEnabled = isPlayerOpen && hasBackstack
+            if (isPlayerOpen) {
+                playerBottomSheetCallback.isEnabled = !hasBackstack
+            }
         }
         playerContainerCallbackUpdater = ::syncPlayerContainerCallback
 
@@ -791,7 +795,7 @@ class MainActivity :
         }
         onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
 
-        val frameBottomSheetCallback = object : OnBackPressedCallback(false) {
+        val frameBottomSheetCallback = object : OnBackPressedCallback(bottomSheetTag != null) {
             override fun handleOnBackPressed() {
                 frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
@@ -826,12 +830,14 @@ class MainActivity :
         this.upNextMultiSelectBackCallback = upNextMultiSelectCallback
         this.playerContainerBackCallback = playerContainerBackstackCallback
         this.modalFragmentBackCallback = modalFragmentCallback
+        this.frameBottomSheetBackCallback = frameBottomSheetCallback
     }
 
     private var playerBottomSheetBackCallback: OnBackPressedCallback? = null
     private var upNextMultiSelectBackCallback: OnBackPressedCallback? = null
     private var playerContainerBackCallback: OnBackPressedCallback? = null
     private var modalFragmentBackCallback: OnBackPressedCallback? = null
+    private var frameBottomSheetBackCallback: OnBackPressedCallback? = null
     private var playerContainerCallbackUpdater: (() -> Unit)? = null
 
     private var upNextMultiSelectObserver: Observer<Boolean>? = null
@@ -854,11 +860,8 @@ class MainActivity :
         upNextMultiSelectBackCallback?.isEnabled = false
     }
 
-    private fun updatePlayerContainerCallback(callback: OnBackPressedCallback? = null) {
-        val cb = callback ?: playerContainerBackCallback ?: return
-        val playerContainerFragment =
-            supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
-        cb.isEnabled = playerContainerFragment != null && playerContainerFragment.getBackstackCount() > 0
+    override fun onPlayerBackstackChanged() {
+        playerContainerCallbackUpdater?.invoke()
     }
 
     override fun updateStatusBar() {
@@ -963,7 +966,6 @@ class MainActivity :
         )
     }
 
-    @Suppress("DEPRECATION")
     private fun setupPlayerViews(animateMiniPlayer: Boolean) {
         binding.playerBottomSheet.listener = this
         binding.playerBottomSheet.initializeBottomSheetBehavior()
@@ -1116,7 +1118,7 @@ class MainActivity :
             }
         }
 
-        frameBottomSheetBehavior.setBottomSheetCallback(object :
+        frameBottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
@@ -1247,7 +1249,7 @@ class MainActivity :
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
-        playerBottomSheetBackCallback?.isEnabled = true
+        playerContainerCallbackUpdater?.invoke()
 
         val playerContainerFragment = supportFragmentManager.fragments
             .find { it is PlayerContainerFragment } as? PlayerContainerFragment
@@ -1278,6 +1280,7 @@ class MainActivity :
         }
 
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        frameBottomSheetBackCallback?.isEnabled = true
         frameBottomSheetBehavior.swipeEnabled = true
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         if (fragment is UpNextFragment) {
@@ -1289,6 +1292,7 @@ class MainActivity :
 
     override fun closeBottomSheet() {
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        frameBottomSheetBackCallback?.isEnabled = false
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 

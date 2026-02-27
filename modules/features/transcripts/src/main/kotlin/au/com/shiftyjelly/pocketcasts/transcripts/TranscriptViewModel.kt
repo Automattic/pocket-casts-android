@@ -211,12 +211,12 @@ class TranscriptViewModel @AssistedInject constructor(
 
             val request = SharingRequest
                 .transcript(
-                    podcastUuid = episode?.podcastUuid,
+                    podcastUuid = episode?.podcastUuid.orEmpty(),
                     episodeUuid = transcript.episodeUuid,
                     episodeTitle = episode?.title.orEmpty(),
                     transcript = text,
+                    source = sourceView,
                 )
-                .setSourceView(sourceView)
                 .build()
 
             sharingClient.shareTranscript(request)
