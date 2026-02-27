@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.TimeTextWithConnectivity
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
@@ -118,8 +119,12 @@ private fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.ROUTE else RequirePlusScreen.ROUTE
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AppScaffold {
+    AppScaffold(
+        timeText = {
+            TimeTextWithConnectivity(isConnected = isConnected)
+        },
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             SwipeDismissableNavHost(
                 startDestination = startDestination,
                 navController = navController,
@@ -350,12 +355,6 @@ private fun WearApp(
                         }
                     },
                 )
-
-                composable(
-                    route = PCVolumeScreen.ROUTE,
-                ) {
-                    PCVolumeScreen()
-                }
 
                 composable(
                     route = EffectsScreen.ROUTE,
