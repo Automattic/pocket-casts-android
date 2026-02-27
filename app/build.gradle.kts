@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,6 +11,43 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+fun loadPropertiesFrom(fileName: String): Properties {
+    val properties = Properties()
+    val file = rootProject.file(fileName)
+    if (file.exists()) {
+        file.inputStream().use(properties::load)
+    }
+    return properties
+}
+
+val onboardingLocalProperties = loadPropertiesFrom("onboarding-test.local.properties")
+
+fun resolveOnboardingArgument(
+    gradlePropertyKey: String,
+    environmentVariableKey: String,
+    localFileKey: String,
+): String {
+    return (
+        project.findProperty(gradlePropertyKey) as? String
+            ?: System.getenv(environmentVariableKey)
+            ?: onboardingLocalProperties.getProperty(localFileKey)
+        )
+        .orEmpty()
+        .trim()
+}
+
+val onboardingEmail = resolveOnboardingArgument(
+    gradlePropertyKey = "onboardingTestEmail",
+    environmentVariableKey = "ONBOARDING_TEST_EMAIL",
+    localFileKey = "onboardingTestEmail",
+)
+
+val onboardingPassword = resolveOnboardingArgument(
+    gradlePropertyKey = "onboardingTestPassword",
+    environmentVariableKey = "ONBOARDING_TEST_PASSWORD",
+    localFileKey = "onboardingTestPassword",
+)
+
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
@@ -16,6 +55,12 @@ android {
         applicationId = project.property("applicationId").toString()
         targetSdk = project.property("targetSdkVersion") as Int
         multiDexEnabled = true
+        if (onboardingEmail.isNotEmpty()) {
+            testInstrumentationRunnerArguments["onboardingEmail"] = onboardingEmail
+        }
+        if (onboardingPassword.isNotEmpty()) {
+            testInstrumentationRunnerArguments["onboardingPassword"] = onboardingPassword
+        }
     }
 
     sourceSets {
@@ -150,6 +195,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.junit.ext)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.compose.activity)
     androidTestImplementation(libs.compose.ui.test.junit)
@@ -164,6 +210,7 @@ dependencies {
     androidTestImplementation(libs.navigation.runtime)
     androidTestImplementation(libs.navigation.testing)
     androidTestImplementation(libs.okHttp.mockwebserver)
+    implementation(libs.radiography)
     androidTestImplementation(libs.retrofit.moshi)
     androidTestImplementation(libs.room)
     androidTestImplementation(libs.room.testing)

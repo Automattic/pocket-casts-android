@@ -22,6 +22,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,45 +62,46 @@ fun RowOutlinedButton(
     tintIcon: Boolean = true,
     fullWidth: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
-            .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
-            .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier),
+    val buttonModifier = modifier
+        .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
+        .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
+        .semantics(mergeDescendants = true) {
+            role = Role.Button
+        }
+
+    OutlinedButton(
+        onClick = { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        border = border,
+        colors = colors,
+        modifier = buttonModifier,
     ) {
-        OutlinedButton(
-            onClick = { onClick() },
-            shape = RoundedCornerShape(12.dp),
-            border = border,
-            colors = colors,
-            modifier = if (fullWidth) Modifier.fillMaxWidth() else Modifier,
-        ) {
-            Box(if (fullWidth) Modifier.fillMaxWidth() else Modifier, contentAlignment = Alignment.CenterStart) {
+        Box(if (fullWidth) Modifier.fillMaxWidth() else Modifier, contentAlignment = Alignment.CenterStart) {
+            RowOutlinedImage(
+                image = leadingIcon,
+                colors = colors,
+                tintIcon = tintIcon,
+            )
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = if (fullWidth) Modifier.fillMaxWidth() else Modifier,
+            ) {
                 RowOutlinedImage(
-                    image = leadingIcon,
+                    image = textIcon,
                     colors = colors,
                     tintIcon = tintIcon,
                 )
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = if (fullWidth) Modifier.fillMaxWidth() else Modifier,
-                ) {
-                    RowOutlinedImage(
-                        image = textIcon,
-                        colors = colors,
-                        tintIcon = tintIcon,
-                    )
-                    TextH30(
-                        text = text,
-                        color = colors.contentColor(enabled = true).value,
-                        textAlign = TextAlign.Center,
-                        fontFamily = fontFamily,
-                        fontWeight = fontWeight,
-                        fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
-                        maxLines = maxLines,
-                        modifier = Modifier.padding(textPadding),
-                    )
-                }
+                TextH30(
+                    text = text,
+                    color = colors.contentColor(enabled = true).value,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily,
+                    fontWeight = fontWeight,
+                    fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
+                    maxLines = maxLines,
+                    modifier = Modifier.padding(textPadding),
+                )
             }
         }
     }

@@ -34,6 +34,45 @@ To build, install, and test the project from the command line:
     $ ./gradlew :app:testDebugUnitTest          # assemble, install and run unit tests
     $ ./gradlew :app:connectedDebugAndroidTest  # assemble, install and run Android tests
 
+### Running Onboarding E2E Tests With Credentials
+
+Onboarding instrumentation tests read login credentials from instrumentation arguments.
+
+Preferred local setup:
+
+1. Create a local file from the template:
+
+    cp onboarding-test.local.properties.example onboarding-test.local.properties
+
+2. Put your credentials in `onboarding-test.local.properties`:
+
+    onboardingTestEmail=your-test-email@example.com
+    onboardingTestPassword=your-test-password
+
+`onboarding-test.local.properties` is ignored by git.
+
+Then run the test:
+
+    $ ./gradlew :app:connectedDebugAndroidTest \
+      -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest
+
+Alternative (CI/one-off CLI): pass credentials via Gradle properties:
+
+    $ ./gradlew :app:connectedDebugAndroidTest \
+      -PonboardingTestEmail=your-test-email@example.com \
+      -PonboardingTestPassword=your-test-password \
+      -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest
+
+CI-friendly option (recommended): provide environment variables in CI secret storage:
+
+- `ONBOARDING_TEST_EMAIL`
+- `ONBOARDING_TEST_PASSWORD`
+
+Then run without passing secrets on the command line:
+
+    $ ./gradlew :app:connectedDebugAndroidTest \
+      -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest
+
 ## Directory structure
     .
     ├── app                    # Mobile app

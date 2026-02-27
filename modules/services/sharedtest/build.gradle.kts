@@ -14,7 +14,10 @@ dependencies {
     api(libs.automattic.crashlogging)
     api(libs.junit)
 
+    implementation(libs.espresso.core)
+    implementation(libs.androidx.test.runner)
     implementation(libs.coroutines.test)
+    implementation(libs.radiography)
     implementation(libs.rx2.android)
 
     implementation(projects.modules.services.utils)

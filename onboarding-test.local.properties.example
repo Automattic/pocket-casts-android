@@ -1,0 +1,5 @@
+# Copy this file to onboarding-test.local.properties and fill with local test credentials.
+# This file is safe to commit. The *.local.properties file is gitignored.
+
+onboardingTestEmail=your-test-email@example.com
+onboardingTestPassword=your-test-password

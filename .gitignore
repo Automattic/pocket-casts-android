@@ -8,6 +8,7 @@ artifacts/
 
 # Local configuration file (sdk path, etc)
 local.properties
+onboarding-test.local.properties
 
 # Android Studio
 .idea/
@@ -67,3 +68,8 @@ sentry.properties
 .kotlin
 
 developer.properties
+
+# Local API export artifacts
+api/
+api_endpoints.csv
+api_endpoints.json
