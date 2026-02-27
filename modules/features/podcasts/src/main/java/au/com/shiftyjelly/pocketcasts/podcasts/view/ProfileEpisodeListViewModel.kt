@@ -13,6 +13,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
+import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -38,6 +41,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val downloadQueue: DownloadQueue,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
     private val userManager: UserManager,
 ) : ViewModel(),
@@ -126,11 +130,19 @@ class ProfileEpisodeListViewModel @Inject constructor(
     )
 
     internal fun onCreateFreeAccountClick() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "listening_history"))
+        eventHorizon.track(
+            InformationalBannerViewCreateAccountTapEvent(
+                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+            ),
+        )
     }
 
     internal fun dismissFreeAccountBanner() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "listening_history"))
+        eventHorizon.track(
+            InformationalBannerViewDismissedEvent(
+                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+            ),
+        )
         settings.isFreeAccountHistoryBannerDismissed.set(true, updateModifiedAt = true)
     }
 

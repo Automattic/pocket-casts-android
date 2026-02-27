@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -206,6 +208,7 @@ class ProfileEpisodeListViewModelTest {
             episodeManager = episodeManager,
             downloadQueue = mock(),
             analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             settings = settings,
             userManager = userManager,
         )

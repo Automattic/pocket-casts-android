@@ -9,12 +9,15 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class CloudSettingsViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
     userManager: UserManager,
 ) : ViewModel() {
@@ -82,6 +85,10 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun onUpgradeBannerDismissed(source: SourceView) {
-        analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
+        eventHorizon.track(
+            UpgradeBannerDismissedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 }
