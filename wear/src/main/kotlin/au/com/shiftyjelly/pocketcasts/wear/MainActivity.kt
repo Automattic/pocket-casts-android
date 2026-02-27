@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                     syncState = state.syncState,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     onRetrySync = viewModel::retrySync,
+                    onSyncScreenVisible = viewModel::restartSyncIfNeeded,
                     signOut = viewModel::signOut,
                 )
             }
@@ -95,6 +96,7 @@ private fun WearApp(
     syncState: WatchSyncState,
     onShowLoginScreen: () -> Unit,
     onRetrySync: () -> Unit,
+    onSyncScreenVisible: () -> Unit,
     signOut: () -> Unit,
 ) {
     val navController = rememberSwipeDismissableNavController()
@@ -324,6 +326,7 @@ private fun WearApp(
                     },
                     syncState = currentSyncState,
                     onRetrySync = onRetrySync,
+                    onSyncScreenVisible = onSyncScreenVisible,
                 )
 
                 loggingInScreens(
@@ -448,6 +451,7 @@ private fun DefaultPreview() {
         syncState = WatchSyncState.Syncing,
         onShowLoginScreen = {},
         onRetrySync = {},
+        onSyncScreenVisible = {},
         signOut = {},
     )
 }
