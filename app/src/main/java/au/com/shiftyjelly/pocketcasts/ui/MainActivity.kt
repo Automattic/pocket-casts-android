@@ -468,6 +468,10 @@ class MainActivity :
             binding.bottomNavigation.updatePadding(bottom = insets.bottom)
             windowInsets
         }
+        // Request insets after view is laid out to ensure proper handling on foldables
+        binding.root.doOnLayout {
+            ViewCompat.requestApplyInsets(it)
+        }
         binding.bottomNavigation.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
             binding.mainFragment.updatePadding(bottom = view.height)
 
@@ -1706,6 +1710,10 @@ class MainActivity :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         theme.setupThemeForConfig(this, newConfig)
+        // Re-request insets to handle foldable device configuration changes
+        binding.root.post {
+            ViewCompat.requestApplyInsets(binding.root)
+        }
     }
 
     override fun openCloudFiles() {
