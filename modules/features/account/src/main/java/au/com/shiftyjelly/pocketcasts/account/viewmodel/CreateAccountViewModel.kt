@@ -15,8 +15,8 @@ import com.automattic.eventhorizon.NewsletterOptInChangedEvent
 import com.automattic.eventhorizon.NewsletterSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CreateAccountViewModel

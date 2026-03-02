@@ -49,8 +49,8 @@ import com.automattic.eventhorizon.AccountDetailsShowTosEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlusPromotionBannerButtonTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR

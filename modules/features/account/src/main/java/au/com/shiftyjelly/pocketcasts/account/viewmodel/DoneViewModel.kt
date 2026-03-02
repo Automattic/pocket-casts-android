@@ -9,9 +9,9 @@ import com.automattic.eventhorizon.AccountUpdatedDismissedEvent
 import com.automattic.eventhorizon.AccountUpdatedShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.account.R as LR
 
 @HiltViewModel

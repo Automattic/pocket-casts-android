@@ -7,11 +7,11 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.ForgotPasswordDismissedEvent
 import com.automattic.eventhorizon.ForgotPasswordShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingForgotPasswordViewModel @Inject constructor(
