@@ -161,46 +161,6 @@ class AnalyticsTracker(
         )
     }
 
-    fun trackSetupAccountButtonTapped(flow: String, button: AnalyticsParameter.SetupAccountButton) {
-        trackWithFlow(
-            event = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.BUTTON to button.value,
-            ),
-        )
-    }
-
-    fun trackSetupAccountDismissed(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, flow = flow)
-    }
-
-    fun trackCreateAccountDismissed(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.CREATE_ACCOUNT_DISMISSED, flow = flow)
-    }
-
-    fun trackCreateAccountShown(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.CREATE_ACCOUNT_SHOWN, flow = flow)
-    }
-
-    fun trackSetupAccountShown(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.SETUP_ACCOUNT_SHOWN, flow = flow)
-    }
-
-    fun trackSignInButtonTapped(flow: String) {
-        trackWithFlow(
-            event = AnalyticsEvent.SIGNIN_BUTTON_TAPPED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.BUTTON to "sign_in",
-            ),
-        )
-    }
-
-    fun trackSignInForgotPasswordTapped(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.SIGNIN_FORGOT_PASSWORD_TAPPED, flow = flow)
-    }
-
     fun trackEndOfYearModalShown(year: Int) {
         track(
             event = AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,

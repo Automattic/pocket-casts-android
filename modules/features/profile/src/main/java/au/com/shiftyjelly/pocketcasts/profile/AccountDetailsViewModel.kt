@@ -3,16 +3,12 @@ package au.com.shiftyjelly.pocketcasts.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -22,8 +18,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.NewsletterOptInChangedEvent
+import com.automattic.eventhorizon.NewsletterSource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,6 +33,7 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class AccountDetailsViewModel @Inject constructor(
@@ -42,11 +41,10 @@ class AccountDetailsViewModel @Inject constructor(
     private val paymentClient: PaymentClient,
     private val syncManager: SyncManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val crashLogging: CrashLogging,
 ) : ViewModel() {
     internal val deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Empty)
-    internal val selectedFeatureCard = MutableStateFlow<SubscriptionPlan.Key?>(null)
     internal val signInState = userManager.getSignInState()
     internal val marketingOptIn = settings.marketingOptIn.flow
 
@@ -190,20 +188,13 @@ class AccountDetailsViewModel @Inject constructor(
     }
 
     fun updateNewsletter(isChecked: Boolean) {
-        analyticsTracker.track(
-            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
+        eventHorizon.track(
+            NewsletterOptInChangedEvent(
+                source = NewsletterSource.Profile,
+                enabled = isChecked,
+            ),
         )
         settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
-    }
-
-    internal fun changeSelectedFeatureCard(key: SubscriptionPlan.Key) {
-        selectedFeatureCard.value = key
-    }
-
-    companion object {
-        private const val SOURCE_KEY = "source"
-        private const val ENABLED_KEY = "enabled"
     }
 }
 

@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.payment
 
 import androidx.annotation.Keep
 import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
+import com.automattic.eventhorizon.SubscriptionFrequencyType
+import com.automattic.eventhorizon.SubscriptionOfferType
+import com.automattic.eventhorizon.SubscriptionTierType
 import java.math.BigDecimal
 
 data class Product(
@@ -398,44 +401,52 @@ sealed interface SubscriptionPlan {
 
 @Keep
 enum class SubscriptionTier(
-    val analyticsValue: String,
+    val eventHorizonValue: SubscriptionTierType,
 ) {
     Plus(
-        analyticsValue = "plus",
+        eventHorizonValue = SubscriptionTierType.Plus,
     ),
     Patron(
-        analyticsValue = "patron",
+        eventHorizonValue = SubscriptionTierType.Patron,
     ),
+    ;
+
+    val analyticsValue get() = eventHorizonValue.toString()
 }
 
 @Keep
 enum class BillingCycle(
-    val analyticsValue: String,
+    val eventHorizonValue: SubscriptionFrequencyType,
 ) {
     Monthly(
-        analyticsValue = "monthly",
+        eventHorizonValue = SubscriptionFrequencyType.Monthly,
     ),
     Yearly(
-        analyticsValue = "yearly",
+        eventHorizonValue = SubscriptionFrequencyType.Yearly,
     ),
+    ;
+
+    val analyticsValue get() = eventHorizonValue.toString()
 }
 
 enum class SubscriptionOffer(
-    val analyticsValue: String,
+    val eventHorizonValue: SubscriptionOfferType,
 ) {
     IntroOffer(
-        analyticsValue = "intro_offer",
+        eventHorizonValue = SubscriptionOfferType.IntroOffer,
     ),
     Trial(
-        analyticsValue = "free_trial",
+        eventHorizonValue = SubscriptionOfferType.FreeTrial,
     ),
     Referral(
-        analyticsValue = "referral",
+        eventHorizonValue = SubscriptionOfferType.Referral,
     ),
     Winback(
-        analyticsValue = "winback",
+        eventHorizonValue = SubscriptionOfferType.Winback,
     ),
     ;
+
+    val analyticsValue get() = eventHorizonValue.toString()
 
     fun offerId(
         tier: SubscriptionTier,

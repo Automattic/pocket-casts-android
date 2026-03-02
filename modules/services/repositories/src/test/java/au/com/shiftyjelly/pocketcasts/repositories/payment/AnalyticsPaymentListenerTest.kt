@@ -1,27 +1,33 @@
 package au.com.shiftyjelly.pocketcasts.repositories.payment
 
 import android.app.Activity
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PurchaseCancelledEvent
+import com.automattic.eventhorizon.PurchaseFailedEvent
+import com.automattic.eventhorizon.PurchaseSuccessfulEvent
+import com.automattic.eventhorizon.SubscriptionFrequencyType
+import com.automattic.eventhorizon.SubscriptionOfferType
+import com.automattic.eventhorizon.SubscriptionTierType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 class AnalyticsPaymentListenerTest {
-    private val tracker = FakeTracker()
+    private val eventSink = TestEventSink()
 
     private val dataSource = FakePaymentDataSource()
     private val paymentClient = PaymentClient.test(
         dataSource,
-        AnalyticsPaymentListener(AnalyticsTracker.test(tracker)),
+        AnalyticsPaymentListener(EventHorizon(eventSink)),
     )
 
     @Test
@@ -30,17 +36,15 @@ class AnalyticsPaymentListenerTest {
 
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
 
-        val event = tracker.events.first()
-        event.assertType(AnalyticsEvent.PURCHASE_SUCCESSFUL)
-        event.assertProperties(
-            mapOf(
-                "tier" to "plus",
-                "frequency" to "yearly",
-                "offer_type" to "none",
-                "is_installment" to false,
-                "product" to "yearly",
-                "source" to "purchase_source",
+        val event = eventSink.pollEvent()
+        assertEquals(
+            PurchaseSuccessfulEvent(
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = false,
+                source = "purchase_source",
             ),
+            event,
         )
     }
 
@@ -51,18 +55,16 @@ class AnalyticsPaymentListenerTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
 
-        val event = tracker.events.first()
-        event.assertType(AnalyticsEvent.PURCHASE_CANCELLED)
-        event.assertProperties(
-            mapOf(
-                "tier" to "patron",
-                "frequency" to "monthly",
-                "offer_type" to "referral",
-                "is_installment" to false,
-                "product" to "com.pocketcasts.monthly.patron",
-                "source" to "purchase_source",
-                "error" to "user_cancelled",
+        val event = eventSink.pollEvent()
+        assertEquals(
+            PurchaseCancelledEvent(
+                tier = SubscriptionTierType.Patron,
+                frequency = SubscriptionFrequencyType.Monthly,
+                offerType = SubscriptionOfferType.Referral,
+                isInstallment = false,
+                source = "purchase_source",
             ),
+            event,
         )
     }
 
@@ -73,99 +75,40 @@ class AnalyticsPaymentListenerTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.Unknown(404)
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
 
-        val event = tracker.events.first()
-        event.assertType(AnalyticsEvent.PURCHASE_FAILED)
-        event.assertProperties(
-            mapOf(
-                "tier" to "plus",
-                "frequency" to "yearly",
-                "offer_type" to "none",
-                "is_installment" to false,
-                "product" to "yearly",
-                "source" to "purchase_source",
-                "error" to "unknown",
-                "error_code" to 404,
-            ),
-        )
-    }
-
-    @Test
-    fun `legacy product property`() = runTest {
-        val keys = listOf(
-            SubscriptionPlan.PlusMonthlyPreview.key,
-            SubscriptionPlan.PlusYearlyPreview.key,
-            SubscriptionPlan.PatronMonthlyPreview.key,
-            SubscriptionPlan.PatronYearlyPreview.key,
-        )
-
-        for (key in keys) {
-            paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
-        }
-
-        val productProperties = tracker.events.map { it.properties["product"] }
+        val event = eventSink.pollEvent()
         assertEquals(
-            listOf(
-                "monthly",
-                "yearly",
-                "com.pocketcasts.monthly.patron",
-                "com.pocketcasts.yearly.patron",
+            PurchaseFailedEvent(
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = false,
+                source = "purchase_source",
+                error = "unknown",
+                errorCode = 404,
             ),
-            productProperties,
+            event,
         )
     }
 
     @Test
     fun `installment plan purchase`() = runTest {
         val key = SubscriptionPlan.Key(
-            tier = au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier.Plus,
-            billingCycle = au.com.shiftyjelly.pocketcasts.payment.BillingCycle.Yearly,
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
             offer = null,
             isInstallment = true,
         )
 
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
 
-        val event = tracker.events.first()
-        event.assertType(AnalyticsEvent.PURCHASE_SUCCESSFUL)
-        event.assertProperties(
-            mapOf(
-                "tier" to "plus",
-                "frequency" to "yearly",
-                "offer_type" to "none",
-                "is_installment" to true,
-                "product" to "yearly",
-                "source" to "purchase_source",
+        val event = eventSink.pollEvent()
+        assertEquals(
+            PurchaseSuccessfulEvent(
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = true,
+                source = "purchase_source",
             ),
+            event,
         )
     }
-}
-
-private class FakeTracker : Tracker {
-    private val _events = mutableListOf<TrackedEvent>()
-
-    val events get() = _events.toList()
-
-    override val id get() = "fake_tracker"
-
-    override fun shouldTrack(event: AnalyticsEvent) = true
-
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        val trackedEvent = TrackedEvent(event, properties)
-        _events += trackedEvent
-        return trackedEvent
-    }
-
-    override fun refreshMetadata() = Unit
-
-    override fun flush() = Unit
-
-    override fun clearAllData() = Unit
-}
-
-private fun TrackedEvent.assertType(type: AnalyticsEvent) {
-    assertEquals(type, this.key)
-}
-
-private fun TrackedEvent.assertProperties(properties: Map<String, Any>) {
-    assertEquals(properties, this.properties)
 }
