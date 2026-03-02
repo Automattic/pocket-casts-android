@@ -94,7 +94,7 @@ class AccountDetailsFragment : BaseFragment() {
             isAutomotive = remember { Util.isAutomotive(requireContext()) },
             miniPlayerPadding = accountViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
             headerState = accountViewModel.headerState.collectAsState().value,
-            upgradeBannerState = accountViewModel.upgradeBannerState.collectAsState().value,
+            recommendedPlan = accountViewModel.recommendedPlanState.collectAsState().value,
             sectionsState = accountViewModel.sectionsState.collectAsState().value,
         )
 
@@ -108,17 +108,6 @@ class AccountDetailsFragment : BaseFragment() {
                 if (state.headerState.subscription.isChampion) {
                     PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
                 }
-            },
-            onClickSubscribe = { planKey ->
-                // this is an old onboarding flow callback, we still want to track this event here
-                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
-                val source = OnboardingUpgradeSource.PROFILE
-                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source, planKey.tier, planKey.billingCycle)
-                OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
-            },
-            onChangeFeatureCard = { planKey ->
-                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to planKey.tier.analyticsValue))
-                accountViewModel.changeSelectedFeatureCard(planKey)
             },
             onChangeAvatar = { email ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
@@ -160,10 +149,10 @@ class AccountDetailsFragment : BaseFragment() {
                     AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED,
                     mapOf(
                         "source" to OnboardingUpgradeSource.PROFILE.analyticsValue,
-                        "flow" to OnboardingFlow.NewOnboardingAccountUpgrade.analyticsValue,
+                        "flow" to OnboardingFlow.AccountUpgrade.analyticsValue,
                     ),
                 )
-                val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
+                val onboardingFlow = OnboardingFlow.AccountUpgrade
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
         )

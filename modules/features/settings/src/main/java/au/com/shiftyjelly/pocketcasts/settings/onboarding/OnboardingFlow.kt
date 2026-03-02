@@ -79,7 +79,7 @@ sealed interface OnboardingFlow : Parcelable {
     }
 
     @Parcelize
-    data object NewOnboardingAccountUpgrade : OnboardingFlow {
+    data object AccountUpgrade : OnboardingFlow {
         override val analyticsValue get() = "plus_account_upgrade"
         override val source get() = OnboardingUpgradeSource.PROFILE
     }

@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.search.SearchUiState
@@ -29,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class OnboardingRecommendationsSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    private val playbackManager: PlaybackManager,
     private val searchHandler: SearchHandler,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {

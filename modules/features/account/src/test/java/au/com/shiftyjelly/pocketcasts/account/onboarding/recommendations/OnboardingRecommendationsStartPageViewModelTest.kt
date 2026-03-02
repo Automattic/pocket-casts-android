@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +66,6 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
     @Test
     fun `should prioritize interest categories when FF is on and interests are set`() = runTest {
-        FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS, true)
         whenever(categoriesManager.interestCategories).thenReturn(MutableStateFlow(mockCategories.takeLast(3).toSet()).asStateFlow())
 
         val viewModel = createViewModel()
@@ -81,25 +78,12 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
     @Test
     fun `should return normal recommendations when FF is on but interests are empty`() = runTest {
-        FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS, true)
         whenever(categoriesManager.interestCategories).thenReturn(MutableStateFlow(emptySet()))
 
         val viewModel = createViewModel()
         viewModel.state.test {
             val item = awaitItem()
             assert(item.sections.take(3).map { it.title }.all { it in mockCategories.take(3).map { it.title } })
-        }
-    }
-
-    @Test
-    fun `should return normal recommendations when FF is off`() = runTest {
-        FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS, false)
-        whenever(categoriesManager.interestCategories).thenReturn(MutableStateFlow(emptySet()))
-
-        val viewModel = createViewModel()
-        viewModel.state.test {
-            val item = awaitItem()
-            assert(item.sections.take(2).map { it.title }.all { it in mockCategories.take(3).map { it.title } })
         }
     }
 

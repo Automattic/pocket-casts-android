@@ -37,76 +37,44 @@ enum class PlusUpgradeFeatureItem(
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_folders
-        } else {
-            LR.string.onboarding_plus_feature_folders_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_folders
     },
     UpNextShuffle(
         image = IR.drawable.ic_plus_feature_shuffle,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_shuffle
-        } else {
-            LR.string.onboarding_plus_feature_up_next_shuffle_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_shuffle
     },
     Bookmarks(
         image = IR.drawable.ic_plus_feature_bookmark,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_bookmarks
-        } else {
-            LR.string.onboarding_plus_feature_bookmarks_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_bookmarks
     },
     SkipChapters(
         image = IR.drawable.ic_plus_feature_chapters,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_chapters
-        } else {
-            LR.string.onboarding_plus_feature_chapters_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_chapters
     },
     CloudStorage(
         image = IR.drawable.ic_plus_feature_cloud_storage,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_files
-        } else {
-            LR.string.onboarding_plus_feature_cloud_storage_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_files
     },
     WatchPlayback(
         image = IR.drawable.ic_plus_feature_wearable,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_wear
-        } else {
-            LR.string.onboarding_plus_feature_watch_playback
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_wear
     },
     ThemesIcons(
         image = IR.drawable.ic_plus_feature_themes,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_themes
-        } else {
-            LR.string.onboarding_plus_feature_extra_themes_icons_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_themes
     },
     SlumberStudiosPromo(
         image = IR.drawable.ic_plus_feature_slumber_studios,
     ) {
         override val isMonthlyFeature get() = false
         override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_features_slumber
-        } else {
-            LR.string.onboarding_plus_feature_slumber_studios_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_features_slumber
     },
     LibroFm(
         image = IR.drawable.ic_plus_feature_libro,
@@ -128,56 +96,32 @@ enum class PatronUpgradeFeatureItem(
     EverythingInPlus(
         image = IR.drawable.ic_check,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_patron_plus_features
-        } else {
-            LR.string.onboarding_patron_feature_everything_in_plus_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_patron_plus_features
     },
     EarlyAccess(
         image = IR.drawable.ic_new_features,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_patron_early_access
-        } else {
-            LR.string.onboarding_patron_feature_early_access_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_patron_early_access
     },
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_patron_cloud_storage
-        } else {
-            LR.string.onboarding_patron_feature_cloud_storage_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_patron_cloud_storage
     },
     ProfileBadge(
         image = IR.drawable.ic_profile_badge,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_patron_badge
-        } else {
-            LR.string.onboarding_patron_feature_profile_badge_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_patron_badge
     },
     SpecialIcons(
         image = IR.drawable.ic_icons,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_app_icons
-        } else {
-            LR.string.onboarding_patron_feature_special_icons_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_app_icons
     },
     UndyingGratitude(
         image = IR.drawable.ic_heart,
     ) {
-        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            LR.string.onboarding_upgrade_gratitude
-        } else {
-            LR.string.onboarding_patron_feature_gratitude_title
-        }
+        override fun title() = LR.string.onboarding_upgrade_gratitude
     },
     ;
 

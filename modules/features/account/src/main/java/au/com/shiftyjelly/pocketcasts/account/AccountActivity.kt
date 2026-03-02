@@ -181,9 +181,6 @@ class AccountActivity : AppCompatActivity() {
             intent.putExtra(SKIP_FIRST, true)
             return intent
         }
-        fun isNewUpgradeInstance(intent: Intent): Boolean {
-            return intent.getBooleanExtra(SKIP_FIRST, false)
-        }
 
         const val AUTO_SELECT_PLUS = "account_activity.autoSelectPlus"
         fun newAutoSelectPlusInstance(context: Context?): Intent {
@@ -194,7 +191,6 @@ class AccountActivity : AppCompatActivity() {
         fun isNewAutoSelectPlusInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
-        private const val PRODUCT_KEY = "product"
         private const val SOURCE_KEY = "source"
         private const val ACCOUNT_PROP_VALUE = "account"
         private const val IS_PROMO_CODE = "account_activity.is_promo_code"

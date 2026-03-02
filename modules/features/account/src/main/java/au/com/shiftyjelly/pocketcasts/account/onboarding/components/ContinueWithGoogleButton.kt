@@ -35,7 +35,6 @@ fun ContinueWithGoogleButton(
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
     viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
-    event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     label: String = stringResource(LR.string.onboarding_continue_with_google),
 ) {
     val activity = checkNotNull(LocalActivity.current)

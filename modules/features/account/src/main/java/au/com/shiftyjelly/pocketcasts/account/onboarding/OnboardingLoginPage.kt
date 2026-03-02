@@ -38,7 +38,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
@@ -60,7 +59,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun NewOnboardingLoginPage(
+internal fun OnboardingLoginPage(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     onBackPress: () -> Unit,
@@ -190,7 +189,6 @@ internal fun NewOnboardingLoginPage(
                     includePadding = false,
                     flow = flow,
                     onComplete = onContinueWithGoogleComplete,
-                    event = AnalyticsEvent.SIGNIN_BUTTON_TAPPED,
                 )
             }
         }

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -21,8 +20,6 @@ import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -84,44 +81,38 @@ class AccountDetailsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = AccountHeaderState.empty())
 
-    internal val upgradeBannerState = combine(
-        signInState.asFlow(),
-        selectedFeatureCard,
-    ) { signInState, featureCard ->
+    internal val recommendedPlanState = signInState.asFlow().map { signInState ->
         val signedInState = signInState as? SignInState.SignedIn
         val isExpiring = signedInState?.subscription?.isExpiring == true
 
-        val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
-        return@combine if (subscriptionPlans == null) {
-            null
-        } else {
-            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                if (signedInState?.subscription != null) {
-                    null
-                } else {
-                    val recommendedPlan = subscriptionPlans.findOfferPlan(tier = SubscriptionTier.Plus, BillingCycle.Yearly, offer = SubscriptionOffer.Trial).getOrNull()?.let {
-                        OnboardingSubscriptionPlan.create(plan = it).getOrNull()
-                    } ?: OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly))
-                    ProfileUpgradeBannerState.NewOnboardingUpgradeState(
-                        recommendedSubscription = recommendedPlan,
-                    )
-                }
-            } else {
-                ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
-                    subscriptionPlans = subscriptionPlans,
-                    selectedFeatureCard = featureCard,
-                    currentSubscription = signedInState?.subscription?.let { subscription ->
-                        SubscriptionPlan.Key(
-                            tier = subscription.tier,
-                            billingCycle = subscription.billingCycle ?: return@let null,
-                            offer = null,
-                        )
-                    },
-                    isRenewingSubscription = isExpiring,
-                )
-            }
+        if (!signInState.isSignedInAsFree && !isExpiring) {
+            return@map null
         }
-            .takeIf { signInState.isSignedInAsFree || isExpiring }
+
+        val subscription = signedInState?.subscription
+        if (subscription != null) {
+            return@map null
+        }
+
+        val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
+        if (subscriptionPlans == null) {
+            return@map null
+        }
+
+        subscriptionPlans
+            .findOfferPlan(
+                tier = SubscriptionTier.Plus,
+                billingCycle = BillingCycle.Yearly,
+                offer = SubscriptionOffer.Trial,
+            )
+            .getOrNull()
+            ?.let { OnboardingSubscriptionPlan.create(plan = it).getOrNull() }
+            ?: OnboardingSubscriptionPlan.create(
+                subscriptionPlans.getBasePlan(
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = BillingCycle.Yearly,
+                ),
+            )
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     internal val sectionsState = combine(
@@ -129,13 +120,12 @@ class AccountDetailsViewModel @Inject constructor(
         marketingOptIn,
     ) { signInState, marketingOptIn ->
         val signedInState = signInState as? SignInState.SignedIn
-        val isGiftExpiring = signedInState?.subscription?.isExpiring == true
         AccountSectionsState(
             isSubscribedToNewsLetter = marketingOptIn,
             email = signedInState?.email,
             winbackInitParams = computeWinbackParams(signInState),
             canChangeCredentials = !syncManager.isGoogleLogin(),
-            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && (isGiftExpiring || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)),
+            canUpgradeAccount = signedInState?.isSignedInAsPlus == true,
             canCancelSubscription = signedInState?.isSignedInAsPaid == true,
         )
     }.stateIn(

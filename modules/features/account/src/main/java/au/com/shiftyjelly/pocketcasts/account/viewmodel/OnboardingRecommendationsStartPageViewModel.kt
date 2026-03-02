@@ -19,8 +19,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -53,7 +51,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     ) {
         private val anySubscribed: Boolean = sections.any { it.anySubscribed }
 
-        val buttonRes = if (anySubscribed || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+        val buttonRes = if (anySubscribed) {
             LR.string.navigation_continue
         } else {
             LR.string.not_now
@@ -88,11 +86,9 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         val sectionId: SectionId,
         val numToShow: Int,
         private val podcasts: List<Podcast>,
-        private val onShowMoreFun: (Section) -> Unit,
     ) {
         val anySubscribed = podcasts.any { it.isSubscribed }
         val visiblePodcasts = podcasts.take(numToShow)
-        fun onShowMore() = onShowMoreFun(this)
     }
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.EMPTY)
@@ -129,7 +125,6 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                                 sectionId = section.sectionId,
                                 podcasts = podcasts,
                                 numToShow = NUM_TO_SHOW_DEFAULT,
-                                onShowMoreFun = ::onShowMore,
                             )
                     }
                 }.collect { sections ->
@@ -160,7 +155,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
             val interestNames = categoriesManager.interestCategories.value.map { it.name }.toSet()
-            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS) && interestNames.isNotEmpty()) {
+            if (interestNames.isNotEmpty()) {
                 updateFlowWithCategories(sectionsFlow, updatedList, replacements, interestNames)
                 updateFlowWith("featured", sectionsFlow, updatedList, interestNames.size)
                 updateFlowWith("trending", sectionsFlow, updatedList, interestNames.size + 1)
@@ -327,27 +322,19 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // Make network calls one at a time so the UI can load the initial sections as quickly
         // as possible, and to maintain the order of the sections
         categories
-            .filter { !FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS) || (it as? DiscoverCategory)?.popularity != null }
+            .filter { (it as? DiscoverCategory)?.popularity != null }
             .sortedWith(
                 compareByDescending<NetworkLoadableList> { it.title in interestCategoryNames }.thenBy {
-                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
-                        val index = interestCategoryNames.indexOf(it.title)
-                        if (index != -1) {
-                            index.toString()
-                        } else {
-                            (it as? DiscoverCategory)?.popularity?.toString() ?: it.title
-                        }
+                    val index = interestCategoryNames.indexOf(it.title)
+                    if (index != -1) {
+                        index.toString()
                     } else {
-                        it.title
+                        (it as? DiscoverCategory)?.popularity?.toString() ?: it.title
                     }
                 },
             )
             .forEach { category ->
-                val source = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
-                    (category as? DiscoverCategory)?.onboardingRecommendationsSource ?: category.source
-                } else {
-                    category.source
-                }
+                val source = (category as? DiscoverCategory)?.onboardingRecommendationsSource ?: category.source
                 runCatching {
                     repository.getListFeed(source)
                 }
