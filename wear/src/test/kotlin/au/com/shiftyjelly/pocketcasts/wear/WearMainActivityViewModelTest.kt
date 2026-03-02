@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
 import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
+import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncError
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
@@ -158,6 +159,50 @@ class WearMainActivityViewModelTest {
         viewModel.retrySync()
 
         // Then - verify state is reset to Syncing after retry
+        assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
+    }
+
+    @Test
+    fun `restartSyncIfNeeded restarts sync when in Failed state`() = runTest {
+        // Given
+        whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(false)
+        viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
+        testScheduler.runCurrent()
+
+        // Verify we're in Failed state due to no phone connection
+        assertEquals(
+            WatchSyncState.Failed(WatchSyncError.NoPhoneConnection),
+            viewModel.state.value.syncState,
+        )
+
+        // Now mock phone as connected for restart
+        whenever(phoneConnectionMonitor.isPhoneConnected()).thenReturn(true)
+
+        // When
+        viewModel.restartSyncIfNeeded()
+        testScheduler.advanceTimeBy(100)
+        testScheduler.runCurrent()
+
+        // Then - sync should have restarted and be in Syncing state
+        assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
+    }
+
+    @Test
+    fun `restartSyncIfNeeded does not restart when already syncing`() = runTest {
+        // Given
+        setupPhoneConnectionMock()
+        viewModel = createViewModel()
+        testScheduler.advanceTimeBy(2100)
+        testScheduler.runCurrent()
+
+        // Verify we're in Syncing state
+        assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
+
+        // When - calling restartSyncIfNeeded should be a no-op
+        viewModel.restartSyncIfNeeded()
+
+        // Then - still syncing, no error
         assertEquals(WatchSyncState.Syncing, viewModel.state.value.syncState)
     }
 
