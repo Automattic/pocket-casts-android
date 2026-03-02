@@ -2738,4 +2738,5 @@
     <string name="app_rating_no_label">Not really</string>
     <!-- A label under the happy face emoji. A user will be redirected to leave a review after tapping it. -->
     <string name="app_rating_yes_label">Yes!</string>
+    <string name="offline_icon_content_description">Offline icon</string>
 </resources>

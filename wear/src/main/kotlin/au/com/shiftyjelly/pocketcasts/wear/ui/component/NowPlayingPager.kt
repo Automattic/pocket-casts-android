@@ -39,21 +39,23 @@ fun NowPlayingPager(
     navController: NavController,
     swipeToDismissState: SwipeToDismissBoxState,
     modifier: Modifier = Modifier,
-    showTimeText: Boolean = true,
     allowSwipeToDismiss: Boolean = true,
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
 ) {
     val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
-    val columState = rememberResponsiveColumnState()
-    val pagerScope = remember(pagerState, columState) { NowPlayingPagerScope(pagerState, columState) }
+    val page0ColumnState = rememberResponsiveColumnState()
+    val page1ColumnState = rememberResponsiveColumnState()
+    val page2ColumnState = rememberResponsiveColumnState()
+    val pagerScope = remember(pagerState, page0ColumnState) { NowPlayingPagerScope(pagerState, page0ColumnState) }
+
+    val activeScrollState = when (pagerState.currentPage) {
+        0 -> page0ColumnState
+        2 -> page2ColumnState
+        else -> page1ColumnState
+    }
 
     ScreenScaffold(
-        scrollState = columState,
-        timeText = if (showTimeText) {
-            null
-        } else {
-            {}
-        },
+        scrollState = activeScrollState,
         modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
@@ -109,7 +111,7 @@ fun NowPlayingPager(
                         navigateToEpisode = { episodeUuid ->
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                         },
-                        columnState = rememberResponsiveColumnState(),
+                        columnState = page2ColumnState,
                     )
                 }
             }

@@ -3,6 +3,8 @@
 *   New Features
     *   Support predictive back navigation
         ([#5014](https://github.com/Automattic/pocket-casts-android/pull/5014))
+    *   Show offline indicator next to time on wear
+        ([#5036](https://github.com/Automattic/pocket-casts-android/pull/5036))
     *   Add pull to refresh on wear main screen
         ([#5037](https://github.com/Automattic/pocket-casts-android/pull/5037))
 *   Updates

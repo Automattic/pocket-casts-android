@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.TimeTextWithConnectivity
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
@@ -74,6 +75,7 @@ class MainActivity : ComponentActivity() {
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
                     syncState = state.syncState,
+                    isConnected = state.isConnected,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     onRetrySync = viewModel::retrySync,
                     onSyncScreenVisible = viewModel::restartSyncIfNeeded,
@@ -94,6 +96,7 @@ private fun WearApp(
     signInState: SignInState,
     showLoggingInScreen: Boolean,
     syncState: WatchSyncState,
+    isConnected: Boolean,
     onShowLoginScreen: () -> Unit,
     onRetrySync: () -> Unit,
     onSyncScreenVisible: () -> Unit,
@@ -120,8 +123,12 @@ private fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.ROUTE else RequirePlusScreen.ROUTE
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AppScaffold {
+    AppScaffold(
+        timeText = {
+            TimeTextWithConnectivity(isConnected = isConnected)
+        },
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             SwipeDismissableNavHost(
                 startDestination = startDestination,
                 navController = navController,
@@ -355,12 +362,6 @@ private fun WearApp(
                 )
 
                 composable(
-                    route = PCVolumeScreen.ROUTE,
-                ) {
-                    PCVolumeScreen()
-                }
-
-                composable(
                     route = EffectsScreen.ROUTE,
                 ) {
                     EffectsScreen()
@@ -449,6 +450,7 @@ private fun DefaultPreview() {
         signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
         syncState = WatchSyncState.Syncing,
+        isConnected = true,
         onShowLoginScreen = {},
         onRetrySync = {},
         onSyncScreenVisible = {},
