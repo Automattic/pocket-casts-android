@@ -401,10 +401,14 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
-        return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
+        return !Util.isCarUiMode(application) &&
+            settings.warnOnMeteredNetwork.value &&
+            !Network.isUnmeteredConnection(application) &&
+            lastWarnedPlayedEpisodeUuid != episodeUUID
     }
 
-    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean = settings.warnOnMeteredNetwork.value &&
+    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean = !Util.isCarUiMode(application) &&
+        settings.warnOnMeteredNetwork.value &&
         lastWarnedPlayedEpisodeUuid != episodeUUID &&
         (player is LocalPlayer) &&
         // don't warn if chromecasting
