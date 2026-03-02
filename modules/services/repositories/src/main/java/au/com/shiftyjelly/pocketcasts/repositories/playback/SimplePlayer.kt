@@ -11,6 +11,7 @@ import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters.AudioOffloadPreferences
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
@@ -217,6 +218,7 @@ class SimplePlayer(
         this.player = player
 
         setPlayerEffects()
+        updateAudioOffloadPreference()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 episodeUuid?.let { onEpisodeChanged(it) }
@@ -306,6 +308,34 @@ class SimplePlayer(
         }
     }
 
+    @OptIn(UnstableApi::class)
+    private fun updateAudioOffloadPreference() {
+        val player = player ?: return
+        val effectsAreDefault = playbackEffects?.usingDefaultValues ?: true
+
+        val offloadMode = if (effectsAreDefault) {
+            AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_ENABLED
+        } else {
+            AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_DISABLED
+        }
+
+        val audioOffloadPreferences = AudioOffloadPreferences.Builder()
+            .setAudioOffloadMode(offloadMode)
+            .setIsGaplessSupportRequired(false)
+            .build()
+
+        player.trackSelectionParameters = player.trackSelectionParameters
+            .buildUpon()
+            .setAudioOffloadPreferences(audioOffloadPreferences)
+            .build()
+
+        LogBuffer.i(
+            LogBuffer.TAG_PLAYBACK,
+            "Audio offload preference set to ${if (effectsAreDefault) "ENABLED" else "DISABLED"}" +
+                " (effects default: $effectsAreDefault)",
+        )
+    }
+
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
         val player = player ?: return false
 
@@ -341,5 +371,6 @@ class SimplePlayer(
             it.setBoostVolume(playbackEffects.isVolumeBoosted)
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
+        updateAudioOffloadPreference()
     }
 }
