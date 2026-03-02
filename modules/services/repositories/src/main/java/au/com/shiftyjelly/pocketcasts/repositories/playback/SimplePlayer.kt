@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.SurfaceView
 import android.widget.Toast
 import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
@@ -210,6 +211,7 @@ class SimplePlayer(
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .setWakeMode(if (isStreaming) C.WAKE_MODE_NETWORK else C.WAKE_MODE_LOCAL)
+            .setAudioAttributes(buildAudioAttributes(), false)
             .build()
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
         player.addAnalyticsListener(renderer)
@@ -306,6 +308,13 @@ class SimplePlayer(
         } else {
             ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = playbackEffects.isVolumeBoosted)
         }
+    }
+
+    private fun buildAudioAttributes(): AudioAttributes {
+        return AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
     }
 
     @OptIn(UnstableApi::class)
