@@ -208,6 +208,7 @@ class SimplePlayer(
             .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
+            .setWakeMode(if (isStreaming) C.WAKE_MODE_NETWORK else C.WAKE_MODE_LOCAL)
             .build()
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
         player.addAnalyticsListener(renderer)
