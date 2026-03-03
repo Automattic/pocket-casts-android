@@ -41,8 +41,8 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -240,7 +240,7 @@ private fun EpisodeChipPreview() {
         publishedDate = Date(System.currentTimeMillis() - 86400000L), // 1 day ago
         title = "Sample Episode",
         podcastUuid = "podcast-uuid",
-        episodeStatus = EpisodeStatusEnum.DOWNLOADED,
+        downloadStatus = EpisodeDownloadStatus.Downloaded,
         playedUpTo = 300.0,
         duration = 1800.0,
     )

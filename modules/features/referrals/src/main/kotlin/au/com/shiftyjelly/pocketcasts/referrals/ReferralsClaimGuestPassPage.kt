@@ -82,7 +82,6 @@ fun ReferralsClaimGuestPassPage(
     viewModel: ReferralsClaimGuestPassViewModel = hiltViewModel(),
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val context = LocalContext.current
         val state by viewModel.state.collectAsStateWithLifecycle()
         val activity = LocalContext.current.getActivity()
         val snackbarHostState = remember { SnackbarHostState() }
@@ -131,12 +130,16 @@ fun ReferralsClaimGuestPassPage(
             }
         }
 
+        val noNetworkString = stringResource(LR.string.error_no_network)
+        val purchaseFailedString = stringResource(LR.string.referrals_create_subscription_failed)
+        val redeemFailedString = stringResource(LR.string.referrals_redeem_code_failed)
         LaunchedEffect(Unit) {
             viewModel.snackBarEvent.collect { snackBarEvent ->
+                @Suppress("LocalContextGetResourceValueCall")
                 val text = when (snackBarEvent) {
-                    SnackbarEvent.NoNetwork -> context.getString(LR.string.error_no_network)
-                    SnackbarEvent.PurchaseFailed -> context.getString(LR.string.referrals_create_subscription_failed)
-                    SnackbarEvent.RedeemFailed -> context.getString(LR.string.referrals_redeem_code_failed)
+                    SnackbarEvent.NoNetwork -> noNetworkString
+                    SnackbarEvent.PurchaseFailed -> purchaseFailedString
+                    SnackbarEvent.RedeemFailed -> redeemFailedString
                 }
                 snackbarHostState.showSnackbar(text)
             }
@@ -304,8 +307,20 @@ private fun ClaimGuestPassContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val descriptionText = if (referralPlan.isInstallment) {
+            stringResource(
+                LR.string.referrals_claim_guest_pass_description_installment,
+                referralPlan.offerDurationText,
+                referralPlan.monthlyPaymentAmount,
+                referralPlan.commitmentPaymentsCount,
+                referralPlan.formattedTotalCommitmentAmount,
+            )
+        } else {
+            stringResource(LR.string.referrals_claim_guest_pass_description, price)
+        }
+
         TextP60(
-            text = stringResource(LR.string.referrals_claim_guest_pass_description, price),
+            text = descriptionText,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(guestPassCardWidth),
         )

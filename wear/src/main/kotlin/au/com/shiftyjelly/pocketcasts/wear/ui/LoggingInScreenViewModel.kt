@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.wear.WearLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -53,7 +54,7 @@ class LoggingInScreenViewModel @Inject constructor(
         val stateValue = state.value
 
         if (stateValue is State.None) {
-            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Immediately closing LoggingInScreen because refresh is not in progress")
+            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "${WearLogging.PREFIX} Immediately closing LoggingInScreen because refresh is not in progress")
             return true
         }
 

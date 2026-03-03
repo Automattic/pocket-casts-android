@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -65,9 +66,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    val uiState = combine(podcastFlow, playlistsFlow, settings.autoAddUpNextLimit.flow) { podcast, playlists, upNextLimit ->
+    val uiState = combine(
+        podcastFlow,
+        playlistsFlow,
+        settings.autoAddUpNextLimit.flow,
+        settings.autoDownloadNewEpisodes.flow.map { it == Podcast.AUTO_DOWNLOAD_NEW_EPISODES },
+    ) { podcast, playlists, upNextLimit, isGlobalAutoDownloadEnabled ->
         if (podcast != null && playlists != null) {
-            UiState(podcast, playlists, upNextLimit)
+            UiState(podcast, playlists, upNextLimit, isGlobalAutoDownloadEnabled)
         } else {
             null
         }
@@ -334,7 +340,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun unfollow() {
         viewModelScope.launch(NonCancellable) {
-            podcastManager.unsubscribe(podcastUuid, playbackManager)
+            podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SETTINGS)
             tracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
                 mapOf(
@@ -354,7 +360,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     suspend fun getDownloadedEpisodeCount() = withContext(Dispatchers.IO) {
-        podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeStatusEnum.DOWNLOADED)
+        podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeDownloadStatus.Downloaded)
     }
 
     private fun changePodcastRule(
@@ -402,6 +408,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast: Podcast,
         val playlists: List<SmartPlaylistPreview>,
         val globalUpNextLimit: Int,
+        val isGlobalAutoDownloadEnabled: Boolean,
     ) {
         val selectedPlaylists = playlists
             .filter { playlist ->

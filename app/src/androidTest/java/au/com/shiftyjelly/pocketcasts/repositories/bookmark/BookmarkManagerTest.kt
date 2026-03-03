@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
@@ -37,7 +39,7 @@ class BookmarkManagerTest {
             .build()
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
         )
         episodeDao = appDatabase.episodeDao()
     }
@@ -55,7 +57,7 @@ class BookmarkManagerTest {
         episodeDao.insertBlocking(episode)
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "Bookmark Title", BookmarkManager.CreationSource.PLAYER)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "Bookmark Title", BookmarkSource.Player)
             val foundBookmark = bookmarkManager.findBookmark(bookmarkUuid = bookmark.uuid)
             assertNotNull(foundBookmark)
             assertEquals(episodeUuid, foundBookmark?.episodeUuid)
@@ -79,8 +81,8 @@ class BookmarkManagerTest {
         episodeDao.insertBlocking(episode)
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
-            bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkSource.Player)
+            bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkSource.Player)
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST).take(1).first()
             assertEquals(1, bookmarks.size)
             assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
@@ -97,8 +99,8 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 610, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
-            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 122, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 610, title = "", creationSource = BookmarkSource.Player)
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 122, title = "", creationSource = BookmarkSource.Player)
 
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
                 episode = episode,
@@ -120,8 +122,8 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "", creationSource = BookmarkManager.CreationSource.PLAYER, addedAt = Instant.ofEpochMilli(0))
-            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkManager.CreationSource.PLAYER, addedAt = Instant.ofEpochMilli(1))
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "", creationSource = BookmarkSource.Player, addedAt = Instant.ofEpochMilli(0))
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkSource.Player, addedAt = Instant.ofEpochMilli(1))
 
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
                 episode = episode,
@@ -143,8 +145,8 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "", creationSource = BookmarkManager.CreationSource.PLAYER, addedAt = Instant.ofEpochMilli(0))
-            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkManager.CreationSource.PLAYER, addedAt = Instant.ofEpochMilli(1))
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "", creationSource = BookmarkSource.Player, addedAt = Instant.ofEpochMilli(0))
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkSource.Player, addedAt = Instant.ofEpochMilli(1))
 
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
                 episode = episode,
@@ -166,7 +168,7 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "", creationSource = BookmarkSource.Player)
             bookmarkManager.deleteToSync(bookmark.uuid)
             val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid, deleted = true)
             assertNotNull(savedBookmark)
@@ -184,7 +186,7 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "", creationSource = BookmarkSource.Player)
             bookmarkManager.deleteSynced(bookmark.uuid)
             val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid)
             assertNull(savedBookmark)

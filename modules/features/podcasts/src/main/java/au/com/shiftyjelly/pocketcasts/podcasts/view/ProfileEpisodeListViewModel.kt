@@ -6,12 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
+import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -34,9 +38,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ProfileEpisodeListViewModel @Inject constructor(
-    val episodeManager: EpisodeManager,
-    val playbackManager: PlaybackManager,
+    private val episodeManager: EpisodeManager,
+    private val downloadQueue: DownloadQueue,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
     private val userManager: UserManager,
 ) : ViewModel(),
@@ -125,11 +130,19 @@ class ProfileEpisodeListViewModel @Inject constructor(
     )
 
     internal fun onCreateFreeAccountClick() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "listening_history"))
+        eventHorizon.track(
+            InformationalBannerViewCreateAccountTapEvent(
+                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+            ),
+        )
     }
 
     internal fun dismissFreeAccountBanner() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "listening_history"))
+        eventHorizon.track(
+            InformationalBannerViewDismissedEvent(
+                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+            ),
+        )
         settings.isFreeAccountHistoryBannerDismissed.set(true, updateModifiedAt = true)
     }
 
@@ -183,5 +196,12 @@ class ProfileEpisodeListViewModel @Inject constructor(
         analyticsEvent: AnalyticsEvent,
     ) {
         mode?.let { analyticsTracker.track(analyticsEvent, mapOf("source" to it.source.analyticsValue)) }
+    }
+
+    fun cancelAllDownloads() {
+        viewModelScope.launch {
+            val cancelledEpisodes = downloadQueue.cancelAll(SourceView.DOWNLOADS).await()
+            episodeManager.disableAutoDownload(cancelledEpisodes)
+        }
     }
 }

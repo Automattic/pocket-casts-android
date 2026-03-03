@@ -15,6 +15,7 @@ data class Subscription(
     val expiryDate: Instant,
     val isAutoRenewing: Boolean,
     val giftDays: Int,
+    val isInstallment: Boolean = false,
 ) {
     val isExpiring
         get() = !isAutoRenewing && expiryDate.isBefore(Instant.now().plus(30, ChronoUnit.DAYS))

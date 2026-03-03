@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-26 09:56:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis %1$s, därefter %2$s/månad i %3$d månader. Totalt åtagande: över %4$s 1 år.</string>
+    <string name="winback_claimed_offer_message_6">Tack för att du väljer Pocket Casts. Din rabatterade år börjar efter din nuvarande faktureringsperiod.</string>
+    <string name="winback_claimed_offer_message_5">50 % rabatt på ditt nästa år med månadsbetalningar!</string>
+    <string name="winback_offer_free_offer_installment_description">Lås in ett år med Pocket Casts Plus till halva priset med 12 månadsbetalningar på %1$s. Ditt rabatterade år börjar efter att ditt nuvarande paket löper ut.</string>
+    <string name="plus_yearly_installments">Årligt paket – betala månadsvis</string>
+    <string name="error_download_too_many_attempts">Nedladdningen avbröts efter flera försök. Kontrollera din internetanslutning och försök igen.</string>
+    <string name="error_download_io_failure">Misslyckades att ladda ner avsnittet. Kontrollera din internet-anslutning och försök igen.</string>
+    <string name="error_download_socket_timeout">Tidsgränsen för anslutning till podcastförfattarens server uppnåddes. Kontrollera din internetanslutning.</string>
+    <string name="error_download_suspicious_content_size">Misslyckades att ladda ner avsnittet. Den nedladdade filen är för liten. Kontakta podcastens skapare.</string>
+    <string name="error_download_invalid_content_type">Misslyckades att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastens skapare.</string>
+    <string name="error_download_http_failure">Misslyckades att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastens skapare.</string>
+    <string name="wear_connectivity_restored">Ansluten</string>
+    <string name="wear_connectivity_lost">Anslutning förlorad</string>
+    <string name="wear_connectivity_streaming_warning">Streaming kan påverkas</string>
+    <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
+    <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
+    <string name="watch_sync_retry">Försök igen</string>
+    <string name="watch_sync_error_unknown_help">Försök igen eller logga in manuellt</string>
+    <string name="watch_sync_error_login_failed_help">Försök logga in manuellt</string>
+    <string name="watch_sync_error_unknown">Något gick fel</string>
+    <string name="watch_sync_error_login_failed">Inloggning misslyckades</string>
+    <string name="watch_sync_error_no_connection">Telefon inte ansluten</string>
+    <string name="watch_sync_error_timeout">Kunde inte ansluta till telefon</string>
+    <string name="watch_sync_success">Inloggad från telefon!</string>
+    <string name="watch_sync_syncing">Synkroniserar med telefon …</string>
+    <string name="error_download_generic_failure">Misslyckades att ladda ner avsnittet. %1$s</string>
+    <string name="watch_sync_error_timeout_help">Se till att din telefon är i närheten och ansluten via Bluetooth</string>
+    <string name="watch_sync_error_no_connection_help">Kontrollera Bluetooth-anslutning till din telefon</string>
+    <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
+    <string name="watch_synced_successfully">Klockan har synkroniserats</string>
+    <string name="watch_sync_waiting_for_phone">Väntar på att telefonen ska synkroniseras…</string>
+    <string name="error_download_ssl_failure">Misslyckades att upprätta en säker anslutning till podcastförfattarens server. Kontrollera att din enhet är uppdaterad.</string>
+    <string name="error_download_connection_error">Det gick inte att ansluta till servern. Kontrollera din internetanslutning.</string>
+    <string name="error_download_unknown_host">Det gick inte att nå podcastförfattarens server. Kontrollera din internetanslutning.</string>
+    <string name="error_download_no_storage">Misslyckades att ladda ner avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
+    <string name="error_download_invalid_url">Webbplatsens URL är ogiltig. Kontakta podcastens skapare.</string>
+    <string name="error_download_no_episode_file">Kan inte skapa en nedladdningsfil för avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
+    <string name="error_download_missing_episode">Kan inte hitta avsnittsdata på denna enhet. Kontakta supporten.</string>
+    <string name="downloading">Laddar ner %s</string>
+    <string name="playlist_only_podcast_episodes_allowed">Spellistor kan endast innehålla podcastavsnitt.</string>
+    <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
+    <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
+    <string name="podcasts_add_episode">Lägg till</string>
+    <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
+    <string name="add_to_up_next_top">Spela upp nästa i Up Next</string>
+    <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
+    <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
+    <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>
+    <string name="price_per_month_for_months">%1$s/månad för %2$d månader</string>
     <string name="no_episodes">Inga avsnitt</string>
     <string name="more_rules">Fler regler</string>
     <string name="player_notification_skip_forward_seconds">Framåt %d sekunder</string>
@@ -44,10 +93,7 @@ Language: sv_SE
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Du lyssnade mer än 500 % i år — välkommen till klubben</string>
     <string name="end_of_year_stories_year_over_year_title_flat">Din lyssnande %1$s höll sig stabilt</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Från noll till hjälte!</string>
-    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nVissa delar av appen använder en avsnittssökning som kräver normaliserade rubriker. Om du trycker på den här inställningen körs databasnormalisering om avsnitten inte redan är normaliserade.</string>
-    <string name="normalization_started">Normalisering påbörjad</string>
     <string name="database">Databas</string>
-    <string name="settings_storage_normalize_episode_titles">Normalisera avsnittstitlar</string>
     <string name="not_normalized">Inte normaliserat</string>
     <string name="normalized">Normaliserat</string>
     <string name="end_of_year_story_top_podcast_subtitle">Det blir inte mer ”du” än så här</string>
@@ -101,8 +147,6 @@ Language: sv_SE
     <string name="add_to_playlist_find_playlist">Hitta spellista</string>
     <string name="add_to_playlist_description">Lägg till i spellista</string>
     <string name="remove_from_playlist">Ta bort från spellista</string>
-    <string name="add_to_up_next_bottom">Lägg till längst ner i Nästa</string>
-    <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
     <string name="playlist_episodes_archived_title">Inga avsnitt</string>
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
     <string name="playlist_edit_episodes">Sortera om avsnitt</string>
@@ -468,7 +512,7 @@ Language: sv_SE
     <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
     <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
     <string name="chapter_count_summary">%1$d av %2$d</string>
-    <string name="referrals_share_text">Hej där!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
+    <string name="referrals_share_text">Hej!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
     <string name="files_plus_prompt">Ladda upp dina filer och mer därtill med Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
@@ -644,7 +688,7 @@ Language: sv_SE
     <string name="widget_preview_episode_in_up_next_title">Avsnitt i Nästa</string>
     <string name="widget_preview_episode_title">Avsnittstitel</string>
     <string name="hour_and_minutes">1 timme och %d minuter</string>
-    <string name="hours_and_minutes">%d timmar och %d minuter</string>
+    <string name="hours_and_minutes">%1$d timmar och %2$d minuter</string>
     <string name="player_sleep_time_fired_end_of_chapter">Vilolägestimern stoppades i slutet av kapitlet.</string>
     <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>

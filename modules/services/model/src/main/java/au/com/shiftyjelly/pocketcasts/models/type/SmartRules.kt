@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
+import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import java.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -79,20 +80,12 @@ data class SmartRules(
         override fun toSqlWhereClause(clock: Clock) = buildString {
             val statuses = when (this@DownloadStatusRule) {
                 Any -> return@buildString
-
-                Downloaded -> listOf(EpisodeStatusEnum.DOWNLOADED)
-
-                NotDownloaded -> listOf(
-                    EpisodeStatusEnum.DOWNLOADING,
-                    EpisodeStatusEnum.QUEUED,
-                    EpisodeStatusEnum.WAITING_FOR_POWER,
-                    EpisodeStatusEnum.WAITING_FOR_WIFI,
-                    EpisodeStatusEnum.NOT_DOWNLOADED,
-                    EpisodeStatusEnum.DOWNLOAD_FAILED,
-                )
+                Downloaded -> listOf(EpisodeDownloadStatus.Downloaded)
+                NotDownloaded -> EpisodeDownloadStatus.entries - EpisodeDownloadStatus.Downloaded
             }
             append("episode.episode_status IN (")
-            append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
+            val converter = EpisodeDownloadStatusConverter()
+            append(statuses.joinToString(separator = ",") { status -> "${converter.toInt(status)}" })
             append(')')
         }
 
@@ -192,9 +185,9 @@ data class SmartRules(
         data class Selected(
             val uuids: Set<String>,
         ) : PodcastsRule {
-            fun withPodcast(podcastUuid: String) = copy(uuids + podcastUuid)
+            fun withPodcast(podcastUuid: String) = copy(uuids = uuids + podcastUuid)
 
-            fun withoutPodcast(podcastUuid: String) = copy(uuids - podcastUuid)
+            fun withoutPodcast(podcastUuid: String) = copy(uuids = uuids - podcastUuid)
 
             override fun toSqlWhereClause(clock: Clock) = buildString {
                 append("episode.podcast_id IN (")

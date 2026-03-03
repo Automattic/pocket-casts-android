@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
 import java.util.UUID
 
 sealed interface BaseEpisode {
     companion object {
+        const val AUTO_DOWNLOAD_STATUS_ALLOW = 0
+        const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
+
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
@@ -27,7 +30,7 @@ sealed interface BaseEpisode {
     var episodeDescription: String
     var title: String
     var sizeInBytes: Long
-    var episodeStatus: EpisodeStatusEnum
+    var downloadStatus: EpisodeDownloadStatus
     var fileType: String?
     var duration: Double
     var downloadUrl: String?
@@ -68,14 +71,41 @@ sealed interface BaseEpisode {
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
 
-    val isQueued: Boolean
-        get() = EpisodeStatusEnum.QUEUED == episodeStatus || EpisodeStatusEnum.WAITING_FOR_WIFI == episodeStatus || EpisodeStatusEnum.WAITING_FOR_POWER == episodeStatus
+    val isDownloadNotRequested
+        get() = downloadStatus == EpisodeDownloadStatus.DownloadNotRequested
 
-    val isDownloading: Boolean
-        get() = EpisodeStatusEnum.DOWNLOADING == episodeStatus
+    val isQueuedForDownload
+        get() = downloadStatus == EpisodeDownloadStatus.Queued
 
-    val isDownloaded: Boolean
-        get() = EpisodeStatusEnum.DOWNLOADED == episodeStatus
+    val isWaitingForWifi
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForWifi
+
+    val isWaitingForPower
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForPower
+
+    val isWaitingForStorage
+        get() = downloadStatus == EpisodeDownloadStatus.WaitingForStorage
+
+    val isDownloadPending
+        get() = downloadStatus.isPending
+
+    val isDownloadCancellable
+        get() = downloadStatus.isCancellable
+
+    val isDownloading
+        get() = downloadStatus == EpisodeDownloadStatus.Downloading
+
+    val isDownloaded
+        get() = downloadStatus == EpisodeDownloadStatus.Downloaded
+
+    val isDownloadFailure
+        get() = downloadStatus == EpisodeDownloadStatus.DownloadFailed
+
+    val isAutoDownloadDisabled: Boolean
+        get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
+
+    val canQueueForAutoDownload
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
@@ -88,15 +118,6 @@ sealed interface BaseEpisode {
 
     val isAudio: Boolean
         get() = !isVideo
-
-    val isManualDownloadOverridingWifiSettings: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-
-    val isAutoDownloaded: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-
-    val isExemptFromAutoDownload: Boolean
-        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid

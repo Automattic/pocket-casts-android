@@ -725,7 +725,7 @@ private fun FeaturesContent(
             UpgradeFeatureItem(
                 item = item,
                 iconColor = MaterialTheme.theme.colors.primaryText01,
-                textColor = MaterialTheme.theme.colors.secondaryText02,
+                textColor = MaterialTheme.theme.colors.primaryText02,
                 iconSize = 18.dp,
                 spacing = 12.dp,
             )

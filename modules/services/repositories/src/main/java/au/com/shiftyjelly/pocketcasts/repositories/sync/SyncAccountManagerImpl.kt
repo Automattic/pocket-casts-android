@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
+import com.automattic.eventhorizon.SignInSource as EventHorizonSignInSource
 
 @Singleton
 open class SyncAccountManagerImpl @Inject constructor(
@@ -142,7 +143,7 @@ open class SyncAccountManagerImpl @Inject constructor(
         val userData = bundleOf(
             AccountConstants.UUID to uuid,
             AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value,
-            AccountConstants.LOGIN_IDENTITY to loginIdentity.value,
+            AccountConstants.LOGIN_IDENTITY to loginIdentity.key,
         )
         val accountAdded = accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
@@ -188,10 +189,10 @@ open class SyncAccountManagerImpl @Inject constructor(
 }
 
 sealed class SignInSource {
-    sealed class UserInitiated(val analyticsValue: String) : SignInSource() {
-        object SignInViewModel : UserInitiated("sign_in_view_model")
-        object Onboarding : UserInitiated("onboarding")
-        object Watch : UserInitiated("watch")
+    sealed class UserInitiated(val eventHorizonValue: EventHorizonSignInSource) : SignInSource() {
+        object SignInViewModel : UserInitiated(EventHorizonSignInSource.SignInViewModel)
+        object Onboarding : UserInitiated(EventHorizonSignInSource.Onboarding)
+        object Watch : UserInitiated(EventHorizonSignInSource.Watch)
     }
     object WatchPhoneSync : SignInSource()
 }

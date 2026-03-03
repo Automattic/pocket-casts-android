@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Icon
@@ -167,11 +168,13 @@ fun NowPlayingScreen(
             },
             buttons = {
                 if (state is NowPlayingViewModel.State.Loaded) {
-                    NowPlayingSettingsButtons(
-                        volumeUiState = volumeUiState,
-                        onVolumeClick = { navController.navigate(PCVolumeScreen.ROUTE) },
-                        navController = navController,
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        NowPlayingSettingsButtons(
+                            volumeUiState = volumeUiState,
+                            onVolumeClick = { navController.navigate(PCVolumeScreen.ROUTE) },
+                            navController = navController,
+                        )
+                    }
                 }
             },
             background = {

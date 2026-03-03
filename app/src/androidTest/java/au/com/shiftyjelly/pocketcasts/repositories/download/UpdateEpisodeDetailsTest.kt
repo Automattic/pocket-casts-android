@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import dagger.Lazy
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -57,7 +58,7 @@ class UpdateEpisodeDetailsTest {
 
         val episode = PodcastEpisode(uuid = UUID.randomUUID().toString(), publishedDate = Date(), downloadUrl = firstUrl.toString())
         val episodeManager = mock<EpisodeManager> {
-            onBlocking { findByUuid(episode.uuid) }.doReturn(episode)
+            on { findByUuid(episode.uuid) }.doReturn(episode)
         }
 
         val episodeUuids: Array<String?> = listOf(episode.uuid).toTypedArray()
@@ -86,7 +87,7 @@ class UpdateEpisodeDetailsTest {
 
     class TestWorkerFactory(private val episodeManager: EpisodeManager) : WorkerFactory() {
         override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-            return UpdateEpisodeDetailsTask(appContext, workerParameters, episodeManager, OkHttpClient())
+            return UpdateEpisodeDetailsTask(appContext, workerParameters, episodeManager, Lazy { OkHttpClient() })
         }
     }
 }

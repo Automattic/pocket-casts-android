@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.crashlogging.di
 
 import android.app.Application
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.BuildConfig
 import au.com.shiftyjelly.pocketcasts.crashlogging.BuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.ContextBasedLocaleProvider
@@ -19,6 +20,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -53,14 +55,14 @@ abstract class CrashLoggingModule {
         @Singleton
         internal fun provideCrashLogging(
             @ApplicationContext application: Context,
+            @ApplicationScope scope: CoroutineScope,
             crashLoggingDataProvider: PocketCastsCrashLoggingDataProvider,
-            provideApplicationScope: ProvideApplicationScope,
         ): CrashLogging {
             return FilteringCrashLogging(
                 CrashLoggingProvider.createInstance(
                     application as Application,
                     crashLoggingDataProvider,
-                    provideApplicationScope(),
+                    scope,
                 ),
             )
         }

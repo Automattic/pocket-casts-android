@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
@@ -232,7 +233,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 podcastUuid = podcast.uuid,
                 source = ONBOARDING_RECOMMENDATIONS,
             )
-            podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
+            podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, SourceView.ONBOARDING_RECOMMENDATIONS)
         } else {
             analyticsTracker.trackPodcastSubscribed(
                 flow = flow.analyticsValue,

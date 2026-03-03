@@ -64,6 +64,7 @@ class AutoDownloadSettingsFragment :
                     if (route != null) {
                         viewModel.trackPageShown(route)
                     }
+                    notifyBackstackChanged()
                 }
             }
 
@@ -100,8 +101,7 @@ class AutoDownloadSettingsFragment :
                         }
                     },
                     onDismiss = {
-                        @Suppress("DEPRECATION")
-                        requireActivity().onBackPressed()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     },
                 )
 
@@ -132,6 +132,8 @@ class AutoDownloadSettingsFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return navController?.popBackStack() == true || super.onBackPressed()
+        val handled = navController?.popBackStack() == true || super.onBackPressed()
+        if (handled) notifyBackstackChanged()
+        return handled
     }
 }

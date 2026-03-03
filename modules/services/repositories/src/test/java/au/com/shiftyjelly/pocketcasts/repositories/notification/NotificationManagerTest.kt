@@ -42,7 +42,7 @@ class NotificationManagerTest {
         val captor = argumentCaptor<List<UserNotifications>>()
         verify(dao).insert(captor.capture())
         val actual = captor.firstValue
-        val expected = insertedIds.map { UserNotifications(notificationId = it.toInt()) }
+        val expected = insertedIds.map { UserNotifications(notificationId = it) }
         assertEquals(expected, actual)
     }
 
@@ -57,7 +57,7 @@ class NotificationManagerTest {
         val captor = argumentCaptor<List<UserNotifications>>()
         verify(dao).insert(captor.capture())
         val actual = captor.firstValue
-        val expected = insertedIds.map { UserNotifications(notificationId = it.toInt()) }
+        val expected = insertedIds.map { UserNotifications(notificationId = it) }
         assertEquals(expected, actual)
     }
 

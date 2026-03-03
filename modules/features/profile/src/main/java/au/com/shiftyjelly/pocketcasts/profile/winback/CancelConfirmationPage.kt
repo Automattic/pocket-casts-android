@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun CancelConfirmationPage(
     expirationDate: Instant?,
+    isInstallment: Boolean,
     onKeepSubscription: () -> Unit,
     onCancelSubscription: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,12 +62,14 @@ internal fun CancelConfirmationPage(
             .padding(top = 24.dp, bottom = 16.dp),
     ) {
         Header(
+            isInstallment = isInstallment,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp),
         )
         Perks(
             expirationDate = expirationDate,
+            isInstallment = isInstallment,
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
@@ -82,6 +85,7 @@ internal fun CancelConfirmationPage(
 
 @Composable
 private fun Header(
+    isInstallment: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -98,7 +102,13 @@ private fun Header(
             textAlign = TextAlign.Center,
         )
         TextP40(
-            text = stringResource(LR.string.winback_cancel_subscription_header_description),
+            text = stringResource(
+                if (isInstallment) {
+                    LR.string.winback_cancel_subscription_header_description_installment
+                } else {
+                    LR.string.winback_cancel_subscription_header_description
+                },
+            ),
             fontSize = 15.sp,
             lineHeight = 21.sp,
             color = MaterialTheme.theme.colors.primaryText02,
@@ -110,6 +120,7 @@ private fun Header(
 @Composable
 private fun Perks(
     expirationDate: Instant?,
+    isInstallment: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -118,7 +129,9 @@ private fun Perks(
     ) {
         PerkRow(
             image = painterResource(IR.drawable.ic_subscription),
-            text = if (expirationDate != null) {
+            text = if (isInstallment) {
+                AnnotatedString(stringResource(LR.string.winback_cancel_subscription_perk_installment))
+            } else if (expirationDate != null) {
                 val formattedDate = expirationDate.let(Date::from).toLocalizedFormatLongStyle()
                 val text = stringResource(LR.string.winback_cancel_subscription_perk_active_with_date, formattedDate)
                 buildAnnotatedString {
@@ -148,6 +161,12 @@ private fun Perks(
             image = painterResource(IR.drawable.ic_remove_from_cloud),
             text = stringResource(LR.string.winback_cancel_subscription_perk_files),
         )
+        if (isInstallment) {
+            PerkRow(
+                image = painterResource(IR.drawable.ic_filters_clock),
+                text = stringResource(LR.string.winback_cancel_subscription_perk_history),
+            )
+        }
     }
 }
 
@@ -226,12 +245,28 @@ private fun PerkRow(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
+private fun CancelInstallmentConfirmationPagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(theme) {
+        CancelConfirmationPage(
+            expirationDate = Instant.ofEpochSecond(1700000000),
+            isInstallment = true,
+            onKeepSubscription = {},
+            onCancelSubscription = {},
+        )
+    }
+}
+
+@Preview(device = Devices.PORTRAIT_REGULAR)
+@Composable
 private fun CancelConfirmationPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
     AppThemeWithBackground(theme) {
         CancelConfirmationPage(
             expirationDate = Instant.ofEpochSecond(1700000000),
+            isInstallment = false,
             onKeepSubscription = {},
             onCancelSubscription = {},
         )

@@ -51,7 +51,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         }
         try {
             for (i in 0 until tracks.groups.size) {
-                val group = tracks.groups[i] ?: continue
+                val group = tracks.groups[i]
                 for (j in 0 until tracks.groups.size) {
                     val metadata = group.getTrackFormat(j).metadata ?: continue
                     for (k in 0 until metadata.length()) {

@@ -16,6 +16,7 @@ internal class AnalyticsPaymentListener(
             put("tier", key.tier.analyticsValue)
             put("frequency", key.billingCycle.analyticsValue)
             put("offer_type", (key.offer?.analyticsValue ?: "none"))
+            put("is_installment", key.isInstallment)
             put("product", key.productLegacyAnalyticsValue())
             put("source", purchaseSource)
             purchaseFlow?.let { put("flow", it) }
@@ -47,6 +48,6 @@ internal class AnalyticsPaymentListener(
 
     private fun SubscriptionPlan.Key.productLegacyAnalyticsValue() = when (tier) {
         SubscriptionTier.Plus -> billingCycle.analyticsValue
-        SubscriptionTier.Patron -> productId
+        else -> requireNotNull(productId) { "productId cannot be null for plan=$this" }
     }
 }

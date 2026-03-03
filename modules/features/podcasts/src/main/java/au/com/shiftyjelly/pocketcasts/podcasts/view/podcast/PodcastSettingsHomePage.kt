@@ -104,11 +104,11 @@ internal fun PodcastSettingsHomePage(
             icon = painterResource(IR.drawable.ic_download),
             iconTint = iconTint,
             toggle = SettingRowToggle.Switch(
-                checked = podcast.isAutoDownloadNewEpisodes,
+                checked = uiState.isGlobalAutoDownloadEnabled && podcast.isAutoDownloadNewEpisodes,
                 enabled = true,
             ),
             modifier = Modifier.toggleable(
-                value = podcast.isAutoDownloadNewEpisodes,
+                value = uiState.isGlobalAutoDownloadEnabled && podcast.isAutoDownloadNewEpisodes,
                 role = Role.Switch,
                 onValueChange = onChangeAutoDownload,
             ),
@@ -340,6 +340,7 @@ private fun PodcastSettingsHomePagePreview(
                     )
                 },
                 globalUpNextLimit = 100,
+                isGlobalAutoDownloadEnabled = true,
             ),
             onChangeNotifications = {},
             onChangeAutoDownload = {},

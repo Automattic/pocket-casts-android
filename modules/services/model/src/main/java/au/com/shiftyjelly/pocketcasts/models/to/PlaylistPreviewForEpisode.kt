@@ -1,14 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import androidx.room.ColumnInfo
-
 data class PlaylistPreviewForEpisode(
-    @ColumnInfo(name = "uuid") val uuid: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "episode_count") val episodeCount: Int,
-    @ColumnInfo(name = "has_episode") val hasEpisode: Boolean,
+    val uuid: String,
+    val title: String,
+    val episodeUuids: Set<String>,
 ) {
-    fun canAddOrRemoveEpisode(episodeLimit: Int): Boolean {
-        return hasEpisode || episodeCount < episodeLimit
+    fun hasAllEpisodes(uuids: Collection<String>): Boolean {
+        return uuids.all { uuid -> uuid in episodeUuids }
+    }
+
+    fun canAddOrRemoveEpisodes(episodeLimit: Int, newEpisodes: Collection<String>): Boolean {
+        return hasAllEpisodes(newEpisodes) || (episodeUuids + newEpisodes).size <= episodeLimit
     }
 }

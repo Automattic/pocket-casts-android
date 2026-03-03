@@ -104,14 +104,12 @@ private val ThemeType.sparkleColors
         ThemeType.INDIGO -> indigoSparkle
         ThemeType.DARK_CONTRAST -> graySparkle
         ThemeType.LIGHT_CONTRAST -> blackSparkle
-        ThemeType.RADIOACTIVE -> greenSparkle
     }
 
 private val blackSparkle = Color.Black to Color(0xFF6B7273)
 private val blueSparkle = Color(0xFF03A9F4) to Color(0xFF50D0F1)
 private val redSparkle = Color(0xFFF43769) to Color(0xFFFB5246)
 private val indigoSparkle = Color(0xFF5C8BCC) to Color(0xFF95B0E6)
-private val greenSparkle = Color(0xFF78D549) to Color(0xFF9BE45E)
 private val graySparkle = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 
 @Preview

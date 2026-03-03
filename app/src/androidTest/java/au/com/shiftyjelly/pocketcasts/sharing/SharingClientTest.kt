@@ -15,6 +15,7 @@ import android.net.Uri
 import androidx.core.content.IntentCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -52,11 +53,20 @@ class SharingClientTest {
 
     private val regularPlatforms = SocialPlatform.entries - SocialPlatform.Instagram - SocialPlatform.PocketCasts
 
+    private val podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title")
+
+    private val episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date())
+
     @Test
     fun sharePodcastToRegularPlatforms() = runTest {
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-                .setPlatform(platform)
+            val request = SharingRequest
+                .podcast(
+                    podcast = podcast,
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                    cardType = CardType.Vertical,
+                )
                 .build()
 
             client.share(request)
@@ -74,8 +84,13 @@ class SharingClientTest {
     @Test
     fun sharePodcastToInstagram() = runTest {
         val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
-        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-            .setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .podcast(
+                podcast = podcast,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .setBackgroundImage(file)
             .build()
 
@@ -92,8 +107,13 @@ class SharingClientTest {
 
     @Test
     fun failToSharePodcastToInstagramWithoutBackgroundFile() = runTest {
-        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-            .setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .podcast(
+                podcast = podcast,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -106,8 +126,13 @@ class SharingClientTest {
 
     @Test
     fun copyPodcastLink() = runTest {
-        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-            .setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .podcast(
+                podcast = podcast,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         client.share(request)
@@ -122,8 +147,13 @@ class SharingClientTest {
     fun copyPodcastLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 
-        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-            .setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .podcast(
+                podcast = podcast,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -135,8 +165,13 @@ class SharingClientTest {
     fun copyPodcastLinkWithoutFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = false)
 
-        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
-            .setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .podcast(
+                podcast = podcast,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -147,10 +182,14 @@ class SharingClientTest {
     @Test
     fun shareEpisodeToRegularPlatforms() = runTest {
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.episode(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            ).setPlatform(platform)
+            val request = SharingRequest
+                .episode(
+                    podcast = podcast,
+                    episode = episode,
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                    cardType = CardType.Vertical,
+                )
                 .build()
 
             client.share(request)
@@ -168,10 +207,14 @@ class SharingClientTest {
     @Test
     fun shareEpisodeToInstagram() = runTest {
         val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
-        val request = SharingRequest.episode(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .episode(
+                podcast = podcast,
+                episode = episode,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .setBackgroundImage(file)
             .build()
 
@@ -188,10 +231,14 @@ class SharingClientTest {
 
     @Test
     fun failToShareEpisodeToInstagramWithoutBackgroundFile() = runTest {
-        val request = SharingRequest.episode(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .episode(
+                podcast = podcast,
+                episode = episode,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -204,10 +251,14 @@ class SharingClientTest {
 
     @Test
     fun copyEpisodeLink() = runTest {
-        val request = SharingRequest.episode(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episode(
+                podcast = podcast,
+                episode = episode,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         client.share(request)
@@ -222,10 +273,14 @@ class SharingClientTest {
     fun copyEpisodeLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 
-        val request = SharingRequest.episode(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episode(
+                podcast = podcast,
+                episode = episode,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -237,10 +292,14 @@ class SharingClientTest {
     fun copyEpisodeLinkWithoutFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = false)
 
-        val request = SharingRequest.episode(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episode(
+                podcast = podcast,
+                episode = episode,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -251,11 +310,15 @@ class SharingClientTest {
     @Test
     fun shareEpisodePositionToRegularPlatforms() = runTest {
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.episodePosition(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                position = 10.seconds + 300.milliseconds,
-            ).setPlatform(platform)
+            val request = SharingRequest
+                .episodePosition(
+                    podcast = podcast,
+                    episode = episode,
+                    position = 10.seconds + 300.milliseconds,
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                    cardType = CardType.Vertical,
+                )
                 .build()
 
             client.share(request)
@@ -273,11 +336,15 @@ class SharingClientTest {
     @Test
     fun shareEpisodePositionToInstagram() = runTest {
         val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
-        val request = SharingRequest.episodePosition(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .episodePosition(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .setBackgroundImage(file)
             .build()
 
@@ -294,11 +361,15 @@ class SharingClientTest {
 
     @Test
     fun failToShareEpisodePositionToInstagramWithoutBackgroundFile() = runTest {
-        val request = SharingRequest.episodePosition(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .episodePosition(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -311,11 +382,15 @@ class SharingClientTest {
 
     @Test
     fun copyEpisodePositionLink() = runTest {
-        val request = SharingRequest.episodePosition(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds + 421.milliseconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episodePosition(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds + 421.milliseconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         client.share(request)
@@ -330,11 +405,15 @@ class SharingClientTest {
     fun copyEpisodePositionLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 
-        val request = SharingRequest.episodePosition(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episodePosition(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -346,11 +425,15 @@ class SharingClientTest {
     fun copyEpisodePositionLinkWithoutFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = false)
 
-        val request = SharingRequest.episodePosition(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .episodePosition(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -361,11 +444,15 @@ class SharingClientTest {
     @Test
     fun shareBookmarkToRegularPlatforms() = runTest {
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.bookmark(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                position = 10.seconds + 112.milliseconds,
-            ).setPlatform(platform)
+            val request = SharingRequest
+                .bookmark(
+                    podcast = podcast,
+                    episode = episode,
+                    position = 10.seconds + 112.milliseconds,
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                    cardType = CardType.Vertical,
+                )
                 .build()
 
             client.share(request)
@@ -382,11 +469,15 @@ class SharingClientTest {
 
     @Test
     fun copyBookmarkLink() = runTest {
-        val request = SharingRequest.bookmark(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds + 677.milliseconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .bookmark(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds + 677.milliseconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         client.share(request)
@@ -401,11 +492,15 @@ class SharingClientTest {
     fun copyBookmarkLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 
-        val request = SharingRequest.bookmark(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .bookmark(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -417,11 +512,15 @@ class SharingClientTest {
     fun copyBookmarkLinkWithoutFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = false)
 
-        val request = SharingRequest.bookmark(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .bookmark(
+                podcast = podcast,
+                episode = episode,
+                position = 10.seconds,
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            )
             .build()
 
         val response = client.share(request)
@@ -432,10 +531,12 @@ class SharingClientTest {
     @Test
     fun shareEpisodeFile() = runTest {
         val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
-        val request = SharingRequest.episodeFile(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", downloadedFilePath = file.path, fileType = "audio/mp3", publishedDate = Date()),
-        ).build()
+        val request = SharingRequest
+            .episodeFile(
+                podcast = podcast,
+                episode = episode.copy(downloadedFilePath = file.path, fileType = "audio/mp3"),
+                source = SourceView.PLAYER,
+            ).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -450,10 +551,12 @@ class SharingClientTest {
 
     @Test
     fun shareEpisodeFileWhenFileDoesNotExist() = runTest {
-        val request = SharingRequest.episodeFile(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", downloadedFilePath = null, publishedDate = Date()),
-        ).build()
+        val request = SharingRequest
+            .episodeFile(
+                podcast = podcast,
+                episode = episode.copy(downloadedFilePath = null, fileType = "audio/mp3"),
+                source = SourceView.PLAYER,
+            ).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -464,11 +567,15 @@ class SharingClientTest {
 
     @Test
     fun copyClipLink() = runTest {
-        val request = SharingRequest.clipLink(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
-        ).build()
+        val request = SharingRequest
+            .clipLink(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            ).build()
 
         client.share(request)
         val clipData = shareStarter.requireShareLink
@@ -481,11 +588,15 @@ class SharingClientTest {
     @Test
     fun shareClipLinkToRegularPlatforms() = runTest {
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.clipLink(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
-            ).setPlatform(platform).build()
+            val request = SharingRequest
+                .clipLink(
+                    podcast = podcast,
+                    episode = episode,
+                    range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                    cardType = CardType.Vertical,
+                ).build()
 
             client.share(request)
             val intent = shareStarter.requireChooserIntent
@@ -502,11 +613,15 @@ class SharingClientTest {
     fun copyClipLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 
-        val request = SharingRequest.clipLink(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-        ).build()
+        val request = SharingRequest
+            .clipLink(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            ).build()
 
         val response = client.share(request)
 
@@ -517,11 +632,15 @@ class SharingClientTest {
     fun copyClipLinkWithoutFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = false)
 
-        val request = SharingRequest.clipLink(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-        ).build()
+        val request = SharingRequest
+            .clipLink(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+                cardType = CardType.Vertical,
+            ).build()
 
         val response = client.share(request)
 
@@ -529,41 +648,17 @@ class SharingClientTest {
     }
 
     @Test
-    fun shareAudioClipToRegularPlatforms() = runTest {
+    fun shareAudioClipsMore() = runTest {
         val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
         testMediaService.audioClip = file
 
-        regularPlatforms.forEach { platform ->
-            val request = SharingRequest.audioClip(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        val request = SharingRequest
+            .audioClip(
+                podcast = podcast,
+                episode = episode,
                 range = Clip.Range(15.seconds, 28.seconds),
-            ).setPlatform(platform)
-                .build()
-
-            val response = client.share(request)
-            assertTrue(response.isSuccessful)
-            assertNull(response.feedbackMessage)
-
-            val intent = shareStarter.requireChooserIntent
-
-            assertEquals(ACTION_SEND, intent.action)
-            assertEquals("audio/mp3", intent.type)
-            assertEquals(platform.packageId, intent.`package`)
-            assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
-        }
-    }
-
-    @Test
-    fun shareAudioClipToPocketCastsAsMore() = runTest {
-        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
-        testMediaService.audioClip = file
-
-        val request = SharingRequest.audioClip(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-        ).setPlatform(SocialPlatform.PocketCasts)
+                source = SourceView.PLAYER,
+            )
             .build()
 
         val response = client.share(request)
@@ -582,11 +677,13 @@ class SharingClientTest {
     fun failToShareAudioClip() = runTest {
         testMediaService.audioClip = null
 
-        val request = SharingRequest.audioClip(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-        ).build()
+        val request = SharingRequest
+            .audioClip(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                source = SourceView.PLAYER,
+            ).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -601,13 +698,16 @@ class SharingClientTest {
         testMediaService.videoClip = file
 
         regularPlatforms.forEach { platform ->
-            val request = SharingRequest.videoClip(
-                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                range = Clip.Range(15.seconds, 28.seconds),
-                cardType = CardType.Square,
-                backgroundImage = File(context.cacheDir, "image.png"),
-            ).setPlatform(platform)
+            val request = SharingRequest
+                .videoClip(
+                    podcast = podcast,
+                    episode = episode,
+                    range = Clip.Range(15.seconds, 28.seconds),
+                    cardType = CardType.Square,
+                    backgroundImage = File(context.cacheDir, "image.png"),
+                    source = SourceView.PLAYER,
+                    platform = platform,
+                )
                 .build()
 
             val response = client.share(request)
@@ -628,13 +728,16 @@ class SharingClientTest {
         val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
         testMediaService.videoClip = file
 
-        val request = SharingRequest.videoClip(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-            cardType = CardType.Square,
-            backgroundImage = File(context.cacheDir, "image.png"),
-        ).setPlatform(SocialPlatform.Instagram)
+        val request = SharingRequest
+            .videoClip(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                cardType = CardType.Square,
+                backgroundImage = File(context.cacheDir, "image.png"),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.Instagram,
+            )
             .build()
 
         client.share(request)
@@ -653,13 +756,16 @@ class SharingClientTest {
         val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
         testMediaService.videoClip = file
 
-        val request = SharingRequest.videoClip(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-            cardType = CardType.Square,
-            backgroundImage = File(context.cacheDir, "image.png"),
-        ).setPlatform(SocialPlatform.PocketCasts)
+        val request = SharingRequest
+            .videoClip(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                cardType = CardType.Square,
+                backgroundImage = File(context.cacheDir, "image.png"),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+            )
             .build()
 
         val response = client.share(request)
@@ -678,13 +784,16 @@ class SharingClientTest {
     fun failToShareVideoClip() = runTest {
         testMediaService.videoClip = null
 
-        val request = SharingRequest.videoClip(
-            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
-            cardType = CardType.Square,
-            backgroundImage = File(context.cacheDir, "image.png"),
-        ).build()
+        val request = SharingRequest
+            .videoClip(
+                podcast = podcast,
+                episode = episode,
+                range = Clip.Range(15.seconds, 28.seconds),
+                cardType = CardType.Square,
+                backgroundImage = File(context.cacheDir, "image.png"),
+                source = SourceView.PLAYER,
+                platform = SocialPlatform.PocketCasts,
+            ).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -698,11 +807,13 @@ class SharingClientTest {
         val referralCode = "referral-code"
         val text = context.getString(LR.string.referrals_share_text, "2-Month")
         val subject = context.getString(LR.string.referrals_share_subject, "2 months")
-        val request = SharingRequest.referralLink(
-            referralCode = referralCode,
-            offerName = "2-Month",
-            offerDuration = "2 months",
-        ).build()
+        val request = SharingRequest
+            .referralLink(
+                referralCode = referralCode,
+                offerName = "2-Month",
+                offerDuration = "2 months",
+                source = SourceView.PLAYER,
+            ).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -730,7 +841,8 @@ class SharingClientTest {
             episodeCount = 200,
             randomShowIds = emptyList(),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -761,7 +873,8 @@ class SharingClientTest {
                 playedEpisodeCount = 0,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -787,7 +900,8 @@ class SharingClientTest {
             shows = emptyList(),
             podcastListUrl = null,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -813,7 +927,8 @@ class SharingClientTest {
             shows = emptyList(),
             podcastListUrl = "podcast-list-url",
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -845,7 +960,8 @@ class SharingClientTest {
                 fives = 50,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -876,7 +992,8 @@ class SharingClientTest {
         val story = Story.TotalTime(
             duration = 12345.seconds,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -908,7 +1025,8 @@ class SharingClientTest {
                 coverUrl = null,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -936,7 +1054,8 @@ class SharingClientTest {
             thisYearDuration = Duration.ZERO,
             subscriptionTier = null,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -964,7 +1083,8 @@ class SharingClientTest {
             completedCount = 25,
             subscriptionTier = null,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -983,7 +1103,8 @@ class SharingClientTest {
     fun shareCoverStory() = runTest {
         val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.Cover
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -996,7 +1117,8 @@ class SharingClientTest {
     fun sharePlusInterstitialStory() = runTest {
         val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.PlusInterstitial(subscriptionTier = null)
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -1009,7 +1131,8 @@ class SharingClientTest {
     fun shareEndingStory() = runTest {
         val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.Ending
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -1030,7 +1153,8 @@ class SharingClientTest {
                 fives = 0,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
+        val request = SharingRequest
+            .endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccessful)
@@ -1042,12 +1166,14 @@ class SharingClientTest {
     @Test
     fun shareTranscript() = runTest {
         val transcriptText = "This is a sample transcript content for testing purposes."
-        val request = SharingRequest.transcript(
-            podcastUuid = "podcast-uuid",
-            episodeUuid = "episode-uuid",
-            episodeTitle = "Episode Title",
-            transcript = transcriptText,
-        ).build()
+        val request = SharingRequest
+            .transcript(
+                podcastUuid = "podcast-uuid",
+                episodeUuid = "episode-uuid",
+                episodeTitle = "Episode Title",
+                transcript = transcriptText,
+                source = SourceView.PLAYER,
+            ).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccessful)
@@ -1057,7 +1183,6 @@ class SharingClientTest {
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("text/plain", intent.type)
-        val streamUri = IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java)
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
 
         // Verify the file contains the transcript content

@@ -3,473 +3,428 @@
 
 package au.com.shiftyjelly.pocketcasts.ui.theme
 
-import android.graphics.Color
 import androidx.annotation.ColorInt
+import androidx.core.graphics.toColorInt
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.colorIntWithAlpha
 
 object ThemeColor {
-    val primaryUi01Light = Color.parseColor("#FFFFFF")
-    val primaryUi01Dark = Color.parseColor("#292B2E")
-    val primaryUi01ExtraDark = Color.parseColor("#222427")
-    val primaryUi01ClassicLight = Color.parseColor("#FFFFFF")
-    val primaryUi01Electric = Color.parseColor("#19232B")
-    val primaryUi01Indigo = Color.parseColor("#ECEDE6")
-    val primaryUi01Radioactive = Color.parseColor("#162F1E")
-    val primaryUi01Rose = Color.parseColor("#fff0eb")
-    val primaryUi01LightContrast = Color.parseColor("#ffffff")
-    val primaryUi01DarkContrast = Color.parseColor("#000000")
-    val primaryUi01ActiveLight = Color.parseColor("#F7F9FA")
-    val primaryUi01ActiveDark = Color.parseColor("#383A3D")
-    val primaryUi01ActiveExtraDark = Color.parseColor("#E0E6EA").colorIntWithAlpha(26)
-    val primaryUi01ActiveClassicLight = Color.parseColor("#F7F9FA")
-    val primaryUi01ActiveElectric = Color.parseColor("#171C24")
-    val primaryUi01ActiveIndigo = Color.parseColor("#F1F2EF")
-    val primaryUi01ActiveRadioactive = Color.parseColor("#193D25")
-    val primaryUi01ActiveRose = Color.parseColor("#fff9f7")
-    val primaryUi01ActiveLightContrast = Color.parseColor("#f7f9fa")
-    val primaryUi01ActiveDarkContrast = Color.parseColor("#1b1b1b")
-    val primaryUi02Light = Color.parseColor("#FFFFFF")
-    val primaryUi02Dark = Color.parseColor("#1A1B1D")
-    val primaryUi02ExtraDark = Color.parseColor("#000000")
-    val primaryUi02ClassicLight = Color.parseColor("#FFFFFF")
-    val primaryUi02Electric = Color.parseColor("#161A20")
-    val primaryUi02Indigo = Color.parseColor("#F4F5F2")
-    val primaryUi02Radioactive = Color.parseColor("#0d1b11")
-    val primaryUi02Rose = Color.parseColor("#FFEEED")
-    val primaryUi02LightContrast = Color.parseColor("#ffffff")
-    val primaryUi02DarkContrast = Color.parseColor("#000000")
-    val primaryUi02SelectedLight = Color.parseColor("#E6F6FE")
-    val primaryUi02SelectedDark = Color.parseColor("#1E333D")
-    val primaryUi02SelectedExtraDark = Color.parseColor("#1F1F1F")
-    val primaryUi02SelectedClassicLight = Color.parseColor("#FEECEB")
-    val primaryUi02SelectedElectric = Color.parseColor("#1A2C34")
-    val primaryUi02SelectedIndigo = Color.parseColor("#E2E4E5")
-    val primaryUi02SelectedRadioactive = Color.parseColor("#173119")
-    val primaryUi02SelectedRose = Color.parseColor("#f7caca")
-    val primaryUi02SelectedLightContrast = Color.parseColor("#e5e5e5")
-    val primaryUi02SelectedDarkContrast = Color.parseColor("#262626")
-    val primaryUi02ActiveLight = Color.parseColor("#F7F9FA")
-    val primaryUi02ActiveDark = Color.parseColor("#222427")
-    val primaryUi02ActiveExtraDark = Color.parseColor("#161717")
-    val primaryUi02ActiveClassicLight = Color.parseColor("#F7F9FA")
-    val primaryUi02ActiveElectric = Color.parseColor("#1B212A")
-    val primaryUi02ActiveIndigo = Color.parseColor("#F7F9FA")
-    val primaryUi02ActiveRadioactive = Color.parseColor("#0d1b11")
-    val primaryUi02ActiveRose = Color.parseColor("#fce2de")
-    val primaryUi02ActiveLightContrast = Color.parseColor("#f2f2f2")
-    val primaryUi02ActiveDarkContrast = Color.parseColor("#1b1b1b")
-    val primaryUi03Light = Color.parseColor("#FAFAFA")
-    val primaryUi03Dark = Color.parseColor("#202124")
-    val primaryUi03ExtraDark = Color.parseColor("#080808")
-    val primaryUi03ClassicLight = Color.parseColor("#FAFAF9")
-    val primaryUi03Electric = Color.parseColor("#171C25")
-    val primaryUi03Indigo = Color.parseColor("#EFEFEF")
-    val primaryUi03Radioactive = Color.parseColor("#162f1e")
-    val primaryUi03Rose = Color.parseColor("#F7E2E2")
-    val primaryUi03LightContrast = Color.parseColor("#ffffff")
-    val primaryUi03DarkContrast = Color.parseColor("#000000")
-    val primaryUi04Light = Color.parseColor("#F7F9FA")
-    val primaryUi04Dark = Color.parseColor("#161718")
-    val primaryUi04ExtraDark = Color.parseColor("#000000")
-    val primaryUi04ClassicLight = Color.parseColor("#F7F9FA")
-    val primaryUi04Electric = Color.parseColor("#111419")
-    val primaryUi04Indigo = Color.parseColor("#ECEDE6")
-    val primaryUi04Radioactive = Color.parseColor("#111419")
-    val primaryUi04Rose = Color.parseColor("#FCE6E6")
-    val primaryUi04LightContrast = Color.parseColor("#ffffff")
-    val primaryUi04DarkContrast = Color.parseColor("#000000")
-    val primaryUi05Light = Color.parseColor("#E0E6EA")
-    val primaryUi05Dark = Color.parseColor("#393A3C")
-    val primaryUi05ExtraDark = Color.parseColor("#393A3C").colorIntWithAlpha(128)
-    val primaryUi05ClassicLight = Color.parseColor("#E0E6EA")
-    val primaryUi05Electric = Color.parseColor("#1E3C4A")
-    val primaryUi05Indigo = Color.parseColor("#D8DCDC")
-    val primaryUi05Radioactive = Color.parseColor("#27591a")
-    val primaryUi05Rose = Color.parseColor("#f5d1c4")
-    val primaryUi05LightContrast = Color.parseColor("#e4e4e4")
-    val primaryUi05DarkContrast = Color.parseColor("#333333")
-    val primaryUi05SelectedLight = Color.parseColor("#8F97A4")
-    val primaryUi05SelectedDark = Color.parseColor("#8F97A4")
-    val primaryUi05SelectedExtraDark = Color.parseColor("#686C74")
-    val primaryUi05SelectedClassicLight = Color.parseColor("#8F97A4")
-    val primaryUi05SelectedElectric = Color.parseColor("#3FD2E6")
-    val primaryUi05SelectedIndigo = Color.parseColor("#556675")
-    val primaryUi05SelectedRadioactive = Color.parseColor("#70e84e")
-    val primaryUi05SelectedRose = Color.parseColor("#e53958")
-    val primaryUi05SelectedLightContrast = Color.parseColor("#000000")
-    val primaryUi05SelectedDarkContrast = Color.parseColor("#ffffff")
-    val primaryUi06Light = Color.parseColor("#F7F9FA")
-    val primaryUi06Dark = Color.parseColor("#303337")
-    val primaryUi06ExtraDark = Color.parseColor("#2D2F31")
-    val primaryUi06ClassicLight = Color.parseColor("#F7F9FA")
-    val primaryUi06Electric = Color.parseColor("#1B2933")
-    val primaryUi06Indigo = Color.parseColor("#E8E8DF")
-    val primaryUi06Radioactive = Color.parseColor("#1a3e11")
-    val primaryUi06Rose = Color.parseColor("#fff8f7")
-    val primaryUi06LightContrast = Color.parseColor("#ffffff")
-    val primaryUi06DarkContrast = Color.parseColor("#000000")
-    val primaryIcon01Light = Color.parseColor("#03A9F4")
-    val primaryIcon01Dark = Color.parseColor("#33B8F4")
-    val primaryIcon01ExtraDark = Color.parseColor("#50D0F1")
-    val primaryIcon01ClassicLight = Color.parseColor("#F43E37")
-    val primaryIcon01Electric = Color.parseColor("#3FD2E6")
-    val primaryIcon01Indigo = Color.parseColor("#3D4E70")
-    val primaryIcon01Radioactive = Color.parseColor("#74f864")
-    val primaryIcon01Rose = Color.parseColor("#f05d54")
-    val primaryIcon01LightContrast = Color.parseColor("#000000")
-    val primaryIcon01DarkContrast = Color.parseColor("#ffffff")
-    val primaryIcon01ActiveLight = Color.parseColor("#8AE9FF")
-    val primaryIcon01ActiveDark = Color.parseColor("#64C7F4")
-    val primaryIcon01ActiveExtraDark = Color.parseColor("#80DAF1")
-    val primaryIcon01ActiveClassicLight = Color.parseColor("#F49D9A")
-    val primaryIcon01ActiveElectric = Color.parseColor("#8AE9FF")
-    val primaryIcon01ActiveIndigo = Color.parseColor("#586784")
-    val primaryIcon01ActiveRadioactive = Color.parseColor("#70e84e")
-    val primaryIcon01ActiveRose = Color.parseColor("#ff6f66")
-    val primaryIcon01ActiveLightContrast = Color.parseColor("#3f3f3f")
-    val primaryIcon01ActiveDarkContrast = Color.parseColor("#bebebe")
-    val primaryIcon02Light = Color.parseColor("#B8C3C9")
-    val primaryIcon02Dark = Color.parseColor("#8F97A4")
-    val primaryIcon02ExtraDark = Color.parseColor("#686C74")
-    val primaryIcon02ClassicLight = Color.parseColor("#B8C3C9")
-    val primaryIcon02Electric = Color.parseColor("#16698C")
-    val primaryIcon02Indigo = Color.parseColor("#9DA7B5")
-    val primaryIcon02Radioactive = Color.parseColor("#59bc3d")
-    val primaryIcon02Rose = Color.parseColor("#F58C87")
-    val primaryIcon02LightContrast = Color.parseColor("#808080")
-    val primaryIcon02DarkContrast = Color.parseColor("#b2b2b2")
-    val primaryIcon02SelectedLight = Color.parseColor("#03A9F4")
-    val primaryIcon02SelectedDark = Color.parseColor("#33B8F4")
-    val primaryIcon02SelectedExtraDark = Color.parseColor("#50D0F1")
-    val primaryIcon02SelectedClassicLight = Color.parseColor("#F43E37")
-    val primaryIcon02SelectedElectric = Color.parseColor("#3FD2E6")
-    val primaryIcon02SelectedIndigo = Color.parseColor("#3F4B6A")
-    val primaryIcon02SelectedRadioactive = Color.parseColor("#9FF2B1")
-    val primaryIcon02SelectedRose = Color.parseColor("#f22469")
-    val primaryIcon02SelectedLightContrast = Color.parseColor("#0225C2")
-    val primaryIcon02SelectedDarkContrast = Color.parseColor("#ffffff")
-    val primaryIcon02ActiveLight = Color.parseColor("#8F97A4")
-    val primaryIcon02ActiveDark = Color.parseColor("#EFF3F5")
-    val primaryIcon02ActiveExtraDark = Color.parseColor("#EFF3F5")
-    val primaryIcon02ActiveClassicLight = Color.parseColor("#8F97A4")
-    val primaryIcon02ActiveElectric = Color.parseColor("#3FD2E6")
-    val primaryIcon02ActiveIndigo = Color.parseColor("#8F97A4")
-    val primaryIcon02ActiveRadioactive = Color.parseColor("#70e84e")
-    val primaryIcon02ActiveRose = Color.parseColor("#f55c53")
-    val primaryIcon02ActiveLightContrast = Color.parseColor("#000000").colorIntWithAlpha(191)
-    val primaryIcon02ActiveDarkContrast = Color.parseColor("#000000").colorIntWithAlpha(191)
-    val primaryIcon03Light = Color.parseColor("#8F97A4")
-    val primaryIcon03Dark = Color.parseColor("#686C74")
-    val primaryIcon03ExtraDark = Color.parseColor("#686C74")
-    val primaryIcon03ClassicLight = Color.parseColor("#8F97A4")
-    val primaryIcon03Electric = Color.parseColor("#2A7683")
-    val primaryIcon03Indigo = Color.parseColor("#6D7B87")
-    val primaryIcon03Radioactive = Color.parseColor("#70e84e")
-    val primaryIcon03Rose = Color.parseColor("#e54558")
-    val primaryIcon03LightContrast = Color.parseColor("#656565")
-    val primaryIcon03DarkContrast = Color.parseColor("#656565")
-    val primaryIcon03ActiveLight = Color.parseColor("#03A9F4")
-    val primaryIcon03ActiveDark = Color.parseColor("#33B8F4")
-    val primaryIcon03ActiveExtraDark = Color.parseColor("#50D0F1")
-    val primaryIcon03ActiveClassicLight = Color.parseColor("#03A9F4")
-    val primaryIcon03ActiveElectric = Color.parseColor("#8AE9FF")
-    val primaryIcon03ActiveIndigo = Color.parseColor("#70ADD1")
-    val primaryIcon03ActiveRadioactive = Color.parseColor("#70e84e")
-    val primaryIcon03ActiveRose = Color.parseColor("#ff7373")
-    val primaryIcon03ActiveLightContrast = Color.parseColor("#000000")
-    val primaryIcon03ActiveDarkContrast = Color.parseColor("#ffffff")
-    val primaryText01Light = Color.parseColor("#292B2E")
-    val primaryText01Dark = Color.parseColor("#FFFFFF")
-    val primaryText01ExtraDark = Color.parseColor("#B8C3C9")
-    val primaryText01ClassicLight = Color.parseColor("#292B2E")
-    val primaryText01Electric = Color.parseColor("#FFFFFF")
-    val primaryText01Indigo = Color.parseColor("#323E5C")
-    val primaryText01Radioactive = Color.parseColor("#74f864")
-    val primaryText01Rose = Color.parseColor("#990038")
-    val primaryText01LightContrast = Color.parseColor("#000000")
-    val primaryText01DarkContrast = Color.parseColor("#ffffff")
-    val primaryText02Light = Color.parseColor("#8F97A4")
-    val primaryText02Dark = Color.parseColor("#9C9FA4")
-    val primaryText02ExtraDark = Color.parseColor("#686C74")
-    val primaryText02ClassicLight = Color.parseColor("#8F97A4")
-    val primaryText02Electric = Color.parseColor("#21ADDB")
-    val primaryText02Indigo = Color.parseColor("#7E8999")
-    val primaryText02Radioactive = Color.parseColor("#469431")
-    val primaryText02Rose = Color.parseColor("#E52535")
-    val primaryText02LightContrast = Color.parseColor("#595959")
-    val primaryText02DarkContrast = Color.parseColor("#d9d9d9")
-    val primaryText02SelectedLight = Color.parseColor("#03A9F4")
-    val primaryText02SelectedDark = Color.parseColor("#33B8F4")
-    val primaryText02SelectedExtraDark = Color.parseColor("#50D0F1")
-    val primaryText02SelectedClassicLight = Color.parseColor("#F43E37")
-    val primaryText02SelectedElectric = Color.parseColor("#3FD2E6")
-    val primaryText02SelectedIndigo = Color.parseColor("#333D58")
-    val primaryText02SelectedRadioactive = Color.parseColor("#9FF2B1")
-    val primaryText02SelectedRose = Color.parseColor("#d90048")
-    val primaryText02SelectedLightContrast = Color.parseColor("#023087")
-    val primaryText02SelectedDarkContrast = Color.parseColor("#ffffff")
-    val primaryField01Light = Color.parseColor("#EFF3F5")
-    val primaryField01Dark = Color.parseColor("#EFF3F5").colorIntWithAlpha(26)
-    val primaryField01ExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(26)
-    val primaryField01ClassicLight = Color.parseColor("#EFF3F5")
-    val primaryField01Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(23)
-    val primaryField01Indigo = Color.parseColor("#E7E8E1")
-    val primaryField01Radioactive = Color.parseColor("#1a3e11")
-    val primaryField01Rose = Color.parseColor("#fffdfc")
-    val primaryField01LightContrast = Color.parseColor("#f1f1f1")
-    val primaryField01DarkContrast = Color.parseColor("#272727")
-    val primaryField01ActiveLight = Color.parseColor("#E0E6EA")
-    val primaryField01ActiveDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val primaryField01ActiveExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val primaryField01ActiveClassicLight = Color.parseColor("#E0E6EA")
-    val primaryField01ActiveElectric = Color.parseColor("#3FD2E6").colorIntWithAlpha(36)
-    val primaryField01ActiveIndigo = Color.parseColor("#EBEADA")
-    val primaryField01ActiveRadioactive = Color.parseColor("#27591a")
-    val primaryField01ActiveRose = Color.parseColor("#ffffff")
-    val primaryField01ActiveLightContrast = Color.parseColor("#e4e4e4")
-    val primaryField01ActiveDarkContrast = Color.parseColor("#181818")
-    val primaryField02Light = Color.parseColor("#FBFBFC")
-    val primaryField02Dark = Color.parseColor("#FBFBFC").colorIntWithAlpha(28)
-    val primaryField02ExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(26)
-    val primaryField02ClassicLight = Color.parseColor("#FBFBFC")
-    val primaryField02Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(23)
-    val primaryField02Indigo = Color.parseColor("#FBFBFC")
-    val primaryField02Radioactive = Color.parseColor("#1a3e11")
-    val primaryField02Rose = Color.parseColor("#fffbfa")
-    val primaryField02LightContrast = Color.parseColor("#fbfbfc")
-    val primaryField02DarkContrast = Color.parseColor("#1a1a1a")
-    val primaryField02ActiveLight = Color.parseColor("#FFFFFF")
-    val primaryField02ActiveDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val primaryField02ActiveExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val primaryField02ActiveClassicLight = Color.parseColor("#FFFFFF")
-    val primaryField02ActiveElectric = Color.parseColor("#3FD2E6").colorIntWithAlpha(36)
-    val primaryField02ActiveIndigo = Color.parseColor("#FFFFFF")
-    val primaryField02ActiveRadioactive = Color.parseColor("#27591a")
-    val primaryField02ActiveRose = Color.parseColor("#ffffff")
-    val primaryField02ActiveLightContrast = Color.parseColor("#ffffff")
-    val primaryField02ActiveDarkContrast = Color.parseColor("#0c0c0c")
-    val primaryField03Light = Color.parseColor("#B8C3C9")
-    val primaryField03Dark = Color.parseColor("#B8C3C9").colorIntWithAlpha(128)
-    val primaryField03ExtraDark = Color.parseColor("#B8C3C9").colorIntWithAlpha(51)
-    val primaryField03ClassicLight = Color.parseColor("#B8C3C9")
-    val primaryField03Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(46)
-    val primaryField03Indigo = Color.parseColor("#B8C3C9")
-    val primaryField03Radioactive = Color.parseColor("#257111")
-    val primaryField03Rose = Color.parseColor("#f7caca")
-    val primaryField03LightContrast = Color.parseColor("#7e7e7e")
-    val primaryField03DarkContrast = Color.parseColor("#808080")
-    val primaryField03ActiveLight = Color.parseColor("#03A9F4")
-    val primaryField03ActiveDark = Color.parseColor("#33B8F4")
-    val primaryField03ActiveExtraDark = Color.parseColor("#33B8F4")
-    val primaryField03ActiveClassicLight = Color.parseColor("#03A9F4")
-    val primaryField03ActiveElectric = Color.parseColor("#3FD2E6")
-    val primaryField03ActiveIndigo = Color.parseColor("#70ADD1")
-    val primaryField03ActiveRadioactive = Color.parseColor("#70e84e")
-    val primaryField03ActiveRose = Color.parseColor("#ffaebd")
-    val primaryField03ActiveLightContrast = Color.parseColor("#000000")
-    val primaryField03ActiveDarkContrast = Color.parseColor("#ffffff")
-    val primaryInteractive01Light = Color.parseColor("#03A9F4")
-    val primaryInteractive01Dark = Color.parseColor("#40C3FF")
-    val primaryInteractive01ExtraDark = Color.parseColor("#50D0F1")
-    val primaryInteractive01ClassicLight = Color.parseColor("#F43E37")
-    val primaryInteractive01Electric = Color.parseColor("#3FD2E6")
-    val primaryInteractive01Indigo = Color.parseColor("#639ED6")
-    val primaryInteractive01Radioactive = Color.parseColor("#88FF66")
-    val primaryInteractive01Rose = Color.parseColor("#ff7978")
-    val primaryInteractive01LightContrast = Color.parseColor("#000000")
-    val primaryInteractive01DarkContrast = Color.parseColor("#ffffff")
-    val primaryInteractive01HoverLight = Color.parseColor("#50D0F1")
-    val primaryInteractive01HoverDark = Color.parseColor("#50D0F1")
-    val primaryInteractive01HoverExtraDark = Color.parseColor("#6EE1FF")
-    val primaryInteractive01HoverClassicLight = Color.parseColor("#03A9F4")
-    val primaryInteractive01HoverElectric = Color.parseColor("#64DDF2")
-    val primaryInteractive01HoverIndigo = Color.parseColor("#AECBE5")
-    val primaryInteractive01HoverRadioactive = Color.parseColor("#87ED7F")
-    val primaryInteractive01HoverRose = Color.parseColor("#ff9f9e")
-    val primaryInteractive01HoverLightContrast = Color.parseColor("#212121")
-    val primaryInteractive01HoverDarkContrast = Color.parseColor("#212121")
-    val primaryInteractive01ActiveLight = Color.parseColor("#8AE9FF")
-    val primaryInteractive01ActiveDark = Color.parseColor("#8AE9FF")
-    val primaryInteractive01ActiveExtraDark = Color.parseColor("#A1ECFF")
-    val primaryInteractive01ActiveClassicLight = Color.parseColor("#F43E37")
-    val primaryInteractive01ActiveElectric = Color.parseColor("#3FD2E6")
-    val primaryInteractive01ActiveIndigo = Color.parseColor("#94B4D1")
-    val primaryInteractive01ActiveRadioactive = Color.parseColor("#9FF2B1")
-    val primaryInteractive01ActiveRose = Color.parseColor("#ffc5c4")
-    val primaryInteractive01ActiveLightContrast = Color.parseColor("#404040")
-    val primaryInteractive01ActiveDarkContrast = Color.parseColor("#404040")
-    val primaryInteractive01DisabledLight = Color.parseColor("#03A9F4").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledDark = Color.parseColor("#33B8F4").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledExtraDark = Color.parseColor("#50D0F1").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledClassicLight = Color.parseColor("#F43E37").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledElectric = Color.parseColor("#3FD2E6").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledIndigo = Color.parseColor("#8395A7").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledRadioactive = Color.parseColor("#59bc3d")
-    val primaryInteractive01DisabledRose = Color.parseColor("#997272").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledLightContrast = Color.parseColor("#F43E37").colorIntWithAlpha(64)
-    val primaryInteractive01DisabledDarkContrast = Color.parseColor("#FB5146").colorIntWithAlpha(64)
-    val primaryInteractive02Light = Color.parseColor("#FFFFFF")
-    val primaryInteractive02Dark = Color.parseColor("#17181A")
-    val primaryInteractive02ExtraDark = Color.parseColor("#09090A")
-    val primaryInteractive02ClassicLight = Color.parseColor("#FFFFFF")
-    val primaryInteractive02Electric = Color.parseColor("#13171C")
-    val primaryInteractive02Indigo = Color.parseColor("#F8FAF2")
-    val primaryInteractive02Radioactive = Color.parseColor("#131711")
-    val primaryInteractive02Rose = Color.parseColor("#fdfaf9")
-    val primaryInteractive02LightContrast = Color.parseColor("#ffffff")
-    val primaryInteractive02DarkContrast = Color.parseColor("#000000")
-    val primaryInteractive02HoverLight = Color.parseColor("#03A9F4").colorIntWithAlpha(13)
-    val primaryInteractive02HoverDark = Color.parseColor("#33B8F4").colorIntWithAlpha(13)
-    val primaryInteractive02HoverExtraDark = Color.parseColor("#03A9F4").colorIntWithAlpha(26)
-    val primaryInteractive02HoverClassicLight = Color.parseColor("#03A9F4").colorIntWithAlpha(26)
-    val primaryInteractive02HoverElectric = Color.parseColor("#03A9F4").colorIntWithAlpha(26)
-    val primaryInteractive02HoverIndigo = Color.parseColor("#03A9F4").colorIntWithAlpha(26)
-    val primaryInteractive02HoverRadioactive = Color.parseColor("#59BC3D").colorIntWithAlpha(26)
-    val primaryInteractive02HoverRose = Color.parseColor("#f4032b").colorIntWithAlpha(26)
-    val primaryInteractive02HoverLightContrast = Color.parseColor("#cccccc")
-    val primaryInteractive02HoverDarkContrast = Color.parseColor("#cccccc")
-    val primaryInteractive02ActiveLight = Color.parseColor("#03A9F4").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveDark = Color.parseColor("#33B8F4").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveExtraDark = Color.parseColor("#50D0F1").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveClassicLight = Color.parseColor("#F43E37").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveElectric = Color.parseColor("#9FE8F2").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveIndigo = Color.parseColor("#94A6B4").colorIntWithAlpha(51)
-    val primaryInteractive02ActiveRadioactive = Color.parseColor("#9FF2B1").colorIntWithAlpha(51)
-    val primaryInteractive02ActiveRose = Color.parseColor("#ffffff").colorIntWithAlpha(204)
-    val primaryInteractive02ActiveLightContrast = Color.parseColor("#000000").colorIntWithAlpha(26)
-    val primaryInteractive02ActiveDarkContrast = Color.parseColor("#000000").colorIntWithAlpha(26)
-    val primaryInteractive03Light = Color.parseColor("#D9D9D9")
-    val primaryInteractive03Dark = Color.parseColor("#595959")
-    val primaryInteractive03ExtraDark = Color.parseColor("#595959")
-    val primaryInteractive03ClassicLight = Color.parseColor("#D9D9D9")
-    val primaryInteractive03Electric = Color.parseColor("#284D5C")
-    val primaryInteractive03Indigo = Color.parseColor("#D1D8DE")
-    val primaryInteractive03Radioactive = Color.parseColor("#1F5014")
-    val primaryInteractive03Rose = Color.parseColor("#E0CED1")
-    val primaryInteractive03LightContrast = Color.parseColor("#D9D9D9")
-    val primaryInteractive03DarkContrast = Color.parseColor("#595959")
-    val secondaryUi01Light = Color.parseColor("#FFFFFF")
-    val secondaryUi01Dark = Color.parseColor("#292B2E")
-    val secondaryUi01ExtraDark = Color.parseColor("#000000")
-    val secondaryUi01ClassicLight = Color.parseColor("#F43E37")
-    val secondaryUi01Electric = Color.parseColor("#212835")
-    val secondaryUi01Indigo = Color.parseColor("#32364F")
-    val secondaryUi01Radioactive = Color.parseColor("#162f1e")
-    val secondaryUi01Rose = Color.parseColor("#FFC2C0")
-    val secondaryUi01LightContrast = Color.parseColor("#ffffff")
-    val secondaryUi01DarkContrast = Color.parseColor("#000000")
-    val secondaryUi02Light = Color.parseColor("#E0E6EA")
-    val secondaryUi02Dark = Color.parseColor("#383A3C")
-    val secondaryUi02ExtraDark = Color.parseColor("#1A1C1E")
-    val secondaryUi02ClassicLight = Color.parseColor("#F43E37")
-    val secondaryUi02Electric = Color.parseColor("#2C384B")
-    val secondaryUi02Indigo = Color.parseColor("#32364F")
-    val secondaryUi02Radioactive = Color.parseColor("#162f1e")
-    val secondaryUi02Rose = Color.parseColor("#FCB3B1")
-    val secondaryUi02LightContrast = Color.parseColor("#bfbfbf")
-    val secondaryUi02DarkContrast = Color.parseColor("#333333")
-    val secondaryIcon01Light = Color.parseColor("#03A9F4")
-    val secondaryIcon01Dark = Color.parseColor("#33B8F4")
-    val secondaryIcon01ExtraDark = Color.parseColor("#50D0F1")
-    val secondaryIcon01ClassicLight = Color.parseColor("#FFFFFF")
-    val secondaryIcon01Electric = Color.parseColor("#3FD2E6")
-    val secondaryIcon01Indigo = Color.parseColor("#F3F1E4")
-    val secondaryIcon01Radioactive = Color.parseColor("#70e84e")
-    val secondaryIcon01Rose = Color.parseColor("#d40019")
-    val secondaryIcon01LightContrast = Color.parseColor("#000000")
-    val secondaryIcon01DarkContrast = Color.parseColor("#ffffff")
-    val secondaryIcon02Light = Color.parseColor("#8F97A4")
-    val secondaryIcon02Dark = Color.parseColor("#686C74")
-    val secondaryIcon02ExtraDark = Color.parseColor("#686C74")
-    val secondaryIcon02ClassicLight = Color.parseColor("#FFFFFF")
-    val secondaryIcon02Electric = Color.parseColor("#16698C")
-    val secondaryIcon02Indigo = Color.parseColor("#DEDEDE")
-    val secondaryIcon02Radioactive = Color.parseColor("#70e84e")
-    val secondaryIcon02Rose = Color.parseColor("#de3e59")
-    val secondaryIcon02LightContrast = Color.parseColor("#000000")
-    val secondaryIcon02DarkContrast = Color.parseColor("#cdcdcd")
-    val secondaryText01Light = Color.parseColor("#292B2E")
-    val secondaryText01Dark = Color.parseColor("#FFFFFF")
-    val secondaryText01ExtraDark = Color.parseColor("#B8C3C9")
-    val secondaryText01ClassicLight = Color.parseColor("#FFFFFF")
-    val secondaryText01Electric = Color.parseColor("#3FD2E6")
-    val secondaryText01Indigo = Color.parseColor("#EAE8DC")
-    val secondaryText01Radioactive = Color.parseColor("#70e84e")
-    val secondaryText01Rose = Color.parseColor("#990059")
-    val secondaryText01LightContrast = Color.parseColor("#000000")
-    val secondaryText01DarkContrast = Color.parseColor("#ffffff")
-    val secondaryText02Light = Color.parseColor("#8F97A4")
-    val secondaryText02Dark = Color.parseColor("#686C74")
-    val secondaryText02ExtraDark = Color.parseColor("#686C74")
-    val secondaryText02ClassicLight = Color.parseColor("#FFFFFF")
-    val secondaryText02Electric = Color.parseColor("#16698C")
-    val secondaryText02Indigo = Color.parseColor("#DEDEDE")
-    val secondaryText02Radioactive = Color.parseColor("#70e84e")
-    val secondaryText02Rose = Color.parseColor("#ab494d")
-    val secondaryText02LightContrast = Color.parseColor("#000000").colorIntWithAlpha(204)
-    val secondaryText02DarkContrast = Color.parseColor("#d9d9d9")
-    val secondaryField01Light = Color.parseColor("#EFF3F5")
-    val secondaryField01Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val secondaryField01ExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(26)
-    val secondaryField01ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(51)
-    val secondaryField01Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(23)
-    val secondaryField01Indigo = Color.parseColor("#EFF3F5").colorIntWithAlpha(38)
-    val secondaryField01Radioactive = Color.parseColor("#1a3e11")
-    val secondaryField01Rose = Color.parseColor("#fbf0ef").colorIntWithAlpha(128)
-    val secondaryField01LightContrast = Color.parseColor("#f2f2f2")
-    val secondaryField01DarkContrast = Color.parseColor("#252525")
-    val secondaryField01ActiveLight = Color.parseColor("#E0E6EA")
-    val secondaryField01ActiveDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val secondaryField01ActiveExtraDark = Color.parseColor("#FBFBFC").colorIntWithAlpha(38)
-    val secondaryField01ActiveClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(77)
-    val secondaryField01ActiveElectric = Color.parseColor("#3FD2E6").colorIntWithAlpha(36)
-    val secondaryField01ActiveIndigo = Color.parseColor("#FFFFFF").colorIntWithAlpha(77)
-    val secondaryField01ActiveRadioactive = Color.parseColor("#27591a")
-    val secondaryField01ActiveRose = Color.parseColor("#fbf0ef")
-    val secondaryField01ActiveLightContrast = Color.parseColor("#f8f8f8")
-    val secondaryField01ActiveDarkContrast = Color.parseColor("#1a1a1a")
-    val secondaryInteractive01Light = Color.parseColor("#03A9F4")
-    val secondaryInteractive01Dark = Color.parseColor("#33B8F4")
-    val secondaryInteractive01ExtraDark = Color.parseColor("#50D0F1")
-    val secondaryInteractive01ClassicLight = Color.parseColor("#FFFFFF")
-    val secondaryInteractive01Electric = Color.parseColor("#3FD2E6")
-    val secondaryInteractive01Indigo = Color.parseColor("#FFFFFF")
-    val secondaryInteractive01Radioactive = Color.parseColor("#88FF66")
-    val secondaryInteractive01Rose = Color.parseColor("#cf1133")
-    val secondaryInteractive01LightContrast = Color.parseColor("#000000")
-    val secondaryInteractive01DarkContrast = Color.parseColor("#ffffff")
-    val secondaryInteractive01HoverLight = Color.parseColor("#50D0F1")
-    val secondaryInteractive01HoverDark = Color.parseColor("#64C7F4")
-    val secondaryInteractive01HoverExtraDark = Color.parseColor("#6EE1FF")
-    val secondaryInteractive01HoverClassicLight = Color.parseColor("#50D0F1")
-    val secondaryInteractive01HoverElectric = Color.parseColor("#64DDF2")
-    val secondaryInteractive01HoverIndigo = Color.parseColor("#C9CFDA")
-    val secondaryInteractive01HoverRadioactive = Color.parseColor("#70e84e")
-    val secondaryInteractive01HoverRose = Color.parseColor("#c9cfda")
-    val secondaryInteractive01HoverLightContrast = Color.parseColor("#212121")
-    val secondaryInteractive01HoverDarkContrast = Color.parseColor("#212121")
-    val secondaryInteractive01ActiveLight = Color.parseColor("#8AE9FF")
-    val secondaryInteractive01ActiveDark = Color.parseColor("#8AE9FF")
-    val secondaryInteractive01ActiveExtraDark = Color.parseColor("#A1ECFF")
-    val secondaryInteractive01ActiveClassicLight = Color.parseColor("#F99F9B")
-    val secondaryInteractive01ActiveElectric = Color.parseColor("#9FE8F2")
-    val secondaryInteractive01ActiveIndigo = Color.parseColor("#949FB5")
-    val secondaryInteractive01ActiveRadioactive = Color.parseColor("#59bc3d")
-    val secondaryInteractive01ActiveRose = Color.parseColor("#e8415f")
-    val secondaryInteractive01ActiveLightContrast = Color.parseColor("#404040")
-    val secondaryInteractive01ActiveDarkContrast = Color.parseColor("#c0c0c0")
+    val primaryUi01Light = "#FFFFFF".toColorInt()
+    val primaryUi01Dark = "#292B2E".toColorInt()
+    val primaryUi01ExtraDark = "#222427".toColorInt()
+    val primaryUi01ClassicLight = "#FFFFFF".toColorInt()
+    val primaryUi01Electric = "#19232B".toColorInt()
+    val primaryUi01Indigo = "#ECEDE6".toColorInt()
+    val primaryUi01Rose = "#fff0eb".toColorInt()
+    val primaryUi01LightContrast = "#ffffff".toColorInt()
+    val primaryUi01DarkContrast = "#000000".toColorInt()
+    val primaryUi01ActiveLight = "#F7F9FA".toColorInt()
+    val primaryUi01ActiveDark = "#383A3D".toColorInt()
+    val primaryUi01ActiveExtraDark = "#E0E6EA".toColorInt().colorIntWithAlpha(26)
+    val primaryUi01ActiveClassicLight = "#F7F9FA".toColorInt()
+    val primaryUi01ActiveElectric = "#171C24".toColorInt()
+    val primaryUi01ActiveIndigo = "#F1F2EF".toColorInt()
+    val primaryUi01ActiveRose = "#fff9f7".toColorInt()
+    val primaryUi01ActiveLightContrast = "#f7f9fa".toColorInt()
+    val primaryUi01ActiveDarkContrast = "#1b1b1b".toColorInt()
+    val primaryUi02Light = "#FFFFFF".toColorInt()
+    val primaryUi02Dark = "#1A1B1D".toColorInt()
+    val primaryUi02ExtraDark = "#000000".toColorInt()
+    val primaryUi02ClassicLight = "#FFFFFF".toColorInt()
+    val primaryUi02Electric = "#161A20".toColorInt()
+    val primaryUi02Indigo = "#F4F5F2".toColorInt()
+    val primaryUi02Rose = "#FFEEED".toColorInt()
+    val primaryUi02LightContrast = "#ffffff".toColorInt()
+    val primaryUi02DarkContrast = "#000000".toColorInt()
+    val primaryUi02SelectedLight = "#E6F6FE".toColorInt()
+    val primaryUi02SelectedDark = "#1E333D".toColorInt()
+    val primaryUi02SelectedExtraDark = "#1F1F1F".toColorInt()
+    val primaryUi02SelectedClassicLight = "#FEECEB".toColorInt()
+    val primaryUi02SelectedElectric = "#1A2C34".toColorInt()
+    val primaryUi02SelectedIndigo = "#E2E4E5".toColorInt()
+    val primaryUi02SelectedRose = "#f7caca".toColorInt()
+    val primaryUi02SelectedLightContrast = "#e5e5e5".toColorInt()
+    val primaryUi02SelectedDarkContrast = "#262626".toColorInt()
+    val primaryUi02ActiveLight = "#F7F9FA".toColorInt()
+    val primaryUi02ActiveDark = "#222427".toColorInt()
+    val primaryUi02ActiveExtraDark = "#161717".toColorInt()
+    val primaryUi02ActiveClassicLight = "#F7F9FA".toColorInt()
+    val primaryUi02ActiveElectric = "#1B212A".toColorInt()
+    val primaryUi02ActiveIndigo = "#F7F9FA".toColorInt()
+    val primaryUi02ActiveRose = "#fce2de".toColorInt()
+    val primaryUi02ActiveLightContrast = "#f2f2f2".toColorInt()
+    val primaryUi02ActiveDarkContrast = "#1b1b1b".toColorInt()
+    val primaryUi03Light = "#FAFAFA".toColorInt()
+    val primaryUi03Dark = "#202124".toColorInt()
+    val primaryUi03ExtraDark = "#080808".toColorInt()
+    val primaryUi03ClassicLight = "#FAFAF9".toColorInt()
+    val primaryUi03Electric = "#171C25".toColorInt()
+    val primaryUi03Indigo = "#EFEFEF".toColorInt()
+    val primaryUi03Rose = "#F7E2E2".toColorInt()
+    val primaryUi03LightContrast = "#ffffff".toColorInt()
+    val primaryUi03DarkContrast = "#000000".toColorInt()
+    val primaryUi04Light = "#F7F9FA".toColorInt()
+    val primaryUi04Dark = "#161718".toColorInt()
+    val primaryUi04ExtraDark = "#000000".toColorInt()
+    val primaryUi04ClassicLight = "#F7F9FA".toColorInt()
+    val primaryUi04Electric = "#111419".toColorInt()
+    val primaryUi04Indigo = "#ECEDE6".toColorInt()
+    val primaryUi04Rose = "#FCE6E6".toColorInt()
+    val primaryUi04LightContrast = "#ffffff".toColorInt()
+    val primaryUi04DarkContrast = "#000000".toColorInt()
+    val primaryUi05Light = "#E0E6EA".toColorInt()
+    val primaryUi05Dark = "#393A3C".toColorInt()
+    val primaryUi05ExtraDark = "#393A3C".toColorInt().colorIntWithAlpha(128)
+    val primaryUi05ClassicLight = "#E0E6EA".toColorInt()
+    val primaryUi05Electric = "#1E3C4A".toColorInt()
+    val primaryUi05Indigo = "#D8DCDC".toColorInt()
+    val primaryUi05Rose = "#f5d1c4".toColorInt()
+    val primaryUi05LightContrast = "#e4e4e4".toColorInt()
+    val primaryUi05DarkContrast = "#333333".toColorInt()
+    val primaryUi05SelectedLight = "#8F97A4".toColorInt()
+    val primaryUi05SelectedDark = "#8F97A4".toColorInt()
+    val primaryUi05SelectedExtraDark = "#686C74".toColorInt()
+    val primaryUi05SelectedClassicLight = "#8F97A4".toColorInt()
+    val primaryUi05SelectedElectric = "#3FD2E6".toColorInt()
+    val primaryUi05SelectedIndigo = "#556675".toColorInt()
+    val primaryUi05SelectedRose = "#e53958".toColorInt()
+    val primaryUi05SelectedLightContrast = "#000000".toColorInt()
+    val primaryUi05SelectedDarkContrast = "#ffffff".toColorInt()
+    val primaryUi06Light = "#F7F9FA".toColorInt()
+    val primaryUi06Dark = "#303337".toColorInt()
+    val primaryUi06ExtraDark = "#2D2F31".toColorInt()
+    val primaryUi06ClassicLight = "#F7F9FA".toColorInt()
+    val primaryUi06Electric = "#1B2933".toColorInt()
+    val primaryUi06Indigo = "#E8E8DF".toColorInt()
+    val primaryUi06Rose = "#fff8f7".toColorInt()
+    val primaryUi06LightContrast = "#ffffff".toColorInt()
+    val primaryUi06DarkContrast = "#000000".toColorInt()
+    val primaryIcon01Light = "#03A9F4".toColorInt()
+    val primaryIcon01Dark = "#33B8F4".toColorInt()
+    val primaryIcon01ExtraDark = "#50D0F1".toColorInt()
+    val primaryIcon01ClassicLight = "#F43E37".toColorInt()
+    val primaryIcon01Electric = "#3FD2E6".toColorInt()
+    val primaryIcon01Indigo = "#3D4E70".toColorInt()
+    val primaryIcon01Rose = "#f05d54".toColorInt()
+    val primaryIcon01LightContrast = "#000000".toColorInt()
+    val primaryIcon01DarkContrast = "#ffffff".toColorInt()
+    val primaryIcon01ActiveLight = "#8AE9FF".toColorInt()
+    val primaryIcon01ActiveDark = "#64C7F4".toColorInt()
+    val primaryIcon01ActiveExtraDark = "#80DAF1".toColorInt()
+    val primaryIcon01ActiveClassicLight = "#F49D9A".toColorInt()
+    val primaryIcon01ActiveElectric = "#8AE9FF".toColorInt()
+    val primaryIcon01ActiveIndigo = "#586784".toColorInt()
+    val primaryIcon01ActiveRose = "#ff6f66".toColorInt()
+    val primaryIcon01ActiveLightContrast = "#3f3f3f".toColorInt()
+    val primaryIcon01ActiveDarkContrast = "#bebebe".toColorInt()
+    val primaryIcon02Light = "#B8C3C9".toColorInt()
+    val primaryIcon02Dark = "#8F97A4".toColorInt()
+    val primaryIcon02ExtraDark = "#686C74".toColorInt()
+    val primaryIcon02ClassicLight = "#B8C3C9".toColorInt()
+    val primaryIcon02Electric = "#16698C".toColorInt()
+    val primaryIcon02Indigo = "#9DA7B5".toColorInt()
+    val primaryIcon02Rose = "#F58C87".toColorInt()
+    val primaryIcon02LightContrast = "#808080".toColorInt()
+    val primaryIcon02DarkContrast = "#b2b2b2".toColorInt()
+    val primaryIcon02SelectedLight = "#03A9F4".toColorInt()
+    val primaryIcon02SelectedDark = "#33B8F4".toColorInt()
+    val primaryIcon02SelectedExtraDark = "#50D0F1".toColorInt()
+    val primaryIcon02SelectedClassicLight = "#F43E37".toColorInt()
+    val primaryIcon02SelectedElectric = "#3FD2E6".toColorInt()
+    val primaryIcon02SelectedIndigo = "#3F4B6A".toColorInt()
+    val primaryIcon02SelectedRose = "#f22469".toColorInt()
+    val primaryIcon02SelectedLightContrast = "#0225C2".toColorInt()
+    val primaryIcon02SelectedDarkContrast = "#ffffff".toColorInt()
+    val primaryIcon02ActiveLight = "#8F97A4".toColorInt()
+    val primaryIcon02ActiveDark = "#EFF3F5".toColorInt()
+    val primaryIcon02ActiveExtraDark = "#EFF3F5".toColorInt()
+    val primaryIcon02ActiveClassicLight = "#8F97A4".toColorInt()
+    val primaryIcon02ActiveElectric = "#3FD2E6".toColorInt()
+    val primaryIcon02ActiveIndigo = "#8F97A4".toColorInt()
+    val primaryIcon02ActiveRose = "#f55c53".toColorInt()
+    val primaryIcon02ActiveLightContrast = "#000000".toColorInt().colorIntWithAlpha(191)
+    val primaryIcon02ActiveDarkContrast = "#000000".toColorInt().colorIntWithAlpha(191)
+    val primaryIcon03Light = "#8F97A4".toColorInt()
+    val primaryIcon03Dark = "#686C74".toColorInt()
+    val primaryIcon03ExtraDark = "#686C74".toColorInt()
+    val primaryIcon03ClassicLight = "#8F97A4".toColorInt()
+    val primaryIcon03Electric = "#2A7683".toColorInt()
+    val primaryIcon03Indigo = "#6D7B87".toColorInt()
+    val primaryIcon03Rose = "#e54558".toColorInt()
+    val primaryIcon03LightContrast = "#656565".toColorInt()
+    val primaryIcon03DarkContrast = "#656565".toColorInt()
+    val primaryIcon03ActiveLight = "#03A9F4".toColorInt()
+    val primaryIcon03ActiveDark = "#33B8F4".toColorInt()
+    val primaryIcon03ActiveExtraDark = "#50D0F1".toColorInt()
+    val primaryIcon03ActiveClassicLight = "#03A9F4".toColorInt()
+    val primaryIcon03ActiveElectric = "#8AE9FF".toColorInt()
+    val primaryIcon03ActiveIndigo = "#70ADD1".toColorInt()
+    val primaryIcon03ActiveRose = "#ff7373".toColorInt()
+    val primaryIcon03ActiveLightContrast = "#000000".toColorInt()
+    val primaryIcon03ActiveDarkContrast = "#ffffff".toColorInt()
+    val primaryText01Light = "#292B2E".toColorInt()
+    val primaryText01Dark = "#FFFFFF".toColorInt()
+    val primaryText01ExtraDark = "#B8C3C9".toColorInt()
+    val primaryText01ClassicLight = "#292B2E".toColorInt()
+    val primaryText01Electric = "#FFFFFF".toColorInt()
+    val primaryText01Indigo = "#323E5C".toColorInt()
+    val primaryText01Rose = "#990038".toColorInt()
+    val primaryText01LightContrast = "#000000".toColorInt()
+    val primaryText01DarkContrast = "#ffffff".toColorInt()
+    val primaryText02Light = "#8F97A4".toColorInt()
+    val primaryText02Dark = "#9C9FA4".toColorInt()
+    val primaryText02ExtraDark = "#686C74".toColorInt()
+    val primaryText02ClassicLight = "#8F97A4".toColorInt()
+    val primaryText02Electric = "#21ADDB".toColorInt()
+    val primaryText02Indigo = "#7E8999".toColorInt()
+    val primaryText02Rose = "#E52535".toColorInt()
+    val primaryText02LightContrast = "#595959".toColorInt()
+    val primaryText02DarkContrast = "#d9d9d9".toColorInt()
+    val primaryText02SelectedLight = "#03A9F4".toColorInt()
+    val primaryText02SelectedDark = "#33B8F4".toColorInt()
+    val primaryText02SelectedExtraDark = "#50D0F1".toColorInt()
+    val primaryText02SelectedClassicLight = "#F43E37".toColorInt()
+    val primaryText02SelectedElectric = "#3FD2E6".toColorInt()
+    val primaryText02SelectedIndigo = "#333D58".toColorInt()
+    val primaryText02SelectedRose = "#d90048".toColorInt()
+    val primaryText02SelectedLightContrast = "#023087".toColorInt()
+    val primaryText02SelectedDarkContrast = "#ffffff".toColorInt()
+    val primaryField01Light = "#EFF3F5".toColorInt()
+    val primaryField01Dark = "#EFF3F5".toColorInt().colorIntWithAlpha(26)
+    val primaryField01ExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(26)
+    val primaryField01ClassicLight = "#EFF3F5".toColorInt()
+    val primaryField01Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
+    val primaryField01Indigo = "#E7E8E1".toColorInt()
+    val primaryField01Rose = "#fffdfc".toColorInt()
+    val primaryField01LightContrast = "#f1f1f1".toColorInt()
+    val primaryField01DarkContrast = "#272727".toColorInt()
+    val primaryField01ActiveLight = "#E0E6EA".toColorInt()
+    val primaryField01ActiveDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val primaryField01ActiveExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val primaryField01ActiveClassicLight = "#E0E6EA".toColorInt()
+    val primaryField01ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
+    val primaryField01ActiveIndigo = "#EBEADA".toColorInt()
+    val primaryField01ActiveRose = "#ffffff".toColorInt()
+    val primaryField01ActiveLightContrast = "#e4e4e4".toColorInt()
+    val primaryField01ActiveDarkContrast = "#181818".toColorInt()
+    val primaryField02Light = "#FBFBFC".toColorInt()
+    val primaryField02Dark = "#FBFBFC".toColorInt().colorIntWithAlpha(28)
+    val primaryField02ExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(26)
+    val primaryField02ClassicLight = "#FBFBFC".toColorInt()
+    val primaryField02Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
+    val primaryField02Indigo = "#FBFBFC".toColorInt()
+    val primaryField02Rose = "#fffbfa".toColorInt()
+    val primaryField02LightContrast = "#fbfbfc".toColorInt()
+    val primaryField02DarkContrast = "#1a1a1a".toColorInt()
+    val primaryField02ActiveLight = "#FFFFFF".toColorInt()
+    val primaryField02ActiveDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val primaryField02ActiveExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val primaryField02ActiveClassicLight = "#FFFFFF".toColorInt()
+    val primaryField02ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
+    val primaryField02ActiveIndigo = "#FFFFFF".toColorInt()
+    val primaryField02ActiveRose = "#ffffff".toColorInt()
+    val primaryField02ActiveLightContrast = "#ffffff".toColorInt()
+    val primaryField02ActiveDarkContrast = "#0c0c0c".toColorInt()
+    val primaryField03Light = "#B8C3C9".toColorInt()
+    val primaryField03Dark = "#B8C3C9".toColorInt().colorIntWithAlpha(128)
+    val primaryField03ExtraDark = "#B8C3C9".toColorInt().colorIntWithAlpha(51)
+    val primaryField03ClassicLight = "#B8C3C9".toColorInt()
+    val primaryField03Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(46)
+    val primaryField03Indigo = "#B8C3C9".toColorInt()
+    val primaryField03Rose = "#f7caca".toColorInt()
+    val primaryField03LightContrast = "#7e7e7e".toColorInt()
+    val primaryField03DarkContrast = "#808080".toColorInt()
+    val primaryField03ActiveLight = "#03A9F4".toColorInt()
+    val primaryField03ActiveDark = "#33B8F4".toColorInt()
+    val primaryField03ActiveExtraDark = "#33B8F4".toColorInt()
+    val primaryField03ActiveClassicLight = "#03A9F4".toColorInt()
+    val primaryField03ActiveElectric = "#3FD2E6".toColorInt()
+    val primaryField03ActiveIndigo = "#70ADD1".toColorInt()
+    val primaryField03ActiveRose = "#ffaebd".toColorInt()
+    val primaryField03ActiveLightContrast = "#000000".toColorInt()
+    val primaryField03ActiveDarkContrast = "#ffffff".toColorInt()
+    val primaryInteractive01Light = "#03A9F4".toColorInt()
+    val primaryInteractive01Dark = "#40C3FF".toColorInt()
+    val primaryInteractive01ExtraDark = "#50D0F1".toColorInt()
+    val primaryInteractive01ClassicLight = "#F43E37".toColorInt()
+    val primaryInteractive01Electric = "#3FD2E6".toColorInt()
+    val primaryInteractive01Indigo = "#639ED6".toColorInt()
+    val primaryInteractive01Rose = "#ff7978".toColorInt()
+    val primaryInteractive01LightContrast = "#000000".toColorInt()
+    val primaryInteractive01DarkContrast = "#ffffff".toColorInt()
+    val primaryInteractive01HoverLight = "#50D0F1".toColorInt()
+    val primaryInteractive01HoverDark = "#50D0F1".toColorInt()
+    val primaryInteractive01HoverExtraDark = "#6EE1FF".toColorInt()
+    val primaryInteractive01HoverClassicLight = "#03A9F4".toColorInt()
+    val primaryInteractive01HoverElectric = "#64DDF2".toColorInt()
+    val primaryInteractive01HoverIndigo = "#AECBE5".toColorInt()
+    val primaryInteractive01HoverRose = "#ff9f9e".toColorInt()
+    val primaryInteractive01HoverLightContrast = "#212121".toColorInt()
+    val primaryInteractive01HoverDarkContrast = "#212121".toColorInt()
+    val primaryInteractive01ActiveLight = "#8AE9FF".toColorInt()
+    val primaryInteractive01ActiveDark = "#8AE9FF".toColorInt()
+    val primaryInteractive01ActiveExtraDark = "#A1ECFF".toColorInt()
+    val primaryInteractive01ActiveClassicLight = "#F43E37".toColorInt()
+    val primaryInteractive01ActiveElectric = "#3FD2E6".toColorInt()
+    val primaryInteractive01ActiveIndigo = "#94B4D1".toColorInt()
+    val primaryInteractive01ActiveRose = "#ffc5c4".toColorInt()
+    val primaryInteractive01ActiveLightContrast = "#404040".toColorInt()
+    val primaryInteractive01ActiveDarkContrast = "#404040".toColorInt()
+    val primaryInteractive01DisabledLight = "#03A9F4".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledDark = "#33B8F4".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledExtraDark = "#50D0F1".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledClassicLight = "#F43E37".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledIndigo = "#8395A7".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledRose = "#997272".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledLightContrast = "#F43E37".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive01DisabledDarkContrast = "#FB5146".toColorInt().colorIntWithAlpha(64)
+    val primaryInteractive02Light = "#FFFFFF".toColorInt()
+    val primaryInteractive02Dark = "#17181A".toColorInt()
+    val primaryInteractive02ExtraDark = "#09090A".toColorInt()
+    val primaryInteractive02ClassicLight = "#FFFFFF".toColorInt()
+    val primaryInteractive02Electric = "#13171C".toColorInt()
+    val primaryInteractive02Indigo = "#F8FAF2".toColorInt()
+    val primaryInteractive02Rose = "#fdfaf9".toColorInt()
+    val primaryInteractive02LightContrast = "#ffffff".toColorInt()
+    val primaryInteractive02DarkContrast = "#000000".toColorInt()
+    val primaryInteractive02HoverLight = "#03A9F4".toColorInt().colorIntWithAlpha(13)
+    val primaryInteractive02HoverDark = "#33B8F4".toColorInt().colorIntWithAlpha(13)
+    val primaryInteractive02HoverExtraDark = "#03A9F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02HoverClassicLight = "#03A9F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02HoverElectric = "#03A9F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02HoverIndigo = "#03A9F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02HoverRose = "#f4032b".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02HoverLightContrast = "#cccccc".toColorInt()
+    val primaryInteractive02HoverDarkContrast = "#cccccc".toColorInt()
+    val primaryInteractive02ActiveLight = "#03A9F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveDark = "#33B8F4".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveExtraDark = "#50D0F1".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveClassicLight = "#F43E37".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveElectric = "#9FE8F2".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveIndigo = "#94A6B4".toColorInt().colorIntWithAlpha(51)
+    val primaryInteractive02ActiveRose = "#ffffff".toColorInt().colorIntWithAlpha(204)
+    val primaryInteractive02ActiveLightContrast = "#000000".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive02ActiveDarkContrast = "#000000".toColorInt().colorIntWithAlpha(26)
+    val primaryInteractive03Light = "#D9D9D9".toColorInt()
+    val primaryInteractive03Dark = "#595959".toColorInt()
+    val primaryInteractive03ExtraDark = "#595959".toColorInt()
+    val primaryInteractive03ClassicLight = "#D9D9D9".toColorInt()
+    val primaryInteractive03Electric = "#284D5C".toColorInt()
+    val primaryInteractive03Indigo = "#D1D8DE".toColorInt()
+    val primaryInteractive03Rose = "#E0CED1".toColorInt()
+    val primaryInteractive03LightContrast = "#D9D9D9".toColorInt()
+    val primaryInteractive03DarkContrast = "#595959".toColorInt()
+    val secondaryUi01Light = "#FFFFFF".toColorInt()
+    val secondaryUi01Dark = "#292B2E".toColorInt()
+    val secondaryUi01ExtraDark = "#000000".toColorInt()
+    val secondaryUi01ClassicLight = "#F43E37".toColorInt()
+    val secondaryUi01Electric = "#212835".toColorInt()
+    val secondaryUi01Indigo = "#32364F".toColorInt()
+    val secondaryUi01Rose = "#FFC2C0".toColorInt()
+    val secondaryUi01LightContrast = "#ffffff".toColorInt()
+    val secondaryUi01DarkContrast = "#000000".toColorInt()
+    val secondaryUi02Light = "#E0E6EA".toColorInt()
+    val secondaryUi02Dark = "#383A3C".toColorInt()
+    val secondaryUi02ExtraDark = "#1A1C1E".toColorInt()
+    val secondaryUi02ClassicLight = "#F43E37".toColorInt()
+    val secondaryUi02Electric = "#2C384B".toColorInt()
+    val secondaryUi02Indigo = "#32364F".toColorInt()
+    val secondaryUi02Rose = "#FCB3B1".toColorInt()
+    val secondaryUi02LightContrast = "#bfbfbf".toColorInt()
+    val secondaryUi02DarkContrast = "#333333".toColorInt()
+    val secondaryIcon01Light = "#03A9F4".toColorInt()
+    val secondaryIcon01Dark = "#33B8F4".toColorInt()
+    val secondaryIcon01ExtraDark = "#50D0F1".toColorInt()
+    val secondaryIcon01ClassicLight = "#FFFFFF".toColorInt()
+    val secondaryIcon01Electric = "#3FD2E6".toColorInt()
+    val secondaryIcon01Indigo = "#F3F1E4".toColorInt()
+    val secondaryIcon01Rose = "#d40019".toColorInt()
+    val secondaryIcon01LightContrast = "#000000".toColorInt()
+    val secondaryIcon01DarkContrast = "#ffffff".toColorInt()
+    val secondaryIcon02Light = "#8F97A4".toColorInt()
+    val secondaryIcon02Dark = "#686C74".toColorInt()
+    val secondaryIcon02ExtraDark = "#686C74".toColorInt()
+    val secondaryIcon02ClassicLight = "#FFFFFF".toColorInt()
+    val secondaryIcon02Electric = "#16698C".toColorInt()
+    val secondaryIcon02Indigo = "#DEDEDE".toColorInt()
+    val secondaryIcon02Rose = "#de3e59".toColorInt()
+    val secondaryIcon02LightContrast = "#000000".toColorInt()
+    val secondaryIcon02DarkContrast = "#cdcdcd".toColorInt()
+    val secondaryText01Light = "#292B2E".toColorInt()
+    val secondaryText01Dark = "#FFFFFF".toColorInt()
+    val secondaryText01ExtraDark = "#B8C3C9".toColorInt()
+    val secondaryText01ClassicLight = "#FFFFFF".toColorInt()
+    val secondaryText01Electric = "#3FD2E6".toColorInt()
+    val secondaryText01Indigo = "#EAE8DC".toColorInt()
+    val secondaryText01Rose = "#990059".toColorInt()
+    val secondaryText01LightContrast = "#000000".toColorInt()
+    val secondaryText01DarkContrast = "#ffffff".toColorInt()
+    val secondaryText02Light = "#8F97A4".toColorInt()
+    val secondaryText02Dark = "#686C74".toColorInt()
+    val secondaryText02ExtraDark = "#686C74".toColorInt()
+    val secondaryText02ClassicLight = "#FFFFFF".toColorInt()
+    val secondaryText02Electric = "#16698C".toColorInt()
+    val secondaryText02Indigo = "#DEDEDE".toColorInt()
+    val secondaryText02Rose = "#ab494d".toColorInt()
+    val secondaryText02LightContrast = "#000000".toColorInt().colorIntWithAlpha(204)
+    val secondaryText02DarkContrast = "#d9d9d9".toColorInt()
+    val secondaryField01Light = "#EFF3F5".toColorInt()
+    val secondaryField01Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val secondaryField01ExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(26)
+    val secondaryField01ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(51)
+    val secondaryField01Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(23)
+    val secondaryField01Indigo = "#EFF3F5".toColorInt().colorIntWithAlpha(38)
+    val secondaryField01Rose = "#fbf0ef".toColorInt().colorIntWithAlpha(128)
+    val secondaryField01LightContrast = "#f2f2f2".toColorInt()
+    val secondaryField01DarkContrast = "#252525".toColorInt()
+    val secondaryField01ActiveLight = "#E0E6EA".toColorInt()
+    val secondaryField01ActiveDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val secondaryField01ActiveExtraDark = "#FBFBFC".toColorInt().colorIntWithAlpha(38)
+    val secondaryField01ActiveClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
+    val secondaryField01ActiveElectric = "#3FD2E6".toColorInt().colorIntWithAlpha(36)
+    val secondaryField01ActiveIndigo = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
+    val secondaryField01ActiveRose = "#fbf0ef".toColorInt()
+    val secondaryField01ActiveLightContrast = "#f8f8f8".toColorInt()
+    val secondaryField01ActiveDarkContrast = "#1a1a1a".toColorInt()
+    val secondaryInteractive01Light = "#03A9F4".toColorInt()
+    val secondaryInteractive01Dark = "#33B8F4".toColorInt()
+    val secondaryInteractive01ExtraDark = "#50D0F1".toColorInt()
+    val secondaryInteractive01ClassicLight = "#FFFFFF".toColorInt()
+    val secondaryInteractive01Electric = "#3FD2E6".toColorInt()
+    val secondaryInteractive01Indigo = "#FFFFFF".toColorInt()
+    val secondaryInteractive01Rose = "#cf1133".toColorInt()
+    val secondaryInteractive01LightContrast = "#000000".toColorInt()
+    val secondaryInteractive01DarkContrast = "#ffffff".toColorInt()
+    val secondaryInteractive01HoverLight = "#50D0F1".toColorInt()
+    val secondaryInteractive01HoverDark = "#64C7F4".toColorInt()
+    val secondaryInteractive01HoverExtraDark = "#6EE1FF".toColorInt()
+    val secondaryInteractive01HoverClassicLight = "#50D0F1".toColorInt()
+    val secondaryInteractive01HoverElectric = "#64DDF2".toColorInt()
+    val secondaryInteractive01HoverIndigo = "#C9CFDA".toColorInt()
+    val secondaryInteractive01HoverRose = "#c9cfda".toColorInt()
+    val secondaryInteractive01HoverLightContrast = "#212121".toColorInt()
+    val secondaryInteractive01HoverDarkContrast = "#212121".toColorInt()
+    val secondaryInteractive01ActiveLight = "#8AE9FF".toColorInt()
+    val secondaryInteractive01ActiveDark = "#8AE9FF".toColorInt()
+    val secondaryInteractive01ActiveExtraDark = "#A1ECFF".toColorInt()
+    val secondaryInteractive01ActiveClassicLight = "#F99F9B".toColorInt()
+    val secondaryInteractive01ActiveElectric = "#9FE8F2".toColorInt()
+    val secondaryInteractive01ActiveIndigo = "#949FB5".toColorInt()
+    val secondaryInteractive01ActiveRose = "#e8415f".toColorInt()
+    val secondaryInteractive01ActiveLightContrast = "#404040".toColorInt()
+    val secondaryInteractive01ActiveDarkContrast = "#c0c0c0".toColorInt()
 
     @ColorInt fun podcastUi01Light(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastUi01Dark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#292B2E")
+        return "#292B2E".toColorInt()
     }
 
     @ColorInt fun podcastUi01ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastUi01ClassicLight(@ColorInt podcastColor: Int): Int {
@@ -477,119 +432,119 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastUi01Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun podcastUi01Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#737B80"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#737B80".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastUi01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#162f1e")
+        return "#162f1e".toColorInt()
     }
 
     @ColorInt fun podcastUi01Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FBE2DD"), ColorUtils.colorWithAlpha(podcastColor, 26))
+        return ColorUtils.calculateCombinedColor("#FBE2DD".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 26))
     }
 
     @ColorInt fun podcastUi01LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastUi01DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastUi02Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 18))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 18))
     }
 
     @ColorInt fun podcastUi02Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1a1e1c"), ColorUtils.colorWithAlpha(podcastColor, 38))
+        return ColorUtils.calculateCombinedColor("#1a1e1c".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
     @ColorInt fun podcastUi02ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1a1e1c"), ColorUtils.colorWithAlpha(podcastColor, 26))
+        return ColorUtils.calculateCombinedColor("#1a1e1c".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 26))
     }
 
     @ColorInt fun podcastUi02ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 18))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 18))
     }
 
     @ColorInt fun podcastUi02Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#152431")
+        return "#152431".toColorInt()
     }
 
     @ColorInt fun podcastUi02Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#DBDBD5"), ColorUtils.colorWithAlpha(podcastColor, 13))
+        return ColorUtils.calculateCombinedColor("#DBDBD5".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 13))
     }
 
     @ColorInt fun podcastUi02Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#162F1E")
+        return "#162F1E".toColorInt()
     }
 
     @ColorInt fun podcastUi02Rose(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFD9D9")
+        return "#FFD9D9".toColorInt()
     }
 
     @ColorInt fun podcastUi02LightContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 20))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 20))
     }
 
     @ColorInt fun podcastUi02DarkContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 31))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 31))
     }
 
     @ColorInt fun podcastUi03Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastUi03Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastUi03ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastUi03ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastUi03Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun podcastUi03Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 51))
+        return ColorUtils.calculateCombinedColor("#17181F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
     @ColorInt fun podcastUi03Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#112417")
+        return "#112417".toColorInt()
     }
 
     @ColorInt fun podcastUi03Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#996B72"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#996B72".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi03LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastUi03DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#141414")
+        return "#141414".toColorInt()
     }
 
     @ColorInt fun podcastUi04Light(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#E0E6EA")
+        return "#E0E6EA".toColorInt()
     }
 
     @ColorInt fun podcastUi04Dark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#383A3C")
+        return "#383A3C".toColorInt()
     }
 
     @ColorInt fun podcastUi04ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#1A1C1E")
+        return "#1A1C1E".toColorInt()
     }
 
     @ColorInt fun podcastUi04ClassicLight(@ColorInt podcastColor: Int): Int {
@@ -597,107 +552,107 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastUi04Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#2E3A4F")
+        return "#2E3A4F".toColorInt()
     }
 
     @ColorInt fun podcastUi04Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#737B80"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#737B80".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastUi04Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#27591a")
+        return "#27591a".toColorInt()
     }
 
     @ColorInt fun podcastUi04Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#EBD3CE"), ColorUtils.colorWithAlpha(podcastColor, 38))
+        return ColorUtils.calculateCombinedColor("#EBD3CE".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
     @ColorInt fun podcastUi04LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#bebebe")
+        return "#bebebe".toColorInt()
     }
 
     @ColorInt fun podcastUi04DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#404040")
+        return "#404040".toColorInt()
     }
 
     @ColorInt fun podcastUi05Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#2B3547")
+        return "#2B3547".toColorInt()
     }
 
     @ColorInt fun podcastUi05Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#272938"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#272938".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastUi05Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#1D3D27")
+        return "#1D3D27".toColorInt()
     }
 
     @ColorInt fun podcastUi05Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#B27982"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#B27982".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05LightContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi05DarkContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#1A1A1A".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi06Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastUi06Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastUi06ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastUi06ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastUi06Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#36425A")
+        return "#36425A".toColorInt()
     }
 
     @ColorInt fun podcastUi06Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#343852"), ColorUtils.colorWithAlpha(podcastColor, 102))
+        return ColorUtils.calculateCombinedColor("#343852".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
     @ColorInt fun podcastUi06Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#254B31")
+        return "#254B31".toColorInt()
     }
 
     @ColorInt fun podcastUi06Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#CC8F98"), ColorUtils.colorWithAlpha(podcastColor, 115))
+        return ColorUtils.calculateCombinedColor("#CC8F98".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 115))
     }
 
     @ColorInt fun podcastUi06LightContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastUi06DarkContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#333333".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastIcon01Light(@ColorInt podcastColor: Int): Int {
@@ -713,31 +668,31 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastIcon01ClassicLight(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastIcon01Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastIcon01Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#F3F1E4"), ColorUtils.colorWithAlpha(podcastColor, 138))
+        return ColorUtils.calculateCombinedColor("#F3F1E4".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
     @ColorInt fun podcastIcon01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#70e84e")
+        return "#70e84e".toColorInt()
     }
 
     @ColorInt fun podcastIcon01Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#B2365F"), ColorUtils.colorWithAlpha(podcastColor, 115))
+        return ColorUtils.calculateCombinedColor("#B2365F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 115))
     }
 
     @ColorInt fun podcastIcon01LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastIcon01DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastIcon02Light(@ColorInt podcastColor: Int): Int {
@@ -757,27 +712,27 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastIcon02Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastIcon02Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#919CB2".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastIcon02Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun podcastIcon02Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastIcon02LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastIcon02DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastIcon03Light(@ColorInt podcastColor: Int): Int {
@@ -785,11 +740,11 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastIcon03Dark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastIcon03ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastIcon03ClassicLight(@ColorInt podcastColor: Int): Int {
@@ -797,27 +752,27 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastIcon03Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastIcon03Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#45516E"), ColorUtils.colorWithAlpha(podcastColor, 51))
+        return ColorUtils.calculateCombinedColor("#45516E".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
     @ColorInt fun podcastIcon03Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#70e84e")
+        return "#70e84e".toColorInt()
     }
 
     @ColorInt fun podcastIcon03Rose(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FF737E")
+        return "#FF737E".toColorInt()
     }
 
     @ColorInt fun podcastIcon03LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastIcon03DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastText01Light(@ColorInt podcastColor: Int): Int {
@@ -833,31 +788,31 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastText01ClassicLight(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastText01Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastText01Indigo(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#EAE8DD")
+        return "#EAE8DD".toColorInt()
     }
 
     @ColorInt fun podcastText01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun podcastText01Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#4D262C"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#4D262C".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastText01LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastText01DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastText02Light(@ColorInt podcastColor: Int): Int {
@@ -877,27 +832,27 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastText02Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastText02Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#919CB2".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastText02Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#59bc3d")
+        return "#59bc3d".toColorInt()
     }
 
     @ColorInt fun podcastText02Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastText02LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#333333")
+        return "#333333".toColorInt()
     }
 
     @ColorInt fun podcastText02DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#cccccc")
+        return "#cccccc".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01Light(@ColorInt podcastColor: Int): Int {
@@ -917,27 +872,27 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastInteractive01Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#919CB2".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastInteractive01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastInteractive01LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#f2f2f2")
+        return "#f2f2f2".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01ActiveLight(@ColorInt podcastColor: Int): Int {
@@ -945,239 +900,239 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastInteractive01ActiveDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 204))
     }
 
     @ColorInt fun podcastInteractive01ActiveExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 204))
     }
 
     @ColorInt fun podcastInteractive01ActiveClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 128))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
     @ColorInt fun podcastInteractive01ActiveElectric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#A0E8F2")
+        return "#A0E8F2".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01ActiveIndigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#91A5CC"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#91A5CC".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastInteractive01ActiveRadioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#9FF2B1")
+        return "#9FF2B1".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01ActiveRose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastInteractive01ActiveLightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3f3f3f")
+        return "#3f3f3f".toColorInt()
     }
 
     @ColorInt fun podcastInteractive01ActiveDarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#cbcbcb")
+        return "#cbcbcb".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Light(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Dark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#292B2E")
+        return "#292B2E".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02ClassicLight(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Indigo(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#0B0D0F")
+        return "#0B0D0F".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02Rose(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#F8EDED")
+        return "#F8EDED".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastInteractive02DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 191))
     }
 
     @ColorInt fun podcastInteractive03Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 191))
     }
 
     @ColorInt fun podcastInteractive03ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 191))
     }
 
     @ColorInt fun podcastInteractive03ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 191))
     }
 
     @ColorInt fun podcastInteractive03Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#807D73"), ColorUtils.colorWithAlpha(podcastColor, 166))
+        return ColorUtils.calculateCombinedColor("#807D73".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 166))
     }
 
     @ColorInt fun podcastInteractive03Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 166))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 166))
     }
 
     @ColorInt fun podcastInteractive03LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03ActiveLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 140))
     }
 
     @ColorInt fun podcastInteractive03ActiveDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 140))
     }
 
     @ColorInt fun podcastInteractive03ActiveExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 140))
     }
 
     @ColorInt fun podcastInteractive03ActiveClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 140))
     }
 
     @ColorInt fun podcastInteractive03ActiveElectric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#A0E8F2")
+        return "#A0E8F2".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03ActiveIndigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#807D74"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#807D74".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastInteractive03ActiveRadioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#9FF2B1")
+        return "#9FF2B1".toColorInt()
     }
 
     @ColorInt fun podcastInteractive03ActiveRose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
+        return ColorUtils.calculateCombinedColor("#A66C7F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
     @ColorInt fun podcastInteractive03ActiveLightContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#ffffff"), 153)
+        return ColorUtils.colorWithAlpha("#ffffff".toColorInt(), 153)
     }
 
     @ColorInt fun podcastInteractive03ActiveDarkContrast(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#ffffff"), 153)
+        return ColorUtils.colorWithAlpha("#ffffff".toColorInt(), 153)
     }
 
     @ColorInt fun podcastInteractive04Light(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04Dark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04ClassicLight(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04Indigo(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#0B0D0F")
+        return "#0B0D0F".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04Rose(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastInteractive04DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive05Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 153))
     }
 
     @ColorInt fun podcastInteractive05Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 153))
     }
 
     @ColorInt fun podcastInteractive05ExtraDark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 153))
     }
 
     @ColorInt fun podcastInteractive05ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 153))
     }
 
     @ColorInt fun podcastInteractive05Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#3FD2E6")
+        return "#3FD2E6".toColorInt()
     }
 
     @ColorInt fun podcastInteractive05Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#807D74"), ColorUtils.colorWithAlpha(podcastColor, 115))
+        return ColorUtils.calculateCombinedColor("#807D74".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 115))
     }
 
     @ColorInt fun podcastInteractive05Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun podcastInteractive05Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#4D262C"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#4D262C".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun podcastInteractive05LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun podcastInteractive05DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun podcastOndarkLight(@ColorInt podcastColor: Int): Int {
@@ -1205,7 +1160,7 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastOndarkRadioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#428C2E")
+        return "#428C2E".toColorInt()
     }
 
     @ColorInt fun podcastOndarkRose(@ColorInt podcastColor: Int): Int {
@@ -1245,7 +1200,7 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastOnlightRadioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#27591A")
+        return "#27591A".toColorInt()
     }
 
     @ColorInt fun podcastOnlightRose(@ColorInt podcastColor: Int): Int {
@@ -1261,15 +1216,15 @@ object ThemeColor {
     }
 
     @ColorInt fun filterUi01Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterUi01Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#292B2E")
+        return "#292B2E".toColorInt()
     }
 
     @ColorInt fun filterUi01ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterUi01ClassicLight(@ColorInt filterColor: Int): Int {
@@ -1277,7 +1232,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterUi01Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun filterUi01Indigo(@ColorInt filterColor: Int): Int {
@@ -1285,111 +1240,111 @@ object ThemeColor {
     }
 
     @ColorInt fun filterUi01Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#162f1e")
+        return "#162f1e".toColorInt()
     }
 
     @ColorInt fun filterUi01Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FCEEEB"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#FCEEEB".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterUi01LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterUi01DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterUi02Light(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 18))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 18))
     }
 
     @ColorInt fun filterUi02Dark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1a1e1c"), ColorUtils.colorWithAlpha(filterColor, 38))
+        return ColorUtils.calculateCombinedColor("#1a1e1c".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 38))
     }
 
     @ColorInt fun filterUi02ExtraDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#1a1e1c"), ColorUtils.colorWithAlpha(filterColor, 26))
+        return ColorUtils.calculateCombinedColor("#1a1e1c".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 26))
     }
 
     @ColorInt fun filterUi02ClassicLight(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 18))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 18))
     }
 
     @ColorInt fun filterUi02Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#152431")
+        return "#152431".toColorInt()
     }
 
     @ColorInt fun filterUi02Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#F19D38")
+        return "#F19D38".toColorInt()
     }
 
     @ColorInt fun filterUi02Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#162F1E")
+        return "#162F1E".toColorInt()
     }
 
     @ColorInt fun filterUi02Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 51))
+        return ColorUtils.calculateCombinedColor("#FBEBE8".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 51))
     }
 
     @ColorInt fun filterUi02LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterUi02DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterUi03Light(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterUi03Dark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterUi03ExtraDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterUi03ClassicLight(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterUi03Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun filterUi03Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#F19D38")
+        return "#F19D38".toColorInt()
     }
 
     @ColorInt fun filterUi03Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#112417")
+        return "#112417".toColorInt()
     }
 
     @ColorInt fun filterUi03Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#261316"), ColorUtils.colorWithAlpha(filterColor, 89))
+        return ColorUtils.calculateCombinedColor("#261316".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 89))
     }
 
     @ColorInt fun filterUi03LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterUi03DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterUi04Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#E0E6EA")
+        return "#E0E6EA".toColorInt()
     }
 
     @ColorInt fun filterUi04Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#383A3C")
+        return "#383A3C".toColorInt()
     }
 
     @ColorInt fun filterUi04ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#1A1C1E")
+        return "#1A1C1E".toColorInt()
     }
 
     @ColorInt fun filterUi04ClassicLight(@ColorInt filterColor: Int): Int {
@@ -1397,7 +1352,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterUi04Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#2E3A4F")
+        return "#2E3A4F".toColorInt()
     }
 
     @ColorInt fun filterUi04Indigo(@ColorInt filterColor: Int): Int {
@@ -1405,19 +1360,19 @@ object ThemeColor {
     }
 
     @ColorInt fun filterUi04Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#27591a")
+        return "#27591a".toColorInt()
     }
 
     @ColorInt fun filterUi04Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FCEEEB"), ColorUtils.colorWithAlpha(filterColor, 128))
+        return ColorUtils.calculateCombinedColor("#FCEEEB".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
     @ColorInt fun filterUi04LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#bebebe")
+        return "#bebebe".toColorInt()
     }
 
     @ColorInt fun filterUi04DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#404040")
+        return "#404040".toColorInt()
     }
 
     @ColorInt fun filterIcon01Light(@ColorInt filterColor: Int): Int {
@@ -1433,7 +1388,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterIcon01ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterIcon01Electric(@ColorInt filterColor: Int): Int {
@@ -1441,15 +1396,15 @@ object ThemeColor {
     }
 
     @ColorInt fun filterIcon01Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#F4F5F2")
+        return "#F4F5F2".toColorInt()
     }
 
     @ColorInt fun filterIcon01Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#3fe664")
+        return "#3fe664".toColorInt()
     }
 
     @ColorInt fun filterIcon01Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 153))
+        return ColorUtils.calculateCombinedColor("#401920".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
     @ColorInt fun filterIcon01LightContrast(@ColorInt filterColor: Int): Int {
@@ -1485,7 +1440,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterIcon02Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#3fe664")
+        return "#3fe664".toColorInt()
     }
 
     @ColorInt fun filterIcon02Rose(@ColorInt filterColor: Int): Int {
@@ -1513,7 +1468,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterText01ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterText01Electric(@ColorInt filterColor: Int): Int {
@@ -1521,23 +1476,23 @@ object ThemeColor {
     }
 
     @ColorInt fun filterText01Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#E9EAE5")
+        return "#E9EAE5".toColorInt()
     }
 
     @ColorInt fun filterText01Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#3fe664")
+        return "#3fe664".toColorInt()
     }
 
     @ColorInt fun filterText01Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#591F2A"), ColorUtils.colorWithAlpha(filterColor, 102))
+        return ColorUtils.calculateCombinedColor("#591F2A".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 102))
     }
 
     @ColorInt fun filterText01LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterText01DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterText02Light(@ColorInt filterColor: Int): Int {
@@ -1561,11 +1516,11 @@ object ThemeColor {
     }
 
     @ColorInt fun filterText02Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterText02Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#3fe664")
+        return "#3fe664".toColorInt()
     }
 
     @ColorInt fun filterText02Rose(@ColorInt filterColor: Int): Int {
@@ -1573,11 +1528,11 @@ object ThemeColor {
     }
 
     @ColorInt fun filterText02LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterText02DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive01Light(@ColorInt filterColor: Int): Int {
@@ -1605,7 +1560,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive01Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#74f864")
+        return "#74f864".toColorInt()
     }
 
     @ColorInt fun filterInteractive01Rose(@ColorInt filterColor: Int): Int {
@@ -1621,35 +1576,35 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive01ActiveLight(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
     @ColorInt fun filterInteractive01ActiveDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 204))
     }
 
     @ColorInt fun filterInteractive01ActiveExtraDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 204))
     }
 
     @ColorInt fun filterInteractive01ActiveClassicLight(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 128))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
     @ColorInt fun filterInteractive01ActiveElectric(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 128))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
     @ColorInt fun filterInteractive01ActiveIndigo(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 191))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 191))
     }
 
     @ColorInt fun filterInteractive01ActiveRadioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#9FF2B1")
+        return "#9FF2B1".toColorInt()
     }
 
     @ColorInt fun filterInteractive01ActiveRose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 153))
+        return ColorUtils.calculateCombinedColor("#FBEBE8".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
     @ColorInt fun filterInteractive01ActiveLightContrast(@ColorInt filterColor: Int): Int {
@@ -1661,43 +1616,43 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive02Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive02Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#292B2E")
+        return "#292B2E".toColorInt()
     }
 
     @ColorInt fun filterInteractive02ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive02ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive02Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun filterInteractive02Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive02Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#0B0D0F")
+        return "#0B0D0F".toColorInt()
     }
 
     @ColorInt fun filterInteractive02Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FCF3F0"), ColorUtils.colorWithAlpha(filterColor, 26))
+        return ColorUtils.calculateCombinedColor("#FCF3F0".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 26))
     }
 
     @ColorInt fun filterInteractive02LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterInteractive02DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive03Light(@ColorInt filterColor: Int): Int {
@@ -1713,7 +1668,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive03ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive03Electric(@ColorInt filterColor: Int): Int {
@@ -1721,55 +1676,55 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive03Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#F3F1E4")
+        return "#F3F1E4".toColorInt()
     }
 
     @ColorInt fun filterInteractive03Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#70e84e")
+        return "#70e84e".toColorInt()
     }
 
     @ColorInt fun filterInteractive03Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#732836"), ColorUtils.colorWithAlpha(filterColor, 153))
+        return ColorUtils.calculateCombinedColor("#732836".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
     @ColorInt fun filterInteractive03LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive03DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterInteractive03ActiveLight(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 153))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
     @ColorInt fun filterInteractive03ActiveDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 204))
     }
 
     @ColorInt fun filterInteractive03ActiveExtraDark(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 204))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 204))
     }
 
     @ColorInt fun filterInteractive03ActiveClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive03ActiveElectric(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 128))
+        return ColorUtils.calculateCombinedColor("#FFFFFF".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
     @ColorInt fun filterInteractive03ActiveIndigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#F3F1E4")
+        return "#F3F1E4".toColorInt()
     }
 
     @ColorInt fun filterInteractive03ActiveRadioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#9ff2b1")
+        return "#9ff2b1".toColorInt()
     }
 
     @ColorInt fun filterInteractive03ActiveRose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 230))
+        return ColorUtils.calculateCombinedColor("#401920".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 230))
     }
 
     @ColorInt fun filterInteractive03ActiveLightContrast(@ColorInt filterColor: Int): Int {
@@ -1781,15 +1736,15 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive04Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive04Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#292B2E")
+        return "#292B2E".toColorInt()
     }
 
     @ColorInt fun filterInteractive04ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive04ClassicLight(@ColorInt filterColor: Int): Int {
@@ -1797,7 +1752,7 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive04Electric(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#212835")
+        return "#212835".toColorInt()
     }
 
     @ColorInt fun filterInteractive04Indigo(@ColorInt filterColor: Int): Int {
@@ -1805,35 +1760,35 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive04Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#0B0D0F")
+        return "#0B0D0F".toColorInt()
     }
 
     @ColorInt fun filterInteractive04Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 51))
+        return ColorUtils.calculateCombinedColor("#FBEBE8".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 51))
     }
 
     @ColorInt fun filterInteractive04LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterInteractive04DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive05Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive05Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive05ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive05ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#FFFFFF")
+        return "#FFFFFF".toColorInt()
     }
 
     @ColorInt fun filterInteractive05Electric(@ColorInt filterColor: Int): Int {
@@ -1841,39 +1796,39 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive05Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ECEDE6")
+        return "#ECEDE6".toColorInt()
     }
 
     @ColorInt fun filterInteractive05Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#70e84e")
+        return "#70e84e".toColorInt()
     }
 
     @ColorInt fun filterInteractive05Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 77))
+        return ColorUtils.calculateCombinedColor("#401920".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
     @ColorInt fun filterInteractive05LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun filterInteractive05DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
     @ColorInt fun filterInteractive06Light(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive06Dark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive06ExtraDark(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C75")
+        return "#686C75".toColorInt()
     }
 
     @ColorInt fun filterInteractive06ClassicLight(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#686C74")
+        return "#686C74".toColorInt()
     }
 
     @ColorInt fun filterInteractive06Electric(@ColorInt filterColor: Int): Int {
@@ -1881,204 +1836,204 @@ object ThemeColor {
     }
 
     @ColorInt fun filterInteractive06Indigo(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#7C839E")
+        return "#7C839E".toColorInt()
     }
 
     @ColorInt fun filterInteractive06Radioactive(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#70e84e")
+        return "#70e84e".toColorInt()
     }
 
     @ColorInt fun filterInteractive06Rose(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 230))
+        return ColorUtils.calculateCombinedColor("#401920".toColorInt(), ColorUtils.colorWithAlpha(filterColor, 230))
     }
 
     @ColorInt fun filterInteractive06LightContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#000001")
+        return "#000001".toColorInt()
     }
 
     @ColorInt fun filterInteractive06DarkContrast(@ColorInt filterColor: Int): Int {
-        return Color.parseColor("#ffffff")
+        return "#ffffff".toColorInt()
     }
 
-    val support01Light = Color.parseColor("#03A9F4")
-    val support01Dark = Color.parseColor("#33B8F4")
-    val support01ExtraDark = Color.parseColor("#50D0F1")
-    val support01ClassicLight = Color.parseColor("#03A9F4")
-    val support01Electric = Color.parseColor("#3FD2E6")
-    val support01Indigo = Color.parseColor("#4BA1D6")
-    val support01Radioactive = Color.parseColor("#74f864")
-    val support01Rose = Color.parseColor("#D93F99")
-    val support01LightContrast = Color.parseColor("#03a9f4")
-    val support01DarkContrast = Color.parseColor("#03a9f4")
-    val support02Light = Color.parseColor("#78D549")
-    val support02Dark = Color.parseColor("#78D549")
-    val support02ExtraDark = Color.parseColor("#78D549")
-    val support02ClassicLight = Color.parseColor("#78D549")
-    val support02Electric = Color.parseColor("#3FE664")
-    val support02Indigo = Color.parseColor("#54C483")
-    val support02Radioactive = Color.parseColor("#70e84e")
-    val support02Rose = Color.parseColor("#899c12")
-    val support02LightContrast = Color.parseColor("#78d549")
-    val support02DarkContrast = Color.parseColor("#78d549")
-    val support03Light = Color.parseColor("#03A9F4")
-    val support03Dark = Color.parseColor("#33B8F4")
-    val support03ExtraDark = Color.parseColor("#33B8F4")
-    val support03ClassicLight = Color.parseColor("#03A9F4")
-    val support03Electric = Color.parseColor("#0B3C50")
-    val support03Indigo = Color.parseColor("#3D4363")
-    val support03Radioactive = Color.parseColor("#27591a")
-    val support03Rose = Color.parseColor("#bf3950")
-    val support03LightContrast = Color.parseColor("#343434")
-    val support03DarkContrast = Color.parseColor("#333333")
-    val support04Light = Color.parseColor("#187ADC")
-    val support04Dark = Color.parseColor("#4490DC")
-    val support04ExtraDark = Color.parseColor("#4490DC")
-    val support04ClassicLight = Color.parseColor("#187ADC")
-    val support04Electric = Color.parseColor("#093243")
-    val support04Indigo = Color.parseColor("#25273E")
-    val support04Radioactive = Color.parseColor("#162f1e")
-    val support04Rose = Color.parseColor("#991f3d")
-    val support04LightContrast = Color.parseColor("#000000")
-    val support04DarkContrast = Color.parseColor("#262626")
-    val support05Light = Color.parseColor("#F43E37")
-    val support05Dark = Color.parseColor("#F43E37")
-    val support05ExtraDark = Color.parseColor("#F43E37")
-    val support05ClassicLight = Color.parseColor("#F43E37")
-    val support05Electric = Color.parseColor("#F84F44")
-    val support05Indigo = Color.parseColor("#D44A5A")
-    val support05Radioactive = Color.parseColor("#489848")
-    val support05Rose = Color.parseColor("#d44a5a")
-    val support05LightContrast = Color.parseColor("#f43e37")
-    val support05DarkContrast = Color.parseColor("#F43E37")
-    val support06Light = Color.parseColor("#4C5052")
-    val support06Dark = Color.parseColor("#7C8A94")
-    val support06ExtraDark = Color.parseColor("#7C8A94")
-    val support06ClassicLight = Color.parseColor("#686C74")
-    val support06Electric = Color.parseColor("#093243")
-    val support06Indigo = Color.parseColor("#90A5B8")
-    val support06Radioactive = Color.parseColor("#162f1e")
-    val support06Rose = Color.parseColor("#ad86a0")
-    val support06LightContrast = Color.parseColor("#1a1a1a")
-    val support06DarkContrast = Color.parseColor("#262626")
-    val support07Light = Color.parseColor("#FFFFFF")
-    val support07Dark = Color.parseColor("#292B2E")
-    val support07ExtraDark = Color.parseColor("#161718")
-    val support07ClassicLight = Color.parseColor("#FFFFFF")
-    val support07Electric = Color.parseColor("#FFFFFF")
-    val support07Indigo = Color.parseColor("#FFFFFF")
-    val support07Radioactive = Color.parseColor("#70e84e")
-    val support07Rose = Color.parseColor("#ffffff")
-    val support07LightContrast = Color.parseColor("#ffffff")
-    val support07DarkContrast = Color.parseColor("#ffffff")
-    val support08Light = Color.parseColor("#FF9D3B")
-    val support08Dark = Color.parseColor("#EB9D4F")
-    val support08ExtraDark = Color.parseColor("#FF9D3B")
-    val support08ClassicLight = Color.parseColor("#FF9D3B")
-    val support08Electric = Color.parseColor("#F6A935")
-    val support08Indigo = Color.parseColor("#B26428")
-    val support08Radioactive = Color.parseColor("#70e84e")
-    val support08Rose = Color.parseColor("#b26428")
-    val support08LightContrast = Color.parseColor("#ff9d3b")
-    val support08DarkContrast = Color.parseColor("#ff9d3b")
-    val support09Light = Color.parseColor("#080808")
-    val support09Dark = Color.parseColor("#161718")
-    val support09ExtraDark = Color.parseColor("#1A1C1E")
-    val support09ClassicLight = Color.parseColor("#080808")
-    val support09Electric = Color.parseColor("#212835")
-    val support09Indigo = Color.parseColor("#232637")
-    val support09Radioactive = Color.parseColor("#111419")
-    val support09Rose = Color.parseColor("#FD4D90")
-    val support09LightContrast = Color.parseColor("#000000")
-    val support09DarkContrast = Color.parseColor("#000000")
-    val support10Light = Color.parseColor("#FEB700")
-    val support10Dark = Color.parseColor("#F5CA5B")
-    val support10ExtraDark = Color.parseColor("#F5CA5B")
-    val support10ClassicLight = Color.parseColor("#FEB700")
-    val support10Electric = Color.parseColor("#FEEC4C")
-    val support10Indigo = Color.parseColor("#F5C167")
-    val support10Radioactive = Color.parseColor("#8DFF80")
-    val support10Rose = Color.parseColor("#FF4FE2")
-    val support10LightContrast = Color.parseColor("#FEB700")
-    val support10DarkContrast = Color.parseColor("#F5CA5B")
+    val support01Light = "#03A9F4".toColorInt()
+    val support01Dark = "#33B8F4".toColorInt()
+    val support01ExtraDark = "#50D0F1".toColorInt()
+    val support01ClassicLight = "#03A9F4".toColorInt()
+    val support01Electric = "#3FD2E6".toColorInt()
+    val support01Indigo = "#4BA1D6".toColorInt()
+    val support01Radioactive = "#74f864".toColorInt()
+    val support01Rose = "#D93F99".toColorInt()
+    val support01LightContrast = "#03a9f4".toColorInt()
+    val support01DarkContrast = "#03a9f4".toColorInt()
+    val support02Light = "#78D549".toColorInt()
+    val support02Dark = "#78D549".toColorInt()
+    val support02ExtraDark = "#78D549".toColorInt()
+    val support02ClassicLight = "#78D549".toColorInt()
+    val support02Electric = "#3FE664".toColorInt()
+    val support02Indigo = "#54C483".toColorInt()
+    val support02Radioactive = "#70e84e".toColorInt()
+    val support02Rose = "#899c12".toColorInt()
+    val support02LightContrast = "#78d549".toColorInt()
+    val support02DarkContrast = "#78d549".toColorInt()
+    val support03Light = "#03A9F4".toColorInt()
+    val support03Dark = "#33B8F4".toColorInt()
+    val support03ExtraDark = "#33B8F4".toColorInt()
+    val support03ClassicLight = "#03A9F4".toColorInt()
+    val support03Electric = "#0B3C50".toColorInt()
+    val support03Indigo = "#3D4363".toColorInt()
+    val support03Radioactive = "#27591a".toColorInt()
+    val support03Rose = "#bf3950".toColorInt()
+    val support03LightContrast = "#343434".toColorInt()
+    val support03DarkContrast = "#333333".toColorInt()
+    val support04Light = "#187ADC".toColorInt()
+    val support04Dark = "#4490DC".toColorInt()
+    val support04ExtraDark = "#4490DC".toColorInt()
+    val support04ClassicLight = "#187ADC".toColorInt()
+    val support04Electric = "#093243".toColorInt()
+    val support04Indigo = "#25273E".toColorInt()
+    val support04Radioactive = "#162f1e".toColorInt()
+    val support04Rose = "#991f3d".toColorInt()
+    val support04LightContrast = "#000000".toColorInt()
+    val support04DarkContrast = "#262626".toColorInt()
+    val support05Light = "#F43E37".toColorInt()
+    val support05Dark = "#F43E37".toColorInt()
+    val support05ExtraDark = "#F43E37".toColorInt()
+    val support05ClassicLight = "#F43E37".toColorInt()
+    val support05Electric = "#F84F44".toColorInt()
+    val support05Indigo = "#D44A5A".toColorInt()
+    val support05Radioactive = "#489848".toColorInt()
+    val support05Rose = "#d44a5a".toColorInt()
+    val support05LightContrast = "#f43e37".toColorInt()
+    val support05DarkContrast = "#F43E37".toColorInt()
+    val support06Light = "#4C5052".toColorInt()
+    val support06Dark = "#7C8A94".toColorInt()
+    val support06ExtraDark = "#7C8A94".toColorInt()
+    val support06ClassicLight = "#686C74".toColorInt()
+    val support06Electric = "#093243".toColorInt()
+    val support06Indigo = "#90A5B8".toColorInt()
+    val support06Radioactive = "#162f1e".toColorInt()
+    val support06Rose = "#ad86a0".toColorInt()
+    val support06LightContrast = "#1a1a1a".toColorInt()
+    val support06DarkContrast = "#262626".toColorInt()
+    val support07Light = "#FFFFFF".toColorInt()
+    val support07Dark = "#292B2E".toColorInt()
+    val support07ExtraDark = "#161718".toColorInt()
+    val support07ClassicLight = "#FFFFFF".toColorInt()
+    val support07Electric = "#FFFFFF".toColorInt()
+    val support07Indigo = "#FFFFFF".toColorInt()
+    val support07Radioactive = "#70e84e".toColorInt()
+    val support07Rose = "#ffffff".toColorInt()
+    val support07LightContrast = "#ffffff".toColorInt()
+    val support07DarkContrast = "#ffffff".toColorInt()
+    val support08Light = "#FF9D3B".toColorInt()
+    val support08Dark = "#EB9D4F".toColorInt()
+    val support08ExtraDark = "#FF9D3B".toColorInt()
+    val support08ClassicLight = "#FF9D3B".toColorInt()
+    val support08Electric = "#F6A935".toColorInt()
+    val support08Indigo = "#B26428".toColorInt()
+    val support08Radioactive = "#70e84e".toColorInt()
+    val support08Rose = "#b26428".toColorInt()
+    val support08LightContrast = "#ff9d3b".toColorInt()
+    val support08DarkContrast = "#ff9d3b".toColorInt()
+    val support09Light = "#080808".toColorInt()
+    val support09Dark = "#161718".toColorInt()
+    val support09ExtraDark = "#1A1C1E".toColorInt()
+    val support09ClassicLight = "#080808".toColorInt()
+    val support09Electric = "#212835".toColorInt()
+    val support09Indigo = "#232637".toColorInt()
+    val support09Radioactive = "#111419".toColorInt()
+    val support09Rose = "#FD4D90".toColorInt()
+    val support09LightContrast = "#000000".toColorInt()
+    val support09DarkContrast = "#000000".toColorInt()
+    val support10Light = "#FEB700".toColorInt()
+    val support10Dark = "#F5CA5B".toColorInt()
+    val support10ExtraDark = "#F5CA5B".toColorInt()
+    val support10ClassicLight = "#FEB700".toColorInt()
+    val support10Electric = "#FEEC4C".toColorInt()
+    val support10Indigo = "#F5C167".toColorInt()
+    val support10Radioactive = "#8DFF80".toColorInt()
+    val support10Rose = "#FF4FE2".toColorInt()
+    val support10LightContrast = "#FEB700".toColorInt()
+    val support10DarkContrast = "#F5CA5B".toColorInt()
 
     @ColorInt fun playerBackground01Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
     @ColorInt fun playerBackground01Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
     @ColorInt fun playerBackground01ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun playerBackground01ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
     @ColorInt fun playerBackground01Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#152431")
+        return "#152431".toColorInt()
     }
 
     @ColorInt fun playerBackground01Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 20))
+        return ColorUtils.calculateCombinedColor("#17181F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 20))
     }
 
     @ColorInt fun playerBackground01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#162f1e")
+        return "#162f1e".toColorInt()
     }
 
     @ColorInt fun playerBackground01Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#260006"), ColorUtils.colorWithAlpha(podcastColor, 38))
+        return ColorUtils.calculateCombinedColor("#260006".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
     @ColorInt fun playerBackground01LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun playerBackground01DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun playerBackground02Light(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun playerBackground02Dark(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun playerBackground02ExtraDark(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#1A1A1A")
+        return "#1A1A1A".toColorInt()
     }
 
     @ColorInt fun playerBackground02ClassicLight(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
+        return ColorUtils.calculateCombinedColor("#000000".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
     @ColorInt fun playerBackground02Electric(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#18334A")
+        return "#18334A".toColorInt()
     }
 
     @ColorInt fun playerBackground02Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 41))
+        return ColorUtils.calculateCombinedColor("#17181F".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 41))
     }
 
     @ColorInt fun playerBackground02Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#19451F")
+        return "#19451F".toColorInt()
     }
 
     @ColorInt fun playerBackground02Rose(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#3B060E"), ColorUtils.colorWithAlpha(podcastColor, 56))
+        return ColorUtils.calculateCombinedColor("#3B060E".toColorInt(), ColorUtils.colorWithAlpha(podcastColor, 56))
     }
 
     @ColorInt fun playerBackground02LightContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#000000")
+        return "#000000".toColorInt()
     }
 
     @ColorInt fun playerBackground02DarkContrast(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#1B1B1B")
+        return "#1B1B1B".toColorInt()
     }
 
     @ColorInt fun playerHighlight01Light(@ColorInt podcastColor: Int): Int {
@@ -2106,7 +2061,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight01Radioactive(@ColorInt podcastColor: Int): Int {
-        return Color.parseColor("#A5FF8C")
+        return "#A5FF8C".toColorInt()
     }
 
     @ColorInt fun playerHighlight01Rose(@ColorInt podcastColor: Int): Int {
@@ -2146,7 +2101,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight02Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#9BFF80"), 191)
+        return ColorUtils.colorWithAlpha("#9BFF80".toColorInt(), 191)
     }
 
     @ColorInt fun playerHighlight02Rose(@ColorInt podcastColor: Int): Int {
@@ -2186,7 +2141,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight03Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#91FF73"), 153)
+        return ColorUtils.colorWithAlpha("#91FF73".toColorInt(), 153)
     }
 
     @ColorInt fun playerHighlight03Rose(@ColorInt podcastColor: Int): Int {
@@ -2226,7 +2181,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight04Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#87FF66"), 128)
+        return ColorUtils.colorWithAlpha("#87FF66".toColorInt(), 128)
     }
 
     @ColorInt fun playerHighlight04Rose(@ColorInt podcastColor: Int): Int {
@@ -2266,7 +2221,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight05Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#7DFF59"), 102)
+        return ColorUtils.colorWithAlpha("#7DFF59".toColorInt(), 102)
     }
 
     @ColorInt fun playerHighlight05Rose(@ColorInt podcastColor: Int): Int {
@@ -2306,7 +2261,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight06Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#73FF4D"), 77)
+        return ColorUtils.colorWithAlpha("#73FF4D".toColorInt(), 77)
     }
 
     @ColorInt fun playerHighlight06Rose(@ColorInt podcastColor: Int): Int {
@@ -2346,7 +2301,7 @@ object ThemeColor {
     }
 
     @ColorInt fun playerHighlight07Radioactive(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.colorWithAlpha(Color.parseColor("#69FF40"), 51)
+        return ColorUtils.colorWithAlpha("#69FF40".toColorInt(), 51)
     }
 
     @ColorInt fun playerHighlight07Rose(@ColorInt podcastColor: Int): Int {
@@ -2361,566 +2316,566 @@ object ThemeColor {
         return ColorUtils.colorWithAlpha(podcastColor, 51)
     }
 
-    val playerContrast01Light = Color.parseColor("#FFFFFF")
-    val playerContrast01Dark = Color.parseColor("#FFFFFF")
-    val playerContrast01ExtraDark = Color.parseColor("#FFFFFF")
-    val playerContrast01ClassicLight = Color.parseColor("#FFFFFF")
-    val playerContrast01Electric = Color.parseColor("#FFFFFF")
-    val playerContrast01Indigo = Color.parseColor("#C1C2BC")
-    val playerContrast01Radioactive = Color.parseColor("#70e84e")
-    val playerContrast01Rose = Color.parseColor("#ffd9d9")
-    val playerContrast01LightContrast = Color.parseColor("#ffffff")
-    val playerContrast01DarkContrast = Color.parseColor("#ffffff")
-    val playerContrast02Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val playerContrast02Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val playerContrast02ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(102)
-    val playerContrast02ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val playerContrast02Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(179)
-    val playerContrast02Indigo = Color.parseColor("#DBDBCE").colorIntWithAlpha(128)
-    val playerContrast02Radioactive = Color.parseColor("#70e84e").colorIntWithAlpha(204)
-    val playerContrast02Rose = Color.parseColor("#FFDCD6").colorIntWithAlpha(153)
-    val playerContrast02LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(204)
-    val playerContrast02DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(204)
-    val playerContrast03Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(102)
-    val playerContrast03Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(102)
-    val playerContrast03ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(82)
-    val playerContrast03ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(102)
-    val playerContrast03Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(140)
-    val playerContrast03Indigo = Color.parseColor("#CFCCBE").colorIntWithAlpha(102)
-    val playerContrast03Radioactive = Color.parseColor("#70e84e").colorIntWithAlpha(179)
-    val playerContrast03Rose = Color.parseColor("#ffdcd6").colorIntWithAlpha(128)
-    val playerContrast03LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(166)
-    val playerContrast03DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(166)
-    val playerContrast04Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(77)
-    val playerContrast04Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(77)
-    val playerContrast04ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(61)
-    val playerContrast04ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(77)
-    val playerContrast04Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(77)
-    val playerContrast04Indigo = Color.parseColor("#DADBD7").colorIntWithAlpha(77)
-    val playerContrast04Radioactive = Color.parseColor("#56E52E").colorIntWithAlpha(82)
-    val playerContrast04Rose = Color.parseColor("#ffe0db").colorIntWithAlpha(102)
-    val playerContrast04LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(128)
-    val playerContrast04DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(128)
-    val playerContrast05Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(51)
-    val playerContrast05Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(51)
-    val playerContrast05ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(41)
-    val playerContrast05ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(51)
-    val playerContrast05Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(51)
-    val playerContrast05Indigo = Color.parseColor("#B1B5AA").colorIntWithAlpha(51)
-    val playerContrast05Radioactive = Color.parseColor("#56E52E").colorIntWithAlpha(61)
-    val playerContrast05Rose = Color.parseColor("#FFDCD6").colorIntWithAlpha(64)
-    val playerContrast05LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(51)
-    val playerContrast05DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(51)
-    val playerContrast06Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val playerContrast06Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val playerContrast06ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(20)
-    val playerContrast06ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val playerContrast06Electric = Color.parseColor("#3FD2E6").colorIntWithAlpha(26)
-    val playerContrast06Indigo = Color.parseColor("#C2C0B6").colorIntWithAlpha(26)
-    val playerContrast06Radioactive = Color.parseColor("#56E52E").colorIntWithAlpha(46)
-    val playerContrast06Rose = Color.parseColor("#ffdcd6").colorIntWithAlpha(26)
-    val playerContrast06LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(26)
-    val playerContrast06DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(26)
-    val contrast01Light = Color.parseColor("#FFFFFF")
-    val contrast01Dark = Color.parseColor("#FFFFFF")
-    val contrast01ExtraDark = Color.parseColor("#FFFFFF")
-    val contrast01ClassicLight = Color.parseColor("#FFFFFF")
-    val contrast01Electric = Color.parseColor("#FFFFFF")
-    val contrast01Indigo = Color.parseColor("#E2E3DC")
-    val contrast01Radioactive = Color.parseColor("#70E84E")
-    val contrast01Rose = Color.parseColor("#ffffff")
-    val contrast01LightContrast = Color.parseColor("#ffffff")
-    val contrast01DarkContrast = Color.parseColor("#ffffff")
-    val contrast02Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(179)
-    val contrast02Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(179)
-    val contrast02ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(179)
-    val contrast02ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(179)
-    val contrast02Electric = Color.parseColor("#B2F6FF").colorIntWithAlpha(204)
-    val contrast02Indigo = Color.parseColor("#DBDBCE").colorIntWithAlpha(179)
-    val contrast02Radioactive = Color.parseColor("#70e84e").colorIntWithAlpha(204)
-    val contrast02Rose = Color.parseColor("#ffffff").colorIntWithAlpha(217)
-    val contrast02LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(217)
-    val contrast02DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(204)
-    val contrast03Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val contrast03Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val contrast03ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val contrast03ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(128)
-    val contrast03Electric = Color.parseColor("#B2F6FF").colorIntWithAlpha(153)
-    val contrast03Indigo = Color.parseColor("#DBDBCE").colorIntWithAlpha(128)
-    val contrast03Radioactive = Color.parseColor("#70E84E").colorIntWithAlpha(179)
-    val contrast03Rose = Color.parseColor("#ffffff").colorIntWithAlpha(179)
-    val contrast03LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(179)
-    val contrast03DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(153)
-    val contrast04Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val contrast04Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val contrast04ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val contrast04ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(26)
-    val contrast04Electric = Color.parseColor("#B2F6FF").colorIntWithAlpha(51)
-    val contrast04Indigo = Color.parseColor("#DBDBCE").colorIntWithAlpha(26)
-    val contrast04Radioactive = Color.parseColor("#70E84E").colorIntWithAlpha(64)
-    val contrast04Rose = Color.parseColor("#ffffff").colorIntWithAlpha(51)
-    val contrast04LightContrast = Color.parseColor("#ffffff").colorIntWithAlpha(51)
-    val contrast04DarkContrast = Color.parseColor("#ffffff").colorIntWithAlpha(51)
-    val filter01Light = Color.parseColor("#F43E37")
-    val filter01Dark = Color.parseColor("#DF514C")
-    val filter01ExtraDark = Color.parseColor("#DF514C")
-    val filter01ClassicLight = Color.parseColor("#F43E37")
-    val filter01Electric = Color.parseColor("#F84F44")
-    val filter01Indigo = Color.parseColor("#8E656B")
-    val filter01Radioactive = Color.parseColor("#74f864")
-    val filter01Rose = Color.parseColor("#d66e6c")
-    val filter01LightContrast = Color.parseColor("#F43E37")
-    val filter01DarkContrast = Color.parseColor("#FF6557")
-    val filter02Light = Color.parseColor("#FF9D3B")
-    val filter02Dark = Color.parseColor("#EB9D4F")
-    val filter02ExtraDark = Color.parseColor("#EB9D4F")
-    val filter02ClassicLight = Color.parseColor("#FF9D3B")
-    val filter02Electric = Color.parseColor("#F6A935")
-    val filter02Indigo = Color.parseColor("#A08B7B")
-    val filter02Radioactive = Color.parseColor("#74f864")
-    val filter02Rose = Color.parseColor("#dfa280")
-    val filter02LightContrast = Color.parseColor("#E87400")
-    val filter02DarkContrast = Color.parseColor("#EB8118")
-    val filter03Light = Color.parseColor("#FEC635")
-    val filter03Dark = Color.parseColor("#EABD49")
-    val filter03ExtraDark = Color.parseColor("#EABD49")
-    val filter03ClassicLight = Color.parseColor("#FEC635")
-    val filter03Electric = Color.parseColor("#CFE63F")
-    val filter03Indigo = Color.parseColor("#A59C80")
-    val filter03Radioactive = Color.parseColor("#74f864")
-    val filter03Rose = Color.parseColor("#e0b985")
-    val filter03LightContrast = Color.parseColor("#BF8C00")
-    val filter03DarkContrast = Color.parseColor("#FFBF1A")
-    val filter04Light = Color.parseColor("#78D549")
-    val filter04Dark = Color.parseColor("#7FBF5F")
-    val filter04ExtraDark = Color.parseColor("#7FBF5F")
-    val filter04ClassicLight = Color.parseColor("#78D549")
-    val filter04Electric = Color.parseColor("#3FE664")
-    val filter04Indigo = Color.parseColor("#7C987D")
-    val filter04Radioactive = Color.parseColor("#74f864")
-    val filter04Rose = Color.parseColor("#b1b676")
-    val filter04LightContrast = Color.parseColor("#39A800")
-    val filter04DarkContrast = Color.parseColor("#99FF66")
-    val filter05Light = Color.parseColor("#03A9F4")
-    val filter05Dark = Color.parseColor("#1BA0DC")
-    val filter05ExtraDark = Color.parseColor("#1BA0DC")
-    val filter05ClassicLight = Color.parseColor("#03A9F4")
-    val filter05Electric = Color.parseColor("#3FD2E6")
-    val filter05Indigo = Color.parseColor("#54829D")
-    val filter05Radioactive = Color.parseColor("#74f864")
-    val filter05Rose = Color.parseColor("#8196bc")
-    val filter05LightContrast = Color.parseColor("#039DE3")
-    val filter05DarkContrast = Color.parseColor("#1AB8FF")
-    val filter06Light = Color.parseColor("#5D31C4")
-    val filter06Dark = Color.parseColor("#9D79F2")
-    val filter06ExtraDark = Color.parseColor("#9D79F2")
-    val filter06ClassicLight = Color.parseColor("#5D31C4")
-    val filter06Electric = Color.parseColor("#B65BFD")
-    val filter06Indigo = Color.parseColor("#5F5885")
-    val filter06Radioactive = Color.parseColor("#74f864")
-    val filter06Rose = Color.parseColor("#9b5c9e")
-    val filter06LightContrast = Color.parseColor("#5D31C4")
-    val filter06DarkContrast = Color.parseColor("#CC73FF")
-    val filter07Light = Color.parseColor("#E93673")
-    val filter07Dark = Color.parseColor("#D24D7A")
-    val filter07ExtraDark = Color.parseColor("#D24D7A")
-    val filter07ClassicLight = Color.parseColor("#E93673")
-    val filter07Electric = Color.parseColor("#FF4BB7")
-    val filter07Indigo = Color.parseColor("#8B637A")
-    val filter07Radioactive = Color.parseColor("#74f864")
-    val filter07Rose = Color.parseColor("#d26c80")
-    val filter07LightContrast = Color.parseColor("#E93673")
-    val filter07DarkContrast = Color.parseColor("#FF6680")
-    val filter08Light = Color.parseColor("#B8C3C9")
-    val filter08Dark = Color.parseColor("#BDC2C4")
-    val filter08ExtraDark = Color.parseColor("#BDC2C4")
-    val filter08ClassicLight = Color.parseColor("#B8C3C9")
-    val filter08Electric = Color.parseColor("#BFBFBF")
-    val filter08Indigo = Color.parseColor("#9299A2")
-    val filter08Radioactive = Color.parseColor("#74f864")
-    val filter08Rose = Color.parseColor("#b8b8d8")
-    val filter08LightContrast = Color.parseColor("#8C9499")
-    val filter08DarkContrast = Color.parseColor("#B8C3C9")
-    val filter09Light = Color.parseColor("#A177D9")
-    val filter09Dark = Color.parseColor("#FAA5C1")
-    val filter09ExtraDark = Color.parseColor("#FAA5C1")
-    val filter09ClassicLight = Color.parseColor("#A177D9")
-    val filter09Electric = Color.parseColor("#FF94F1")
-    val filter09Indigo = Color.parseColor("#998A9E")
-    val filter09Radioactive = Color.parseColor("#74f864")
-    val filter09Rose = Color.parseColor("#6883BA")
-    val filter09LightContrast = Color.parseColor("#A177D9")
-    val filter09DarkContrast = Color.parseColor("#9BA2FF")
-    val filter10Light = Color.parseColor("#3DAD88")
-    val filter10Dark = Color.parseColor("#03CEA4")
-    val filter10ExtraDark = Color.parseColor("#03CEA4")
-    val filter10ClassicLight = Color.parseColor("#3DAD88")
-    val filter10Electric = Color.parseColor("#58EDAC")
-    val filter10Indigo = Color.parseColor("#A4B391")
-    val filter10Radioactive = Color.parseColor("#74f864")
-    val filter10Rose = Color.parseColor("#546A76")
-    val filter10LightContrast = Color.parseColor("#3DAD88")
-    val filter10DarkContrast = Color.parseColor("#32D9A9")
-    val filter11Light = Color.parseColor("#2555CF")
-    val filter11Dark = Color.parseColor("#5584FA")
-    val filter11ExtraDark = Color.parseColor("#5584FA")
-    val filter11ClassicLight = Color.parseColor("#2555CF")
-    val filter11Electric = Color.parseColor("#0A9AFA")
-    val filter11Indigo = Color.parseColor("#84A0B0")
-    val filter11Radioactive = Color.parseColor("#74f864")
-    val filter11Rose = Color.parseColor("#998E87")
-    val filter11LightContrast = Color.parseColor("#2555CF")
-    val filter11DarkContrast = Color.parseColor("#21E6ED")
-    val filter12Light = Color.parseColor("#945712")
-    val filter12Dark = Color.parseColor("#A3863B")
-    val filter12ExtraDark = Color.parseColor("#A3863B")
-    val filter12ClassicLight = Color.parseColor("#945712")
-    val filter12Electric = Color.parseColor("#CCA083")
-    val filter12Indigo = Color.parseColor("#8C8C80")
-    val filter12Radioactive = Color.parseColor("#74f864")
-    val filter12Rose = Color.parseColor("#997F7F")
-    val filter12LightContrast = Color.parseColor("#945712")
-    val filter12DarkContrast = Color.parseColor("#AD753D")
-    val veilLight = Color.parseColor("#000000").colorIntWithAlpha(77)
-    val veilDark = Color.parseColor("#000000").colorIntWithAlpha(128)
-    val veilExtraDark = Color.parseColor("#000000").colorIntWithAlpha(128)
-    val veilClassicLight = Color.parseColor("#000000").colorIntWithAlpha(77)
-    val veilElectric = Color.parseColor("#000000").colorIntWithAlpha(128)
-    val veilIndigo = Color.parseColor("#25273E").colorIntWithAlpha(77)
-    val veilRadioactive = Color.parseColor("#173d17").colorIntWithAlpha(191)
-    val veilRose = Color.parseColor("#f2ccc7").colorIntWithAlpha(191)
-    val veilLightContrast = Color.parseColor("#000000").colorIntWithAlpha(77)
-    val veilDarkContrast = Color.parseColor("#000000").colorIntWithAlpha(153)
-    val gradient01ALight = Color.parseColor("#FED745")
-    val gradient01ADark = Color.parseColor("#D7B32E")
-    val gradient01AExtraDark = Color.parseColor("#D7B32E")
-    val gradient01AClassicLight = Color.parseColor("#FED745")
-    val gradient01AElectric = Color.parseColor("#D7B32E")
-    val gradient01AIndigo = Color.parseColor("#F2D672")
-    val gradient01ARadioactive = Color.parseColor("#948a00")
-    val gradient01ARose = Color.parseColor("#ffcb78")
-    val gradient01ALightContrast = Color.parseColor("#FED745")
-    val gradient01ADarkContrast = Color.parseColor("#D7B32E")
-    val gradient01ELight = Color.parseColor("#FEB525")
-    val gradient01EDark = Color.parseColor("#C18000")
-    val gradient01EExtraDark = Color.parseColor("#C18000")
-    val gradient01EClassicLight = Color.parseColor("#FEB525")
-    val gradient01EElectric = Color.parseColor("#C18000")
-    val gradient01EIndigo = Color.parseColor("#F2B03D")
-    val gradient01ERadioactive = Color.parseColor("#eeff00")
-    val gradient01ERose = Color.parseColor("#ffaf4d")
-    val gradient01ELightContrast = Color.parseColor("#FEB525")
-    val gradient01EDarkContrast = Color.parseColor("#C18000")
-    val gradient02ALight = Color.parseColor("#03A9F4")
-    val gradient02ADark = Color.parseColor("#3993AA")
-    val gradient02AExtraDark = Color.parseColor("#3993AA")
-    val gradient02AClassicLight = Color.parseColor("#03A9F4")
-    val gradient02AElectric = Color.parseColor("#54B29E")
-    val gradient02AIndigo = Color.parseColor("#5C8BCC")
-    val gradient02ARadioactive = Color.parseColor("#3dbd4c")
-    val gradient02ARose = Color.parseColor("#f0546e")
-    val gradient02ALightContrast = Color.parseColor("#03A9F4")
-    val gradient02ADarkContrast = Color.parseColor("#3993AA")
-    val gradient02ELight = Color.parseColor("#50D0F1")
-    val gradient02EDark = Color.parseColor("#008CCB")
-    val gradient02EExtraDark = Color.parseColor("#008CCB")
-    val gradient02EClassicLight = Color.parseColor("#50D0F1")
-    val gradient02EElectric = Color.parseColor("#3FB7E6")
-    val gradient02EIndigo = Color.parseColor("#95B0E5")
-    val gradient02ERadioactive = Color.parseColor("#a4f864")
-    val gradient02ERose = Color.parseColor("#ff938c")
-    val gradient02ELightContrast = Color.parseColor("#50D0F1")
-    val gradient02EDarkContrast = Color.parseColor("#008CCB")
-    val gradient03ALight = Color.parseColor("#F43769")
-    val gradient03ADark = Color.parseColor("#C9522E")
-    val gradient03AExtraDark = Color.parseColor("#C9522E")
-    val gradient03AClassicLight = Color.parseColor("#F43769")
-    val gradient03AElectric = Color.parseColor("#DE4010")
-    val gradient03AIndigo = Color.parseColor("#D96F8B")
-    val gradient03ARadioactive = Color.parseColor("#538a11")
-    val gradient03ARose = Color.parseColor("#c4459a")
-    val gradient03ALightContrast = Color.parseColor("#F43769")
-    val gradient03ADarkContrast = Color.parseColor("#C9522E")
-    val gradient03ELight = Color.parseColor("#FB5246")
-    val gradient03EDark = Color.parseColor("#B82E3C")
-    val gradient03EExtraDark = Color.parseColor("#B82E3C")
-    val gradient03EClassicLight = Color.parseColor("#FB5246")
-    val gradient03EElectric = Color.parseColor("#AB5068")
-    val gradient03EIndigo = Color.parseColor("#D94860")
-    val gradient03ERadioactive = Color.parseColor("#f8e963")
-    val gradient03ERose = Color.parseColor("#de435c")
-    val gradient03ELightContrast = Color.parseColor("#FB5246")
-    val gradient03EDarkContrast = Color.parseColor("#B82E3C")
-    val gradient04ALight = Color.parseColor("#78D549")
-    val gradient04ADark = Color.parseColor("#7FB74F")
-    val gradient04AExtraDark = Color.parseColor("#7FB74F")
-    val gradient04AClassicLight = Color.parseColor("#78D549")
-    val gradient04AElectric = Color.parseColor("#38CC71")
-    val gradient04AIndigo = Color.parseColor("#66CC91")
-    val gradient04ARadioactive = Color.parseColor("#579986")
-    val gradient04ARose = Color.parseColor("#c1c917")
-    val gradient04ALightContrast = Color.parseColor("#78D549")
-    val gradient04ADarkContrast = Color.parseColor("#7FB74F")
-    val gradient04ELight = Color.parseColor("#9BE45E")
-    val gradient04EDark = Color.parseColor("#508D32")
-    val gradient04EExtraDark = Color.parseColor("#508D32")
-    val gradient04EClassicLight = Color.parseColor("#9BE45E")
-    val gradient04EElectric = Color.parseColor("#519948")
-    val gradient04EIndigo = Color.parseColor("#90D977")
-    val gradient04ERadioactive = Color.parseColor("#0ecc77")
-    val gradient04ERose = Color.parseColor("#bbde47")
-    val gradient04ELightContrast = Color.parseColor("#9BE45E")
-    val gradient04EDarkContrast = Color.parseColor("#508D32")
-    val gradient05ALight = Color.parseColor("#E74B8A")
-    val gradient05ADark = Color.parseColor("#BC4E7B")
-    val gradient05AExtraDark = Color.parseColor("#BC4E7B")
-    val gradient05AClassicLight = Color.parseColor("#E74B8A")
-    val gradient05AElectric = Color.parseColor("#CC3C92")
-    val gradient05AIndigo = Color.parseColor("#CC70A4")
-    val gradient05ARadioactive = Color.parseColor("#53a26a")
-    val gradient05ARose = Color.parseColor("#e5679a")
-    val gradient05ALightContrast = Color.parseColor("#E74B8A")
-    val gradient05ADarkContrast = Color.parseColor("#BC4E7B")
-    val gradient05ELight = Color.parseColor("#6046E9")
-    val gradient05EDark = Color.parseColor("#6B59C7")
-    val gradient05EExtraDark = Color.parseColor("#6B59C7")
-    val gradient05EClassicLight = Color.parseColor("#6046E9")
-    val gradient05EElectric = Color.parseColor("#8163B0")
-    val gradient05EIndigo = Color.parseColor("#7B73BF")
-    val gradient05ERadioactive = Color.parseColor("#b0c073")
-    val gradient05ERose = Color.parseColor("#af73bf")
-    val gradient05ELightContrast = Color.parseColor("#6046E9")
-    val gradient05EDarkContrast = Color.parseColor("#6B59C7")
-    val imageFilter01Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01Electric = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01Indigo = Color.parseColor("#FFFFFF")
-    val imageFilter01Radioactive = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01Rose = Color.parseColor("#FFFFFF")
-    val imageFilter01LightContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter01DarkContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02Electric = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02Indigo = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02Radioactive = Color.parseColor("#FFFFFF").colorIntWithAlpha(38)
-    val imageFilter02Rose = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02LightContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter02DarkContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03Electric = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03Indigo = Color.parseColor("#FFFFFF")
-    val imageFilter03Radioactive = Color.parseColor("#70E84E")
-    val imageFilter03Rose = Color.parseColor("#FFFFFF")
-    val imageFilter03LightContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter03DarkContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04Light = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04Dark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04ExtraDark = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04ClassicLight = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04Electric = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04Indigo = Color.parseColor("#FFFFFF")
-    val imageFilter04Radioactive = Color.parseColor("#70E84E").colorIntWithAlpha(128)
-    val imageFilter04Rose = Color.parseColor("#FFFFFF")
-    val imageFilter04LightContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val imageFilter04DarkContrast = Color.parseColor("#FFFFFF").colorIntWithAlpha(0)
-    val category01Light = Color.parseColor("#F43E37")
-    val category01Dark = Color.parseColor("#F8574D")
-    val category01ExtraDark = Color.parseColor("#F8574D")
-    val category01ClassicLight = Color.parseColor("#F43E37")
-    val category01Electric = Color.parseColor("#3FD2E6")
-    val category01Indigo = Color.parseColor("#CE4A4E")
-    val category01Radioactive = Color.parseColor("#74f864")
-    val category01Rose = Color.parseColor("#CE4A4E")
-    val category01LightContrast = Color.parseColor("#F43E37")
-    val category01DarkContrast = Color.parseColor("#F8574D")
-    val category02Light = Color.parseColor("#03A9F4")
-    val category02Dark = Color.parseColor("#09B7DF")
-    val category02ExtraDark = Color.parseColor("#09B7DF")
-    val category02ClassicLight = Color.parseColor("#03A9F4")
-    val category02Electric = Color.parseColor("#3FD2E6")
-    val category02Indigo = Color.parseColor("#2998D0")
-    val category02Radioactive = Color.parseColor("#74f864")
-    val category02Rose = Color.parseColor("#2998D0")
-    val category02LightContrast = Color.parseColor("#03A9F4")
-    val category02DarkContrast = Color.parseColor("#09B7DF")
-    val category03Light = Color.parseColor("#FEC635")
-    val category03Dark = Color.parseColor("#FEDD4A")
-    val category03ExtraDark = Color.parseColor("#FEDD4A")
-    val category03ClassicLight = Color.parseColor("#FEC635")
-    val category03Electric = Color.parseColor("#3FD2E6")
-    val category03Indigo = Color.parseColor("#EEC465")
-    val category03Radioactive = Color.parseColor("#74f864")
-    val category03Rose = Color.parseColor("#EEC465")
-    val category03LightContrast = Color.parseColor("#FEC635")
-    val category03DarkContrast = Color.parseColor("#FEDD4A")
-    val category04Light = Color.parseColor("#187ADC")
-    val category04Dark = Color.parseColor("#22ABEA")
-    val category04ExtraDark = Color.parseColor("#22ABEA")
-    val category04ClassicLight = Color.parseColor("#187ADC")
-    val category04Electric = Color.parseColor("#3FD2E6")
-    val category04Indigo = Color.parseColor("#2C6EBC")
-    val category04Radioactive = Color.parseColor("#74f864")
-    val category04Rose = Color.parseColor("#2C6EBC")
-    val category04LightContrast = Color.parseColor("#187ADC")
-    val category04DarkContrast = Color.parseColor("#22ABEA")
-    val category05Light = Color.parseColor("#3B862D")
-    val category05Dark = Color.parseColor("#53B63F")
-    val category05ExtraDark = Color.parseColor("#53B63F")
-    val category05ClassicLight = Color.parseColor("#3B862D")
-    val category05Electric = Color.parseColor("#3FD2E6")
-    val category05Indigo = Color.parseColor("#397B39")
-    val category05Radioactive = Color.parseColor("#74f864")
-    val category05Rose = Color.parseColor("#397B39")
-    val category05LightContrast = Color.parseColor("#3B862D")
-    val category05DarkContrast = Color.parseColor("#53B63F")
-    val category06Light = Color.parseColor("#8F97A4")
-    val category06Dark = Color.parseColor("#BCC0C8")
-    val category06ExtraDark = Color.parseColor("#BCC0C8")
-    val category06ClassicLight = Color.parseColor("#8F97A4")
-    val category06Electric = Color.parseColor("#3FD2E6")
-    val category06Indigo = Color.parseColor("#8091B3")
-    val category06Radioactive = Color.parseColor("#74f864")
-    val category06Rose = Color.parseColor("#8091B3")
-    val category06LightContrast = Color.parseColor("#8F97A4")
-    val category06DarkContrast = Color.parseColor("#BCC0C8")
-    val category07Light = Color.parseColor("#B25900")
-    val category07Dark = Color.parseColor("#D17D00")
-    val category07ExtraDark = Color.parseColor("#D17D00")
-    val category07ClassicLight = Color.parseColor("#B25900")
-    val category07Electric = Color.parseColor("#3FD2E6")
-    val category07Indigo = Color.parseColor("#96581C")
-    val category07Radioactive = Color.parseColor("#74f864")
-    val category07Rose = Color.parseColor("#96581C")
-    val category07LightContrast = Color.parseColor("#B25900")
-    val category07DarkContrast = Color.parseColor("#D17D00")
-    val category08Light = Color.parseColor("#78D549")
-    val category08Dark = Color.parseColor("#A8E666")
-    val category08ExtraDark = Color.parseColor("#A8E666")
-    val category08ClassicLight = Color.parseColor("#78D549")
-    val category08Electric = Color.parseColor("#3FD2E6")
-    val category08Indigo = Color.parseColor("#77C868")
-    val category08Radioactive = Color.parseColor("#74f864")
-    val category08Rose = Color.parseColor("#77C868")
-    val category08LightContrast = Color.parseColor("#78D549")
-    val category08DarkContrast = Color.parseColor("#A8E666")
-    val category09Light = Color.parseColor("#FB8ECE")
-    val category09Dark = Color.parseColor("#FDBBE1")
-    val category09ExtraDark = Color.parseColor("#FDBBE1")
-    val category09ClassicLight = Color.parseColor("#FB8ECE")
-    val category09Electric = Color.parseColor("#3FD2E6")
-    val category09Indigo = Color.parseColor("#EA90CE")
-    val category09Radioactive = Color.parseColor("#74f864")
-    val category09Rose = Color.parseColor("#EA90CE")
-    val category09LightContrast = Color.parseColor("#FB8ECE")
-    val category09DarkContrast = Color.parseColor("#FDBBE1")
-    val category10Light = Color.parseColor("#A866DB")
-    val category10Dark = Color.parseColor("#CB8FE9")
-    val category10ExtraDark = Color.parseColor("#CB8FE9")
-    val category10ClassicLight = Color.parseColor("#A866DB")
-    val category10Electric = Color.parseColor("#3FD2E6")
-    val category10Indigo = Color.parseColor("#9668CA")
-    val category10Radioactive = Color.parseColor("#74f864")
-    val category10Rose = Color.parseColor("#9668CA")
-    val category10LightContrast = Color.parseColor("#A866DB")
-    val category10DarkContrast = Color.parseColor("#CB8FE9")
-    val category11Light = Color.parseColor("#D61F59")
-    val category11Dark = Color.parseColor("#E62B7D")
-    val category11ExtraDark = Color.parseColor("#E62B7D")
-    val category11ClassicLight = Color.parseColor("#D61F59")
-    val category11Electric = Color.parseColor("#3FD2E6")
-    val category11Indigo = Color.parseColor("#B02F64")
-    val category11Radioactive = Color.parseColor("#74f864")
-    val category11Rose = Color.parseColor("#B02F64")
-    val category11LightContrast = Color.parseColor("#D61F59")
-    val category11DarkContrast = Color.parseColor("#E62B7D")
-    val category12Light = Color.parseColor("#686C74")
-    val category12Dark = Color.parseColor("#9297A2")
-    val category12ExtraDark = Color.parseColor("#9297A2")
-    val category12ClassicLight = Color.parseColor("#686C74")
-    val category12Electric = Color.parseColor("#3FD2E6")
-    val category12Indigo = Color.parseColor("#5A6689")
-    val category12Radioactive = Color.parseColor("#74f864")
-    val category12Rose = Color.parseColor("#5A6689")
-    val category12LightContrast = Color.parseColor("#686C74")
-    val category12DarkContrast = Color.parseColor("#9297A2")
-    val category13Light = Color.parseColor("#FF9D3B")
-    val category13Dark = Color.parseColor("#FFC453")
-    val category13ExtraDark = Color.parseColor("#FFC453")
-    val category13ClassicLight = Color.parseColor("#FF9D3B")
-    val category13Electric = Color.parseColor("#3FD2E6")
-    val category13Indigo = Color.parseColor("#E79D62")
-    val category13Radioactive = Color.parseColor("#74f864")
-    val category13Rose = Color.parseColor("#E79D62")
-    val category13LightContrast = Color.parseColor("#FF9D3B")
-    val category13DarkContrast = Color.parseColor("#FFC453")
-    val category14Light = Color.parseColor("#50D0F1")
-    val category14Dark = Color.parseColor("#70E3F7")
-    val category14ExtraDark = Color.parseColor("#70E3F7")
-    val category14ClassicLight = Color.parseColor("#50D0F1")
-    val category14Electric = Color.parseColor("#3FD2E6")
-    val category14Indigo = Color.parseColor("#61C3DE")
-    val category14Radioactive = Color.parseColor("#74f864")
-    val category14Rose = Color.parseColor("#61C3DE")
-    val category14LightContrast = Color.parseColor("#50D0F1")
-    val category14DarkContrast = Color.parseColor("#70E3F7")
-    val category15Light = Color.parseColor("#E93673")
-    val category15Dark = Color.parseColor("#E62B7D")
-    val category15ExtraDark = Color.parseColor("#E62B7D")
-    val category15ClassicLight = Color.parseColor("#E93673")
-    val category15Electric = Color.parseColor("#3FD2E6")
-    val category15Indigo = Color.parseColor("#B02F64")
-    val category15Radioactive = Color.parseColor("#74f864")
-    val category15Rose = Color.parseColor("#B02F64")
-    val category15LightContrast = Color.parseColor("#E93673")
-    val category15DarkContrast = Color.parseColor("#E62B7D")
-    val category16Light = Color.parseColor("#0059B2")
-    val category16Dark = Color.parseColor("#007DD1")
-    val category16ExtraDark = Color.parseColor("#007DD1")
-    val category16ClassicLight = Color.parseColor("#0059B2")
-    val category16Electric = Color.parseColor("#3FD2E6")
-    val category16Indigo = Color.parseColor("#14509C")
-    val category16Radioactive = Color.parseColor("#74f864")
-    val category16Rose = Color.parseColor("#14509C")
-    val category16LightContrast = Color.parseColor("#0059B2")
-    val category16DarkContrast = Color.parseColor("#007DD1")
-    val category17Light = Color.parseColor("#CC98F0")
-    val category17Dark = Color.parseColor("#E0C1F6")
-    val category17ExtraDark = Color.parseColor("#E0C1F6")
-    val category17ClassicLight = Color.parseColor("#CC98F0")
-    val category17Electric = Color.parseColor("#3FD2E6")
-    val category17Indigo = Color.parseColor("#C197E5")
-    val category17Radioactive = Color.parseColor("#74f864")
-    val category17Rose = Color.parseColor("#C197E5")
-    val category17LightContrast = Color.parseColor("#CC98F0")
-    val category17DarkContrast = Color.parseColor("#E0C1F6")
-    val category18Light = Color.parseColor("#D9201C")
-    val category18Dark = Color.parseColor("#E82D27")
-    val category18ExtraDark = Color.parseColor("#E82D27")
-    val category18ClassicLight = Color.parseColor("#D9201C")
-    val category18Electric = Color.parseColor("#3FD2E6")
-    val category18Indigo = Color.parseColor("#B02E2F")
-    val category18Radioactive = Color.parseColor("#74f864")
-    val category18Rose = Color.parseColor("#B02E2F")
-    val category18LightContrast = Color.parseColor("#D9201C")
-    val category18DarkContrast = Color.parseColor("#E82D27")
-    val category19Light = Color.parseColor("#5D31C4")
-    val category19Dark = Color.parseColor("#8245DC")
-    val category19ExtraDark = Color.parseColor("#8245DC")
-    val category19ClassicLight = Color.parseColor("#5D31C4")
-    val category19Electric = Color.parseColor("#3FD2E6")
-    val category19Indigo = Color.parseColor("#5036AA")
-    val category19Radioactive = Color.parseColor("#74f864")
-    val category19Rose = Color.parseColor("#5036AA")
-    val category19LightContrast = Color.parseColor("#5D31C4")
-    val category19DarkContrast = Color.parseColor("#8245DC")
+    val playerContrast01Light = "#FFFFFF".toColorInt()
+    val playerContrast01Dark = "#FFFFFF".toColorInt()
+    val playerContrast01ExtraDark = "#FFFFFF".toColorInt()
+    val playerContrast01ClassicLight = "#FFFFFF".toColorInt()
+    val playerContrast01Electric = "#FFFFFF".toColorInt()
+    val playerContrast01Indigo = "#C1C2BC".toColorInt()
+    val playerContrast01Radioactive = "#70e84e".toColorInt()
+    val playerContrast01Rose = "#ffd9d9".toColorInt()
+    val playerContrast01LightContrast = "#ffffff".toColorInt()
+    val playerContrast01DarkContrast = "#ffffff".toColorInt()
+    val playerContrast02Light = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val playerContrast02Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val playerContrast02ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(102)
+    val playerContrast02ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val playerContrast02Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(179)
+    val playerContrast02Indigo = "#DBDBCE".toColorInt().colorIntWithAlpha(128)
+    val playerContrast02Radioactive = "#70e84e".toColorInt().colorIntWithAlpha(204)
+    val playerContrast02Rose = "#FFDCD6".toColorInt().colorIntWithAlpha(153)
+    val playerContrast02LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(204)
+    val playerContrast02DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(204)
+    val playerContrast03Light = "#FFFFFF".toColorInt().colorIntWithAlpha(102)
+    val playerContrast03Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(102)
+    val playerContrast03ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(82)
+    val playerContrast03ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(102)
+    val playerContrast03Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(140)
+    val playerContrast03Indigo = "#CFCCBE".toColorInt().colorIntWithAlpha(102)
+    val playerContrast03Radioactive = "#70e84e".toColorInt().colorIntWithAlpha(179)
+    val playerContrast03Rose = "#ffdcd6".toColorInt().colorIntWithAlpha(128)
+    val playerContrast03LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(166)
+    val playerContrast03DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(166)
+    val playerContrast04Light = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
+    val playerContrast04Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
+    val playerContrast04ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(61)
+    val playerContrast04ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(77)
+    val playerContrast04Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(77)
+    val playerContrast04Indigo = "#DADBD7".toColorInt().colorIntWithAlpha(77)
+    val playerContrast04Radioactive = "#56E52E".toColorInt().colorIntWithAlpha(82)
+    val playerContrast04Rose = "#ffe0db".toColorInt().colorIntWithAlpha(102)
+    val playerContrast04LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(128)
+    val playerContrast04DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(128)
+    val playerContrast05Light = "#FFFFFF".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(41)
+    val playerContrast05ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05Indigo = "#B1B5AA".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05Radioactive = "#56E52E".toColorInt().colorIntWithAlpha(61)
+    val playerContrast05Rose = "#FFDCD6".toColorInt().colorIntWithAlpha(64)
+    val playerContrast05LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(51)
+    val playerContrast05DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(51)
+    val playerContrast06Light = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(20)
+    val playerContrast06ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06Electric = "#3FD2E6".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06Indigo = "#C2C0B6".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06Radioactive = "#56E52E".toColorInt().colorIntWithAlpha(46)
+    val playerContrast06Rose = "#ffdcd6".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(26)
+    val playerContrast06DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(26)
+    val contrast01Light = "#FFFFFF".toColorInt()
+    val contrast01Dark = "#FFFFFF".toColorInt()
+    val contrast01ExtraDark = "#FFFFFF".toColorInt()
+    val contrast01ClassicLight = "#FFFFFF".toColorInt()
+    val contrast01Electric = "#FFFFFF".toColorInt()
+    val contrast01Indigo = "#E2E3DC".toColorInt()
+    val contrast01Radioactive = "#70E84E".toColorInt()
+    val contrast01Rose = "#ffffff".toColorInt()
+    val contrast01LightContrast = "#ffffff".toColorInt()
+    val contrast01DarkContrast = "#ffffff".toColorInt()
+    val contrast02Light = "#FFFFFF".toColorInt().colorIntWithAlpha(179)
+    val contrast02Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(179)
+    val contrast02ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(179)
+    val contrast02ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(179)
+    val contrast02Electric = "#B2F6FF".toColorInt().colorIntWithAlpha(204)
+    val contrast02Indigo = "#DBDBCE".toColorInt().colorIntWithAlpha(179)
+    val contrast02Radioactive = "#70e84e".toColorInt().colorIntWithAlpha(204)
+    val contrast02Rose = "#ffffff".toColorInt().colorIntWithAlpha(217)
+    val contrast02LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(217)
+    val contrast02DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(204)
+    val contrast03Light = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val contrast03Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val contrast03ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val contrast03ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(128)
+    val contrast03Electric = "#B2F6FF".toColorInt().colorIntWithAlpha(153)
+    val contrast03Indigo = "#DBDBCE".toColorInt().colorIntWithAlpha(128)
+    val contrast03Radioactive = "#70E84E".toColorInt().colorIntWithAlpha(179)
+    val contrast03Rose = "#ffffff".toColorInt().colorIntWithAlpha(179)
+    val contrast03LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(179)
+    val contrast03DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(153)
+    val contrast04Light = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val contrast04Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val contrast04ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val contrast04ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(26)
+    val contrast04Electric = "#B2F6FF".toColorInt().colorIntWithAlpha(51)
+    val contrast04Indigo = "#DBDBCE".toColorInt().colorIntWithAlpha(26)
+    val contrast04Radioactive = "#70E84E".toColorInt().colorIntWithAlpha(64)
+    val contrast04Rose = "#ffffff".toColorInt().colorIntWithAlpha(51)
+    val contrast04LightContrast = "#ffffff".toColorInt().colorIntWithAlpha(51)
+    val contrast04DarkContrast = "#ffffff".toColorInt().colorIntWithAlpha(51)
+    val filter01Light = "#F43E37".toColorInt()
+    val filter01Dark = "#DF514C".toColorInt()
+    val filter01ExtraDark = "#DF514C".toColorInt()
+    val filter01ClassicLight = "#F43E37".toColorInt()
+    val filter01Electric = "#F84F44".toColorInt()
+    val filter01Indigo = "#8E656B".toColorInt()
+    val filter01Radioactive = "#74f864".toColorInt()
+    val filter01Rose = "#d66e6c".toColorInt()
+    val filter01LightContrast = "#F43E37".toColorInt()
+    val filter01DarkContrast = "#FF6557".toColorInt()
+    val filter02Light = "#FF9D3B".toColorInt()
+    val filter02Dark = "#EB9D4F".toColorInt()
+    val filter02ExtraDark = "#EB9D4F".toColorInt()
+    val filter02ClassicLight = "#FF9D3B".toColorInt()
+    val filter02Electric = "#F6A935".toColorInt()
+    val filter02Indigo = "#A08B7B".toColorInt()
+    val filter02Radioactive = "#74f864".toColorInt()
+    val filter02Rose = "#dfa280".toColorInt()
+    val filter02LightContrast = "#E87400".toColorInt()
+    val filter02DarkContrast = "#EB8118".toColorInt()
+    val filter03Light = "#FEC635".toColorInt()
+    val filter03Dark = "#EABD49".toColorInt()
+    val filter03ExtraDark = "#EABD49".toColorInt()
+    val filter03ClassicLight = "#FEC635".toColorInt()
+    val filter03Electric = "#CFE63F".toColorInt()
+    val filter03Indigo = "#A59C80".toColorInt()
+    val filter03Radioactive = "#74f864".toColorInt()
+    val filter03Rose = "#e0b985".toColorInt()
+    val filter03LightContrast = "#BF8C00".toColorInt()
+    val filter03DarkContrast = "#FFBF1A".toColorInt()
+    val filter04Light = "#78D549".toColorInt()
+    val filter04Dark = "#7FBF5F".toColorInt()
+    val filter04ExtraDark = "#7FBF5F".toColorInt()
+    val filter04ClassicLight = "#78D549".toColorInt()
+    val filter04Electric = "#3FE664".toColorInt()
+    val filter04Indigo = "#7C987D".toColorInt()
+    val filter04Radioactive = "#74f864".toColorInt()
+    val filter04Rose = "#b1b676".toColorInt()
+    val filter04LightContrast = "#39A800".toColorInt()
+    val filter04DarkContrast = "#99FF66".toColorInt()
+    val filter05Light = "#03A9F4".toColorInt()
+    val filter05Dark = "#1BA0DC".toColorInt()
+    val filter05ExtraDark = "#1BA0DC".toColorInt()
+    val filter05ClassicLight = "#03A9F4".toColorInt()
+    val filter05Electric = "#3FD2E6".toColorInt()
+    val filter05Indigo = "#54829D".toColorInt()
+    val filter05Radioactive = "#74f864".toColorInt()
+    val filter05Rose = "#8196bc".toColorInt()
+    val filter05LightContrast = "#039DE3".toColorInt()
+    val filter05DarkContrast = "#1AB8FF".toColorInt()
+    val filter06Light = "#5D31C4".toColorInt()
+    val filter06Dark = "#9D79F2".toColorInt()
+    val filter06ExtraDark = "#9D79F2".toColorInt()
+    val filter06ClassicLight = "#5D31C4".toColorInt()
+    val filter06Electric = "#B65BFD".toColorInt()
+    val filter06Indigo = "#5F5885".toColorInt()
+    val filter06Radioactive = "#74f864".toColorInt()
+    val filter06Rose = "#9b5c9e".toColorInt()
+    val filter06LightContrast = "#5D31C4".toColorInt()
+    val filter06DarkContrast = "#CC73FF".toColorInt()
+    val filter07Light = "#E93673".toColorInt()
+    val filter07Dark = "#D24D7A".toColorInt()
+    val filter07ExtraDark = "#D24D7A".toColorInt()
+    val filter07ClassicLight = "#E93673".toColorInt()
+    val filter07Electric = "#FF4BB7".toColorInt()
+    val filter07Indigo = "#8B637A".toColorInt()
+    val filter07Radioactive = "#74f864".toColorInt()
+    val filter07Rose = "#d26c80".toColorInt()
+    val filter07LightContrast = "#E93673".toColorInt()
+    val filter07DarkContrast = "#FF6680".toColorInt()
+    val filter08Light = "#B8C3C9".toColorInt()
+    val filter08Dark = "#BDC2C4".toColorInt()
+    val filter08ExtraDark = "#BDC2C4".toColorInt()
+    val filter08ClassicLight = "#B8C3C9".toColorInt()
+    val filter08Electric = "#BFBFBF".toColorInt()
+    val filter08Indigo = "#9299A2".toColorInt()
+    val filter08Radioactive = "#74f864".toColorInt()
+    val filter08Rose = "#b8b8d8".toColorInt()
+    val filter08LightContrast = "#8C9499".toColorInt()
+    val filter08DarkContrast = "#B8C3C9".toColorInt()
+    val filter09Light = "#A177D9".toColorInt()
+    val filter09Dark = "#FAA5C1".toColorInt()
+    val filter09ExtraDark = "#FAA5C1".toColorInt()
+    val filter09ClassicLight = "#A177D9".toColorInt()
+    val filter09Electric = "#FF94F1".toColorInt()
+    val filter09Indigo = "#998A9E".toColorInt()
+    val filter09Radioactive = "#74f864".toColorInt()
+    val filter09Rose = "#6883BA".toColorInt()
+    val filter09LightContrast = "#A177D9".toColorInt()
+    val filter09DarkContrast = "#9BA2FF".toColorInt()
+    val filter10Light = "#3DAD88".toColorInt()
+    val filter10Dark = "#03CEA4".toColorInt()
+    val filter10ExtraDark = "#03CEA4".toColorInt()
+    val filter10ClassicLight = "#3DAD88".toColorInt()
+    val filter10Electric = "#58EDAC".toColorInt()
+    val filter10Indigo = "#A4B391".toColorInt()
+    val filter10Radioactive = "#74f864".toColorInt()
+    val filter10Rose = "#546A76".toColorInt()
+    val filter10LightContrast = "#3DAD88".toColorInt()
+    val filter10DarkContrast = "#32D9A9".toColorInt()
+    val filter11Light = "#2555CF".toColorInt()
+    val filter11Dark = "#5584FA".toColorInt()
+    val filter11ExtraDark = "#5584FA".toColorInt()
+    val filter11ClassicLight = "#2555CF".toColorInt()
+    val filter11Electric = "#0A9AFA".toColorInt()
+    val filter11Indigo = "#84A0B0".toColorInt()
+    val filter11Radioactive = "#74f864".toColorInt()
+    val filter11Rose = "#998E87".toColorInt()
+    val filter11LightContrast = "#2555CF".toColorInt()
+    val filter11DarkContrast = "#21E6ED".toColorInt()
+    val filter12Light = "#945712".toColorInt()
+    val filter12Dark = "#A3863B".toColorInt()
+    val filter12ExtraDark = "#A3863B".toColorInt()
+    val filter12ClassicLight = "#945712".toColorInt()
+    val filter12Electric = "#CCA083".toColorInt()
+    val filter12Indigo = "#8C8C80".toColorInt()
+    val filter12Radioactive = "#74f864".toColorInt()
+    val filter12Rose = "#997F7F".toColorInt()
+    val filter12LightContrast = "#945712".toColorInt()
+    val filter12DarkContrast = "#AD753D".toColorInt()
+    val veilLight = "#000000".toColorInt().colorIntWithAlpha(77)
+    val veilDark = "#000000".toColorInt().colorIntWithAlpha(128)
+    val veilExtraDark = "#000000".toColorInt().colorIntWithAlpha(128)
+    val veilClassicLight = "#000000".toColorInt().colorIntWithAlpha(77)
+    val veilElectric = "#000000".toColorInt().colorIntWithAlpha(128)
+    val veilIndigo = "#25273E".toColorInt().colorIntWithAlpha(77)
+    val veilRadioactive = "#173d17".toColorInt().colorIntWithAlpha(191)
+    val veilRose = "#f2ccc7".toColorInt().colorIntWithAlpha(191)
+    val veilLightContrast = "#000000".toColorInt().colorIntWithAlpha(77)
+    val veilDarkContrast = "#000000".toColorInt().colorIntWithAlpha(153)
+    val gradient01ALight = "#FED745".toColorInt()
+    val gradient01ADark = "#D7B32E".toColorInt()
+    val gradient01AExtraDark = "#D7B32E".toColorInt()
+    val gradient01AClassicLight = "#FED745".toColorInt()
+    val gradient01AElectric = "#D7B32E".toColorInt()
+    val gradient01AIndigo = "#F2D672".toColorInt()
+    val gradient01ARadioactive = "#948a00".toColorInt()
+    val gradient01ARose = "#ffcb78".toColorInt()
+    val gradient01ALightContrast = "#FED745".toColorInt()
+    val gradient01ADarkContrast = "#D7B32E".toColorInt()
+    val gradient01ELight = "#FEB525".toColorInt()
+    val gradient01EDark = "#C18000".toColorInt()
+    val gradient01EExtraDark = "#C18000".toColorInt()
+    val gradient01EClassicLight = "#FEB525".toColorInt()
+    val gradient01EElectric = "#C18000".toColorInt()
+    val gradient01EIndigo = "#F2B03D".toColorInt()
+    val gradient01ERadioactive = "#eeff00".toColorInt()
+    val gradient01ERose = "#ffaf4d".toColorInt()
+    val gradient01ELightContrast = "#FEB525".toColorInt()
+    val gradient01EDarkContrast = "#C18000".toColorInt()
+    val gradient02ALight = "#03A9F4".toColorInt()
+    val gradient02ADark = "#3993AA".toColorInt()
+    val gradient02AExtraDark = "#3993AA".toColorInt()
+    val gradient02AClassicLight = "#03A9F4".toColorInt()
+    val gradient02AElectric = "#54B29E".toColorInt()
+    val gradient02AIndigo = "#5C8BCC".toColorInt()
+    val gradient02ARadioactive = "#3dbd4c".toColorInt()
+    val gradient02ARose = "#f0546e".toColorInt()
+    val gradient02ALightContrast = "#03A9F4".toColorInt()
+    val gradient02ADarkContrast = "#3993AA".toColorInt()
+    val gradient02ELight = "#50D0F1".toColorInt()
+    val gradient02EDark = "#008CCB".toColorInt()
+    val gradient02EExtraDark = "#008CCB".toColorInt()
+    val gradient02EClassicLight = "#50D0F1".toColorInt()
+    val gradient02EElectric = "#3FB7E6".toColorInt()
+    val gradient02EIndigo = "#95B0E5".toColorInt()
+    val gradient02ERadioactive = "#a4f864".toColorInt()
+    val gradient02ERose = "#ff938c".toColorInt()
+    val gradient02ELightContrast = "#50D0F1".toColorInt()
+    val gradient02EDarkContrast = "#008CCB".toColorInt()
+    val gradient03ALight = "#F43769".toColorInt()
+    val gradient03ADark = "#C9522E".toColorInt()
+    val gradient03AExtraDark = "#C9522E".toColorInt()
+    val gradient03AClassicLight = "#F43769".toColorInt()
+    val gradient03AElectric = "#DE4010".toColorInt()
+    val gradient03AIndigo = "#D96F8B".toColorInt()
+    val gradient03ARadioactive = "#538a11".toColorInt()
+    val gradient03ARose = "#c4459a".toColorInt()
+    val gradient03ALightContrast = "#F43769".toColorInt()
+    val gradient03ADarkContrast = "#C9522E".toColorInt()
+    val gradient03ELight = "#FB5246".toColorInt()
+    val gradient03EDark = "#B82E3C".toColorInt()
+    val gradient03EExtraDark = "#B82E3C".toColorInt()
+    val gradient03EClassicLight = "#FB5246".toColorInt()
+    val gradient03EElectric = "#AB5068".toColorInt()
+    val gradient03EIndigo = "#D94860".toColorInt()
+    val gradient03ERadioactive = "#f8e963".toColorInt()
+    val gradient03ERose = "#de435c".toColorInt()
+    val gradient03ELightContrast = "#FB5246".toColorInt()
+    val gradient03EDarkContrast = "#B82E3C".toColorInt()
+    val gradient04ALight = "#78D549".toColorInt()
+    val gradient04ADark = "#7FB74F".toColorInt()
+    val gradient04AExtraDark = "#7FB74F".toColorInt()
+    val gradient04AClassicLight = "#78D549".toColorInt()
+    val gradient04AElectric = "#38CC71".toColorInt()
+    val gradient04AIndigo = "#66CC91".toColorInt()
+    val gradient04ARadioactive = "#579986".toColorInt()
+    val gradient04ARose = "#c1c917".toColorInt()
+    val gradient04ALightContrast = "#78D549".toColorInt()
+    val gradient04ADarkContrast = "#7FB74F".toColorInt()
+    val gradient04ELight = "#9BE45E".toColorInt()
+    val gradient04EDark = "#508D32".toColorInt()
+    val gradient04EExtraDark = "#508D32".toColorInt()
+    val gradient04EClassicLight = "#9BE45E".toColorInt()
+    val gradient04EElectric = "#519948".toColorInt()
+    val gradient04EIndigo = "#90D977".toColorInt()
+    val gradient04ERadioactive = "#0ecc77".toColorInt()
+    val gradient04ERose = "#bbde47".toColorInt()
+    val gradient04ELightContrast = "#9BE45E".toColorInt()
+    val gradient04EDarkContrast = "#508D32".toColorInt()
+    val gradient05ALight = "#E74B8A".toColorInt()
+    val gradient05ADark = "#BC4E7B".toColorInt()
+    val gradient05AExtraDark = "#BC4E7B".toColorInt()
+    val gradient05AClassicLight = "#E74B8A".toColorInt()
+    val gradient05AElectric = "#CC3C92".toColorInt()
+    val gradient05AIndigo = "#CC70A4".toColorInt()
+    val gradient05ARadioactive = "#53a26a".toColorInt()
+    val gradient05ARose = "#e5679a".toColorInt()
+    val gradient05ALightContrast = "#E74B8A".toColorInt()
+    val gradient05ADarkContrast = "#BC4E7B".toColorInt()
+    val gradient05ELight = "#6046E9".toColorInt()
+    val gradient05EDark = "#6B59C7".toColorInt()
+    val gradient05EExtraDark = "#6B59C7".toColorInt()
+    val gradient05EClassicLight = "#6046E9".toColorInt()
+    val gradient05EElectric = "#8163B0".toColorInt()
+    val gradient05EIndigo = "#7B73BF".toColorInt()
+    val gradient05ERadioactive = "#b0c073".toColorInt()
+    val gradient05ERose = "#af73bf".toColorInt()
+    val gradient05ELightContrast = "#6046E9".toColorInt()
+    val gradient05EDarkContrast = "#6B59C7".toColorInt()
+    val imageFilter01Light = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01Electric = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01Indigo = "#FFFFFF".toColorInt()
+    val imageFilter01Radioactive = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01Rose = "#FFFFFF".toColorInt()
+    val imageFilter01LightContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter01DarkContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02Light = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02Electric = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02Indigo = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02Radioactive = "#FFFFFF".toColorInt().colorIntWithAlpha(38)
+    val imageFilter02Rose = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02LightContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter02DarkContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03Light = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03Electric = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03Indigo = "#FFFFFF".toColorInt()
+    val imageFilter03Radioactive = "#70E84E".toColorInt()
+    val imageFilter03Rose = "#FFFFFF".toColorInt()
+    val imageFilter03LightContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter03DarkContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04Light = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04Dark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04ExtraDark = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04ClassicLight = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04Electric = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04Indigo = "#FFFFFF".toColorInt()
+    val imageFilter04Radioactive = "#70E84E".toColorInt().colorIntWithAlpha(128)
+    val imageFilter04Rose = "#FFFFFF".toColorInt()
+    val imageFilter04LightContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val imageFilter04DarkContrast = "#FFFFFF".toColorInt().colorIntWithAlpha(0)
+    val category01Light = "#F43E37".toColorInt()
+    val category01Dark = "#F8574D".toColorInt()
+    val category01ExtraDark = "#F8574D".toColorInt()
+    val category01ClassicLight = "#F43E37".toColorInt()
+    val category01Electric = "#3FD2E6".toColorInt()
+    val category01Indigo = "#CE4A4E".toColorInt()
+    val category01Radioactive = "#74f864".toColorInt()
+    val category01Rose = "#CE4A4E".toColorInt()
+    val category01LightContrast = "#F43E37".toColorInt()
+    val category01DarkContrast = "#F8574D".toColorInt()
+    val category02Light = "#03A9F4".toColorInt()
+    val category02Dark = "#09B7DF".toColorInt()
+    val category02ExtraDark = "#09B7DF".toColorInt()
+    val category02ClassicLight = "#03A9F4".toColorInt()
+    val category02Electric = "#3FD2E6".toColorInt()
+    val category02Indigo = "#2998D0".toColorInt()
+    val category02Radioactive = "#74f864".toColorInt()
+    val category02Rose = "#2998D0".toColorInt()
+    val category02LightContrast = "#03A9F4".toColorInt()
+    val category02DarkContrast = "#09B7DF".toColorInt()
+    val category03Light = "#FEC635".toColorInt()
+    val category03Dark = "#FEDD4A".toColorInt()
+    val category03ExtraDark = "#FEDD4A".toColorInt()
+    val category03ClassicLight = "#FEC635".toColorInt()
+    val category03Electric = "#3FD2E6".toColorInt()
+    val category03Indigo = "#EEC465".toColorInt()
+    val category03Radioactive = "#74f864".toColorInt()
+    val category03Rose = "#EEC465".toColorInt()
+    val category03LightContrast = "#FEC635".toColorInt()
+    val category03DarkContrast = "#FEDD4A".toColorInt()
+    val category04Light = "#187ADC".toColorInt()
+    val category04Dark = "#22ABEA".toColorInt()
+    val category04ExtraDark = "#22ABEA".toColorInt()
+    val category04ClassicLight = "#187ADC".toColorInt()
+    val category04Electric = "#3FD2E6".toColorInt()
+    val category04Indigo = "#2C6EBC".toColorInt()
+    val category04Radioactive = "#74f864".toColorInt()
+    val category04Rose = "#2C6EBC".toColorInt()
+    val category04LightContrast = "#187ADC".toColorInt()
+    val category04DarkContrast = "#22ABEA".toColorInt()
+    val category05Light = "#3B862D".toColorInt()
+    val category05Dark = "#53B63F".toColorInt()
+    val category05ExtraDark = "#53B63F".toColorInt()
+    val category05ClassicLight = "#3B862D".toColorInt()
+    val category05Electric = "#3FD2E6".toColorInt()
+    val category05Indigo = "#397B39".toColorInt()
+    val category05Radioactive = "#74f864".toColorInt()
+    val category05Rose = "#397B39".toColorInt()
+    val category05LightContrast = "#3B862D".toColorInt()
+    val category05DarkContrast = "#53B63F".toColorInt()
+    val category06Light = "#8F97A4".toColorInt()
+    val category06Dark = "#BCC0C8".toColorInt()
+    val category06ExtraDark = "#BCC0C8".toColorInt()
+    val category06ClassicLight = "#8F97A4".toColorInt()
+    val category06Electric = "#3FD2E6".toColorInt()
+    val category06Indigo = "#8091B3".toColorInt()
+    val category06Radioactive = "#74f864".toColorInt()
+    val category06Rose = "#8091B3".toColorInt()
+    val category06LightContrast = "#8F97A4".toColorInt()
+    val category06DarkContrast = "#BCC0C8".toColorInt()
+    val category07Light = "#B25900".toColorInt()
+    val category07Dark = "#D17D00".toColorInt()
+    val category07ExtraDark = "#D17D00".toColorInt()
+    val category07ClassicLight = "#B25900".toColorInt()
+    val category07Electric = "#3FD2E6".toColorInt()
+    val category07Indigo = "#96581C".toColorInt()
+    val category07Radioactive = "#74f864".toColorInt()
+    val category07Rose = "#96581C".toColorInt()
+    val category07LightContrast = "#B25900".toColorInt()
+    val category07DarkContrast = "#D17D00".toColorInt()
+    val category08Light = "#78D549".toColorInt()
+    val category08Dark = "#A8E666".toColorInt()
+    val category08ExtraDark = "#A8E666".toColorInt()
+    val category08ClassicLight = "#78D549".toColorInt()
+    val category08Electric = "#3FD2E6".toColorInt()
+    val category08Indigo = "#77C868".toColorInt()
+    val category08Radioactive = "#74f864".toColorInt()
+    val category08Rose = "#77C868".toColorInt()
+    val category08LightContrast = "#78D549".toColorInt()
+    val category08DarkContrast = "#A8E666".toColorInt()
+    val category09Light = "#FB8ECE".toColorInt()
+    val category09Dark = "#FDBBE1".toColorInt()
+    val category09ExtraDark = "#FDBBE1".toColorInt()
+    val category09ClassicLight = "#FB8ECE".toColorInt()
+    val category09Electric = "#3FD2E6".toColorInt()
+    val category09Indigo = "#EA90CE".toColorInt()
+    val category09Radioactive = "#74f864".toColorInt()
+    val category09Rose = "#EA90CE".toColorInt()
+    val category09LightContrast = "#FB8ECE".toColorInt()
+    val category09DarkContrast = "#FDBBE1".toColorInt()
+    val category10Light = "#A866DB".toColorInt()
+    val category10Dark = "#CB8FE9".toColorInt()
+    val category10ExtraDark = "#CB8FE9".toColorInt()
+    val category10ClassicLight = "#A866DB".toColorInt()
+    val category10Electric = "#3FD2E6".toColorInt()
+    val category10Indigo = "#9668CA".toColorInt()
+    val category10Radioactive = "#74f864".toColorInt()
+    val category10Rose = "#9668CA".toColorInt()
+    val category10LightContrast = "#A866DB".toColorInt()
+    val category10DarkContrast = "#CB8FE9".toColorInt()
+    val category11Light = "#D61F59".toColorInt()
+    val category11Dark = "#E62B7D".toColorInt()
+    val category11ExtraDark = "#E62B7D".toColorInt()
+    val category11ClassicLight = "#D61F59".toColorInt()
+    val category11Electric = "#3FD2E6".toColorInt()
+    val category11Indigo = "#B02F64".toColorInt()
+    val category11Radioactive = "#74f864".toColorInt()
+    val category11Rose = "#B02F64".toColorInt()
+    val category11LightContrast = "#D61F59".toColorInt()
+    val category11DarkContrast = "#E62B7D".toColorInt()
+    val category12Light = "#686C74".toColorInt()
+    val category12Dark = "#9297A2".toColorInt()
+    val category12ExtraDark = "#9297A2".toColorInt()
+    val category12ClassicLight = "#686C74".toColorInt()
+    val category12Electric = "#3FD2E6".toColorInt()
+    val category12Indigo = "#5A6689".toColorInt()
+    val category12Radioactive = "#74f864".toColorInt()
+    val category12Rose = "#5A6689".toColorInt()
+    val category12LightContrast = "#686C74".toColorInt()
+    val category12DarkContrast = "#9297A2".toColorInt()
+    val category13Light = "#FF9D3B".toColorInt()
+    val category13Dark = "#FFC453".toColorInt()
+    val category13ExtraDark = "#FFC453".toColorInt()
+    val category13ClassicLight = "#FF9D3B".toColorInt()
+    val category13Electric = "#3FD2E6".toColorInt()
+    val category13Indigo = "#E79D62".toColorInt()
+    val category13Radioactive = "#74f864".toColorInt()
+    val category13Rose = "#E79D62".toColorInt()
+    val category13LightContrast = "#FF9D3B".toColorInt()
+    val category13DarkContrast = "#FFC453".toColorInt()
+    val category14Light = "#50D0F1".toColorInt()
+    val category14Dark = "#70E3F7".toColorInt()
+    val category14ExtraDark = "#70E3F7".toColorInt()
+    val category14ClassicLight = "#50D0F1".toColorInt()
+    val category14Electric = "#3FD2E6".toColorInt()
+    val category14Indigo = "#61C3DE".toColorInt()
+    val category14Radioactive = "#74f864".toColorInt()
+    val category14Rose = "#61C3DE".toColorInt()
+    val category14LightContrast = "#50D0F1".toColorInt()
+    val category14DarkContrast = "#70E3F7".toColorInt()
+    val category15Light = "#E93673".toColorInt()
+    val category15Dark = "#E62B7D".toColorInt()
+    val category15ExtraDark = "#E62B7D".toColorInt()
+    val category15ClassicLight = "#E93673".toColorInt()
+    val category15Electric = "#3FD2E6".toColorInt()
+    val category15Indigo = "#B02F64".toColorInt()
+    val category15Radioactive = "#74f864".toColorInt()
+    val category15Rose = "#B02F64".toColorInt()
+    val category15LightContrast = "#E93673".toColorInt()
+    val category15DarkContrast = "#E62B7D".toColorInt()
+    val category16Light = "#0059B2".toColorInt()
+    val category16Dark = "#007DD1".toColorInt()
+    val category16ExtraDark = "#007DD1".toColorInt()
+    val category16ClassicLight = "#0059B2".toColorInt()
+    val category16Electric = "#3FD2E6".toColorInt()
+    val category16Indigo = "#14509C".toColorInt()
+    val category16Radioactive = "#74f864".toColorInt()
+    val category16Rose = "#14509C".toColorInt()
+    val category16LightContrast = "#0059B2".toColorInt()
+    val category16DarkContrast = "#007DD1".toColorInt()
+    val category17Light = "#CC98F0".toColorInt()
+    val category17Dark = "#E0C1F6".toColorInt()
+    val category17ExtraDark = "#E0C1F6".toColorInt()
+    val category17ClassicLight = "#CC98F0".toColorInt()
+    val category17Electric = "#3FD2E6".toColorInt()
+    val category17Indigo = "#C197E5".toColorInt()
+    val category17Radioactive = "#74f864".toColorInt()
+    val category17Rose = "#C197E5".toColorInt()
+    val category17LightContrast = "#CC98F0".toColorInt()
+    val category17DarkContrast = "#E0C1F6".toColorInt()
+    val category18Light = "#D9201C".toColorInt()
+    val category18Dark = "#E82D27".toColorInt()
+    val category18ExtraDark = "#E82D27".toColorInt()
+    val category18ClassicLight = "#D9201C".toColorInt()
+    val category18Electric = "#3FD2E6".toColorInt()
+    val category18Indigo = "#B02E2F".toColorInt()
+    val category18Radioactive = "#74f864".toColorInt()
+    val category18Rose = "#B02E2F".toColorInt()
+    val category18LightContrast = "#D9201C".toColorInt()
+    val category18DarkContrast = "#E82D27".toColorInt()
+    val category19Light = "#5D31C4".toColorInt()
+    val category19Dark = "#8245DC".toColorInt()
+    val category19ExtraDark = "#8245DC".toColorInt()
+    val category19ClassicLight = "#5D31C4".toColorInt()
+    val category19Electric = "#3FD2E6".toColorInt()
+    val category19Indigo = "#5036AA".toColorInt()
+    val category19Radioactive = "#74f864".toColorInt()
+    val category19Rose = "#5036AA".toColorInt()
+    val category19LightContrast = "#5D31C4".toColorInt()
+    val category19DarkContrast = "#8245DC".toColorInt()
 
     @ColorInt fun primaryUi01(theme: Theme.ThemeType): Int {
         return when (theme) {
@@ -2941,9 +2896,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi01Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi01Rose
@@ -2976,9 +2928,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi01ActiveRose
 
@@ -3009,9 +2958,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi02Rose
@@ -3044,9 +2990,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi02SelectedIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02SelectedRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi02SelectedRose
 
@@ -3077,9 +3020,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi02ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi02ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi02ActiveRose
@@ -3112,9 +3052,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi03Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi03Rose
 
@@ -3145,9 +3082,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi04Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi04Rose
@@ -3180,9 +3114,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi05Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi05Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi05Rose
 
@@ -3213,9 +3144,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryUi05SelectedIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi05SelectedRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryUi05SelectedRose
@@ -3248,9 +3176,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryUi06Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryUi06Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryUi06Rose
 
@@ -3281,9 +3206,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon01Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon01Rose
@@ -3316,9 +3238,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon01ActiveRose
 
@@ -3349,9 +3268,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon02Rose
@@ -3384,9 +3300,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon02SelectedIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02SelectedRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon02SelectedRose
 
@@ -3417,9 +3330,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon02ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon02ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon02ActiveRose
@@ -3452,9 +3362,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryIcon03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon03Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryIcon03Rose
 
@@ -3485,9 +3392,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryIcon03ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryIcon03ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryIcon03ActiveRose
@@ -3520,9 +3424,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryText01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText01Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryText01Rose
 
@@ -3553,9 +3454,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryText02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText02Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryText02Rose
@@ -3588,9 +3486,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryText02SelectedIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryText02SelectedRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryText02SelectedRose
 
@@ -3621,9 +3516,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField01Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField01Rose
@@ -3656,9 +3548,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField01ActiveRose
 
@@ -3689,9 +3578,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField02Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField02Rose
@@ -3724,9 +3610,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField02ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField02ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField02ActiveRose
 
@@ -3757,9 +3640,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryField03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField03Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryField03Rose
@@ -3792,9 +3672,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryField03ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryField03ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryField03ActiveRose
 
@@ -3825,9 +3702,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive01Rose
@@ -3860,9 +3734,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01HoverIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01HoverRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive01HoverRose
 
@@ -3893,9 +3764,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive01ActiveRose
@@ -3928,9 +3796,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01DisabledIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive01DisabledRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive01DisabledRose
 
@@ -3961,9 +3826,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02Radioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive02Rose
@@ -3996,9 +3858,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02HoverIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02HoverRadioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive02HoverRose
 
@@ -4029,9 +3888,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive02ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 primaryInteractive02ActiveRose
@@ -4064,9 +3920,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 primaryInteractive03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                primaryInteractive03Radioactive
-
             Theme.ThemeType.ROSE ->
                 primaryInteractive03Rose
 
@@ -4097,9 +3950,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryUi01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryUi01Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryUi01Rose
@@ -4132,9 +3982,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryUi02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryUi02Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryUi02Rose
 
@@ -4165,9 +4012,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryIcon01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryIcon01Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryIcon01Rose
@@ -4200,9 +4044,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryIcon02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryIcon02Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryIcon02Rose
 
@@ -4233,9 +4074,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryText01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryText01Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryText01Rose
@@ -4268,9 +4106,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryText02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryText02Radioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryText02Rose
 
@@ -4301,9 +4136,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryField01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryField01Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryField01Rose
@@ -4336,9 +4168,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryField01ActiveIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryField01ActiveRadioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryField01ActiveRose
 
@@ -4369,9 +4198,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01Radioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01Rose
@@ -4404,9 +4230,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01HoverIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01HoverRadioactive
-
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01HoverRose
 
@@ -4437,9 +4260,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01ActiveIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                secondaryInteractive01ActiveRadioactive
 
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01ActiveRose
@@ -4472,9 +4292,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi01Rose(podcastColor)
 
@@ -4505,9 +4322,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi02Rose(podcastColor)
@@ -4540,9 +4354,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi03Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi03Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi03Rose(podcastColor)
 
@@ -4573,9 +4384,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi04Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi04Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi04Rose(podcastColor)
@@ -4608,9 +4416,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastUi05Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi05Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastUi05Rose(podcastColor)
 
@@ -4641,9 +4446,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastUi06Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastUi06Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastUi06Rose(podcastColor)
@@ -4676,9 +4478,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastIcon01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastIcon01Rose(podcastColor)
 
@@ -4709,9 +4508,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastIcon02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastIcon02Rose(podcastColor)
@@ -4744,9 +4540,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastIcon03Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastIcon03Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastIcon03Rose(podcastColor)
 
@@ -4777,9 +4570,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastText01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastText01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastText01Rose(podcastColor)
@@ -4812,9 +4602,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastText02Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastText02Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastText02Rose(podcastColor)
 
@@ -4845,9 +4632,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive01Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive01Rose(podcastColor)
@@ -4880,9 +4664,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01ActiveIndigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive01ActiveRadioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive01ActiveRose(podcastColor)
 
@@ -4913,9 +4694,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive02Rose(podcastColor)
@@ -4948,9 +4726,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive03Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive03Rose(podcastColor)
 
@@ -4981,9 +4756,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03ActiveIndigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive03ActiveRadioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive03ActiveRose(podcastColor)
@@ -5016,9 +4788,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastInteractive04Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive04Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastInteractive04Rose(podcastColor)
 
@@ -5049,9 +4818,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastInteractive05Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastInteractive05Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastInteractive05Rose(podcastColor)
@@ -5084,9 +4850,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 podcastOndarkIndigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastOndarkRadioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 podcastOndarkRose(podcastColor)
 
@@ -5117,9 +4880,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 podcastOnlightIndigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                podcastOnlightRadioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 podcastOnlightRose(podcastColor)
@@ -5152,9 +4912,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterUi01Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi01Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterUi01Rose(filterColor)
 
@@ -5185,9 +4942,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterUi02Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi02Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterUi02Rose(filterColor)
@@ -5220,9 +4974,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterUi03Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi03Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterUi03Rose(filterColor)
 
@@ -5253,9 +5004,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterUi04Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterUi04Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterUi04Rose(filterColor)
@@ -5288,9 +5036,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterIcon01Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterIcon01Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterIcon01Rose(filterColor)
 
@@ -5321,9 +5066,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterIcon02Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterIcon02Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterIcon02Rose(filterColor)
@@ -5356,9 +5098,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterText01Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterText01Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterText01Rose(filterColor)
 
@@ -5389,9 +5128,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterText02Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterText02Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterText02Rose(filterColor)
@@ -5424,9 +5160,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive01Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive01Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive01Rose(filterColor)
 
@@ -5457,9 +5190,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive01ActiveIndigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive01ActiveRadioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive01ActiveRose(filterColor)
@@ -5492,9 +5222,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive02Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive02Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive02Rose(filterColor)
 
@@ -5525,9 +5252,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive03Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive03Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive03Rose(filterColor)
@@ -5560,9 +5284,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive03ActiveIndigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive03ActiveRadioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive03ActiveRose(filterColor)
 
@@ -5593,9 +5314,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive04Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive04Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive04Rose(filterColor)
@@ -5628,9 +5346,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filterInteractive05Indigo(filterColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive05Radioactive(filterColor)
-
             Theme.ThemeType.ROSE ->
                 filterInteractive05Rose(filterColor)
 
@@ -5661,9 +5376,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filterInteractive06Indigo(filterColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filterInteractive06Radioactive(filterColor)
 
             Theme.ThemeType.ROSE ->
                 filterInteractive06Rose(filterColor)
@@ -5696,9 +5408,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support01Radioactive
-
             Theme.ThemeType.ROSE ->
                 support01Rose
 
@@ -5729,9 +5438,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support02Radioactive
 
             Theme.ThemeType.ROSE ->
                 support02Rose
@@ -5764,9 +5470,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support03Radioactive
-
             Theme.ThemeType.ROSE ->
                 support03Rose
 
@@ -5797,9 +5500,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support04Radioactive
 
             Theme.ThemeType.ROSE ->
                 support04Rose
@@ -5832,9 +5532,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support05Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support05Radioactive
-
             Theme.ThemeType.ROSE ->
                 support05Rose
 
@@ -5865,9 +5562,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support06Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support06Radioactive
 
             Theme.ThemeType.ROSE ->
                 support06Rose
@@ -5900,9 +5594,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support07Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support07Radioactive
-
             Theme.ThemeType.ROSE ->
                 support07Rose
 
@@ -5933,9 +5624,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support08Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support08Radioactive
 
             Theme.ThemeType.ROSE ->
                 support08Rose
@@ -5968,9 +5656,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 support09Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                support09Radioactive
-
             Theme.ThemeType.ROSE ->
                 support09Rose
 
@@ -6001,9 +5686,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 support10Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                support10Radioactive
 
             Theme.ThemeType.ROSE ->
                 support10Rose
@@ -6036,9 +5718,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerBackground01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerBackground01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerBackground01Rose(podcastColor)
 
@@ -6069,9 +5748,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerBackground02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerBackground02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerBackground02Rose(podcastColor)
@@ -6104,9 +5780,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight01Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight01Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight01Rose(podcastColor)
 
@@ -6137,9 +5810,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight02Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight02Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight02Rose(podcastColor)
@@ -6172,9 +5842,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight03Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight03Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight03Rose(podcastColor)
 
@@ -6205,9 +5872,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight04Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight04Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight04Rose(podcastColor)
@@ -6240,9 +5904,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight05Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight05Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight05Rose(podcastColor)
 
@@ -6273,9 +5934,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerHighlight06Indigo(podcastColor)
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight06Radioactive(podcastColor)
 
             Theme.ThemeType.ROSE ->
                 playerHighlight06Rose(podcastColor)
@@ -6308,9 +5966,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerHighlight07Indigo(podcastColor)
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerHighlight07Radioactive(podcastColor)
-
             Theme.ThemeType.ROSE ->
                 playerHighlight07Rose(podcastColor)
 
@@ -6341,9 +5996,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast01Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast01Rose
@@ -6376,9 +6028,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast02Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast02Rose
 
@@ -6409,9 +6058,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast03Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast03Rose
@@ -6444,9 +6090,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast04Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast04Rose
 
@@ -6477,9 +6120,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 playerContrast05Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast05Radioactive
 
             Theme.ThemeType.ROSE ->
                 playerContrast05Rose
@@ -6512,9 +6152,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 playerContrast06Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                playerContrast06Radioactive
-
             Theme.ThemeType.ROSE ->
                 playerContrast06Rose
 
@@ -6545,9 +6182,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 contrast01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast01Radioactive
 
             Theme.ThemeType.ROSE ->
                 contrast01Rose
@@ -6580,9 +6214,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 contrast02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast02Radioactive
-
             Theme.ThemeType.ROSE ->
                 contrast02Rose
 
@@ -6613,9 +6244,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 contrast03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast03Radioactive
 
             Theme.ThemeType.ROSE ->
                 contrast03Rose
@@ -6648,9 +6276,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 contrast04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                contrast04Radioactive
-
             Theme.ThemeType.ROSE ->
                 contrast04Rose
 
@@ -6681,9 +6306,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter01Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter01Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter01Rose
@@ -6716,9 +6338,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter02Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter02Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter02Rose
 
@@ -6749,9 +6368,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter03Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter03Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter03Rose
@@ -6784,9 +6400,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter04Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter04Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter04Rose
 
@@ -6817,9 +6430,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter05Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter05Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter05Rose
@@ -6852,9 +6462,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter06Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter06Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter06Rose
 
@@ -6885,9 +6492,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter07Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter07Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter07Rose
@@ -6920,9 +6524,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter08Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter08Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter08Rose
 
@@ -6953,9 +6554,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter09Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter09Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter09Rose
@@ -6988,9 +6586,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter10Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter10Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter10Rose
 
@@ -7021,9 +6616,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 filter11Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                filter11Radioactive
 
             Theme.ThemeType.ROSE ->
                 filter11Rose
@@ -7056,9 +6648,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 filter12Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                filter12Radioactive
-
             Theme.ThemeType.ROSE ->
                 filter12Rose
 
@@ -7089,9 +6678,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 veilIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                veilRadioactive
 
             Theme.ThemeType.ROSE ->
                 veilRose
@@ -7124,9 +6710,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient01AIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient01ARadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient01ARose
 
@@ -7157,9 +6740,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient01EIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient01ERadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient01ERose
@@ -7192,9 +6772,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient02AIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient02ARadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient02ARose
 
@@ -7225,9 +6802,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient02EIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient02ERadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient02ERose
@@ -7260,9 +6834,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient03AIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient03ARadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient03ARose
 
@@ -7293,9 +6864,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient03EIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient03ERadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient03ERose
@@ -7328,9 +6896,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient04AIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient04ARadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient04ARose
 
@@ -7361,9 +6926,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient04EIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient04ERadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient04ERose
@@ -7396,9 +6958,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 gradient05AIndigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient05ARadioactive
-
             Theme.ThemeType.ROSE ->
                 gradient05ARose
 
@@ -7429,9 +6988,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 gradient05EIndigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                gradient05ERadioactive
 
             Theme.ThemeType.ROSE ->
                 gradient05ERose
@@ -7464,9 +7020,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 imageFilter01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter01Radioactive
-
             Theme.ThemeType.ROSE ->
                 imageFilter01Rose
 
@@ -7497,9 +7050,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 imageFilter02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter02Radioactive
 
             Theme.ThemeType.ROSE ->
                 imageFilter02Rose
@@ -7532,9 +7082,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 imageFilter03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter03Radioactive
-
             Theme.ThemeType.ROSE ->
                 imageFilter03Rose
 
@@ -7565,9 +7112,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 imageFilter04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                imageFilter04Radioactive
 
             Theme.ThemeType.ROSE ->
                 imageFilter04Rose
@@ -7600,9 +7144,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category01Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category01Radioactive
-
             Theme.ThemeType.ROSE ->
                 category01Rose
 
@@ -7633,9 +7174,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category02Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category02Radioactive
 
             Theme.ThemeType.ROSE ->
                 category02Rose
@@ -7668,9 +7206,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category03Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category03Radioactive
-
             Theme.ThemeType.ROSE ->
                 category03Rose
 
@@ -7701,9 +7236,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category04Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category04Radioactive
 
             Theme.ThemeType.ROSE ->
                 category04Rose
@@ -7736,9 +7268,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category05Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category05Radioactive
-
             Theme.ThemeType.ROSE ->
                 category05Rose
 
@@ -7769,9 +7298,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category06Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category06Radioactive
 
             Theme.ThemeType.ROSE ->
                 category06Rose
@@ -7804,9 +7330,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category07Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category07Radioactive
-
             Theme.ThemeType.ROSE ->
                 category07Rose
 
@@ -7837,9 +7360,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category08Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category08Radioactive
 
             Theme.ThemeType.ROSE ->
                 category08Rose
@@ -7872,9 +7392,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category09Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category09Radioactive
-
             Theme.ThemeType.ROSE ->
                 category09Rose
 
@@ -7905,9 +7422,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category10Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category10Radioactive
 
             Theme.ThemeType.ROSE ->
                 category10Rose
@@ -7940,9 +7454,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category11Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category11Radioactive
-
             Theme.ThemeType.ROSE ->
                 category11Rose
 
@@ -7973,9 +7484,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category12Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category12Radioactive
 
             Theme.ThemeType.ROSE ->
                 category12Rose
@@ -8008,9 +7516,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category13Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category13Radioactive
-
             Theme.ThemeType.ROSE ->
                 category13Rose
 
@@ -8041,9 +7546,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category14Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category14Radioactive
 
             Theme.ThemeType.ROSE ->
                 category14Rose
@@ -8076,9 +7578,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category15Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category15Radioactive
-
             Theme.ThemeType.ROSE ->
                 category15Rose
 
@@ -8109,9 +7608,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category16Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category16Radioactive
 
             Theme.ThemeType.ROSE ->
                 category16Rose
@@ -8144,9 +7640,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category17Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category17Radioactive
-
             Theme.ThemeType.ROSE ->
                 category17Rose
 
@@ -8178,9 +7671,6 @@ object ThemeColor {
             Theme.ThemeType.INDIGO ->
                 category18Indigo
 
-            Theme.ThemeType.RADIOACTIVE ->
-                category18Radioactive
-
             Theme.ThemeType.ROSE ->
                 category18Rose
 
@@ -8211,9 +7701,6 @@ object ThemeColor {
 
             Theme.ThemeType.INDIGO ->
                 category19Indigo
-
-            Theme.ThemeType.RADIOACTIVE ->
-                category19Radioactive
 
             Theme.ThemeType.ROSE ->
                 category19Rose

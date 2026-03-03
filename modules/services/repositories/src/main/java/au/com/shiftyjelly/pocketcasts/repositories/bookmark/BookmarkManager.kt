@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import com.automattic.eventhorizon.BookmarkSource
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +15,7 @@ interface BookmarkManager {
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        creationSource: CreationSource,
+        creationSource: BookmarkSource,
         addedAt: Instant = Instant.now(),
     ): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
@@ -41,9 +42,4 @@ interface BookmarkManager {
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
 
     var sourceView: SourceView
-
-    enum class CreationSource(val analyticsValue: String) {
-        HEADPHONES("headphones"),
-        PLAYER("player"),
-    }
 }

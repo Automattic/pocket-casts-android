@@ -1,14 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
+import au.com.shiftyjelly.pocketcasts.coroutines.SyncedAction
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.run
 import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.toMembership
-import au.com.shiftyjelly.pocketcasts.utils.coroutines.SyncedAction
-import au.com.shiftyjelly.pocketcasts.utils.coroutines.run
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope

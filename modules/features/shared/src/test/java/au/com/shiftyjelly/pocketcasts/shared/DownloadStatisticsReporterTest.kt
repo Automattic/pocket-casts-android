@@ -45,7 +45,7 @@ class DownloadStatisticsReporterTest {
     @Before
     fun setUp() {
         episodeDao = mock<EpisodeDao> {
-            onBlocking { getFailedDownloadsStatistics() } doReturn statistics
+            on { getFailedDownloadsStatistics() } doReturn statistics
         }
         reporter = DownloadStatisticsReporter(
             episodeDao,

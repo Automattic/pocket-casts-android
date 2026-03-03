@@ -117,23 +117,17 @@ internal class BillingPaymentDataSource(
 private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParams.newBuilder()
     .setProductList(
         listOf(
+            SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
+            SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
+            SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID,
+            SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID,
+            SubscriptionPlan.PLUS_YEARLY_INSTALLMENT_PRODUCT_ID,
+        ).map { productId ->
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID)
+                .setProductId(productId)
                 .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-        ),
+                .build()
+        },
     )
     .build()
 

@@ -166,16 +166,6 @@ class Theme @Inject constructor(private val settings: Settings) {
             darkTheme = false,
             isPlus = true,
         ),
-        RADIOACTIVE(
-            themeSetting = ThemeSetting.RADIOACTIVE,
-            labelId = LR.string.settings_theme_radioactivity,
-            resourceId = R.style.Radioactive,
-            iconResourceId = IR.drawable.ic_theme_radioactive,
-            toolbarLightIcons = true,
-            backgroundLightIcons = true,
-            darkTheme = true,
-            isPlus = true,
-        ),
         ;
 
         companion object {
@@ -189,7 +179,6 @@ class Theme @Inject constructor(private val settings: Settings) {
                 ThemeSetting.LIGHT_CONTRAST -> Theme.ThemeType.LIGHT_CONTRAST
                 ThemeSetting.ELECTRIC -> Theme.ThemeType.ELECTRIC
                 ThemeSetting.CLASSIC_LIGHT -> Theme.ThemeType.CLASSIC_LIGHT
-                ThemeSetting.RADIOACTIVE -> Theme.ThemeType.RADIOACTIVE
             }
         }
     }

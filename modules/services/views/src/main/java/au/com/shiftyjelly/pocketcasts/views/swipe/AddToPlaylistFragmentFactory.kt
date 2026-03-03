@@ -1,15 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 
 interface AddToPlaylistFragmentFactory {
     fun create(
         source: Source,
+        uuids: List<EpisodeUuidPair>,
+        customTheme: Theme.ThemeType? = null,
+    ): BaseDialogFragment
+
+    fun create(
+        source: Source,
         episodeUuid: String,
         podcastUuid: String,
         customTheme: Theme.ThemeType? = null,
-    ): BaseDialogFragment
+    ): BaseDialogFragment = create(
+        source = source,
+        uuids = listOf(
+            EpisodeUuidPair(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        ),
+        customTheme = customTheme,
+    )
 
     enum class Source(
         val analyticsValue: String,
@@ -23,6 +39,14 @@ interface AddToPlaylistFragmentFactory {
             analyticsValue = "shelf",
             episodeEditAnalyticsValue = "shelf",
         ),
+        EpisodeDetails(
+            analyticsValue = "episode_details",
+            episodeEditAnalyticsValue = "episode_details",
+        ),
+        MultiSelect(
+            analyticsValue = "multi_select",
+            episodeEditAnalyticsValue = "multi_select",
+        ),
     }
 
     companion object {
@@ -30,8 +54,7 @@ interface AddToPlaylistFragmentFactory {
         val Stub = object : AddToPlaylistFragmentFactory {
             override fun create(
                 source: Source,
-                episodeUuid: String,
-                podcastUuid: String,
+                uuids: List<EpisodeUuidPair>,
                 customTheme: Theme.ThemeType?,
             ): BaseDialogFragment {
                 error("Adding episodes to playlist is not supported")

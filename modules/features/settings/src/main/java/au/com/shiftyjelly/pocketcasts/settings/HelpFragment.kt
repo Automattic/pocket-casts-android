@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,8 +61,7 @@ class HelpFragment :
                     (requireActivity() as FragmentHostListener).addFragment(StatusFragment())
                 },
                 onGoBack = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onWebViewCreate = { webView = it },
                 onWebViewDispose = { webView = null },
@@ -72,6 +72,7 @@ class HelpFragment :
         }
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         setupKeyboardModeResize()

@@ -17,9 +17,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -29,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,6 +48,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 
@@ -56,9 +58,10 @@ class EpisodeFragmentViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val podcastManager: PodcastManager,
     val theme: Theme,
-    val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
     val settings: Settings,
+    private val downloadQueue: DownloadQueue,
+    private val downloadProgressCache: DownloadProgressCache,
     private val showNotesManager: ShowNotesManager,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -71,7 +74,6 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val source = SourceView.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
     lateinit var showNotesState: LiveData<ShowNotesState>
-    lateinit var inUpNext: LiveData<Boolean>
     val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {
         it.episodeUuid == episode?.uuid && it.isPlaying
     }
@@ -98,11 +100,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         startPlaybackTimestamp = timestamp
         autoDispatchPlay = autoPlay
         val isDarkTheme = forceDark || theme.isDarkTheme
-        val progressUpdatesObservable = downloadManager
-            .episodeDownloadProgressFlow(episodeUuid)
+        val progressUpdatesObservable = downloadProgressCache
+            .progressFlow(episodeUuid)
+            .map { progress -> (progress?.percentage?.toFloat() ?: 0f) / 100 }
+            .distinctUntilChanged()
             .asFlowable()
-            .map { it.downloadProgress }
-            .startWith(0f)
 
         // If we can't find it in the database and we know the podcast uuid we can try load it
         // from the server
@@ -170,10 +172,6 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
             .distinctUntilChanged()
 
-        val inUpNextObservable = playbackManager.upNextQueue.changesObservable.toFlowable(BackpressureStrategy.LATEST)
-            .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUuid)) }
-        inUpNext = inUpNextObservable.toLiveData()
-
         if (transcript.value?.episodeUuid != episodeUuid) {
             val oldJob = loadTranscriptJob
             loadTranscriptJob = launch {
@@ -189,41 +187,23 @@ class EpisodeFragmentViewModel @Inject constructor(
     }
 
     fun deleteDownloadedEpisode() {
-        episode?.let {
+        episode?.let { episode ->
+            downloadQueue.cancel(episode.uuid, source)
             launch {
-                episodeManager.deleteEpisodeFile(it, playbackManager, disableAutoDownload = true)
-                episodeAnalytics.trackEvent(
-                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                    source = source,
-                    uuid = it.uuid,
-                )
+                episodeManager.disableAutoDownload(episode)
             }
         }
     }
 
-    fun shouldDownload(): Boolean {
-        return episode?.let {
-            it.downloadTaskId == null && !it.isDownloaded
-        } ?: false
-    }
-
     fun downloadEpisode() {
+        val episode = episode ?: return
+        if (episode.isDownloadCancellable) {
+            downloadQueue.cancel(episode.uuid, source)
+        } else if (!episode.isDownloaded) {
+            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
+        }
         launch {
-            episode?.let {
-                var analyticsEvent: AnalyticsEvent? = null
-                if (it.downloadTaskId != null) {
-                    episodeManager.stopDownloadAndCleanUp(it, "episode card")
-                    analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED
-                } else if (!it.isDownloaded) {
-                    it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, source = source)
-                    analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
-                }
-                episodeManager.clearPlaybackErrorBlocking(episode)
-                analyticsEvent?.let { event ->
-                    episodeAnalytics.trackEvent(event, source = source, uuid = it.uuid)
-                }
-            }
+            episodeManager.clearPlaybackErrorBlocking(episode)
         }
     }
 
@@ -243,30 +223,30 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
-    fun addToUpNext(isOn: Boolean, addLast: Boolean = false): Boolean {
+    fun addToUpNextTop() {
         episode?.let { episode ->
-            return if (!isOn) {
-                launch {
-                    if (addLast) {
-                        playbackManager.playLast(episode = episode, source = source)
-                    } else {
-                        playbackManager.playNext(episode = episode, source = source)
-                    }
-                }
-
-                true
-            } else {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = source)
-
-                false
-            }
+            launch { playbackManager.playNext(episode = episode, source = source) }
         }
-
-        return false
     }
 
-    fun shouldShowUpNextDialog(): Boolean {
-        return playbackManager.upNextQueue.queueEpisodes.isNotEmpty()
+    fun addToUpNextBottom() {
+        episode?.let { episode ->
+            launch { playbackManager.playLast(episode = episode, source = source) }
+        }
+    }
+
+    fun removeFromUpNext() {
+        episode?.let { episode ->
+            launch { playbackManager.removeEpisode(episodeToRemove = episode, source = source) }
+        }
+    }
+
+    fun isEpisodeInUpNext(): Boolean {
+        return playbackManager.upNextQueue.allEpisodes.any { it.uuid == episode?.uuid }
+    }
+
+    fun isUpNextEmpty(): Boolean {
+        return playbackManager.upNextQueue.queueEpisodes.isEmpty()
     }
 
     fun seekToTimeMs(positionMs: Int) {

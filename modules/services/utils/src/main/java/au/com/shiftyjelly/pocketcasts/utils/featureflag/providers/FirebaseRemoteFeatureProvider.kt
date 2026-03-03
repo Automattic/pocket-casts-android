@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -11,24 +12,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Singleton
-class FirebaseRemoteFeatureProvider(
+class FirebaseRemoteFeatureProvider @Inject constructor(
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
-    private val scope: CoroutineScope,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : FeatureProvider {
-    @Inject constructor(firebaseRemoteConfig: FirebaseRemoteConfig) : this(
-        firebaseRemoteConfig,
-        @Suppress("OPT_IN_USAGE")
-        // Using GlobalScope here is perfectly fine. This type is instantiated as a singleton.
-        // We have @ApplicationScope but it lives in a different module which cannot be included here.
-        // GlobalScope and @ApplicationScope are effectively the same as they have the same lifetime.
-        GlobalScope,
-    )
+    private val initialFetchComplete = CompletableDeferred<Boolean>()
 
     override val priority: Int = MAX_PRIORITY
 
@@ -36,8 +30,14 @@ class FirebaseRemoteFeatureProvider(
         scope.launch {
             firebaseRemoteConfig.fetchSuspending()
                 .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
-                .onSuccess { Timber.i("Firebase feature flag refreshed") }
-                .onFailure { Timber.e(it, "Failed to refresh Firebase feature flags") }
+                .onSuccess {
+                    Timber.i("Firebase feature flag refreshed")
+                    initialFetchComplete.complete(true)
+                }
+                .onFailure {
+                    Timber.e(it, "Failed to refresh Firebase feature flags")
+                    initialFetchComplete.complete(false)
+                }
 
             firebaseRemoteConfig.configUpdates.collect {
                 firebaseRemoteConfig.activateSuspending()
@@ -58,6 +58,8 @@ class FirebaseRemoteFeatureProvider(
     }
 
     override fun hasFeature(feature: Feature) = feature.hasFirebaseRemoteFlag
+
+    override suspend fun awaitInitialization() = initialFetchComplete.await()
 }
 
 private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Result<Unit>> { continuation ->

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -19,6 +18,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.dagger.hilt.android)
+    api(libs.eventhorizon)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.deeplink)
@@ -38,4 +38,6 @@ dependencies {
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+
+    testImplementation(projects.modules.services.analytics.testing)
 }

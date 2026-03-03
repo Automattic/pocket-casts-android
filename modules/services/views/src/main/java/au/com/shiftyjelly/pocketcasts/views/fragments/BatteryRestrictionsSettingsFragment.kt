@@ -107,8 +107,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                 isUnrestricted = isUnrestricted,
                 navigationButton = navigationButton,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onClick = {
                     analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.analyticsValue))

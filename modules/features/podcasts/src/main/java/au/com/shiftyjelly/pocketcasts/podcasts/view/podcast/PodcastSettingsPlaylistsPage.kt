@@ -225,6 +225,7 @@ private fun PodcastSettingsPlaylistsPagePreview(
                     )
                 },
                 globalUpNextLimit = 100,
+                isGlobalAutoDownloadEnabled = true,
             ),
             getArtworkUuidsFlow = { MutableStateFlow(null) },
             refreshArtworkUuids = {},

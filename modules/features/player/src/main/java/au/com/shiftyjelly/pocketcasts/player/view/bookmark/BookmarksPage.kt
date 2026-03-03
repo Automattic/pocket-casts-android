@@ -119,6 +119,7 @@ fun BookmarksPage(
         bookmarksViewModel
             .message
             .collectLatest { message ->
+                @Suppress("LocalContextGetResourceValueCall")
                 val string = when (message) {
                     is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)
                     is BookmarkMessage.PlayingBookmark -> context.getString(LR.string.playing_bookmark, message.bookmarkTitle)

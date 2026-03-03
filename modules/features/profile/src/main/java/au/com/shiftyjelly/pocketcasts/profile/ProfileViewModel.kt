@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
@@ -14,6 +12,23 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
+import com.automattic.eventhorizon.DownloadsShownEvent
+import com.automattic.eventhorizon.EndOfYearProfileCardShownEvent
+import com.automattic.eventhorizon.EndOfYearProfileCardTappedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
+import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
+import com.automattic.eventhorizon.ListeningHistoryShownEvent
+import com.automattic.eventhorizon.ProfileAccountButtonTappedEvent
+import com.automattic.eventhorizon.ProfileBookmarksShownEvent
+import com.automattic.eventhorizon.ProfileRefreshButtonTappedEvent
+import com.automattic.eventhorizon.ProfileSettingsButtonTappedEvent
+import com.automattic.eventhorizon.ProfileShownEvent
+import com.automattic.eventhorizon.SettingsHelpShownEvent
+import com.automattic.eventhorizon.StarredShownEvent
+import com.automattic.eventhorizon.StatsShownEvent
+import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
+import com.automattic.eventhorizon.UploadedFilesShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -35,7 +50,7 @@ class ProfileViewModel @Inject constructor(
     private val statsManager: StatsManager,
     private val userManager: UserManager,
     private val endOfYearManager: EndOfYearManager,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val refreshStatsTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -129,15 +144,15 @@ class ProfileViewModel @Inject constructor(
     )
 
     internal fun onScreenShown() {
-        tracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        eventHorizon.track(ProfileShownEvent)
     }
 
     internal fun onSettingsClick() {
-        tracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
+        eventHorizon.track(ProfileSettingsButtonTappedEvent)
     }
 
     internal fun onHeaderClick() {
-        tracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
+        eventHorizon.track(ProfileAccountButtonTappedEvent)
     }
 
     internal fun refreshStats() {
@@ -145,16 +160,18 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun onEndOfYearCardShown() {
-        tracker.track(
-            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_SHOWN,
-            mapOf("current_year" to EndOfYearManager.YEAR_TO_SYNC.value),
+        eventHorizon.track(
+            EndOfYearProfileCardShownEvent(
+                currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
+            ),
         )
     }
 
     internal fun onPlaybackClick() {
-        tracker.track(
-            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
-            mapOf("current_year" to EndOfYearManager.YEAR_TO_SYNC.value),
+        eventHorizon.track(
+            EndOfYearProfileCardTappedEvent(
+                currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
+            ),
         )
         // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
         if (settings.getEndOfYearShowModal()) {
@@ -164,19 +181,19 @@ class ProfileViewModel @Inject constructor(
 
     internal fun onSectionClick(section: ProfileSection) {
         val event = when (section) {
-            ProfileSection.Stats -> AnalyticsEvent.STATS_SHOWN
-            ProfileSection.Downloads -> AnalyticsEvent.DOWNLOADS_SHOWN
-            ProfileSection.CloudFiles -> AnalyticsEvent.UPLOADED_FILES_SHOWN
-            ProfileSection.Starred -> AnalyticsEvent.STARRED_SHOWN
-            ProfileSection.Bookmarks -> AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN
-            ProfileSection.ListeningHistory -> AnalyticsEvent.LISTENING_HISTORY_SHOWN
-            ProfileSection.Help -> AnalyticsEvent.SETTINGS_HELP_SHOWN
+            ProfileSection.Stats -> StatsShownEvent
+            ProfileSection.Downloads -> DownloadsShownEvent
+            ProfileSection.CloudFiles -> UploadedFilesShownEvent
+            ProfileSection.Starred -> StarredShownEvent
+            ProfileSection.Bookmarks -> ProfileBookmarksShownEvent
+            ProfileSection.ListeningHistory -> ListeningHistoryShownEvent
+            ProfileSection.Help -> SettingsHelpShownEvent
         }
-        tracker.track(event)
+        eventHorizon.track(event)
     }
 
     internal fun refreshProfile() {
-        tracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
+        eventHorizon.track(ProfileRefreshButtonTappedEvent)
         podcastManager.refreshPodcasts("profile")
     }
 
@@ -188,16 +205,28 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun closeUpgradeProfile(source: SourceView) {
-        tracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
+        eventHorizon.track(
+            UpgradeBannerDismissedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
     }
 
     internal fun onCreateFreeAccountClick() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "profile"))
+        eventHorizon.track(
+            InformationalBannerViewCreateAccountTapEvent(
+                source = SourceView.PROFILE.eventHorizonValue,
+            ),
+        )
     }
 
     internal fun dismissFreeAccountBanner() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "profile"))
+        eventHorizon.track(
+            InformationalBannerViewDismissedEvent(
+                source = SourceView.PROFILE.eventHorizonValue,
+            ),
+        )
         settings.isFreeAccountProfileBannerDismissed.set(true, updateModifiedAt = true)
     }
 }

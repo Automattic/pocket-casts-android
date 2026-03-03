@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import kotlin.time.Duration
@@ -365,7 +366,7 @@ class PlaylistManagerManualTest {
     }
 
     @Test
-    fun addEpisodes() = dsl.test {
+    fun addSingleEpisode() = dsl.test {
         insertManualPlaylist(index = 0)
         insertPodcast(index = 0)
         insertPodcastEpisode(index = 0, podcastIndex = 0)
@@ -403,6 +404,72 @@ class PlaylistManagerManualTest {
                 )
             },
         )
+    }
+
+    @Test
+    fun addMultipleEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1"))
+        assertTrue(isAdded)
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "",
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun ignoreMissingEpisodesWhenAddingThem() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1", "episode-id-3"))
+        assertTrue(isAdded)
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "",
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun failToAddEpisodesWhenNoneAreFound() = dsl.test {
+        insertManualPlaylist(index = 0)
+
+        val isAdded = manager.addManualEpisodes("playlist-id-0", listOf("episode-id-0", "episode-id-1"))
+        assertFalse(isAdded)
     }
 
     @Test
@@ -609,14 +676,14 @@ class PlaylistManagerManualTest {
         insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 1)
         insertManualEpisode(index = 2, podcastIndex = 1, playlistIndex = 1)
 
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0").test {
+        manager.playlistPreviewsForEpisodeFlow().test {
             assertEquals(
                 listOf(
                     playlistPreviewForEpisode(index = 0) {
-                        it.copy(episodeCount = 1, hasEpisode = true)
+                        it.copy(episodeUuids = setOf("episode-id-0"))
                     },
                     playlistPreviewForEpisode(index = 1) {
-                        it.copy(episodeCount = 2, hasEpisode = false)
+                        it.copy(episodeUuids = setOf("episode-id-1", "episode-id-2"))
                     },
                     playlistPreviewForEpisode(index = 2),
                 ),
@@ -627,10 +694,10 @@ class PlaylistManagerManualTest {
             assertEquals(
                 listOf(
                     playlistPreviewForEpisode(index = 0) {
-                        it.copy(episodeCount = 1, hasEpisode = true)
+                        it.copy(episodeUuids = setOf("episode-id-0"))
                     },
                     playlistPreviewForEpisode(index = 1) {
-                        it.copy(episodeCount = 3, hasEpisode = true)
+                        it.copy(episodeUuids = setOf("episode-id-0", "episode-id-1", "episode-id-2"))
                     },
                     playlistPreviewForEpisode(index = 2),
                 ),
@@ -641,10 +708,10 @@ class PlaylistManagerManualTest {
             assertEquals(
                 listOf(
                     playlistPreviewForEpisode(index = 0) {
-                        it.copy(episodeCount = 0, hasEpisode = false)
+                        it.copy(episodeUuids = emptySet())
                     },
                     playlistPreviewForEpisode(index = 1) {
-                        it.copy(episodeCount = 3, hasEpisode = true)
+                        it.copy(episodeUuids = setOf("episode-id-0", "episode-id-1", "episode-id-2"))
                     },
                     playlistPreviewForEpisode(index = 2),
                 ),
@@ -654,11 +721,18 @@ class PlaylistManagerManualTest {
     }
 
     @Test
+    fun observeEmptyPlaylistPreviewsForEpisodes() = dsl.test {
+        manager.playlistPreviewsForEpisodeFlow().test {
+            assertEquals(emptyList<PlaylistPreviewForEpisode>(), awaitItem())
+        }
+    }
+
+    @Test
     fun searchPlaylistPreviewsForEpisodes() = dsl.test {
         insertManualPlaylist(0) { it.copy(title = "abc") }
         insertManualPlaylist(1) { it.copy(title = "DeF") }
 
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = null).test {
+        manager.playlistPreviewsForEpisodeFlow(searchTerm = null).test {
             assertEquals(
                 "null search term",
                 listOf(
@@ -669,7 +743,7 @@ class PlaylistManagerManualTest {
             )
         }
 
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = " ").test {
+        manager.playlistPreviewsForEpisodeFlow(searchTerm = " ").test {
             assertEquals(
                 "blank term",
                 listOf(
@@ -680,7 +754,7 @@ class PlaylistManagerManualTest {
             )
         }
 
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "aBc").test {
+        manager.playlistPreviewsForEpisodeFlow(searchTerm = "aBc").test {
             assertEquals(
                 "playlist search",
                 listOf(

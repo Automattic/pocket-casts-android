@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
@@ -33,7 +34,7 @@ import timber.log.Timber
 @OptIn(UnstableApi::class)
 class ExoPlayerDataSourceFactory @Inject constructor(
     @ApplicationContext private val context: Context,
-    @Player private val client: OkHttpClient,
+    @Player private val httpClient: Lazy<OkHttpClient>,
     private val settings: Settings,
     private val crashLogging: CrashLogging,
 ) {
@@ -48,7 +49,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
     }.getOrNull()
 
-    private val defaultFactory = DefaultDataSource.Factory(context, OkHttpDataSource.Factory(client))
+    private val defaultFactory = DefaultDataSource.Factory(
+        context,
+        OkHttpDataSource.Factory { request -> httpClient.get().newCall(request) },
+    )
 
     val cacheFactory get() = CacheDataSource.Factory()
         .setUpstreamDataSourceFactory(defaultFactory)

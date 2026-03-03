@@ -295,14 +295,16 @@ private fun ChapterProgressCircle(
 @Composable
 private fun formatTimeRemainingContentDescription(
     chapterTimeRemaining: String,
-) = runCatching {
-    val duration = Duration.parse(chapterTimeRemaining)
-    when {
+): String {
+    val duration = runCatching { Duration.parse(chapterTimeRemaining) }.getOrNull()
+        ?: return chapterTimeRemaining
+
+    return when {
         duration.inWholeHours > 0 -> pluralStringResource(LR.plurals.hour, duration.inWholeHours.toInt())
         duration.inWholeMinutes > 0 -> pluralStringResource(LR.plurals.minute, duration.inWholeMinutes.toInt())
         else -> pluralStringResource(LR.plurals.second, duration.inWholeSeconds.toInt())
     }
-}.getOrElse { chapterTimeRemaining }
+}
 
 private data class PlayerHeadingSectionState(
     val episodeUuid: String = "",

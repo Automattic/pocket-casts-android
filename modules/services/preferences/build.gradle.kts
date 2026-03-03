@@ -1,8 +1,5 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -29,6 +26,7 @@ dependencies {
     api(projects.modules.services.utils)
 
     implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
@@ -37,6 +35,7 @@ dependencies {
     implementation(libs.play.cast)
     implementation(libs.timber)
 
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
 

@@ -43,12 +43,11 @@ class ChangeDoneFragment : BaseFragment() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun closeForm() {
         val activity = activity ?: return
-        activity.onBackPressed()
+        activity.onBackPressedDispatcher.onBackPressed()
         if (shouldCloseParent) {
-            activity.onBackPressed()
+            activity.onBackPressedDispatcher.onBackPressed()
         }
     }
 

@@ -23,13 +23,11 @@ class TrialFinishedFragment : BaseFragment() {
 
             TrialFinishedPage(
                 onUpgradeClick = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                     activity?.startActivity(AccountActivity.newUpgradeInstance(context))
                 },
                 onDoneClick = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
             )
         }

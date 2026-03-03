@@ -45,7 +45,10 @@ class WinbackViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
-                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = subscription?.expiryDate)
+                _uiState.value = _uiState.value.copy(
+                    currentSubscriptionExpirationDate = subscription?.expiryDate,
+                    isInstallment = subscription?.isInstallment ?: false,
+                )
             }
         }
     }
@@ -86,7 +89,7 @@ class WinbackViewModel @Inject constructor(
         newPlan: SubscriptionPlan.Base,
         activity: Activity,
     ) {
-        trackPlanSelected(newPlan.productId)
+        trackPlanSelected(requireNotNull(newPlan.productId) { "productId shouldn't be null for plan=$newPlan" })
         if (changePlanJob?.isActive == true) {
             return
         }
@@ -115,8 +118,8 @@ class WinbackViewModel @Inject constructor(
 
                 is PurchaseResult.Purchased -> {
                     trackPlanPurchased(
-                        currentProductId = loadedState.currentSubscription.productId,
-                        newProductId = newPlan.productId,
+                        currentProductId = requireNotNull(loadedState.currentSubscription.productId) { "productId shouldn't be null for plan=${loadedState.currentSubscription}" },
+                        newProductId = requireNotNull(newPlan.productId) { "productId shouldn't be null for plan=${newPlan.key}" },
                     )
                     val activeSubscriptionDeferred = async { loadActiveSubscription() }
                     val winbackOfferResponseDeferred = async { loadWinbackOffer() }
@@ -172,6 +175,7 @@ class WinbackViewModel @Inject constructor(
                 loadedState.currentSubscription.tier,
                 loadedState.currentSubscription.billingCycle,
                 SubscriptionOffer.Winback,
+                loadedState.currentSubscription.isInstallment,
             )
             when (paymentClient.purchaseSubscriptionPlan(newPlanKey, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Purchased -> {
@@ -249,14 +253,43 @@ class WinbackViewModel @Inject constructor(
         val plan = plans.finMatchingWinbackPlan(offer) ?: return null
         val (discountPhase, regularPhase) = plan.pricingPhases.takeIf { it.size == 2 } ?: return null
 
+        val formattedPrice: String
+        val formattedTotalSavings: String?
+
+        when {
+            plan.billingCycle == BillingCycle.Monthly -> {
+                formattedPrice = regularPhase.price.formattedPrice
+                formattedTotalSavings = null
+            }
+
+            plan.isInstallment -> {
+                formattedPrice = discountPhase.price.formattedPrice
+                // Calculate total savings: (regular monthly price * 12) - (discounted monthly price * 12)
+                val regularYearlyAmount = regularPhase.price.amount * 12.toBigDecimal()
+                val discountedYearlyAmount = discountPhase.price.amount * 12.toBigDecimal()
+                val savingsAmount = regularYearlyAmount - discountedYearlyAmount
+                formattedTotalSavings = try {
+                    java.text.NumberFormat.getCurrencyInstance().apply {
+                        currency = java.util.Currency.getInstance(discountPhase.price.currencyCode)
+                    }.format(savingsAmount)
+                } catch (_: IllegalArgumentException) {
+                    "${discountPhase.price.currencyCode} $savingsAmount"
+                }
+            }
+
+            else -> {
+                formattedPrice = discountPhase.price.formattedPrice
+                formattedTotalSavings = null
+            }
+        }
+
         return WinbackOffer(
             redeemCode = redeemCode,
-            formattedPrice = when (plan.billingCycle) {
-                BillingCycle.Monthly -> regularPhase.price.formattedPrice
-                BillingCycle.Yearly -> discountPhase.price.formattedPrice
-            },
+            formattedPrice = formattedPrice,
             tier = plan.tier,
             billingCycle = plan.billingCycle,
+            isInstallment = plan.isInstallment,
+            formattedTotalSavings = formattedTotalSavings,
         )
     }
 
@@ -291,9 +324,12 @@ class WinbackViewModel @Inject constructor(
     private fun SubscriptionPlans.finMatchingWinbackPlan(offerId: String): SubscriptionPlan.WithOffer? {
         SubscriptionTier.entries.forEach { tier ->
             BillingCycle.entries.forEach { billingCycle ->
-                val offer = findOfferPlan(tier, billingCycle, SubscriptionOffer.Winback).getOrNull()
-                if (offer != null && offer.offerId == offerId) {
-                    return offer
+                // Check both non-installment and installment winback offers
+                listOf(false, true).forEach { isInstallment ->
+                    val offer = findOfferPlan(tier, billingCycle, SubscriptionOffer.Winback, isInstallment).getOrNull()
+                    if (offer != null && offer.offerId == offerId) {
+                        return offer
+                    }
                 }
             }
         }
@@ -337,6 +373,7 @@ class WinbackViewModel @Inject constructor(
                 currentScubscription?.billingCycle?.let { billingCycle ->
                     put("frequency", billingCycle.analyticsValue)
                 }
+                put("is_installment", (currentScubscription?.isInstallment ?: false).toString())
             },
         )
     }
@@ -412,12 +449,14 @@ class WinbackViewModel @Inject constructor(
         val currentSubscriptionExpirationDate: Instant?,
         val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
+        val isInstallment: Boolean,
     ) {
         companion object {
             val Empty = UiState(
                 currentSubscriptionExpirationDate = null,
                 winbackOfferState = null,
                 subscriptionPlansState = SubscriptionPlansState.Loading,
+                isInstallment = false,
             )
         }
     }
@@ -462,8 +501,10 @@ internal data class WinbackOffer(
     val formattedPrice: String,
     val tier: SubscriptionTier,
     val billingCycle: BillingCycle,
+    val isInstallment: Boolean,
+    val formattedTotalSavings: String? = null,
 ) {
-    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
+    val productId get() = SubscriptionPlan.productId(tier, billingCycle, isInstallment)
 }
 
 internal enum class FailureReason {

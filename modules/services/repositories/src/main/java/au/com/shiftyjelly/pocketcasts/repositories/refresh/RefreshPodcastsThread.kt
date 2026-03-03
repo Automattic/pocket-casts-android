@@ -27,14 +27,14 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.AutoDownloadEpisodeProvider
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -79,7 +78,6 @@ class RefreshPodcastsThread(
     interface RefreshPodcastsThreadEntryPoint {
         fun serviceManager(): ServiceManager
         fun podcastManager(): PodcastManager
-        fun playlistManager(): PlaylistManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
         fun userEpisodeManager(): UserEpisodeManager
@@ -88,7 +86,8 @@ class RefreshPodcastsThread(
         fun settings(): Settings
         fun playbackManager(): PlaybackManager
         fun episodeManager(): EpisodeManager
-        fun downloadManager(): DownloadManager
+        fun autoDownloadProvider(): AutoDownloadEpisodeProvider
+        fun downloadQueue(): DownloadQueue
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
@@ -178,13 +177,9 @@ class RefreshPodcastsThread(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
                 processRefreshResponse(response)
             }
-            .onFailure { throwable ->
-                val serverError = throwable as? ServerResponseException
-                val message = "Not refreshing as server call failed errorCode: ${serverError?.errorCode} serverMessage: ${serverError?.serverMessage ?: ""}"
-
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
-                refreshFailedOrCancelled(message)
+            .onFailure { error ->
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, error, "Server call failed")
+                refreshFailedOrCancelled("Server call failed")
             }
     }
 
@@ -199,8 +194,8 @@ class RefreshPodcastsThread(
         val podcastManager = entryPoint.podcastManager()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
-        val playlistManager = entryPoint.playlistManager()
-        val downloadManager = entryPoint.downloadManager()
+        val autoDownloadProvider = entryPoint.autoDownloadProvider()
+        val downloadQueue = entryPoint.downloadQueue()
         val settings = entryPoint.settings()
         val notificationHelper = entryPoint.notificationHelper()
 
@@ -212,23 +207,24 @@ class RefreshPodcastsThread(
 
         addNewEpisodesToUpNext(addedEpisodes.episodesToAddToUpNext)
 
+        var startTime = SystemClock.elapsedRealtime()
         if (!emptyResponse) {
-            var startTime = SystemClock.elapsedRealtime()
             episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToAutoArchive - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToAutoArchive - ${SystemClock.elapsedRealtime() - startTime} ms}")
+
             startTime = SystemClock.elapsedRealtime()
             podcastManager.checkForUnusedPodcastsBlocking(playbackManager)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForUnusedPodcasts - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-            startTime = SystemClock.elapsedRealtime()
-            checkForEpisodesToDownloadBlocking(playlistManager, downloadManager, episodeManager)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - playlist checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-            startTime = SystemClock.elapsedRealtime()
-            podcastManager.checkForEpisodesToDownloadBlocking(addedEpisodes.episodeUuidsAdded, downloadManager)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcast checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForUnusedPodcasts - ${SystemClock.elapsedRealtime() - startTime} ms}")
+
             startTime = SystemClock.elapsedRealtime()
             updateNotifications(notificationLastSeen, settings, podcastManager, episodeManager, notificationHelper, context)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - updateNotifications - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - updateNotifications - ${SystemClock.elapsedRealtime() - startTime} ms}")
         }
+
+        startTime = SystemClock.elapsedRealtime()
+        val episodes = runBlocking { autoDownloadProvider.getAll(addedEpisodes.episodeUuidsAdded) }
+        downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToDownload - ${SystemClock.elapsedRealtime() - startTime} ms}")
 
         if (syncRefreshState is RefreshState.Failed) {
             settings.setRefreshState(syncRefreshState)
@@ -699,23 +695,6 @@ class RefreshPodcastsThread(
                     if (episodeName == null) "" else TextUtils.htmlEncode(episodeName),
                 ),
                 HtmlCompat.FROM_HTML_MODE_COMPACT,
-            )
-        }
-    }
-
-    private fun checkForEpisodesToDownloadBlocking(
-        playlistManager: PlaylistManager,
-        downloadManager: DownloadManager,
-        episodeManager: EpisodeManager,
-    ) {
-        val autoDownloadEpisodes = runBlocking { playlistManager.getAutoDownloadEpisodes() }
-        for (episode in autoDownloadEpisodes) {
-            DownloadHelper.addAutoDownloadedEpisodeToQueue(
-                episode = episode,
-                from = "playlist",
-                downloadManager = downloadManager,
-                episodeManager = episodeManager,
-                source = SourceView.FILTERS,
             )
         }
     }

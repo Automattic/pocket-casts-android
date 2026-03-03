@@ -23,15 +23,22 @@ constructor(
     private val syncManager: SyncManager,
     private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
 ) {
+    companion object {
+        private const val TAG = "WatchSync"
+    }
+
     /**
      * This should be called by the phone app to update the refresh token available to
      * the watch app in the data layer.
+     *
+     * @return Result indicating success or failure. The Result is primarily for testing purposes;
+     * failures are logged internally so callers may safely ignore the return value in production code.
      */
     @OptIn(ExperimentalHorologistApi::class)
-    suspend fun sendAuthToDataLayer() {
-        withContext(Dispatchers.Default) {
+    suspend fun sendAuthToDataLayer(): Result<Unit> {
+        return withContext(Dispatchers.Default) {
             try {
-                Timber.i("Updating WatchSyncAuthData in data layer")
+                LogBuffer.i(TAG, "Initiating auth token sync to Wear")
 
                 val watchSyncAuthData = syncManager.getRefreshToken()?.let { refreshToken ->
                     syncManager.getLoginIdentity()?.let { loginIdentity ->
@@ -43,24 +50,32 @@ constructor(
                 }
 
                 if (watchSyncAuthData == null) {
-                    Timber.i("Removing WatchSyncAuthData from data layer")
+                    LogBuffer.i(TAG, "Removing auth token from Wear: Phone not logged in to Pocket Casts")
                 }
 
                 tokenBundleRepository.update(watchSyncAuthData)
+                Result.success(Unit)
             } catch (cancellationException: CancellationException) {
                 // Don't catch CancellationException since this represents the normal cancellation of a coroutine
                 throw cancellationException
             } catch (exception: Exception) {
                 LogBuffer.e(
-                    LogBuffer.TAG_BACKGROUND_TASKS,
-                    "Saving refresh token to data layer failed: $exception",
+                    TAG,
+                    "Failed to sync auth token to Wear Data Layer: ${exception.message}",
                 )
+                Result.failure(exception)
             }
         }
     }
 
     suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
-        if (data != null) {
+        if (data == null) {
+            // The user either was never logged in on their phone or just logged out.
+            // Either way, leave the user's login state on the watch unchanged.
+            Timber.i("Received null WatchSyncAuthData (no login from phone yet)")
+            return
+        }
+        try {
             Timber.i("Received WatchSyncAuthData change from phone")
 
             if (!syncManager.isLoggedIn()) {
@@ -71,12 +86,13 @@ constructor(
                 )
                 onResult(result)
             } else {
-                Timber.i("Received WatchSyncAuthData from phone, but user is already logged in")
+                Timber.i("Already logged in, skipping login")
             }
-        } else {
-            // The user either was never logged in on their phone or just logged out.
-            // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received null WatchSyncAuthData change")
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(TAG, "Failed to process auth data: ${e.message}")
+            onResult(LoginResult.Failed(message = e.message ?: "Unknown error", messageId = null))
         }
     }
 }

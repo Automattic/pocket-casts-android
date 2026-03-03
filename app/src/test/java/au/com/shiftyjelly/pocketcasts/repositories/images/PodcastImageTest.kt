@@ -49,15 +49,15 @@ class PodcastImageTest {
     }
 
     @Test
-    fun `getArtworkUrl with null size returns 480 image for WearOS`() {
+    fun `getArtworkUrl with null size returns 200 image for WearOS`() {
         val url = PodcastImage.getArtworkUrl(size = null, uuid = testUuid, isWearOS = true)
-        assertEquals("${Settings.SERVER_STATIC_URL}/discover/images/webp/480/$testUuid.webp", url)
+        assertEquals("${Settings.SERVER_STATIC_URL}/discover/images/webp/200/$testUuid.webp", url)
     }
 
     @Test
-    fun `getArtworkUrl with size greater than 480 returns 480 image size for WearOS`() {
+    fun `getArtworkUrl with size greater than 480 returns 200 image size for WearOS`() {
         val url = PodcastImage.getArtworkUrl(size = 800, uuid = testUuid, isWearOS = true)
-        assertEquals("${Settings.SERVER_STATIC_URL}/discover/images/webp/480/$testUuid.webp", url)
+        assertEquals("${Settings.SERVER_STATIC_URL}/discover/images/webp/200/$testUuid.webp", url)
     }
 
     @Test

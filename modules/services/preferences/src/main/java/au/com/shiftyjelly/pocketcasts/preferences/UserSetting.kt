@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.utils.extensions.mapState
+import au.com.shiftyjelly.pocketcasts.coroutines.flow.mapState
 import java.time.Clock
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow

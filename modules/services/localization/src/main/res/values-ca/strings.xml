@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-28 23:46:29+0000
+Translation-Revision-Date: 2026-02-18 23:53:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="playlist_only_podcast_episodes_allowed">Les llistes de reproducció només poden tenir episodis de pòdcasts.</string>
+    <string name="playlist_limit_reached">Les llistes de reproducció només poden tenir fins a %d episodis.</string>
+    <string name="playlist_limit_almost_full">La llista de reproducció està gairebé plena. Prova d\'afegir menys episodis.</string>
+    <string name="podcasts_add_episode">Afegir</string>
+    <string name="add_to_up_next_bottom">Reprodueix al final de \'Tot seguit\'</string>
+    <string name="add_to_up_next_top">Reprodueix després a \'Tot seguit\'</string>
+    <string name="winback_cancel_subscription_perk_installment">Tens un pla de pagament a terminis de 12 mesos. Si cancel·les, finalitzarà el teu accés, però Google Play continuarà cobrant els mesos restants.</string>
+    <string name="winback_cancel_subscription_header_description_installment">La cancel·lació acaba la teva subscripció a Pocket Casts. \nEl teu pla de pagament de Google Play continuarà.</string>
+    <string name="winback_cancel_subscription_perk_history">Els teus pòdcasts i l\'historial d\'escolta seguiran sent accessibles.</string>
+    <string name="price_per_month_for_months">%1$s/mes durant %2$d mesos</string>
     <string name="no_episodes">No hi ha episodis</string>
     <string name="more_rules">Més regles</string>
     <string name="player_notification_skip_forward_seconds">Avançar %d segons</string>
@@ -47,9 +57,6 @@ Language: ca
     <string name="database">Base de dades</string>
     <string name="normalized">Normalitzat</string>
     <string name="not_normalized">No normalitzat</string>
-    <string name="normalization_started">Normalització començada</string>
-    <string name="settings_storage_normalize_episode_titles">Normalitzar els títols dels episodis</string>
-    <string name="settings_storage_normalize_episode_titles_description">Estat: %1$s\nAlgunes parts de l\'aplicació utilitzen una cerca d\'episodis que requereix títols normalitzats. Tocar aquesta configuració executa la normalització de la base de dades si els episodis no estan normalitzats ja.</string>
     <string name="end_of_year_story_top_podcast_stats_hours">%1$s i %2$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s i %3$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_subtitle">No hi ha res que sigui més “tu” que això</string>
@@ -101,8 +108,6 @@ Language: ca
     <string name="add_to_playlist_find_playlist">Cercar una llista de reproducció</string>
     <string name="add_to_playlist_description">Afegeix a la llista de reproducció</string>
     <string name="remove_from_playlist">Esborrar de la llista de reproducció</string>
-    <string name="add_to_up_next_bottom">Afegir al final de la cua</string>
-    <string name="add_to_up_next_top">Afegir al principi de la cua</string>
     <string name="playlist_episodes_archived_title">No hi ha episodis</string>
     <string name="playlist_episodes_archived_count">%1$d arxivats</string>
     <string name="playlist_edit_episodes">Reordenar els episodis</string>
@@ -124,19 +129,19 @@ Language: ca
     <string name="add_to_playlist_episode_desc">Afegeix %1$s a la llista de reproducció</string>
     <string name="add_to_playlist">Afegeix a “%1$s”</string>
     <string name="your_podcasts">Els teus pòdcasts</string>
-    <string name="onboarding_recommendations_message">Aquí tens alguns pòdcasts fantàstics per començar. Toca per seguir-los, cercar-ne més o importar-ne des d’altres aplicacions.</string>
-    <string name="onboarding_recommendations_title">Esperem que t\'agradin aquestes suggeriments!</string>
+    <string name="onboarding_recommendations_message">Aquí tens alguns pòdcasts fantàstics per començar. Selecciona\'ls per seguir-los, cercar-ne més o importar-ne des d’altres aplicacions.</string>
     <string name="add_episodes">Afegir episodis</string>
+    <string name="onboarding_recommendations_title">Esperem que t\'agradin aquests suggeriments!</string>
     <string name="onboarding_interests_select_at_least_label">Selecciona’n almenys 3.</string>
     <string name="onboarding_interests_show_more">Mostra més categories</string>
     <string name="onboarding_interests_description">Arriben grans pòdcasts, triats a mà per persones reals!</string>
     <string name="onboarding_interests_title">Explica’ns quins són els teus temes preferits</string>
     <string name="onboarding_create_account_sign_up_google">Registra\'t amb Google</string>
     <string name="onboarding_create_account_sign_up_email">Registra\'t amb un correu electrònic</string>
-    <string name="onboarding_create_account_message">Els teus pòdcasts, sempre sincronitzats. Mantingues la teva biblioteca segura i gaudeix de Pocket\u00A0Casts a la web i a l\'escriptori.</string>
-    <string name="onboarding_create_account_title">Crear el teu compte de Pocket\u00A0Casts</string>
     <string name="onboarding_login_or">O</string>
     <string name="onboarding_login_continue_with_email">Continua amb el correu electrònic</string>
+    <string name="onboarding_create_account_title">Crea el teu compte de Pocket\u00A0Casts</string>
+    <string name="onboarding_create_account_message">Els teus pòdcasts, sempre sincronitzats. Mantén la teva biblioteca segura i gaudeix de Pocket\u00A0Casts a la web i a l\'escriptori.</string>
     <string name="playlist_artwork_description">Caràtula de la llista de reproducció</string>
     <string name="onboarding_intro_get_started">Començar</string>
     <string name="onboarding_intro_carousel_pc_user">Usuari de Pocket Casts</string>
@@ -186,16 +191,16 @@ Language: ca
     <string name="clear">Esborrar</string>
     <string name="create_playlist">Crear una llista de reproducció</string>
     <string name="new_smart_playlist_banner_body">Afegeix episodis automàticament segons les regles</string>
-    <string name="new_smart_playlist_banner_title">Fes-ho en una llista de reproducció intel·ligent</string>
     <string name="new_playlists_title_placeholder">Títol de la llista de reproducció</string>
+    <string name="new_smart_playlist_banner_title">Converteix-ho en una llista de reproducció intel·ligent</string>
     <string name="onboarding_folders_title_3">Esports</string>
     <string name="onboarding_folders_title_2">Preferits</string>
     <string name="onboarding_folders_title_1">Llibres</string>
     <string name="onboarding_folders_title">Carpetes: els teus pòdcasts, perfectament col·locats</string>
     <string name="encourage_account_playlists_banner_description">Crea un compte gratuït per a sincronitzar les teves llistes de reproducció a qualsevol dispositiu.</string>
-    <string name="encourage_account_playlists_banner_title">Mantingues les llistes de reproducció sincronitzades</string>
     <string name="premade_playlists_tooltip_body">Ho hem fet per ajudar-te a començar. S\'actualitzen automàticament segons la teva escolta.</string>
     <string name="premade_playlists_tooltip_title">Llistes intel·ligents, llestes per començar</string>
+    <string name="encourage_account_playlists_banner_title">Mantén les llistes de reproducció sincronitzades</string>
     <string name="onboarding_upgrade_account_message">Desbloqueja totes les funcions de pagament com ara les carpetes, mode aleatori, marques de temps i moltes més</string>
     <string name="new_playlist">Nova llista de reproducció</string>
     <string name="playlists_empty_state_body">Les llistes de reproducció permeten organitzar els episodis manualment o automàticament amb regles intel·ligents.</string>
@@ -644,7 +649,7 @@ Language: ca
     <string name="widget_preview_episode_in_up_next_title">Episodi a \'Tot seguit\'</string>
     <string name="widget_preview_episode_title">Títol de l\'episodi</string>
     <string name="hour_and_minutes">1 hora i %d minuts</string>
-    <string name="hours_and_minutes">%d hores i %d minuts</string>
+    <string name="hours_and_minutes">%1$d hores i %2$d minuts</string>
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
@@ -716,7 +721,7 @@ Language: ca
     <string name="go_to_top">Ves a l\'inici</string>
     <string name="support">Ajuda</string>
     <string name="bookmark_notification_action_change_title">Canviar el títol</string>
-    <string name="bookmark_notification_content_tap_to_view">Toca per veure</string>
+    <string name="bookmark_notification_content_tap_to_view">Prem per veure</string>
     <string name="bookmark_notification_title_added">Marcador afegit</string>
     <string name="notification_channel_description_playback">Mostra mentre Pocket Casts està reproduint àudio</string>
     <string name="notification_channel_description_playback_error">Errors durant la reproducció</string>
@@ -1724,10 +1729,10 @@ Language: ca
     <string name="profile_not_signed_in">NO HAS INICIAT SESSIÓ</string>
     <string name="profile_next_payment">Proper pagament: %s</string>
     <string name="profile_last_refresh">Darrera actualització: fa %s</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_joined">S\'ha unit:</string>
     <string name="profile_files_remove_image">Canviar la imatge</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per obrir-los a Pocket Casts, i apareixeran aquí.</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_file_locked">bloquejat</string>
     <string name="profile_file">Arxiu</string>
     <string name="profile_ends">Acaba %s</string>
@@ -1929,7 +1934,6 @@ Language: ca
     <string name="podcast_group_episodes">Agrupar episodis</string>
     <string name="podcast_group_episode_length">Durada de l\'episodi</string>
     <string name="podcast_feed_issue_dialog_button">Intenta actualitzar-lo</string>
-    <string name="podcast_feed_issue_detected_summary">Toca per arreglar-ho</string>
     <string name="podcast_feed_issue_detected">S\'ha detectat un problema amb el feed</string>
     <string name="podcast_episodes_limited">Limitat a %d episodis més recents</string>
     <string name="podcast_episode_unstarred">Episodi no destacat</string>
@@ -2044,6 +2048,7 @@ Language: ca
     <string name="search_podcasts">Cercar pòdcasts </string>
     <string name="podcast_unsubscribe_warning">Si deixes de seguir aquest pòdcast, s\'esborraran tots els arxius descarregats.</string>
     <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
+    <string name="podcast_feed_issue_detected_summary">Prem per arreglar-ho</string>
     <string name="pause">Pausar</string>
     <string name="play">Reproduir</string>
     <string name="search">Cercar</string>

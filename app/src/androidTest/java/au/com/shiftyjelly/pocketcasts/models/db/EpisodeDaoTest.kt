@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import com.squareup.moshi.Moshi
 import java.time.Instant
@@ -84,7 +84,7 @@ class EpisodeDaoTest {
         val episode = PodcastEpisode(
             uuid = "1",
             publishedDate = Date(),
-            episodeStatus = EpisodeStatusEnum.DOWNLOAD_FAILED,
+            downloadStatus = EpisodeDownloadStatus.DownloadFailed,
             lastDownloadAttemptDate = Date.from(Instant.EPOCH),
         )
         episodeDao.insertBlocking(episode)
@@ -105,7 +105,7 @@ class EpisodeDaoTest {
             PodcastEpisode(
                 uuid = index.toString(),
                 publishedDate = Date(),
-                episodeStatus = EpisodeStatusEnum.DOWNLOAD_FAILED,
+                downloadStatus = EpisodeDownloadStatus.DownloadFailed,
                 lastDownloadAttemptDate = Date.from(Instant.EPOCH.plusMillis(index.toLong())),
             )
         }
@@ -127,7 +127,7 @@ class EpisodeDaoTest {
             PodcastEpisode(
                 uuid = index.toString(),
                 publishedDate = Date(),
-                episodeStatus = EpisodeStatusEnum.DOWNLOAD_FAILED,
+                downloadStatus = EpisodeDownloadStatus.DownloadFailed,
                 lastDownloadAttemptDate = null,
             )
         }
@@ -145,11 +145,11 @@ class EpisodeDaoTest {
 
     @Test
     fun getFailedDownloadStatisticsOnlyForFailedDownloads() = runBlocking {
-        val episodes = EpisodeStatusEnum.entries.map { entry ->
+        val episodes = EpisodeDownloadStatus.entries.map { entry ->
             PodcastEpisode(
                 uuid = entry.ordinal.toString(),
                 publishedDate = Date(),
-                episodeStatus = entry,
+                downloadStatus = entry,
                 lastDownloadAttemptDate = Date.from(Instant.EPOCH.plusMillis(entry.ordinal.toLong())),
             )
         }
@@ -159,8 +159,8 @@ class EpisodeDaoTest {
 
         val expected = EpisodeDownloadFailureStatistics(
             count = 1,
-            newestTimestamp = Instant.EPOCH.plusMillis(EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal.toLong()),
-            oldestTimestamp = Instant.EPOCH.plusMillis(EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal.toLong()),
+            newestTimestamp = Instant.EPOCH.plusMillis(EpisodeDownloadStatus.DownloadFailed.ordinal.toLong()),
+            oldestTimestamp = Instant.EPOCH.plusMillis(EpisodeDownloadStatus.DownloadFailed.ordinal.toLong()),
         )
         assertEquals(expected, statistics)
     }

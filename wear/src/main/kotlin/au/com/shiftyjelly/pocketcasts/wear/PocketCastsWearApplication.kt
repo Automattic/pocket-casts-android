@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityLogger
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
@@ -41,7 +42,7 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject lateinit var downloadStatusObserver: DownloadStatusObserver
 
     @Inject lateinit var episodeManager: EpisodeManager
 
@@ -65,6 +66,8 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
+    @Inject lateinit var connectivityLogger: ConnectivityLogger
+
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
@@ -85,6 +88,7 @@ class PocketCastsWearApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+        connectivityLogger.startMonitoring()
     }
 
     private fun setupApp() {
@@ -94,8 +98,6 @@ class PocketCastsWearApplication :
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playbackManager)
-
                 val storageChoice = settings.getStorageChoice()
                 if (storageChoice == null) {
                     val folder = StorageOptions()
@@ -117,7 +119,7 @@ class PocketCastsWearApplication :
         }
 
         userManager.beginMonitoringAccountManager(playbackManager)
-        downloadManager.beginMonitoringWorkManager(applicationContext)
+        downloadStatusObserver.monitorDownloadStatus()
     }
 
     private fun setupAnalytics() {

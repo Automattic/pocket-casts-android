@@ -5,12 +5,6 @@ plugins {
     alias(libs.plugins.protobuf)
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(libs.versions.java.get().toInt())
-    }
-}
-
 protobuf {
     protoc {
         artifact = libs.protobuf.protoc.get().toString()

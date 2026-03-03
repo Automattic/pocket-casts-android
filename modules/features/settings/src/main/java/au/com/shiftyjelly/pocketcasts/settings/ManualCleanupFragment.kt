@@ -29,8 +29,7 @@ class ManualCleanupFragment : BaseFragment() {
             ManualCleanupPage(
                 viewModel = viewModel,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
             )
         }

@@ -2,16 +2,18 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,12 +37,11 @@ class ProfileEpisodeListViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val episodeManager: EpisodeManager = mock()
-    private val playbackManager: PlaybackManager = mock()
     private val analyticsTracker: AnalyticsTracker = mock()
 
-    private val downloadedEpisodesMock = listOf(mock<PodcastEpisode>())
-    private val starredEpisodesMock = listOf(mock<PodcastEpisode>())
-    private val listeningHistoryEpisodesMock = listOf(mock<PodcastEpisode>())
+    private val downloadedEpisodesMock = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
+    private val starredEpisodesMock = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
+    private val listeningHistoryEpisodesMock = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
 
     private lateinit var viewModel: ProfileEpisodeListViewModel
 
@@ -143,7 +144,7 @@ class ProfileEpisodeListViewModelTest {
     @Test
     fun `search returns filtered playback history episodes`() = runTest {
         initViewModel()
-        val filteredEpisodes = listOf(mock<PodcastEpisode>())
+        val filteredEpisodes = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow("query")).thenReturn(flowOf(filteredEpisodes))
         viewModel.setup(Mode.History)
 
@@ -205,8 +206,9 @@ class ProfileEpisodeListViewModelTest {
 
         viewModel = ProfileEpisodeListViewModel(
             episodeManager = episodeManager,
-            playbackManager = playbackManager,
+            downloadQueue = mock(),
             analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             settings = settings,
             userManager = userManager,
         )

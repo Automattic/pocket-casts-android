@@ -31,10 +31,10 @@ class BillingPaymentMapperFlowParamsTest {
         fun `create billing params`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
                         offerIdToken = "offer-token",
                     ),
@@ -86,10 +86,10 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
                         offerIdToken = "offer-token",
                     ),
@@ -111,12 +111,12 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log too many matching products`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
-                        offerIdToken = "${planKey.name}-offer-token",
+                        offerIdToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                 ),
             )
@@ -143,15 +143,15 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log too many matching offers`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
                         offerIdToken = "token-1",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
                         offerIdToken = "token-2",
                     ),
@@ -169,7 +169,7 @@ class BillingPaymentMapperFlowParamsTest {
         fun `log no matching offers`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = emptyList(),
             )
 
@@ -194,9 +194,9 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
                 ),
             )
 
@@ -217,9 +217,9 @@ class BillingPaymentMapperFlowParamsTest {
             )
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
                 ),
             )
 
@@ -234,15 +234,84 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not log anything when mapped succesfully`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
                 ),
             )
 
             mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
 
             listener.assertMessages()
+        }
+
+        @Test
+        fun `log unsupported plan combination for Plus Monthly installment`() {
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null, isInstallment = true)
+            // productId and basePlanId will be null for this unsupported combination
+            val product = createGoogleProductDetails(
+                productId = "com.pocketcasts.plus.monthly",
+                subscriptionOfferDetails = listOf(
+                    createGoogleOfferDetails(basePlanId = "p1m", offerId = null),
+                ),
+            )
+
+            val request = mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
+
+            assertNull(request)
+            listener.assertMessages(
+                "Unsupported plan combination in {billingCycle=Monthly, offer=null, tier=Plus}",
+            )
+        }
+
+        @Test
+        fun `log unsupported plan combination for Patron Monthly installment`() {
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Patron, BillingCycle.Monthly, offer = null, isInstallment = true)
+            // productId and basePlanId will be null for this unsupported combination
+            val product = createGoogleProductDetails(
+                productId = "com.pocketcasts.monthly.patron",
+                subscriptionOfferDetails = listOf(
+                    createGoogleOfferDetails(basePlanId = "patron-monthly", offerId = null),
+                ),
+            )
+
+            val request = mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
+
+            assertNull(request)
+            listener.assertMessages(
+                "Unsupported plan combination in {billingCycle=Monthly, offer=null, tier=Patron}",
+            )
+        }
+
+        @Test
+        fun `log unsupported plan combination for Patron Yearly installment`() {
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Patron, BillingCycle.Yearly, offer = null, isInstallment = true)
+            // productId and basePlanId will be null for this unsupported combination
+            val product = createGoogleProductDetails(
+                productId = "com.pocketcasts.yearly.patron",
+                subscriptionOfferDetails = listOf(
+                    createGoogleOfferDetails(basePlanId = "patron-yearly", offerId = null),
+                ),
+            )
+
+            val request = mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
+
+            assertNull(request)
+            listener.assertMessages(
+                "Unsupported plan combination in {billingCycle=Yearly, offer=null, tier=Patron}",
+            )
+        }
+
+        @Test
+        fun `return null for unsupported plan combination without logging errors when no products provided`() {
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null, isInstallment = true)
+
+            val request = mapper.toBillingFlowRequest(planKey, productDetails = emptyList(), purchases = emptyList())
+
+            assertNull(request)
+            listener.assertMessages(
+                "Unsupported plan combination in {billingCycle=Monthly, offer=null, tier=Plus}",
+            )
         }
     }
 
@@ -258,22 +327,22 @@ class BillingPaymentMapperFlowParamsTest {
         fun `map base plan to billing flow request`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
+                        basePlanId = requireNotNull(planKey.basePlanId),
                         offerId = planKey.offerId,
-                        offerIdToken = "${planKey.name}-offer-token",
+                        offerIdToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = planKey.basePlanId,
-                        offerId = "random-offer-id-${planKey.name}",
-                        offerIdToken = "random-offer-token-1-${planKey.name}",
+                        basePlanId = requireNotNull(planKey.basePlanId),
+                        offerId = "random-offer-id-${planKey.tier}-${planKey.billingCycle}",
+                        offerIdToken = "random-offer-token-1-${planKey.tier}-${planKey.billingCycle}",
                     ),
                     createGoogleOfferDetails(
-                        basePlanId = "random-base-plan-id-${planKey.name}",
+                        basePlanId = "random-base-plan-id-${planKey.tier}-${planKey.billingCycle}",
                         offerId = planKey.offerId,
-                        offerIdToken = "random-offer-token-2-${planKey.name}",
+                        offerIdToken = "random-offer-token-2-${planKey.tier}-${planKey.billingCycle}",
                     ),
                 ),
             )
@@ -284,7 +353,7 @@ class BillingPaymentMapperFlowParamsTest {
                 BillingFlowRequest(
                     productQuery = BillingFlowRequest.ProductQuery(
                         product = product,
-                        offerToken = "${planKey.name}-offer-token",
+                        offerToken = "${planKey.tier}-${planKey.billingCycle}-offer-token",
                     ),
                     subscriptionUpdateQuery = null,
                 ),
@@ -296,9 +365,9 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not map base plan to billing flow request with multiple matching products`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
                 ),
             )
 
@@ -311,10 +380,10 @@ class BillingPaymentMapperFlowParamsTest {
         fun `do not map base plan to billing flow request with multiple matching offers`() {
             val planKey = SubscriptionPlan.Key(tier, billingCycle, offer = null)
             val product = createGoogleProductDetails(
-                productId = planKey.productId,
+                productId = requireNotNull(planKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
-                    createGoogleOfferDetails(basePlanId = planKey.basePlanId, offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(planKey.basePlanId), offerId = planKey.offerId),
                 ),
             )
 
@@ -325,6 +394,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         companion object {
             @JvmStatic
+            @Suppress("unused")
             @ParameterizedRobolectricTestRunner.Parameters(name = "{0} {1}")
             fun params() = listOf(
                 arrayOf(SubscriptionTier.Plus, BillingCycle.Monthly),
@@ -343,20 +413,22 @@ class BillingPaymentMapperFlowParamsTest {
         private val toTier: SubscriptionTier,
         private val toBillingCycle: BillingCycle,
         private val expectedReplacementMode: Int?,
+        private val fromIsInstallment: Boolean,
+        private val toIsInstallment: Boolean,
     ) {
         private val mapper = BillingPaymentMapper(listeners = emptySet())
 
         @Test
         fun `create billing request with correct replacement mode`() {
-            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
+            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!
             val currentPurchase = createGooglePurchase(
                 productIds = listOf(currentProductId),
             )
-            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
+            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null, isInstallment = toIsInstallment)
             val product = createGoogleProductDetails(
-                productId = newPlanKey.productId,
+                productId = requireNotNull(newPlanKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
                 ),
             )
 
@@ -379,21 +451,21 @@ class BillingPaymentMapperFlowParamsTest {
                 createGooglePurchase(
                     purchaseToken = "purchase-token-1",
                     productIds = listOf(
-                        SubscriptionPlan.productId(fromTier, fromBillingCycle),
+                        SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!,
                     ),
                 ),
                 createGooglePurchase(
                     purchaseToken = "purchase-token-2",
                     productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), BillingCycle.entries.random()),
+                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), BillingCycle.entries.random())!!,
                     ),
                 ),
             )
-            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
+            val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null, isInstallment = toIsInstallment)
             val product = createGoogleProductDetails(
-                productId = newPlanKey.productId,
+                productId = requireNotNull(newPlanKey.productId),
                 subscriptionOfferDetails = listOf(
-                    createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                    createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
                 ),
             )
 
@@ -405,16 +477,21 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `create billing request with full price replacement mode for offers`() {
+            // Skip this test for installment plans since they don't support promotional offers
+            if (toIsInstallment) {
+                return
+            }
+
             SubscriptionOffer.entries.forEach { offer ->
-                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
+                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle, fromIsInstallment)!!
                 val currentPurchase = createGooglePurchase(
                     productIds = listOf(currentProductId),
                 )
-                val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer)
+                val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer, isInstallment = toIsInstallment)
                 val product = createGoogleProductDetails(
-                    productId = newPlanKey.productId,
+                    productId = requireNotNull(newPlanKey.productId),
                     subscriptionOfferDetails = listOf(
-                        createGoogleOfferDetails(basePlanId = newPlanKey.basePlanId, offerId = newPlanKey.offerId),
+                        createGoogleOfferDetails(basePlanId = requireNotNull(newPlanKey.basePlanId), offerId = newPlanKey.offerId),
                     ),
                 )
 
@@ -429,7 +506,8 @@ class BillingPaymentMapperFlowParamsTest {
 
         companion object {
             @JvmStatic
-            @ParameterizedRobolectricTestRunner.Parameters(name = "From: {0} {1}, To: {2} {3}")
+            @Suppress("unused")
+            @ParameterizedRobolectricTestRunner.Parameters(name = "From: {0} {1} (installment={5}), To: {2} {3} (installment={6})")
             fun params() = listOf<Array<Any?>>(
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -437,6 +515,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -444,6 +524,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -451,6 +533,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -458,6 +542,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -465,6 +551,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -472,6 +560,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -479,6 +569,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
@@ -486,6 +578,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -493,6 +587,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -500,6 +596,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -507,6 +605,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     null,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -514,6 +614,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -521,6 +623,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -528,6 +632,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Plus,
                     BillingCycle.Yearly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -535,6 +641,8 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    false,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
@@ -542,19 +650,95 @@ class BillingPaymentMapperFlowParamsTest {
                     SubscriptionTier.Patron,
                     BillingCycle.Yearly,
                     null,
+                    false,
+                    false,
+                ),
+                // Installment plan scenarios
+                // FROM Plus Yearly Installment TO other plans
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Monthly,
+                    ReplacementMode.WITH_TIME_PRORATION,
+                    true, // fromIsInstallment
+                    false, // toIsInstallment
+                ),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Patron,
+                    BillingCycle.Monthly,
+                    ReplacementMode.WITH_TIME_PRORATION,
+                    true,
+                    false,
+                ),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Patron,
+                    BillingCycle.Yearly,
+                    ReplacementMode.CHARGE_PRORATED_PRICE,
+                    true,
+                    false,
+                ),
+                // FROM other plans TO Plus Yearly Installment
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Monthly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    true, // toIsInstallment
+                ),
+                arrayOf(
+                    SubscriptionTier.Patron,
+                    BillingCycle.Monthly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    ReplacementMode.CHARGE_FULL_PRICE,
+                    false,
+                    true,
+                ),
+                arrayOf(
+                    SubscriptionTier.Patron,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    ReplacementMode.WITH_TIME_PRORATION,
+                    false,
+                    true,
+                ),
+                // Same plan scenarios (installment to non-installment and vice versa)
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    true, // fromIsInstallment
+                    true, // toIsInstallment
+                ),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    false,
+                    true, // toIsInstallment
+                ),
+                arrayOf(
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    SubscriptionTier.Plus,
+                    BillingCycle.Yearly,
+                    null,
+                    true, // fromIsInstallment
+                    false,
                 ),
             )
         }
     }
 }
-
-private val SubscriptionPlan.Key.name
-    get() = buildString {
-        append(tier)
-        append(' ')
-        append(billingCycle)
-        if (offer != null) {
-            append(' ')
-            append(offer)
-        }
-    }

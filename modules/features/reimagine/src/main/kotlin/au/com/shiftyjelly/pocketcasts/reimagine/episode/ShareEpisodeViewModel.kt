@@ -2,14 +2,15 @@ package au.com.shiftyjelly.pocketcasts.reimagine.episode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ShareActionMediaType
+import com.automattic.eventhorizon.ShareScreenShownEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,7 +28,7 @@ class ShareEpisodeViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     val uiState = combine(
         podcastManager.podcastByEpisodeUuidFlow(episodeUuid),
@@ -43,13 +44,12 @@ class ShareEpisodeViewModel @AssistedInject constructor(
     )
 
     fun onScreenShown() {
-        tracker.track(
-            AnalyticsEvent.SHARE_SCREEN_SHOWN,
-            mapOf(
-                "type" to "episode",
-                "podcast_uuid" to podcastUuid,
-                "episode_uuid" to episodeUuid,
-                "source" to sourceView.analyticsValue,
+        eventHorizon.track(
+            ShareScreenShownEvent(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = sourceView.eventHorizonValue,
+                type = ShareActionMediaType.Episode,
             ),
         )
     }

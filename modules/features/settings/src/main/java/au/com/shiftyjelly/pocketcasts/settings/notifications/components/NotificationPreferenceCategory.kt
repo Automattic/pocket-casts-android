@@ -24,7 +24,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun NotificationPreferenceCategory(
@@ -188,6 +187,7 @@ internal fun NotificationPreferenceCategory(
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
+                            @Suppress("LocalContextGetResourceValueCall")
                             context.getString(it.summary)
                         },
                         onSave = { value ->
@@ -206,6 +206,7 @@ internal fun NotificationPreferenceCategory(
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
+                            @Suppress("LocalContextGetResourceValueCall")
                             context.getString(it.titleRes)
                         },
                         onSave = { value ->
@@ -245,7 +246,7 @@ internal fun NotificationPreferenceCategory(
                                         res = R.string.ok,
                                         click = {
                                             onItemClick(
-                                                item.copy(value = selectedActions.toImmutableList()),
+                                                item.copy(value = selectedActions.toList()),
                                             )
                                         },
                                     )

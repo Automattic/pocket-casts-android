@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
@@ -38,7 +38,7 @@ class PlayButton @JvmOverloads constructor(
     private var buttonColor: Int? = null
     private var fromListUuid: String? = null
     private var playedUpToMs: Int? = null
-    private var episodeStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED
+    private var episodeStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested
     private val progressCircle: ProgressCircleView
     private val buttonImage: ImageView
 
@@ -62,7 +62,7 @@ class PlayButton @JvmOverloads constructor(
                 episode.playing -> PlayButtonType.PAUSE
                 episode.isFinished -> PlayButtonType.PLAYED
                 episode.isDownloaded -> PlayButtonType.PLAY
-                episode.isDownloading || episode.isQueued -> if (streamByDefault) PlayButtonType.PLAY else PlayButtonType.STOP_DOWNLOAD
+                episode.isDownloading || episode.isDownloadPending -> if (streamByDefault) PlayButtonType.PLAY else PlayButtonType.STOP_DOWNLOAD
                 !streamByDefault -> PlayButtonType.DOWNLOAD
                 else -> PlayButtonType.PLAY
             }
@@ -110,9 +110,9 @@ class PlayButton @JvmOverloads constructor(
         this.setOnTouchListener(popup.dragToOpenListener)
         popup.inflate(R.menu.play_button)
         val menu = popup.menu
-        menu.findItem(R.id.download).isVisible = (episodeStatus == EpisodeStatusEnum.NOT_DOWNLOADED && buttonType != PlayButtonType.DOWNLOAD)
-        menu.findItem(R.id.stream).isVisible = (episodeStatus == EpisodeStatusEnum.NOT_DOWNLOADED && buttonType == PlayButtonType.DOWNLOAD)
-        menu.findItem(R.id.stop_downloading).isVisible = episodeStatus == EpisodeStatusEnum.DOWNLOADING || episodeStatus == EpisodeStatusEnum.QUEUED || episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER || episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI
+        menu.findItem(R.id.download).isVisible = (episodeStatus == EpisodeDownloadStatus.DownloadNotRequested && buttonType != PlayButtonType.DOWNLOAD)
+        menu.findItem(R.id.stream).isVisible = (episodeStatus == EpisodeDownloadStatus.DownloadNotRequested && buttonType == PlayButtonType.DOWNLOAD)
+        menu.findItem(R.id.stop_downloading).isVisible = episodeStatus.isCancellable
         popup.setOnMenuItemClickListener { item ->
             val episodeUuid = episodeUuid
             if (episodeUuid != null) {
@@ -142,7 +142,7 @@ class PlayButton @JvmOverloads constructor(
             this.podcastUuid = episode.podcastUuid
             this.fromListUuid = fromListUuid
         }
-        this.episodeStatus = episode.episodeStatus
+        this.episodeStatus = episode.downloadStatus
         val buttonColor = when (buttonType) {
             PlayButtonType.PLAYED -> context.getThemeColor(UR.attr.primary_icon_02)
             else -> color

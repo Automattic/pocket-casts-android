@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.widget.data.ClassicPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState

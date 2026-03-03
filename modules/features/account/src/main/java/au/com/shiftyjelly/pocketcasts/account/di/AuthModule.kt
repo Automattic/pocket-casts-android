@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.di
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.data.WearDataLayerRegistry
 import dagger.Module

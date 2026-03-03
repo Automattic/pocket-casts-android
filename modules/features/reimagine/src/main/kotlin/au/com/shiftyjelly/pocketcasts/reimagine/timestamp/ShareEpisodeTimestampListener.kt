@@ -25,11 +25,9 @@ internal class ShareEpisodeTimestampListener @AssistedInject constructor(
 ) : ShareEpisodeTimestampPageListener {
     override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: VisualCardType): SharingResponse {
         val builder = when (type) {
-            TimestampType.Episode -> SharingRequest.episodePosition(podcast, episode, timestamp)
-            TimestampType.Bookmark -> SharingRequest.bookmark(podcast, episode, timestamp)
-        }.setPlatform(platform)
-            .setCardType(cardType)
-            .setSourceView(sourceView)
+            TimestampType.Episode -> SharingRequest.episodePosition(podcast, episode, timestamp, sourceView, platform, cardType)
+            TimestampType.Bookmark -> SharingRequest.bookmark(podcast, episode, timestamp, sourceView, platform, cardType)
+        }
 
         val request = if (platform == SocialPlatform.Instagram) {
             assetController.capture(cardType).map { builder.setBackgroundImage(it).build() }

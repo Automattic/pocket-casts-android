@@ -54,7 +54,7 @@ class SignInFragment : BaseFragment() {
 
         viewModel.clearValues()
 
-        txtEmail.setText(viewModel.email.value?.toString())
+        txtEmail.setText(viewModel.email.value)
         txtEmail.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 txtPwd.requestFocus()

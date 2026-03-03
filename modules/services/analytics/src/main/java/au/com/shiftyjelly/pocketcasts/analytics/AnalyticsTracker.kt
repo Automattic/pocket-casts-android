@@ -183,15 +183,6 @@ class AnalyticsTracker(
         trackWithFlow(event = AnalyticsEvent.CREATE_ACCOUNT_SHOWN, flow = flow)
     }
 
-    fun trackSsoStartedGoogle() {
-        track(
-            AnalyticsEvent.SSO_STARTED,
-            mapOf(
-                AnalyticsParameter.SOURCE to "google",
-            ),
-        )
-    }
-
     fun trackSetupAccountShown(flow: String) {
         trackWithFlow(event = AnalyticsEvent.SETUP_ACCOUNT_SHOWN, flow = flow)
     }

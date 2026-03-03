@@ -115,13 +115,13 @@ class PlaybackServiceTest {
         }
         service.upNextQueue = upNextQueue
         val podcastManager = mock<PodcastManager> {
-            onBlocking { findPodcastByUuid(podcastOne.uuid) }.doReturn(podcastOne)
-            onBlocking { findPodcastByUuid(podcastTwo.uuid) }.doReturn(podcastTwo)
+            on { findPodcastByUuid(podcastOne.uuid) }.doReturn(podcastOne)
+            on { findPodcastByUuid(podcastTwo.uuid) }.doReturn(podcastTwo)
         }
         service.podcastManager = podcastManager
         val episodeManager = mock<EpisodeManager> {
             on { findEpisodesWhereBlocking(any(), any()) }.doReturn(playlistEpisodes.mapNotNull(PlaylistEpisode::toPodcastEpisode))
-            onBlocking { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
+            on { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
         }
         service.episodeManager = episodeManager
         val smartPlaylistManager = mock<PlaylistManager> {

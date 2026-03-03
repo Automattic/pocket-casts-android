@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-12-18 15:54:04+0000
+Translation-Revision-Date: 2026-02-26 15:54:58+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis durante %1$sunos meses y %2$sal mes durante %3$d meses. Compromiso total: %4$s más de 1 año.</string>
+    <string name="winback_claimed_offer_message_6">Gracias por elegir Pocket Casts. Tu año con descuento empezará después de tu periodo de facturación actual.</string>
+    <string name="winback_claimed_offer_message_5">¡50 % de descuento en tu próximo año con pagos mensuales!</string>
+    <string name="winback_offer_free_offer_installment_description">Consigue un año de Pocket Casts Plus a mitad de precio con 12 pagos mensuales de %1$s. Tu año con descuento empezará cuando finalice tu plan actual.</string>
+    <string name="plus_yearly_installments">Plan anual: paga mensualmente</string>
+    <string name="error_download_too_many_attempts">Descarga cancelada después de varios intentos. Revisa tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="error_download_io_failure">Error al descargar el episodio. Por favor, revisa tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="error_download_socket_timeout">Se ha agotado el tiempo de espera de la conexión con el servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_suspicious_content_size">Error al descargar el episodio. El archivo descargado es demasiado pequeño. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_invalid_content_type">Error al descargar el episodio. Tipo de contenido recibido %1$s. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_http_failure">Error al descargar el episodio. Se ha recibido el código de estado HTTP %1$s. Ponte en contacto con el autor del podcast.</string>
+    <string name="wear_connectivity_streaming_warning">La transmisión puede verse afectada</string>
+    <string name="wear_connectivity_restored">Se ha conectado</string>
+    <string name="wear_connectivity_lost">Se ha perdido la conexión</string>
+    <string name="episode_row_waiting_for_storage">Esperando espacio de almacenamiento</string>
+    <string name="podcasts_download_storage">Descarga esperando espacio de almacenamiento</string>
+    <string name="watch_sync_failed">No se ha podido sincronizar con el reloj</string>
+    <string name="watch_synced_successfully">El reloj se ha sincronizado correctamente</string>
+    <string name="watch_sync_waiting_for_phone">Esperando a que el teléfono se sincronice…</string>
+    <string name="watch_sync_retry">Inténtalo de nuevo</string>
+    <string name="watch_sync_error_unknown_help">Inténtalo de nuevo o accede manualmente</string>
+    <string name="watch_sync_error_login_failed_help">Prueba a acceder manualmente</string>
+    <string name="watch_sync_error_no_connection_help">Comprueba la conexión Bluetooth con el teléfono</string>
+    <string name="watch_sync_error_timeout_help">Asegúrate de que el teléfono esté cerca y conectado por Bluetooth</string>
+    <string name="watch_sync_error_unknown">Se ha producido un error</string>
+    <string name="watch_sync_error_login_failed">No se ha podido acceder</string>
+    <string name="watch_sync_error_no_connection">El teléfono no está conectado</string>
+    <string name="watch_sync_error_timeout">No se ha podido conectar al teléfono</string>
+    <string name="watch_sync_success">Has accedido desde el teléfono.</string>
+    <string name="watch_sync_syncing">Sincronizando con el teléfono…</string>
+    <string name="error_download_generic_failure">No se ha podido descargar el episodio. %1$s</string>
+    <string name="error_download_ssl_failure">No se ha podido establecer una conexión segura con el servidor del autor del podcast. Comprueba que tu dispositivo esté actualizado.</string>
+    <string name="error_download_connection_error">No se ha podido conectar al servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_unknown_host">No se ha podido acceder al servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
+    <string name="error_download_no_storage">Error al descargar el episodio. Comprueba que tienes suficiente espacio de almacenamiento en tu dispositivo.</string>
+    <string name="error_download_invalid_url">La url del sitio no es válida. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_no_episode_file">No se ha podido crear un archivo de descarga para el episodio. Comprueba que tienes suficiente espacio de almacenamiento en tu dispositivo.</string>
+    <string name="error_download_missing_episode">No se han podido encontrar los datos del episodio en este dispositivo. Ponte en contacto con el servicio de soporte.</string>
+    <string name="downloading">Descargando %s</string>
+    <string name="playlist_only_podcast_episodes_allowed">Las listas de reproducción solo pueden contener episodios de podcasts.</string>
+    <string name="playlist_limit_reached">Las listas de reproducción solo pueden contener hasta %d episodios.</string>
+    <string name="playlist_limit_almost_full">La lista de reproducción está casi completa. Prueba a añadir menos episodios.</string>
+    <string name="podcasts_add_episode">Añadir</string>
+    <string name="add_to_up_next_bottom">Reproducir el último en A continuación</string>
+    <string name="add_to_up_next_top">Reproducir siguiente en A continuación</string>
+    <string name="winback_cancel_subscription_perk_installment">Tienes un plan a plazos de 12 meses. Si cancelas el acceso, se acabará el proceso, pero Google Play seguirá cobrando los meses restantes.</string>
+    <string name="winback_cancel_subscription_header_description_installment">Si cancelas, finalizará tu suscripción a Pocket Casts.\nTu plan de pago de Google Play continuará.</string>
+    <string name="winback_cancel_subscription_perk_history">Podrás seguir accediendo a tus podcasts y a tu historial de escucha.</string>
+    <string name="price_per_month_for_months">%1$sal mes durante %2$d meses</string>
     <string name="no_episodes">No hay episodios</string>
     <string name="more_rules">Más reglas</string>
     <string name="player_notification_skip_forward_seconds">Avanzar %d segundos</string>
@@ -44,9 +93,6 @@ Language: es
     <string name="end_of_year_stories_year_over_year_title_flat">Tu escucha de %1$s se ha mantenido estable</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Has escuchado un 500 % más este año: te damos la bienvenida al club</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">¡De cero a héroe!</string>
-    <string name="settings_storage_normalize_episode_titles_description">Estado: %1$s\nAlgunas partes de la aplicación usan una búsqueda de episodios que requiere títulos normalizados. Tocando este ajuste se ejecuta la normalización de la base de datos si los episodios no están normalizados todavía.</string>
-    <string name="settings_storage_normalize_episode_titles">Normalizar títulos de episodios</string>
-    <string name="normalization_started">Se ha iniciado la normalización</string>
     <string name="not_normalized">No normalizado</string>
     <string name="normalized">Normalizado</string>
     <string name="database">Base de datos</string>
@@ -100,8 +146,6 @@ Language: es
     <string name="add_to_playlist_no_playlist_found_body">No hemos podido encontrar ninguna playlist para esa búsqueda. Crea una playlist o prueba con otra palabra clave.</string>
     <string name="add_to_playlist_find_playlist">Buscar playlist</string>
     <string name="add_to_playlist_description">Añadir a playlist</string>
-    <string name="add_to_up_next_bottom">Añadir a la parte inferior de A continuación</string>
-    <string name="add_to_up_next_top">Añadir a la parte superior de A continuación</string>
     <string name="remove_from_playlist">Eliminar de la playlist</string>
     <string name="playlist_episodes_archived_title">No hay episodios</string>
     <string name="playlist_episodes_archived_count">%1$d archivado(s)</string>
@@ -468,7 +512,7 @@ Language: es
     <string name="shuffle_whats_new_message">Reproduce un episodio aleatorio fácilmente sin cambiar el orden de la cola.</string>
     <string name="chapter_time_remaining_content_description">Quedan %s del capítulo</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
-    <string name="referrals_share_text">Hola:\n\nAquí tienes un pase de invitado de %1$s para Pocket Casts Plus, mi reproductor de podcast favorito. Cuenta con funciones únicas como los marcadores, las carpetas y muchas más que no encontrarás en otras plataformas. Creo que a ti también te encantará.</string>
+    <string name="referrals_share_text">Hola:\n\nAquí tienes un pase de invitado de %1$s para Pocket Casts Plus, mi reproductor de podcast favorito. Cuenta con funciones únicas como los marcadores, las carpetas y muchas más que no encontrarás en otras plataformas. Creemos que a ti también te encantará.</string>
     <string name="files_plus_prompt">Sube tus archivos con Pocket Casts Plus, y mucho más</string>
     <string name="icons_plus_prompt">Consigue iconos exclusivos de aplicaciones con Pocket Casts Plus, y mucho más</string>
     <string name="themes_plus_prompt">Consigue temas exclusivos con Pocket Casts Plus, y mucho más</string>
@@ -644,7 +688,7 @@ Language: es
     <string name="widget_preview_episode_in_up_next_title">Episodio en \"A continuación\"</string>
     <string name="widget_preview_episode_title">Título del episodio</string>
     <string name="hour_and_minutes">1 hora y %d minutos</string>
-    <string name="hours_and_minutes">%d horas y %d minutos</string>
+    <string name="hours_and_minutes">%1$d horas y %2$d minutos</string>
     <string name="player_sleep_in_chapters">En suspensión dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Dentro de 1 capítulo</string>

@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -128,7 +129,7 @@ class CreateAccountViewModel
         createAccountState.postValue(CreateAccountState.AccountCreating)
 
         viewModelScope.launch {
-            when (val result = syncManager.createUserWithEmailAndPassword(emailString, passwordString)) {
+            when (val result = syncManager.createUserWithEmailAndPassword(emailString, passwordString, SignInSource.UserInitiated.SignInViewModel)) {
                 is LoginResult.Success -> {
                     analyticsTracker.refreshMetadata()
                     podcastManager.refreshPodcastsAfterSignIn()

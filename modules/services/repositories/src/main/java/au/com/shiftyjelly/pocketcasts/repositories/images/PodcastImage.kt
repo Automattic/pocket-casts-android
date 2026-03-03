@@ -13,7 +13,7 @@ object PodcastImage {
     }
 
     fun getArtworkUrl(size: Int?, uuid: String, isWearOS: Boolean): String {
-        val maxSize = if (isWearOS) MEDIUM_SIZE else LARGE_SIZE
+        val maxSize = if (isWearOS) SMALL_SIZE else LARGE_SIZE
         val realSize = when {
             size == null -> maxSize
             size > MEDIUM_SIZE -> maxSize

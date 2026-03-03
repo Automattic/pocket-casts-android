@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.playlists.create.FakePlaylistManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
@@ -24,8 +25,9 @@ class AddToPlaylistViewModelTest {
             playlistManager = playlistManager,
             tracker = AnalyticsTracker.test(),
             source = AddToPlaylistFragmentFactory.Source.Shelf,
-            episodeUuid = "episode-uuid",
-            podcastUuid = "podcast-uuid",
+            episodeUuids = List(3) { index ->
+                EpisodeUuidPair("episode-uuid-$index", "podcast-uuid-$index")
+            },
             initialPlaylistTitle = "Title",
         )
     }
@@ -40,24 +42,31 @@ class AddToPlaylistViewModelTest {
         viewModel.removeFromPlaylist("playlist-uuid-2")
 
         viewModel.addToPlaylist("playlist-uuid-3")
+
         viewModel.removeFromPlaylist("playlist-uuid-4")
 
         playlistManager.addManualEpisodeTurbine.expectNoEvents()
         playlistManager.deleteManualEpisodeTurbine.expectNoEvents()
 
         viewModel.commitPlaylistChanges()
-        assertEquals(
-            "playlist-uuid-1" to "episode-uuid",
-            playlistManager.addManualEpisodeTurbine.awaitItem(),
-        )
-        assertEquals(
-            "playlist-uuid-3" to "episode-uuid",
-            playlistManager.addManualEpisodeTurbine.awaitItem(),
-        )
-        assertEquals(
-            "playlist-uuid-4" to "episode-uuid",
-            playlistManager.deleteManualEpisodeTurbine.awaitItem(),
-        )
+        repeat(3) { index ->
+            assertEquals(
+                "playlist-uuid-1" to "episode-uuid-$index",
+                playlistManager.addManualEpisodeTurbine.awaitItem(),
+            )
+        }
+        repeat(3) { index ->
+            assertEquals(
+                "playlist-uuid-3" to "episode-uuid-$index",
+                playlistManager.addManualEpisodeTurbine.awaitItem(),
+            )
+        }
+        repeat(3) { index ->
+            assertEquals(
+                "playlist-uuid-4" to "episode-uuid-$index",
+                playlistManager.deleteManualEpisodeTurbine.awaitItem(),
+            )
+        }
         playlistManager.addManualEpisodeTurbine.expectNoEvents()
         playlistManager.deleteManualEpisodeTurbine.expectNoEvents()
     }

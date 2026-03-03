@@ -52,9 +52,8 @@ class DeveloperFragment : BaseFragment() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun onBackPress() {
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
     }
 
     private fun onShowWhatsNewClick() {

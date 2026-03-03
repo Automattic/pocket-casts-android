@@ -2,13 +2,16 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.google.services)
     alias(libs.plugins.compose.compiler)
+}
+
+sentry {
+    projectName = project.findProperty("sentryAndroidProject")?.toString()
 }
 
 fun loadPropertiesFrom(fileName: String): Properties {
@@ -65,7 +68,7 @@ android {
 
     sourceSets {
         getByName("androidTest") {
-            assets.srcDir(files("$rootDir/modules/services/model/schemas"))
+            assets.directories.add("$rootDir/modules/services/model/schemas")
         }
     }
 
@@ -91,8 +94,8 @@ android {
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
-            if (!file("${project.rootDir}/sentry.properties").exists()) {
-                println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")
+            if (project.findProperty("sentryAndroidProject")?.toString().isNullOrBlank()) {
+                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
             }
         }
     }
@@ -164,6 +167,7 @@ dependencies {
     implementation(projects.modules.features.widgets)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)
@@ -188,6 +192,7 @@ dependencies {
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)
+    testImplementation(projects.modules.services.analytics.testing)
 
     androidTestImplementation(libs.androidx.preference.ktx)
     androidTestImplementation(libs.androidx.recyclerview)
@@ -218,4 +223,5 @@ dependencies {
     androidTestImplementation(libs.work.test)
 
     androidTestImplementation(projects.modules.services.sharedtest)
+    androidTestImplementation(projects.modules.services.analytics.testing)
 }

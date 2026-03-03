@@ -3,12 +3,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.google.services)
     alias(libs.plugins.compose.compiler)
+}
+
+sentry {
+    projectName = project.findProperty("sentryWearProject")?.toString()
 }
 
 android {
@@ -32,8 +35,8 @@ android {
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
-            if (!file("${project.rootDir}/sentry.properties").exists()) {
-                println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")
+            if (project.findProperty("sentryWearProject")?.toString().isNullOrBlank()) {
+                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
             }
         }
     }
@@ -142,6 +145,7 @@ dependencies {
     implementation(projects.modules.features.shared)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)

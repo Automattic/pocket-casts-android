@@ -72,7 +72,6 @@ private fun ImageContent(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(IR.drawable.playback_launch_banner),
             contentDescription = null,
-            colorFilter = MaterialTheme.theme.imageColorFilter,
             modifier = Modifier.clip(RoundedCornerShape(16.dp)),
         )
     }

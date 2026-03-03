@@ -190,7 +190,7 @@ private class ShowEpisodeAdapter : DeepLinkAdapter {
 }
 
 private class ShowPageAdapter : DeepLinkAdapter {
-    override fun create(intent: Intent) = if (intent.action == ACTION_VIEW) {
+    override fun create(intent: Intent): DeepLink? = if (intent.action == ACTION_VIEW) {
         when (intent.getStringExtra(EXTRA_PAGE)) {
             "podcasts" -> ShowPodcastsDeepLink
 

@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUD
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import java.util.Date
 import org.junit.Assert.assertEquals
@@ -364,31 +365,51 @@ class PlaylistManagerBaseTest {
     }
 
     @Test
-    fun getSmartPlaylistAutoDownloadEpisodes() = dsl.test {
-        insertSmartPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 3) }
-        insertSmartPlaylist(index = 1) { it.copy(autoDownload = false, autodownloadLimit = 100) }
+    fun getSmartAutoDownloadPlaylist() = dsl.test {
+        insertSmartPlaylist(index = 0) { it.copy(autoDownload = true) }
+        insertSmartPlaylist(index = 1) { it.copy(autoDownload = false) }
+        insertSmartPlaylist(index = 2) { it.copy(autoDownload = true, starred = true) }
         insertPodcast(index = 0)
         insertPodcast(index = 1) { it.copy(isSubscribed = false) }
-        repeat(10) { index ->
+        repeat(4) { index ->
             insertPodcastEpisode(index = index, podcastIndex = index % 2)
         }
 
-        val episodes = manager.getAutoDownloadEpisodes()
+        val playlists = manager.getAutoDownloadPlaylists()
         assertEquals(
             listOf(
-                podcastEpisode(index = 0, podcastIndex = 0),
-                podcastEpisode(index = 2, podcastIndex = 0),
-                podcastEpisode(index = 4, podcastIndex = 0),
+                smartPlaylist(index = 0) { playlist ->
+                    playlist.copy(
+                        settings = playlist.settings.copy(isAutoDownloadEnabled = true),
+                        episodes = listOf(
+                            availablePlaylistEpisode(index = 0, podcastIndex = 0),
+                            availablePlaylistEpisode(index = 2, podcastIndex = 0),
+                        ),
+                        metadata = playlist.metadata.copy(
+                            artworkUuids = listOf("podcast-id-0"),
+                            totalEpisodeCount = 2,
+                            displayedEpisodeCount = 2,
+                            displayedAvailableEpisodeCount = 2,
+                        ),
+                    )
+                },
+                smartPlaylist(index = 2) { playlist ->
+                    playlist.copy(
+                        settings = playlist.settings.copy(isAutoDownloadEnabled = true),
+                        smartRules = playlist.smartRules.copy(starred = SmartRules.StarredRule.Starred),
+                    )
+                },
             ),
-            episodes,
+            playlists,
         )
     }
 
     @Test
-    fun getManualPlaylistAutoDownloadEpisodes() = dsl.test {
-        insertManualPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 3) }
-        insertManualPlaylist(index = 1) { it.copy(autoDownload = false, autodownloadLimit = 100) }
-        repeat(10) { index ->
+    fun getManualAutoDownloadPlaylist() = dsl.test {
+        insertManualPlaylist(index = 0) { it.copy(autoDownload = true) }
+        insertManualPlaylist(index = 1) { it.copy(autoDownload = false) }
+        insertManualPlaylist(index = 2) { it.copy(autoDownload = true) }
+        repeat(4) { index ->
             if (index % 2 == 0) {
                 insertPodcastEpisode(index = index, podcastIndex = 0)
             }
@@ -396,41 +417,33 @@ class PlaylistManagerBaseTest {
             insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 1)
         }
 
-        val episodes = manager.getAutoDownloadEpisodes()
+        val playlists = manager.getAutoDownloadPlaylists()
         assertEquals(
             listOf(
-                podcastEpisode(index = 0, podcastIndex = 0),
-                podcastEpisode(index = 2, podcastIndex = 0),
-                podcastEpisode(index = 4, podcastIndex = 0),
+                manualPlaylist(index = 0) { playlist ->
+                    playlist.copy(
+                        settings = playlist.settings.copy(isAutoDownloadEnabled = true),
+                        episodes = listOf(
+                            availablePlaylistEpisode(index = 0, podcastIndex = 0),
+                            unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                            availablePlaylistEpisode(index = 2, podcastIndex = 0),
+                            unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                        ),
+                        metadata = playlist.metadata.copy(
+                            artworkUuids = listOf("podcast-id-0"),
+                            totalEpisodeCount = 4,
+                            displayedEpisodeCount = 4,
+                            displayedAvailableEpisodeCount = 2,
+                        ),
+                    )
+                },
+                manualPlaylist(index = 2) { playlist ->
+                    playlist.copy(
+                        settings = playlist.settings.copy(isAutoDownloadEnabled = true),
+                    )
+                },
             ),
-            episodes,
-        )
-    }
-
-    @Test
-    fun getDistinctAutoDownloadEpisodes() = dsl.test {
-        insertManualPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 4) }
-        insertManualPlaylist(index = 1) { it.copy(autoDownload = true, autodownloadLimit = 5) }
-        repeat(10) { index ->
-            insertPodcastEpisode(index = index, podcastIndex = 0)
-            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
-            if (index >= 2) {
-                insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 1)
-            }
-        }
-
-        val episodes = manager.getAutoDownloadEpisodes()
-        assertEquals(
-            listOf(
-                podcastEpisode(index = 0, podcastIndex = 0),
-                podcastEpisode(index = 1, podcastIndex = 0),
-                podcastEpisode(index = 2, podcastIndex = 0),
-                podcastEpisode(index = 3, podcastIndex = 0),
-                podcastEpisode(index = 4, podcastIndex = 0),
-                podcastEpisode(index = 5, podcastIndex = 0),
-                podcastEpisode(index = 6, podcastIndex = 0),
-            ),
-            episodes,
+            playlists,
         )
     }
 

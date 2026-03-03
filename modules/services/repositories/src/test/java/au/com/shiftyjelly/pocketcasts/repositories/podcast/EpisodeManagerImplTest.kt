@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import android.content.Context
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
@@ -34,20 +35,23 @@ class EpisodeManagerImplTest {
     @Mock
     lateinit var episodeDao: EpisodeDao
 
+    @Mock
+    lateinit var context: Context
+
     private lateinit var episodeManagerImpl: EpisodeManagerImpl
 
     @Before
     fun setUp() = runTest {
         whenever(appDatabase.episodeDao()).thenReturn(episodeDao)
+        whenever(appDatabase.userEpisodeDao()).thenReturn(mock())
         episodeManagerImpl = EpisodeManagerImpl(
             appDatabase = appDatabase,
             settings = mock(),
-            fileStorage = mock(),
-            downloadManager = mock(),
-            context = mock(),
+            downloadQueue = mock(),
+            context = context,
             podcastCacheServiceManager = mock(),
             userEpisodeManager = mock(),
-            ioDispatcher = mock(),
+            ioDispatcher = coroutineRule.testDispatcher,
             episodeAnalytics = mock(),
         )
     }
@@ -56,7 +60,7 @@ class EpisodeManagerImplTest {
     fun `get all podcasts episodes`() = runTest {
         val episodes = List(26) { PodcastEpisode(uuid = "$it", publishedDate = Date()) }
         episodeDao.stub {
-            onBlocking { getAllPodcastEpisodes(any(), any()) } doReturnConsecutively (episodes.chunked(10) + listOf(emptyList()))
+            on { getAllPodcastEpisodes(any(), any()) } doReturnConsecutively (episodes.chunked(10) + listOf(emptyList()))
         }
 
         episodeManagerImpl.getAllPodcastEpisodes(10).test {

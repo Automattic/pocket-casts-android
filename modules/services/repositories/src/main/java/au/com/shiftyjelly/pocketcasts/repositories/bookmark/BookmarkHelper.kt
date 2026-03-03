@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.BookmarkSource
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -56,7 +57,7 @@ class BookmarkHelper(
                     episode = episode,
                     timeSecs = timeInSecs,
                     title = context.getString(LR.string.bookmark),
-                    creationSource = BookmarkManager.CreationSource.HEADPHONES,
+                    creationSource = BookmarkSource.Headphones,
                 )
             }
 

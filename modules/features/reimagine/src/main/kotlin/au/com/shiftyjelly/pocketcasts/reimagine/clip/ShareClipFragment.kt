@@ -13,11 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -33,6 +30,10 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ShareScreenCloseButtonTappedEvent
+import com.automattic.eventhorizon.ShareScreenEditButtonTappedEvent
+import com.automattic.eventhorizon.ShareScreenNavigationButtonTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.util.UUID
@@ -71,7 +72,7 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var sharingClient: SharingClient
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
@@ -126,9 +127,9 @@ class ShareClipFragment : BaseDialogFragment() {
             assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
-            onNavigationButtonClick = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_NAVIGATION_BUTTON_TAPPED) },
-            onEditClick = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_EDIT_BUTTON_TAPPED) },
-            onCloseClick = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_CLOSE_BUTTON_TAPPED) },
+            onNavigationButtonClick = { eventHorizon.track(ShareScreenNavigationButtonTappedEvent) },
+            onEditClick = { eventHorizon.track(ShareScreenEditButtonTappedEvent) },
+            onCloseClick = { eventHorizon.track(ShareScreenCloseButtonTappedEvent) },
         )
 
         LaunchedEffect(Unit) {

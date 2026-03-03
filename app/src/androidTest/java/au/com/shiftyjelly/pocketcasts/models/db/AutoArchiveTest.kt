@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -49,9 +47,7 @@ import org.mockito.kotlin.mock
 class AutoArchiveTest {
     lateinit var testDb: AppDatabase
     lateinit var episodeDao: EpisodeDao
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val fileStorage = mock<FileStorage> {}
-    val downloadManager = mock<DownloadManager> {}
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
 
@@ -86,8 +82,7 @@ class AutoArchiveTest {
         }
         return EpisodeManagerImpl(
             settings = settings,
-            fileStorage = fileStorage,
-            downloadManager = downloadManager,
+            downloadQueue = mock(),
             context = context,
             appDatabase = db,
             podcastCacheServiceManager = podcastCacheServiceManager,
@@ -110,7 +105,7 @@ class AutoArchiveTest {
         }
         val context = mock<Context>()
         val syncManager = mock<SyncManager>()
-        return UpNextQueueImpl(db, settings, episodeManager, syncManager, context)
+        return UpNextQueueImpl(db, settings, episodeManager, syncManager, mock(), context)
     }
 
     @Test
@@ -539,7 +534,7 @@ class AutoArchiveTest {
         val updatedNewEpisode = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should be archived as it was archive modified 8 day ago (inactive setting = 7d)", updatedNewEpisode.isArchived)
 
-        runBlocking { upNext.playLast(updatedNewEpisode, downloadManager, null) }
+        runBlocking { upNext.playLast(updatedNewEpisode, onAdd = null) }
 
         val updatedNewEpisodeInUpNext = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next", !updatedNewEpisodeInUpNext.isArchived)

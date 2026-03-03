@@ -88,6 +88,9 @@ class AutomotiveSettingsActivity :
     override fun openPlayer() {
     }
 
+    override fun closeDialogs() {
+    }
+
     override fun closePlayer() {
     }
 
@@ -167,4 +170,6 @@ class AutomotiveSettingsActivity :
 
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
     }
+
+    override fun onPlayerBackstackChanged() = Unit
 }

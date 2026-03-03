@@ -50,10 +50,10 @@ internal class NotificationsSettingsViewModelTest {
     @Before
     fun setup() {
         repository.stub {
-            onBlocking { getPreferenceCategories() }.doReturn(categories)
+            on { getPreferenceCategories() }.doReturn(categories)
         }
         notificationHelper.stub {
-            onBlocking { hasNotificationsPermission() }.doReturn(false)
+            on { hasNotificationsPermission() }.doReturn(false)
         }
     }
 
@@ -128,7 +128,7 @@ internal class NotificationsSettingsViewModelTest {
     @Test
     fun `GIVEN notifications enabled WHEN initializing viewmodel THEN state reflects it`() = runTest {
         notificationHelper.stub {
-            onBlocking { hasNotificationsPermission() }.doReturn(true)
+            on { hasNotificationsPermission() }.doReturn(true)
         }
 
         val viewModel = createViewModel()
@@ -142,7 +142,7 @@ internal class NotificationsSettingsViewModelTest {
         assertEquals(viewModel.state.value.areSystemNotificationsEnabled, false)
 
         notificationHelper.stub {
-            onBlocking { hasNotificationsPermission() }.doReturn(true)
+            on { hasNotificationsPermission() }.doReturn(true)
         }
         viewModel.checkNotificationPermission()
 

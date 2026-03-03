@@ -127,6 +127,20 @@ class PlaylistManagerImpl(
         }
     }
 
+    override suspend fun getAutoDownloadPlaylists(): List<Playlist> {
+        val playlists = playlistDao.getAllAutoDownloadPlaylists()
+        return withContext(computationContext) {
+            playlists.mapNotNull { playlist ->
+                val playlistFlow = if (playlist.manual) {
+                    manualPlaylistFlow(playlist.uuid)
+                } else {
+                    smartPlaylistFlow(playlist.uuid)
+                }
+                playlistFlow.first()
+            }
+        }
+    }
+
     private val artworkCache = ConcurrentHashMap<String, MutableStateFlow<List<String>?>>()
     private val episodeCountCache = ConcurrentHashMap<String, MutableStateFlow<Int?>>()
 
@@ -154,29 +168,6 @@ class PlaylistManagerImpl(
             is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
             is SmartPlaylistPreview -> playlistDao.smartPlaylistMetadataFlow(clock, playlistPreview.smartRules)
         }.first().episodeCount
-    }
-
-    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
-        return appDatabase.withTransaction {
-            val playlists = playlistDao.getAllAutoDownloadPlaylists()
-            withContext(computationContext) {
-                playlists
-                    .flatMap { playlist ->
-                        val playlistFlow = if (playlist.manual) {
-                            manualPlaylistFlow(playlist.uuid)
-                        } else {
-                            smartPlaylistFlow(playlist.uuid)
-                        }
-                        playlistFlow.first()
-                            ?.episodes
-                            ?.toPodcastEpisodes()
-                            ?.filterNot { it.isExemptFromAutoDownload }
-                            ?.take(playlist.autodownloadLimit)
-                            .orEmpty()
-                    }
-                    .distinctBy(PodcastEpisode::uuid)
-            }
-        }
     }
 
     override suspend fun sortPlaylists(sortedUuids: List<String>) {
@@ -372,8 +363,8 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
+    override fun playlistPreviewsForEpisodeFlow(searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
+        return playlistDao.playlistPreviewsForEpisodeFlow(searchTerm.orEmpty())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -401,40 +392,50 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
-        return appDatabase.withTransaction {
-            val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid)
-            val episodeUuids = episodes.map(ManualPlaylistEpisode::episodeUuid)
-            if (episodeUuid in episodeUuids) {
-                return@withTransaction true
-            }
+    override suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean {
+        return withContext(computationContext) {
+            appDatabase.withTransaction {
+                val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid)
+                val existingEpisodeUuids = episodes.map(ManualPlaylistEpisode::episodeUuid)
+                val newEpisodeUuids = episodeUuids.filter { uuid -> uuid !in existingEpisodeUuids }
+                if (newEpisodeUuids.isEmpty()) {
+                    return@withTransaction true
+                }
 
-            if (episodeUuids.size >= manualEpisodeLimit) {
-                return@withTransaction false
-            }
+                if (existingEpisodeUuids.size + newEpisodeUuids.size > manualEpisodeLimit) {
+                    return@withTransaction false
+                }
 
-            val podcastEpisode = episodeDao.findByUuid(episodeUuid)
-            if (podcastEpisode == null) {
-                return@withTransaction false
-            }
+                val newPodcastEpisodes = episodeDao.findByUuids(newEpisodeUuids).associateBy(PodcastEpisode::uuid)
+                if (newPodcastEpisodes.isEmpty()) {
+                    return@withTransaction false
+                }
+                val podcastUuids = newPodcastEpisodes.mapTo(mutableSetOf()) { (_, episode) -> episode.podcastUuid }
+                val podcastSlugs = podcastDao.findAllIn(podcastUuids).associate { it.uuid to it.slug }
 
-            val podcast = podcastDao.findPodcastByUuid(podcastEpisode.podcastUuid)
-            val newEpisode = ManualPlaylistEpisode(
-                playlistUuid = playlistUuid,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastEpisode.podcastUuid,
-                title = podcastEpisode.title,
-                addedAt = clock.instant(),
-                publishedAt = podcastEpisode.publishedDate.toInstant(),
-                downloadUrl = podcastEpisode.downloadUrl,
-                episodeSlug = podcastEpisode.slug,
-                podcastSlug = podcast?.slug.orEmpty(),
-                sortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0,
-                isSynced = false,
-            )
-            playlistDao.upsertManualEpisode(newEpisode)
-            playlistDao.markPlaylistAsNotSynced(playlistUuid)
-            true
+                val addedAt = clock.instant()
+                val startSortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0
+                newEpisodeUuids
+                    .mapNotNull { uuid -> newPodcastEpisodes[uuid] }
+                    .forEachIndexed { index, podcastEpisode ->
+                        val newEpisode = ManualPlaylistEpisode(
+                            playlistUuid = playlistUuid,
+                            episodeUuid = podcastEpisode.uuid,
+                            podcastUuid = podcastEpisode.podcastUuid,
+                            title = podcastEpisode.title,
+                            addedAt = addedAt,
+                            publishedAt = podcastEpisode.publishedDate.toInstant(),
+                            downloadUrl = podcastEpisode.downloadUrl,
+                            episodeSlug = podcastEpisode.slug,
+                            podcastSlug = podcastSlugs[podcastEpisode.podcastUuid].orEmpty(),
+                            sortPosition = startSortPosition + index,
+                            isSynced = false,
+                        )
+                        playlistDao.upsertManualEpisode(newEpisode)
+                    }
+                playlistDao.markPlaylistAsNotSynced(playlistUuid)
+                true
+            }
         }
     }
 

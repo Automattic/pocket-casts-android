@@ -1,13 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import com.automattic.eventhorizon.EventHorizon
 
 internal class SharingAnalytics(
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : SharingClient.Listener {
     override fun onShare(request: SharingRequest) {
-        request.analyticsEvent?.let { event ->
-            tracker.track(event, request.analyticsProperties)
-        }
+        eventHorizon.track(request.trackable)
     }
 }

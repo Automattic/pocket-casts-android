@@ -14,8 +14,7 @@ class NotificationsTestingFragment : BaseFragment() {
         AppTheme(theme.activeTheme) {
             NotificationsTestingPage(
                 onBack = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
             )
         }

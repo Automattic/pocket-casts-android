@@ -73,7 +73,7 @@ fun PlayerShelf(
                 isStarred = it.podcastHeader.isStarred,
                 downloadData = PlayerShelfData.DownloadData(
                     isDownloading = it.podcastHeader.episode?.isDownloading == true,
-                    isQueued = it.podcastHeader.episode?.isQueued == true,
+                    isQueued = it.podcastHeader.episode?.isDownloadPending == true,
                     isDownloaded = it.podcastHeader.episode?.isDownloaded == true,
                 ),
             )

@@ -31,8 +31,7 @@ class AdvancedSettingsFragment : BaseFragment() {
             AdvancedSettingsPage(
                 viewModel = viewModel,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )

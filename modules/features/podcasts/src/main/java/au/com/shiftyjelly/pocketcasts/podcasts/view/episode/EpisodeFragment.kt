@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.ColorStateList
@@ -43,8 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
@@ -78,6 +79,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -143,6 +146,9 @@ class EpisodeFragment : BaseFragment() {
 
     @Inject
     lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
+
+    @Inject
+    lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -211,6 +217,7 @@ class EpisodeFragment : BaseFragment() {
         return showNotesFormatter
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = context as FragmentHostListener
@@ -273,7 +280,7 @@ class EpisodeFragment : BaseFragment() {
                         binding.lblAuthor.setTextColor(state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
-                        binding.btnAddToUpNext.tintColor = iconColor
+                        binding.btnAddEpisode.tintColor = iconColor
                         binding.btnArchive.tintColor = iconColor
                         binding.btnPlayed.tintColor = iconColor
                         binding.progressBar.progressTintList = ColorStateList.valueOf(state.podcastColor)
@@ -300,36 +307,41 @@ class EpisodeFragment : BaseFragment() {
                                 LR.string.podcasts_download_download,
                             ),
                         )
-                        val episodeStatus = state.episode.episodeStatus
+                        val episodeStatus = state.episode.downloadStatus
                         binding.btnDownload.state = when (episodeStatus) {
-                            EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButtonState.NotDownloaded(downloadSize)
-                            EpisodeStatusEnum.QUEUED -> DownloadButtonState.Queued
-                            EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(state.downloadProgress)
-                            EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
-                            EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
+                            EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(downloadSize)
+                            EpisodeDownloadStatus.Queued -> DownloadButtonState.Queued
+                            EpisodeDownloadStatus.Downloading -> DownloadButtonState.Downloading(state.downloadProgress)
+                            EpisodeDownloadStatus.DownloadFailed -> DownloadButtonState.Errored
+                            EpisodeDownloadStatus.Downloaded -> DownloadButtonState.Downloaded(downloadSize)
                             else -> DownloadButtonState.Queued
                         }
 
                         val playbackError = state.episode.playErrorDetails
 
                         if (playbackError == null) {
-                            binding.errorLayout.isVisible = episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED || episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER || episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI
+                            binding.errorLayout.isVisible = episodeStatus == EpisodeDownloadStatus.DownloadFailed ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForPower ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForWifi ||
+                                episodeStatus == EpisodeDownloadStatus.WaitingForStorage
                             binding.lblErrorDetail.isVisible = false
 
                             binding.lblError.text = when (episodeStatus) {
-                                EpisodeStatusEnum.DOWNLOAD_FAILED -> getString(LR.string.podcasts_download_failed)
-                                EpisodeStatusEnum.WAITING_FOR_WIFI -> getString(LR.string.podcasts_download_wifi)
-                                EpisodeStatusEnum.WAITING_FOR_POWER -> getString(LR.string.podcasts_download_power)
+                                EpisodeDownloadStatus.DownloadFailed -> getString(LR.string.podcasts_download_failed)
+                                EpisodeDownloadStatus.WaitingForWifi -> getString(LR.string.podcasts_download_wifi)
+                                EpisodeDownloadStatus.WaitingForPower -> getString(LR.string.podcasts_download_power)
+                                EpisodeDownloadStatus.WaitingForStorage -> getString(LR.string.podcasts_download_storage)
                                 else -> null
                             }
-                            if (episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+                            if (episodeStatus == EpisodeDownloadStatus.DownloadFailed) {
                                 binding.lblErrorDetail.text = state.episode.downloadErrorDetails
                                 binding.lblErrorDetail.isVisible = true
                             }
                             val iconResource = when (episodeStatus) {
-                                EpisodeStatusEnum.DOWNLOAD_FAILED -> IR.drawable.ic_failedwarning
-                                EpisodeStatusEnum.WAITING_FOR_WIFI -> IR.drawable.ic_waitingforwifi
-                                EpisodeStatusEnum.WAITING_FOR_POWER -> IR.drawable.ic_waitingforpower
+                                EpisodeDownloadStatus.DownloadFailed -> IR.drawable.ic_failedwarning
+                                EpisodeDownloadStatus.WaitingForWifi -> IR.drawable.ic_waitingforwifi
+                                EpisodeDownloadStatus.WaitingForPower -> IR.drawable.ic_waitingforpower
+                                EpisodeDownloadStatus.WaitingForStorage -> IR.drawable.ic_waitingforstorage
                                 else -> null
                             }
                             if (iconResource != null) {
@@ -453,28 +465,65 @@ class EpisodeFragment : BaseFragment() {
         }
 
         // Up Next
-        binding?.btnAddToUpNext?.setOnClickListener { _ ->
-            val binding = binding ?: return@setOnClickListener
-            if (!binding.btnAddToUpNext.isOn && viewModel.shouldShowUpNextDialog()) {
-                val tintColor = ThemeColor.podcastIcon02(activeTheme, (viewModel.state.value as? EpisodeFragmentState.Loaded)?.tintColor ?: 0xFF000000.toInt())
-                val dialog = OptionsDialog()
-                    .setIconColor(tintColor)
-                    .addCheckedOption(LR.string.play_next, imageId = IR.drawable.ic_upnext_playnext, click = { viewModel.addToUpNext(binding.btnAddToUpNext.isOn) })
-                    .addCheckedOption(LR.string.play_last, imageId = IR.drawable.ic_upnext_playlast, click = { viewModel.addToUpNext(binding.btnAddToUpNext.isOn, addLast = true) })
-                activity?.supportFragmentManager?.let {
-                    dialog.show(it, "upnext")
+        var podcastTint = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
+        var loadedPodcastUuid: String? = null
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            val loadedState = state as? EpisodeFragmentState.Loaded
+            val stateTint = loadedState?.tintColor ?: 0xFF000000.toInt()
+            podcastTint = ThemeColor.podcastIcon02(activeTheme, stateTint)
+            loadedPodcastUuid = loadedState?.podcast?.uuid
+        }
+        binding?.btnAddEpisode?.setOnClickListener { _ ->
+            val dialog = OptionsDialog().setIconColor(podcastTint)
+            when {
+                viewModel.isEpisodeInUpNext() -> {
+                    dialog.addCheckedOption(LR.string.remove_from_up_next, imageId = IR.drawable.ic_upnext_remove) {
+                        viewModel.removeFromUpNext()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_removed_from_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
-            } else {
-                val wasAdded = viewModel.addToUpNext(binding.btnAddToUpNext.isOn)
-                activity?.let { activity ->
-                    val text = if (wasAdded) LR.string.episode_added_to_up_next else LR.string.episode_removed_from_up_next
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
+
+                viewModel.isUpNextEmpty() -> {
+                    dialog.addCheckedOption(LR.string.add_to_up_next, imageId = IR.drawable.ic_upnext_playnext) {
+                        viewModel.addToUpNextTop()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                }
+
+                else -> {
+                    dialog.addCheckedOption(LR.string.add_to_up_next_top, imageId = IR.drawable.ic_upnext_playnext) {
+                        viewModel.addToUpNextTop()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                    dialog.addCheckedOption(LR.string.add_to_up_next_bottom, imageId = IR.drawable.ic_upnext_playlast) {
+                        viewModel.addToUpNextBottom()
+                        Snackbar
+                            .make(requireNotNull(listener).snackBarView(), LR.string.episode_added_to_up_next, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
             }
-        }
-        viewModel.inUpNext.observe(viewLifecycleOwner) { isInUpNext ->
-            // Up Next
-            binding?.btnAddToUpNext?.isOn = isInUpNext
+            loadedPodcastUuid?.let { podcastUuid ->
+                dialog.addCheckedOption(LR.string.add_to_playlist_description, imageId = IR.drawable.ic_playlist_add_episode) {
+                    if (parentFragmentManager.findFragmentByTag("add-to-playlist") == null) {
+                        val fragment = addToPlaylistFragmentFactory.create(
+                            source = AddToPlaylistFragmentFactory.Source.EpisodeDetails,
+                            episodeUuid = episodeUUID,
+                            podcastUuid = podcastUuid,
+                        )
+                        fragment.show(parentFragmentManager, "add-to-playlist")
+                    }
+                }
+            }
+            if (parentFragmentManager.findFragmentByTag("EpisodeDetailsAddEpisode") == null) {
+                dialog.show(parentFragmentManager, "EpisodeDetailsAddEpisode")
+            }
         }
 
         viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
@@ -496,8 +545,9 @@ class EpisodeFragment : BaseFragment() {
                 }
             } else {
                 context?.let { context ->
-                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && viewModel.shouldDownload()) {
-                        warningsHelper.downloadWarning(episodeUUID, "episode card")
+                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context)) {
+                        warningsHelper
+                            .downloadWarning(episodeUUID, SourceView.EPISODE_DETAILS)
                             .show(parentFragmentManager, "download warning")
                     } else {
                         viewModel.downloadEpisode()
@@ -506,7 +556,7 @@ class EpisodeFragment : BaseFragment() {
             }
         }
 
-        binding?.btnAddToUpNext?.setup(ToggleActionButton.State.On(LR.string.podcasts_up_next, IR.drawable.ic_upnext_remove), ToggleActionButton.State.Off(LR.string.podcasts_up_next, IR.drawable.ic_upnext_playnext), false)
+        binding?.btnAddEpisode?.setup(ToggleActionButton.State.On(LR.string.podcasts_add_episode, IR.drawable.ic_add_black_24dp), ToggleActionButton.State.Off(LR.string.podcasts_add_episode, IR.drawable.ic_add_black_24dp), false)
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
 

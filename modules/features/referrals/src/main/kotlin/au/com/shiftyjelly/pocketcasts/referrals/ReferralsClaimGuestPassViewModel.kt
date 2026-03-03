@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
@@ -18,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -38,6 +43,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val paymentClient: PaymentClient,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val experimentProvider: ExperimentProvider,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -56,11 +62,46 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     private fun loadReferralClaimOffer() {
         viewModelScope.launch {
-            val referralPlan = paymentClient.loadSubscriptionPlans()
-                .flatMap { plans -> plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral) }
+            val isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEW_INSTALLMENT_PLAN)
+            val experimentVariation = experimentProvider.getVariation(Experiment.YearlyInstallments)
+            val isInstallmentEnabled = isFeatureEnabled && experimentVariation is Variation.Treatment
+
+            // Try installment offer first if feature flag AND experiment treatment are enabled
+            val installmentPlan = if (isInstallmentEnabled) {
+                paymentClient.loadSubscriptionPlans()
+                    .flatMap { plans ->
+                        plans.findOfferPlan(
+                            SubscriptionTier.Plus,
+                            BillingCycle.Yearly,
+                            SubscriptionOffer.Referral,
+                            isInstallment = true,
+                        )
+                    }
+                    .flatMap(ReferralSubscriptionPlan::create)
+                    .onFailure { code, message ->
+                        LogBuffer.i(LogBuffer.TAG_SUBSCRIPTIONS, "Installment referral not available: $code, $message")
+                    }
+                    .getOrNull()
+            } else {
+                null
+            }
+
+            // Fallback to regular offer if installment not available
+            val referralPlan = installmentPlan ?: paymentClient.loadSubscriptionPlans()
+                .flatMap { plans ->
+                    plans.findOfferPlan(
+                        SubscriptionTier.Plus,
+                        BillingCycle.Yearly,
+                        SubscriptionOffer.Referral,
+                        isInstallment = false,
+                    )
+                }
                 .flatMap(ReferralSubscriptionPlan::create)
-                .onFailure { code, message -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message") }
+                .onFailure { code, message ->
+                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message")
+                }
                 .getOrNull()
+
             _state.value = if (referralPlan != null) {
                 UiState.Loaded(referralPlan)
             } else {
@@ -118,12 +159,22 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         referralPlan: ReferralSubscriptionPlan,
         activity: Activity,
     ) {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)
+        analyticsTracker.track(
+            AnalyticsEvent.REFERRAL_PURCHASE_SHOWN,
+            mapOf(
+                "is_installment" to referralPlan.key.isInstallment.toString(),
+            ),
+        )
         viewModelScope.launch {
             val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, purchaseSource = "referrals", activity)
             when (purchaseResult) {
                 PurchaseResult.Purchased -> {
-                    analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
+                    analyticsTracker.track(
+                        AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS,
+                        mapOf(
+                            "is_installment" to referralPlan.key.isInstallment.toString(),
+                        ),
+                    )
                     redeemReferralCode(settings.referralClaimCode.value)
                 }
 

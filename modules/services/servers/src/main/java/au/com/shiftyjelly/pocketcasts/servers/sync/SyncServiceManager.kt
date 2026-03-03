@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
-import au.com.shiftyjelly.pocketcasts.servers.di.SyncServiceRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -44,6 +43,7 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
+import dagger.Lazy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -52,11 +52,12 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.Retrofit
 
 /**
  * The only class outside of the server module that should use this class is the
@@ -64,9 +65,9 @@ import retrofit2.Retrofit
  */
 @Singleton
 open class SyncServiceManager @Inject constructor(
-    @SyncServiceRetrofit retrofit: Retrofit,
+    private val service: SyncService,
     val settings: Settings,
-    @Cached val cache: Cache,
+    @Cached val cache: Lazy<Cache>,
 ) {
 
     companion object {
@@ -82,8 +83,6 @@ open class SyncServiceManager @Inject constructor(
             m = Settings.SYNC_API_MODEL
         }
     }
-
-    private val service: SyncService = retrofit.create(SyncService::class.java)
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
         val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
@@ -321,7 +320,8 @@ open class SyncServiceManager @Inject constructor(
         return service.redeemReferralCode(addBearer(token), request)
     }
 
-    fun signOut() {
+    suspend fun signOut() {
+        val cache = withContext(Dispatchers.Default) { cache.get() }
         cache.evictAll()
     }
 

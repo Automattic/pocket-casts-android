@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
@@ -32,6 +31,7 @@ dependencies {
 
     implementation(libs.automattic.crashlogging)
     implementation(libs.coroutines.core)
+    implementation(libs.coroutines.rx2)
     implementation(libs.moshi.adapters)
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit.moshi)

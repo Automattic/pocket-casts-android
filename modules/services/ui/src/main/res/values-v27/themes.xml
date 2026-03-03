@@ -20,11 +20,6 @@
         <item name="android:statusBarColor">?attr/secondary_ui_01</item>
     </style>
 
-    <style name="Radioactive" parent="BaseRadioactive">
-        <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
-    </style>
-
     <style name="BottomSheetDialogThemeLight" parent="BottomSheetDialogBaseThemeLight">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@color/transparent</item>

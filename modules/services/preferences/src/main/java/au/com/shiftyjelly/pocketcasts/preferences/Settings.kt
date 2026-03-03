@@ -334,7 +334,7 @@ interface Settings {
 
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
-    val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting>
+    val autoDownloadLimit: ReadWriteSetting<AutoDownloadLimitSetting>
 
     fun setLastModified(lastModified: String?)
     fun getLastModified(): String?
@@ -366,9 +366,9 @@ interface Settings {
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
-    val autoDownloadUpNext: UserSetting<Boolean>
+    val autoDownloadUpNext: ReadWriteSetting<Boolean>
     val autoDownloadOnFollowPodcast: UserSetting<Boolean>
-    val autoDownloadNewEpisodes: UserSetting<Int>
+    val autoDownloadNewEpisodes: ReadWriteSetting<Int>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>
 
@@ -450,7 +450,7 @@ interface Settings {
     val deleteLocalFileAfterPlaying: UserSetting<Boolean>
     val deleteCloudFileAfterPlaying: UserSetting<Boolean>
     val cloudAutoUpload: UserSetting<Boolean>
-    val cloudAutoDownload: UserSetting<Boolean>
+    val cloudAutoDownload: ReadWriteSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     val cachedMembership: UserSetting<Membership>
     val cachedSubscription: ReadSetting<Subscription?>

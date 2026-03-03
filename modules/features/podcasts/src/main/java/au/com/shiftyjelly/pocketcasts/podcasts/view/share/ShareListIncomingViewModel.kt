@@ -6,6 +6,7 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -62,7 +63,7 @@ class ShareListIncomingViewModel
     }
 
     fun unsubscribeFromPodcast(uuid: String) {
-        podcastManager.unsubscribeAsync(uuid, playbackManager)
+        podcastManager.unsubscribeAsync(uuid, SourceView.SHARE_LIST)
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {

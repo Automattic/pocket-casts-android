@@ -28,12 +28,18 @@ class UpdateShowNotesTask @AssistedInject constructor(
     private val showNotesManager: ShowNotesManager,
 ) : CoroutineWorker(context, params) {
     companion object {
-        private const val TASK_NAME = "UpdateShowNotesTask"
+        internal const val WORKER_TAG = "UpdateShowNotesTask"
+        private const val WORKER_EPISODE_TAG_PREFIX = "$WORKER_TAG:Episode:"
+        private const val WORKER_PODCAST_TAG_PREFIX = "$WORKER_TAG:Podcast:"
         const val INPUT_PODCAST_UUID = "podcast_uuid"
         const val INPUT_EPISODE_UUID = "episode_uuid"
 
+        fun episodeTag(episodeUuid: String) = "$WORKER_EPISODE_TAG_PREFIX$episodeUuid"
+
+        fun podcastTag(podcastUuid: String) = "$WORKER_PODCAST_TAG_PREFIX$podcastUuid"
+
         fun enqueue(episode: PodcastEpisode, constraints: Constraints = Constraints.NONE, context: Context) {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME - enqueued ${episode.uuid}")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$WORKER_TAG - enqueued ${episode.uuid}")
             val cacheShowNotesData = Data.Builder()
                 .putString(INPUT_PODCAST_UUID, episode.podcastUuid)
                 .putString(INPUT_EPISODE_UUID, episode.uuid)
@@ -41,9 +47,12 @@ class UpdateShowNotesTask @AssistedInject constructor(
             val workRequest = OneTimeWorkRequestBuilder<UpdateShowNotesTask>()
                 .setInputData(cacheShowNotesData)
                 .addTag(episode.uuid)
+                .addTag(WORKER_TAG)
+                .addTag(episodeTag(episode.uuid))
+                .addTag(podcastTag(episode.podcastUuid))
                 .setConstraints(constraints)
                 .build()
-            WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest).enqueue()
+            WorkManager.getInstance(context).beginUniqueWork(WORKER_TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest).enqueue()
         }
     }
 
@@ -67,6 +76,6 @@ class UpdateShowNotesTask @AssistedInject constructor(
     }
 
     private fun info(message: String) {
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME (Worker ID: $id) - $message")
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$WORKER_TAG (Worker ID: $id) - $message")
     }
 }

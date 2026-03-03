@@ -41,8 +41,7 @@ class AutoArchiveFragment : BaseFragment() {
                 viewModel = viewModel,
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
             )
         }

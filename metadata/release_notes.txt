@@ -1,7 +1,7 @@
 *   Bug Fixes
-    *   Fix Android 10 full screen player appearing under the status and navigation bars
-        ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
-    *   Fix the mini player Up Next count overflow
-        ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
-    *   Fix 3-button navigation obstructing the sharing buttons
-        ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
+    *   Fix up next queue episode ordering on the large widget
+        ([#4957](https://github.com/Automattic/pocket-casts-android/pull/4957))
+    *   On the podcasts tab show the podcast title when artwork is missing
+        ([#4973](https://github.com/Automattic/pocket-casts-android/pull/4973))
+    *   Fix Up Next not syncing for free users when a custom file is added to it
+        ([#4991](https://github.com/Automattic/pocket-casts-android/pull/4991))

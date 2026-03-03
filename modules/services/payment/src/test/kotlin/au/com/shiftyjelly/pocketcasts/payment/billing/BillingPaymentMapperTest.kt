@@ -401,6 +401,38 @@ class BillingPaymentMapperTest {
     }
 
     @Test
+    fun `map product with installment plan details`() {
+        val googleProduct = createGoogleProductDetails(
+            subscriptionOfferDetails = listOf(
+                createGoogleOfferDetails(
+                    offerId = null,
+                    installmentPlanCommitmentPaymentsCount = 12,
+                    subsequentInstallmentPlanCommitmentPaymentsCount = 1,
+                ),
+            ),
+        )
+
+        val basePlan = mapper.toProduct(googleProduct)!!.pricingPlans.basePlan
+
+        assertNotNull(basePlan.installmentPlanDetails)
+        assertEquals(12, basePlan.installmentPlanDetails?.commitmentPaymentsCount)
+        assertEquals(1, basePlan.installmentPlanDetails?.subsequentCommitmentPaymentsCount)
+    }
+
+    @Test
+    fun `map product without installment plan details`() {
+        val googleProduct = createGoogleProductDetails(
+            subscriptionOfferDetails = listOf(
+                createGoogleOfferDetails(offerId = null),
+            ),
+        )
+
+        val basePlan = mapper.toProduct(googleProduct)!!.pricingPlans.basePlan
+
+        assertNull(basePlan.installmentPlanDetails)
+    }
+
+    @Test
     fun `map purchase`() {
         assertNotNull(mapper.toPurchase(createGooglePurchase()))
     }

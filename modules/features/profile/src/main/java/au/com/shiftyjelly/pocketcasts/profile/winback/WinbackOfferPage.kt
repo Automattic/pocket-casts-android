@@ -80,9 +80,10 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(20.dp),
         )
         Text(
-            text = when (offer.billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
+            text = when {
+                offer.billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
+                offer.isInstallment && offer.formattedTotalSavings != null -> stringResource(LR.string.winback_offer_free_offer_installment_title, offer.formattedPrice, offer.formattedTotalSavings)
+                else -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
@@ -95,9 +96,10 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(16.dp),
         )
         TextP30(
-            text = when (offer.billingCycle) {
-                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
-                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
+            text = when {
+                offer.billingCycle == BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
+                offer.isInstallment -> stringResource(LR.string.winback_offer_free_offer_installment_description, offer.formattedPrice)
+                else -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
             },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
@@ -220,14 +222,12 @@ private val ThemeType.heartColors
         ThemeType.INDIGO -> indigoHeart
         ThemeType.DARK_CONTRAST -> grayHeart
         ThemeType.LIGHT_CONTRAST -> blackHeart
-        ThemeType.RADIOACTIVE -> greenHeart
     }
 
 private val blackHeart = Color.Black to Color(0xFF6B7273)
 private val blueHeart = Color(0xFF03A9F4) to Color(0xFF50D0F1)
 private val redHeart = Color(0xFFF43769) to Color(0xFFFB5246)
 private val indigoHeart = Color(0xFF5C8BCC) to Color(0xFF95B0E6)
-private val greenHeart = Color(0xFF78D549) to Color(0xFF9BE45E)
 private val grayHeart = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
@@ -262,6 +262,8 @@ private fun WinbackOfferPageThemePreview(
                 formattedPrice = "\$3.99",
                 tier = SubscriptionTier.Plus,
                 billingCycle = BillingCycle.Monthly,
+                isInstallment = false,
+                formattedTotalSavings = null,
             ),
         )
     }
@@ -274,12 +276,24 @@ private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOf
             formattedPrice = "\$3.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Monthly,
+            isInstallment = false,
+            formattedTotalSavings = null,
         ),
         WinbackOffer(
             redeemCode = "",
             formattedPrice = "\$19.99",
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Yearly,
+            isInstallment = false,
+            formattedTotalSavings = null,
+        ),
+        WinbackOffer(
+            redeemCode = "",
+            formattedPrice = "\$2.49",
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Yearly,
+            isInstallment = true,
+            formattedTotalSavings = "\$29.88",
         ),
     )
 }

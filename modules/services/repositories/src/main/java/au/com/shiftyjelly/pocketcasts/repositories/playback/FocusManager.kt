@@ -11,6 +11,11 @@ import androidx.media.AudioManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Manages the focus of the player by tracking audio focus and audio noisy events.
@@ -19,6 +24,8 @@ class FocusManager(
     context: Context,
     private val settings: Settings,
     private val focusChangeListener: FocusChangeListener,
+    private val coroutineScope: CoroutineScope,
+    private val mainThreadContext: CoroutineContext,
 ) : AudioManager.OnAudioFocusChangeListener {
 
     companion object {
@@ -33,6 +40,8 @@ class FocusManager(
 
         // we have full audio focus
         private const val AUDIO_FOCUSED = 3
+
+        private const val DUCK_LOSS_DELAY_MS = 200L
 
         private val GAIN_FOCUS_LIST = listOf(
             AudioManager.AUDIOFOCUS_GAIN,
@@ -60,6 +69,7 @@ class FocusManager(
     // track when the time lost as we don't want to resume if it has been too long
     private var timeFocusLost: Long = 0
     private var deviceRemovedWhileFocusLost = false
+    private var pendingDuckLossJob: Job? = null
 
     val isFocused: Boolean
         get() = audioFocus == AUDIO_FOCUSED
@@ -141,6 +151,9 @@ class FocusManager(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "On audio focus change: $focusString")
         when (focusChange) {
             in GAIN_FOCUS_LIST -> {
+                pendingDuckLossJob?.cancel()
+                pendingDuckLossJob = null
+
                 // if not transient only let it resume within 2 minutes
                 val shouldResume = (isLostTransient || System.currentTimeMillis() < timeFocusLost + 120000) && !deviceRemovedWhileFocusLost
                 audioFocus = AUDIO_FOCUSED
@@ -149,6 +162,7 @@ class FocusManager(
             }
 
             in LOSS_FOCUS_LIST -> {
+                val previousAudioFocus = audioFocus
                 audioFocus = when {
                     focusChange == AudioManager.AUDIOFOCUS_LOSS -> AUDIO_NO_FOCUS_NO_DUCK
                     isFocused && focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> AUDIO_NO_FOCUS_NO_DUCK_TRANSIENT
@@ -157,9 +171,21 @@ class FocusManager(
                 }
                 timeFocusLost = System.currentTimeMillis()
                 deviceRemovedWhileFocusLost = false
-                val playOverNotification = canDuck()
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost. Play over notification: $playOverNotification, is transient: $isLostTransient")
-                focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
+
+                if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK && previousAudioFocus == AUDIO_FOCUSED) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost (can duck). Delaying notification by ${DUCK_LOSS_DELAY_MS}ms")
+                    pendingDuckLossJob?.cancel()
+                    pendingDuckLossJob = coroutineScope.launch(mainThreadContext) {
+                        delay(DUCK_LOSS_DELAY_MS)
+                        val playOverNotification = canDuck()
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost (can duck) after delay. Play over notification: $playOverNotification, is transient: $isLostTransient")
+                        focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
+                    }
+                } else {
+                    val playOverNotification = canDuck()
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost. Play over notification: $playOverNotification, is transient: $isLostTransient")
+                    focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
+                }
             }
 
             else -> {

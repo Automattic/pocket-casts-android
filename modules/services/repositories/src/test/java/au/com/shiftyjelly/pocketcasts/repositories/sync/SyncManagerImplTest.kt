@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
+import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -16,16 +19,12 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
 class SyncManagerImplTest {
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     private lateinit var context: Context
@@ -52,7 +51,7 @@ class SyncManagerImplTest {
         MockitoAnnotations.openMocks(this)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             context = context,
             settings = settings,
             syncAccountManager = syncAccountManager,
@@ -66,7 +65,7 @@ class SyncManagerImplTest {
     fun `should update user interaction with sync feature on user registration with password`() = runTest {
         val response = createMockLoginResponse(isNew = true)
         whenever(syncServiceManager.register(any(), any())).thenReturn(response)
-        syncManager.createUserWithEmailAndPassword("test@example.com", "password123")
+        syncManager.createUserWithEmailAndPassword("test@example.com", "password123", SignInSource.UserInitiated.Onboarding)
         verifyNotificationCalled()
     }
 
@@ -87,13 +86,15 @@ class SyncManagerImplTest {
     }
 
     private fun createMockLoginResponse(isNew: Boolean): LoginTokenResponse {
-        return mock<LoginTokenResponse>().apply {
-            whenever(email).thenReturn("test@example.com")
-            whenever(uuid).thenReturn("uuid")
-            whenever(refreshToken).thenReturn(mock())
-            whenever(accessToken).thenReturn(mock())
-            whenever(this.isNew).thenReturn(isNew)
-        }
+        return LoginTokenResponse(
+            email = "test@example.com",
+            uuid = "uuid",
+            isNew = isNew,
+            accessToken = AccessToken("value"),
+            refreshToken = RefreshToken("value"),
+            tokenType = "token_type",
+            expiresIn = 0,
+        )
     }
 
     private suspend fun verifyNotificationCalled() {

@@ -5,7 +5,7 @@ sealed interface PaymentResult<out T : Any> {
         val value: T,
     ) : PaymentResult<T>
 
-    data class Failure constructor(
+    data class Failure(
         val code: PaymentResultCode,
         val message: String,
     ) : PaymentResult<Nothing>

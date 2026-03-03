@@ -31,4 +31,7 @@
     <item android:id="@+id/menu_unselect_all"
         android:title="@string/select_none"
         app:showAsAction="never" />
+    <item android:id="@+id/menu_add_to_playlist"
+        android:title="@string/add_to_playlist_description"
+        app:showAsAction="never" />
 </menu>

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,8 +54,7 @@ class ChangeEmailFragment : BaseFragment() {
                 updateEmail = viewModel::updateEmail,
                 updatePassword = viewModel::updatePassword,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 changeEmail = viewModel::changeEmail,
                 clearServerError = viewModel::clearServerError,
@@ -67,8 +67,7 @@ class ChangeEmailFragment : BaseFragment() {
 
                     val activity = requireActivity()
 
-                    @Suppress("DEPRECATION")
-                    activity.onBackPressed() // done fragment needs to back to profile page
+                    activity.onBackPressedDispatcher.onBackPressed()
 
                     val fragment = ChangeDoneFragment.newInstance()
                     (activity as FragmentHostListener).addFragment(fragment)
@@ -79,6 +78,7 @@ class ChangeEmailFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
         super.onAttach(context)
         setupKeyboardModeResize()

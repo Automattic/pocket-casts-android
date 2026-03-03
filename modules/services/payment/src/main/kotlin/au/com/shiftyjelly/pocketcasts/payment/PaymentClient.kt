@@ -143,16 +143,24 @@ class PaymentClient @Inject constructor(
             return null
         }
 
-        return AcknowledgedSubscription(state.orderId, productKey.tier, productKey.billingCycle, isAutoRenewing)
+        val acknowledgedSubscription = AcknowledgedSubscription(state.orderId, productKey.tier, productKey.billingCycle, isAutoRenewing, productKey.isInstallment)
+        return acknowledgedSubscription
     }
 
     private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
-        val keys = SubscriptionTier.entries.flatMap { tier ->
-            BillingCycle.entries.map { cycle ->
-                SubscriptionPlan.Key(tier, cycle, offer = null)
+        val allKeys = SubscriptionTier.entries.flatMap { tier ->
+            BillingCycle.entries.flatMap { cycle ->
+                listOfNotNull(
+                    SubscriptionPlan.Key(tier, cycle, offer = null, isInstallment = false),
+                    if (tier == SubscriptionTier.Plus && cycle == BillingCycle.Yearly) {
+                        SubscriptionPlan.Key(tier, cycle, offer = null, isInstallment = true)
+                    } else {
+                        null
+                    },
+                )
             }
         }
-        return keys.firstOrNull { it.productId == productId }
+        return allKeys.firstOrNull { it.productId == productId }
     }
 
     private fun forEachListener(block: Listener.() -> Unit) {

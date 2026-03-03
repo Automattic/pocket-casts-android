@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -74,6 +75,12 @@ class PodcastSettingsFragment :
             val navController = rememberNavController()
             this.navController = navController
 
+            LaunchedEffect(navController) {
+                navController.currentBackStackEntryFlow.collect {
+                    notifyBackstackChanged()
+                }
+            }
+
             PodcastSettingsPage(
                 podcastTitle = args.title,
                 uiState = uiState,
@@ -106,8 +113,7 @@ class PodcastSettingsFragment :
                 onRemovePodcastFromPlaylists = viewModel::removePodcastFromPlaylists,
                 onUnfollow = ::showUnfollowDialog,
                 onDismiss = {
-                    @Suppress("DEPRECATION")
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 },
                 modifier = Modifier.padding(
                     bottom = miniPlayerInset.pxToDp(requireContext()).dp,
@@ -196,7 +202,9 @@ class PodcastSettingsFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return navController?.popBackStack() == true || super.onBackPressed()
+        val handled = navController?.popBackStack() == true || super.onBackPressed()
+        if (handled) notifyBackstackChanged()
+        return handled
     }
 
     @Parcelize

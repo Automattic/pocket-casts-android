@@ -75,8 +75,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                 nextAction = nextAction,
                 confirmationSound = confirmationSound,
                 onBackPress = {
-                    @Suppress("DEPRECATION")
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )

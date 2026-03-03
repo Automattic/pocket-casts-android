@@ -20,7 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -151,10 +152,6 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun providesDownloadManager(downloadManagerImpl: DownloadManagerImpl): DownloadManager
-
-    @Binds
-    @Singleton
     abstract fun providesPlayerFactory(playerFactoryImpl: PlayerFactoryImpl): PlayerFactory
 
     @Binds
@@ -241,6 +238,12 @@ abstract class RepositoryModule {
     @Binds
     @IntoSet
     abstract fun provideAppReviewAnalyticsListener(appReviewAnalyticsListener: AppReviewAnalyticsListener): AnalyticsTracker.Listener
+
+    @Binds
+    abstract fun provideDownloadQueue(manager: DownloadManager): DownloadQueue
+
+    @Binds
+    abstract fun provideDownloadStatusObserver(manager: DownloadManager): DownloadStatusObserver
 
     companion object {
         @Provides

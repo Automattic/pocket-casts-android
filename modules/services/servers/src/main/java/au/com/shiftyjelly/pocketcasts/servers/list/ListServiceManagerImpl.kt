@@ -2,23 +2,16 @@ package au.com.shiftyjelly.pocketcasts.servers.list
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.ListDownloadServiceRetrofit
-import au.com.shiftyjelly.pocketcasts.servers.di.ListUploadServiceRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.sha1
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-import retrofit2.Retrofit
 
 class ListServiceManagerImpl @Inject constructor(
-    @ListUploadServiceRetrofit uploadRetrofit: Retrofit,
-    @ListDownloadServiceRetrofit downloadRetrofit: Retrofit,
+    private val uploadService: ListUploadService,
+    private val downloadService: ListDownloadService,
 ) : ListServiceManager {
-
-    private val uploadService: ListUploadService = uploadRetrofit.create(ListUploadService::class.java)
-    private val downloadService: ListDownloadService = downloadRetrofit.create(ListDownloadService::class.java)
-
     companion object {
         private val DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
 

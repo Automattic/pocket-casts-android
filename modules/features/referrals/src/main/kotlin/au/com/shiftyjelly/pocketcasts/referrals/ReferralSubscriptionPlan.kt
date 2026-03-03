@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.referrals
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import au.com.shiftyjelly.pocketcasts.payment.InstallmentPlanDetails
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
@@ -19,6 +20,7 @@ data class ReferralSubscriptionPlan private constructor(
     val key: SubscriptionPlan.Key,
     val freePricingPhase: PricingPhase,
     val paidPricingPhase: PricingPhase,
+    val installmentPlanDetails: InstallmentPlanDetails? = null,
 ) {
     val offerName: String
         @Composable get() {
@@ -51,6 +53,43 @@ data class ReferralSubscriptionPlan private constructor(
 
     val priceAfterOffer get() = paidPricingPhase.price
 
+    val isInstallment get() = key.isInstallment
+
+    val monthlyPaymentAmount: String
+        @Composable get() = if (isInstallment) {
+            paidPricingPhase.price.formattedPrice
+        } else {
+            ""
+        }
+
+    val commitmentPaymentsCount: Int
+        get() = if (isInstallment && paidPricingPhase.schedule.period == Period.Monthly) {
+            val totalCommitment = installmentPlanDetails?.commitmentPaymentsCount ?: 0
+            val recurrenceCount = (freePricingPhase.schedule.recurrenceMode as? RecurrenceMode.Recurring)?.value ?: 0
+            val periodCount = freePricingPhase.schedule.periodCount
+            val freeMonths = recurrenceCount * periodCount
+            maxOf(0, totalCommitment - freeMonths)
+        } else {
+            0
+        }
+
+    val totalCommitmentAmount: BigDecimal
+        get() = if (isInstallment) {
+            paidPricingPhase.price.amount * commitmentPaymentsCount.toBigDecimal()
+        } else {
+            BigDecimal.ZERO
+        }
+
+    val formattedTotalCommitmentAmount: String
+        get() = if (isInstallment && totalCommitmentAmount > BigDecimal.ZERO) {
+            // Format the total using the same currency as the monthly payment, respecting locale
+            java.text.NumberFormat.getCurrencyInstance().apply {
+                currency = java.util.Currency.getInstance(paidPricingPhase.price.currencyCode)
+            }.format(totalCommitmentAmount)
+        } else {
+            ""
+        }
+
     companion object {
         fun create(plan: SubscriptionPlan.WithOffer): PaymentResult<ReferralSubscriptionPlan> {
             return when {
@@ -80,7 +119,7 @@ data class ReferralSubscriptionPlan private constructor(
                 )
 
                 else -> PaymentResult.Success(
-                    ReferralSubscriptionPlan(plan.key, plan.pricingPhases[0], plan.pricingPhases[1]),
+                    ReferralSubscriptionPlan(plan.key, plan.pricingPhases[0], plan.pricingPhases[1], plan.installmentPlanDetails),
                 )
             }
         }

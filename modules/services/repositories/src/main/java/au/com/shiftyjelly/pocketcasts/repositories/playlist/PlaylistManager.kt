@@ -19,6 +19,8 @@ interface PlaylistManager {
 
     suspend fun getAutoPlayEpisodes(playlistUuid: String, currentEpisodeUuid: String?): List<PodcastEpisode>
 
+    suspend fun getAutoDownloadPlaylists(): List<Playlist>
+
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?>
 
     fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?>
@@ -26,8 +28,6 @@ interface PlaylistManager {
     suspend fun refreshArtworkUuids(playlistUuid: String)
 
     suspend fun refreshEpisodeCount(playlistUuid: String)
-
-    suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode>
 
     suspend fun sortPlaylists(sortedUuids: List<String>)
 
@@ -70,7 +70,7 @@ interface PlaylistManager {
         searchTerm: String? = null,
     ): Flow<ManualPlaylist?>
 
-    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
+    fun playlistPreviewsForEpisodeFlow(searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
 
     suspend fun getManualEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
 
@@ -78,7 +78,9 @@ interface PlaylistManager {
 
     fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
-    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean
+    suspend fun addManualEpisodes(playlistUuid: String, episodeUuids: List<String>): Boolean
+
+    suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean = addManualEpisodes(playlistUuid, listOf(episodeUuid))
 
     suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>)
 

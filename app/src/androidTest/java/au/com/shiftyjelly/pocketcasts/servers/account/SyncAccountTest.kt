@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.account
 import android.accounts.AccountManager
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -11,11 +11,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import com.automattic.eventhorizon.EventHorizon
+import dagger.Lazy
 import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
-import okhttp3.Cache
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -24,14 +26,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import retrofit2.Retrofit
+import retrofit2.create
 
 internal class SyncAccountTest {
-
     private lateinit var context: Context
     private lateinit var mockWebServer: MockWebServer
-    private lateinit var retrofit: Retrofit
-    private lateinit var okhttpCache: Cache
     private lateinit var syncManager: SyncManager
 
     @Before
@@ -40,17 +39,21 @@ internal class SyncAccountTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = ServersModule().provideMoshi()
+        val module = NetworkModule()
+        val moshi = module.provideMoshi()
         val okHttpClient = OkHttpClient.Builder().build()
-        retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
-        okhttpCache = ServersModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
+        val retrofit = module.provideRetrofitBuilder(moshi, Dispatcher())
+            .baseUrl(mockWebServer.url("/").toString())
+            .client(okHttpClient)
+            .build()
+        val okhttpCache = NetworkModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServiceManager = SyncServiceManager(retrofit, mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,
@@ -58,13 +61,13 @@ internal class SyncAccountTest {
             moshi = moshi,
             notificationManager = mock(),
         )
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
     }
 
     @After
     fun tearDown() {
         mockWebServer.shutdown()
-        syncManager.signOut()
+        runBlocking { syncManager.signOut() }
     }
 
     @Test
@@ -140,6 +143,7 @@ internal class SyncAccountTest {
             syncManager.createUserWithEmailAndPassword(
                 email = "support+register@pocketcasts.com",
                 password = "password_register",
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Success)
@@ -185,6 +189,7 @@ internal class SyncAccountTest {
             syncManager.createUserWithEmailAndPassword(
                 email = "support@pocketcasts.com",
                 password = "password",
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Failed)

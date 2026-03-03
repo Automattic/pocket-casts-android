@@ -53,11 +53,6 @@ enum class ThemeSetting(
         serverId = 8,
         analyticsValue = "classic",
     ),
-    RADIOACTIVE(
-        id = "radioactive",
-        serverId = 9,
-        analyticsValue = "radioactive",
-    ),
     ;
 
     class UserSettingPref(
