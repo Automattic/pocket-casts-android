@@ -198,6 +198,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
+    NEXT_EPISODE_PREFETCH(
+        key = "next_episode_prefetch",
+        title = "Next Episode Prefetch",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     UP_NEXT_SYNC_PROTOBUF(
         key = "up_next_sync_protobuf",
         title = "Up Next sync with Protocol Buffers",

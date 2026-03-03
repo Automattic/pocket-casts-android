@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -63,6 +64,8 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -801,6 +804,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun stop() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Stopping playback")
 
+        cancelPrefetchNextEpisode()
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
 
@@ -1119,6 +1123,7 @@ open class PlaybackManager @Inject constructor(
 
     fun castConnected() {
         upNextQueue.currentEpisode ?: return
+        cancelPrefetchNextEpisode()
         launch {
             if (isPlayerSwitchRequired()) {
                 loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
@@ -1243,6 +1248,7 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
+        prefetchNextEpisodeIfNeeded()
     }
 
     suspend fun onPlayerPaused() {
@@ -2303,6 +2309,28 @@ open class PlaybackManager @Inject constructor(
         pauseTimerDisposable?.dispose()
     }
 
+    private fun prefetchNextEpisodeIfNeeded() {
+        val request = buildPrefetchRequest(
+            isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH),
+            isCacheEnabled = settings.cacheEntirePlayingEpisode.value,
+            isPlayerRemote = player?.isRemote,
+            nextEpisode = upNextQueue.queueEpisodes.firstOrNull(),
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            appPlatform = Util.getAppPlatform(application),
+        ) ?: return
+
+        PrefetchWorker.prefetchNextEpisode(
+            context = application,
+            episodeUuid = request.episodeUuid,
+            downloadUrl = request.downloadUrl,
+            networkConstraint = request.networkConstraint,
+        )
+    }
+
+    private fun cancelPrefetchNextEpisode() {
+        PrefetchWorker.cancelPrefetch(application)
+    }
+
     suspend fun preparePlayer() {
         val episode = upNextQueue.currentEpisode ?: return
         val currentPlayer = this.player
@@ -2473,4 +2501,42 @@ open class PlaybackManager @Inject constructor(
         OnUpdateSleepTimerStatus("updateSleepTimerStatus"),
         OnUserSeeking("onUserSeeking"),
     }
+}
+
+internal data class PrefetchRequest(
+    val episodeUuid: String,
+    val downloadUrl: String,
+    val networkConstraint: NetworkType,
+)
+
+internal fun buildPrefetchRequest(
+    isFeatureEnabled: Boolean,
+    isCacheEnabled: Boolean,
+    isPlayerRemote: Boolean?,
+    nextEpisode: BaseEpisode?,
+    warnOnMeteredNetwork: Boolean,
+    appPlatform: AppPlatform = AppPlatform.Phone,
+): PrefetchRequest? {
+    if (!isFeatureEnabled) return null
+    if (appPlatform == AppPlatform.WearOs) return null
+    if (!isCacheEnabled) return null
+    if (isPlayerRemote == true) return null
+
+    val episode = nextEpisode ?: return null
+    if (episode.isDownloaded) return null
+    if (episode.isDownloading) return null
+    if (episode.isHLS) return null
+    val url = episode.downloadUrl ?: return null
+
+    val networkConstraint = if (warnOnMeteredNetwork) {
+        NetworkType.UNMETERED
+    } else {
+        NetworkType.CONNECTED
+    }
+
+    return PrefetchRequest(
+        episodeUuid = episode.uuid,
+        downloadUrl = url,
+        networkConstraint = networkConstraint,
+    )
 }
