@@ -27,7 +27,6 @@ class PrefetchNextEpisodeTest {
         val episode = createEpisode()
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = episode,
             warnOnMeteredNetwork = false,
@@ -42,20 +41,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when feature flag is disabled`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = false,
-            isCacheEnabled = true,
-            isPlayerRemote = false,
-            nextEpisode = createEpisode(),
-            warnOnMeteredNetwork = false,
-        )
-
-        assertNull(result)
-    }
-
-    @Test
-    fun `should not prefetch when cache is disabled`() {
-        val result = buildPrefetchRequest(
-            isFeatureEnabled = true,
-            isCacheEnabled = false,
             isPlayerRemote = false,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
@@ -68,7 +53,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when player is remote`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = true,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
@@ -81,7 +65,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when queue is empty`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = null,
             warnOnMeteredNetwork = false,
@@ -94,7 +77,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when next episode is downloaded`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(downloadStatus = EpisodeDownloadStatus.Downloaded),
             warnOnMeteredNetwork = false,
@@ -107,7 +89,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when next episode is downloading`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(downloadStatus = EpisodeDownloadStatus.Downloading),
             warnOnMeteredNetwork = false,
@@ -120,7 +101,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when next episode is HLS`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(downloadUrl = "https://example.com/episode.m3u8"),
             warnOnMeteredNetwork = false,
@@ -133,7 +113,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch when download URL is null`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(downloadUrl = null),
             warnOnMeteredNetwork = false,
@@ -146,7 +125,6 @@ class PrefetchNextEpisodeTest {
     fun `should use UNMETERED constraint when warn on metered network is enabled`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = true,
@@ -159,7 +137,6 @@ class PrefetchNextEpisodeTest {
     fun `should use CONNECTED constraint when warn on metered network is disabled`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
@@ -172,7 +149,6 @@ class PrefetchNextEpisodeTest {
     fun `should not prefetch on Wear OS`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
@@ -186,7 +162,6 @@ class PrefetchNextEpisodeTest {
     fun `should prefetch when player is null`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
-            isCacheEnabled = true,
             isPlayerRemote = null,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
