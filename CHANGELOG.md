@@ -19,6 +19,8 @@
         ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
     *   Fix user file status not updating
         ([#4998](https://github.com/Automattic/pocket-casts-android/pull/4998))
+    *   Prevent category duplication in the Discover section
+        ([#5064](https://github.com/Automattic/pocket-casts-android/pull/5064))
     *   Skip metered network data warnings during Android Auto and Android Automotive playback to prevent interruptions while driving, as the option explains
         ([#5047](https://github.com/Automattic/pocket-casts-android/pull/5047))
 
