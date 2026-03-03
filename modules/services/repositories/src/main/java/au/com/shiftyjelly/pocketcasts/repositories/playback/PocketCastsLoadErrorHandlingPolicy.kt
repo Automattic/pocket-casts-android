@@ -9,12 +9,9 @@ import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.io.FileNotFoundException
-import java.util.Random
 
 @UnstableApi
-class PocketCastsLoadErrorHandlingPolicy(
-    private val random: Random = Random(),
-) : LoadErrorHandlingPolicy {
+class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
 
     override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorInfo): Long {
         val exception = loadErrorInfo.exception
@@ -26,6 +23,7 @@ class PocketCastsLoadErrorHandlingPolicy(
         if (errorCount > maxRetries) {
             LogBuffer.e(
                 LogBuffer.TAG_PLAYBACK,
+                exception,
                 "Load error retry limit reached (%d/%d) for data type %d: %s",
                 errorCount,
                 maxRetries,
@@ -39,6 +37,7 @@ class PocketCastsLoadErrorHandlingPolicy(
             ErrorClassification.NonRetryable -> {
                 LogBuffer.e(
                     LogBuffer.TAG_PLAYBACK,
+                    exception,
                     "Non-retryable load error: %s",
                     exception.message.orEmpty(),
                 )
@@ -49,6 +48,7 @@ class PocketCastsLoadErrorHandlingPolicy(
                 val delay = exponentialBackoff(errorCount)
                 LogBuffer.i(
                     LogBuffer.TAG_PLAYBACK,
+                    exception,
                     "Retryable HTTP %d error, attempt %d/%d, delay %dms",
                     classification.responseCode,
                     errorCount,
@@ -59,9 +59,10 @@ class PocketCastsLoadErrorHandlingPolicy(
             }
 
             ErrorClassification.RetryableNetwork -> {
-                val delay = exponentialBackoffWithJitter(errorCount)
+                val delay = exponentialBackoff(errorCount)
                 LogBuffer.i(
                     LogBuffer.TAG_PLAYBACK,
+                    exception,
                     "Retryable network error, attempt %d/%d, delay %dms: %s",
                     errorCount,
                     maxRetries,
@@ -113,18 +114,6 @@ class PocketCastsLoadErrorHandlingPolicy(
         return delay.coerceAtMost(MAX_DELAY_MS)
     }
 
-    @VisibleForTesting
-    internal fun exponentialBackoffWithJitter(errorCount: Int): Long {
-        val ceiling = BASE_DELAY_MS * (1L shl (errorCount - 1).coerceAtMost(MAX_SHIFT))
-        val cappedCeiling = ceiling.coerceAtMost(MAX_DELAY_MS)
-        val range = cappedCeiling - MIN_JITTER_DELAY_MS
-        return if (range <= 0) {
-            MIN_JITTER_DELAY_MS
-        } else {
-            MIN_JITTER_DELAY_MS + random.nextLong(range)
-        }
-    }
-
     private fun maxRetriesForDataType(dataType: Int): Int {
         return when (dataType) {
             C.DATA_TYPE_MEDIA -> MAX_RETRIES_MEDIA
@@ -143,23 +132,9 @@ class PocketCastsLoadErrorHandlingPolicy(
     internal companion object {
         const val BASE_DELAY_MS = 1_000L
         const val MAX_DELAY_MS = 30_000L
-        const val MIN_JITTER_DELAY_MS = 500L
         const val MAX_RETRIES_MEDIA = 6
         const val MAX_RETRIES_MANIFEST = 4
         const val MAX_RETRIES_OTHER = 3
         private const val MAX_SHIFT = 20
     }
-}
-
-private fun Random.nextLong(bound: Long): Long {
-    if (bound <= Int.MAX_VALUE) {
-        return nextInt(bound.toInt()).toLong()
-    }
-    var bits: Long
-    var value: Long
-    do {
-        bits = (nextLong() ushr 1)
-        value = bits % bound
-    } while (bits - value + (bound - 1) < 0L)
-    return value
 }

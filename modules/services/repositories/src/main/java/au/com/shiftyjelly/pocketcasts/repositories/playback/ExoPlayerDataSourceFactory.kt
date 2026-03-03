@@ -93,17 +93,14 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         )
 
         val dataFactory = cacheFactory ?: defaultFactory
-        val loadErrorPolicy = PocketCastsLoadErrorHandlingPolicy()
-        return when {
+        val factory = when {
             episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
-                .setLoadErrorHandlingPolicy(loadErrorPolicy)
-
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
-                .setLoadErrorHandlingPolicy(loadErrorPolicy)
-
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
-                .setLoadErrorHandlingPolicy(loadErrorPolicy)
-        }.createMediaSource(mediaItem)
+        }
+        return factory
+            .setLoadErrorHandlingPolicy(PocketCastsLoadErrorHandlingPolicy())
+            .createMediaSource(mediaItem)
     }
 
     private fun startCachingEntireEpisodeIfNeeded(

@@ -15,11 +15,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadError
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MANIFEST
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MEDIA
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_OTHER
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MIN_JITTER_DELAY_MS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.ErrorClassification
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.util.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -30,8 +28,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class PocketCastsLoadErrorHandlingPolicyTest {
 
-    private val seededRandom = Random(42)
-    private val policy = PocketCastsLoadErrorHandlingPolicy(random = seededRandom)
+    private val policy = PocketCastsLoadErrorHandlingPolicy()
 
     // region Error Classification — HTTP codes
 
@@ -154,41 +151,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
 
     // endregion
 
-    // region Exponential Backoff with Jitter
-
-    @Test
-    fun `jitter delay is within expected bounds`() {
-        val jitterPolicy = PocketCastsLoadErrorHandlingPolicy(random = Random(0))
-        repeat(100) {
-            for (errorCount in 1..6) {
-                val delay = jitterPolicy.exponentialBackoffWithJitter(errorCount)
-                val ceiling = (BASE_DELAY_MS * (1L shl (errorCount - 1))).coerceAtMost(MAX_DELAY_MS)
-                assertTrue(
-                    "Delay $delay should be >= $MIN_JITTER_DELAY_MS",
-                    delay >= MIN_JITTER_DELAY_MS,
-                )
-                assertTrue(
-                    "Delay $delay should be < $ceiling",
-                    delay < ceiling,
-                )
-            }
-        }
-    }
-
-    @Test
-    fun `jitter delay with seeded random is deterministic`() {
-        val policy1 = PocketCastsLoadErrorHandlingPolicy(random = Random(123))
-        val policy2 = PocketCastsLoadErrorHandlingPolicy(random = Random(123))
-        for (errorCount in 1..6) {
-            assertEquals(
-                policy1.exponentialBackoffWithJitter(errorCount),
-                policy2.exponentialBackoffWithJitter(errorCount),
-            )
-        }
-    }
-
-    // endregion
-
     // region getRetryDelayMsFor — integration
 
     @Test
@@ -267,22 +229,16 @@ class PocketCastsLoadErrorHandlingPolicyTest {
     }
 
     @Test
-    fun `network IOException uses jitter-based delay`() {
-        val policy1 = PocketCastsLoadErrorHandlingPolicy(random = Random(99))
-        val policy2 = PocketCastsLoadErrorHandlingPolicy(random = Random(99))
-        val loadErrorInfo1 = createLoadErrorInfo(
+    fun `network IOException uses exponential backoff delay`() {
+        val errorCount = 3
+        val loadErrorInfo = createLoadErrorInfo(
             exception = IOException("network"),
-            errorCount = 3,
-            dataType = C.DATA_TYPE_MEDIA,
-        )
-        val loadErrorInfo2 = createLoadErrorInfo(
-            exception = IOException("network"),
-            errorCount = 3,
+            errorCount = errorCount,
             dataType = C.DATA_TYPE_MEDIA,
         )
         assertEquals(
-            policy1.getRetryDelayMsFor(loadErrorInfo1),
-            policy2.getRetryDelayMsFor(loadErrorInfo2),
+            policy.exponentialBackoff(errorCount),
+            policy.getRetryDelayMsFor(loadErrorInfo),
         )
     }
 
