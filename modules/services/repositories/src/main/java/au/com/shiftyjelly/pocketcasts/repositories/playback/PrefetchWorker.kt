@@ -99,7 +99,7 @@ class PrefetchWorker @AssistedInject constructor(
                 .build()
 
             WorkManager.getInstance(context)
-                .enqueueUniqueWork(PREFETCH_WORKER_TAG, ExistingWorkPolicy.KEEP, workRequest)
+                .enqueueUniqueWork(PREFETCH_WORKER_TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
         fun cancelPrefetch(context: Context) {

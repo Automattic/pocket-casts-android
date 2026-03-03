@@ -97,6 +97,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -263,6 +264,18 @@ open class PlaybackManager @Inject constructor(
                 }
             })
             playbackManagerNetworkWatcher.observeConnection()
+        }
+
+        launch {
+            upNextQueue.changesObservable.asFlow()
+                .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.firstOrNull()?.uuid }
+                .distinctUntilChanged()
+                .collect {
+                    lastPrefetchedEpisodeUuid = null
+                    if (isPlaying()) {
+                        prefetchNextEpisodeIfNeeded()
+                    }
+                }
         }
     }
 
