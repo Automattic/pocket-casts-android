@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -210,9 +212,12 @@ class SimplePlayer(
             .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
-            .setWakeMode(if (isStreaming) C.WAKE_MODE_NETWORK else C.WAKE_MODE_LOCAL)
-            .setAudioAttributes(buildAudioAttributes(), false)
             .build()
+
+        if (FeatureFlag.isEnabled(Feature.AUDIO_OFFLOAD)) {
+            player.setWakeMode(if (isStreaming) C.WAKE_MODE_NETWORK else C.WAKE_MODE_LOCAL)
+            player.setAudioAttributes(buildAudioAttributes(), false)
+        }
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
         player.addAnalyticsListener(renderer)
 
@@ -220,7 +225,9 @@ class SimplePlayer(
         this.player = player
 
         setPlayerEffects()
-        updateAudioOffloadPreference()
+        if (playbackEffects == null && FeatureFlag.isEnabled(Feature.AUDIO_OFFLOAD)) {
+            updateAudioOffloadPreference()
+        }
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 episodeUuid?.let { onEpisodeChanged(it) }
@@ -380,6 +387,8 @@ class SimplePlayer(
             it.setBoostVolume(playbackEffects.isVolumeBoosted)
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
-        updateAudioOffloadPreference()
+        if (FeatureFlag.isEnabled(Feature.AUDIO_OFFLOAD)) {
+            updateAudioOffloadPreference()
+        }
     }
 }
