@@ -55,8 +55,9 @@ class CategoriesManager @Inject constructor(
                 addAll((groupedBySponsoredWithVisits[false] ?: emptyList()).map { it.copy(isSponsored = false) })
 
                 if (size < FEATURED_CATEGORY_COUNT) {
+                    val existingIds = map { it.id }.toSet()
                     val popularFillers = categories
-                        .filter { !contains(it) }
+                        .filterNot { it.id in existingIds }
                         .filter { it.id in rowInfo.popularCategoryIds }
                         .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
                         .take(FEATURED_CATEGORY_COUNT - size)
