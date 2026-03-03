@@ -14,6 +14,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PullToRefreshSource
+import com.automattic.eventhorizon.PulledToRefreshEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +32,7 @@ class CloudFilesViewModel @Inject constructor(
     private val settings: Settings,
     userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
 ) : ViewModel() {
@@ -60,13 +64,12 @@ class CloudFilesViewModel @Inject constructor(
     fun refreshFiles(userInitiated: Boolean) {
         viewModelScope.launch {
             if (userInitiated) {
-                analyticsTracker.track(
-                    AnalyticsEvent.PULLED_TO_REFRESH,
-                    mapOf(
-                        "source" to when (cloudFilesManager.sortedCloudFiles.firstOrNull()?.isEmpty()) {
-                            true -> "no_files"
-                            false -> "files"
-                            else -> "unknown"
+                eventHorizon.track(
+                    PulledToRefreshEvent(
+                        source = when (cloudFilesManager.sortedCloudFiles.firstOrNull()?.isEmpty()) {
+                            true -> PullToRefreshSource.NoFiles
+                            false -> PullToRefreshSource.Files
+                            else -> PullToRefreshSource.Unknown
                         },
                     ),
                 )
