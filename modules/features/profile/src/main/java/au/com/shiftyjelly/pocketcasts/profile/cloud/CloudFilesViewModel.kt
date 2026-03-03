@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -17,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PullToRefreshSource
 import com.automattic.eventhorizon.PulledToRefreshEvent
+import com.automattic.eventhorizon.UploadedFilesSortByChangedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +30,6 @@ class CloudFilesViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
     userManager: UserManager,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
@@ -79,9 +77,10 @@ class CloudFilesViewModel @Inject constructor(
     }
 
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
-        analyticsTracker.track(
-            AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-            mapOf(SORT_BY to sortOrder.analyticsValue),
+        eventHorizon.track(
+            UploadedFilesSortByChangedEvent(
+                sortBy = sortOrder.eventHorizonValue,
+            ),
         )
         settings.cloudSortOrder.set(sortOrder, updateModifiedAt = true)
     }

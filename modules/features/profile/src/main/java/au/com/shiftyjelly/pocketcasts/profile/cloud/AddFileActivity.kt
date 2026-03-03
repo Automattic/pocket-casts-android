@@ -35,8 +35,6 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -66,6 +64,9 @@ import coil3.target.Target
 import coil3.toBitmap
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
+import com.automattic.eventhorizon.UploadedFilesInvalidFileErrorEvent
+import com.automattic.eventhorizon.UploadedFilesUploadFailedEvent
+import com.automattic.eventhorizon.UserFileEditSaveEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
@@ -146,8 +147,6 @@ class AddFileActivity :
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Inject lateinit var settings: Settings
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var eventHorizon: EventHorizon
 
@@ -476,7 +475,7 @@ class AddFileActivity :
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_save -> {
-                analyticsTracker.track(AnalyticsEvent.USER_FILE_EDIT_SAVE)
+                eventHorizon.track(UserFileEditSaveEvent)
                 saveFile()
                 true
             }
@@ -503,7 +502,11 @@ class AddFileActivity :
         }
 
         if (isUriInvalid(uri)) {
-            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_INVALID_FILE_ERROR, mapOf("uri" to uri.toString()))
+            eventHorizon.track(
+                UploadedFilesInvalidFileErrorEvent(
+                    uri = uri.toString(),
+                ),
+            )
 
             Timber.e("Could not upload invalid file")
 
@@ -548,7 +551,11 @@ class AddFileActivity :
                         }
                     }
                 } catch (e: Exception) {
-                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_UPLOAD_FAILED, mapOf("uri" to uri.toString()))
+                    eventHorizon.track(
+                        UploadedFilesUploadFailedEvent(
+                            uri = uri.toString(),
+                        ),
+                    )
 
                     Timber.e(e, "Could not load file")
 
