@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -133,7 +134,7 @@ internal class CategoriesManagerTest {
 
         categoriesManager.state.test {
             val state = awaitItem()
-            assert(state is CategoriesManager.State.Idle)
+            assertTrue(state is CategoriesManager.State.Idle)
             val featuredIds = (state as CategoriesManager.State.Idle).featuredCategories.map { it.id }
             assertEquals("Category 3 should not appear twice", 1, featuredIds.count { it == 3 })
             assertEquals(listOf(3, 0, 1, 2, 4, 5), featuredIds)
