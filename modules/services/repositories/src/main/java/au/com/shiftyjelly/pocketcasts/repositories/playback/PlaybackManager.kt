@@ -210,6 +210,7 @@ open class PlaybackManager @Inject constructor(
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
+    private var lastPrefetchedEpisodeUuid: String? = null
 
     private val resumptionHelper = ResumptionHelper(settings)
 
@@ -2319,6 +2320,9 @@ open class PlaybackManager @Inject constructor(
             appPlatform = Util.getAppPlatform(application),
         ) ?: return
 
+        if (request.episodeUuid == lastPrefetchedEpisodeUuid) return
+        lastPrefetchedEpisodeUuid = request.episodeUuid
+
         PrefetchWorker.prefetchNextEpisode(
             context = application,
             episodeUuid = request.episodeUuid,
@@ -2328,6 +2332,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun cancelPrefetchNextEpisode() {
+        lastPrefetchedEpisodeUuid = null
         PrefetchWorker.cancelPrefetch(application)
     }
 
