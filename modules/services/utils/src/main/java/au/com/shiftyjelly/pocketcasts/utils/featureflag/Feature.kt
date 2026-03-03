@@ -116,14 +116,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SMART_CATEGORIES(
-        key = "smart_categories",
-        title = "Smart Categories",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     SHARE_TRANSCRIPTS(
         key = "share_transcripts",
         title = "Share transcripts",
