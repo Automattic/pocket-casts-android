@@ -211,6 +211,8 @@ open class PlaybackManager @Inject constructor(
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
+
+    @Volatile
     private var lastPrefetchedEpisodeUuid: String? = null
 
     private val resumptionHelper = ResumptionHelper(settings)
@@ -2326,7 +2328,6 @@ open class PlaybackManager @Inject constructor(
     private fun prefetchNextEpisodeIfNeeded() {
         val request = buildPrefetchRequest(
             isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH),
-            isCacheEnabled = settings.cacheEntirePlayingEpisode.value,
             isPlayerRemote = player?.isRemote,
             nextEpisode = upNextQueue.queueEpisodes.firstOrNull(),
             warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
@@ -2529,7 +2530,6 @@ internal data class PrefetchRequest(
 
 internal fun buildPrefetchRequest(
     isFeatureEnabled: Boolean,
-    isCacheEnabled: Boolean,
     isPlayerRemote: Boolean?,
     nextEpisode: BaseEpisode?,
     warnOnMeteredNetwork: Boolean,
@@ -2537,7 +2537,6 @@ internal fun buildPrefetchRequest(
 ): PrefetchRequest? {
     if (!isFeatureEnabled) return null
     if (appPlatform == AppPlatform.WearOs) return null
-    if (!isCacheEnabled) return null
     if (isPlayerRemote == true) return null
 
     val episode = nextEpisode ?: return null
