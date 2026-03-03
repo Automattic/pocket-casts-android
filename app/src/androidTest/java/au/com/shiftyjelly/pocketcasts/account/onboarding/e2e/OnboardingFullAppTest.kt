@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import au.com.shiftyjelly.pocketcasts.account.onboarding.testutil.OnboardingTestConstants
 import au.com.shiftyjelly.pocketcasts.account.onboarding.testutil.OnboardingTestCredentials
+import au.com.shiftyjelly.pocketcasts.account.onboarding.testutil.OnboardingStateResetRule
 import au.com.shiftyjelly.pocketcasts.account.onboarding.pageobject.EmailSignUpPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.pageobject.InterestsSelectionPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.pageobject.OnboardingWelcomePage
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingFullAppTest {
 
     private val radiographyRule = RadiographyDumpRule()
+    private val onboardingStateResetRule = OnboardingStateResetRule()
 
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
@@ -35,7 +37,8 @@ class OnboardingFullAppTest {
     private val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @get:Rule
-    val ruleChain: RuleChain = RuleChain.outerRule(activityRule)
+    val ruleChain: RuleChain = RuleChain.outerRule(onboardingStateResetRule)
+        .around(activityRule)
         .around(radiographyRule)
 
     @OptIn(ExperimentalTestApi::class)
