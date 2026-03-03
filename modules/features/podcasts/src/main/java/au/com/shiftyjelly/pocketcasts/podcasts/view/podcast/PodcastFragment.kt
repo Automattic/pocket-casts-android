@@ -96,6 +96,11 @@ import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderChooseFolderTappedEvent
+import com.automattic.eventhorizon.FolderChooseShownEvent
+import com.automattic.eventhorizon.FolderPodcastModalOptionTappedEvent
+import com.automattic.eventhorizon.FolderPodcastModalOptionType
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -117,15 +122,11 @@ class PodcastFragment : BaseFragment() {
 
     companion object {
         private const val NEW_INSTANCE_ARGS = "PodcastFragmentArgs"
-        private const val OPTION_KEY = "option"
         private const val IS_EXPANDED_KEY = "is_expanded"
         private const val PODCAST_UUID_KEY = "podcast_uuid"
         private const val LIST_ID_KEY = "list_id"
         private const val EPISODE_UUID_KEY = "episode_uuid"
         private const val SOURCE_KEY = "source"
-        private const val REMOVE = "remove"
-        private const val CHANGE = "change"
-        private const val GO_TO = "go_to"
         private const val EPISODE_CARD = "episode_card"
 
         fun newInstance(
@@ -161,6 +162,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var colorAnalyzer: PodcastImageColorAnalyzer
@@ -537,27 +541,39 @@ class PodcastFragment : BaseFragment() {
             }
             val folder = viewModel.getFolder()
             if (folder == null) {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_SHOWN)
+                eventHorizon.track(FolderChooseShownEvent)
                 FolderChooserFragment
                     .newInstance(viewModel.podcastUuid)
                     .show(parentFragmentManager, "folder_chooser_fragment")
                 return@launch
             }
-            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_FOLDER_TAPPED)
+            eventHorizon.track(FolderChooseFolderTappedEvent)
             val dialog = PodcastFolderOptionsDialog(
                 folder = folder,
                 onRemoveFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to REMOVE))
+                    eventHorizon.track(
+                        FolderPodcastModalOptionTappedEvent(
+                            option = FolderPodcastModalOptionType.Remove,
+                        ),
+                    )
                     viewModel.removeFromFolder()
                 },
                 onChangeFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CHANGE))
+                    eventHorizon.track(
+                        FolderPodcastModalOptionTappedEvent(
+                            option = FolderPodcastModalOptionType.Change,
+                        ),
+                    )
                     FolderChooserFragment
                         .newInstance(viewModel.podcastUuid)
                         .show(parentFragmentManager, "folder_chooser_fragment")
                 },
                 onOpenFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to GO_TO))
+                    eventHorizon.track(
+                        FolderPodcastModalOptionTappedEvent(
+                            option = FolderPodcastModalOptionType.GoTo,
+                        ),
+                    )
                     val fragment = PodcastsFragment.newInstance(folderUuid = folder.uuid)
                     (activity as FragmentHostListener).addFragment(fragment)
                 },

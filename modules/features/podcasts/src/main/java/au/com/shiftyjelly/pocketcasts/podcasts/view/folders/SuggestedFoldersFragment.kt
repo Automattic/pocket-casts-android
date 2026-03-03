@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.CreateFolderSource
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
@@ -182,7 +183,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         viewModel.trackCreateCustomFolderTapped()
         if (isUserPlusOrPatreon) {
             FolderCreateFragment
-                .newInstance(source = "suggested_folders")
+                .newInstance(source = CreateFolderSource.SuggestedFolders)
                 .show(parentFragmentManager, "create_folder_card")
             finalizeAndDismiss()
         } else {

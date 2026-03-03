@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -24,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipShownEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderShownEvent
 import com.automattic.eventhorizon.PodcastsListReorderedEvent
 import com.automattic.eventhorizon.PodcastsListShownEvent
 import com.automattic.eventhorizon.PullToRefreshSource
@@ -58,7 +57,6 @@ class PodcastsViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val folderManager: FolderManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
@@ -287,11 +285,12 @@ class PodcastsViewModel @AssistedInject constructor(
 
     private fun trackFolderShown(folderUuid: String) {
         viewModelScope.launch {
-            val properties = mapOf(
-                SORT_ORDER_KEY to (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).analyticsValue,
-                NUMBER_OF_PODCASTS_KEY to folderManager.findFolderPodcastsSorted(folderUuid).size,
+            eventHorizon.track(
+                FolderShownEvent(
+                    sortOrder = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).eventHorizonValue,
+                    numberOfPodcasts = folderManager.findFolderPodcastsSorted(folderUuid).size.toLong(),
+                ),
             )
-            analyticsTracker.track(AnalyticsEvent.FOLDER_SHOWN, properties)
         }
     }
 
@@ -336,12 +335,4 @@ class PodcastsViewModel @AssistedInject constructor(
         val hasPermission: Boolean,
         val hasShownPromptBefore: Boolean,
     )
-
-    companion object {
-        private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"
-        private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
-        private const val BADGE_TYPE_KEY = "badge_type"
-        private const val LAYOUT_KEY = "layout"
-        private const val SORT_ORDER_KEY = "sort_order"
-    }
 }
