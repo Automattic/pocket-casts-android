@@ -34,9 +34,9 @@ template below. Fill in every section:
    - `[Type] Core` — Core infrastructure changes.
    - `[Type] Other` — Issues not covered by other types, such as refactoring and documentation.
 4. Add an `[Area]` label that matches the changes. Run `gh label list --search "[Area]"` to find the best match, then apply with `gh pr edit --add-label`.
-5. Set the milestone to the current one (not past its due date). Run `gh api repos/Automattic/pocket-casts-android/milestones --jq '.[] | select(.due_on >= (now | todate)) | .title'` to find it, then apply with `gh pr edit --milestone`.
+5. Set the milestone to the current one (not past its due date). Run `gh api repos/Automattic/pocket-casts-android/milestones --jq '[.[] | select(.due_on != null and (.due_on | fromdateiso8601) >= now)] | sort_by(.due_on) | .[0].title'` to find it, then apply with `gh pr edit --milestone`.
 6. After creating the PR, output the PR URL.
 
 ## PR Template
 
-!`cat .github/pull_request_template.md`
+![[.github/pull_request_template.md]]
