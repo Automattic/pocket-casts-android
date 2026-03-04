@@ -2,7 +2,7 @@
 name: create-pr
 description: Create a pull request
 disable-model-invocation: true
-allowed-tools: Read, Bash(gh *), Bash(git *)
+allowed-tools: Read, Bash(git diff *), Bash(git log *), Bash(gh pr create *), Bash(gh pr edit *), Bash(gh label list *), Bash(gh api *)
 ---
 
 # Create Pull Request
