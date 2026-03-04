@@ -6,12 +6,13 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.widget.Toast
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerSleepTimerRestartedEvent
+import com.automattic.eventhorizon.SleepTimerRestartSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 class SleepTimerRestartWhenShakingDevice @Inject constructor(
     private val sleepTimer: SleepTimer,
     private var playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) : SensorEventListener {
@@ -89,17 +90,13 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
         val currentTime = System.currentTimeMillis().milliseconds
         val elapsedTime: Duration? = lastTrackTime?.let { currentTime - it }
         if (elapsedTime == null || elapsedTime >= 3.seconds) { // Make sure we don't send the same report in 3 seconds
-            analyticsTracker.track(
-                PLAYER_SLEEP_TIMER_RESTARTED,
-                mapOf(TIME_KEY to time.inWholeSeconds, REASON_KEY to DEVICE_SHAKE_VALUE),
+            eventHorizon.track(
+                PlayerSleepTimerRestartedEvent(
+                    seconds = time.inWholeSeconds,
+                    source = SleepTimerRestartSource.Shake,
+                ),
             )
             lastTrackTime = currentTime
         }
-    }
-
-    companion object {
-        private const val TIME_KEY = "time"
-        private const val REASON_KEY = "reason"
-        private const val DEVICE_SHAKE_VALUE = "device_shake"
     }
 }

@@ -43,6 +43,9 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerTabSelectedEvent
+import com.automattic.eventhorizon.PlayerTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +57,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class PlayerContainerFragment :
@@ -65,6 +67,10 @@ class PlayerContainerFragment :
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
+
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     var upNextBottomSheetBehavior: BottomSheetBehavior<View>? = null
@@ -172,27 +178,37 @@ class PlayerContainerFragment :
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                when {
+                val tab = when {
                     adapter.isPlayerTab(position) -> {
-                        if (previousPosition == INVALID_TAB_POSITION) return
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "now_playing"))
+                        if (previousPosition == INVALID_TAB_POSITION) {
+                            return
+                        }
+                        PlayerTabType.NowPlaying
                     }
 
                     adapter.isNotesTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "show_notes"))
+                        PlayerTabType.ShowNotes
                     }
 
                     adapter.isBookmarksTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "bookmarks"))
+                        PlayerTabType.Bookmarks
                     }
 
                     adapter.isChaptersTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "chapters"))
+                        PlayerTabType.Chapters
                     }
 
                     else -> {
                         Timber.e("Invalid tab selected")
+                        null
                     }
+                }
+                tab?.let { tab ->
+                    eventHorizon.track(
+                        PlayerTabSelectedEvent(
+                            tab = tab,
+                        ),
+                    )
                 }
                 previousPosition = position
             }

@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerSleepTimerRestartedEvent
+import com.automattic.eventhorizon.SleepTimerRestartSource
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
@@ -18,15 +19,10 @@ import kotlinx.coroutines.flow.update
 @Singleton
 class SleepTimer @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) {
     companion object {
         private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 1.minutes
-        private const val TIME_KEY = "time"
-        private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
-        private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
-        private const val END_OF_EPISODE_VALUE = "end_of_episode"
-        private const val END_OF_CHAPTER_VALUE = "end_of_chapter"
         const val TAG: String = "SleepTimer"
     }
 
@@ -112,7 +108,12 @@ class SleepTimer @Inject constructor(
                     val chapter = settings.getlastSleepEndOfChapter()
                     LogBuffer.i(TAG, "Sleep timer was restarted with end of $chapter chapter set")
                     updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
-                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to settings.getlastSleepEndOfChapter()))
+                    eventHorizon.track(
+                        PlayerSleepTimerRestartedEvent(
+                            numberOfChapters = settings.getlastSleepEndOfChapter().toLong(),
+                            source = SleepTimerRestartSource.Player,
+                        ),
+                    )
                 }
             }
 
@@ -121,14 +122,24 @@ class SleepTimer @Inject constructor(
                     val episodes = settings.getlastSleepEndOfEpisodes()
                     LogBuffer.i(TAG, "Sleep timer was restarted with end of $episodes episodes set")
                     updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
-                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to settings.getlastSleepEndOfEpisodes()))
+                    eventHorizon.track(
+                        PlayerSleepTimerRestartedEvent(
+                            numberOfEpisodes = settings.getlastSleepEndOfEpisodes().toLong(),
+                            source = SleepTimerRestartSource.Player,
+                        ),
+                    )
                 }
             }
 
             is SleepTimerHistory.AfterTime -> {
                 if (shouldRestartSleepAfterTime(diffTime, state.isSleepTimerRunning)) {
                     sleepAfter(history.lastSleepAfterTime)
-                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to history.lastSleepAfterTime.inWholeSeconds))
+                    eventHorizon.track(
+                        PlayerSleepTimerRestartedEvent(
+                            seconds = history.lastSleepAfterTime.inWholeSeconds,
+                            source = SleepTimerRestartSource.Player,
+                        ),
+                    )
                     LogBuffer.i(TAG, "Was restarted with ${history.lastSleepAfterTime.inWholeMinutes} minutes set")
                 }
             }

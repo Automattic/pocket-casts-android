@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Companion.MIN_SHELF_ITEMS_SIZE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -11,6 +9,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeStartedEvent
+import com.automattic.eventhorizon.ShelfActionSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -30,7 +33,7 @@ class ShelfViewModel @AssistedInject constructor(
     @Assisted private val episodeId: String,
     @Assisted private val isEditable: Boolean,
     private val transcriptManager: TranscriptManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
@@ -119,32 +122,33 @@ class ShelfViewModel @AssistedInject constructor(
         settings.shelfItems.set(_uiState.value.shelfRowItems.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
     }
 
-    private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+    private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) {
+        ShelfActionSource.Shelf
+    } else {
+        ShelfActionSource.OverflowMenu
+    }
 
     fun onEditButtonClick() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
+        eventHorizon.track(PlayerShelfOverflowMenuRearrangeStartedEvent)
     }
 
     fun onDismiss() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
+        eventHorizon.track(PlayerShelfOverflowMenuRearrangeFinishedEvent)
     }
 
     fun trackShelfItemMovedEvent(fromPosition: Int, toPosition: Int, shelfItem: ShelfItem) {
-        val title = shelfItem.analyticsValue
         val movedFrom = sectionTitleAt(fromPosition)
         val movedTo = sectionTitleAt(toPosition)
-        val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
-            toPosition - 1
-        } else {
-            toPosition - (_uiState.value.shelfRowItems.indexOf(moreActionsTitle) + 1)
+        val newPosition = when (movedTo) {
+            ShelfActionSource.Shelf -> toPosition - 1
+            ShelfActionSource.OverflowMenu -> toPosition - (_uiState.value.shelfRowItems.indexOf(moreActionsTitle) + 1)
         }
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-            mapOf(
-                AnalyticsProp.Key.ACTION to title,
-                AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
-                AnalyticsProp.Key.MOVED_FROM to movedFrom,
-                AnalyticsProp.Key.MOVED_TO to movedTo,
+        eventHorizon.track(
+            PlayerShelfOverflowMenuRearrangeActionMovedEvent(
+                action = shelfItem.eventHorizonValue,
+                position = newPosition.toLong(),
+                movedFrom = movedFrom,
+                movedTo = movedTo,
             ),
         )
     }
@@ -164,18 +168,8 @@ class ShelfViewModel @AssistedInject constructor(
 
         object AnalyticsProp {
             object Key {
-                const val ACTION = "action"
-                const val MOVED_FROM = "moved_from"
-                const val MOVED_TO = "moved_to"
-                const val POSITION = "position"
                 const val SOURCE = "source"
                 const val EPISODE_UUID = "episode_uuid"
-            }
-
-            object Value {
-                const val SHELF = "shelf"
-                const val OVERFLOW_MENU = "overflow_menu"
-                const val UNKNOWN = "unknown"
             }
         }
     }
