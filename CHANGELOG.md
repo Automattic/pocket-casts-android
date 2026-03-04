@@ -12,6 +12,8 @@
         ([#4976](https://github.com/Automattic/pocket-casts-android/pull/4976))
     *   This release includes a rewrite of the download system, making downloads more reliable and surfacing issues with additional details; if you manually queued any downloads before this update and they did not complete, you will need to queue them again. Auto downloads will resume as usual after you refresh the app from the Profile page or when the app refreshes automatically.
         ([#5017](https://github.com/Automattic/pocket-casts-android/pull/5017))
+    *   Retry playing streamed episodes in case of failures.
+        ([#5060](https://github.com/Automattic/pocket-casts-android/pull/5060))
     *   Optimize battery usage by enabling audio offload mode
         ([#5059](https://github.com/Automattic/pocket-casts-android/pull/5059))
 *   Bug Fixes
