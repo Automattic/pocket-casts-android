@@ -4,8 +4,6 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
@@ -48,29 +46,21 @@ class CategoriesManager @Inject constructor(
             State.Selected(selectedCategory, categories, areAllShown)
         } else {
             val featuredCategories = buildList {
-                if (FeatureFlag.isEnabled(Feature.SMART_CATEGORIES)) {
-                    val categoriesWithVisits = categories
-                        .filter { it.totalVisits > 0 }
-                        .sortedByDescending { it.totalVisits }
-                    val groupedBySponsoredWithVisits = categoriesWithVisits.groupBy { rowInfo.sponsoredCategoryIds.contains(it.id) }
+                val categoriesWithVisits = categories
+                    .filter { it.totalVisits > 0 }
+                    .sortedByDescending { it.totalVisits }
+                val groupedBySponsoredWithVisits = categoriesWithVisits.groupBy { rowInfo.sponsoredCategoryIds.contains(it.id) }
 
-                    addAll((groupedBySponsoredWithVisits[true] ?: emptyList()).map { it.copy(isSponsored = true) })
-                    addAll((groupedBySponsoredWithVisits[false] ?: emptyList()).map { it.copy(isSponsored = false) })
+                addAll((groupedBySponsoredWithVisits[true] ?: emptyList()).map { it.copy(isSponsored = true) })
+                addAll((groupedBySponsoredWithVisits[false] ?: emptyList()).map { it.copy(isSponsored = false) })
 
-                    if (size < FEATURED_CATEGORY_COUNT) {
-                        val popularFillers = categories
-                            .filter { !contains(it) }
-                            .filter { it.id in rowInfo.popularCategoryIds }
-                            .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
-                            .take(FEATURED_CATEGORY_COUNT - size)
-                        addAll(popularFillers)
-                    }
-                } else {
-                    addAll(
-                        categories
-                            .filter { it.id in rowInfo.popularCategoryIds }
-                            .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) },
-                    )
+                if (size < FEATURED_CATEGORY_COUNT) {
+                    val popularFillers = categories
+                        .filter { !contains(it) }
+                        .filter { it.id in rowInfo.popularCategoryIds }
+                        .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
+                        .take(FEATURED_CATEGORY_COUNT - size)
+                    addAll(popularFillers)
                 }
             }.ifEmpty {
                 categories
