@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.activity.SystemBarStyle
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -35,7 +33,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -61,7 +58,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -79,6 +75,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.bars.custom
+import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
@@ -126,8 +124,12 @@ internal fun OnboardingUpgradeFeaturesPage(
         viewModel.onShown(flow, source)
     }
 
-    val scrollState = rememberScrollState()
-    SetStatusBarBackground(scrollState, onUpdateSystemBars)
+    val pocketCastsTheme = MaterialTheme.theme
+    LaunchedEffect(onUpdateSystemBars) {
+        val statusBar = SystemBarStyle.custom(Color.Transparent, pocketCastsTheme.isDark)
+        val navigationBar = SystemBarStyle.transparent { pocketCastsTheme.isDark }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
+    }
 
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit
@@ -511,32 +513,6 @@ internal fun UpgradeButton(
                 modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars),
             )
         }
-    }
-}
-
-@Composable
-private fun SetStatusBarBackground(
-    scrollState: ScrollState,
-    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
-) {
-    val hasScrolled = scrollState.value > 0
-
-    val scrimAlpha: Float by animateFloatAsState(
-        targetValue = if (hasScrolled) 0.6f else 0f,
-        animationSpec = tween(durationMillis = 400),
-        label = "scrimAlpha",
-    )
-
-    val statusBarBackground = if (scrimAlpha > 0) {
-        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha).toArgb()
-    } else {
-        Color.Transparent.toArgb()
-    }
-
-    LaunchedEffect(statusBarBackground, onUpdateSystemBars) {
-        val statusBar = SystemBarStyle.dark(statusBarBackground)
-        val navigationBar = SystemBarStyle.dark(Color.Transparent.toArgb())
-        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 }
 
