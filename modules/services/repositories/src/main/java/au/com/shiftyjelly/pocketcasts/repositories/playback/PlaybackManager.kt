@@ -16,7 +16,6 @@ import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -68,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.AutoplayFinishedLastEpisodeEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlaybackChapterSkippedEvent
 import com.automattic.eventhorizon.PlaybackContentType
@@ -142,7 +142,6 @@ open class PlaybackManager @Inject constructor(
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
@@ -1452,7 +1451,11 @@ open class PlaybackManager @Inject constructor(
             AppPlatform.Phone -> {
                 if (episodeWithSource != null) {
                     val (_, source) = episodeWithSource
-                    analyticsTracker.track(AnalyticsEvent.AUTOPLAY_FINISHED_LAST_EPISODE, mapOf("episode_source" to source.analyticsValue))
+                    eventHorizon.track(
+                        AutoplayFinishedLastEpisodeEvent(
+                            episodeSource = source.analyticsValue,
+                        ),
+                    )
                 }
                 episodeWithSource?.first
             }
@@ -2101,7 +2104,7 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
-        trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
+        trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackPlayEvent(
                 source = source.eventHorizonValue,
                 contentType = contentType,

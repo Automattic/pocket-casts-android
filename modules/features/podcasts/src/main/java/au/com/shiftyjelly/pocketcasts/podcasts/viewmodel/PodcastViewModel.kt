@@ -51,7 +51,6 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastRefreshType
 import com.automattic.eventhorizon.PodcastScreenFundingTappedEvent
 import com.automattic.eventhorizon.PodcastScreenNotificationsTappedEvent
-import com.automattic.eventhorizon.PodcastScreenPodcastDetailsLinkTappedEvent
 import com.automattic.eventhorizon.PodcastScreenPodrollInformationModelShownEvent
 import com.automattic.eventhorizon.PodcastScreenPodrollPodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastScreenPodrollPodcastTappedEvent

@@ -64,8 +64,6 @@ enum class SourceView(val analyticsValue: String) {
 
     val eventHorizonValue get() = EVENT_MAP[analyticsValue] ?: EventHorizonSourceView.Unknown
 
-    fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
-
     companion object {
         fun fromString(source: String?) = SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
     }
