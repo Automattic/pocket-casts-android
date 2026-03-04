@@ -48,7 +48,8 @@ class LogInFullAppTest {
             .waitForVisibleLogIn()
             .tapLogIn()
 
-        EmailLogInPage(composeTestRule)
+        EmailLogInPage(composeTestRule, context)
+            .waitForVisible()
             .enterEmail(OnboardingTestCredentials.email)
             .enterPassword(OnboardingTestCredentials.password)
             .tapCreateAccount()
@@ -61,7 +62,7 @@ class LogInFullAppTest {
             .assertAccountVisible()
             .tapAccount()
 
-        AccountPage(composeTestRule)
+        AccountPage(composeTestRule, context)
             .checkAccountBottomIsVisible()
             .checkEmailIsVisible(OnboardingTestCredentials.email)
 

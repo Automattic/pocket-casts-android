@@ -54,20 +54,21 @@ class OnboardingFullAppTest {
             .tapGetStarted()
 
         InterestsSelectionPage(composeTestRule, context)
-            .assertInstructionVisible()
             .waitForVisible()
+            .assertInstructionVisible()
             .selectInterests(crime, sports, education)
             .tapContinue()
 
-        SuggestionsPage(composeTestRule)
+        SuggestionsPage(composeTestRule, context)
             .waitForVisible()
             .tapContinue()
 
-        SignUpOptionsPage(composeTestRule)
+        SignUpOptionsPage(composeTestRule, context)
             .waitForVisible()
             .tapSignUpWithEmail()
 
-        EmailSignUpPage(composeTestRule)
+        EmailSignUpPage(composeTestRule, context)
+            .waitForVisible()
             .enterEmail(OnboardingTestCredentials.email)
             .enterPassword(OnboardingTestConstants.INVALID_PASSWORD)
             .tapCreateAccount()

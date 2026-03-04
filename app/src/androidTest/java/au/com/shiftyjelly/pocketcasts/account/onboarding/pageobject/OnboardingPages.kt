@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.testutil.OnboardingTest
 
 class OnboardingWelcomePage(
     private val rule: ComposeTestRule,
-    private val context: Context
+    context: Context
 ) {
     private val getStartedText = context.getString(LR.string.onboarding_intro_get_started)
     private val getLogInText = context.getString(LR.string.onboarding_log_in)
@@ -47,9 +47,11 @@ class OnboardingWelcomePage(
 
 class InterestsSelectionPage(
     private val rule: ComposeTestRule,
-    private val context: Context
+    context: Context
 ) {
     private val titleText = context.getString(LR.string.onboarding_interests_title)
+    private val instructionText = context.getString(LR.string.onboarding_interests_select_at_least_label)
+    private val continueText = context.getString(LR.string.navigation_continue)
 
     @OptIn(ExperimentalTestApi::class)
     fun waitForVisible(): InterestsSelectionPage {
@@ -59,7 +61,7 @@ class InterestsSelectionPage(
     }
 
     fun assertInstructionVisible(): InterestsSelectionPage {
-        rule.onNodeWithText("Select at least 3").assertIsDisplayed()
+        rule.onNodeWithText(instructionText).assertIsDisplayed()
         return this
     }
 
@@ -69,62 +71,84 @@ class InterestsSelectionPage(
     }
 
     fun tapContinue(): InterestsSelectionPage {
-        rule.onNodeWithText("Continue").assertIsDisplayed().performClick()
+        rule.onNodeWithText(continueText).assertIsDisplayed().performClick()
         return this
     }
 }
 
 class SuggestionsPage(
-    private val rule: ComposeTestRule
+    private val rule: ComposeTestRule,
+    context: Context
 ) {
+    private val titleText = context.getString(LR.string.onboarding_recommendations_title)
+    private val continueText = context.getString(LR.string.navigation_continue)
+
+    @OptIn(ExperimentalTestApi::class)
     fun waitForVisible(): SuggestionsPage {
-        rule.onNodeWithText("We hope you love these suggestions!").assertIsDisplayed()
+        rule.waitUntilAtLeastOneExists(hasText(titleText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        rule.onNodeWithText(titleText).assertIsDisplayed()
         return this
     }
 
     fun tapContinue(): SuggestionsPage {
-        rule.onNodeWithText("Continue").assertIsDisplayed().performClick()
+        rule.onNodeWithText(continueText).assertIsDisplayed().performClick()
         return this
     }
 }
 
 class SignUpOptionsPage(
-    private val rule: ComposeTestRule
+    private val rule: ComposeTestRule,
+    context: Context
 ) {
+    private val signUpWithEmailText = context.getString(LR.string.onboarding_create_account_sign_up_email)
+
+    @OptIn(ExperimentalTestApi::class)
     fun waitForVisible(): SignUpOptionsPage {
-        rule.onNodeWithText("Sign up with email").assertIsDisplayed()
+        rule.waitUntilAtLeastOneExists(hasText(signUpWithEmailText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        rule.onNodeWithText(signUpWithEmailText).assertIsDisplayed()
         return this
     }
 
     fun tapSignUpWithEmail(): SignUpOptionsPage {
-        rule.onNodeWithText("Sign up with email").performClick()
+        rule.onNodeWithText(signUpWithEmailText).performClick()
         return this
     }
 }
 
 class EmailSignUpPage(
-    private val rule: ComposeTestRule
+    private val rule: ComposeTestRule,
+    context: Context
 ) {
+    private val emailAddressText = context.getString(LR.string.profile_email_address)
+    private val passwordText = context.getString(LR.string.profile_password)
+    private val createAccountText = context.getString(LR.string.create_account)
+    private val passwordTooShortText = "• ${context.getString(LR.string.profile_create_password_requirements)}"
+
+    @OptIn(ExperimentalTestApi::class)
+    fun waitForVisible(): EmailSignUpPage {
+        rule.waitUntilAtLeastOneExists(hasText(emailAddressText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        rule.waitUntilAtLeastOneExists(hasText(passwordText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        rule.waitUntilAtLeastOneExists(hasText(createAccountText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        return this
+    }
+
     fun enterEmail(email: String): EmailSignUpPage {
-        rule.onNode(hasText("Email Address")).performTextInput(email)
+        rule.onNode(hasText(emailAddressText)).performTextInput(email)
         return this
     }
 
     fun enterPassword(password: String): EmailSignUpPage {
-        rule.onNode(hasText("Password")).performTextInput(password)
+        rule.onNode(hasText(passwordText)).performTextInput(password)
         return this
     }
 
     fun tapCreateAccount(): EmailSignUpPage {
-        rule.onNode(hasText("Create account") and hasClickAction()).performClick()
+        rule.onNode(hasText(createAccountText) and hasClickAction()).performClick()
         return this
     }
 
     fun assertPasswordTooShortVisible(): EmailSignUpPage {
-        rule.onNodeWithText("• Password must be at least 6 characters").assertIsDisplayed()
+        rule.onNodeWithText(passwordTooShortText).assertIsDisplayed()
         return this
     }
 }
-
-
-

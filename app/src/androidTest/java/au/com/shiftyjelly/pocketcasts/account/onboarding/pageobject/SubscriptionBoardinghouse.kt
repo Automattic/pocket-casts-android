@@ -13,18 +13,20 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.testutil.OnboardingTest
 
 class SubscriptionBoardinghouse(
     private val rule: ComposeTestRule,
-    private val context: Context,
+    context: Context,
 ) {
+    private val closeText = context.getString(LR.string.close)
+    private val subtitleText = context.getString(LR.string.onboarding_upgrade_generic_title)
+
     fun tapClose(): SubscriptionBoardinghouse {
-        val closeText = context.getString(LR.string.close)
         rule.onNodeWithContentDescription(closeText).assertIsDisplayed().performClick()
         return this
     }
 
     @OptIn(ExperimentalTestApi::class)
     fun waitForVisibleSubText(): SubscriptionBoardinghouse {
-        rule.waitUntilAtLeastOneExists(hasText("Superpowers for your podcasts"), OnboardingTestConstants.UI_TIMEOUT_MS)
-        rule.onNodeWithText("Superpowers for your podcasts").assertIsDisplayed()
+        rule.waitUntilAtLeastOneExists(hasText(subtitleText), OnboardingTestConstants.UI_TIMEOUT_MS)
+        rule.onNodeWithText(subtitleText).assertIsDisplayed()
         return this
     }
 }
