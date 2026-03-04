@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -114,6 +115,29 @@ internal class CategoriesManagerTest {
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals((0..5).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
+
+    @Test
+    fun `GIVEN visited category is also popular WHEN categories evaluated THEN category is not duplicated`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            listOf(
+                UserCategoryVisits(categoryId = 3, totalVisits = 1),
+            ),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
+        categoriesManager.loadCategories("whatever")
+        val popularCategoryIds = listOf(3, 0, 1, 2, 4, 5)
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = emptyList())
+
+        categoriesManager.state.test {
+            val state = awaitItem()
+            assertTrue(state is CategoriesManager.State.Idle)
+            val featuredIds = (state as CategoriesManager.State.Idle).featuredCategories.map { it.id }
+            assertEquals("Category 3 should not appear twice", 1, featuredIds.count { it == 3 })
+            assertEquals(listOf(3, 0, 1, 2, 4, 5), featuredIds)
         }
     }
 }
