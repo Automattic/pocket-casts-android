@@ -14,6 +14,8 @@
         ([#5017](https://github.com/Automattic/pocket-casts-android/pull/5017))
     *   Optimize battery usage by enabling audio offload mode
         ([#5059](https://github.com/Automattic/pocket-casts-android/pull/5059))
+    *   Use larger buffer size for streaming when possible
+        ([#5076](https://github.com/Automattic/pocket-casts-android/pull/5076))
 *   Bug Fixes
     *   Respect global auto download setting
         ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
