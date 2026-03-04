@@ -39,4 +39,4 @@ template below. Fill in every section:
 
 ## PR Template
 
-!cat .github/pull_request_template.md
+!`cat .github/pull_request_template.md`
