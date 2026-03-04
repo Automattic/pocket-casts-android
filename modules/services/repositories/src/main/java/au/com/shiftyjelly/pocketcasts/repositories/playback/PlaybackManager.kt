@@ -2088,6 +2088,7 @@ open class PlaybackManager @Inject constructor(
                 Timber.i("Creating media player of type CastPlayer.")
             } else {
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
+                (player as? SimplePlayer)?.exoPlayer?.let { mediaSessionManager.installPlayer(it) }
                 Timber.i("Creating media player of type SimplePlayer.")
             }
         }

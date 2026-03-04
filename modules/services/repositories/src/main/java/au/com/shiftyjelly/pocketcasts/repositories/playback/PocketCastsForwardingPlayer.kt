@@ -35,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 @OptIn(UnstableApi::class)
 class PocketCastsForwardingPlayer(
     wrappedPlayer: Player,
+    private val onSkipForward: (() -> Unit)? = null,
+    private val onSkipBack: (() -> Unit)? = null,
 ) : ForwardingPlayer(wrappedPlayer) {
 
     private var currentMediaItem: MediaItem = MediaItem.EMPTY
@@ -59,7 +61,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack).also {
             it.currentMediaItem = this.currentMediaItem
             it.isTransientLoss = this.isTransientLoss
         }
@@ -118,6 +120,14 @@ class PocketCastsForwardingPlayer(
                 Player.COMMAND_GET_METADATA,
             )
             .build()
+    }
+
+    override fun seekToNext() {
+        onSkipForward?.invoke() ?: super.seekToNext()
+    }
+
+    override fun seekToPrevious() {
+        onSkipBack?.invoke() ?: super.seekToPrevious()
     }
 
     override fun getDuration(): Long {

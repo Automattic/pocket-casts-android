@@ -229,6 +229,68 @@ class PocketCastsForwardingPlayerTest {
         assertEquals(45_000L, swapped.seekForwardIncrement)
     }
 
+    @Test
+    fun `seekToNext delegates to skip lambda when provided`() {
+        var skipForwardCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSkipForward = { skipForwardCalled = true },
+        )
+
+        player.seekToNext()
+
+        assertTrue(skipForwardCalled)
+    }
+
+    @Test
+    fun `seekToPrevious delegates to skip lambda when provided`() {
+        var skipBackCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSkipBack = { skipBackCalled = true },
+        )
+
+        player.seekToPrevious()
+
+        assertTrue(skipBackCalled)
+    }
+
+    @Test
+    fun `seekToNext falls back to super when no lambda`() {
+        forwardingPlayer.seekToNext()
+
+        verify(mockPlayer).seekToNext()
+    }
+
+    @Test
+    fun `seekToPrevious falls back to super when no lambda`() {
+        forwardingPlayer.seekToPrevious()
+
+        verify(mockPlayer).seekToPrevious()
+    }
+
+    @Test
+    fun `swapPlayer preserves skip lambdas`() {
+        var skipForwardCalled = false
+        var skipBackCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSkipForward = { skipForwardCalled = true },
+            onSkipBack = { skipBackCalled = true },
+        )
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = player.swapPlayer(newWrappedPlayer)
+
+        swapped.seekToNext()
+        swapped.seekToPrevious()
+
+        assertTrue(skipForwardCalled)
+        assertTrue(skipBackCalled)
+    }
+
     private fun createPodcastEpisode(
         uuid: String = "test-uuid",
         title: String = "Test Episode",
