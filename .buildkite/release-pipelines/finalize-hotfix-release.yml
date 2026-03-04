@@ -21,7 +21,7 @@ steps:
       bundle exec fastlane finalize_hotfix_release skip_confirm:true
     plugins: [$CI_TOOLKIT]
     agents:
-      queue: "mac-metal"
+      role: "releases"
     retry:
       manual:
         reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
