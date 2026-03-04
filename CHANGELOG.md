@@ -21,6 +21,8 @@
         ([#4998](https://github.com/Automattic/pocket-casts-android/pull/4998))
     *   Skip metered network data warnings during Android Auto and Android Automotive playback to prevent interruptions while driving, as the option explains
         ([#5047](https://github.com/Automattic/pocket-casts-android/pull/5047))
+    *   Fix onboarding page status bar icon color
+        ([#5073](https://github.com/Automattic/pocket-casts-android/pull/5073))
 
 8.6
 -----
