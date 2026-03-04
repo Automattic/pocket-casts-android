@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -63,6 +64,8 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -94,6 +97,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -208,6 +212,9 @@ open class PlaybackManager @Inject constructor(
     private var lastPlayedEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
+    @Volatile
+    private var lastPrefetchedEpisodeUuid: String? = null
+
     private val resumptionHelper = ResumptionHelper(settings)
 
     var episodeSubscription: Disposable? = null
@@ -259,6 +266,18 @@ open class PlaybackManager @Inject constructor(
                 }
             })
             playbackManagerNetworkWatcher.observeConnection()
+        }
+
+        launch {
+            upNextQueue.changesObservable.asFlow()
+                .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.firstOrNull()?.uuid }
+                .distinctUntilChanged()
+                .collect {
+                    lastPrefetchedEpisodeUuid = null
+                    if (isPlaying()) {
+                        prefetchNextEpisodeIfNeeded()
+                    }
+                }
         }
     }
 
@@ -801,6 +820,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun stop() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Stopping playback")
 
+        cancelPrefetchNextEpisode()
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
 
@@ -1119,6 +1139,7 @@ open class PlaybackManager @Inject constructor(
 
     fun castConnected() {
         upNextQueue.currentEpisode ?: return
+        cancelPrefetchNextEpisode()
         launch {
             if (isPlayerSwitchRequired()) {
                 loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
@@ -1243,6 +1264,7 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
+        prefetchNextEpisodeIfNeeded()
     }
 
     suspend fun onPlayerPaused() {
@@ -2303,6 +2325,31 @@ open class PlaybackManager @Inject constructor(
         pauseTimerDisposable?.dispose()
     }
 
+    private fun prefetchNextEpisodeIfNeeded() {
+        val request = buildPrefetchRequest(
+            isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH),
+            isPlayerRemote = player?.isRemote,
+            nextEpisode = upNextQueue.queueEpisodes.firstOrNull(),
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            appPlatform = Util.getAppPlatform(application),
+        ) ?: return
+
+        if (request.episodeUuid == lastPrefetchedEpisodeUuid) return
+        lastPrefetchedEpisodeUuid = request.episodeUuid
+
+        PrefetchWorker.prefetchNextEpisode(
+            context = application,
+            episodeUuid = request.episodeUuid,
+            downloadUrl = request.downloadUrl,
+            networkConstraint = request.networkConstraint,
+        )
+    }
+
+    private fun cancelPrefetchNextEpisode() {
+        lastPrefetchedEpisodeUuid = null
+        PrefetchWorker.cancelPrefetch(application)
+    }
+
     suspend fun preparePlayer() {
         val episode = upNextQueue.currentEpisode ?: return
         val currentPlayer = this.player
@@ -2473,4 +2520,40 @@ open class PlaybackManager @Inject constructor(
         OnUpdateSleepTimerStatus("updateSleepTimerStatus"),
         OnUserSeeking("onUserSeeking"),
     }
+}
+
+internal data class PrefetchRequest(
+    val episodeUuid: String,
+    val downloadUrl: String,
+    val networkConstraint: NetworkType,
+)
+
+internal fun buildPrefetchRequest(
+    isFeatureEnabled: Boolean,
+    isPlayerRemote: Boolean?,
+    nextEpisode: BaseEpisode?,
+    warnOnMeteredNetwork: Boolean,
+    appPlatform: AppPlatform = AppPlatform.Phone,
+): PrefetchRequest? {
+    if (!isFeatureEnabled) return null
+    if (appPlatform == AppPlatform.WearOs) return null
+    if (isPlayerRemote == true) return null
+
+    val episode = nextEpisode ?: return null
+    if (episode.isDownloaded) return null
+    if (episode.isDownloading) return null
+    if (episode.isHLS) return null
+    val url = episode.downloadUrl ?: return null
+
+    val networkConstraint = if (warnOnMeteredNetwork) {
+        NetworkType.UNMETERED
+    } else {
+        NetworkType.CONNECTED
+    }
+
+    return PrefetchRequest(
+        episodeUuid = episode.uuid,
+        downloadUrl = url,
+        networkConstraint = networkConstraint,
+    )
 }
