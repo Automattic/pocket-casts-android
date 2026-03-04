@@ -6,12 +6,14 @@ import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import com.automattic.eventhorizon.EpisodeGroupingType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class PodcastGrouping(
     @StringRes val groupName: Int,
     val index: Int,
     val serverId: Int,
+    val eventHorizonValue: EpisodeGroupingType,
 ) {
     companion object {
         val All
@@ -30,6 +32,7 @@ sealed class PodcastGrouping(
         groupName = LR.string.none,
         index = 0,
         serverId = 0,
+        eventHorizonValue = EpisodeGroupingType.None,
     ) {
         override val sortFunction: ((PodcastEpisode) -> Int)? = null
 
@@ -42,6 +45,7 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_downloaded,
         index = 1,
         serverId = 1,
+        eventHorizonValue = EpisodeGroupingType.Downloaded,
     ) {
         override val sortFunction: ((PodcastEpisode) -> Int)
             get() = {
@@ -63,6 +67,7 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_unplayed,
         index = 2,
         serverId = 2,
+        eventHorizonValue = EpisodeGroupingType.Unplayed,
     ) {
         override val sortFunction: ((PodcastEpisode) -> Int)
             get() = { if (it.isUnplayed || it.isInProgress) 0 else 1 }
@@ -82,6 +87,7 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_season,
         index = 3,
         serverId = 3,
+        eventHorizonValue = EpisodeGroupingType.Season,
     ) {
         lateinit var groupTitlesList: List<String>
 
@@ -119,6 +125,7 @@ sealed class PodcastGrouping(
         groupName = LR.string.profile_navigation_starred,
         index = 4,
         serverId = 4,
+        eventHorizonValue = EpisodeGroupingType.Starred,
     ) {
         override val sortFunction: (PodcastEpisode) -> Int
             get() = { if (it.isStarred) 0 else 1 }

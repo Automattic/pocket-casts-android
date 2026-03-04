@@ -12,7 +12,6 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -43,7 +42,6 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class GoogleSignInButtonViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,

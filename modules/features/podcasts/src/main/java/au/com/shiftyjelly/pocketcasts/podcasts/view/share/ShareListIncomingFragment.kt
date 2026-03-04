@@ -140,10 +140,7 @@ class ShareListIncomingFragment :
 
     override fun onSubscribeClick(podcast: Podcast) {
         viewModel.subscribeToPodcast(podcast.uuid)
-        viewModel.trackShareEvent(
-            AnalyticsEvent.PODCAST_SUBSCRIBED,
-            AnalyticsProp.subscribeToggledMap(uuid = podcast.uuid),
-        )
+        viewModel.trackPodcastSubscribed(podcast.uuid)
     }
 
     override fun onUnsubscribeClick(podcast: Podcast) {
@@ -154,10 +151,7 @@ class ShareListIncomingFragment :
                 titleId = LR.string.unsubscribe,
                 click = {
                     viewModel.unsubscribeFromPodcast(uuid)
-                    viewModel.trackShareEvent(
-                        AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                        AnalyticsProp.subscribeToggledMap(uuid = uuid),
-                    )
+                    viewModel.trackPodcastUnsubscribed(uuid)
                 },
             )
         activity?.supportFragmentManager?.let {
@@ -173,10 +167,7 @@ class ShareListIncomingFragment :
         for (podcastHeader in podcasts) {
             val uuid = podcastHeader.uuid
             viewModel.subscribeToPodcast(uuid)
-            viewModel.trackShareEvent(
-                AnalyticsEvent.PODCAST_SUBSCRIBED,
-                AnalyticsProp.subscribeToggledMap(uuid = uuid),
-            )
+            viewModel.trackPodcastSubscribed(uuid)
         }
     }
 
@@ -187,9 +178,6 @@ class ShareListIncomingFragment :
 
     private object AnalyticsProp {
         private const val COUNT = "count"
-        private const val SOURCE = "source"
-        private const val UUID = "uuid"
         fun countMap(count: Int) = mapOf(this.COUNT to count)
-        fun subscribeToggledMap(uuid: String) = mapOf(this.SOURCE to "incoming_share_list", this.UUID to uuid)
     }
 }

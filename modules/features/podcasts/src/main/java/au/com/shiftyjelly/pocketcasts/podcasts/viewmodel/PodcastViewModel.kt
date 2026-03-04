@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -49,6 +48,25 @@ import com.automattic.eventhorizon.BookmarksEmptyGoToHeadphoneSettingsEvent
 import com.automattic.eventhorizon.BookmarksGetBookmarksButtonTappedEvent
 import com.automattic.eventhorizon.BookmarksSortByChangedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastRefreshType
+import com.automattic.eventhorizon.PodcastScreenFundingTappedEvent
+import com.automattic.eventhorizon.PodcastScreenNotificationsTappedEvent
+import com.automattic.eventhorizon.PodcastScreenPodcastDetailsLinkTappedEvent
+import com.automattic.eventhorizon.PodcastScreenPodrollInformationModelShownEvent
+import com.automattic.eventhorizon.PodcastScreenPodrollPodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastScreenPodrollPodcastTappedEvent
+import com.automattic.eventhorizon.PodcastScreenRefreshEpisodeListEvent
+import com.automattic.eventhorizon.PodcastScreenRefreshNewEpisodeFoundEvent
+import com.automattic.eventhorizon.PodcastScreenRefreshNoEpisodesFoundEvent
+import com.automattic.eventhorizon.PodcastScreenToggleArchivedEvent
+import com.automattic.eventhorizon.PodcastScreenYouMightLikeSubscribedEvent
+import com.automattic.eventhorizon.PodcastScreenYouMightLikeTappedEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastTabType
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.PodcastsScreenEpisodeGroupingChangedEvent
+import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
+import com.automattic.eventhorizon.PodcastsScreenTabTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -83,7 +101,6 @@ class PodcastViewModel @Inject constructor(
     private val castManager: CastManager,
     private val downloadQueue: DownloadQueue,
     private val userManager: UserManager,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val episodeAnalytics: EpisodeAnalytics,
     private val bookmarkManager: BookmarkManager,
@@ -215,7 +232,11 @@ class PodcastViewModel @Inject constructor(
 
     fun onTabClicked(tab: PodcastTab) {
         multiSelectBookmarksHelper.closeMultiSelect()
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
+        eventHorizon.track(
+            PodcastsScreenTabTappedEvent(
+                value = tab.eventHorizonValue,
+            ),
+        )
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
 
@@ -244,9 +265,11 @@ class PodcastViewModel @Inject constructor(
             it.isSubscribed = true
             podcast.value = it
             podcastManager.subscribeToPodcast(podcastUuid = it.uuid, sync = true)
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN),
+            eventHorizon.track(
+                PodcastSubscribedEvent(
+                    uuid = it.uuid,
+                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                ),
             )
         }
     }
@@ -254,9 +277,11 @@ class PodcastViewModel @Inject constructor(
     fun unsubscribeFromPodcast() {
         podcast.value?.let {
             podcastManager.unsubscribeAsync(podcastUuid = it.uuid, SourceView.PODCAST_SCREEN)
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN),
+            eventHorizon.track(
+                PodcastUnsubscribedEvent(
+                    uuid = it.uuid,
+                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                ),
             )
         }
     }
@@ -265,7 +290,11 @@ class PodcastViewModel @Inject constructor(
         launch {
             podcast.value?.let {
                 podcastManager.updateShowArchived(it, !it.showArchived)
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, AnalyticsProp.archiveToggled(!it.showArchived))
+                eventHorizon.track(
+                    PodcastScreenToggleArchivedEvent(
+                        showArchived = !it.showArchived,
+                    ),
+                )
             }
         }
     }
@@ -306,17 +335,9 @@ class PodcastViewModel @Inject constructor(
         launch {
             podcast.value?.let {
                 podcastManager.updateEpisodesSortTypeBlocking(it, episodesSortType)
-                analyticsTracker.track(
-                    AnalyticsEvent.PODCASTS_SCREEN_SORT_ORDER_CHANGED,
-                    mapOf(
-                        "sort_order" to when (episodesSortType) {
-                            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> "oldest_to_newest"
-                            EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> "newest_to_oldest"
-                            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> "shortest_to_longest"
-                            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "longest_to_shortest"
-                            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "title_a_to_z"
-                            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "title_z_to_a"
-                        },
+                eventHorizon.track(
+                    PodcastsScreenSortOrderChangedEvent(
+                        sortOrder = episodesSortType.eventHorizonValue,
                     ),
                 )
             }
@@ -327,16 +348,9 @@ class PodcastViewModel @Inject constructor(
         launch {
             podcast.value?.let {
                 podcastManager.updateGroupingBlocking(it, grouping)
-                analyticsTracker.track(
-                    AnalyticsEvent.PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED,
-                    mapOf(
-                        "value" to when (grouping) {
-                            PodcastGrouping.None -> "none"
-                            PodcastGrouping.Downloaded -> "downloaded"
-                            PodcastGrouping.Season -> "season"
-                            PodcastGrouping.Unplayed -> "unplayed"
-                            PodcastGrouping.Starred -> "starred"
-                        },
+                eventHorizon.track(
+                    PodcastsScreenEpisodeGroupingChangedEvent(
+                        value = grouping.eventHorizonValue,
                     ),
                 )
             }
@@ -344,7 +358,11 @@ class PodcastViewModel @Inject constructor(
     }
 
     fun showNotifications(podcastUuid: String, show: Boolean) {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
+        eventHorizon.track(
+            PodcastScreenNotificationsTappedEvent(
+                enabled = show,
+            ),
+        )
         viewModelScope.launch {
             if (!notificationHelper.hasNotificationsPermission()) {
                 _showNotificationSnack.emit(
@@ -602,18 +620,30 @@ class PodcastViewModel @Inject constructor(
     suspend fun onRefreshPodcast(refreshType: RefreshType) {
         val podcast = podcast.value ?: return
 
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
+        eventHorizon.track(
+            PodcastScreenRefreshEpisodeListEvent(
+                podcastUuid = podcast.uuid,
+                action = refreshType.eventHorizonValue,
+            ),
+        )
 
         _refreshState.emit(RefreshState.Refreshing(refreshType))
         val newEpisodeFound = podcastManager.refreshPodcastFeed(podcast = podcast)
 
-        if (newEpisodeFound) {
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
+        val event = if (newEpisodeFound) {
             _refreshState.emit(RefreshState.NewEpisodeFound)
+            PodcastScreenRefreshNewEpisodeFoundEvent(
+                podcastUuid = podcast.uuid,
+                action = refreshType.eventHorizonValue,
+            )
         } else {
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
             _refreshState.emit(RefreshState.NoEpisodesFound)
+            PodcastScreenRefreshNoEpisodesFoundEvent(
+                podcastUuid = podcast.uuid,
+                action = refreshType.eventHorizonValue,
+            )
         }
+        eventHorizon.track(event)
     }
 
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
@@ -643,26 +673,28 @@ class PodcastViewModel @Inject constructor(
     }
 
     fun onDonateClicked() {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
+        eventHorizon.track(
+            PodcastScreenFundingTappedEvent(
+                podcastUuid = podcastUuid,
+            ),
+        )
     }
 
     fun onRecommendedPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
         podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_SUBSCRIBED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
+        eventHorizon.track(
+            PodcastScreenYouMightLikeSubscribedEvent(
+                podcastUuid = podcastUuid,
+                listDatetime = listDate,
             ),
         )
     }
 
     fun onRecommendedPodcastClicked(podcastUuid: String, listDate: String) {
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_TAPPED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
+        eventHorizon.track(
+            PodcastScreenYouMightLikeTappedEvent(
+                podcastUuid = podcastUuid,
+                listDatetime = listDate,
             ),
         )
     }
@@ -672,21 +704,23 @@ class PodcastViewModel @Inject constructor(
     }
 
     fun onPodrollInformationModalShown() {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN)
+        eventHorizon.track(PodcastScreenPodrollInformationModelShownEvent)
     }
 
     fun onPodrollPodcastClicked(podcastUuid: String) {
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_TAPPED,
-            properties = mapOf("podcast_uuid" to podcastUuid),
+        eventHorizon.track(
+            PodcastScreenPodrollPodcastTappedEvent(
+                podcastUuid = podcastUuid,
+            ),
         )
     }
 
     fun onPodrollPodcastSubscribeClicked(podcastUuid: String) {
         podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_SUBSCRIBED,
-            properties = mapOf("podcast_uuid" to podcastUuid),
+        eventHorizon.track(
+            PodcastScreenPodrollPodcastSubscribedEvent(
+                podcastUuid = podcastUuid,
+            ),
         )
     }
 
@@ -694,18 +728,21 @@ class PodcastViewModel @Inject constructor(
         notificationHelper.openNotificationSettings(activity)
     }
 
-    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+    enum class PodcastTab(
+        @StringRes val labelResId: Int,
+        val eventHorizonValue: PodcastTabType,
+    ) {
         EPISODES(
             labelResId = LR.string.episodes,
-            analyticsValue = "episodes",
+            eventHorizonValue = PodcastTabType.Episodes,
         ),
         BOOKMARKS(
             labelResId = LR.string.bookmarks,
-            analyticsValue = "bookmarks",
+            eventHorizonValue = PodcastTabType.Bookmarks,
         ),
         RECOMMENDATIONS(
             labelResId = LR.string.you_might_like,
-            analyticsValue = "you_might_like",
+            eventHorizonValue = PodcastTabType.YouMightLike,
         ),
     }
 
@@ -739,9 +776,15 @@ class PodcastViewModel @Inject constructor(
         data object NoEpisodesFound : RefreshState()
     }
 
-    enum class RefreshType(val analyticsValue: String) {
-        PULL_TO_REFRESH("pull_to_refresh"),
-        REFRESH_BUTTON("refresh_button"),
+    enum class RefreshType(
+        val eventHorizonValue: PodcastRefreshType,
+    ) {
+        PULL_TO_REFRESH(
+            eventHorizonValue = PodcastRefreshType.PullToRefresh,
+        ),
+        REFRESH_BUTTON(
+            eventHorizonValue = PodcastRefreshType.RefreshButton,
+        ),
     }
 
     sealed interface SnackBarMessage {
@@ -755,18 +798,6 @@ class PodcastViewModel @Inject constructor(
         data class ShowNotifyOnNewEpisodesMessage(
             override val message: TextResource,
         ) : SnackBarMessage
-    }
-
-    private object AnalyticsProp {
-        private const val ENABLED_KEY = "enabled"
-        private const val SHOW_ARCHIVED = "show_archived"
-        private const val SOURCE_KEY = "source"
-        private const val UUID_KEY = "uuid"
-        fun archiveToggled(archived: Boolean) = mapOf(SHOW_ARCHIVED to archived)
-
-        fun notificationEnabled(show: Boolean) = mapOf(ENABLED_KEY to show)
-
-        fun podcastSubscribeToggled(source: SourceView, uuid: String) = mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
 }
 

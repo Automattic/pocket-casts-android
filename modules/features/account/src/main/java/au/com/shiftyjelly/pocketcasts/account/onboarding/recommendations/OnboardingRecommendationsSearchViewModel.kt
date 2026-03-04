@@ -13,6 +13,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.search.SearchUiState
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +33,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val searchHandler: SearchHandler,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -120,16 +124,21 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     }
 
     fun toggleSubscribed(podcastResult: PodcastResult) {
-        val event: AnalyticsEvent
         val uuid = podcastResult.podcast.uuid
-        if (podcastResult.isSubscribed) {
-            event = AnalyticsEvent.PODCAST_UNSUBSCRIBED
+        val event = if (podcastResult.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = uuid, SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH)
+            PodcastUnsubscribedEvent(
+                uuid = uuid,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.eventHorizonValue,
+            )
         } else {
-            event = AnalyticsEvent.PODCAST_SUBSCRIBED
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
+            PodcastSubscribedEvent(
+                uuid = uuid,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.eventHorizonValue,
+            )
         }
-        analyticsTracker.track(event, AnalyticsProp.podcastSubscribeToggled(uuid))
+        eventHorizon.track(event)
 
         _state.update {
             it.copy(
