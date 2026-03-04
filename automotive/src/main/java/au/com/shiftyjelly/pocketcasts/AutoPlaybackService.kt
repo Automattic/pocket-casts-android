@@ -18,13 +18,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
-import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
-import au.com.shiftyjelly.pocketcasts.repositories.playback.RECENT_ROOT
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SUGGESTED_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -54,6 +52,8 @@ class AutoPlaybackService : PlaybackService() {
 
     @Inject lateinit var listSource: ListRepository
 
+    @Inject lateinit var podcastManager: PodcastManager
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -81,32 +81,13 @@ class AutoPlaybackService : PlaybackService() {
             try {
                 val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
                     MEDIA_ID_ROOT -> loadRootChildren()
-
-                    PODCASTS_ROOT -> loadPodcastsChildren()
-
                     FILTERS_ROOT -> loadFiltersRoot()
-
                     DISCOVER_ROOT -> loadDiscoverRoot()
-
                     PROFILE_ROOT -> loadProfileRoot()
-
-                    PROFILE_FILES -> loadFilesChildren()
-
-                    PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren()
-
-                    PROFILE_STARRED -> loadStarredChildren()
-
-                    RECENT_ROOT -> loadRecentChildren()
-
-                    SUGGESTED_ROOT -> loadSuggestedChildren()
-
-                    else -> {
-                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
-                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
-                        } else {
-                            loadEpisodeChildren(parentId)
-                        }
-                    }
+                    PROFILE_FILES -> browseTreeProvider.loadFilesChildren(this@AutoPlaybackService)
+                    PROFILE_LISTENING_HISTORY -> browseTreeProvider.loadListeningHistoryChildren(this@AutoPlaybackService)
+                    PROFILE_STARRED -> browseTreeProvider.loadStarredChildren(this@AutoPlaybackService)
+                    else -> browseTreeProvider.loadChildren(parentId, this@AutoPlaybackService)
                 }
                 Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Sending results $parentId")
                 result.sendResult(items)
@@ -119,7 +100,7 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    override suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
+    private suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
         val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
         val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
@@ -140,8 +121,8 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    suspend fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
-        return getPlaylistPreviews().mapNotNull {
+    private suspend fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
+        return browseTreeProvider.getPlaylistPreviews().mapNotNull {
             Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
 
             try {
@@ -177,7 +158,7 @@ class AutoPlaybackService : PlaybackService() {
         return MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    suspend fun loadDiscoverRoot(): List<MediaBrowserCompat.MediaItem> {
+    private suspend fun loadDiscoverRoot(): List<MediaBrowserCompat.MediaItem> {
         Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
         val discoverFeed: Discover
         try {
