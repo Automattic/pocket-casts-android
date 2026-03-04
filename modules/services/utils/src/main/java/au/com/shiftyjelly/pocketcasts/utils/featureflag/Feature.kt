@@ -164,6 +164,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    ADAPTIVE_BUFFER(
+        key = "adaptive_buffer",
+        title = "Adaptive Buffer Sizing",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
