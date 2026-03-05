@@ -11,12 +11,14 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * [MediaLibraryService.MediaLibrarySession.Callback] that provides browse tree and search
@@ -24,13 +26,17 @@ import kotlinx.coroutines.launch
  * (onConnect, onCustomCommand, onAddMediaItems, onSetRating, onMediaButtonEvent) to
  * [Media3SessionCallback].
  *
- * This callback is created but not wired in this PR — it will be used when the service
- * base class changes from [MediaBrowserServiceCompat] to [MediaLibraryService].
+ * Currently wired as the shadow [MediaSession]'s callback in [MediaSessionManager].
+ * The library-specific methods (onGetChildren, onGetLibraryRoot, etc.) won't fire on a
+ * plain MediaSession, but session-level methods route through this callback chain.
+ * When the service base class changes to [MediaLibraryService], all methods will be active.
  */
 @OptIn(UnstableApi::class)
 internal class Media3LibrarySessionCallback(
     private val sessionCallback: Media3SessionCallback,
     private val browseTreeProvider: BrowseTreeProvider,
+    private val playbackManager: PlaybackManager,
+    private val packageValidator: PackageValidator?,
     private val scope: CoroutineScope,
     private val contextProvider: () -> android.content.Context,
 ) : MediaLibraryService.MediaLibrarySession.Callback {
@@ -39,6 +45,10 @@ internal class Media3LibrarySessionCallback(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
     ): MediaSession.ConnectionResult {
+        if (packageValidator != null && !packageValidator.isKnownCaller(controller.packageName, controller.uid)) {
+            Timber.e("Unknown caller trying to connect to Media3 session: ${controller.packageName} ${controller.uid}")
+            return MediaSession.ConnectionResult.reject()
+        }
         return sessionCallback.onConnect(session, controller)
     }
 
