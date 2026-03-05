@@ -225,6 +225,20 @@ class MediaSessionManager(
                 wrappedPlayer = exoPlayer,
                 onSkipForward = { launch { playbackManager.skipForwardSuspend() } },
                 onSkipBack = { launch { playbackManager.skipBackwardSuspend() } },
+                onStop = {
+                    if (playbackManager.player !is CastPlayer) {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
+                        launch { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
+                    }
+                },
+                playGuard = {
+                    if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
+                        false
+                    } else {
+                        true
+                    }
+                },
             )
             media3Callback = Media3SessionCallback(
                 playbackManager = playbackManager,

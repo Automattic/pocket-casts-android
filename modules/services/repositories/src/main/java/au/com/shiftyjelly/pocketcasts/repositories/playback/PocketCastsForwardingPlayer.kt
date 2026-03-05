@@ -37,6 +37,8 @@ class PocketCastsForwardingPlayer(
     wrappedPlayer: Player,
     private val onSkipForward: (() -> Unit)? = null,
     private val onSkipBack: (() -> Unit)? = null,
+    private val onStop: (() -> Unit)? = null,
+    private val playGuard: (() -> Boolean) = { true },
 ) : ForwardingPlayer(wrappedPlayer) {
 
     private var currentMediaItem: MediaItem = MediaItem.EMPTY
@@ -61,7 +63,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, playGuard).also {
             it.currentMediaItem = this.currentMediaItem
             it.isTransientLoss = this.isTransientLoss
         }
@@ -128,6 +130,14 @@ class PocketCastsForwardingPlayer(
 
     override fun seekToPrevious() {
         onSkipBack?.invoke() ?: super.seekToPrevious()
+    }
+
+    override fun stop() {
+        onStop?.invoke()
+    }
+
+    override fun play() {
+        if (playGuard()) super.play()
     }
 
     override fun getDuration(): Long {

@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
@@ -267,6 +268,82 @@ class PocketCastsForwardingPlayerTest {
         forwardingPlayer.seekToPrevious()
 
         verify(mockPlayer).seekToPrevious()
+    }
+
+    @Test
+    fun `stop delegates to onStop callback`() {
+        var stopCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onStop = { stopCalled = true },
+        )
+
+        player.stop()
+
+        assertTrue(stopCalled)
+        verify(mockPlayer, never()).stop()
+    }
+
+    @Test
+    fun `stop does nothing when onStop is null`() {
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onStop = null,
+        )
+
+        player.stop()
+
+        verify(mockPlayer, never()).stop()
+    }
+
+    @Test
+    fun `play blocked when playGuard returns false`() {
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            playGuard = { false },
+        )
+
+        player.play()
+
+        verify(mockPlayer, never()).play()
+    }
+
+    @Test
+    fun `play allowed when playGuard returns true`() {
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            playGuard = { true },
+        )
+
+        player.play()
+
+        verify(mockPlayer).play()
+    }
+
+    @Test
+    fun `swapPlayer preserves onStop and playGuard`() {
+        var stopCalled = false
+        var guardChecked = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onStop = { stopCalled = true },
+            playGuard = {
+                guardChecked = true
+                false
+            },
+        )
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = player.swapPlayer(newWrappedPlayer)
+
+        swapped.stop()
+        swapped.play()
+
+        assertTrue(stopCalled)
+        assertTrue(guardChecked)
+        verify(newWrappedPlayer, never()).play()
     }
 
     @Test
