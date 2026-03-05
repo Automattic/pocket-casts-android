@@ -41,9 +41,9 @@ import com.automattic.eventhorizon.FilterSelectAllBelowEvent
 import com.automattic.eventhorizon.FilterSelectAllEvent
 import dagger.hilt.android.lifecycle.withCreationCallback
 import dagger.hilt.android.scopes.FragmentScoped
-import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(

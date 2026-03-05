@@ -22,6 +22,8 @@ import com.automattic.eventhorizon.FilterTooltipShownEvent
 import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
 import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -31,8 +33,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class PlaylistsViewModel @Inject constructor(
