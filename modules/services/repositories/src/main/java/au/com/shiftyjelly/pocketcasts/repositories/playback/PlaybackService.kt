@@ -5,25 +5,22 @@ import android.app.Notification
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
-import androidx.media.MediaBrowserServiceCompat
+import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaSession
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
-import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -37,8 +34,6 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.Timer
-import java.util.TimerTask
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -56,7 +51,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
 const val PODCASTS_ROOT = "__PODCASTS__"
@@ -64,8 +58,8 @@ const val RECENT_ROOT = "__RECENT__"
 const val SUGGESTED_ROOT = "__SUGGESTED__"
 const val FOLDER_ROOT_PREFIX = "__FOLDER__"
 
-private const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
-private const val CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED"
+internal const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
+internal const val CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED"
 
 const val CONTENT_STYLE_BROWSABLE_HINT = "android.media.browse.CONTENT_STYLE_BROWSABLE_HINT"
 const val CONTENT_STYLE_PLAYABLE_HINT = "android.media.browse.CONTENT_STYLE_PLAYABLE_HINT"
@@ -83,11 +77,15 @@ const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 
 @AndroidEntryPoint
 open class PlaybackService :
-    MediaBrowserServiceCompat(),
+    MediaLibraryService(),
     CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibraryService.MediaLibrarySession? {
+        return playbackManager.mediaSessionManager.getMedia3Session()
     }
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -101,8 +99,6 @@ open class PlaybackService :
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var sleepTimer: SleepTimer
-
-    @Inject lateinit var browseTreeProvider: BrowseTreeProvider
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -137,9 +133,9 @@ open class PlaybackService :
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback service created")
 
-        val mediaSession = playbackManager.mediaSession
-        sessionToken = mediaSession.sessionToken
+        playbackManager.mediaSessionManager.createSession(this)
 
+        val mediaSession = playbackManager.mediaSession
         mediaController = MediaControllerCompat(this, mediaSession)
         notificationManager = PlayerNotificationManagerImpl(this)
 
@@ -317,10 +313,10 @@ open class PlaybackService :
                 return media3Builder.build(media3Session.player, compatToken, media3Session.sessionActivity)
             }
 
-            // Compat fallback (flag off or Media3 session not yet created)
-            val sessionToken = sessionToken
+            // Compat fallback (Media3 session not yet created)
+            val sessionToken = playbackManager.mediaSession.sessionToken
             if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
-            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null
+            return if (state != PlaybackStateCompat.STATE_NONE) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null
         }
     }
 
@@ -336,57 +332,6 @@ open class PlaybackService :
         assert(IS_RUNNING_UNDER_TEST) // This method should only be used for testing
         mediaControllerCallback?.onMetadataChanged(metadata)
         mediaControllerCallback?.onPlaybackStateChanged(playbackStateCompat)
-    }
-
-    override fun onGetRoot(clientPackageName: String, clientUid: Int, bundle: Bundle?): BrowserRoot? {
-        val extras = Bundle()
-
-        Timber.d("onGetRoot() $clientPackageName ${bundle?.keySet()?.toList()}")
-        // tell Android Auto we support media search
-        extras.putBoolean(MEDIA_SEARCH_SUPPORTED, true)
-
-        // tell Android Auto we support grids and lists and that browsable things should be grids, the rest lists
-        extras.putBoolean(CONTENT_STYLE_SUPPORTED, true)
-        extras.putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
-        extras.putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
-
-        // To ensure you are not allowing any arbitrary app to browse your app's contents, check the origin
-        if (!PackageValidator(this, LR.xml.allowed_media_browser_callers).isKnownCaller(clientPackageName, clientUid) && !BuildConfig.DEBUG) {
-            // If the request comes from an untrusted package, return null
-            Timber.e("Unknown caller trying to connect to media service $clientPackageName $clientUid")
-            return null
-        }
-
-        if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
-            if (Util.isAutomotive(applicationContext) && !settings.automotiveConnectedToMediaSession()) {
-                Timer().schedule(
-                    object : TimerTask() {
-                        override fun run() {
-                            settings.setAutomotiveConnectedToMediaSession(true)
-                        }
-                    },
-                    1000,
-                )
-            }
-        }
-
-        val rootId = browseTreeProvider.getRootId(
-            isRecent = browserRootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true,
-            isSuggested = browserRootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) == true,
-            hasCurrentEpisode = playbackManager.getCurrentEpisode() != null,
-        ) ?: return null
-        return BrowserRoot(rootId, extras)
-    }
-
-    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
-        result.detach()
-        launch { result.sendResult(browseTreeProvider.loadChildren(parentId, this@PlaybackService)) }
-    }
-
-    override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaBrowserCompat.MediaItem>>) {
-        result.detach()
-        launch { result.sendResult(browseTreeProvider.search(query, this@PlaybackService)) }
     }
 
     private fun observePlaybackState() {

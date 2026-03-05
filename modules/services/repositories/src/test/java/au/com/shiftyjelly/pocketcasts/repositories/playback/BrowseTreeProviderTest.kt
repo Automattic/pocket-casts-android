@@ -61,6 +61,7 @@ class BrowseTreeProviderTest {
             settings = settings,
             serviceManager = serviceManager,
             podcastCacheServiceManager = podcastCacheServiceManager,
+            listRepository = mock(),
         )
     }
 

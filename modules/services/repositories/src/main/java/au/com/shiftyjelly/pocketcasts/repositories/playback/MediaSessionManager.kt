@@ -20,7 +20,9 @@ import androidx.core.content.IntentCompat
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
+import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -45,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -126,15 +126,15 @@ class MediaSessionManager(
 
     private var bookmarkHelper: BookmarkHelper
 
-    // --- Media3 shadow session (behind feature flag) ---
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
-    private var media3Session: MediaSession? = null
+    // --- Media3 session ---
+    private var media3Session: MediaLibraryService.MediaLibrarySession? = null
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
     private var media3Callback: Media3SessionCallback? = null
     private var media3LibraryCallback: Media3LibrarySessionCallback? = null
     private var media3NotificationBuilder: Media3NotificationBuilder? = null
+    private var placeholderPlayer: androidx.media3.common.Player? = null
 
-    internal fun getMedia3Session(): MediaSession? = media3Session
+    internal fun getMedia3Session(): MediaLibraryService.MediaLibrarySession? = media3Session
     internal fun getMedia3NotificationBuilder(): Media3NotificationBuilder? = media3NotificationBuilder
 
     override val coroutineContext: CoroutineContext
@@ -206,9 +206,73 @@ class MediaSessionManager(
             .catch { Timber.e(it) }
             .launchIn(this)
 
-        if (useMedia3Session) {
-            observeForMedia3Updates()
-        }
+        observeForMedia3Updates()
+    }
+
+    /**
+     * Creates the [MediaLibraryService.MediaLibrarySession] with a placeholder ExoPlayer.
+     * Called from [PlaybackService.onCreate] so that [onGetSession] can return a session
+     * before playback starts. The placeholder is released on the first [installPlayer] call.
+     */
+    @OptIn(UnstableApi::class)
+    @MainThread
+    fun createSession(service: MediaLibraryService) {
+        val placeholder = ExoPlayer.Builder(service).build()
+        placeholderPlayer = placeholder
+
+        forwardingPlayer = PocketCastsForwardingPlayer(
+            wrappedPlayer = placeholder,
+            onSkipForward = { launch { playbackManager.skipForwardSuspend() } },
+            onSkipBack = { launch { playbackManager.skipBackwardSuspend() } },
+            onStop = {
+                if (playbackManager.player !is CastPlayer) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
+                    launch { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
+                }
+            },
+            playGuard = {
+                if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
+                    false
+                } else {
+                    true
+                }
+            },
+        )
+
+        media3Callback = Media3SessionCallback(
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            actions = actions,
+            bookmarkHelper = bookmarkHelper,
+            scope = this,
+            contextProvider = { context },
+        )
+        media3LibraryCallback = Media3LibrarySessionCallback(
+            sessionCallback = media3Callback!!,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            settings = settings,
+            packageValidator = if (!BuildConfig.DEBUG) {
+                PackageValidator(context, LR.xml.allowed_media_browser_callers)
+            } else {
+                null
+            },
+            scope = this,
+            contextProvider = { context },
+        )
+
+        media3Session = MediaLibraryService.MediaLibrarySession.Builder(service, forwardingPlayer!!, media3LibraryCallback!!)
+            .setId("PocketCastsMedia3Session")
+            .apply {
+                if (!Util.isAutomotive(context)) {
+                    setSessionActivity(context.getLaunchActivityPendingIntent())
+                }
+            }
+            .build()
+        media3NotificationBuilder = Media3NotificationBuilder(context, notificationHelper, settings)
+        Timber.i("Media3 session created")
     }
 
     /**
@@ -218,65 +282,11 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun installPlayer(exoPlayer: androidx.media3.common.Player) {
-        if (!useMedia3Session) return
-
-        if (forwardingPlayer == null) {
-            forwardingPlayer = PocketCastsForwardingPlayer(
-                wrappedPlayer = exoPlayer,
-                onSkipForward = { launch { playbackManager.skipForwardSuspend() } },
-                onSkipBack = { launch { playbackManager.skipBackwardSuspend() } },
-                onStop = {
-                    if (playbackManager.player !is CastPlayer) {
-                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                        launch { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
-                    }
-                },
-                playGuard = {
-                    if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
-                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
-                        false
-                    } else {
-                        true
-                    }
-                },
-            )
-            media3Callback = Media3SessionCallback(
-                playbackManager = playbackManager,
-                episodeManager = episodeManager,
-                settings = settings,
-                actions = actions,
-                bookmarkHelper = bookmarkHelper,
-                scope = this,
-                contextProvider = { context },
-            )
-            media3LibraryCallback = Media3LibrarySessionCallback(
-                sessionCallback = media3Callback!!,
-                browseTreeProvider = browseTreeProvider,
-                playbackManager = playbackManager,
-                packageValidator = if (!BuildConfig.DEBUG) {
-                    PackageValidator(context, LR.xml.allowed_media_browser_callers)
-                } else {
-                    null
-                },
-                scope = this,
-                contextProvider = { context },
-            )
-            media3Session = MediaSession.Builder(context, forwardingPlayer!!)
-                .setId("PocketCastsMedia3Session")
-                .setCallback(media3LibraryCallback!!)
-                .apply {
-                    if (!Util.isAutomotive(context)) {
-                        setSessionActivity(context.getLaunchActivityPendingIntent())
-                    }
-                }
-                .build()
-            media3NotificationBuilder = Media3NotificationBuilder(context, notificationHelper, settings)
-            Timber.i("Media3 session created")
-        } else {
-            forwardingPlayer = forwardingPlayer!!.swapPlayer(exoPlayer)
-            media3Session?.player = forwardingPlayer!!
-            Timber.i("Media3 session player swapped")
-        }
+        forwardingPlayer = forwardingPlayer!!.swapPlayer(exoPlayer)
+        media3Session?.player = forwardingPlayer!!
+        placeholderPlayer?.release()
+        placeholderPlayer = null
+        Timber.i("Media3 session player swapped")
     }
 
     @OptIn(UnstableApi::class)
@@ -417,6 +427,8 @@ class MediaSessionManager(
         cancel()
         media3Session?.release()
         media3Session = null
+        placeholderPlayer?.release()
+        placeholderPlayer = null
     }
 
     private fun observeCustomMediaActionsVisibility() {

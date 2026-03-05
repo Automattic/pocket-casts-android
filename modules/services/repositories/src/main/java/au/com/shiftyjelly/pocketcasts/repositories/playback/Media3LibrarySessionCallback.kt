@@ -11,12 +11,16 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -36,6 +40,7 @@ internal class Media3LibrarySessionCallback(
     private val sessionCallback: Media3SessionCallback,
     private val browseTreeProvider: BrowseTreeProvider,
     private val playbackManager: PlaybackManager,
+    private val settings: Settings,
     private val packageValidator: PackageValidator?,
     private val scope: CoroutineScope,
     private val contextProvider: () -> android.content.Context,
@@ -48,6 +53,16 @@ internal class Media3LibrarySessionCallback(
         if (packageValidator != null && !packageValidator.isKnownCaller(controller.packageName, controller.uid)) {
             Timber.e("Unknown caller trying to connect to Media3 session: ${controller.packageName} ${controller.uid}")
             return MediaSession.ConnectionResult.reject()
+        }
+        if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")
+            val context = contextProvider()
+            if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
+                scope.launch {
+                    delay(1000)
+                    settings.setAutomotiveConnectedToMediaSession(true)
+                }
+            }
         }
         return sessionCallback.onConnect(session, controller)
     }
@@ -110,7 +125,17 @@ internal class Media3LibrarySessionCallback(
             )
             .build()
 
-        return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
+        val extras = Bundle().apply {
+            putBoolean(MEDIA_SEARCH_SUPPORTED, true)
+            putBoolean(CONTENT_STYLE_SUPPORTED, true)
+            putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
+            putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
+        }
+        val responseParams = MediaLibraryService.LibraryParams.Builder()
+            .setExtras(extras)
+            .build()
+
+        return Futures.immediateFuture(LibraryResult.ofItem(rootItem, responseParams))
     }
 
     override fun onGetChildren(

@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -9,6 +11,7 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -35,6 +38,7 @@ class Media3LibrarySessionCallbackTest {
     private lateinit var sessionCallback: Media3SessionCallback
     private lateinit var browseTreeProvider: BrowseTreeProvider
     private lateinit var playbackManager: PlaybackManager
+    private lateinit var mockSettings: Settings
     private lateinit var callback: Media3LibrarySessionCallback
     private lateinit var mockSession: MediaLibraryService.MediaLibrarySession
     private lateinit var mockController: MediaSession.ControllerInfo
@@ -46,15 +50,23 @@ class Media3LibrarySessionCallbackTest {
         sessionCallback = mock()
         browseTreeProvider = mock()
         playbackManager = mock()
+        mockSettings = mock()
         mockSession = mock()
         mockController = mock()
+        whenever(mockController.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+        whenever(mockController.uid).thenReturn(1000)
         mockContext = mock()
+        val mockPackageManager: PackageManager = mock()
+        whenever(mockPackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(ApplicationInfo())
+        whenever(mockContext.packageManager).thenReturn(mockPackageManager)
+        whenever(mockContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
         testScope = TestScope(UnconfinedTestDispatcher())
 
         callback = Media3LibrarySessionCallback(
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            settings = mockSettings,
             packageValidator = null,
             scope = testScope,
             contextProvider = { mockContext },
@@ -217,6 +229,7 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            settings = mockSettings,
             packageValidator = packageValidator,
             scope = testScope,
             contextProvider = { mockContext },
@@ -230,9 +243,9 @@ class Media3LibrarySessionCallbackTest {
     @Test
     fun `onConnect accepts known caller when packageValidator accepts`() {
         val packageValidator: PackageValidator = mock()
-        whenever(mockController.packageName).thenReturn("com.known.app")
+        whenever(mockController.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.known")
         whenever(mockController.uid).thenReturn(12345)
-        whenever(packageValidator.isKnownCaller("com.known.app", 12345)).thenReturn(true)
+        whenever(packageValidator.isKnownCaller("au.com.shiftyjelly.pocketcasts.known", 12345)).thenReturn(true)
 
         val connectionResult = MediaSession.ConnectionResult.accept(
             androidx.media3.session.SessionCommands.Builder().build(),
@@ -244,6 +257,7 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            settings = mockSettings,
             packageValidator = packageValidator,
             scope = testScope,
             contextProvider = { mockContext },
@@ -263,6 +277,22 @@ class Media3LibrarySessionCallbackTest {
         whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
 
         // Default callback has null packageValidator
+        callback.onConnect(mockSession, mockController)
+
+        verify(sessionCallback).onConnect(mockSession, mockController)
+    }
+
+    @Test
+    fun `onConnect delegates for external client`() {
+        whenever(mockController.packageName).thenReturn("com.external.app")
+        whenever(mockController.uid).thenReturn(99)
+        whenever(mockSettings.automotiveConnectedToMediaSession()).thenReturn(false)
+        val connectionResult = MediaSession.ConnectionResult.accept(
+            androidx.media3.session.SessionCommands.Builder().build(),
+            androidx.media3.common.Player.Commands.Builder().build(),
+        )
+        whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
+
         callback.onConnect(mockSession, mockController)
 
         verify(sessionCallback).onConnect(mockSession, mockController)

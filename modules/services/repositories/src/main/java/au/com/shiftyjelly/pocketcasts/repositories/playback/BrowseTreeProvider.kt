@@ -1,8 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.net.toUri
+import androidx.core.os.bundleOf
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -11,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
@@ -22,17 +32,31 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val DOWNLOADS_ROOT = "__DOWNLOADS__"
 private const val FILES_ROOT = "__FILES__"
 private const val EPISODE_LIMIT = 100
 private const val NUM_SUGGESTED_ITEMS = 8
+
+const val FILTERS_ROOT = "__FILTERS__"
+const val DISCOVER_ROOT = "__DISCOVER__"
+const val PROFILE_ROOT = "__PROFILE__"
+const val PROFILE_FILES = "__PROFILE_FILES__"
+const val PROFILE_STARRED = "__PROFILE_STARRED__"
+const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 
 @Singleton
 class BrowseTreeProvider @Inject constructor(
@@ -45,6 +69,7 @@ class BrowseTreeProvider @Inject constructor(
     private val settings: Settings,
     private val serviceManager: ServiceManager,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
+    private val listRepository: ListRepository,
 ) {
 
     fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean): String? {
@@ -70,11 +95,27 @@ class BrowseTreeProvider @Inject constructor(
 
             SUGGESTED_ROOT -> loadSuggestedChildren(context)
 
-            MEDIA_ID_ROOT -> loadRootChildren(context)
+            MEDIA_ID_ROOT -> if (Util.isAutomotive(context)) {
+                loadAutomotiveRootChildren(context)
+            } else {
+                loadRootChildren(context)
+            }
 
             PODCASTS_ROOT -> loadPodcastsChildren(context)
 
             FILES_ROOT -> loadFilesChildren(context)
+
+            FILTERS_ROOT -> loadFiltersRoot(context)
+
+            DISCOVER_ROOT -> loadDiscoverRoot(context)
+
+            PROFILE_ROOT -> loadProfileRoot(context)
+
+            PROFILE_FILES -> loadFilesChildren(context)
+
+            PROFILE_STARRED -> loadStarredChildren(context)
+
+            PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren(context)
 
             else -> {
                 if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
@@ -320,6 +361,117 @@ class BrowseTreeProvider @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun loadAutomotiveRootChildren(context: Context): List<MediaBrowserCompat.MediaItem> {
+        val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+
+        val podcastsItem = buildListMediaItem(context, id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
+        val filtersItem = buildListMediaItem(
+            context,
+            id = FILTERS_ROOT,
+            title = LR.string.playlists,
+            drawable = IR.drawable.auto_tab_playlists,
+            extras = extrasContentAsList,
+        )
+        val discoverItem = buildListMediaItem(context, id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)
+        val profileItem = buildListMediaItem(context, id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
+
+        return if (podcastManager.countSubscribed() > 0) {
+            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
+        } else {
+            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
+        }
+    }
+
+    private suspend fun loadFiltersRoot(context: Context): List<MediaBrowserCompat.MediaItem> {
+        return getPlaylistPreviews().mapNotNull {
+            Timber.d("Filters ${it.title}")
+            try {
+                AutoConverter.convertPlaylistToMediaItem(context, it)
+            } catch (e: Exception) {
+                Timber.e(e, "Filter ${it.title} load failed")
+                null
+            }
+        }
+    }
+
+    private suspend fun loadDiscoverRoot(context: Context): List<MediaBrowserCompat.MediaItem> {
+        Timber.d("Loading discover root")
+        val discoverFeed = try {
+            listRepository.getDiscoverFeed()
+        } catch (e: Exception) {
+            Timber.e(e, "Error loading discover")
+            return emptyList()
+        }
+
+        val region = discoverFeed.regions[discoverFeed.defaultRegionCode] ?: return emptyList()
+        val replacements = mapOf(
+            discoverFeed.regionCodeToken to region.code,
+            discoverFeed.regionNameToken to region.name,
+        )
+
+        return discoverFeed.layout.transformWithRegion(region, replacements, context.resources)
+            .filter {
+                it.type is ListType.PodcastList &&
+                    it.displayStyle !is DisplayStyle.CollectionList &&
+                    !it.sponsored &&
+                    it.authenticated == false &&
+                    it.displayStyle !is DisplayStyle.SinglePodcast
+            }
+            .mapNotNull { discoverItem ->
+                Timber.d("Loading discover feed ${discoverItem.source}")
+                listRepository.getListFeed(
+                    url = discoverItem.source,
+                    authenticated = discoverItem.authenticated,
+                )?.run {
+                    Pair(
+                        title.orEmpty().ifEmpty { discoverItem.title },
+                        podcasts?.take(6).orEmpty(),
+                    )
+                }
+            }
+            .flatMap { (title, podcasts) ->
+                Timber.d("Mapping $title to media item")
+                val groupTitle = title.tryToLocalise(context.resources)
+                podcasts.map {
+                    val extras = Bundle()
+                    extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
+
+                    val artworkUri = PodcastImage.getMediumArtworkUrl(uuid = it.uuid)
+                    val localUri = AutoConverter.getArtworkUriForContentProvider(artworkUri.toUri(), context)
+
+                    val discoverDescription = MediaDescriptionCompat.Builder()
+                        .setTitle(it.title)
+                        .setMediaId(it.uuid)
+                        .setIconUri(localUri)
+                        .setExtras(extras)
+                        .build()
+
+                    return@map MediaBrowserCompat.MediaItem(discoverDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+                }
+            }
+    }
+
+    private fun loadProfileRoot(context: Context): List<MediaBrowserCompat.MediaItem> {
+        return buildList {
+            val isPaidUser = settings.cachedSubscription.value != null
+            if (isPaidUser) {
+                add(buildListMediaItem(context, id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
+            }
+            add(buildListMediaItem(context, id = PROFILE_STARRED, title = LR.string.profile_navigation_starred, drawable = IR.drawable.automotive_filter_star))
+            add(buildListMediaItem(context, id = PROFILE_LISTENING_HISTORY, title = LR.string.profile_navigation_listening_history, drawable = IR.drawable.automotive_listening_history))
+        }
+    }
+
+    private fun buildListMediaItem(context: Context, id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaBrowserCompat.MediaItem {
+        val description = MediaDescriptionCompat.Builder()
+            .setTitle(context.getString(title))
+            .setMediaId(id)
+            .setExtras(extras)
+            .setIconUri(AutoConverter.getBitmapUri(drawable = drawable, context))
+            .build()
+        return MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
     /**
