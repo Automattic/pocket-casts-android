@@ -8,6 +8,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,6 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -31,6 +34,7 @@ class Media3LibrarySessionCallbackTest {
 
     private lateinit var sessionCallback: Media3SessionCallback
     private lateinit var browseTreeProvider: BrowseTreeProvider
+    private lateinit var playbackManager: PlaybackManager
     private lateinit var callback: Media3LibrarySessionCallback
     private lateinit var mockSession: MediaLibraryService.MediaLibrarySession
     private lateinit var mockController: MediaSession.ControllerInfo
@@ -41,6 +45,7 @@ class Media3LibrarySessionCallbackTest {
     fun setUp() {
         sessionCallback = mock()
         browseTreeProvider = mock()
+        playbackManager = mock()
         mockSession = mock()
         mockController = mock()
         mockContext = mock()
@@ -49,6 +54,8 @@ class Media3LibrarySessionCallbackTest {
         callback = Media3LibrarySessionCallback(
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            packageValidator = null,
             scope = testScope,
             contextProvider = { mockContext },
         )
@@ -58,6 +65,8 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns root media item for default params`() {
+        val episode: PodcastEpisode = mock()
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = true))
             .thenReturn(MEDIA_ID_ROOT)
 
@@ -69,6 +78,8 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns suggested root when params isSuggested`() {
+        val episode: PodcastEpisode = mock()
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = true, hasCurrentEpisode = true))
             .thenReturn(SUGGESTED_ROOT)
 
@@ -84,6 +95,8 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns recent root when params isRecent`() {
+        val episode: PodcastEpisode = mock()
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = true, isSuggested = false, hasCurrentEpisode = true))
             .thenReturn(RECENT_ROOT)
 
@@ -95,6 +108,19 @@ class Media3LibrarySessionCallbackTest {
 
         val libraryResult = result.get()
         assertEquals(RECENT_ROOT, libraryResult.value?.mediaId)
+    }
+
+    @Test
+    fun `onGetLibraryRoot passes hasCurrentEpisode false when no current episode`() {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+        whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false))
+            .thenReturn(MEDIA_ID_ROOT)
+
+        val result = callback.onGetLibraryRoot(mockSession, mockController, null)
+
+        val libraryResult = result.get()
+        assertEquals(MEDIA_ID_ROOT, libraryResult.value?.mediaId)
+        verify(browseTreeProvider).getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false)
     }
 
     // --- onGetChildren ---
@@ -176,6 +202,68 @@ class Media3LibrarySessionCallbackTest {
         whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
 
         val result = callback.onConnect(mockSession, mockController)
+
+        verify(sessionCallback).onConnect(mockSession, mockController)
+    }
+
+    @Test
+    fun `onConnect rejects unknown caller when packageValidator rejects`() {
+        val packageValidator: PackageValidator = mock()
+        whenever(mockController.packageName).thenReturn("com.unknown.app")
+        whenever(mockController.uid).thenReturn(12345)
+        whenever(packageValidator.isKnownCaller("com.unknown.app", 12345)).thenReturn(false)
+
+        val callbackWithValidator = Media3LibrarySessionCallback(
+            sessionCallback = sessionCallback,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            packageValidator = packageValidator,
+            scope = testScope,
+            contextProvider = { mockContext },
+        )
+
+        val result = callbackWithValidator.onConnect(mockSession, mockController)
+
+        verify(sessionCallback, never()).onConnect(any(), any())
+    }
+
+    @Test
+    fun `onConnect accepts known caller when packageValidator accepts`() {
+        val packageValidator: PackageValidator = mock()
+        whenever(mockController.packageName).thenReturn("com.known.app")
+        whenever(mockController.uid).thenReturn(12345)
+        whenever(packageValidator.isKnownCaller("com.known.app", 12345)).thenReturn(true)
+
+        val connectionResult = MediaSession.ConnectionResult.accept(
+            androidx.media3.session.SessionCommands.Builder().build(),
+            androidx.media3.common.Player.Commands.Builder().build(),
+        )
+        whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
+
+        val callbackWithValidator = Media3LibrarySessionCallback(
+            sessionCallback = sessionCallback,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            packageValidator = packageValidator,
+            scope = testScope,
+            contextProvider = { mockContext },
+        )
+
+        callbackWithValidator.onConnect(mockSession, mockController)
+
+        verify(sessionCallback).onConnect(mockSession, mockController)
+    }
+
+    @Test
+    fun `onConnect accepts any caller when packageValidator is null`() {
+        val connectionResult = MediaSession.ConnectionResult.accept(
+            androidx.media3.session.SessionCommands.Builder().build(),
+            androidx.media3.common.Player.Commands.Builder().build(),
+        )
+        whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
+
+        // Default callback has null packageValidator
+        callback.onConnect(mockSession, mockController)
 
         verify(sessionCallback).onConnect(mockSession, mockController)
     }
