@@ -9,7 +9,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -29,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -63,7 +64,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     private val downloadProgressCache: DownloadProgressCache,
     private val showNotesManager: ShowNotesManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val episodeAnalytics: EpisodeAnalytics,
     private val transcriptManager: TranscriptManager,
 ) : ViewModel(),
@@ -299,8 +300,13 @@ class EpisodeFragmentViewModel @Inject constructor(
                 else -> {
                     startPlaybackTimestamp = null
                     autoDispatchPlay = false
-                    fromListUuid?.let {
-                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
+                    fromListUuid?.let { listId ->
+                        eventHorizon.track(
+                            DiscoverListEpisodePlayEvent(
+                                listId = listId,
+                                podcastUuid = episode.podcastUuid,
+                            ),
+                        )
                     }
                     playbackManager.playNow(
                         episode = episode,
@@ -335,11 +341,6 @@ class EpisodeFragmentViewModel @Inject constructor(
                 episodeManager.toggleStarEpisode(episode, source)
             }
         }
-    }
-
-    companion object {
-        private const val LIST_ID_KEY = "list_id"
-        private const val PODCAST_ID_KEY = "podcast_id"
     }
 }
 
