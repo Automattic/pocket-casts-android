@@ -101,6 +101,16 @@ import com.automattic.eventhorizon.FolderChooseFolderTappedEvent
 import com.automattic.eventhorizon.FolderChooseShownEvent
 import com.automattic.eventhorizon.FolderPodcastModalOptionTappedEvent
 import com.automattic.eventhorizon.FolderPodcastModalOptionType
+import com.automattic.eventhorizon.PodcastScreenCategoryTappedEvent
+import com.automattic.eventhorizon.PodcastScreenFolderTappedEvent
+import com.automattic.eventhorizon.PodcastScreenOptionsTappedEvent
+import com.automattic.eventhorizon.PodcastScreenPodcastDetailsLinkTappedEvent
+import com.automattic.eventhorizon.PodcastScreenSettingsTappedEvent
+import com.automattic.eventhorizon.PodcastScreenShareTappedEvent
+import com.automattic.eventhorizon.PodcastScreenShownEvent
+import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleSummaryEvent
+import com.automattic.eventhorizon.PodcastScreenUnsubscribeTappedEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -268,9 +278,10 @@ class PodcastFragment : BaseFragment() {
         userInitiated: Boolean,
     ) -> Unit = { expanded, userInitiated ->
         if (userInitiated) {
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY,
-                mapOf(IS_EXPANDED_KEY to expanded),
+            eventHorizon.track(
+                PodcastScreenToggleSummaryEvent(
+                    isExpanded = expanded,
+                ),
             )
         }
     }
@@ -282,7 +293,7 @@ class PodcastFragment : BaseFragment() {
                 analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
             }
         }
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
+        eventHorizon.track(PodcastScreenSubscribeTappedEvent)
 
         viewModel.subscribeToPodcast()
     }
@@ -295,7 +306,7 @@ class PodcastFragment : BaseFragment() {
                 1 -> getString(LR.string.podcast_unsubscribe_downloaded_file_singular)
                 else -> getString(LR.string.podcast_unsubscribe_downloaded_file_plural, downloaded)
             }
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_UNSUBSCRIBE_TAPPED)
+            eventHorizon.track(PodcastScreenUnsubscribeTappedEvent)
             val dialog = ConfirmationDialog().setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.unsubscribe)))
                 .setTitle(title)
                 .setSummary(getString(LR.string.podcast_unsubscribe_warning))
@@ -457,7 +468,7 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onEpisodesOptionsClicked: () -> Unit = {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
+        eventHorizon.track(PodcastScreenOptionsTappedEvent)
         var optionsDialog = OptionsDialog()
             .addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
@@ -533,7 +544,7 @@ class PodcastFragment : BaseFragment() {
 
     private val onFoldersClicked: () -> Unit = {
         lifecycleScope.launch {
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FOLDER_TAPPED)
+            eventHorizon.track(PodcastScreenFolderTappedEvent)
             val isSignedInAsPlusOrPatron = viewModel.signInState.value?.isSignedInAsPlusOrPatron == true
             if (!isSignedInAsPlusOrPatron) {
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN))
@@ -600,7 +611,7 @@ class PodcastFragment : BaseFragment() {
 
     private val onSettingsClicked: () -> Unit = callback@{
         val podcast = viewModel.podcast.value ?: return@callback
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
+        eventHorizon.track(PodcastScreenSettingsTappedEvent)
         val fragment = PodcastSettingsFragment.newInstance(
             uuid = podcast.uuid,
             title = podcast.title,
@@ -681,7 +692,11 @@ class PodcastFragment : BaseFragment() {
 
         adapter?.fromListUuid = fromListUuid
         if (savedInstanceState == null) {
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
+            eventHorizon.track(
+                PodcastScreenShownEvent(
+                    source = sourceView.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -758,9 +773,10 @@ class PodcastFragment : BaseFragment() {
             onClickCategory = { podcast ->
                 val categoryId = podcast.getFirstCategoryId()
                 if (categoryId != null) {
-                    analyticsTracker.track(
-                        AnalyticsEvent.PODCAST_SCREEN_CATEGORY_TAPPED,
-                        mapOf("category" to podcast.getFirstCategoryUnlocalised()),
+                    eventHorizon.track(
+                        PodcastScreenCategoryTappedEvent(
+                            category = podcast.getFirstCategoryUnlocalised(),
+                        ),
                     )
                     categoriesManager.selectCategory(categoryId)
                     val hostListener = (requireActivity() as FragmentHostListener)
@@ -771,9 +787,10 @@ class PodcastFragment : BaseFragment() {
             onClickWebsite = { podcast ->
                 podcast.podcastUrl?.let { url ->
                     if (url.isNotBlank()) {
-                        analyticsTracker.track(
-                            AnalyticsEvent.PODCAST_SCREEN_PODCAST_DETAILS_LINK_TAPPED,
-                            mapOf("podcast_uuid" to podcast.uuid),
+                        eventHorizon.track(
+                            PodcastScreenPodcastDetailsLinkTappedEvent(
+                                podcastUuid = podcast.uuid,
+                            ),
                         )
                         try {
                             var uri = Uri.parse(url)
@@ -1195,7 +1212,7 @@ class PodcastFragment : BaseFragment() {
     private fun share() {
         val podcast = viewModel.podcast.value ?: return
 
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
+        eventHorizon.track(PodcastScreenShareTappedEvent)
 
         if (!podcast.canShare) {
             showSnackBar(message = getString(LR.string.sharing_is_not_available_for_private_podcasts))

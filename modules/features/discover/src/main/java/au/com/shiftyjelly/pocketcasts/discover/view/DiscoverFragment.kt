@@ -37,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastSubscribedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -54,6 +56,8 @@ class DiscoverFragment :
     @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
@@ -83,9 +87,12 @@ class DiscoverFragment :
 
     override fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?, listDate: String?) {
         viewModel.subscribeToPodcast(podcast)
-        analyticsTracker.track(
-            AnalyticsEvent.PODCAST_SUBSCRIBED,
-            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid),
+
+        eventHorizon.track(
+            PodcastSubscribedEvent(
+                uuid = podcast.uuid,
+                source = SourceView.DISCOVER.eventHorizonValue,
+            ),
         )
     }
 

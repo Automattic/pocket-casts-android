@@ -11,6 +11,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -26,6 +29,7 @@ class ShareListIncomingViewModel
     val listServiceManager: ListServiceManager,
     val playbackManager: PlaybackManager,
     val analyticsTracker: AnalyticsTracker,
+    val eventHorizon: EventHorizon,
 ) : ViewModel(),
     CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -72,6 +76,24 @@ class ShareListIncomingViewModel
 
     fun trackShareEvent(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         analyticsTracker.track(event, properties)
+    }
+
+    fun trackPodcastUnsubscribed(uuid: String) {
+        eventHorizon.track(
+            PodcastUnsubscribedEvent(
+                uuid = uuid,
+                source = SourceView.SHARE_LIST.eventHorizonValue,
+            ),
+        )
+    }
+
+    fun trackPodcastSubscribed(uuid: String) {
+        eventHorizon.track(
+            PodcastSubscribedEvent(
+                uuid = uuid,
+                source = SourceView.SHARE_LIST.eventHorizonValue,
+            ),
+        )
     }
 }
 

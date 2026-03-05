@@ -139,28 +139,6 @@ class AnalyticsTracker(
         )
     }
 
-    fun trackPodcastSubscribed(flow: String, podcastUuid: String, source: String) {
-        trackWithFlow(
-            event = AnalyticsEvent.PODCAST_SUBSCRIBED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.UUID to podcastUuid,
-                AnalyticsParameter.SOURCE to source,
-            ),
-        )
-    }
-
-    fun trackPodcastUnsubscribed(flow: String, podcastUuid: String, source: String) {
-        trackWithFlow(
-            event = AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.UUID to podcastUuid,
-                AnalyticsParameter.SOURCE to source,
-            ),
-        )
-    }
-
     fun trackEndOfYearModalShown(year: Int) {
         track(
             event = AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,

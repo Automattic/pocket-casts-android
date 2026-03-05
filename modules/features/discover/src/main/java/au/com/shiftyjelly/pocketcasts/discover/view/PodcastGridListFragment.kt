@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Comp
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.SOURCE_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -49,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import coil3.load
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastSubscribedEvent
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -63,6 +63,8 @@ open class PodcastGridListFragment :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var notificationManager: NotificationManager
 
@@ -154,7 +156,13 @@ open class PodcastGridListFragment :
         } else if (expandedStyle is ExpandedStyle.PlainList) {
             podcastSubscribedSource = SourceView.DISCOVER_PLAIN_LIST
         }
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, mapOf(SOURCE_KEY to podcastSubscribedSource.analyticsValue, UUID_KEY to podcastUuid))
+
+        eventHorizon.track(
+            PodcastSubscribedEvent(
+                uuid = podcastUuid,
+                source = podcastSubscribedSource.eventHorizonValue,
+            ),
+        )
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
     }
 
