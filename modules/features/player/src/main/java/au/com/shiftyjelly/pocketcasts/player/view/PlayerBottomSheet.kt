@@ -12,8 +12,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewPlayerBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation
@@ -25,6 +23,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerDismissedEvent
+import com.automattic.eventhorizon.PlayerShownEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -37,7 +38,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     FrameLayout(context, attrs),
     CoroutineScope {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var settings: Settings
     override val coroutineContext: CoroutineContext
@@ -221,7 +222,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     private fun onCollapsed() {
         listener?.onPlayerClosed()
         animations?.forEach { it.onCollapsed() }
-        analyticsTracker.track(AnalyticsEvent.PLAYER_DISMISSED)
+        eventHorizon.track(PlayerDismissedEvent)
 
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         binding.miniPlayer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
@@ -238,7 +239,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     private fun onExpanded() {
         listener?.onPlayerOpen()
         animations?.forEach { it.onExpanded() }
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHOWN)
+        eventHorizon.track(PlayerShownEvent)
 
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         binding.miniPlayer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS

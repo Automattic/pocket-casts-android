@@ -14,8 +14,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentNotesBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -32,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.applyTimeLong
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerShowNotesLinkTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -44,7 +45,7 @@ class NotesFragment : BaseFragment() {
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private val viewModel: NotesViewModel by viewModels()
@@ -53,8 +54,6 @@ class NotesFragment : BaseFragment() {
 
     companion object {
         internal const val ARG_EPISODE_UUID = "episode_uuid"
-        private const val EPISODE_UUID_KEY = "episode_uuid"
-        private const val UNKNOWN = "unknown"
 
         fun newInstance(episodeUuid: String): NotesFragment {
             return NotesFragment().apply {
@@ -134,7 +133,12 @@ class NotesFragment : BaseFragment() {
                             jumpToTime(time)
                             return true
                         }
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_SHOW_NOTES_LINK_TAPPED, mapOf(EPISODE_UUID_KEY to (viewModel.episode.value?.uuid ?: UNKNOWN)))
+
+                        eventHorizon.track(
+                            PlayerShowNotesLinkTappedEvent(
+                                episodeUuid = viewModel.episode.value?.uuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                            ),
+                        )
                         return IntentUtil.webViewShouldOverrideUrl(url, view.context)
                     }
 

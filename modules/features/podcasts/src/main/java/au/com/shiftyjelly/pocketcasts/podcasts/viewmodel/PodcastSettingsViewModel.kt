@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -21,6 +19,11 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.decrementByOrRound
 import au.com.shiftyjelly.pocketcasts.utils.extensions.incrementByOrRound
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSpeedChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceAmountChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceToggledEvent
+import com.automattic.eventhorizon.PlaybackEffectVolumeBoostToggledEvent
 import com.automattic.eventhorizon.PodcastSettingsAutoAddUpNextPositionOptionChangedEvent
 import com.automattic.eventhorizon.PodcastSettingsAutoAddUpNextToggledEvent
 import com.automattic.eventhorizon.PodcastSettingsAutoArchiveEpisodeLimitChangedEvent
@@ -33,6 +36,7 @@ import com.automattic.eventhorizon.PodcastSettingsNotificationsToggledEvent
 import com.automattic.eventhorizon.PodcastSettingsSkipFirstChangedEvent
 import com.automattic.eventhorizon.PodcastSettingsSkipLastChangedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.SettingType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -56,7 +60,6 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     @Assisted private val podcastUuid: String,
 ) : ViewModel() {
@@ -240,11 +243,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private fun changePlaybackSpeed(podcast: Podcast, change: Double) {
         val newPlaybackSpeed = (podcast.playbackSpeed + change).roundedSpeed()
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED,
-                mapOf(
-                    "speed" to newPlaybackSpeed,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectSpeedChangedEvent(
+                    speed = newPlaybackSpeed,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -258,11 +262,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast = podcastFlow.value ?: return
         val mode = if (enable) TrimMode.LOW else TrimMode.OFF
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
-                mapOf(
-                    "enabled" to enable,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectTrimSilenceToggledEvent(
+                    enabled = enable,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -275,11 +280,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeTrimMode(mode: TrimMode) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
-                mapOf(
-                    "amount" to mode.analyticsVale,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectTrimSilenceAmountChangedEvent(
+                    amount = mode.eventHorizonValue,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -292,11 +298,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeVolumeBoost(enable: Boolean) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED,
-                mapOf(
-                    "enabled" to enable,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectVolumeBoostToggledEvent(
+                    enabled = enable,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 

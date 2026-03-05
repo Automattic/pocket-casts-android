@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -53,7 +55,6 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
-    private val tracker = AnalyticsTracker.test()
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
@@ -94,7 +95,8 @@ class ChaptersViewModelTest {
             playbackManager,
             episodeManager,
             settings,
-            tracker,
+            AnalyticsTracker.test(),
+            EventHorizon(TestEventSink()),
             testDispatcher,
         )
     }
@@ -229,7 +231,8 @@ class ChaptersViewModelTest {
             playbackManager,
             episodeManager,
             settings,
-            tracker,
+            AnalyticsTracker.test(),
+            EventHorizon(TestEventSink()),
             testDispatcher,
         )
 
