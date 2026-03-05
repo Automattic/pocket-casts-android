@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.helper.setupPredictiveBackWithAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -53,6 +54,8 @@ class OnboardingActivity : AppCompatActivity() {
         // Make content edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+
+        setupPredictiveBackWithAnimation()
 
         setContent {
             val onboardingState by upgradeFeaturesViewModel.state.collectAsState()

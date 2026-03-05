@@ -54,6 +54,7 @@ sentry-plugin = "6.1.0"
 tasker-plugin = "0.4.10"
 test = "1.7.0"
 tracks = "6.0.7"
+transition = "1.5.1"
 wear-compose = "1.6.0-alpha05"
 webkit = "1.15.0"
 wordpress-lint = "2.2.0"
@@ -237,6 +238,10 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "test" }
 automattic-crashlogging = { module = "com.automattic.tracks:crashlogging", version.ref = "tracks" }
 automattic-tracks = { module = "com.automattic:Automattic-Tracks-Android", version.ref = "tracks" }
 automattic-explat = { module = "com.automattic.tracks:experimentation", version.ref = "tracks" }
+
+# Transition
+androidx-transition = { module = "androidx.transition:transition", version.ref = "transition" }
+androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "transition" }
 
 # Wear
 wear-input = "androidx.wear:wear-input:1.2.0"

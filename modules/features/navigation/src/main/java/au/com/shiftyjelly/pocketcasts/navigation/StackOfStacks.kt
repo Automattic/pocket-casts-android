@@ -97,6 +97,20 @@ class StackOfStacks<K, V> {
     }
 
     /**
+     * Returns the value below the top of the stack (the "previous" item).
+     * This is useful for predictive back animations to show the previous fragment.
+     * Returns null if there is no item below the top.
+     */
+    fun peekValueBelowTop(): V? {
+        return try {
+            val (_, stack) = getTopStack()
+            stack.peekBelowTop()
+        } catch (e: EmptyStackException) {
+            null
+        }
+    }
+
+    /**
      * Removes all the keys from the map
      */
     fun clear() {
@@ -143,6 +157,17 @@ private class Stack<T> : Iterable<T> {
     fun pop(): T = dequeue.removeLast()
 
     fun peek(): T? = dequeue.peekLast()
+
+    /**
+     * Returns the element below the top of the stack without removing it.
+     * Returns null if the stack has fewer than 2 elements.
+     */
+    fun peekBelowTop(): T? {
+        if (dequeue.size < 2) return null
+        val iterator = dequeue.descendingIterator()
+        iterator.next() // Skip the top element
+        return if (iterator.hasNext()) iterator.next() else null
+    }
 
     override fun iterator(): Iterator<T> = dequeue.descendingIterator()
 

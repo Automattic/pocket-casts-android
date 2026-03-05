@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPad
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.setupPredictiveBackWithAnimation
 import coil3.Image
 import coil3.imageLoader
 import coil3.request.ImageRequest
@@ -210,6 +211,8 @@ class AddFileActivity :
         val view = binding.root
         view.setSystemWindowInsetToPadding(right = true, left = true)
         setContentView(view)
+
+        setupPredictiveBackWithAnimation()
 
         colorAdapter = AddFileColourAdapter(
             onSelectedChange = {

@@ -952,6 +952,8 @@ class PodcastFragment : BaseFragment() {
             multiSelectToolbar.isVisible = it
             binding?.toolbar?.isInvisible = it
             adapter?.notifyItemRangeChanged(0, adapter?.itemCount ?: 0, MULTI_SELECT_TOGGLE_PAYLOAD)
+            // Notify backstack changed to update predictive back callback enabled state
+            notifyBackstackChanged()
         }
         coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         context = requireActivity()

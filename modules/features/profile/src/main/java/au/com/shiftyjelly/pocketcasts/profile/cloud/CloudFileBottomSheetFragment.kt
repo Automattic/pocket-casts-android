@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksDialogFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.EDIT
@@ -228,10 +228,10 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
                     viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
-                    BookmarksContainerFragment.newInstance(
+                    BookmarksDialogFragment.newInstance(
                         episodeUuid = args.episodeId,
                         sourceView = SourceView.FILES,
-                    ).show(parentFragmentManager, "bookmarks_container")
+                    ).show(parentFragmentManager, "bookmarks_dialog")
                 }
 
                 val errorLayout = binding.errorLayout

@@ -5,6 +5,8 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.BackEventCompat
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -36,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -60,7 +63,18 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private var backPressedCallback: OnBackPressedCallback? = null
+
     open fun snackBarView(): View? = null
+
+    /**
+     * Override to disable the default predictive back animation.
+     * Default is true, showing a scale + fade animation.
+     *
+     * **Note:** Predictive back is only available on Android 13+ (API 33).
+     * On older versions, animations won't run but dismiss() still works.
+     */
+    protected open fun enableDefaultBackAnimation(): Boolean = true
 
     @Inject
     lateinit var theme: Theme
@@ -86,6 +100,59 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
 
         isBeingDragged = false
         addDismissCallback()
+        setupPredictiveBack()
+    }
+
+    private fun setupPredictiveBack() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                if (enableDefaultBackAnimation()) {
+                    bottomSheetView()?.let {
+                        PredictiveBackAnimator.applyProgress(
+                            it,
+                            backEvent.progress,
+                            scaleAmount = 0.1f,
+                            alphaAmount = 0.3f,
+                        )
+                    }
+                }
+            }
+
+            override fun handleOnBackPressed() {
+                if (!isAdded) return
+
+                if (enableDefaultBackAnimation()) {
+                    bottomSheetView()?.let {
+                        PredictiveBackAnimator.animateToEnd(
+                            view = it,
+                            targetScale = 0.9f,
+                            targetAlpha = 0.7f,
+                            duration = PredictiveBackAnimator.Defaults.SHORT_ANIMATION_DURATION_MS,
+                        ) {
+                            if (isAdded) {
+                                dismiss()
+                            }
+                        }
+                    } ?: dismiss()
+                } else {
+                    dismiss()
+                }
+            }
+
+            override fun handleOnBackCancelled() {
+                if (enableDefaultBackAnimation()) {
+                    bottomSheetView()?.let { PredictiveBackAnimator.reset(it) }
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+        backPressedCallback = callback
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        bottomSheetView()?.let { PredictiveBackAnimator.reset(it) }
+        backPressedCallback = null
     }
 
     private fun addDismissCallback() {

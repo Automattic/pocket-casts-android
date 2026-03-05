@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.Remo
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.RemoveAllAndShowExisting
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowAndRemove
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowExisting
+import au.com.shiftyjelly.pocketcasts.views.helper.PredictiveBackAnimator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
@@ -271,6 +272,45 @@ open class BottomNavigator internal constructor() : ViewModel() {
         return activityDelegate?.fragmentManager?.findFragmentByTag(
             tabStackMap.peekValue().toString(),
         )
+    }
+
+    /**
+     * Returns the previous fragment in the stack (the one that would be shown after a back press).
+     * Returns null if there is no previous fragment.
+     */
+    open fun previousFragment(): Fragment? {
+        val previousTag = tabStackMap.peekValueBelowTop() ?: return null
+        return activityDelegate?.fragmentManager?.findFragmentByTag(previousTag.toString())
+    }
+
+    /**
+     * Handle predictive back gesture progress for smooth animations.
+     *
+     * @param progress The back gesture progress from 0.0 (start) to 1.0 (complete)
+     */
+    open fun handleBackGestureProgress(progress: Float) {
+        currentFragment()?.view?.let { currentView ->
+            PredictiveBackAnimator.applyProgress(currentView, progress)
+        }
+
+        previousFragment()?.view?.let { previousView ->
+            if (previousView.visibility != android.view.View.VISIBLE) {
+                previousView.visibility = android.view.View.VISIBLE
+            }
+            PredictiveBackAnimator.applyProgressReverse(previousView, progress)
+        }
+    }
+
+    /**
+     * Reset fragment views to their default state after back gesture is cancelled.
+     */
+    open fun resetBackGestureState() {
+        currentFragment()?.view?.let { PredictiveBackAnimator.reset(it) }
+
+        previousFragment()?.view?.let {
+            PredictiveBackAnimator.reset(it)
+            it.visibility = android.view.View.GONE
+        }
     }
 
     /**

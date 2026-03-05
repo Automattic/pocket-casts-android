@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksNavigationFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
@@ -171,7 +171,7 @@ class ProfileFragment :
             ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
             ProfileSection.CloudFiles -> CloudFilesFragment()
             ProfileSection.Starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
-            ProfileSection.Bookmarks -> BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
+            ProfileSection.Bookmarks -> BookmarksNavigationFragment.newInstance(sourceView = SourceView.PROFILE)
             ProfileSection.ListeningHistory -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
             ProfileSection.Help -> HelpFragment()
         }
