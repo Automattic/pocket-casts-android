@@ -193,6 +193,12 @@ import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.DiscoverTabOpenedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FiltersTabOpenedEvent
+import com.automattic.eventhorizon.PodcastsTabOpenedEvent
+import com.automattic.eventhorizon.ProfileTabOpenedEvent
+import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -275,6 +281,9 @@ class MainActivity :
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var episodeAnalytics: EpisodeAnalytics
@@ -1880,23 +1889,33 @@ class MainActivity :
     }
 
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
-        val event: AnalyticsEvent? = when (tab) {
-            VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
+        val event = when (tab) {
+            VR.id.navigation_podcasts -> PodcastsTabOpenedEvent(
+                initial = isInitial,
+            )
 
-            VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
+            VR.id.navigation_upnext -> UpNextTabOpenedEvent(
+                initial = isInitial,
+            )
 
-            VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
+            VR.id.navigation_filters -> FiltersTabOpenedEvent(
+                initial = isInitial,
+            )
 
-            VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
+            VR.id.navigation_discover -> DiscoverTabOpenedEvent(
+                initial = isInitial,
+            )
 
-            VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
+            VR.id.navigation_profile -> ProfileTabOpenedEvent(
+                initial = isInitial,
+            )
 
             else -> {
                 Timber.e("Can't open invalid tab")
                 null
             }
         }
-        event?.let { analyticsTracker.track(event, mapOf(INITIAL_KEY to isInitial)) }
+        event?.let(eventHorizon::track)
     }
 
     override fun checkNotificationPermission(onPermissionGranted: () -> Unit) {

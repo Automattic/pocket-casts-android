@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeSwipeActionPerformedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -42,6 +44,7 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
     private val tracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val swipeSource: SwipeSource,
@@ -194,11 +197,10 @@ class SwipeActionViewModel @AssistedInject constructor(
     }
 
     private fun trackAction(action: SwipeAction) {
-        tracker.track(
-            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            mapOf(
-                "action" to action.analyticsValue,
-                "source" to swipeSource.analyticsValue,
+        eventHorizon.track(
+            EpisodeSwipeActionPerformedEvent(
+                source = swipeSource.eventHorizonValue,
+                action = action.eventHorizonValue,
             ),
         )
     }

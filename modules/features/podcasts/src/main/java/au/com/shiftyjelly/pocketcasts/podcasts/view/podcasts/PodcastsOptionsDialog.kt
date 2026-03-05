@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ToggleButtonOption
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -15,13 +13,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastListModalOptionType
+import com.automattic.eventhorizon.PodcastsListBadgesChangedEvent
+import com.automattic.eventhorizon.PodcastsListLayoutChangedEvent
+import com.automattic.eventhorizon.PodcastsListModalOptionTappedEvent
+import com.automattic.eventhorizon.PodcastsListSortOrderChangedEvent
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class PodcastsOptionsDialog(
     val fragment: Fragment,
     val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) {
     private var showDialog: OptionsDialog? = null
     private var sortDialog: OptionsDialog? = null
@@ -172,26 +176,52 @@ class PodcastsOptionsDialog(
     }
 
     private fun trackTapOnModalOption(option: ModalOption) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to option.analyticsValue))
+        eventHorizon.track(
+            PodcastsListModalOptionTappedEvent(
+                option = option.eventHorizonValue,
+            ),
+        )
     }
 
     private fun trackSortByChanged(order: PodcastsSortType) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SORT_ORDER_CHANGED, mapOf(SORT_BY_KEY to order.analyticsValue))
+        eventHorizon.track(
+            PodcastsListSortOrderChangedEvent(
+                sortBy = order.eventHorizonValue,
+            ),
+        )
     }
 
     private fun trackLayoutChanged(layoutType: PodcastGridLayoutType) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_LAYOUT_CHANGED, mapOf(LAYOUT_KEY to layoutType.analyticsValue))
+        eventHorizon.track(
+            PodcastsListLayoutChangedEvent(
+                layout = layoutType.eventHorizonValue,
+            ),
+        )
     }
 
     private fun trackBadgeChanged(badgeType: BadgeType) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_BADGES_CHANGED, mapOf(TYPE_KEY to badgeType.analyticsValue))
+        eventHorizon.track(
+            PodcastsListBadgesChangedEvent(
+                badge = badgeType.eventHorizonValue,
+            ),
+        )
     }
 
-    enum class ModalOption(val analyticsValue: String) {
-        SORT_BY("sort_by"),
-        LAYOUT("layout"),
-        BADGE("badge"),
-        SHARE("share"),
+    enum class ModalOption(
+        val eventHorizonValue: PodcastListModalOptionType,
+    ) {
+        SORT_BY(
+            eventHorizonValue = PodcastListModalOptionType.SortBy,
+        ),
+        LAYOUT(
+            eventHorizonValue = PodcastListModalOptionType.Layout,
+        ),
+        BADGE(
+            eventHorizonValue = PodcastListModalOptionType.Badge,
+        ),
+        SHARE(
+            eventHorizonValue = PodcastListModalOptionType.Share,
+        ),
     }
 
     companion object {
