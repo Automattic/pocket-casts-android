@@ -19,11 +19,21 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.AccountUpdatedDismissedEvent
+import com.automattic.eventhorizon.AccountUpdatedShownEvent
+import com.automattic.eventhorizon.CreateAccountDismissedLegacyEvent
+import com.automattic.eventhorizon.CreateAccountShownLegacyEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ForgotPasswordDismissedEvent
+import com.automattic.eventhorizon.ForgotPasswordShownEvent
+import com.automattic.eventhorizon.SetupAccountDismissedLegacyEvent
+import com.automattic.eventhorizon.SetupAccountShownLegacyEvent
+import com.automattic.eventhorizon.SigninDismissedEvent
+import com.automattic.eventhorizon.SigninShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -33,8 +43,10 @@ class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
+
     private val viewModel: CreateAccountViewModel by viewModels()
+
     private lateinit var binding: AccountActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,46 +144,41 @@ class AccountActivity : AppCompatActivity() {
 
     private fun NavDestination.trackShown() {
         val analyticsEvent = when (id) {
-            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
-            R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
-            R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
-            R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
-            R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
-            else -> null
-        }
-        val properties = when (id) {
-            R.id.createDoneFragment -> {
-                val source = when (viewModel.createAccountState.value) {
+            R.id.accountFragment -> SetupAccountShownLegacyEvent
+
+            R.id.signInFragment -> SigninShownEvent
+
+            R.id.createEmailFragment -> CreateAccountShownLegacyEvent
+
+            R.id.resetPasswordFragment -> ForgotPasswordShownEvent
+
+            R.id.createDoneFragment -> AccountUpdatedShownEvent(
+                source = when (viewModel.createAccountState.value) {
                     CreateAccountState.AccountCreated -> AccountUpdatedSource.CREATE_ACCOUNT.analyticsValue
                     CreateAccountState.SubscriptionCreated -> AccountUpdatedSource.CONFIRM_PAYMENT.analyticsValue
-                    else -> null
-                }
-                source?.let { mapOf(SOURCE_KEY to source) }
-            }
-
-            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
+                    else -> Tracker.INVALID_OR_NULL_VALUE
+                },
+            )
 
             else -> null
-        } ?: emptyMap()
-        analyticsEvent?.let { analyticsTracker.track(it, properties) }
+        }
+        if (analyticsEvent != null) {
+            eventHorizon.track(analyticsEvent)
+        }
     }
 
     private fun NavDestination.trackDismissed() {
         val analyticsEvent = when (id) {
-            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
-            R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
-            R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
-            R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
-            R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
+            R.id.accountFragment -> SetupAccountDismissedLegacyEvent
+            R.id.signInFragment -> SigninDismissedEvent
+            R.id.createEmailFragment -> CreateAccountDismissedLegacyEvent
+            R.id.resetPasswordFragment -> ForgotPasswordDismissedEvent
+            R.id.createDoneFragment -> AccountUpdatedDismissedEvent
             else -> null
         }
-
-        val properties = when (id) {
-            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
-            else -> emptyMap()
+        if (analyticsEvent != null) {
+            eventHorizon.track(analyticsEvent)
         }
-
-        analyticsEvent?.let { analyticsTracker.track(it, properties) }
     }
 
     companion object {
@@ -191,8 +198,6 @@ class AccountActivity : AppCompatActivity() {
         fun isNewAutoSelectPlusInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
-        private const val SOURCE_KEY = "source"
-        private const val ACCOUNT_PROP_VALUE = "account"
         private const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"

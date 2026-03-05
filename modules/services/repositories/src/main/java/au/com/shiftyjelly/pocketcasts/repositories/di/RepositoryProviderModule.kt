@@ -4,7 +4,6 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -15,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import com.automattic.eventhorizon.EventHorizon
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,8 +44,8 @@ class RepositoryProviderModule {
 
     @Provides
     @IntoSet
-    fun provideAnalyticsListener(tracker: AnalyticsTracker): PaymentClient.Listener {
-        return AnalyticsPaymentListener(tracker)
+    fun provideAnalyticsListener(eventHorizon: EventHorizon): PaymentClient.Listener {
+        return AnalyticsPaymentListener(eventHorizon)
     }
 
     @Provides

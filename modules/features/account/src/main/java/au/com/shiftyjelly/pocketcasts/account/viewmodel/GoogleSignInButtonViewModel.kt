@@ -12,7 +12,6 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -27,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvail
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentity
+import com.automattic.eventhorizon.SetupAccountButtonTappedEvent
+import com.automattic.eventhorizon.SetupAccountButtonType
 import com.automattic.eventhorizon.SsoStartedEvent
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -73,9 +74,11 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     source = LoginIdentity.Google,
                 ),
             )
-            analyticsTracker.trackSetupAccountButtonTapped(
-                flow = flow.analyticsValue,
-                button = AnalyticsParameter.SetupAccountButton.ContinueWithGoogle,
+            eventHorizon.track(
+                SetupAccountButtonTappedEvent(
+                    flow = flow.eventHorizonValue,
+                    button = SetupAccountButtonType.ContinueWithGoogle,
+                ),
             )
         } else if (!Util.isAutomotive(context)) {
             throw IllegalArgumentException("OnboardingFlow must be provided for non-automotive devices")

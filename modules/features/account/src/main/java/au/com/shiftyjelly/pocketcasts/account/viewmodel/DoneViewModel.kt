@@ -4,9 +4,10 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.R
+import com.automattic.eventhorizon.AccountUpdatedDismissedEvent
+import com.automattic.eventhorizon.AccountUpdatedShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.account.R as LR
 
 @HiltViewModel
 class DoneViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Empty)
@@ -30,11 +31,15 @@ class DoneViewModel @Inject constructor(
     }
 
     fun trackShown(source: AccountUpdatedSource) {
-        analyticsTracker.track(AnalyticsEvent.ACCOUNT_UPDATED_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        eventHorizon.track(
+            AccountUpdatedShownEvent(
+                source = source.analyticsValue,
+            ),
+        )
     }
 
     fun trackDismissed() {
-        analyticsTracker.track(AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED)
+        eventHorizon.track(AccountUpdatedDismissedEvent)
     }
 
     sealed class State {

@@ -18,6 +18,7 @@ dependencies {
 
     api(libs.coroutines.core)
     api(libs.dagger.hilt.android)
+    api(libs.eventhorizon)
 
     implementation(libs.billing.ktx)
 

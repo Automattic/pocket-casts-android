@@ -3,28 +3,30 @@ package au.com.shiftyjelly.pocketcasts.settings.onboarding
 import android.os.Parcelable
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import com.automattic.eventhorizon.OnboardingFlowType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 sealed interface OnboardingFlow : Parcelable {
-    val analyticsValue: String
+    val eventHorizonValue: OnboardingFlowType
+    val analyticsValue: String get() = eventHorizonValue.toString()
     val source: OnboardingUpgradeSource get() = OnboardingUpgradeSource.UNKNOWN
     val preselectedTier: SubscriptionTier get() = SubscriptionTier.Plus
     val preselectedBillingCycle: BillingCycle get() = BillingCycle.Yearly
 
     @Parcelize
     data object LoggedOut : OnboardingFlow {
-        override val analyticsValue get() = "logged_out"
+        override val eventHorizonValue get() = OnboardingFlowType.LoggedOut
     }
 
     @Parcelize
     data object InitialOnboarding : OnboardingFlow {
-        override val analyticsValue get() = "initial_onboarding"
+        override val eventHorizonValue get() = OnboardingFlowType.InitialOnboarding
     }
 
     @Parcelize
     data object EngageSdk : OnboardingFlow {
-        override val analyticsValue get() = "engage_sdk"
+        override val eventHorizonValue get() = OnboardingFlowType.EngageSdk
     }
 
     @Parcelize
@@ -33,31 +35,31 @@ sealed interface OnboardingFlow : Parcelable {
         override val preselectedTier: SubscriptionTier,
         override val preselectedBillingCycle: BillingCycle,
     ) : OnboardingFlow {
-        override val analyticsValue get() = "plus_account_upgrade"
+        override val eventHorizonValue get() = OnboardingFlowType.PlusAccountUpgrade
     }
 
     @Parcelize
     data object PlusAccountUpgradeNeedsLogin : OnboardingFlow {
-        override val analyticsValue get() = "plus_account_upgrade_needs_login"
+        override val eventHorizonValue get() = OnboardingFlowType.PlusAccountUpgradeNeedsLogin
     }
 
     @Parcelize
     data object ReferralLoginOrSignUp : OnboardingFlow {
-        override val analyticsValue get() = "referral_login_or_signup"
+        override val eventHorizonValue get() = OnboardingFlowType.ReferralLoginOrSignup
     }
 
     @Parcelize
     data class Upsell(
         override val source: OnboardingUpgradeSource,
     ) : OnboardingFlow {
-        override val analyticsValue get() = "plus_upsell"
+        override val eventHorizonValue get() = OnboardingFlowType.PlusUpsell
     }
 
     @Parcelize
     data class UpsellSuggestedFolder(
         val action: SuggestedFoldersAction,
     ) : OnboardingFlow {
-        override val analyticsValue get() = "suggested_folders"
+        override val eventHorizonValue get() = OnboardingFlowType.SuggestedFolders
         override val source get() = OnboardingUpgradeSource.SUGGESTED_FOLDERS
     }
 
@@ -65,22 +67,22 @@ sealed interface OnboardingFlow : Parcelable {
     data class PatronAccountUpgrade(
         override val source: OnboardingUpgradeSource,
     ) : OnboardingFlow {
-        override val analyticsValue get() = "patron_account_upgrade"
+        override val eventHorizonValue get() = OnboardingFlowType.PatronAccountUpgrade
     }
 
     @Parcelize
     data object Welcome : OnboardingFlow {
-        override val analyticsValue get() = "welcome"
+        override val eventHorizonValue get() = OnboardingFlowType.Welcome
     }
 
     @Parcelize
     data object AccountEncouragement : OnboardingFlow {
-        override val analyticsValue get() = "account_encouragement"
+        override val eventHorizonValue get() = OnboardingFlowType.AccountEncouragement
     }
 
     @Parcelize
     data object AccountUpgrade : OnboardingFlow {
-        override val analyticsValue get() = "plus_account_upgrade"
+        override val eventHorizonValue get() = OnboardingFlowType.PlusAccountUpgrade
         override val source get() = OnboardingUpgradeSource.PROFILE
     }
 }
