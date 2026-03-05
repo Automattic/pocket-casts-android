@@ -4,8 +4,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -13,8 +11,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.smart.AppliedRules
 import au.com.shiftyjelly.pocketcasts.playlists.smart.RuleType
 import au.com.shiftyjelly.pocketcasts.playlists.smart.RulesBuilder
@@ -24,6 +25,12 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterCreateAsManualPlaylistTappedEvent
+import com.automattic.eventhorizon.FilterCreateAsSmartPlaylistTappedEvent
+import com.automattic.eventhorizon.FilterCreateCancelledEvent
+import com.automattic.eventhorizon.FilterCreateShownEvent
+import com.automattic.eventhorizon.FilterCreatedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -41,7 +48,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     rulesEditorFactory: SmartRulesEditor.Factory,
     settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
     private val _createdPlaylist = CompletableDeferred<PlaylistCreated>(viewModelScope.coroutineContext[Job])
@@ -185,23 +192,38 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackCreatePlaylistShown() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_SHOWN)
+        eventHorizon.track(FilterCreateShownEvent)
     }
 
     fun trackCreatePlaylistCancelled() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_CANCELLED)
+        eventHorizon.track(FilterCreateCancelledEvent)
     }
 
     fun trackCreateManualPlaylist() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_AS_MANUAL_PLAYLIST_TAPPED)
+        eventHorizon.track(FilterCreateAsManualPlaylistTappedEvent)
     }
 
     fun trackCreateSmartPlaylist() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_AS_SMART_PLAYLIST_TAPPED)
+        eventHorizon.track(FilterCreateAsSmartPlaylistTappedEvent)
     }
 
     fun trackPlaylistCreated(rules: SmartRules?) {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, rules?.analyticsProperties() ?: emptyMap())
+        eventHorizon.track(
+            FilterCreatedEvent(
+                episodeStatusInProgress = rules?.episodeStatus?.inProgress,
+                episodeStatusPlayed = rules?.episodeStatus?.completed,
+                episodeStatusUnplayed = rules?.episodeStatus?.unplayed,
+                downloaded = rules?.downloadStatus?.let { it == DownloadStatusRule.Any || it == DownloadStatusRule.Downloaded },
+                notDownloaded = rules?.downloadStatus?.let { it == DownloadStatusRule.Any || it == DownloadStatusRule.NotDownloaded },
+                mediaType = rules?.mediaType?.eventHorizonValue,
+                releaseDate = rules?.releaseDate?.eventHorizonValue,
+                starred = rules?.starred?.let { it == StarredRule.Starred },
+                allPodcasts = rules?.podcasts?.let { it is PodcastsRule.Any },
+                duration = rules?.episodeDuration?.let { it is EpisodeDurationRule.Constrained },
+                durationLongerThan = (rules?.episodeDuration as? EpisodeDurationRule.Constrained)?.longerThan?.inWholeMinutes,
+                durationShorterThan = (rules?.episodeDuration as? EpisodeDurationRule.Constrained)?.shorterThan?.inWholeMinutes,
+            ),
+        )
     }
 
     data class UiState(

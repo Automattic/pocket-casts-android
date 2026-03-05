@@ -5,12 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterManualEpisodesRearrangedEvent
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -31,7 +34,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private var isOrderChanged = false
     private var _episodes by mutableStateOf(emptyList<PlaylistEpisode>())
@@ -56,17 +59,14 @@ class EditPlaylistViewModel @AssistedInject constructor(
             playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
 
             val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
-            tracker.track(
-                AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
-                buildMap {
-                    if (playlistName != null) {
-                        put("playlist_name", playlistName)
-                    }
-                    put("playlist_uuid", playlistUuid)
-                    put("episode_uuid", episodeUuid)
-                    put("podcast_uuid", podcastUuid)
-                    put("source", "playlist_rearrange")
-                },
+            eventHorizon.track(
+                EpisodeRemovedFromListEvent(
+                    playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                    playlistUuid = playlistUuid,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    source = PlaylistRemoveEpisodeSource.PlaylistRearrange,
+                ),
             )
         }
     }
@@ -79,7 +79,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
     fun persistEpisodesOrder() {
         if (isOrderChanged) {
             viewModelScope.launch(NonCancellable) {
-                tracker.track(AnalyticsEvent.FILTER_MANUAL_EPISODES_REARRANGED)
+                eventHorizon.track(FilterManualEpisodesRearrangedEvent)
                 val sortedUuids = withContext(Dispatchers.Default) {
                     _episodes.map(PlaylistEpisode::uuid)
                 }

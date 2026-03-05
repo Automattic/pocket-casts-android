@@ -1,28 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
+import com.automattic.eventhorizon.PlaylistEpisodeSortType as EventHorizonSortType
+
 enum class PlaylistEpisodeSortType(
     val serverId: Int,
-    val analyticsValue: String,
+    val eventHorizonValue: EventHorizonSortType,
 ) {
     NewestToOldest(
         serverId = 0,
-        analyticsValue = "newest_to_oldest",
+        eventHorizonValue = EventHorizonSortType.NewestToOldest,
     ),
     OldestToNewest(
         serverId = 1,
-        analyticsValue = "oldest_to_newest",
+        eventHorizonValue = EventHorizonSortType.OldestToNewest,
     ),
     ShortestToLongest(
         serverId = 2,
-        analyticsValue = "shortest_to_longest",
+        eventHorizonValue = EventHorizonSortType.ShortestToLongest,
     ),
     LongestToShortest(
         serverId = 3,
-        analyticsValue = "longest_to_shortest",
+        eventHorizonValue = EventHorizonSortType.LongestToShortest,
     ),
     DragAndDrop(
         serverId = 4,
-        analyticsValue = "drag_and_drop",
+        eventHorizonValue = EventHorizonSortType.DragAndDrop,
     ),
     ;
 
