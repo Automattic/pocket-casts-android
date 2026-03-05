@@ -309,6 +309,15 @@ open class PlaybackService :
                 return null
             }
 
+            // When Media3 flag is on, build from Media3 session
+            val media3Session = playbackManager.mediaSessionManager.getMedia3Session()
+            val media3Builder = playbackManager.mediaSessionManager.getMedia3NotificationBuilder()
+            if (media3Session != null && media3Builder != null) {
+                val compatToken = MediaSessionCompat.Token.fromToken(media3Session.platformToken)
+                return media3Builder.build(media3Session.player, compatToken, media3Session.sessionActivity)
+            }
+
+            // Compat fallback (flag off or Media3 session not yet created)
             val sessionToken = sessionToken
             if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
             return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null

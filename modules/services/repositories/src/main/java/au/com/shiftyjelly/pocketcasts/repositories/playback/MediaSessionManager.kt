@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
@@ -84,6 +85,7 @@ class MediaSessionManager(
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
+    private val notificationHelper: NotificationHelper,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -130,6 +132,10 @@ class MediaSessionManager(
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
     private var media3Callback: Media3SessionCallback? = null
     private var media3LibraryCallback: Media3LibrarySessionCallback? = null
+    private var media3NotificationBuilder: Media3NotificationBuilder? = null
+
+    internal fun getMedia3Session(): MediaSession? = media3Session
+    internal fun getMedia3NotificationBuilder(): Media3NotificationBuilder? = media3NotificationBuilder
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -249,6 +255,7 @@ class MediaSessionManager(
                     }
                 }
                 .build()
+            media3NotificationBuilder = Media3NotificationBuilder(context, notificationHelper, settings)
             Timber.i("Media3 session created")
         } else {
             forwardingPlayer = forwardingPlayer!!.swapPlayer(exoPlayer)

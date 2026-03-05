@@ -230,6 +230,7 @@ open class PlaybackManager @Inject constructor(
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         browseTreeProvider = browseTreeProvider,
+        notificationHelper = notificationHelper,
         applicationScope = applicationScope,
     )
 
