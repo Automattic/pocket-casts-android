@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
+import com.automattic.eventhorizon.EpisodeViewSource as EventHorizonEpisodeViewSource
+
 enum class EpisodeViewSource(val value: String) {
     DISCOVER("discover"),
     ENGAGE_SDK_CONTINUATION("engage_sdk_continuation"),
@@ -21,7 +23,11 @@ enum class EpisodeViewSource(val value: String) {
     UNKNOWN("unknown"),
     ;
 
+    val eventHorizonValue get() = EVENT_MAP[value] ?: EventHorizonEpisodeViewSource.Unknown
+
     companion object {
         fun fromString(source: String?) = EpisodeViewSource.values().find { it.value == source } ?: UNKNOWN
     }
 }
+
+private val EVENT_MAP = EventHorizonEpisodeViewSource.entries.associateBy(EventHorizonEpisodeViewSource::toString)

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
 import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
+import com.automattic.eventhorizon.ListeningHistoryClearedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -101,7 +102,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
 
     fun clearAllEpisodeHistory() {
         launch {
-            analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEARED)
+            eventHorizon.track(ListeningHistoryClearedEvent)
             episodeManager.clearAllEpisodeHistory()
         }
     }

@@ -15,8 +15,6 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -24,10 +22,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.EDIT
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD_UPGRADE_REQUIRED
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -45,6 +39,10 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UploadedFileDetailModalOptionType
+import com.automattic.eventhorizon.UserFileDetailDismissedEvent
+import com.automattic.eventhorizon.UserFileDetailShownEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -86,7 +84,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     @Inject lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var rowDataProvider: EpisodeRowDataProvider
 
@@ -102,7 +100,11 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (savedInstanceState == null) {
-            analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN, mapOf("source" to args.source.value))
+            eventHorizon.track(
+                UserFileDetailShownEvent(
+                    source = args.source.eventHorizonValue,
+                ),
+            )
         }
         if (!args.forceDark) {
             return super.onCreateDialog(savedInstanceState)
@@ -119,7 +121,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_DISMISSED)
+        eventHorizon.track(UserFileDetailDismissedEvent)
     }
 
     override fun onDestroyView() {
@@ -227,7 +229,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val layoutBookmark = binding.layoutBookmark
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
-                    viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
+                    viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Bookmarks)
                     BookmarksContainerFragment.newInstance(
                         episodeUuid = args.episodeId,
                         sourceView = SourceView.FILES,
@@ -308,7 +310,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 binding.layoutLockedCloud.setOnClickListener {
-                    viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
+                    viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.UploadUpgradeRequired)
                     OnboardingLauncher.openOnboardingFlow(
                         requireActivity(),
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
@@ -324,7 +326,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.layoutEdit.setOnClickListener {
                     activity?.let { activity ->
-                        viewModel.trackOptionTapped(EDIT)
+                        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Edit)
                         val intent = AddFileActivity.newEditInstance(activity, episode.uuid)
                         activity.startActivity(intent)
 
@@ -372,7 +374,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
-        viewModel.trackOptionTapped(DOWNLOAD)
+        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Download)
         if (settings.warnOnMeteredNetwork.value && !isOnWifi) {
             warningsHelper.downloadWarning(args.episodeId, SourceView.FILES)
                 .show(parentFragmentManager, "download_warning")
@@ -382,7 +384,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun upload(episode: UserEpisode, isOnWifi: Boolean) {
-        viewModel.trackOptionTapped(UPLOAD)
+        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Upload)
         if (settings.warnOnMeteredNetwork.value && !isOnWifi) {
             warningsHelper.uploadWarning(args.episodeId, source = SourceView.FILES)
                 .show(parentFragmentManager, "upload_warning")

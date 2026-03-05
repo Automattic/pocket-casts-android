@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import com.automattic.eventhorizon.UploadedFilesSortType
 import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
@@ -171,34 +172,36 @@ interface Settings {
     }
 
     enum class CloudSortOrder(
-        val analyticsValue: String,
         val serverId: Int,
+        val eventHorizonValue: UploadedFilesSortType,
     ) {
         NEWEST_OLDEST(
-            analyticsValue = "newest_to_oldest",
             serverId = 0,
+            eventHorizonValue = UploadedFilesSortType.NewestToOldest,
         ),
         OLDEST_NEWEST(
-            analyticsValue = "oldest_to_newest",
             serverId = 1,
+            eventHorizonValue = UploadedFilesSortType.OldestToNewest,
         ),
         A_TO_Z(
-            analyticsValue = "title_a_to_z",
             serverId = 2,
+            eventHorizonValue = UploadedFilesSortType.TitleAToZ,
         ),
         Z_TO_A(
-            analyticsValue = "title_z_to_a",
             serverId = 3,
+            eventHorizonValue = UploadedFilesSortType.TitleZToA,
         ),
         SHORT_LONG(
-            analyticsValue = "shortest_to_longest",
             serverId = 4,
+            eventHorizonValue = UploadedFilesSortType.ShortestToLongest,
         ),
         LONG_SHORT(
-            analyticsValue = "longest_to_shortest",
             serverId = 5,
+            eventHorizonValue = UploadedFilesSortType.LongestToShortest,
         ),
         ;
+
+        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromServerId(id: Int) = entries.find { it.serverId == id }
