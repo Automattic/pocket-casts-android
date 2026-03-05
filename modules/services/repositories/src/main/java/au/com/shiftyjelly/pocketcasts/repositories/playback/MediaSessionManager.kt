@@ -233,6 +233,7 @@ class MediaSessionManager(
                 actions = actions,
                 bookmarkHelper = bookmarkHelper,
                 scope = this,
+                contextProvider = { context },
             )
             media3LibraryCallback = Media3LibrarySessionCallback(
                 sessionCallback = media3Callback!!,

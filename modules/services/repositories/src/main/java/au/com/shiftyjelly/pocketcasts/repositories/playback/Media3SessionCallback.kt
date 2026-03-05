@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
@@ -21,10 +22,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -44,6 +48,7 @@ internal class Media3SessionCallback(
     private val actions: MediaSessionActions,
     private val bookmarkHelper: BookmarkHelper,
     private val scope: CoroutineScope,
+    private val contextProvider: () -> Context,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
 ) : MediaSession.Callback {
 
@@ -205,9 +210,10 @@ internal class Media3SessionCallback(
     private fun handleMediaButtonAction(action: HeadphoneAction) {
         when (action) {
             HeadphoneAction.ADD_BOOKMARK -> {
-                // Bookmark handling is done via the BookmarkHelper in the legacy callback.
-                // For Media3 we keep the same pattern.
-                Timber.d("Media3: bookmark action not yet wired")
+                scope.launch(Dispatchers.Main) {
+                    val isAutoConnected = Util.isAndroidAutoConnectedFlow(contextProvider()).first()
+                    bookmarkHelper.handleAddBookmarkAction(contextProvider(), isAutoConnected)
+                }
             }
 
             HeadphoneAction.SKIP_FORWARD -> {
