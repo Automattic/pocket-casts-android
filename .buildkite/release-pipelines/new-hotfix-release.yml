@@ -3,6 +3,9 @@
 
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
+env:
+  IMAGE_ID: "xcode-26.2"
+
 steps:
   - label: "🚂 New Hotfix Release"
     command: |
@@ -19,7 +22,7 @@ steps:
       bundle exec fastlane new_hotfix_release version_name:"$RELEASE_VERSION" version_code:"$VERSION_CODE" skip_confirm:true
     plugins: [$CI_TOOLKIT]
     agents:
-      queue: "mac-metal"
+      queue: "mac"
     retry:
       manual:
         reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
