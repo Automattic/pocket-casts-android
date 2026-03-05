@@ -10,9 +10,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
@@ -23,13 +21,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal class LargeListRowAdapter(
     context: Context,
     val onPodcastClicked: ((DiscoverPodcast, String?, String?) -> Unit),
     val onPodcastSubscribe: ((DiscoverPodcast, String?, String?) -> Unit),
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     var list: PodcastList? = null
 
@@ -62,13 +63,29 @@ internal class LargeListRowAdapter(
             holder.lblSubtitle.text = podcast.author
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
-                analyticsTracker.discoverListPodcastTapped(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                list?.listId?.let { listId ->
+                    eventHorizon.track(
+                        DiscoverListPodcastTappedEvent(
+                            listId = listId,
+                            podcastUuid = podcast.uuid,
+                            listDatetime = list?.date ?: Tracker.INVALID_OR_NULL_VALUE,
+                        ),
+                    )
+                }
                 onPodcastClicked(podcast, list?.listId, list?.date)
             }
             holder.btnSubscribe.isClickable = true
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                list?.listId?.let { listId ->
+                    eventHorizon.track(
+                        DiscoverListPodcastSubscribedEvent(
+                            listId = listId,
+                            podcastUuid = podcast.uuid,
+                            listDatetime = list?.date,
+                        ),
+                    )
+                }
                 onPodcastSubscribe(podcast, list?.listId, list?.date)
             }
             holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = podcast.isSubscribed, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)

@@ -14,11 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -30,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import com.automattic.eventhorizon.DiscoverListImpressionEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -39,8 +39,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastListFragment : PodcastGridListFragment() {
 
     companion object {
-        private const val LIST_ID_KEY = "list_id"
-
         fun newInstance(networkLoadableList: NetworkLoadableList): PodcastListFragment {
             return PodcastListFragment().apply {
                 arguments = newInstanceBundle(networkLoadableList)
@@ -49,7 +47,12 @@ class PodcastListFragment : PodcastGridListFragment() {
     }
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
+        eventHorizon.track(
+            DiscoverListPodcastTappedEvent(
+                listId = promotion.promotionUuid,
+                podcastUuid = promotion.podcastUuid,
+            ),
+        )
 
         val sourceView = when (expandedStyle) {
             is ExpandedStyle.RankedList -> SourceView.DISCOVER_RANKED_LIST
@@ -122,7 +125,11 @@ class PodcastListFragment : PodcastGridListFragment() {
         if (analyticsImpressionSent || impressionId == null) {
             return
         }
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
+        eventHorizon.track(
+            DiscoverListImpressionEvent(
+                listId = impressionId,
+            ),
+        )
         analyticsImpressionSent = true
     }
 

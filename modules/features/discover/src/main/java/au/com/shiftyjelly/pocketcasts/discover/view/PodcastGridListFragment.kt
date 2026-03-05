@@ -12,16 +12,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -47,6 +40,11 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import coil3.load
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
+import com.automattic.eventhorizon.DiscoverCollectionLinkTappedEvent
+import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
+import com.automattic.eventhorizon.DiscoverListShareTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import javax.inject.Inject
@@ -61,8 +59,6 @@ open class PodcastGridListFragment :
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var settings: Settings
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var eventHorizon: EventHorizon
 
@@ -133,7 +129,15 @@ open class PodcastGridListFragment :
 
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
         val listDate = viewModel.listFeed?.date
-        analyticsTracker.discoverListPodcastTapped(podcastUuid = podcast.uuid, listId = listUuid, listDate = listDate)
+        listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListPodcastTappedEvent(
+                    listId = listId,
+                    podcastUuid = podcast.uuid,
+                    listDatetime = listDate,
+                ),
+            )
+        }
         val sourceView = when (expandedStyle) {
             is ExpandedStyle.RankedList -> SourceView.DISCOVER_RANKED_LIST
             is ExpandedStyle.PlainList -> SourceView.DISCOVER_PLAIN_LIST
@@ -149,7 +153,15 @@ open class PodcastGridListFragment :
     }
 
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
-        analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcastUuid, listId = listUuid, listDate = viewModel.listFeed?.date)
+        listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListPodcastSubscribedEvent(
+                    listId = listId,
+                    podcastUuid = podcastUuid,
+                    listDatetime = viewModel.listFeed?.date,
+                ),
+            )
+        }
         var podcastSubscribedSource = SourceView.DISCOVER
         if (expandedStyle is ExpandedStyle.RankedList) {
             podcastSubscribedSource = SourceView.DISCOVER_RANKED_LIST
@@ -167,10 +179,13 @@ open class PodcastGridListFragment :
     }
 
     val onEpisodeClick: (DiscoverEpisode) -> Unit = { episode ->
-        listUuid?.let { listUuid ->
-            analyticsTracker.track(
-                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid),
+        listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListEpisodeTappedEvent(
+                    listId = listId,
+                    podcastUuid = episode.podcast_uuid,
+                    episodeUuid = episode.uuid,
+                ),
             )
         }
         val fragment = EpisodeContainerFragment.newInstance(
@@ -207,7 +222,7 @@ open class PodcastGridListFragment :
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, shareUrl ?: "")
             }
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHARE_TAPPED)
+            eventHorizon.track(DiscoverListShareTappedEvent)
             startActivity(Intent.createChooser(intent, getString(LR.string.podcasts_share_via)))
             return true
         }
@@ -240,7 +255,11 @@ open class PodcastGridListFragment :
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to inferredId))
+                eventHorizon.track(
+                    DiscoverCollectionLinkTappedEvent(
+                        listId = inferredId,
+                    ),
+                )
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }

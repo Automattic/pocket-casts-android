@@ -8,14 +8,16 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.DiscoverCategoriesPickerClosedEvent
+import com.automattic.eventhorizon.DiscoverCategoriesPickerPickEvent
+import com.automattic.eventhorizon.DiscoverCategoriesPickerShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -24,7 +26,7 @@ import javax.inject.Inject
 class CategoriesBottomSheet : BaseDialogFragment() {
     @Inject lateinit var categoriesManager: CategoriesManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val region get() = requireArguments().getString(REGION_KEY, "")
 
@@ -70,29 +72,30 @@ class CategoriesBottomSheet : BaseDialogFragment() {
     }
 
     private fun trackCategorySelected(category: DiscoverCategory) {
-        analyticsTracker.track(
-            AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
-            mapOf(
-                "name" to category.name,
-                "id" to category.id,
-                "region" to region,
-                "visits" to category.totalVisits,
-                "sponsored" to (category.isSponsored == true),
+        eventHorizon.track(
+            DiscoverCategoriesPickerPickEvent(
+                name = category.name,
+                region = region,
+                id = category.id.toLong(),
+                visits = category.totalVisits.toLong(),
+                sponsored = category.isSponsored == true,
             ),
         )
     }
 
     private fun trackShown() {
-        analyticsTracker.track(
-            AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN,
-            mapOf("region" to region),
+        eventHorizon.track(
+            DiscoverCategoriesPickerShownEvent(
+                region = region,
+            ),
         )
     }
 
     private fun trackDismissed() {
-        analyticsTracker.track(
-            AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED,
-            mapOf("region" to region),
+        eventHorizon.track(
+            DiscoverCategoriesPickerClosedEvent(
+                region = region,
+            ),
         )
     }
 
