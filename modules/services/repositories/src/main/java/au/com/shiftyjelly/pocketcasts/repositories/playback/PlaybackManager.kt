@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
-import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -224,7 +223,6 @@ open class PlaybackManager @Inject constructor(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
-        playlistManager = playlistManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
@@ -242,9 +240,6 @@ open class PlaybackManager @Inject constructor(
         set(value) {
             _playerFlow.value = value
         }
-
-    val mediaSession: MediaSessionCompat
-        get() = mediaSessionManager.mediaSession
 
     @SuppressLint("CheckResult")
     fun setup() {

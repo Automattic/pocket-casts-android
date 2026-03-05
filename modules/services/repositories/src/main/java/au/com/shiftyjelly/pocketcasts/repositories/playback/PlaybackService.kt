@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
@@ -90,8 +89,6 @@ open class PlaybackService :
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var notificationDrawer: NotificationDrawer
-
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var notificationHelper: NotificationHelper
@@ -135,8 +132,9 @@ open class PlaybackService :
 
         playbackManager.mediaSessionManager.createSession(this)
 
-        val mediaSession = playbackManager.mediaSession
-        mediaController = MediaControllerCompat(this, mediaSession)
+        val media3Session = playbackManager.mediaSessionManager.getMedia3Session()!!
+        val compatToken = MediaSessionCompat.Token.fromToken(media3Session.platformToken)
+        mediaController = MediaControllerCompat(this, compatToken)
         notificationManager = PlayerNotificationManagerImpl(this)
 
         observePlaybackState()
@@ -175,7 +173,7 @@ open class PlaybackService :
                         (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
                 }
                 // build the notification including artwork in the background
-                .map { (playbackState, metadata, artworkConfiguration) -> playbackState to buildNotification(playbackState.state, metadata, artworkConfiguration.useEpisodeArtwork) }
+                .map { (playbackState, _, artworkConfiguration) -> playbackState to buildNotification(artworkConfiguration.useEpisodeArtwork) }
                 .observeOn(SchedulerProvider.mainThread)
                 .subscribeBy(
                     onNext = { (state: PlaybackStateCompat, notification: Notification?) ->
@@ -258,7 +256,7 @@ open class PlaybackService :
                     // We have to be careful here to only call notify when moving from PLAY to PAUSE once
                     // or else the notification will come back after being swiped away
                     if (removeNotification || isForegroundService) {
-                        val isTransientLoss = playbackState.extras?.getBoolean(MediaSessionManager.EXTRA_TRANSIENT) ?: false
+                        val isTransientLoss = playbackManager.playbackStateRelay.blockingFirst().transientLoss
                         if (isTransientLoss) {
                             // Don't kill the foreground service for transient pauses
                             return
@@ -296,27 +294,12 @@ open class PlaybackService :
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        private fun buildNotification(
-            state: Int,
-            metadata: MediaMetadataCompat?,
-            useEpisodeArtwork: Boolean,
-        ): Notification? {
-            if (Util.isAutomotive(this@PlaybackService)) {
-                return null
-            }
-
-            // When Media3 flag is on, build from Media3 session
-            val media3Session = playbackManager.mediaSessionManager.getMedia3Session()
-            val media3Builder = playbackManager.mediaSessionManager.getMedia3NotificationBuilder()
-            if (media3Session != null && media3Builder != null) {
-                val compatToken = MediaSessionCompat.Token.fromToken(media3Session.platformToken)
-                return media3Builder.build(media3Session.player, compatToken, media3Session.sessionActivity)
-            }
-
-            // Compat fallback (Media3 session not yet created)
-            val sessionToken = playbackManager.mediaSession.sessionToken
-            if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
-            return if (state != PlaybackStateCompat.STATE_NONE) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null
+        private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
+            if (Util.isAutomotive(this@PlaybackService)) return null
+            val media3Session = playbackManager.mediaSessionManager.getMedia3Session() ?: return null
+            val media3Builder = playbackManager.mediaSessionManager.getMedia3NotificationBuilder() ?: return null
+            val compatToken = MediaSessionCompat.Token.fromToken(media3Session.platformToken)
+            return media3Builder.build(media3Session.player, compatToken, media3Session.sessionActivity)
         }
     }
 
