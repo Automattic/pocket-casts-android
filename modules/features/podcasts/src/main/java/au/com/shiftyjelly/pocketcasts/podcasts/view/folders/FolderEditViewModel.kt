@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
@@ -18,6 +16,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderChooseFolderTappedEvent
+import com.automattic.eventhorizon.FolderChoosePodcastsDismissedEvent
+import com.automattic.eventhorizon.FolderCreateShownEvent
+import com.automattic.eventhorizon.FolderPodcastPickerFilterChangedEvent
+import com.automattic.eventhorizon.FolderPodcastPickerSearchClearedEvent
+import com.automattic.eventhorizon.FolderPodcastPickerSearchPerformedEvent
+import com.automattic.eventhorizon.FolderSavedEvent
+import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import java.util.Locale
@@ -41,7 +49,7 @@ class FolderEditViewModel
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
 ) : ViewModel(),
     CoroutineScope {
@@ -187,7 +195,11 @@ class FolderEditViewModel
 
     fun changeSortOrder(order: PodcastsSortType) {
         settings.setSelectPodcastsSortType(order)
-        analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_FILTER_CHANGED, mapOf(SORT_ORDER_KEY to order.analyticsValue))
+        eventHorizon.track(
+            FolderPodcastPickerFilterChangedEvent(
+                sortOrder = order.eventHorizonValue,
+            ),
+        )
     }
 
     fun changeFolderName(name: String) {
@@ -280,7 +292,7 @@ class FolderEditViewModel
         viewModelScope.launch {
             podcastManager.updateFolderUuid(folderUuid = folder.uuid, listOf(podcastUuid))
             folderUuid.value = Optional.of(folder.uuid)
-            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_FOLDER_TAPPED)
+            eventHorizon.track(FolderChooseFolderTappedEvent)
         }
     }
 
@@ -299,20 +311,20 @@ class FolderEditViewModel
 
     private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
         if (oldValue.isEmpty() && newValue.isNotEmpty()) {
-            analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_SEARCH_PERFORMED)
+            eventHorizon.track(FolderPodcastPickerSearchPerformedEvent)
         } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
-            analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_SEARCH_CLEARED)
+            eventHorizon.track(FolderPodcastPickerSearchClearedEvent)
         }
     }
 
-    fun trackCreateFolderNavigation(analyticsEvent: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        if (!state.value.isCreateFolder) return
-        val properties = HashMap<String, Any>()
-        properties[NUMBER_OF_PODCASTS_KEY] = state.value.selectedCount
-        properties.putAll(props)
-        analyticsTracker.track(analyticsEvent, properties)
+    fun trackCreateFolderNavigation(createTrackable: (numOfPodcasts: Long) -> Trackable) {
+        if (!state.value.isCreateFolder) {
+            return
+        }
+        val trackable = createTrackable(state.value.selectedCount.toLong())
+        eventHorizon.track(trackable)
         viewModelScope.launch {
-            if (analyticsEvent == AnalyticsEvent.FOLDER_SAVED) {
+            if (trackable is FolderSavedEvent) {
                 notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Filters)
             }
         }
@@ -320,18 +332,19 @@ class FolderEditViewModel
 
     fun trackDismiss() {
         if (state.value.isEditFolder) {
-            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_DISMISSED, mapOf(CHANGED_PODCASTS_KEY to state.value.selectedCount))
+            eventHorizon.track(
+                FolderChoosePodcastsDismissedEvent(
+                    changedPodcasts = state.value.selectedCount.toLong(),
+                ),
+            )
         }
     }
 
-    fun trackShown(source: String) {
-        analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf("source" to source))
-    }
-
-    companion object {
-        private const val SORT_ORDER_KEY = "sort_order"
-        private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
-        private const val CHANGED_PODCASTS_KEY = "changed_podcasts"
-        const val COLOR_KEY = "color"
+    fun trackShown(source: CreateFolderSource) {
+        eventHorizon.track(
+            FolderCreateShownEvent(
+                source = source,
+            ),
+        )
     }
 }

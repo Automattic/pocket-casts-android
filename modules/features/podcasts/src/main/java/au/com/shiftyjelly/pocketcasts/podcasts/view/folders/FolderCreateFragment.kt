@@ -18,15 +18,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditViewModel.Companion.COLOR_KEY
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.FolderCreateColorShownEvent
+import com.automattic.eventhorizon.FolderCreateNameShownEvent
+import com.automattic.eventhorizon.FolderSavedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,7 +44,7 @@ class FolderCreateFragment : BaseDialogFragment() {
     companion object {
         const val ARG_SOURCE = "ARG_SOURCE"
 
-        fun newInstance(source: String): FolderCreateFragment {
+        fun newInstance(source: CreateFolderSource): FolderCreateFragment {
             return FolderCreateFragment().apply {
                 arguments = bundleOf(
                     ARG_SOURCE to source,
@@ -56,8 +59,7 @@ class FolderCreateFragment : BaseDialogFragment() {
         const val COLOR = "folder_color"
     }
 
-    private val source: String
-        get() = arguments?.getString(ARG_SOURCE) ?: ""
+    private val source get() = requireArguments().requireSerializable<CreateFolderSource>(ARG_SOURCE)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,7 +82,11 @@ class FolderCreateFragment : BaseDialogFragment() {
                     FolderEditPodcastsPage(
                         onCloseClick = { dismiss() },
                         onNextClick = {
-                            viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_NAME_SHOWN)
+                            viewModel.trackCreateFolderNavigation { numOfPodcasts ->
+                                FolderCreateNameShownEvent(
+                                    numberOfPodcasts = numOfPodcasts,
+                                )
+                            }
                             navController.navigate(NavRoutes.NAME)
                         },
                         viewModel = viewModel,
@@ -92,7 +98,11 @@ class FolderCreateFragment : BaseDialogFragment() {
                     FolderEditNamePage(
                         onBackPress = { navController.popBackStack() },
                         onNextClick = {
-                            viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN)
+                            viewModel.trackCreateFolderNavigation { numOfPodcasts ->
+                                FolderCreateColorShownEvent(
+                                    numberOfPodcasts = numOfPodcasts,
+                                )
+                            }
                             navController.navigate(NavRoutes.COLOR)
                         },
                         viewModel = viewModel,
@@ -106,7 +116,12 @@ class FolderCreateFragment : BaseDialogFragment() {
                             viewModel.saveFolder(resources = resources) { folder ->
                                 sharedViewModel.folderUuid = folder.uuid
                                 val colorHex = ColorUtils.colorIntToHexString(colors.getFolderColor(folder.color).toArgb())
-                                viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_SAVED, mapOf(COLOR_KEY to colorHex))
+                                viewModel.trackCreateFolderNavigation { numOfPodcasts ->
+                                    FolderSavedEvent(
+                                        color = colorHex,
+                                        numberOfPodcasts = numOfPodcasts,
+                                    )
+                                }
                                 dismiss()
                             }
                         },
