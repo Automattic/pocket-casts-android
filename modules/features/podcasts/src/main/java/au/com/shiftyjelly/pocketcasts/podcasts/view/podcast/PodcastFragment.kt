@@ -36,10 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.SimpleItemAnimator
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -96,6 +93,9 @@ import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderChooseFolderTappedEvent
 import com.automattic.eventhorizon.FolderChooseShownEvent
@@ -132,11 +132,6 @@ class PodcastFragment : BaseFragment() {
 
     companion object {
         private const val NEW_INSTANCE_ARGS = "PodcastFragmentArgs"
-        private const val IS_EXPANDED_KEY = "is_expanded"
-        private const val PODCAST_UUID_KEY = "podcast_uuid"
-        private const val LIST_ID_KEY = "list_id"
-        private const val EPISODE_UUID_KEY = "episode_uuid"
-        private const val SOURCE_KEY = "source"
         private const val EPISODE_CARD = "episode_card"
 
         fun newInstance(
@@ -169,9 +164,6 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var coilManager: CoilManager
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -287,10 +279,22 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onSubscribeClicked: () -> Unit = {
-        analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcastUuid, listId = fromListUuid, listDate = fromListDate)
+        fromListUuid?.let { fromListUuid ->
+            eventHorizon.track(
+                DiscoverListPodcastSubscribedEvent(
+                    listId = fromListUuid,
+                    podcastUuid = podcastUuid,
+                    listDatetime = fromListDate,
+                ),
+            )
+        }
         if (featuredPodcast) {
             viewModel.podcast.value?.uuid?.let { podcastUuid ->
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
+                eventHorizon.track(
+                    DiscoverFeaturedPodcastSubscribedEvent(
+                        podcastUuid = podcastUuid,
+                    ),
+                )
             }
         }
         eventHorizon.track(PodcastScreenSubscribeTappedEvent)
@@ -356,9 +360,12 @@ class PodcastFragment : BaseFragment() {
 
     private val onRowClicked: (PodcastEpisode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
-            analyticsTracker.track(
-                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid),
+            eventHorizon.track(
+                DiscoverListEpisodeTappedEvent(
+                    listId = listUuid,
+                    podcastUuid = episode.podcastUuid,
+                    episodeUuid = episode.uuid,
+                ),
             )
         }
         val episodeCard = EpisodeContainerFragment.newInstance(
