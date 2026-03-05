@@ -56,15 +56,16 @@ class ConnectivityStateManagerTest {
     }
 
     @Test
-    fun `isConnected is false with only Bluetooth`() = testScope.runTest {
+    fun `isConnected is true with only Bluetooth`() = testScope.runTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.BT)),
         )
         val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
 
         connectivityStateManager.isConnected.test {
-            assertEquals(false, awaitItem())
+            assertEquals(true, awaitItem())
             cancel()
         }
     }
@@ -156,6 +157,27 @@ class ConnectivityStateManagerTest {
         networkStatusFlow.value = Networks(
             activeNetwork = null,
             networks = listOf(buildNetworkStatus(NetworkType.Wifi)),
+        )
+        val connectivityStateManager = createConnectivityStateManager()
+        testScheduler.runCurrent()
+
+        connectivityStateManager.isConnected.test {
+            assertEquals(true, awaitItem())
+
+            networkStatusFlow.value = Networks(
+                activeNetwork = null,
+                networks = emptyList(),
+            )
+            assertEquals(false, awaitItem())
+            cancel()
+        }
+    }
+
+    @Test
+    fun `isConnected changes from true to false when Bluetooth disconnects`() = testScope.runTest {
+        networkStatusFlow.value = Networks(
+            activeNetwork = null,
+            networks = listOf(buildNetworkStatus(NetworkType.BT)),
         )
         val connectivityStateManager = createConnectivityStateManager()
         testScheduler.runCurrent()
