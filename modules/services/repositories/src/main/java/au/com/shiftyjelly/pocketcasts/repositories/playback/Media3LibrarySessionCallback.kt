@@ -95,7 +95,7 @@ internal class Media3LibrarySessionCallback(
         val rootId = browseTreeProvider.getRootId(
             isRecent = isRecent,
             isSuggested = isSuggested,
-            hasCurrentEpisode = true,
+            hasCurrentEpisode = playbackManager.getCurrentEpisode() != null,
         ) ?: return Futures.immediateFuture(
             LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE),
         )

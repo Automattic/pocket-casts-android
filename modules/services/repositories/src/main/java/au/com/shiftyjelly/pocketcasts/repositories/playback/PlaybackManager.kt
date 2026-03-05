@@ -141,6 +141,7 @@ open class PlaybackManager @Inject constructor(
     private val upNextHistoryManager: UpNextHistoryManager,
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
+    private val browseTreeProvider: BrowseTreeProvider,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -228,6 +229,7 @@ open class PlaybackManager @Inject constructor(
         context = application,
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
+        browseTreeProvider = browseTreeProvider,
         applicationScope = applicationScope,
     )
 

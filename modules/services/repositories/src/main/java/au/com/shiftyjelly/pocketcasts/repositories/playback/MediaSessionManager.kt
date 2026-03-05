@@ -25,6 +25,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -35,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -70,6 +72,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class MediaSessionManager(
     val playbackManager: PlaybackManager,
@@ -80,6 +83,7 @@ class MediaSessionManager(
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    val browseTreeProvider: BrowseTreeProvider,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -125,6 +129,7 @@ class MediaSessionManager(
     private var media3Session: MediaSession? = null
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
     private var media3Callback: Media3SessionCallback? = null
+    private var media3LibraryCallback: Media3LibrarySessionCallback? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -223,9 +228,21 @@ class MediaSessionManager(
                 bookmarkHelper = bookmarkHelper,
                 scope = this,
             )
+            media3LibraryCallback = Media3LibrarySessionCallback(
+                sessionCallback = media3Callback!!,
+                browseTreeProvider = browseTreeProvider,
+                playbackManager = playbackManager,
+                packageValidator = if (!BuildConfig.DEBUG) {
+                    PackageValidator(context, LR.xml.allowed_media_browser_callers)
+                } else {
+                    null
+                },
+                scope = this,
+                contextProvider = { context },
+            )
             media3Session = MediaSession.Builder(context, forwardingPlayer!!)
                 .setId("PocketCastsMedia3Session")
-                .setCallback(media3Callback!!)
+                .setCallback(media3LibraryCallback!!)
                 .apply {
                     if (!Util.isAutomotive(context)) {
                         setSessionActivity(context.getLaunchActivityPendingIntent())
