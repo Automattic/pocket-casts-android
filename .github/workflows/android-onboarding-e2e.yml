@@ -41,9 +41,7 @@ jobs:
           heap-size: 1024M
           disable-animations: true
           script: |
-            ./gradlew :app:connectedDebugAndroidTest \
-              -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest \
-              --stacktrace
+            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest --stacktrace
 
       - name: Publish JUnit report
         if: always()
