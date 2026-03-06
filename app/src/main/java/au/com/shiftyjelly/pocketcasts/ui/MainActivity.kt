@@ -55,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -198,6 +197,8 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FiltersTabOpenedEvent
 import com.automattic.eventhorizon.PodcastsTabOpenedEvent
 import com.automattic.eventhorizon.ProfileTabOpenedEvent
+import com.automattic.eventhorizon.UpNextDismissedEvent
+import com.automattic.eventhorizon.UpNextShownEvent
 import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -906,14 +907,18 @@ class MainActivity :
             podcastManager = podcastManager,
             episodeManager = episodeManager,
             fragmentManager = supportFragmentManager,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = eventHorizon,
             episodeAnalytics = episodeAnalytics,
             settings = settings,
         ).show(this)
     }
 
     private fun showUpNextFragment(source: UpNextSource) {
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        eventHorizon.track(
+            UpNextShownEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
@@ -1128,7 +1133,7 @@ class MainActivity :
                 settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     if (bottomSheetTag == UpNextFragment::class.java.name) {
-                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                        eventHorizon.track(UpNextDismissedEvent)
                     }
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
