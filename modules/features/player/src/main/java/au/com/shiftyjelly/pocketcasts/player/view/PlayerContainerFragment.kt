@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
@@ -46,6 +45,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerTabSelectedEvent
 import com.automattic.eventhorizon.PlayerTabType
+import com.automattic.eventhorizon.UpNextDismissedEvent
+import com.automattic.eventhorizon.UpNextShownEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -149,7 +150,11 @@ class PlayerContainerFragment :
                 notifyBackstackChangedToHost()
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
+                    eventHorizon.track(
+                        UpNextShownEvent(
+                            source = UpNextSource.NOW_PLAYING.eventHorizonValue,
+                        ),
+                    )
 
                     activity?.let {
                         theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.UpNext(isFullScreen = true))
@@ -158,7 +163,7 @@ class PlayerContainerFragment :
 
                     upNextFragment.onExpanded()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    eventHorizon.track(UpNextDismissedEvent)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
                     upNextFragment.onCollapsed()
@@ -234,7 +239,11 @@ class PlayerContainerFragment :
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
 
             binding.upNextButton.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                eventHorizon.track(
+                    UpNextShownEvent(
+                        source = UpNextSource.PLAYER.eventHorizonValue,
+                    ),
+                )
                 openUpNext()
             }
         }

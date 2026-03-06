@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
+import com.automattic.eventhorizon.UpNextSource as EvenHorizonUpNextSource
 
 interface UpNextQueue {
     val isEmpty: Boolean
@@ -147,18 +148,24 @@ interface UpNextQueue {
     }
 }
 
-enum class UpNextSource(val analyticsValue: String) {
-    MINI_PLAYER("mini_player"),
-    PLAYER("player"),
-    NOW_PLAYING("now_playing"),
-    UP_NEXT_SHORTCUT("up_next_shortcut"),
-    UP_NEXT_TAB("up_next_tab"),
-    UNKNOWN("unknown"),
-    ;
-
-    companion object {
-        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
-    }
+enum class UpNextSource(
+    val eventHorizonValue: EvenHorizonUpNextSource,
+) {
+    MINI_PLAYER(
+        eventHorizonValue = EvenHorizonUpNextSource.MiniPlayer,
+    ),
+    PLAYER(
+        eventHorizonValue = EvenHorizonUpNextSource.Player,
+    ),
+    NOW_PLAYING(
+        eventHorizonValue = EvenHorizonUpNextSource.NowPlaying,
+    ),
+    UP_NEXT_SHORTCUT(
+        eventHorizonValue = EvenHorizonUpNextSource.UpNextShortcut,
+    ),
+    UP_NEXT_TAB(
+        eventHorizonValue = EvenHorizonUpNextSource.UpNextTab,
+    ),
 }
 
 fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {
