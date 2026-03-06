@@ -73,6 +73,18 @@ Then run without passing secrets on the command line:
     $ ./gradlew :app:connectedDebugAndroidTest \
       -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest
 
+Additional documentation for onboarding E2E tests:
+
+- [Onboarding E2E tests guide](docs/testing/onboarding-e2e.md)
+
+Portfolio contribution note:
+
+- This repository is an open source project maintained by Pocket Casts.
+- The onboarding E2E tests contribution in this fork includes `LogInFullAppTest`.
+- The onboarding E2E tests contribution in this fork includes `OnboardingFullAppTest`.
+- The contribution includes a Page Object-based test flow under `app/src/androidTest/.../account/onboarding/pageobject/`.
+- The contribution includes a GitHub Actions workflow for onboarding E2E execution and report artifacts.
+
 ## Directory structure
     .
     ├── app                    # Mobile app
