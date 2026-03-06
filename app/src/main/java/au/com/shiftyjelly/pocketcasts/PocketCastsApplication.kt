@@ -5,6 +5,7 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -49,10 +50,6 @@ import coil3.SingletonImageLoader
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
-import java.io.File
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -67,6 +64,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import java.util.concurrent.Executors
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltAndroidApp
 class PocketCastsApplication :
@@ -162,6 +163,7 @@ class PocketCastsApplication :
         setupAnalytics()
         setupApp()
         cleanupDatabaseExportFileIfExists()
+        Timber.tag("LOG_TAG").i("${AnalyticsEvent.entries.size}")
     }
 
     private fun setupAnalytics() {
