@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
-import com.automattic.eventhorizon.UpNextSource as EvenHorizonUpNextSource
+import com.automattic.eventhorizon.UpNextSource as EventHorizonUpNextSource
 
 interface UpNextQueue {
     val isEmpty: Boolean
@@ -149,22 +149,22 @@ interface UpNextQueue {
 }
 
 enum class UpNextSource(
-    val eventHorizonValue: EvenHorizonUpNextSource,
+    val eventHorizonValue: EventHorizonUpNextSource,
 ) {
     MINI_PLAYER(
-        eventHorizonValue = EvenHorizonUpNextSource.MiniPlayer,
+        eventHorizonValue = EventHorizonUpNextSource.MiniPlayer,
     ),
     PLAYER(
-        eventHorizonValue = EvenHorizonUpNextSource.Player,
+        eventHorizonValue = EventHorizonUpNextSource.Player,
     ),
     NOW_PLAYING(
-        eventHorizonValue = EvenHorizonUpNextSource.NowPlaying,
+        eventHorizonValue = EventHorizonUpNextSource.NowPlaying,
     ),
     UP_NEXT_SHORTCUT(
-        eventHorizonValue = EvenHorizonUpNextSource.UpNextShortcut,
+        eventHorizonValue = EventHorizonUpNextSource.UpNextShortcut,
     ),
     UP_NEXT_TAB(
-        eventHorizonValue = EvenHorizonUpNextSource.UpNextTab,
+        eventHorizonValue = EventHorizonUpNextSource.UpNextTab,
     ),
 }
 

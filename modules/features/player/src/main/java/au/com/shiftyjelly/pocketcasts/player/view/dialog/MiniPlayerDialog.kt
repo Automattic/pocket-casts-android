@@ -90,10 +90,4 @@ class MiniPlayerDialog(
         episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager, settings.upNextShuffle.value)
         episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, SourceView.MINIPLAYER, episode.uuid)
     }
-
-    companion object {
-        private const val OPTION_KEY = "option"
-        private const val MARK_PLAYED = "mark_played"
-        private const val CLOSE_AND_CLEAR_UP_NEXT = "close_and_clear_up_next"
-    }
 }
