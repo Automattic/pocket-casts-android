@@ -5,7 +5,9 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
@@ -162,6 +164,7 @@ class PocketCastsApplication :
         setupAnalytics()
         setupApp()
         cleanupDatabaseExportFileIfExists()
+        Timber.tag("LOG_TAG").i("${AnalyticsEvent.entries.size}")
     }
 
     private fun setupAnalytics() {

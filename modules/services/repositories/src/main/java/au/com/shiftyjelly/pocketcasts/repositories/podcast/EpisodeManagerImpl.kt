@@ -6,8 +6,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -33,6 +31,9 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
+import com.automattic.eventhorizon.EpisodeStarredEvent
+import com.automattic.eventhorizon.EpisodeUnstarredEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -63,7 +64,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
 ) : EpisodeManager,
     CoroutineScope {
 
@@ -406,13 +407,18 @@ class EpisodeManagerImpl @Inject constructor(
             uuid = episode.uuid,
         )
 
-        val event =
-            if (starred) {
-                AnalyticsEvent.EPISODE_STARRED
-            } else {
-                AnalyticsEvent.EPISODE_UNSTARRED
-            }
-        episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
+        val event = if (starred) {
+            EpisodeStarredEvent(
+                episodeUuid = episode.uuid,
+                source = sourceView.eventHorizonValue,
+            )
+        } else {
+            EpisodeUnstarredEvent(
+                episodeUuid = episode.uuid,
+                source = sourceView.eventHorizonValue,
+            )
+        }
+        eventHorizon.track(event)
     }
 
     override suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean) {

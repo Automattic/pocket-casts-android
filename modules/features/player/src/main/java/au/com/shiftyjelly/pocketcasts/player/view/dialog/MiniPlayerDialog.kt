@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -12,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.MiniPlayerLongPressMenuDismissedEvent
 import com.automattic.eventhorizon.MiniPlayerLongPressMenuOptionTappedEvent
@@ -30,7 +29,6 @@ class MiniPlayerDialog(
     private val episodeManager: EpisodeManager,
     private val fragmentManager: FragmentManager,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     private val settings: Settings,
 ) {
     private var isOptionClicked = false
@@ -88,6 +86,11 @@ class MiniPlayerDialog(
     private fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
         episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager, settings.upNextShuffle.value)
-        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, SourceView.MINIPLAYER, episode.uuid)
+        eventHorizon.track(
+            EpisodeMarkedAsPlayedEvent(
+                episodeUuid = episode.uuid,
+                source = SourceView.MINIPLAYER.eventHorizonValue,
+            ),
+        )
     }
 }

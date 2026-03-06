@@ -56,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContr
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.appreview.AppReviewDialogFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -285,9 +284,6 @@ class MainActivity :
 
     @Inject
     lateinit var eventHorizon: EventHorizon
-
-    @Inject
-    lateinit var episodeAnalytics: EpisodeAnalytics
 
     @Inject
     lateinit var syncManager: SyncManager
@@ -908,7 +904,6 @@ class MainActivity :
             episodeManager = episodeManager,
             fragmentManager = supportFragmentManager,
             eventHorizon = eventHorizon,
-            episodeAnalytics = episodeAnalytics,
             settings = settings,
         ).show(this)
     }

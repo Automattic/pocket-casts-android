@@ -35,9 +35,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -80,6 +79,13 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.EpisodeDetailDismissedEvent
+import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
+import com.automattic.eventhorizon.EpisodeDetailShowNotesLinkTappedEvent
+import com.automattic.eventhorizon.EpisodeDetailShownEvent
+import com.automattic.eventhorizon.EpisodeDetailTranscriptCardShownEvent
+import com.automattic.eventhorizon.EpisodeDetailTranscriptCardTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -95,13 +101,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class EpisodeFragment : BaseFragment() {
     companion object {
         private const val NEW_INSTANCE_ARG = "EpisodeFragmentArg"
-
-        private object AnalyticsProp {
-            object Key {
-                const val SOURCE = "source"
-                const val EPISODE_UUID = "episode_uuid"
-            }
-        }
 
         fun newInstance(
             episodeUuid: String,
@@ -142,7 +141,7 @@ class EpisodeFragment : BaseFragment() {
     lateinit var warningsHelper: WarningsHelper
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
@@ -228,14 +227,22 @@ class EpisodeFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!viewModel.isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
+            eventHorizon.track(
+                EpisodeDetailShownEvent(
+                    source = episodeViewSource.eventHorizonValue,
+                ),
+            )
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         if (!viewModel.isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
+            eventHorizon.track(
+                EpisodeDetailDismissedEvent(
+                    source = episodeViewSource.eventHorizonValue,
+                ),
+            )
             podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed?.invoke()
         }
         webView.cleanup()
@@ -368,11 +375,10 @@ class EpisodeFragment : BaseFragment() {
 
                         TextViewCompat.setCompoundDrawableTintList(binding.lblAuthor, ColorStateList.valueOf(iconColor))
                         binding.lblAuthor.setOnClickListener {
-                            analyticsTracker.track(
-                                AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-                                mapOf(
-                                    AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
-                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                            eventHorizon.track(
+                                EpisodeDetailPodcastNameTappedEvent(
+                                    episodeUuid = state.episode.uuid,
+                                    source = episodeViewSource.eventHorizonValue,
                                 ),
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
@@ -589,24 +595,22 @@ class EpisodeFragment : BaseFragment() {
                                             val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
                                             fragment.show(parentFragmentManager, "episode_transcript")
                                         }
-                                        analyticsTracker.track(
-                                            AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED,
-                                            buildMap {
-                                                put("episode_uuid", episodeUuid)
-                                                podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
-                                            },
+                                        eventHorizon.track(
+                                            EpisodeDetailTranscriptCardTappedEvent(
+                                                episodeUuid = episodeUuid,
+                                                podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                            ),
                                         )
                                     },
                                 ),
                             )
                         }
                         LaunchedEffect(podcastUuid, episodeUuid) {
-                            analyticsTracker.track(
-                                AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_SHOWN,
-                                buildMap {
-                                    put("episode_uuid", episodeUuid)
-                                    podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
-                                },
+                            eventHorizon.track(
+                                EpisodeDetailTranscriptCardShownEvent(
+                                    episodeUuid = episodeUuid,
+                                    podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                ),
                             )
                         }
                     }
@@ -657,11 +661,10 @@ class EpisodeFragment : BaseFragment() {
                             }
 
                             viewModel.episode?.uuid?.let { episodeUuid ->
-                                analyticsTracker.track(
-                                    AnalyticsEvent.EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED,
-                                    mapOf(
-                                        AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
-                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                                eventHorizon.track(
+                                    EpisodeDetailShowNotesLinkTappedEvent(
+                                        episodeUuid = episodeUuid,
+                                        source = EpisodeViewSource.PODCAST_SCREEN.eventHorizonValue,
                                     ),
                                 )
                             }

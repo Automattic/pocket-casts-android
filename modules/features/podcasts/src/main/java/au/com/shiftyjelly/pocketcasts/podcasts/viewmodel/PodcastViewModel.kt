@@ -8,8 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -47,6 +45,8 @@ import com.automattic.eventhorizon.BookmarkShareTappedEvent
 import com.automattic.eventhorizon.BookmarksEmptyGoToHeadphoneSettingsEvent
 import com.automattic.eventhorizon.BookmarksGetBookmarksButtonTappedEvent
 import com.automattic.eventhorizon.BookmarksSortByChangedEvent
+import com.automattic.eventhorizon.EpisodeBulkArchivedEvent
+import com.automattic.eventhorizon.EpisodeBulkUnarchivedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastRefreshType
 import com.automattic.eventhorizon.PodcastScreenFundingTappedEvent
@@ -101,7 +101,6 @@ class PodcastViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     private val userManager: UserManager,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
@@ -303,7 +302,12 @@ class PodcastViewModel @Inject constructor(
             val p = podcast.value ?: return@launch
             val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(p)
             episodeManager.unarchiveAllInListBlocking(episodes)
-            trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, episodes.size)
+            eventHorizon.track(
+                EpisodeBulkUnarchivedEvent(
+                    count = episodes.size.toLong(),
+                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -312,7 +316,12 @@ class PodcastViewModel @Inject constructor(
             val episodeState = uiState.value
             if (episodeState is UiState.Loaded) {
                 episodeManager.archiveAllInList(episodeState.episodes, playbackManager)
-                trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodeState.episodes.size)
+                eventHorizon.track(
+                    EpisodeBulkArchivedEvent(
+                        count = episodeState.episodes.size.toLong(),
+                        source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                    ),
+                )
             }
         }
     }
@@ -404,7 +413,12 @@ class PodcastViewModel @Inject constructor(
         launch {
             val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast).filter { it.isFinished }
             episodeManager.archiveAllInList(episodes, playbackManager)
-            trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodes.size)
+            eventHorizon.track(
+                EpisodeBulkArchivedEvent(
+                    count = episodes.size.toLong(),
+                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -643,14 +657,6 @@ class PodcastViewModel @Inject constructor(
             )
         }
         eventHorizon.track(event)
-    }
-
-    private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
-        episodeAnalytics.trackBulkEvent(
-            event,
-            source = SourceView.PODCAST_SCREEN,
-            count = count,
-        )
     }
 
     private fun getCurrentTab() = (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
