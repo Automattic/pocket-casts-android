@@ -23,4 +23,6 @@ class TestEventSink : (Trackable) -> Unit {
     }
 
     fun isEmpty() = events.isEmpty()
+
+    val size get() = events.size
 }

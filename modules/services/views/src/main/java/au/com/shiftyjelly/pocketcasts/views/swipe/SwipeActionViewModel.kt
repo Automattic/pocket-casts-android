@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -20,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeDeletedFromCloudEvent
 import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
 import com.automattic.eventhorizon.EpisodeSwipeActionPerformedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -44,7 +43,6 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val shareDialogFactory: ShareDialogFactory,
     private val downloadQueue: DownloadQueue,
     private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
-    private val episodeAnalytics: EpisodeAnalytics,
     private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -167,10 +165,11 @@ class SwipeActionViewModel @AssistedInject constructor(
                     applicationScope = applicationScope,
                 )
                 if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
-                    episodeAnalytics.trackEvent(
-                        event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
-                        source = swipeSource.toSourceView(),
-                        uuid = episode.uuid,
+                    eventHorizon.track(
+                        EpisodeDeletedFromCloudEvent(
+                            episodeUuid = episode.uuid,
+                            source = swipeSource.toSourceView().eventHorizonValue,
+                        ),
                     )
                 }
                 viewModelScope.launch {

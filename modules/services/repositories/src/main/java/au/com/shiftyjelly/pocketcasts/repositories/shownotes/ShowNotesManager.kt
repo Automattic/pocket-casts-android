@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.CacheControl
+import timber.log.Timber
 
 class ShowNotesManager @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
@@ -26,7 +27,7 @@ class ShowNotesManager @Inject constructor(
         processShowNotes = {
             scope.launch { showNotesProcessor.process(episodeUuid, it) }
         },
-    )
+    ).also { Timber.tag("LOG_TAG").i("Load show notes flow") }
 
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(
         podcastUuid = podcastUuid,
@@ -34,7 +35,7 @@ class ShowNotesManager @Inject constructor(
         processShowNotes = {
             scope.launch { showNotesProcessor.process(episodeUuid, it) }
         },
-    )
+    ).also { Timber.tag("LOG_TAG").i("Load show notes") }
 
     suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
         showNotesServiceManager.downloadToCacheShowNotes(
@@ -48,6 +49,6 @@ class ShowNotesManager @Inject constructor(
                     }
                 }
             },
-        )
+        ).also { Timber.tag("LOG_TAG").i("Load show notes to cache") }
     }
 }

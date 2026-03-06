@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,19 +9,24 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentMultiselectBinding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeActionMovedEvent
+import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeFinishedEvent
+import com.automattic.eventhorizon.ShelfActionSource
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import java.util.Collections
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -30,15 +36,11 @@ class MultiSelectFragment :
     MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
 
-    private val source: String
-        get() = arguments?.getString(ARG_SOURCE) ?: SourceView.UNKNOWN.analyticsValue
-
-    private val shouldShowRemoveListeningHistory: Boolean
-        get() = arguments?.getBoolean(ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY) ?: false
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_KEY)
 
     private val adapter = MultiSelectAdapter(editable = true, listener = null, dragListener = this::onItemStartDrag)
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -88,7 +90,7 @@ class MultiSelectFragment :
             .observe(viewLifecycleOwner) {
                 val multiSelectActions: MutableList<Any> = MultiSelectEpisodeAction.listFromIds(it).toMutableList()
 
-                if (!shouldShowRemoveListeningHistory) {
+                if (!args.shouldShowRemoveListeningHistory) {
                     multiSelectActions.removeAll { action ->
                         action is MultiSelectEpisodeAction.RemoveListeningHistory
                     }
@@ -145,64 +147,57 @@ class MultiSelectFragment :
         trackItemMovedEvent(position)
     }
 
-    private fun sectionTitleAt(position: Int) = if (position <= multiSelectEpisodesHelper.maxToolbarIcons) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+    private fun sectionTitleAt(position: Int) = if (position <= multiSelectEpisodesHelper.maxToolbarIcons) {
+        ShelfActionSource.Shelf
+    } else {
+        ShelfActionSource.OverflowMenu
+    }
 
     private fun trackRearrangeFinishedEvent() {
-        analyticsTracker.track(
-            AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_FINISHED,
-            mapOf(AnalyticsProp.Key.SOURCE to source),
+        eventHorizon.track(
+            MultiSelectViewOverflowMenuRearrangeFinishedEvent(
+                source = args.source.eventHorizonValue,
+            ),
         )
     }
 
     private fun trackItemMovedEvent(position: Int) {
         dragStartPosition?.let {
-            val title = (items[position] as? MultiSelectAction)?.analyticsValue
-                ?: AnalyticsProp.Value.UNKNOWN
+            val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
             val movedFrom = sectionTitleAt(it)
             val movedTo = sectionTitleAt(position)
-            val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
+            val newPosition = if (movedTo == ShelfActionSource.Shelf) {
                 position - 1
             } else {
                 position - (items.indexOf(multiSelectEpisodesHelper.maxToolbarIcons) + 1)
             }
-            analyticsTracker.track(
-                AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-                mapOf(
-                    AnalyticsProp.Key.ACTION to title,
-                    AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
-                    AnalyticsProp.Key.MOVED_FROM to movedFrom,
-                    AnalyticsProp.Key.MOVED_TO to movedTo,
-                    AnalyticsProp.Key.SOURCE to source,
+            eventHorizon.track(
+                MultiSelectViewOverflowMenuRearrangeActionMovedEvent(
+                    source = args.source.eventHorizonValue,
+                    title = title,
+                    position = newPosition.toLong(),
+                    movedFrom = movedFrom,
+                    movedTo = movedTo,
                 ),
             )
             dragStartPosition = null
         }
     }
 
-    private object AnalyticsProp {
-        object Key {
-            const val ACTION = "action"
-            const val MOVED_FROM = "moved_from"
-            const val MOVED_TO = "moved_to"
-            const val POSITION = "position"
-            const val SOURCE = "source"
-        }
-
-        object Value {
-            const val SHELF = "shelf"
-            const val OVERFLOW_MENU = "overflow_menu"
-            const val UNKNOWN = "unknown"
-        }
-    }
+    @Parcelize
+    private class Args(
+        val source: SourceView,
+        val shouldShowRemoveListeningHistory: Boolean,
+    ) : Parcelable
 
     companion object {
-        private const val ARG_SOURCE = "source"
-        private const val ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY = "should_show_remove_listening_history"
-        fun newInstance(source: SourceView, shouldShowRemoveListeningHistory: Boolean) = MultiSelectFragment().apply {
-            arguments = bundleOf(
-                ARG_SOURCE to source.analyticsValue,
-                ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY to shouldShowRemoveListeningHistory,
-            )
+        const val NEW_INSTANCE_KEY = "new_instance_key"
+
+        fun newInstance(
+            source: SourceView,
+            shouldShowRemoveListeningHistory: Boolean,
+        ) = MultiSelectFragment().apply {
+            arguments = bundleOf(NEW_INSTANCE_KEY to Args(source, shouldShowRemoveListeningHistory))
         }
     }
 }

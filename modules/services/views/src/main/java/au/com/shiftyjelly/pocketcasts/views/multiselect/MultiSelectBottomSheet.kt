@@ -9,16 +9,15 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentMultiselectBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeStartedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -41,9 +40,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         }
     }
 
-    @Inject lateinit var castManager: CastManager
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     var multiSelectHelper: MultiSelectEpisodesHelper? = null
 
@@ -99,9 +96,11 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
                 }
 
                 val source = (multiSelectHelper?.source ?: SourceView.UNKNOWN)
-                analyticsTracker.track(
-                    AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
-                    AnalyticsProp.sourceMap(source),
+
+                eventHorizon.track(
+                    MultiSelectViewOverflowMenuRearrangeStartedEvent(
+                        source = source.eventHorizonValue,
+                    ),
                 )
                 (activity as FragmentHostListener).showModal(
                     MultiSelectFragment.newInstance(source, shouldShowRemoveListeningHistory = hasPlayedAnyEpisode && source == SourceView.LISTENING_HISTORY),
@@ -114,11 +113,5 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     private fun onClick(item: MultiSelectAction) {
         multiSelectHelper?.onMenuItemSelected(item.actionId, resources, requireActivity())
         dismiss()
-    }
-
-    private object AnalyticsProp {
-        private const val SOURCE = "source"
-
-        fun sourceMap(eventSource: SourceView) = mapOf(SOURCE to eventSource.analyticsValue)
     }
 }
