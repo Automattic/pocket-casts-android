@@ -31,6 +31,10 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Build check
+        run: |
+          ./gradlew :app:assembleDebugAndroidTest --stacktrace
+
       - name: Run instrumentation tests on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
