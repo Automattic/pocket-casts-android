@@ -1,0 +1,64 @@
+name: Android Onboarding E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  onboarding-e2e:
+    name: Run onboarding E2E tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ONBOARDING_TEST_EMAIL: ${{ secrets.ONBOARDING_TEST_EMAIL }}
+      ONBOARDING_TEST_PASSWORD: ${{ secrets.ONBOARDING_TEST_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run instrumentation tests on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_7
+          ram-size: 4096M
+          heap-size: 1024M
+          disable-animations: true
+          script: |
+            ./gradlew :app:connectedDebugAndroidTest \
+              -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest \
+              --stacktrace
+
+      - name: Publish JUnit report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: app/build/outputs/androidTest-results/connected/**/*.xml
+          detailed_summary: true
+          fail_on_failure: false
+
+      - name: Upload Android test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: onboarding-e2e-android-reports
+          path: |
+            app/build/reports/androidTests/connected/**
+            app/build/outputs/androidTest-results/connected/**
+          if-no-files-found: warn
