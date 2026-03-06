@@ -7,14 +7,11 @@ import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.testing.TestLifecycleOwner
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
-import java.time.Instant
+import com.automattic.eventhorizon.EpisodeDownloadsStaleEvent
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -24,6 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DownloadStatisticsReporterTest {
@@ -34,7 +32,7 @@ class DownloadStatisticsReporterTest {
     )
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val tracker = FakeTracker()
+    private val eventSink = TestEventSink()
     private val lifecycleOwner = TestLifecycleOwner(
         initialState = INITIALIZED,
         coroutineDispatcher = testDispatcher,
@@ -49,7 +47,7 @@ class DownloadStatisticsReporterTest {
         }
         reporter = DownloadStatisticsReporter(
             episodeDao,
-            EpisodeAnalytics(AnalyticsTracker.test(tracker)),
+            EventHorizon(eventSink),
             lifecycleOwner,
             CoroutineScope(testDispatcher),
         )
@@ -60,16 +58,14 @@ class DownloadStatisticsReporterTest {
         reporter.setup()
 
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
-        val (event, properties) = tracker.events.single()
 
-        assertEquals(AnalyticsEvent.EPISODE_DOWNLOAD_STALE, event)
         assertEquals(
-            mapOf(
-                "failed_download_count" to 10L,
-                "newest_failed_download" to "1970-01-01T00:00:15Z",
-                "oldest_failed_download" to "1970-01-01T00:00:00Z",
+            EpisodeDownloadsStaleEvent(
+                failedDownloadCount = 10L,
+                newestFailedDownload = "1970-01-01T00:00:15Z",
+                oldestFailedDownload = "1970-01-01T00:00:00Z",
             ),
-            properties,
+            eventSink.pollEvent(),
         )
     }
 
@@ -81,11 +77,11 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_START)
         lifecycleOwner.handleLifecycleEvent(ON_STOP)
 
-        assertEquals(0, tracker.events.size)
+        assertEquals(0, eventSink.size)
 
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
-        assertEquals(1, tracker.events.size)
+        assertEquals(1, eventSink.size)
     }
 
     @Test
@@ -96,7 +92,7 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_PAUSE)
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
-        assertEquals(1, tracker.events.size)
+        assertEquals(1, eventSink.size)
     }
 
     @Test
@@ -121,28 +117,6 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
         assertEquals(0, lifecycleOwner.observerCount)
-        assertEquals(1, tracker.events.size)
+        assertEquals(1, eventSink.size)
     }
-}
-
-private class FakeTracker : Tracker {
-    private val _events = mutableListOf<TrackedEvent>()
-
-    val events get() = _events.toList()
-
-    override val id get() = "fake_tracker"
-
-    override fun shouldTrack(event: AnalyticsEvent) = true
-
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        val trackedEvent = TrackedEvent(event, properties)
-        _events += trackedEvent
-        return trackedEvent
-    }
-
-    override fun refreshMetadata() = Unit
-
-    override fun flush() = Unit
-
-    override fun clearAllData() = Unit
 }

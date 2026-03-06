@@ -8,8 +8,6 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -29,6 +27,10 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeUnarchivedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Flowable
@@ -37,11 +39,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
-import java.util.Date
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,6 +50,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(
@@ -65,7 +67,6 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val downloadProgressCache: DownloadProgressCache,
     private val showNotesManager: ShowNotesManager,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     private val transcriptManager: TranscriptManager,
 ) : ViewModel(),
     CoroutineScope {
@@ -210,16 +211,21 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun markAsPlayedClicked(isOn: Boolean) {
         launch {
-            val event: AnalyticsEvent
             episode?.let { episode ->
-                if (isOn) {
-                    event = AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
+                val event = if (isOn) {
                     episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+                    EpisodeMarkedAsPlayedEvent(
+                        episodeUuid = episode.uuid,
+                        source = source.eventHorizonValue,
+                    )
                 } else {
-                    event = AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                     episodeManager.markAsNotPlayedBlocking(episode)
+                    EpisodeMarkedAsUnplayedEvent(
+                        episodeUuid = episode.uuid,
+                        source = source.eventHorizonValue,
+                    )
                 }
-                episodeAnalytics.trackEvent(event, source, episode.uuid)
+                eventHorizon.track(event)
             }
         }
     }
@@ -261,13 +267,20 @@ class EpisodeFragmentViewModel @Inject constructor(
     fun archiveClicked(isOn: Boolean) {
         launch {
             episode?.let { episode ->
-                if (isOn) {
+                val event = if (isOn) {
                     episodeManager.archiveBlocking(episode, playbackManager)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
+                    EpisodeArchivedEvent(
+                        episodeUuid = episode.uuid,
+                        source = source.eventHorizonValue,
+                    )
                 } else {
                     episodeManager.unarchiveBlocking(episode)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
+                    EpisodeUnarchivedEvent(
+                        episodeUuid = episode.uuid,
+                        source = source.eventHorizonValue,
+                    )
                 }
+                eventHorizon.track(event)
             }
         }
     }

@@ -7,8 +7,6 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
@@ -28,6 +26,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EpisodeUploadFailedEvent
+import com.automattic.eventhorizon.EpisodeUploadFinishedEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
@@ -38,14 +39,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.Date
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -59,6 +52,14 @@ import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.Date
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 
 interface UserEpisodeManager {
     suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager)
@@ -128,7 +129,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     val settings: Settings,
     val downloadQueue: DownloadQueue,
     @ApplicationContext val context: Context,
-    val episodeAnalytics: EpisodeAnalytics,
+    val eventHorizon: EventHorizon,
 ) : UserEpisodeManager,
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -460,10 +461,18 @@ class UserEpisodeManagerImpl @Inject constructor(
                     }
                     .flatMapCompletable { success ->
                         if (success) {
-                            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FINISHED, uuid = userEpisode.uuid)
+                            eventHorizon.track(
+                                EpisodeUploadFinishedEvent(
+                                    episodeUuid = userEpisode.uuid,
+                                ),
+                            )
                             userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
                         } else {
-                            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FAILED, uuid = userEpisode.uuid)
+                            eventHorizon.track(
+                                EpisodeUploadFailedEvent(
+                                    episodeUuid = userEpisode.uuid,
+                                ),
+                            )
                             userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, "Upload failed")
                         }
                     },

@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -19,6 +17,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeDeletedFromCloudEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeUploadCancelledEvent
+import com.automattic.eventhorizon.EpisodeUploadQueuedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UploadedFileDetailModalOptionType
 import com.automattic.eventhorizon.UploadedFilePlayOptionType
@@ -28,10 +31,10 @@ import com.automattic.eventhorizon.UserFilePlayPauseButtonTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.Flowables
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(
@@ -41,7 +44,6 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     private val podcastManager: PodcastManager,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
     userManager: UserManager,
 ) : ViewModel() {
@@ -76,10 +78,11 @@ class CloudBottomSheetViewModel @Inject constructor(
         )
         eventHorizon.track(UserFileDeletedEvent)
         if (deleteState == DeleteState.Cloud) {
-            episodeAnalytics.trackEvent(
-                event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
-                source = source,
-                uuid = episode.uuid,
+            eventHorizon.track(
+                EpisodeDeletedFromCloudEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
             )
         }
         viewModelScope.launch {
@@ -89,19 +92,35 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun uploadEpisode(episode: UserEpisode) {
         userEpisodeManager.uploadToServer(episode, waitForWifi = false)
-        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_QUEUED, source = source, uuid = episode.uuid)
+        eventHorizon.track(
+            EpisodeUploadQueuedEvent(
+                episodeUuid = episode.uuid,
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun removeEpisode(episode: UserEpisode) {
         userEpisodeManager.removeFromCloud(episode)
         trackOptionTapped(UploadedFileDetailModalOptionType.DeleteFromCloud)
-        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD, source = source, uuid = episode.uuid)
+        eventHorizon.track(
+            EpisodeDeletedFromCloudEvent(
+                episodeUuid = episode.uuid,
+                source = source.eventHorizonValue,
+            ),
+
+        )
     }
 
     fun cancelUpload(episode: UserEpisode) {
         userEpisodeManager.cancelUpload(episode)
         trackOptionTapped(UploadedFileDetailModalOptionType.CancelUpload)
-        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_CANCELLED, source = source, uuid = episode.uuid)
+        eventHorizon.track(
+            EpisodeUploadCancelledEvent(
+                episodeUuid = episode.uuid,
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun cancelDownload(episode: UserEpisode) {
@@ -135,7 +154,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun markAsPlayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeMarkedAsPlayedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
             trackOptionTapped(UploadedFileDetailModalOptionType.MarkPlayed)
         }
     }
@@ -143,7 +167,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun markAsUnplayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsNotPlayedBlocking(episode)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeMarkedAsUnplayedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
             trackOptionTapped(UploadedFileDetailModalOptionType.MarkUnplayed)
         }
     }

@@ -4,8 +4,6 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -14,12 +12,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
 class NotificationBroadcastReceiver :
@@ -36,7 +37,7 @@ class NotificationBroadcastReceiver :
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var episodeAnalytics: EpisodeAnalytics
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val source = SourceView.NOTIFICATION
 
@@ -123,7 +124,12 @@ class NotificationBroadcastReceiver :
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
+                eventHorizon.track(
+                    EpisodeMarkedAsPlayedEvent(
+                        episodeUuid = episodeUuid,
+                        source = source.eventHorizonValue,
+                    ),
+                )
             }
         }
     }
@@ -132,7 +138,12 @@ class NotificationBroadcastReceiver :
         launch {
             episodeManager.findByUuid(episodeUuid)?.let { episode ->
                 episodeManager.archiveBlocking(episode, playbackManager, true)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episodeUuid)
+                eventHorizon.track(
+                    EpisodeArchivedEvent(
+                        episodeUuid = episode.uuid,
+                        source = source.eventHorizonValue,
+                    ),
+                )
             }
         }
     }

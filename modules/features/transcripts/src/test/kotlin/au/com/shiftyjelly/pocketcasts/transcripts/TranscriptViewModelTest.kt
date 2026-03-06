@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
@@ -13,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -50,6 +52,7 @@ class TranscriptViewModelTest {
             },
             paymentClient = PaymentClient.test(),
             analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             source = TranscriptViewModel.Source.Player,
             sharingClient = object : TranscriptSharingClient {
                 override suspend fun shareTranscript(request: SharingRequest): SharingResponse {

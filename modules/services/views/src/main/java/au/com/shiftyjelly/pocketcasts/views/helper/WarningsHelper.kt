@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -21,12 +19,14 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
+import com.automattic.eventhorizon.EpisodeUploadQueuedEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ActivityContext
-import java.util.Locale
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Locale
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -38,7 +38,7 @@ class WarningsHelper @Inject constructor(
     private val settings: Settings,
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
     private val userEpisodeManager: UserEpisodeManager,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -104,7 +104,12 @@ class WarningsHelper @Inject constructor(
 
                 if (!it.isUploaded && !it.isQueuedForUpload && !it.isUploading) {
                     userEpisodeManager.uploadToServer(it, waitForWifi)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_QUEUED, source = source, uuid = it.uuid)
+                    eventHorizon.track(
+                        EpisodeUploadQueuedEvent(
+                            episodeUuid = it.uuid,
+                            source = source.eventHorizonValue,
+                        ),
+                    )
                 }
             }
         }

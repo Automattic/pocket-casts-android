@@ -11,16 +11,16 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.MultiSelectViewOverflowMenuShownEvent
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -34,7 +34,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
 
     private var overflowItems: List<MultiSelectAction> = emptyList()
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     fun <T> setup(
         lifecycleOwner: LifecycleOwner,
@@ -103,9 +103,10 @@ class MultiSelectToolbar @JvmOverloads constructor(
         setOnMenuItemClickListener {
             if (it.itemId == R.id.menu_overflow) {
                 if (multiSelectHelper is MultiSelectEpisodesHelper) {
-                    analyticsTracker.track(
-                        AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN,
-                        AnalyticsProp.sourceMap(multiSelectHelper.source),
+                    eventHorizon.track(
+                        MultiSelectViewOverflowMenuShownEvent(
+                            source = multiSelectHelper.source.eventHorizonValue,
+                        ),
                     )
                     showOverflowBottomSheet(activity.supportFragmentManager, multiSelectHelper, sourceView)
                 }
@@ -149,11 +150,5 @@ class MultiSelectToolbar @JvmOverloads constructor(
         val tintedIcon = DrawableCompat.wrap(icon)
         DrawableCompat.setTint(tintedIcon.mutate(), context.getThemeColor(UR.attr.primary_interactive_02))
         super.setNavigationIcon(tintedIcon)
-    }
-
-    private object AnalyticsProp {
-        private const val SOURCE = "source"
-
-        fun sourceMap(eventSource: SourceView) = mapOf(SOURCE to eventSource.analyticsValue)
     }
 }

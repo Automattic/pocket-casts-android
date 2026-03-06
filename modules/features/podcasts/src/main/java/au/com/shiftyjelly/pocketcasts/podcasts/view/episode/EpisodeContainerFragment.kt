@@ -34,14 +34,15 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.EpisodeTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlin.time.Duration
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -229,7 +230,7 @@ class EpisodeContainerFragment :
                 super.onPageSelected(position)
                 btnFav.isVisible = adapter.isDetailsTab(position)
                 btnShare.isVisible = adapter.isDetailsTab(position)
-                viewModel.onPageSelected(adapter.pageKey(position))
+                viewModel.onPageSelected(adapter.tabType(position))
             }
         })
 
@@ -293,10 +294,22 @@ class EpisodeContainerFragment :
         val indexOfBookmarks: Int
             get() = sections.indexOf(Section.Bookmarks)
 
-        private sealed class Section(@StringRes val titleRes: Int, val analyticsValue: String) {
-            data object Details : Section(LR.string.details, "details")
-            data object Chapters : Section(LR.string.chapters, "chapters")
-            data object Bookmarks : Section(LR.string.bookmarks, "bookmarks")
+        private sealed class Section(
+            @StringRes val titleRes: Int,
+            val eventHorizonValue: EpisodeTabType,
+        ) {
+            data object Details : Section(
+                titleRes = LR.string.details,
+                eventHorizonValue = EpisodeTabType.Details,
+            )
+            data object Chapters : Section(
+                titleRes = LR.string.chapters,
+                eventHorizonValue = EpisodeTabType.Chapters,
+            )
+            data object Bookmarks : Section(
+                titleRes = LR.string.bookmarks,
+                eventHorizonValue = EpisodeTabType.Bookmarks,
+            )
         }
 
         private var sections = listOf(
@@ -368,7 +381,7 @@ class EpisodeContainerFragment :
             return sections[position].titleRes
         }
 
-        fun pageKey(position: Int) = sections[position].analyticsValue
+        fun tabType(position: Int) = sections[position].eventHorizonValue
 
         fun isDetailsTab(position: Int) = sections[position] is Section.Details
     }

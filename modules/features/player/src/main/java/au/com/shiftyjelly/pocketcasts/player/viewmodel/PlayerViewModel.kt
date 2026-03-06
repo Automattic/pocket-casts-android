@@ -8,9 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -44,6 +42,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlaybackContentType
 import com.automattic.eventhorizon.PlaybackEffectSettingsChangedEvent
@@ -62,11 +63,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +78,11 @@ import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import timber.log.Timber
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -96,7 +97,6 @@ class PlayerViewModel @Inject constructor(
     private val theme: Theme,
     private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     blazeAdsManager: BlazeAdsManager,
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -277,7 +277,6 @@ class PlayerViewModel @Inject constructor(
     val snackbarMessages = _snackbarMessages.asSharedFlow()
 
     private val _episodeFlow = MutableStateFlow<BaseEpisode?>(null)
-    val episodeFlow = _episodeFlow.asStateFlow()
     var episode: BaseEpisode?
         get() = _episodeFlow.value
         set(value) {
@@ -522,14 +521,24 @@ class PlayerViewModel @Inject constructor(
     fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
             episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeMarkedAsPlayedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
     fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
             episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeArchivedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -742,11 +751,10 @@ class PlayerViewModel @Inject constructor(
 
     fun onPodcastTitleClick(episodeUuid: String, podcastUuid: String?) {
         if (podcastUuid == null) return
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-            mapOf(
-                ShelfViewModel.Companion.AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
-                ShelfViewModel.Companion.AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+        eventHorizon.track(
+            EpisodeDetailPodcastNameTappedEvent(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.NOW_PLAYING.eventHorizonValue,
             ),
         )
         viewModelScope.launch {
@@ -785,10 +793,6 @@ class PlayerViewModel @Inject constructor(
 
     sealed interface SnackbarMessage {
         data object ShowBatteryWarningIfAppropriate : SnackbarMessage
-    }
-
-    private object AnalyticsProp {
-        const val SETTINGS = "settings"
     }
 
     enum class PlaybackEffectsSettingsTab(
