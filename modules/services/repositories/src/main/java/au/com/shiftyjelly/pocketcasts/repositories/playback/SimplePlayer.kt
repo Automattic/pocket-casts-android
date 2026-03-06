@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.SurfaceView
 import android.widget.Toast
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -44,7 +46,6 @@ class SimplePlayer(
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
     private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
-    private val bufferTimeMaxMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(4).toInt()
 
     // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
     private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.SECONDS.toMillis(50).toInt()
@@ -192,7 +193,12 @@ class SimplePlayer(
         val trackSelector = DefaultTrackSelector(context)
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
-        val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+        val maxBufferMillis = computeMaxBufferMs(
+            isStreaming = isStreaming,
+            useReducedBuffer = useReducedBuffer,
+            isAdaptiveBufferEnabled = FeatureFlag.isEnabled(Feature.ADAPTIVE_BUFFER),
+            isUnmeteredNetwork = Network.isUnmeteredConnection(context),
+        )
         val backBufferMillis = if (isStreaming) backBufferTimeMillis else DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
@@ -391,4 +397,17 @@ class SimplePlayer(
             updateAudioOffloadPreference()
         }
     }
+}
+
+@VisibleForTesting
+internal fun computeMaxBufferMs(
+    isStreaming: Boolean,
+    useReducedBuffer: Boolean,
+    isAdaptiveBufferEnabled: Boolean,
+    isUnmeteredNetwork: Boolean,
+): Int = when {
+    !isStreaming -> DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+    useReducedBuffer -> TimeUnit.MINUTES.toMillis(2).toInt()
+    isAdaptiveBufferEnabled && isUnmeteredNetwork -> TimeUnit.MINUTES.toMillis(5).toInt()
+    else -> TimeUnit.MINUTES.toMillis(4).toInt()
 }
