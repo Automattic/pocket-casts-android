@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 import androidx.compose.foundation.text.input.setTextAndSelectAll
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,7 +79,7 @@ class CreatePlaylistViewModelTest {
                 on { artworkConfiguration } doReturn settingMock
             }
         },
-        analyticsTracker = AnalyticsTracker.test(),
+        eventHorizon = EventHorizon(TestEventSink()),
         initialPlaylistTitle = "Playlist name",
     )
 

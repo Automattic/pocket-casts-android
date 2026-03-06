@@ -4,13 +4,22 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
+import com.automattic.eventhorizon.AddToPlaylistsCreateNewPlaylistTappedEvent
+import com.automattic.eventhorizon.AddToPlaylistsEpisodeAddTappedEvent
+import com.automattic.eventhorizon.AddToPlaylistsEpisodeRemoveTappedEvent
+import com.automattic.eventhorizon.AddToPlaylistsNewPlaylistTappedEvent
+import com.automattic.eventhorizon.AddToPlaylistsShownEvent
+import com.automattic.eventhorizon.EpisodeAddedToListBulkEvent
+import com.automattic.eventhorizon.EpisodeAddedToListEvent
+import com.automattic.eventhorizon.EpisodeRemovedFromListBulkEvent
+import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterCreatedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -39,7 +48,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
 class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @Assisted private val source: Source,
     @Assisted("uuids") private val episodeUuids: List<EpisodeUuidPair>,
     @Assisted("title") initialPlaylistTitle: String,
@@ -92,7 +101,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                 // If the change is already stored keep it.
                 isCurrentlyAdded
             } else {
-                // If playlist was added but will be removed or vice-versa remove the change value.
+                // If playlist was added but will be removed or vice versa remove the change value.
                 null
             }
         }
@@ -124,7 +133,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
             val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
             playlistManager.addManualEpisodes(playlistUuid, uuids)
-            tracker.track(AnalyticsEvent.FILTER_CREATED)
+            eventHorizon.track(FilterCreatedEvent())
 
             val playlist = CreatedPlaylist(uuid = playlistUuid, title = sanitizedName)
             _createdPlaylist.complete(playlist)
@@ -179,9 +188,10 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackScreenShown() {
-        tracker.track(
-            AnalyticsEvent.ADD_TO_PLAYLISTS_SHOWN,
-            mapOf("source" to source.analyticsValue),
+        eventHorizon.track(
+            AddToPlaylistsShownEvent(
+                source = source.analyticsValue,
+            ),
         )
     }
 
@@ -189,89 +199,81 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         playlist: PlaylistPreviewForEpisode,
         isPlaylistFull: Boolean,
     ) {
-        tracker.track(
-            AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
-                "is_playlist_full" to isPlaylistFull,
+        eventHorizon.track(
+            AddToPlaylistsEpisodeAddTappedEvent(
+                source = source.analyticsValue,
+                isPlaylistFull = isPlaylistFull,
             ),
         )
         if (!isPlaylistFull) {
-            when (episodeUuids.size) {
+            val event = when (episodeUuids.size) {
                 1 -> {
                     val uuids = episodeUuids.first()
-                    tracker.track(
-                        AnalyticsEvent.EPISODE_ADDED_TO_LIST,
-                        buildMap {
-                            put("playlist_name", playlist.title)
-                            put("playlist_uuid", playlist.uuid)
-                            put("episode_uuid", uuids.episodeUuid)
-                            put("podcast_uuid", uuids.podcastUuid)
-                            put("source", source.episodeEditAnalyticsValue)
-                        },
+                    EpisodeAddedToListEvent(
+                        playlistName = playlist.title,
+                        playlistUuid = playlist.uuid,
+                        episodeUuid = uuids.episodeUuid,
+                        podcastUuid = uuids.podcastUuid,
+                        source = source.episodeAddAnalyticsValue,
                     )
                 }
 
                 else -> {
-                    tracker.track(
-                        AnalyticsEvent.EPISODE_ADDED_TO_LIST_BULK,
-                        buildMap {
-                            put("playlist_name", playlist.title)
-                            put("playlist_uuid", playlist.uuid)
-                            put("episode_count", episodeUuids.size)
-                            put("source", source.episodeEditAnalyticsValue)
-                        },
+                    EpisodeAddedToListBulkEvent(
+                        playlistName = playlist.title,
+                        playlistUuid = playlist.uuid,
+                        episodeCount = episodeUuids.size.toLong(),
+                        source = source.episodeAddAnalyticsValue,
                     )
                 }
             }
+            eventHorizon.track(event)
         }
     }
 
     fun trackEpisodeRemoveTapped(playlist: PlaylistPreviewForEpisode) {
-        tracker.track(
-            AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED,
-            mapOf("source" to source.analyticsValue),
+        eventHorizon.track(
+            AddToPlaylistsEpisodeRemoveTappedEvent(
+                source = source.analyticsValue,
+            ),
         )
-        when (episodeUuids.size) {
+        val event = when (episodeUuids.size) {
             1 -> {
                 val uuids = episodeUuids.first()
-                tracker.track(
-                    AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
-                    buildMap {
-                        put("playlist_name", playlist.title)
-                        put("playlist_uuid", playlist.uuid)
-                        put("episode_uuid", uuids.episodeUuid)
-                        put("podcast_uuid", uuids.podcastUuid)
-                        put("source", source.episodeEditAnalyticsValue)
-                    },
+                EpisodeRemovedFromListEvent(
+                    playlistName = playlist.title,
+                    playlistUuid = playlist.uuid,
+                    episodeUuid = uuids.episodeUuid,
+                    podcastUuid = uuids.podcastUuid,
+                    source = source.episodeRemoveAnalyticsValue,
                 )
             }
 
             else -> {
-                tracker.track(
-                    AnalyticsEvent.EPISODE_REMOVED_FROM_LIST_BULK,
-                    buildMap {
-                        put("playlist_name", playlist.title)
-                        put("playlist_uuid", playlist.uuid)
-                        put("episode_count", episodeUuids.size)
-                        put("source", source.episodeEditAnalyticsValue)
-                    },
+                EpisodeRemovedFromListBulkEvent(
+                    playlistName = playlist.title,
+                    playlistUuid = playlist.uuid,
+                    episodeCount = episodeUuids.size.toLong(),
+                    source = source.episodeRemoveAnalyticsValue,
                 )
             }
         }
+        eventHorizon.track(event)
     }
 
     fun trackNewPlaylistTapped() {
-        tracker.track(
-            AnalyticsEvent.ADD_TO_PLAYLISTS_NEW_PLAYLIST_TAPPED,
-            mapOf("source" to source.analyticsValue),
+        eventHorizon.track(
+            AddToPlaylistsNewPlaylistTappedEvent(
+                source = source.analyticsValue,
+            ),
         )
     }
 
     fun trackCreateNewPlaylistTapped() {
-        tracker.track(
-            AnalyticsEvent.ADD_TO_PLAYLISTS_CREATE_NEW_PLAYLIST_TAPPED,
-            mapOf("source" to source.analyticsValue),
+        eventHorizon.track(
+            AddToPlaylistsCreateNewPlaylistTappedEvent(
+                source = source.analyticsValue,
+            ),
         )
     }
 
