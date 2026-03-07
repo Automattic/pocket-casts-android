@@ -45,7 +45,28 @@ jobs:
           heap-size: 1024M
           disable-animations: true
           script: |
-            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest --stacktrace
+            set -euo pipefail
+
+            adb devices
+            adb logcat -c || true
+
+            set +e
+            ./gradlew :app:connectedDebugAndroidTest \
+              -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest \
+              --stacktrace \
+              --info
+            status=$?
+            set -e
+
+            if [ "$status" -ne 0 ]; then
+              echo "Gradle failed, dumping logs..."
+            fi
+
+            adb logcat -d -v time > logcat.txt || true
+            adb shell dumpsys activity processes > dumpsys-processes.txt || true
+            adb shell dumpsys activity top > dumpsys-top.txt || true
+
+            exit "$status"
 
       - name: Publish JUnit report
         if: always()
@@ -63,4 +84,7 @@ jobs:
           path: |
             app/build/reports/androidTests/connected/**
             app/build/outputs/androidTest-results/connected/**
+            logcat.txt
+            dumpsys-processes.txt
+            dumpsys-top.txt
           if-no-files-found: warn
