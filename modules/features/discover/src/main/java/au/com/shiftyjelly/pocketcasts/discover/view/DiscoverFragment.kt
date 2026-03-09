@@ -12,11 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.discoverListShowAllTapped
-import au.com.shiftyjelly.pocketcasts.analytics.discoverShowAllTapped
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
@@ -37,6 +33,12 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
+import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
+import com.automattic.eventhorizon.DiscoverCategoryCloseButtonTappedEvent
+import com.automattic.eventhorizon.DiscoverCategoryShownEvent
+import com.automattic.eventhorizon.DiscoverListCollectionHeaderTappedEvent
+import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
+import com.automattic.eventhorizon.DiscoverShowAllTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,8 +56,6 @@ class DiscoverFragment :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var eventHorizon: EventHorizon
 
@@ -100,11 +100,18 @@ class DiscoverFragment :
         val transformedList = viewModel.transformNetworkLoadableList(contentList, resources) // Replace any [regionCode] etc references
         val listId = contentList.listUuid
         val listDate = podcastList?.date ?: ""
-        if (listId != null) {
-            analyticsTracker.discoverListShowAllTapped(listId = listId, listDate = listDate)
+        val event = if (listId != null) {
+            DiscoverListShowAllTappedEvent(
+                listId = listId,
+                listDatetime = listDate,
+            )
         } else {
-            analyticsTracker.discoverShowAllTapped(listId = transformedList.inferredId(), listDate = listDate)
+            DiscoverShowAllTappedEvent(
+                listId = transformedList.inferredId(),
+                listDatetime = listDate,
+            )
         }
+        eventHorizon.track(event)
         if (contentList is DiscoverCategory) {
             trackCategoryShownImpression(contentList)
         }
@@ -120,9 +127,12 @@ class DiscoverFragment :
 
     override fun onCollectionHeaderClicked(list: NetworkLoadableList) {
         val transformedList = viewModel.transformNetworkLoadableList(list, resources)
-        val listId = list.listUuid
-        if (listId != null) {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_COLLECTION_HEADER_TAPPED, mapOf(LIST_ID_KEY to listId))
+        list.listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListCollectionHeaderTappedEvent(
+                    listId = listId,
+                ),
+            )
         }
         if (list.expandedStyle is ExpandedStyle.GridList) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
@@ -163,25 +173,25 @@ class DiscoverFragment :
     }
 
     override fun onSelectCategory(category: DiscoverCategory) {
-        analyticsTracker.track(
-            AnalyticsEvent.DISCOVER_CATEGORIES_PILL_TAPPED,
-            mapOf(
-                "name" to category.name,
-                "id" to category.id,
-                "region" to viewModel.currentRegionCode.orEmpty(),
-                "index" to (category.featuredIndex ?: -1),
-                "sponsored" to (category.isSponsored == true),
-                "visits" to category.totalVisits,
+        eventHorizon.track(
+            DiscoverCategoriesPillTappedEvent(
+                name = category.name,
+                region = viewModel.currentRegionCode.orEmpty(),
+                index = category.featuredIndex?.toLong() ?: -1,
+                visits = category.totalVisits.toLong(),
+                sponsored = category.isSponsored == true,
             ),
         )
-
         categoriesManager.selectCategory(category.id)
     }
 
     override fun onDismissSelectedCategory(category: DiscoverCategory) {
-        analyticsTracker.track(
-            AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED,
-            mapOf("name" to category.name, "id" to category.id, "region" to viewModel.currentRegionCode.orEmpty()),
+        eventHorizon.track(
+            DiscoverCategoryCloseButtonTappedEvent(
+                name = category.name,
+                region = viewModel.currentRegionCode.orEmpty(),
+                id = category.id.toLong(),
+            ),
         )
 
         categoriesManager.dismissSelectedCategory()
@@ -222,7 +232,7 @@ class DiscoverFragment :
                     categoriesManager.loadCategories(url)
                     categoriesManager.state.asFlowable()
                 },
-                analyticsTracker = analyticsTracker,
+                eventHorizon = eventHorizon,
             )
         }
         recyclerView.adapter = adapter
@@ -298,13 +308,12 @@ class DiscoverFragment :
     }
 
     private fun trackCategoryShownImpression(category: DiscoverCategory) {
-        viewModel.currentRegionCode?.let {
-            analyticsTracker.track(
-                AnalyticsEvent.DISCOVER_CATEGORY_SHOWN,
-                mapOf(
-                    NAME_KEY to category.name,
-                    REGION_KEY to it,
-                    ID_KEY to category.id,
+        viewModel.currentRegionCode?.let { region ->
+            eventHorizon.track(
+                DiscoverCategoryShownEvent(
+                    name = category.name,
+                    region = region,
+                    id = category.id.toLong(),
                 ),
             )
         }
@@ -314,16 +323,5 @@ class DiscoverFragment :
         val canScroll = binding?.recyclerView?.canScrollVertically(-1) ?: false
         binding?.recyclerView?.quickScrollToTop()
         return canScroll
-    }
-
-    companion object {
-        private const val ID_KEY = "id"
-        private const val NAME_KEY = "name"
-        private const val REGION_KEY = "region"
-        const val LIST_ID_KEY = "list_id"
-        const val PODCAST_UUID_KEY = "podcast_uuid"
-        const val EPISODE_UUID_KEY = "episode_uuid"
-        const val SOURCE_KEY = "source"
-        const val UUID_KEY = "uuid"
     }
 }

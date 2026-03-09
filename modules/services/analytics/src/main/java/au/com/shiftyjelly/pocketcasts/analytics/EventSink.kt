@@ -7,17 +7,17 @@ class EventSink(
     private val listeners: Set<AnalyticsTracker.Listener>,
 ) : (Trackable) -> Unit {
     override fun invoke(event: Trackable) {
-        val analyticsEvent = EVENT_MAP[event.name] ?: return
+        val analyticsEvent = EVENT_MAP[event.analyticsName] ?: return
         val trackedEvents = trackers.associate { tracker ->
             val trackedEvent = if (tracker.shouldTrack(analyticsEvent)) {
-                tracker.track(analyticsEvent, event.properties)
+                tracker.track(analyticsEvent, event.analyticsProperties)
             } else {
                 null
             }
             tracker.id to trackedEvent
         }
         listeners.forEach { listener ->
-            listener.onEvent(analyticsEvent, event.properties, trackedEvents)
+            listener.onEvent(analyticsEvent, event.analyticsProperties, trackedEvents)
         }
     }
 }
