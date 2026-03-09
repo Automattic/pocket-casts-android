@@ -168,6 +168,8 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_SEEK_FORWARD))
         assertTrue(commands.contains(Player.COMMAND_SEEK_BACK))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
     }

@@ -98,6 +98,34 @@ internal class Media3LibrarySessionCallback(
         return sessionCallback.onMediaButtonEvent(session, controllerInfo, intent)
     }
 
+    override fun onPlaybackResumption(
+        mediaSession: MediaSession,
+        controller: MediaSession.ControllerInfo,
+        playbackHasBeenResumed: Boolean,
+    ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+        val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
+        scope.launch {
+            try {
+                val episode = playbackManager.getCurrentEpisode()
+                if (episode != null) {
+                    val mediaItem = MediaItem.Builder().setMediaId(episode.uuid).build()
+                    future.set(
+                        MediaSession.MediaItemsWithStartPosition(
+                            listOf(mediaItem),
+                            0,
+                            episode.playedUpToMs.toLong(),
+                        ),
+                    )
+                } else {
+                    future.setException(UnsupportedOperationException("No episode to resume"))
+                }
+            } catch (e: Exception) {
+                future.setException(e)
+            }
+        }
+        return future
+    }
+
     override fun onGetLibraryRoot(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,

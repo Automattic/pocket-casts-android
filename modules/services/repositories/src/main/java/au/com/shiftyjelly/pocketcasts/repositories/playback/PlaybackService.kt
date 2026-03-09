@@ -113,7 +113,8 @@ open class PlaybackService :
 
     @OptIn(UnstableApi::class)
     override fun onUpdateNotification(session: MediaSession, startInForegroundRequired: Boolean) {
-        if (!startInForegroundRequired && settings.hideNotificationOnPause.value) {
+        val isTransientLoss = (session.player as? PocketCastsForwardingPlayer)?.isTransientLoss == true
+        if (!startInForegroundRequired && settings.hideNotificationOnPause.value && !isTransientLoss) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             return
         }
@@ -128,6 +129,7 @@ open class PlaybackService :
     }
 
     override fun onDestroy() {
+        playbackManager.mediaSessionManager.release()
         super.onDestroy()
 
         sleepTimerDisposable?.dispose()

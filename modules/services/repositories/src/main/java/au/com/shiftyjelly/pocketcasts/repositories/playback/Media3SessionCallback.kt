@@ -67,6 +67,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_ARCHIVE, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_PLAY_NEXT, Bundle.EMPTY))
+            .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
         val playerCommands = Player.Commands.Builder()
@@ -80,6 +81,7 @@ internal class Media3SessionCallback(
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
+                Player.COMMAND_SET_MEDIA_ITEM,
             )
             .build()
 

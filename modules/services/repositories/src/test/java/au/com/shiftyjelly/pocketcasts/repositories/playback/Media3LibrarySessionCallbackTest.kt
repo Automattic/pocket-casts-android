@@ -9,14 +9,19 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import java.util.Date
+import java.util.concurrent.ExecutionException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,8 +74,6 @@ class Media3LibrarySessionCallbackTest {
             contextProvider = { mockContext },
         )
     }
-
-    // --- onGetLibraryRoot ---
 
     @Test
     fun `onGetLibraryRoot returns root media item for default params`() {
@@ -132,8 +135,6 @@ class Media3LibrarySessionCallbackTest {
         verify(browseTreeProvider).getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false)
     }
 
-    // --- onGetChildren ---
-
     @Test
     fun `onGetChildren returns browse items from provider`() = runTest {
         val items = listOf(
@@ -156,23 +157,18 @@ class Media3LibrarySessionCallbackTest {
         val items = (1..10).map { createMediaItem("id$it", "Title $it", browsable = true) }
         whenever(browseTreeProvider.loadChildren(eq(MEDIA_ID_ROOT), any())).thenReturn(items)
 
-        // Page 0, size 3
         val page0 = callback.onGetChildren(mockSession, mockController, MEDIA_ID_ROOT, 0, 3, null).get()
         assertEquals(3, page0.value!!.size)
         assertEquals("id1", page0.value!![0].mediaId)
 
-        // Page 1, size 3
         val page1 = callback.onGetChildren(mockSession, mockController, MEDIA_ID_ROOT, 1, 3, null).get()
         assertEquals(3, page1.value!!.size)
         assertEquals("id4", page1.value!![0].mediaId)
 
-        // Page 3, size 3 (last page, only 1 item)
         val page3 = callback.onGetChildren(mockSession, mockController, MEDIA_ID_ROOT, 3, 3, null).get()
         assertEquals(1, page3.value!!.size)
         assertEquals("id10", page3.value!![0].mediaId)
     }
-
-    // --- onGetSearchResult ---
 
     @Test
     fun `onGetSearchResult returns results from provider`() = runTest {
@@ -197,8 +193,6 @@ class Media3LibrarySessionCallbackTest {
 
         assertEquals(androidx.media3.session.LibraryResult.RESULT_ERROR_UNKNOWN, libraryResult.resultCode)
     }
-
-    // --- Session callback delegation ---
 
     @Test
     fun `onConnect delegates to sessionCallback`() {
@@ -273,7 +267,6 @@ class Media3LibrarySessionCallbackTest {
         )
         whenever(sessionCallback.onConnect(any(), any())).thenReturn(connectionResult)
 
-        // Default callback has null packageValidator
         callback.onConnect(mockSession, mockController)
 
         verify(sessionCallback).onConnect(mockSession, mockController)
@@ -304,7 +297,36 @@ class Media3LibrarySessionCallbackTest {
         verify(sessionCallback).onCustomCommand(mockSession, mockController, command, Bundle.EMPTY)
     }
 
-    // --- Helpers ---
+    @Test
+    fun `onPlaybackResumption returns current episode with position`() = runTest {
+        val episode = PodcastEpisode(
+            uuid = "resume-ep",
+            title = "Resume Episode",
+            publishedDate = Date(),
+            podcastUuid = "podcast-uuid",
+        ).apply { playedUpTo = 42.5 }
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+
+        val mockMediaSession: MediaSession = mock()
+        val result = callback.onPlaybackResumption(mockMediaSession, mockController, false)
+
+        val itemsWithPosition = result.get()
+        assertEquals(1, itemsWithPosition.mediaItems.size)
+        assertEquals("resume-ep", itemsWithPosition.mediaItems[0].mediaId)
+        assertEquals(0, itemsWithPosition.startIndex)
+        assertEquals(42_500L, itemsWithPosition.startPositionMs)
+    }
+
+    @Test
+    fun `onPlaybackResumption fails when no current episode`() = runTest {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+
+        val mockMediaSession: MediaSession = mock()
+        val result = callback.onPlaybackResumption(mockMediaSession, mockController, false)
+
+        val exception = assertThrows(ExecutionException::class.java) { result.get() }
+        assertTrue(exception.cause is UnsupportedOperationException)
+    }
 
     private fun createMediaItem(
         mediaId: String,
