@@ -6,7 +6,7 @@ adb logcat -c || true
 
 set +e
 ./gradlew :app:connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLinkTest \
   --stacktrace \
   --info
 status=$?
