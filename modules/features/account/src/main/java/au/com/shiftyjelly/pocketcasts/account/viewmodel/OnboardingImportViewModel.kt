@@ -1,50 +1,51 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.OnboardingImportAppSelectedEvent
+import com.automattic.eventhorizon.OnboardingImportDismissedEvent
+import com.automattic.eventhorizon.OnboardingImportOpenAppSelectedEvent
+import com.automattic.eventhorizon.OnboardingImportShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingImportViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     fun onImportStartPageShown(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_IMPORT_SHOWN,
-            mapOf(FLOW_KEY to flow.analyticsValue),
+        eventHorizon.track(
+            OnboardingImportShownEvent(
+                flow = flow.eventHorizonValue,
+            ),
         )
     }
 
     fun onOpenApp(flow: OnboardingFlow, appName: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_IMPORT_OPEN_APP_SELECTED,
-            mapOf(
-                FLOW_KEY to flow.analyticsValue,
-                APP_NAME_KEY to appName,
+        eventHorizon.track(
+            OnboardingImportOpenAppSelectedEvent(
+                flow = flow.eventHorizonValue,
+                app = appName,
             ),
         )
     }
 
     fun onAppSelected(flow: OnboardingFlow, appName: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_IMPORT_APP_SELECTED,
-            mapOf(FLOW_KEY to flow, APP_NAME_KEY to appName),
+        eventHorizon.track(
+            OnboardingImportAppSelectedEvent(
+                flow = flow.eventHorizonValue,
+                app = appName,
+            ),
         )
     }
 
     fun onImportDismissed(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_IMPORT_DISMISSED,
-            mapOf(FLOW_KEY to flow.analyticsValue),
+        eventHorizon.track(
+            OnboardingImportDismissedEvent(
+                flow = flow.eventHorizonValue,
+            ),
         )
-    }
-
-    companion object {
-        const val FLOW_KEY = "flow"
-        const val APP_NAME_KEY = "app"
     }
 }
