@@ -19,9 +19,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
@@ -285,7 +287,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `stop does nothing when onStop is null`() {
+    fun `stop delegates to wrapped player when onStop is null`() {
         val player = PocketCastsForwardingPlayer(
             wrappedPlayer = mockPlayer,
             onStop = null,
@@ -293,7 +295,7 @@ class PocketCastsForwardingPlayerTest {
 
         player.stop()
 
-        verify(mockPlayer, never()).stop()
+        verify(mockPlayer).stop()
     }
 
     @Test
@@ -321,6 +323,49 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `play calls onPlay callback`() {
+        var onPlayCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onPlay = { onPlayCalled = true },
+        )
+
+        player.play()
+
+        assertTrue(onPlayCalled)
+        verify(mockPlayer).play()
+    }
+
+    @Test
+    fun `play with guard returning false does not call onPlay`() {
+        var onPlayCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onPlay = { onPlayCalled = true },
+            playGuard = { false },
+        )
+
+        player.play()
+
+        assertFalse(onPlayCalled)
+        verify(mockPlayer, never()).play()
+    }
+
+    @Test
+    fun `pause calls onPause callback`() {
+        var onPauseCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onPause = { onPauseCalled = true },
+        )
+
+        player.pause()
+
+        assertTrue(onPauseCalled)
+        verify(mockPlayer).pause()
+    }
+
+    @Test
     fun `swapPlayer preserves onStop and playGuard`() {
         var stopCalled = false
         var guardChecked = false
@@ -344,6 +389,46 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(stopCalled)
         assertTrue(guardChecked)
         verify(newWrappedPlayer, never()).play()
+    }
+
+    @Test
+    fun `available commands include COMMAND_STOP`() {
+        val commands = forwardingPlayer.availableCommands
+        assertTrue(commands.contains(Player.COMMAND_STOP))
+    }
+
+    @Test
+    fun `updateMetadata does not fire onMediaItemTransition when episode UUID unchanged`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        val episode = createPodcastEpisode(uuid = "ep-1", title = "First")
+        forwardingPlayer.updateMetadata(episode, null)
+
+        verify(listener).onMediaItemTransition(
+            forwardingPlayer.currentMediaItem,
+            Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
+        )
+
+        val updatedEpisode = createPodcastEpisode(uuid = "ep-1", title = "Updated")
+        forwardingPlayer.updateMetadata(updatedEpisode, null)
+
+        verify(listener, times(2)).onMediaMetadataChanged(any())
+        verify(listener, times(1)).onMediaItemTransition(any(), any())
+    }
+
+    @Test
+    fun `updateMetadata fires onMediaItemTransition when episode UUID changes`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        val episode1 = createPodcastEpisode(uuid = "ep-1", title = "First")
+        forwardingPlayer.updateMetadata(episode1, null)
+
+        val episode2 = createPodcastEpisode(uuid = "ep-2", title = "Second")
+        forwardingPlayer.updateMetadata(episode2, null)
+
+        verify(listener, times(2)).onMediaItemTransition(any(), any())
     }
 
     @Test

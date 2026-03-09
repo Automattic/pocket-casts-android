@@ -7,15 +7,17 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -28,10 +30,12 @@ internal class MediaSessionActions(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
+    private val playlistManager: PlaylistManager,
     private val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
     private val scope: CoroutineScope,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+    private val onSearchFailed: ((String) -> Unit)? = null,
 ) {
 
     fun markAsPlayed() {
@@ -116,10 +120,9 @@ internal class MediaSessionActions(
     }
 
     fun performPlayFromSearch(searchTerm: String?) {
-        Timber.d("performSearch $searchTerm")
         val query: String = searchTerm?.trim { it <= ' ' }?.lowercase() ?: return
 
-        Timber.i("performPlayFromSearch query: $query")
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "performPlayFromSearch query: %s", query)
 
         val sourceView = SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
         scope.launch {
@@ -140,6 +143,7 @@ internal class MediaSessionActions(
             for (option in options) {
                 val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
                 if (matchingPodcast != null) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
                     playPodcast(podcast = matchingPodcast, sourceView = sourceView)
                     return@launch
                 }
@@ -147,11 +151,28 @@ internal class MediaSessionActions(
 
             for (option in options) {
                 val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
                 playbackManager.playNow(episode = matchingEpisode, sourceView = sourceView)
                 return@launch
             }
 
-            Timber.i("No search results for: $query")
+            for (option in options) {
+                val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
+                val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) }
+                    ?: continue
+                val playlist = playlistManager.smartPlaylistFlow(playlistPreview.uuid).first()
+                    ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
+                    ?: continue
+                val episodes = playlist.episodes.toPodcastEpisodes()
+                if (episodes.isNotEmpty()) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played playlist from search %s.", option)
+                    playbackManager.playEpisodes(episodes = episodes, sourceView = sourceView)
+                    return@launch
+                }
+            }
+
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No search results for: %s", query)
+            onSearchFailed?.invoke("No search results")
         }
     }
 

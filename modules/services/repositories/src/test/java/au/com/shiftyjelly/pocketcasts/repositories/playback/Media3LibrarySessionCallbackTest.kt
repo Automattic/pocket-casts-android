@@ -4,9 +4,8 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaDescriptionCompat
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
@@ -18,8 +17,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -139,25 +136,25 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetChildren returns browse items from provider`() = runTest {
-        val compatItems = listOf(
-            createCompatItem("id1", "Title 1", browsable = true),
-            createCompatItem("id2", "Title 2", playable = true),
+        val items = listOf(
+            createMediaItem("id1", "Title 1", browsable = true),
+            createMediaItem("id2", "Title 2", playable = true),
         )
-        whenever(browseTreeProvider.loadChildren(eq(MEDIA_ID_ROOT), any())).thenReturn(compatItems)
+        whenever(browseTreeProvider.loadChildren(eq(MEDIA_ID_ROOT), any())).thenReturn(items)
 
         val result = callback.onGetChildren(mockSession, mockController, MEDIA_ID_ROOT, 0, Int.MAX_VALUE, null)
         val libraryResult = result.get()
 
-        val items = libraryResult.value!!
-        assertEquals(2, items.size)
-        assertEquals("id1", items[0].mediaId)
-        assertEquals("id2", items[1].mediaId)
+        val resultItems = libraryResult.value!!
+        assertEquals(2, resultItems.size)
+        assertEquals("id1", resultItems[0].mediaId)
+        assertEquals("id2", resultItems[1].mediaId)
     }
 
     @Test
     fun `onGetChildren paginates correctly`() = runTest {
-        val compatItems = (1..10).map { createCompatItem("id$it", "Title $it", browsable = true) }
-        whenever(browseTreeProvider.loadChildren(eq(MEDIA_ID_ROOT), any())).thenReturn(compatItems)
+        val items = (1..10).map { createMediaItem("id$it", "Title $it", browsable = true) }
+        whenever(browseTreeProvider.loadChildren(eq(MEDIA_ID_ROOT), any())).thenReturn(items)
 
         // Page 0, size 3
         val page0 = callback.onGetChildren(mockSession, mockController, MEDIA_ID_ROOT, 0, 3, null).get()
@@ -179,10 +176,10 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetSearchResult returns results from provider`() = runTest {
-        val compatItems = listOf(
-            createCompatItem("podcast1", "My Podcast", browsable = true),
+        val items = listOf(
+            createMediaItem("podcast1", "My Podcast", browsable = true),
         )
-        whenever(browseTreeProvider.search(eq("test"), any())).thenReturn(compatItems)
+        whenever(browseTreeProvider.search(eq("test"), any())).thenReturn(items)
 
         val result = callback.onGetSearchResult(mockSession, mockController, "test", 0, Int.MAX_VALUE, null)
         val libraryResult = result.get()
@@ -307,46 +304,22 @@ class Media3LibrarySessionCallbackTest {
         verify(sessionCallback).onCustomCommand(mockSession, mockController, command, Bundle.EMPTY)
     }
 
-    // --- toMedia3MediaItem ---
-
-    @Test
-    fun `toMedia3MediaItem converts browsable item correctly`() {
-        val compatItem = createCompatItem("testId", "Test Title", browsable = true)
-
-        val result = Media3LibrarySessionCallback.toMedia3MediaItem(compatItem)
-
-        assertEquals("testId", result.mediaId)
-        assertEquals("Test Title", result.mediaMetadata.title)
-        assertTrue(result.mediaMetadata.isBrowsable == true)
-        assertFalse(result.mediaMetadata.isPlayable == true)
-    }
-
-    @Test
-    fun `toMedia3MediaItem converts playable item correctly`() {
-        val compatItem = createCompatItem("epId", "Episode Title", playable = true)
-
-        val result = Media3LibrarySessionCallback.toMedia3MediaItem(compatItem)
-
-        assertEquals("epId", result.mediaId)
-        assertFalse(result.mediaMetadata.isBrowsable == true)
-        assertTrue(result.mediaMetadata.isPlayable == true)
-    }
-
     // --- Helpers ---
 
-    private fun createCompatItem(
+    private fun createMediaItem(
         mediaId: String,
         title: String,
         browsable: Boolean = false,
         playable: Boolean = false,
-    ): MediaBrowserCompat.MediaItem {
-        val description = MediaDescriptionCompat.Builder()
-            .setMediaId(mediaId)
+    ): MediaItem {
+        val metadata = MediaMetadata.Builder()
             .setTitle(title)
+            .setIsBrowsable(browsable)
+            .setIsPlayable(playable)
             .build()
-        var flags = 0
-        if (browsable) flags = flags or MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
-        if (playable) flags = flags or MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
-        return MediaBrowserCompat.MediaItem(description, flags)
+        return MediaItem.Builder()
+            .setMediaId(mediaId)
+            .setMediaMetadata(metadata)
+            .build()
     }
 }

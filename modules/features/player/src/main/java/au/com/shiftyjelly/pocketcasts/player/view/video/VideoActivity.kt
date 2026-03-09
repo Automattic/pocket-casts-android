@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.video
 
+import android.app.PendingIntent
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
 import android.content.Context
@@ -8,14 +9,14 @@ import android.content.res.Configuration
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Rational
+import android.view.KeyEvent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
@@ -111,10 +112,10 @@ class VideoActivity : AppCompatActivity() {
 
         // create PiP actions
         if (pipActionsPlaying == null) {
-            val skipBackward = createRemoteAction(IR.drawable.notification_skipbackwards, LR.string.skip_back, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-            val play = createRemoteAction(IR.drawable.notification_play, LR.string.play, PlaybackStateCompat.ACTION_PLAY)
-            val pause = createRemoteAction(IR.drawable.notification_pause, LR.string.pause, PlaybackStateCompat.ACTION_PAUSE)
-            val skipForward = createRemoteAction(IR.drawable.notification_skipforward, LR.string.skip_forward, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
+            val skipBackward = createRemoteAction(IR.drawable.notification_skipbackwards, LR.string.skip_back, KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD)
+            val play = createRemoteAction(IR.drawable.notification_play, LR.string.play, KeyEvent.KEYCODE_MEDIA_PLAY)
+            val pause = createRemoteAction(IR.drawable.notification_pause, LR.string.pause, KeyEvent.KEYCODE_MEDIA_PAUSE)
+            val skipForward = createRemoteAction(IR.drawable.notification_skipforward, LR.string.skip_forward, KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD)
 
             pipActionsPlaying = listOf(skipBackward, pause, skipForward)
             pipActionsPaused = listOf(skipBackward, play, skipForward)
@@ -137,9 +138,16 @@ class VideoActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createRemoteAction(drawableId: Int, titleId: Int, playbackState: Long): RemoteAction {
-        val title = this.resources.getString(titleId)
-        val intent = MediaButtonReceiver.buildMediaButtonPendingIntent(application, playbackState)
-        return RemoteAction(Icon.createWithResource(this, drawableId), title, title, intent)
+    private fun createRemoteAction(drawableId: Int, titleId: Int, keyCode: Int): RemoteAction {
+        val title = resources.getString(titleId)
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON, null, application, PlaybackService::class.java)
+            .putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+        val pendingIntent = PendingIntent.getService(
+            application,
+            keyCode,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+        return RemoteAction(Icon.createWithResource(this, drawableId), title, title, pendingIntent)
     }
 }

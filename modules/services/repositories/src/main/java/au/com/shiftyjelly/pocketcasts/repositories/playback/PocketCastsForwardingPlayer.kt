@@ -38,10 +38,13 @@ class PocketCastsForwardingPlayer(
     private val onSkipForward: (() -> Unit)? = null,
     private val onSkipBack: (() -> Unit)? = null,
     private val onStop: (() -> Unit)? = null,
+    private val onPlay: (() -> Unit)? = null,
+    private val onPause: (() -> Unit)? = null,
     private val playGuard: (() -> Boolean) = { true },
 ) : ForwardingPlayer(wrappedPlayer) {
 
     private var currentMediaItem: MediaItem = MediaItem.EMPTY
+    private var previousMediaId: String? = null
 
     /**
      * Indicates the player is in a transient loss state (e.g., audio focus lost temporarily).
@@ -63,8 +66,9 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, playGuard).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, playGuard).also {
             it.currentMediaItem = this.currentMediaItem
+            it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
         }
     }
@@ -93,6 +97,9 @@ class PocketCastsForwardingPlayer(
             .setUserRating(buildRating(episode))
             .build()
 
+        val episodeChanged = previousMediaId != episode.uuid
+        previousMediaId = episode.uuid
+
         currentMediaItem = MediaItem.Builder()
             .setMediaId(episode.uuid)
             .setMediaMetadata(metadata)
@@ -100,10 +107,12 @@ class PocketCastsForwardingPlayer(
 
         listeners.forEach { listener ->
             listener.onMediaMetadataChanged(metadata)
-            listener.onMediaItemTransition(
-                currentMediaItem,
-                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
-            )
+            if (episodeChanged) {
+                listener.onMediaItemTransition(
+                    currentMediaItem,
+                    Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
+                )
+            }
         }
     }
 
@@ -118,6 +127,7 @@ class PocketCastsForwardingPlayer(
                 Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_SEEK_FORWARD,
                 Player.COMMAND_SEEK_BACK,
+                Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
             )
@@ -133,11 +143,19 @@ class PocketCastsForwardingPlayer(
     }
 
     override fun stop() {
-        onStop?.invoke()
+        onStop?.invoke() ?: super.stop()
     }
 
     override fun play() {
-        if (playGuard()) super.play()
+        if (playGuard()) {
+            super.play()
+            onPlay?.invoke()
+        }
+    }
+
+    override fun pause() {
+        super.pause()
+        onPause?.invoke()
     }
 
     override fun getDuration(): Long {
@@ -148,7 +166,7 @@ class PocketCastsForwardingPlayer(
         return currentMediaItem.mediaMetadata.durationMs ?: C.TIME_UNSET
     }
 
-    private val listeners = mutableListOf<Player.Listener>()
+    private val listeners = java.util.concurrent.CopyOnWriteArrayList<Player.Listener>()
 
     override fun addListener(listener: Player.Listener) {
         super.addListener(listener)

@@ -223,12 +223,12 @@ open class PlaybackManager @Inject constructor(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
+        playlistManager = playlistManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         browseTreeProvider = browseTreeProvider,
-        notificationHelper = notificationHelper,
         applicationScope = applicationScope,
     )
 
@@ -2053,6 +2053,15 @@ open class PlaybackManager @Inject constructor(
 
         player?.play(currentTimeMs)
 
+        // SimplePlayer creates its ExoPlayer lazily in prepare(), which is called
+        // inside play(). Now that the ExoPlayer exists, install it into the Media3
+        // session so the notification system can monitor the player state.
+        withContext(Dispatchers.Main) {
+            (player as? SimplePlayer)?.exoPlayer?.let {
+                mediaSessionManager.installPlayer(it)
+            }
+        }
+
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
@@ -2086,7 +2095,9 @@ open class PlaybackManager @Inject constructor(
                 Timber.i("Creating media player of type CastPlayer.")
             } else {
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
-                (player as? SimplePlayer)?.exoPlayer?.let { mediaSessionManager.installPlayer(it) }
+                // Start the service early so it's ready when we install the player later.
+                // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
+                mediaSessionManager.startServiceIfNeeded(application)
                 Timber.i("Creating media player of type SimplePlayer.")
             }
         }

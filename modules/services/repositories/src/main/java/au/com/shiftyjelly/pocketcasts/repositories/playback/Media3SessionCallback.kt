@@ -93,14 +93,39 @@ internal class Media3SessionCallback(
         args: Bundle,
     ): ListenableFuture<SessionResult> {
         when (customCommand.customAction) {
-            APP_ACTION_SKIP_BACK -> scope.launch { playbackManager.skipBackwardSuspend() }
-            APP_ACTION_SKIP_FWD -> scope.launch { playbackManager.skipForwardSuspend() }
+            APP_ACTION_SKIP_BACK -> scope.launch {
+                try {
+                    playbackManager.skipBackwardSuspend()
+                } catch (e: Exception) {
+                    Timber.e(e, "Skip back failed")
+                }
+            }
+
+            APP_ACTION_SKIP_FWD -> scope.launch {
+                try {
+                    playbackManager.skipForwardSuspend()
+                } catch (e: Exception) {
+                    Timber.e(e, "Skip forward failed")
+                }
+            }
+
             APP_ACTION_MARK_AS_PLAYED -> actions.markAsPlayed()
+
             APP_ACTION_STAR -> actions.starEpisode()
+
             APP_ACTION_UNSTAR -> actions.unstarEpisode()
+
             APP_ACTION_CHANGE_SPEED -> actions.changePlaybackSpeed()
+
             APP_ACTION_ARCHIVE -> actions.archive()
-            APP_ACTION_PLAY_NEXT -> scope.launch { playbackManager.playNextInQueue() }
+
+            APP_ACTION_PLAY_NEXT -> scope.launch {
+                try {
+                    playbackManager.playNextInQueue()
+                } catch (e: Exception) {
+                    Timber.e(e, "Play next failed")
+                }
+            }
         }
         return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
     }
@@ -122,10 +147,14 @@ internal class Media3SessionCallback(
         val mediaId = item.mediaId
         if (mediaId.isNotEmpty()) {
             scope.launch {
-                val autoMediaId = AutoMediaId.fromMediaId(mediaId)
-                val episodeId = autoMediaId.episodeId
-                episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
-                    playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                try {
+                    val autoMediaId = AutoMediaId.fromMediaId(mediaId)
+                    val episodeId = autoMediaId.episodeId
+                    episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
+                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Play from media ID failed: $mediaId")
                 }
             }
         }
@@ -166,6 +195,38 @@ internal class Media3SessionCallback(
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3 media button event: keyCode=${keyEvent.keyCode}")
 
+        // PiP skip buttons use dedicated key codes that always skip forward/back,
+        // bypassing headphone control settings.
+        when (keyEvent.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> {
+                scope.launch {
+                    try {
+                        playbackManager.skipForwardSuspend(
+                            sourceView = source,
+                            jumpAmountSeconds = settings.skipForwardInSecs.value,
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "PiP skip forward failed")
+                    }
+                }
+                return true
+            }
+
+            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> {
+                scope.launch {
+                    try {
+                        playbackManager.skipBackwardSuspend(
+                            sourceView = source,
+                            jumpAmountSeconds = settings.skipBackInSecs.value,
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "PiP skip backward failed")
+                    }
+                }
+                return true
+            }
+        }
+
         val inputEvent = when (keyEvent.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PLAY,
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
@@ -181,12 +242,16 @@ internal class Media3SessionCallback(
 
         if (inputEvent != null) {
             scope.launch {
-                val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
-                when (outputEvent) {
-                    MediaEvent.SingleTap -> handleMediaButtonSingleTap()
-                    MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                    MediaEvent.TripleTap -> handleMediaButtonTripleTap()
-                    null -> Unit
+                try {
+                    val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
+                    when (outputEvent) {
+                        MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                        MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                        MediaEvent.TripleTap -> handleMediaButtonTripleTap()
+                        null -> Unit
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Media button event handling failed")
                 }
             }
             return true
@@ -211,22 +276,42 @@ internal class Media3SessionCallback(
         when (action) {
             HeadphoneAction.ADD_BOOKMARK -> {
                 scope.launch(Dispatchers.Main) {
-                    val isAutoConnected = Util.isAndroidAutoConnectedFlow(contextProvider()).first()
-                    bookmarkHelper.handleAddBookmarkAction(contextProvider(), isAutoConnected)
+                    try {
+                        val isAutoConnected = Util.isAndroidAutoConnectedFlow(contextProvider()).first()
+                        bookmarkHelper.handleAddBookmarkAction(contextProvider(), isAutoConnected)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Add bookmark failed")
+                    }
                 }
             }
 
             HeadphoneAction.SKIP_FORWARD -> {
                 scope.launch {
-                    playbackManager.skipForwardSuspend(sourceView = source)
-                    if (!playbackManager.isPlaying()) {
-                        playbackManager.playQueueSuspend(source)
+                    try {
+                        playbackManager.skipForwardSuspend(
+                            sourceView = source,
+                            jumpAmountSeconds = settings.skipForwardInSecs.value,
+                        )
+                        if (!playbackManager.isPlaying()) {
+                            playbackManager.playQueueSuspend(source)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Skip forward failed")
                     }
                 }
             }
 
             HeadphoneAction.SKIP_BACK -> {
-                scope.launch { playbackManager.skipBackwardSuspend(sourceView = source) }
+                scope.launch {
+                    try {
+                        playbackManager.skipBackwardSuspend(
+                            sourceView = source,
+                            jumpAmountSeconds = settings.skipBackInSecs.value,
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "Skip back failed")
+                    }
+                }
             }
 
             HeadphoneAction.NEXT_CHAPTER,

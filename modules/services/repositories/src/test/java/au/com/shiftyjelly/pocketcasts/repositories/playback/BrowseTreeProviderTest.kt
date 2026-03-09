@@ -1,8 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.content.Context
-import android.support.v4.media.MediaBrowserCompat
+import androidx.media3.common.MediaItem
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -10,6 +18,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import java.util.Date
+import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -21,6 +32,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -36,7 +48,6 @@ class BrowseTreeProviderTest {
     private lateinit var serviceManager: ServiceManager
     private lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
     private lateinit var provider: BrowseTreeProvider
-    private lateinit var context: Context
 
     @Before
     fun setUp() {
@@ -49,7 +60,6 @@ class BrowseTreeProviderTest {
         settings = mock()
         serviceManager = mock()
         podcastCacheServiceManager = mock()
-        context = mock()
 
         provider = BrowseTreeProvider(
             podcastManager = podcastManager,
@@ -103,8 +113,31 @@ class BrowseTreeProviderTest {
     fun `loadRecentChildren returns empty when no current episode`() = runTest {
         whenever(upNextQueue.currentEpisode).thenReturn(null)
 
+        val result = provider.loadRecentChildren(mock())
+        assertEquals(emptyList<MediaItem>(), result)
+    }
+
+    @Test
+    fun `loadRecentChildren returns current episode`() = runTest {
+        val context = RuntimeEnvironment.getApplication()
+        val podcastOne = Podcast(uuid = UUID.randomUUID().toString())
+        val currentEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastOne.uuid,
+            publishedDate = Date(),
+            title = "Episode 1",
+        )
+        whenever(upNextQueue.currentEpisode).thenReturn(currentEpisode)
+        whenever(podcastManager.findPodcastByUuid(podcastOne.uuid)).thenReturn(podcastOne)
+        mockArtworkConfiguration()
+
         val result = provider.loadRecentChildren(context)
-        assertEquals(emptyList<MediaBrowserCompat.MediaItem>(), result)
+
+        assertEquals(1, result.size)
+        assertEquals(
+            AutoMediaId(currentEpisode.uuid, podcastOne.uuid).toMediaId(),
+            result[0].mediaId,
+        )
     }
 
     // --- loadSuggestedChildren ---
@@ -117,13 +150,107 @@ class BrowseTreeProviderTest {
         whenever(playlistManager.playlistPreviewsFlow()).thenReturn(flowOf(emptyList()))
         whenever(episodeManager.findLatestEpisodeToPlayBlocking()).thenReturn(null)
 
-        val result = provider.loadSuggestedChildren(context)
-        assertEquals(emptyList<MediaBrowserCompat.MediaItem>(), result)
+        val result = provider.loadSuggestedChildren(mock())
+        assertEquals(emptyList<MediaItem>(), result)
+    }
+
+    @Test
+    fun `loadSuggestedChildren returns up next, playlist, and latest episodes deduplicated`() = runTest {
+        val context = RuntimeEnvironment.getApplication()
+        val podcastOne = Podcast(uuid = UUID.randomUUID().toString())
+        val podcastTwo = Podcast(uuid = UUID.randomUUID().toString())
+
+        val currentEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastOne.uuid,
+            publishedDate = Date(),
+            title = "Episode 1",
+        )
+        val queueEpisode1 = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastTwo.uuid,
+            publishedDate = Date(),
+            title = "Episode 2",
+        )
+        val queueEpisode2 = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastOne.uuid,
+            publishedDate = Date(),
+            title = "Episode 3",
+        )
+        val playlistOnlyEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastOne.uuid,
+            publishedDate = Date(),
+            title = "Episode 4",
+        )
+        val latestEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastTwo.uuid,
+            publishedDate = Date(),
+            title = "Episode 5",
+        )
+
+        whenever(upNextQueue.currentEpisode).thenReturn(currentEpisode)
+        whenever(upNextQueue.queueEpisodes).thenReturn(listOf(queueEpisode1, queueEpisode2))
+        mockAutoShowPlayed(false)
+
+        val playlistPreview = ManualPlaylistPreview(
+            uuid = UUID.randomUUID().toString(),
+            title = "Playlist title",
+            settings = Playlist.Settings.ForPreview,
+            icon = PlaylistIcon(0),
+        )
+        whenever(playlistManager.playlistPreviewsFlow()).thenReturn(flowOf(listOf(playlistPreview)))
+        whenever(playlistManager.smartPlaylistFlow(playlistPreview.uuid)).thenReturn(flowOf(null))
+        whenever(playlistManager.manualPlaylistFlow(playlistPreview.uuid)).thenReturn(
+            flowOf(
+                ManualPlaylist(
+                    uuid = playlistPreview.uuid,
+                    title = playlistPreview.title,
+                    episodes = listOf(
+                        PlaylistEpisode.Available(playlistOnlyEpisode),
+                        // duplicate of queueEpisode2 — should be filtered out
+                        PlaylistEpisode.Available(queueEpisode2),
+                    ),
+                    settings = playlistPreview.settings,
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 0.seconds,
+                        artworkUuids = emptyList(),
+                        isShowingArchived = true,
+                        totalEpisodeCount = 0,
+                        displayedEpisodeCount = 0,
+                        displayedAvailableEpisodeCount = 0,
+                        archivedEpisodeCount = 0,
+                    ),
+                ),
+            ),
+        )
+
+        whenever(episodeManager.findLatestEpisodeToPlayBlocking()).thenReturn(latestEpisode)
+        whenever(podcastManager.findPodcastByUuid(podcastOne.uuid)).thenReturn(podcastOne)
+        whenever(podcastManager.findPodcastByUuid(podcastTwo.uuid)).thenReturn(podcastTwo)
+        mockArtworkConfiguration()
+
+        val mediaItems = provider.loadSuggestedChildren(context)
+
+        assertEquals(5, mediaItems.size)
+        assertEquals(AutoMediaId(currentEpisode.uuid, podcastOne.uuid).toMediaId(), mediaItems[0].mediaId)
+        assertEquals(AutoMediaId(queueEpisode1.uuid, podcastTwo.uuid).toMediaId(), mediaItems[1].mediaId)
+        assertEquals(AutoMediaId(queueEpisode2.uuid, podcastOne.uuid).toMediaId(), mediaItems[2].mediaId)
+        assertEquals(AutoMediaId(playlistOnlyEpisode.uuid, podcastOne.uuid).toMediaId(), mediaItems[3].mediaId)
+        assertEquals(AutoMediaId(latestEpisode.uuid, podcastTwo.uuid).toMediaId(), mediaItems[4].mediaId)
     }
 
     private fun mockAutoShowPlayed(value: Boolean) {
         val mockAutoShowPlayed = mock<au.com.shiftyjelly.pocketcasts.preferences.UserSetting<Boolean>>()
         whenever(mockAutoShowPlayed.value).thenReturn(value)
         whenever(settings.autoShowPlayed).thenReturn(mockAutoShowPlayed)
+    }
+
+    private fun mockArtworkConfiguration() {
+        val mockArtworkConfig = mock<au.com.shiftyjelly.pocketcasts.preferences.UserSetting<ArtworkConfiguration>>()
+        whenever(mockArtworkConfig.value).thenReturn(ArtworkConfiguration(useEpisodeArtwork = false))
+        whenever(settings.artworkConfiguration).thenReturn(mockArtworkConfig)
     }
 }

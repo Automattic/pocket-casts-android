@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -29,11 +28,6 @@ import timber.log.Timber
  * functionality using [BrowseTreeProvider] and delegates session-level operations
  * (onConnect, onCustomCommand, onAddMediaItems, onSetRating, onMediaButtonEvent) to
  * [Media3SessionCallback].
- *
- * Currently wired as the shadow [MediaSession]'s callback in [MediaSessionManager].
- * The library-specific methods (onGetChildren, onGetLibraryRoot, etc.) won't fire on a
- * plain MediaSession, but session-level methods route through this callback chain.
- * When the service base class changes to [MediaLibraryService], all methods will be active.
  */
 @OptIn(UnstableApi::class)
 internal class Media3LibrarySessionCallback(
@@ -59,8 +53,12 @@ internal class Media3LibrarySessionCallback(
             val context = contextProvider()
             if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                 scope.launch {
-                    delay(1000)
-                    settings.setAutomotiveConnectedToMediaSession(true)
+                    try {
+                        delay(1000)
+                        settings.setAutomotiveConnectedToMediaSession(true)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to set automotive connected flag")
+                    }
                 }
             }
         }
@@ -149,9 +147,8 @@ internal class Media3LibrarySessionCallback(
         val future = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
         scope.launch {
             try {
-                val compatItems = browseTreeProvider.loadChildren(parentId, contextProvider())
-                val media3Items = compatItems.map { toMedia3MediaItem(it) }
-                val paginated = paginate(media3Items, page, pageSize)
+                val items = browseTreeProvider.loadChildren(parentId, contextProvider())
+                val paginated = paginate(items, page, pageSize)
                 future.set(LibraryResult.ofItemList(paginated, params))
             } catch (e: Exception) {
                 future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
@@ -171,12 +168,11 @@ internal class Media3LibrarySessionCallback(
         val future = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
         scope.launch {
             try {
-                val compatItems = browseTreeProvider.search(query, contextProvider())
-                if (compatItems == null) {
+                val items = browseTreeProvider.search(query, contextProvider())
+                if (items == null) {
                     future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
                 } else {
-                    val media3Items = compatItems.map { toMedia3MediaItem(it) }
-                    val paginated = paginate(media3Items, page, pageSize)
+                    val paginated = paginate(items, page, pageSize)
                     future.set(LibraryResult.ofItemList(paginated, params))
                 }
             } catch (e: Exception) {
@@ -193,8 +189,12 @@ internal class Media3LibrarySessionCallback(
         params: MediaLibraryService.LibraryParams?,
     ): ListenableFuture<LibraryResult<Void>> {
         scope.launch {
-            browseTreeProvider.search(query, contextProvider())
-            session.notifySearchResultChanged(browser, query, 0, params)
+            try {
+                browseTreeProvider.search(query, contextProvider())
+                session.notifySearchResultChanged(browser, query, 0, params)
+            } catch (e: Exception) {
+                Timber.e(e, "Search failed for query: $query")
+            }
         }
         return Futures.immediateFuture(LibraryResult.ofVoid(params))
     }
@@ -204,31 +204,5 @@ internal class Media3LibrarySessionCallback(
         val start = (page * pageSize).coerceAtMost(items.size)
         val end = (start + pageSize).coerceAtMost(items.size)
         return items.subList(start, end)
-    }
-
-    companion object {
-        /**
-         * Converts a compat [MediaBrowserCompat.MediaItem] to a Media3 [MediaItem] by extracting
-         * mediaId, title, subtitle, iconUri, and flags (browsable/playable) from the
-         * [MediaDescriptionCompat][android.support.v4.media.MediaDescriptionCompat].
-         */
-        internal fun toMedia3MediaItem(compatItem: MediaBrowserCompat.MediaItem): MediaItem {
-            val description = compatItem.description
-            val isBrowsable = compatItem.flags and MediaBrowserCompat.MediaItem.FLAG_BROWSABLE != 0
-            val isPlayable = compatItem.flags and MediaBrowserCompat.MediaItem.FLAG_PLAYABLE != 0
-
-            val metadata = MediaMetadata.Builder()
-                .setTitle(description.title)
-                .setSubtitle(description.subtitle)
-                .setArtworkUri(description.iconUri)
-                .setIsBrowsable(isBrowsable)
-                .setIsPlayable(isPlayable)
-                .build()
-
-            return MediaItem.Builder()
-                .setMediaId(description.mediaId.orEmpty())
-                .setMediaMetadata(metadata)
-                .build()
-        }
     }
 }
