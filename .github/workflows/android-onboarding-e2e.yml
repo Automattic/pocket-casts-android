@@ -45,7 +45,7 @@ jobs:
           heap-size: 1024M
           disable-animations: true
           script: |
-            set -euo pipefail
+            set -eu
 
             adb devices
             adb logcat -c || true
