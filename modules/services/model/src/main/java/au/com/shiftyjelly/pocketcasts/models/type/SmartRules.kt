@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
+import com.automattic.eventhorizon.PlaylistMediaType
+import com.automattic.eventhorizon.PlaylistReleaseDateType
 import java.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -24,16 +26,6 @@ data class SmartRules(
         episodeDuration.run { appendSqlQuery(clock) }
         NonArchivedRule.run { appendSqlQuery(clock) }
         FollowedPodcastRule.run { appendSqlQuery(clock) }
-    }
-
-    fun analyticsProperties() = buildMap {
-        putAll(episodeStatus.analyticsProperties())
-        putAll(downloadStatus.analyticsProperties())
-        putAll(mediaType.analyticsProperties())
-        putAll(releaseDate.analyticsProperties())
-        putAll(starred.analyticsProperties())
-        putAll(podcasts.analyticsProperties())
-        putAll(episodeDuration.analyticsProperties())
     }
 
     data class EpisodeStatusRule(
@@ -60,12 +52,6 @@ data class SmartRules(
             }
         }
 
-        fun analyticsProperties() = mapOf(
-            "episode_status_in_progress" to inProgress,
-            "episode_status_played" to completed,
-            "episode_status_unplayed" to unplayed,
-        )
-
         private val areAllConstraintsTicked get() = unplayed && inProgress && completed
 
         private val isAnyConstraintTicked get() = unplayed || inProgress || completed
@@ -88,17 +74,20 @@ data class SmartRules(
             append(statuses.joinToString(separator = ",") { status -> "${converter.toInt(status)}" })
             append(')')
         }
-
-        fun analyticsProperties() = mapOf(
-            "downloaded" to (this == Any || this == Downloaded),
-            "not_downloaded" to (this == Any || this == NotDownloaded),
-        )
     }
 
-    enum class MediaTypeRule : SmartRule {
-        Any,
-        Audio,
-        Video,
+    enum class MediaTypeRule(
+        val eventHorizonValue: PlaylistMediaType,
+    ) : SmartRule {
+        Any(
+            eventHorizonValue = PlaylistMediaType.All,
+        ),
+        Audio(
+            eventHorizonValue = PlaylistMediaType.Audio,
+        ),
+        Video(
+            eventHorizonValue = PlaylistMediaType.Video,
+        ),
         ;
 
         override fun toSqlWhereClause(clock: Clock) = buildString {
@@ -108,36 +97,35 @@ data class SmartRules(
                 Video -> append("episode.file_type LIKE 'video/%'")
             }
         }
-
-        fun analyticsProperties() = mapOf(
-            "media_type" to when (this) {
-                Any -> "all"
-                Audio -> "audio"
-                Video -> "video"
-            },
-        )
     }
 
     enum class ReleaseDateRule(
         private val duration: Duration,
+        val eventHorizonValue: PlaylistReleaseDateType,
     ) : SmartRule {
         AnyTime(
             duration = Duration.INFINITE,
+            eventHorizonValue = PlaylistReleaseDateType.Anytime,
         ),
         Last24Hours(
             duration = 1.days,
+            eventHorizonValue = PlaylistReleaseDateType.Last24Hours,
         ),
         Last3Days(
             duration = 3.days,
+            eventHorizonValue = PlaylistReleaseDateType.Last3Days,
         ),
         LastWeek(
             duration = 7.days,
+            eventHorizonValue = PlaylistReleaseDateType.LastWeek,
         ),
         Last2Weeks(
             duration = 14.days,
+            eventHorizonValue = PlaylistReleaseDateType.Last2Weeks,
         ),
         LastMonth(
             duration = 31.days,
+            eventHorizonValue = PlaylistReleaseDateType.LastMonth,
         ),
         ;
 
@@ -147,17 +135,6 @@ data class SmartRules(
                 append(clock.instant().minusMillis(duration.inWholeMilliseconds).toEpochMilli())
             }
         }
-
-        fun analyticsProperties() = mapOf(
-            "release_date" to when (this) {
-                AnyTime -> "anytime"
-                Last24Hours -> "24_hours"
-                Last3Days -> "3_days"
-                LastWeek -> "last_week"
-                Last2Weeks -> "last_2_weeks"
-                LastMonth -> "last_month"
-            },
-        )
     }
 
     enum class StarredRule : SmartRule {
@@ -171,10 +148,6 @@ data class SmartRules(
                 Starred -> append("episode.starred = 1")
             }
         }
-
-        fun analyticsProperties() = mapOf(
-            "starred" to (this == Starred),
-        )
     }
 
     sealed interface PodcastsRule : SmartRule {
@@ -195,22 +168,11 @@ data class SmartRules(
                 append(')')
             }
         }
-
-        fun analyticsProperties() = mapOf(
-            "all_podcasts" to (this is Any),
-        )
     }
 
     sealed interface EpisodeDurationRule : SmartRule {
-
-        fun analyticsProperties(): Map<String, kotlin.Any>
-
         data object Any : EpisodeDurationRule {
             override fun toSqlWhereClause(clock: Clock) = ""
-
-            override fun analyticsProperties() = mapOf(
-                "duration" to false,
-            )
         }
 
         data class Constrained(
@@ -224,12 +186,6 @@ data class SmartRules(
                 append(shorterThan.inWholeSeconds)
                 append(')')
             }
-
-            override fun analyticsProperties() = mapOf(
-                "duration" to true,
-                "duration_longer_than" to longerThan.inWholeMinutes,
-                "duration_shorter_than" to shorterThan.inWholeMinutes,
-            )
         }
     }
 

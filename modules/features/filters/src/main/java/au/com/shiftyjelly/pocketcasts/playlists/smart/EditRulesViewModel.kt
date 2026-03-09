@@ -2,8 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -14,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterUpdatedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -34,7 +35,7 @@ class EditRulesViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     rulesEditorFactory: SmartRulesEditor.Factory,
     settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @Assisted private val playlistUuid: String,
 ) : ViewModel() {
     private var rulesEditor: SmartRulesEditor? = null
@@ -178,11 +179,10 @@ class EditRulesViewModel @AssistedInject constructor(
     }
 
     fun trackRulesUpdated(type: RuleType) {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_UPDATED,
-            mapOf(
-                "group" to type.analyticsValue,
-                "source" to "filters",
+        eventHorizon.track(
+            FilterUpdatedEvent(
+                group = type.eventHorizonValue,
+                source = SourceView.FILTERS.eventHorizonValue,
             ),
         )
     }
