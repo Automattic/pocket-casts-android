@@ -71,6 +71,16 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.LegalAndMoreRowType
+import com.automattic.eventhorizon.SettingsAboutAutomatticFamilyTappedEvent
+import com.automattic.eventhorizon.SettingsAboutInstagramTappedEvent
+import com.automattic.eventhorizon.SettingsAboutLegalAndMoreTappedEvent
+import com.automattic.eventhorizon.SettingsAboutShareWithFriendsTappedEvent
+import com.automattic.eventhorizon.SettingsAboutShownEvent
+import com.automattic.eventhorizon.SettingsAboutTwitterTappedEvent
+import com.automattic.eventhorizon.SettingsAboutWebsiteTappedEvent
+import com.automattic.eventhorizon.SettingsAboutWorkWithUsTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -83,6 +93,8 @@ class AboutFragment : BaseFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
+    @Inject lateinit var eventHorizon: EventHorizon
+
     @Inject lateinit var settings: Settings
 
     override fun onCreateView(
@@ -92,13 +104,17 @@ class AboutFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
         CallOnce {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHOWN)
+            eventHorizon.track(SettingsAboutShownEvent)
         }
 
         AppThemeWithBackground(theme.activeTheme) {
             AboutPage(
                 openFragment = { fragment ->
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "acknowledgements"))
+                    eventHorizon.track(
+                        SettingsAboutLegalAndMoreTappedEvent(
+                            row = LegalAndMoreRowType.Acknowledgements,
+                        ),
+                    )
                     (activity as? FragmentHostListener)?.addFragment(fragment)
                 },
                 onBackPress = { closeFragment() },
@@ -107,28 +123,36 @@ class AboutFragment : BaseFragment() {
                     analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
                 },
                 onShareWithFriendsClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED)
+                    eventHorizon.track(SettingsAboutShareWithFriendsTappedEvent)
                 },
                 onWebsiteClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WEBSITE_TAPPED)
+                    eventHorizon.track(SettingsAboutWebsiteTappedEvent)
                 },
                 onInstagramClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_INSTAGRAM_TAPPED)
+                    eventHorizon.track(SettingsAboutInstagramTappedEvent)
                 },
                 onXClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_X_TAPPED)
+                    eventHorizon.track(SettingsAboutTwitterTappedEvent)
                 },
                 onAutomatticFamilyClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED)
+                    eventHorizon.track(SettingsAboutAutomatticFamilyTappedEvent)
                 },
                 onWorkWithUsClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WORK_WITH_US_TAPPED)
+                    eventHorizon.track(SettingsAboutWorkWithUsTappedEvent)
                 },
                 onTermsOfServiceClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "terms_of_service"))
+                    eventHorizon.track(
+                        SettingsAboutLegalAndMoreTappedEvent(
+                            row = LegalAndMoreRowType.TermsOfService,
+                        ),
+                    )
                 },
                 onPrivacyPolicyClick = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "privacy_policy"))
+                    eventHorizon.track(
+                        SettingsAboutLegalAndMoreTappedEvent(
+                            row = LegalAndMoreRowType.PrivacyPolicy,
+                        ),
+                    )
                 },
             )
         }

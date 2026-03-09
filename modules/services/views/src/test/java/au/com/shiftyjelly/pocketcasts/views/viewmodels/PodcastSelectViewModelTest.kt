@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.views.viewmodels
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -35,7 +37,11 @@ class PodcastSelectViewModelTest {
 
         whenever(podcastManager.findSubscribedBlocking()).thenReturn(listOf(podcast1, podcast2))
 
-        val viewModel = PodcastSelectViewModel(podcastManager, analyticsTracker)
+        val viewModel = PodcastSelectViewModel(
+            podcastManager = podcastManager,
+            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
+        )
 
         viewModel.selectablePodcasts.test {
             viewModel.loadSelectablePodcasts(listOf(uuid1))

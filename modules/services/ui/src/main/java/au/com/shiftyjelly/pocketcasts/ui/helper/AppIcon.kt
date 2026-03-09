@@ -5,18 +5,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private const val PREFERENCE_APPICON = "pocketCastsAppIcon"
+import com.automattic.eventhorizon.AppIconType as EventHorizonAppIconType
 
 @Singleton
 class AppIcon @Inject constructor(
@@ -31,6 +28,7 @@ class AppIcon @Inject constructor(
         val tier: SubscriptionTier?,
         @DrawableRes val launcherIcon: Int,
         val aliasName: String,
+        val eventHorizonValue: EventHorizonAppIconType,
     ) {
         DEFAULT(
             setting = AppIconSetting.DEFAULT,
@@ -39,6 +37,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher,
             aliasName = ".ui.MainActivity_0",
+            eventHorizonValue = EventHorizonAppIconType.Default,
         ),
         DARK(
             setting = AppIconSetting.DARK,
@@ -47,6 +46,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_1,
             aliasName = ".ui.MainActivity_1",
+            eventHorizonValue = EventHorizonAppIconType.Dark,
         ),
         ROUND_LIGHT(
             setting = AppIconSetting.ROUND_LIGHT,
@@ -55,6 +55,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_2,
             aliasName = ".ui.MainActivity_2",
+            eventHorizonValue = EventHorizonAppIconType.RoundLight,
         ),
         ROUND_DARK(
             setting = AppIconSetting.ROUND_DARK,
@@ -63,6 +64,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_3,
             aliasName = ".ui.MainActivity_3",
+            eventHorizonValue = EventHorizonAppIconType.RoundDark,
         ),
         INDIGO(
             setting = AppIconSetting.INDIGO,
@@ -71,6 +73,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_indigo,
             aliasName = ".ui.MainActivity_9",
+            eventHorizonValue = EventHorizonAppIconType.Indigo,
         ),
         ROSE(
             setting = AppIconSetting.ROSE,
@@ -79,6 +82,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_rose,
             aliasName = ".ui.MainActivity_12",
+            eventHorizonValue = EventHorizonAppIconType.Rose,
         ),
         CAT(
             setting = AppIconSetting.CAT,
@@ -87,6 +91,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_cat,
             aliasName = ".ui.MainActivity_10",
+            eventHorizonValue = EventHorizonAppIconType.PocketCats,
         ),
         REDVELVET(
             setting = AppIconSetting.REDVELVET,
@@ -95,6 +100,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_redvelvet,
             aliasName = ".ui.MainActivity_11",
+            eventHorizonValue = EventHorizonAppIconType.RedVelvet,
         ),
         PRIDE(
             setting = AppIconSetting.PRIDE,
@@ -103,6 +109,7 @@ class AppIcon @Inject constructor(
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher_pride,
             aliasName = ".ui.MainActivity_18",
+            eventHorizonValue = EventHorizonAppIconType.Pride2023,
         ),
         PLUS(
             setting = AppIconSetting.PLUS,
@@ -111,6 +118,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_4,
             aliasName = ".ui.MainActivity_4",
+            eventHorizonValue = EventHorizonAppIconType.Plus,
         ),
         CLASSIC(
             setting = AppIconSetting.CLASSIC,
@@ -119,6 +127,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_5,
             aliasName = ".ui.MainActivity_5",
+            eventHorizonValue = EventHorizonAppIconType.Classic,
         ),
         ELECTRIC_BLUE(
             setting = AppIconSetting.ELECTRIC_BLUE,
@@ -127,6 +136,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_6,
             aliasName = ".ui.MainActivity_6",
+            eventHorizonValue = EventHorizonAppIconType.ElectricBlue,
         ),
         ELECTRIC_PINK(
             setting = AppIconSetting.ELECTRIC_PINK,
@@ -135,6 +145,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_7,
             aliasName = ".ui.MainActivity_7",
+            eventHorizonValue = EventHorizonAppIconType.ElectricPink,
         ),
         RADIOACTIVE(
             setting = AppIconSetting.RADIOACTIVE,
@@ -143,6 +154,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_radioactive,
             aliasName = ".ui.MainActivity_8",
+            eventHorizonValue = EventHorizonAppIconType.Radioactive,
         ),
         HALLOWEEN(
             setting = AppIconSetting.HALLOWEEN,
@@ -151,6 +163,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Plus,
             launcherIcon = IR.mipmap.ic_launcher_halloween,
             aliasName = ".ui.MainActivity_13",
+            eventHorizonValue = EventHorizonAppIconType.Halloween,
         ),
         PATRON_CHROME(
             setting = AppIconSetting.PATRON_CHROME,
@@ -159,6 +172,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Patron,
             launcherIcon = IR.mipmap.ic_launcher_patron_chrome,
             aliasName = ".ui.MainActivity_14",
+            eventHorizonValue = EventHorizonAppIconType.PatronChrome,
         ),
         PATRON_ROUND(
             setting = AppIconSetting.PATRON_ROUND,
@@ -167,6 +181,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Patron,
             launcherIcon = IR.mipmap.ic_launcher_patron_round,
             aliasName = ".ui.MainActivity_15",
+            eventHorizonValue = EventHorizonAppIconType.PatronRound,
         ),
         PATRON_GLOW(
             setting = AppIconSetting.PATRON_GLOW,
@@ -175,6 +190,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Patron,
             launcherIcon = IR.mipmap.ic_launcher_patron_glow,
             aliasName = ".ui.MainActivity_16",
+            eventHorizonValue = EventHorizonAppIconType.PatronGlow,
         ),
         PATRON_DARK(
             setting = AppIconSetting.PATRON_DARK,
@@ -183,6 +199,7 @@ class AppIcon @Inject constructor(
             tier = SubscriptionTier.Patron,
             launcherIcon = IR.mipmap.ic_launcher_patron_dark,
             aliasName = ".ui.MainActivity_17",
+            eventHorizonValue = EventHorizonAppIconType.PatronDark,
         ),
         ;
 
