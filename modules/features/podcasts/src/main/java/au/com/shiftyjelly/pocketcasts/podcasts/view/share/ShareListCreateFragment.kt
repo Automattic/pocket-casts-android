@@ -14,10 +14,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.SharePodcastsPodcastsSelectedEvent
+import com.automattic.eventhorizon.SharePodcastsShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,9 +52,10 @@ class ShareListCreateFragment : BaseFragment() {
                     ShareListCreatePodcastsPage(
                         onCloseClick = { activity?.finish() },
                         onNextClick = { selectedPodcastsCount ->
-                            viewModel.trackShareEvent(
-                                AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
-                                AnalyticsProp.countMap(selectedPodcastsCount),
+                            viewModel.track(
+                                SharePodcastsPodcastsSelectedEvent(
+                                    count = selectedPodcastsCount.toLong(),
+                                ),
                             )
                             navController.navigate(NavRoutes.TITLE)
                         },
@@ -83,7 +85,7 @@ class ShareListCreateFragment : BaseFragment() {
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
-            viewModel.trackShareEvent(AnalyticsEvent.SHARE_PODCASTS_SHOWN)
+            viewModel.track(SharePodcastsShownEvent)
         }
     }
 
@@ -101,9 +103,4 @@ class ShareListCreateFragment : BaseFragment() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
-}
-
-private object AnalyticsProp {
-    private const val COUNT = "count"
-    fun countMap(count: Int) = mapOf(this.COUNT to count)
 }
