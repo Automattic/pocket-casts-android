@@ -59,6 +59,7 @@ class PodcastRefresherImpl @Inject constructor(
                     existingEpisode.season = newEpisode.season
                     existingEpisode.number = newEpisode.number
                     existingEpisode.type = newEpisode.type
+                    existingEpisode.hasGeneratedTranscript = newEpisode.hasGeneratedTranscript
                     // only update the db if the fields have changed
                     if (originalEpisode != existingEpisode) {
                         episodeManager.update(existingEpisode)

@@ -88,6 +88,7 @@ data class EpisodeInfo(
     @Json(name = "duration") val duration: Double?,
     @Json(name = "published") val published: String,
     @Json(name = "slug") val slug: String?,
+    @Json(name = "has_generated_transcript") val hasGeneratedTranscript: Boolean?,
 ) {
 
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
@@ -107,6 +108,7 @@ data class EpisodeInfo(
             number = number,
             type = type,
             slug = slug.orEmpty(),
+            hasGeneratedTranscript = hasGeneratedTranscript == true,
         )
     }
 }

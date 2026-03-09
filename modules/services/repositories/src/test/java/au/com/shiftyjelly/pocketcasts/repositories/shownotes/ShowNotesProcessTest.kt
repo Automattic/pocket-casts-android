@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -14,10 +15,13 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -35,7 +39,13 @@ class ShowNotesProcessTest {
     private val transcriptDao = mock<TranscriptDao>()
     private val service = mock<PodcastCacheService>()
 
-    private val processor = ShowNotesProcessor(episodeManager, chapterManager, transcriptDao, service)
+    private val processor = ShowNotesProcessor(
+        episodeManager = episodeManager,
+        chapterManager = chapterManager,
+        transcriptDao = transcriptDao,
+        service = service,
+        showNotesBaseUrl = "https://test.com".toHttpUrl(),
+    )
 
     @Test
     fun `update episodes with image URLs`() = runTest(coroutineRule.testDispatcher) {
@@ -66,7 +76,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode_uuid1", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode_uuid1",
+            showNotes = showNotesResponse,
+        )
 
         val imageUrlUpdateForEpisode = { episode: ShowNotesEpisode ->
             ImageUrlUpdate(
@@ -120,7 +134,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode-id-1", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id-1",
+            showNotes = showNotes,
+        )
 
         val expected1 = listOf(
             DbChapter(
@@ -166,7 +184,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode-id", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotesResponse,
+        )
 
         verify(chapterManager).updateChapters("episode-id", emptyList())
     }
@@ -184,7 +206,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         verify(chapterManager, never()).updateChapters("episode-id", emptyList())
     }
@@ -220,7 +246,11 @@ class ShowNotesProcessTest {
         )
         whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
 
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         val expected = listOf(
             DbChapter(
@@ -275,7 +305,11 @@ class ShowNotesProcessTest {
         )
         whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
 
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         val expected = listOf(
             DbChapter(
@@ -330,7 +364,11 @@ class ShowNotesProcessTest {
         )
         whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
 
-        processor.process("episode-id", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotesResponse,
+        )
 
         val expected = listOf(
             DbChapter(
@@ -380,7 +418,11 @@ class ShowNotesProcessTest {
         )
         whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
 
-        processor.process("episode-id", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotesResponse,
+        )
 
         val expected = listOf(
             DbChapter(
@@ -416,7 +458,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode-id-1", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id-1",
+            showNotes = showNotesResponse,
+        )
 
         verifyBlocking(service) { getShowNotesChapters("url1") }
         verifyBlocking(service, never()) { getShowNotesChapters("url2") }
@@ -438,12 +484,6 @@ class ShowNotesProcessTest {
                     language = "Language 2",
                 ),
             ),
-            pocketCastsTranscripts = listOf(
-                ShowNotesTranscript(
-                    url = "Url 3",
-                    type = "Type 3",
-                ),
-            ),
         )
         val showNotes = ShowNotesResponse(
             podcast = ShowNotesPodcast(
@@ -453,8 +493,18 @@ class ShowNotesProcessTest {
                 ),
             ),
         )
+        whenever { episodeManager.findEpisodeByUuid("episode-id") } doReturn PodcastEpisode(
+            uuid = "episode-id",
+            podcastUuid = "podcast-id",
+            hasGeneratedTranscript = true,
+            publishedDate = Date(),
+        )
 
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         val expected1 = listOf(
             Transcript(
@@ -473,8 +523,8 @@ class ShowNotesProcessTest {
             ),
             Transcript(
                 episodeUuid = "episode-id",
-                url = "Url 3",
-                type = "Type 3",
+                url = "https://test.com/generated_transcripts/podcast-id/episode-id.vtt",
+                type = "text/vtt",
                 isGenerated = true,
             ),
         )
@@ -493,14 +543,6 @@ class ShowNotesProcessTest {
                     type = "Type",
                 ),
             ),
-            pocketCastsTranscripts = listOf(
-                ShowNotesTranscript(
-                    url = "Url",
-                ),
-                ShowNotesTranscript(
-                    type = "Type",
-                ),
-            ),
         )
         val showNotes = ShowNotesResponse(
             podcast = ShowNotesPodcast(
@@ -510,7 +552,11 @@ class ShowNotesProcessTest {
                 ),
             ),
         )
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         val expected2 = emptyList<Transcript>()
         verify(transcriptDao).replaceAll(expected2)
@@ -521,7 +567,6 @@ class ShowNotesProcessTest {
         val episodeWithTranscripts = ShowNotesEpisode(
             uuid = "episode-id",
             transcripts = null,
-            pocketCastsTranscripts = null,
         )
         val showNotes = ShowNotesResponse(
             podcast = ShowNotesPodcast(
@@ -531,7 +576,11 @@ class ShowNotesProcessTest {
                 ),
             ),
         )
-        processor.process("episode-id", showNotes)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
 
         val expected2 = emptyList<Transcript>()
         verify(transcriptDao).replaceAll(expected2)
@@ -567,7 +616,11 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process("episode-id", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotesResponse,
+        )
 
         val expected = listOf(
             DbChapter(
@@ -619,7 +672,11 @@ class ShowNotesProcessTest {
         )
         whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
 
-        processor.process("episode-id", showNotesResponse)
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotesResponse,
+        )
 
         val expected = listOf(
             DbChapter(

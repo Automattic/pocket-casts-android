@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -10,25 +11,47 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.coroutineScope
+import okhttp3.HttpUrl
 import timber.log.Timber
 
-class ShowNotesProcessor @Inject constructor(
+class ShowNotesProcessor @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
     private val transcriptDao: TranscriptDao,
     private val service: PodcastCacheService,
+    @Assisted private val showNotesBaseUrl: HttpUrl,
 ) {
+    @AssistedFactory
+    interface Factory {
+        fun create(showNotesBaseUrl: HttpUrl): ShowNotesProcessor
+    }
+
     suspend fun process(
+        podcastUuid: String,
         episodeUuid: String,
         showNotes: ShowNotesResponse,
     ) = coroutineScope {
-        updateImageUrls(showNotes)
-        updateChapters(episodeUuid, showNotes)
-        updateChapterFromLink(episodeUuid, showNotes)
-        updateTranscripts(episodeUuid, showNotes)
+        updateImageUrls(
+            showNotes = showNotes,
+        )
+        updateChapters(
+            episodeUuid = episodeUuid,
+            showNotes = showNotes,
+        )
+        updateChapterFromLink(
+            episodeUuid = episodeUuid,
+            showNotes = showNotes,
+        )
+        updateTranscripts(
+            podcastUuid = podcastUuid,
+            episodeUuid = episodeUuid,
+            showNotes = showNotes,
+        )
     }
 
     private suspend fun updateImageUrls(showNotes: ShowNotesResponse) {
@@ -43,7 +66,8 @@ class ShowNotesProcessor @Inject constructor(
             ?.filter { it.uuid != episodeUuid } // We handle requesting episode with URL link
             ?.mapNotNull { episodeShowNotes ->
                 val mappingEpisodeId = episodeShowNotes.uuid
-                val chapters = episodeShowNotes.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, mappingEpisodeId) }
+                val chapters =
+                    episodeShowNotes.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, mappingEpisodeId) }
                 chapters?.let { episodeShowNotes.uuid to it }
             }
         chapters?.forEach { (episodeUuid, chapters) ->
@@ -72,8 +96,18 @@ class ShowNotesProcessor @Inject constructor(
         newChapters?.let { chapterManager.updateChapters(episodeUuid, it) }
     }
 
-    private suspend fun updateTranscripts(episodeUuid: String, showNotes: ShowNotesResponse) {
-        val transcripts = showNotes.findTranscripts(episodeUuid)
+    private suspend fun updateTranscripts(
+        podcastUuid: String,
+        episodeUuid: String,
+        showNotes: ShowNotesResponse,
+    ) {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) as? PodcastEpisode
+        val transcripts = showNotes.findTranscripts(
+            podcastUuid = podcastUuid,
+            episodeUuid = episodeUuid,
+            hasGeneratedTranscript = episode?.hasGeneratedTranscript == true,
+            showNotesBaseUrl = showNotesBaseUrl,
+        )
         if (transcripts != null) {
             transcriptDao.replaceAll(transcripts)
         }
@@ -95,11 +129,31 @@ class ShowNotesProcessor @Inject constructor(
     }
 }
 
-internal fun ShowNotesResponse.findTranscripts(episodeUuid: String): List<Transcript>? {
+internal fun ShowNotesResponse.findTranscripts(
+    podcastUuid: String,
+    episodeUuid: String,
+    hasGeneratedTranscript: Boolean,
+    showNotesBaseUrl: HttpUrl,
+): List<Transcript>? {
     val episode = podcast?.episodes?.firstOrNull { it.uuid == episodeUuid } ?: return null
-    val transcripts = episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = false) }.orEmpty()
-    val pocketCastsTranscripts = episode.pocketCastsTranscripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = true) }.orEmpty()
-    return transcripts + pocketCastsTranscripts
+    return buildList {
+        addAll(episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = false) }.orEmpty())
+        if (hasGeneratedTranscript) {
+            add(
+                Transcript(
+                    episodeUuid = episodeUuid,
+                    url = showNotesBaseUrl.newBuilder()
+                        .addPathSegment("generated_transcripts")
+                        .addPathSegment(podcastUuid)
+                        .addPathSegment("$episodeUuid.vtt")
+                        .build()
+                        .toString(),
+                    type = "text/vtt",
+                    isGenerated = true,
+                ),
+            )
+        }
+    }
 }
 
 private fun ShowNotesTranscript.toTranscript(
