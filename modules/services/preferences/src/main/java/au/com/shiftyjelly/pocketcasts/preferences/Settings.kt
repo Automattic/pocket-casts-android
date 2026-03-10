@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
 import io.reactivex.Observable
 import java.time.Instant
@@ -161,9 +162,18 @@ interface Settings {
         OFFERS(21483663),
     }
 
-    enum class UpNextAction(val serverId: Int) {
-        PLAY_NEXT(serverId = 0),
-        PLAY_LAST(serverId = 1),
+    enum class UpNextAction(
+        val serverId: Int,
+        val eventHorizonValue: UpNextSwipeActionType,
+    ) {
+        PLAY_NEXT(
+            serverId = 0,
+            eventHorizonValue = UpNextSwipeActionType.PlayNext,
+        ),
+        PLAY_LAST(
+            serverId = 1,
+            eventHorizonValue = UpNextSwipeActionType.PlayLast,
+        ),
         ;
 
         companion object {

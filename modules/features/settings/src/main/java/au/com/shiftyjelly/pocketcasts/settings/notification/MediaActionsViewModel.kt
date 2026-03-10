@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.settings.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.rearrange.MenuAction
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsGeneralMediaNotificationControlsOrderChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralMediaNotificationControlsShowCustomToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralMediaNotificationNextPreviousTrackSkipButtonsToggledEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,7 @@ import timber.log.Timber
 @HiltViewModel
 class MediaActionsViewModel @Inject constructor(
     val settings: Settings,
-    val analyticsTracker: AnalyticsTracker,
+    val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     data class State(
@@ -52,17 +54,19 @@ class MediaActionsViewModel @Inject constructor(
 
     fun setShowCustomActionsChanged(visibility: Boolean) {
         settings.customMediaActionsVisibility.set(visibility, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED,
-            mapOf("enabled" to visibility),
+        eventHorizon.track(
+            SettingsGeneralMediaNotificationControlsShowCustomToggledEvent(
+                enabled = visibility,
+            ),
         )
     }
 
     fun setNextPreviousTrackSkipButtonsChanged(enabled: Boolean) {
         settings.nextPreviousTrackSkipButtons.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_NEXT_PREVIOUS_TRACK_SKIP_BUTTONS_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsGeneralMediaNotificationNextPreviousTrackSkipButtonsToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
@@ -77,12 +81,11 @@ class MediaActionsViewModel @Inject constructor(
             return
         }
 
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED,
-            mapOf(
-                "item" to (MediaNotificationControls.itemForId(action.key)?.serverId ?: ""),
-                "previous_position" to fromIndex,
-                "updated_position" to toIndex,
+        eventHorizon.track(
+            SettingsGeneralMediaNotificationControlsOrderChangedEvent(
+                item = MediaNotificationControls.itemForId(action.key)?.serverId.orEmpty(),
+                previousPosition = fromIndex.toLong(),
+                updatedPosition = toIndex.toLong(),
             ),
         )
     }
