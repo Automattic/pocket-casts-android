@@ -108,7 +108,6 @@ class CloudBottomSheetViewModel @Inject constructor(
                 episodeUuid = episode.uuid,
                 source = source.eventHorizonValue,
             ),
-
         )
     }
 
