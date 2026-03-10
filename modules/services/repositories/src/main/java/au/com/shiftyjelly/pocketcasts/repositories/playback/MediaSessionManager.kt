@@ -286,6 +286,16 @@ class MediaSessionManager(
             .onEach { updateMedia3CustomLayout() }
             .catch { Timber.e(it) }
             .launchIn(scope)
+
+        playbackManager.upNextQueue.changesObservable
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onNext = {
+                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, 0, null)
+                },
+                onError = { Timber.e(it, "Error observing Up Next changes") },
+            )
+            .addTo(disposables)
     }
 
     @OptIn(UnstableApi::class)

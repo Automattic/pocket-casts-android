@@ -100,6 +100,8 @@ class BrowseTreeProvider @Inject constructor(
                 loadRootChildren(context)
             }
 
+            UP_NEXT_ROOT -> loadUpNextChildren(context)
+
             PODCASTS_ROOT -> loadPodcastsChildren(context)
 
             FILES_ROOT -> loadFilesChildren(context)
@@ -129,6 +131,14 @@ class BrowseTreeProvider @Inject constructor(
     suspend fun loadRecentChildren(context: Context): List<MediaItem> {
         Timber.d("Loading recent children")
         val episodes = listOfNotNull(upNextQueue.currentEpisode)
+        return convertEpisodesToMediaItems(episodes, context)
+    }
+
+    suspend fun loadUpNextChildren(context: Context): List<MediaItem> {
+        Timber.d("Loading Up Next children")
+        val episodes = mutableListOf<BaseEpisode>()
+        upNextQueue.currentEpisode?.let { episodes.add(it) }
+        episodes.addAll(upNextQueue.queueEpisodes)
         return convertEpisodesToMediaItems(episodes, context)
     }
 
@@ -174,6 +184,18 @@ class BrowseTreeProvider @Inject constructor(
 
     suspend fun loadRootChildren(context: Context): List<MediaItem> {
         val rootItems = ArrayList<MediaItem>()
+
+        val upNextMetadata = MediaMetadata.Builder()
+            .setTitle(context.getString(LR.string.up_next))
+            .setArtworkUri(AutoConverter.getBitmapUri(drawable = IR.drawable.ic_upnext, context))
+            .setIsBrowsable(true)
+            .setIsPlayable(false)
+            .build()
+        val upNextItem = MediaItem.Builder()
+            .setMediaId(UP_NEXT_ROOT)
+            .setMediaMetadata(upNextMetadata)
+            .build()
+        rootItems.add(upNextItem)
 
         val podcastsMetadata = MediaMetadata.Builder()
             .setTitle("Podcasts")
@@ -377,6 +399,7 @@ class BrowseTreeProvider @Inject constructor(
     private suspend fun loadAutomotiveRootChildren(context: Context): List<MediaItem> {
         val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
+        val upNextItem = buildListMediaItem(context, id = UP_NEXT_ROOT, title = LR.string.up_next, drawable = IR.drawable.ic_upnext)
         val podcastsItem = buildListMediaItem(context, id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
         val filtersItem = buildListMediaItem(
             context,
@@ -389,9 +412,9 @@ class BrowseTreeProvider @Inject constructor(
         val profileItem = buildListMediaItem(context, id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
 
         return if (podcastManager.countSubscribed() > 0) {
-            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
+            listOf(upNextItem, podcastsItem, filtersItem, discoverItem, profileItem)
         } else {
-            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
+            listOf(upNextItem, discoverItem, podcastsItem, filtersItem, profileItem)
         }
     }
 

@@ -40,6 +40,7 @@ const val PODCASTS_ROOT = "__PODCASTS__"
 const val RECENT_ROOT = "__RECENT__"
 const val SUGGESTED_ROOT = "__SUGGESTED__"
 const val FOLDER_ROOT_PREFIX = "__FOLDER__"
+const val UP_NEXT_ROOT = "__UP_NEXT__"
 
 internal const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
 internal const val CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED"

@@ -137,6 +137,24 @@ class PocketCastsForwardingPlayer(
             .build()
     }
 
+    override fun seekTo(positionMs: Long) {
+        if (onSeekTo != null) {
+            onSeekTo.invoke(positionMs)
+            super.seekTo(positionMs)
+        } else {
+            super.seekTo(positionMs)
+        }
+    }
+
+    override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+        if (onSeekTo != null) {
+            onSeekTo.invoke(positionMs)
+            super.seekTo(mediaItemIndex, positionMs)
+        } else {
+            super.seekTo(mediaItemIndex, positionMs)
+        }
+    }
+
     override fun seekToNext() {
         onSkipForward?.invoke() ?: super.seekToNext()
     }

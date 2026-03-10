@@ -140,6 +140,53 @@ class BrowseTreeProviderTest {
         )
     }
 
+    @Test
+    fun `loadUpNextChildren returns empty when queue is empty`() = runTest {
+        whenever(upNextQueue.currentEpisode).thenReturn(null)
+        whenever(upNextQueue.queueEpisodes).thenReturn(emptyList())
+
+        val result = provider.loadUpNextChildren(mock())
+        assertEquals(emptyList<MediaItem>(), result)
+    }
+
+    @Test
+    fun `loadUpNextChildren returns current episode and queue`() = runTest {
+        val context = RuntimeEnvironment.getApplication()
+        val podcastOne = Podcast(uuid = UUID.randomUUID().toString())
+        val podcastTwo = Podcast(uuid = UUID.randomUUID().toString())
+
+        val currentEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastOne.uuid,
+            publishedDate = Date(),
+            title = "Current",
+        )
+        val queueEpisode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcastTwo.uuid,
+            publishedDate = Date(),
+            title = "Queued",
+        )
+
+        whenever(upNextQueue.currentEpisode).thenReturn(currentEpisode)
+        whenever(upNextQueue.queueEpisodes).thenReturn(listOf(queueEpisode))
+        whenever(podcastManager.findPodcastByUuid(podcastOne.uuid)).thenReturn(podcastOne)
+        whenever(podcastManager.findPodcastByUuid(podcastTwo.uuid)).thenReturn(podcastTwo)
+        mockArtworkConfiguration()
+
+        val result = provider.loadUpNextChildren(context)
+
+        assertEquals(2, result.size)
+        assertEquals(
+            AutoMediaId(currentEpisode.uuid, podcastOne.uuid).toMediaId(),
+            result[0].mediaId,
+        )
+        assertEquals(
+            AutoMediaId(queueEpisode.uuid, podcastTwo.uuid).toMediaId(),
+            result[1].mediaId,
+        )
+    }
+
     // --- loadSuggestedChildren ---
 
     @Test
