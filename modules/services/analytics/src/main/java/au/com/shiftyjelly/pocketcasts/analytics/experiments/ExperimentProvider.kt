@@ -24,39 +24,35 @@ class ExperimentProvider @Inject constructor(
     }
 
     fun initialize() {
-        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            initialize(accountStatusInfo.getUserIds().id)
-        }
+        initialize(accountStatusInfo.getUserIds().id)
     }
 
     fun initialize(uuid: String) {
-        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
-            repository.initialize(anonymousId = uuid, oAuthToken = null)
-        }
+        LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
+        repository.initialize(anonymousId = uuid, oAuthToken = null)
     }
 
     suspend fun refreshExperiments(uuid: String? = null) = withContext(ioDispatcher) {
-        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            clear()
-            // This will update the repository with the current user ID
-            initialize(uuid ?: accountStatusInfo.getUserIds().id)
-        }
+        clear()
+        // This will update the repository with the current user ID
+        initialize(uuid ?: accountStatusInfo.getUserIds().id)
     }
 
     fun getVariation(experiment: ExperimentType): Variation? {
-        if (!FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) return null
-
-        return when (val variation = repository.getVariation(Experiment(experiment.identifier))) {
-            is Control -> Variation.Control
-            is Treatment -> Variation.Treatment(variation.name)
+        if (!FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
+            return null
         }
+
+        return runCatching {
+            when (val variation = repository.getVariation(Experiment(experiment.identifier))) {
+                is Control -> Variation.Control
+                is Treatment -> Variation.Treatment(variation.name)
+            }
+        }.getOrNull()
     }
 
     private fun clear() {
-        if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            LogBuffer.i(TAG, "Clearing experiments")
-            repository.clear()
-        }
+        LogBuffer.i(TAG, "Clearing experiments")
+        repository.clear()
     }
 }

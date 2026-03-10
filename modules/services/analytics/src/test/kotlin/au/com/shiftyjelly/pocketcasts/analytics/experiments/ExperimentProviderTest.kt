@@ -98,15 +98,6 @@ class ExperimentProviderTest {
     }
 
     @Test
-    fun `should not initialize when feature flag is disabled`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
-
-        experimentProvider.initialize()
-
-        verify(repository, never()).initialize(anyString(), eq(null))
-    }
-
-    @Test
     fun `should return null variation when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
@@ -129,16 +120,6 @@ class ExperimentProviderTest {
 
         verify(repository).clear()
         verify(repository).initialize(uuid, null)
-    }
-
-    @Test
-    fun `refreshExperiments should not refresh experiments when feature flag is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
-
-        experimentProvider.refreshExperiments()
-
-        verify(repository, never()).clear()
-        verify(repository, never()).initialize(anyString(), eq(null))
     }
 }
 
