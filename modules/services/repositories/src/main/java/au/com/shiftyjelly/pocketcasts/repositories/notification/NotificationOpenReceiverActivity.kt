@@ -30,20 +30,20 @@ class NotificationOpenReceiverActivity : AppCompatActivity() {
     }
 
     private fun trackOpen(intent: Intent) {
+        val type = intent
+            .takeIf { it.action == ACTION_REVAMP_NOTIFICATION_OPENED }
+            ?.getStringExtra(EXTRA_REVAMPED_TYPE)
+            ?.let(NotificationType::fromSubCategory)
+            ?.analyticsType
+
         eventHorizon.track(
             NotificationOpenedEvent(
                 category = if (intent.action == ACTION_REVAMP_NOTIFICATION_OPENED) {
-                    intent.getStringExtra(EXTRA_REVAMPED_TYPE)?.let { CATEGORY_DEEP_LINK }
+                    CATEGORY_DEEP_LINK.takeIf { type != null }
                 } else {
                     intent.getStringExtra(EXTRA_CATEGORY)
                 },
-                type = if (intent.action == ACTION_REVAMP_NOTIFICATION_OPENED) {
-                    intent.getStringExtra(EXTRA_REVAMPED_TYPE)
-                        ?.let(NotificationType::fromSubCategory)
-                        ?.analyticsType
-                } else {
-                    null
-                },
+                type = type,
             ),
         )
     }
