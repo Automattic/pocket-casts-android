@@ -18,18 +18,6 @@ class AnalyticsTracker(
         }
     }
 
-    private fun trackWithFlow(event: AnalyticsEvent, flow: String, properties: Map<String, Any> = emptyMap()) {
-        track(
-            event = event,
-            properties = buildMap {
-                put(AnalyticsParameter.FLOW, flow)
-                if (properties.isNotEmpty()) {
-                    putAll(properties)
-                }
-            },
-        )
-    }
-
     fun trackBannerAdImpression(id: String, location: String) {
         track(
             AnalyticsEvent.BANNER_AD_IMPRESSION,
@@ -57,84 +45,6 @@ class AnalyticsTracker(
                 "id" to id,
                 "reason" to reason,
                 "location" to location,
-            ),
-        )
-    }
-
-    fun trackOnboardingIntroCarouselShown(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.ONBOARDING_INTRO_CAROUSEL_SHOWN, flow = flow)
-    }
-
-    fun trackOnboardingGetStarted(flow: String) {
-        trackWithFlow(
-            event = AnalyticsEvent.ONBOARDING_GET_STARTED,
-            flow = flow,
-            properties = mapOf(AnalyticsParameter.BUTTON to "get_started"),
-        )
-    }
-
-    fun trackInterestsShown(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.INTERESTS_SHOWN, flow = flow)
-    }
-
-    fun trackInterestsNotNowTapped(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.INTERESTS_NOT_NOW_TAPPED, flow = flow)
-    }
-
-    fun trackInterestsShowMoreTapped(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.INTERESTS_SHOW_MORE_TAPPED, flow = flow)
-    }
-
-    fun trackInterestsCategorySelected(flow: String, categoryId: Int, categoryName: String, isSelected: Boolean) {
-        trackWithFlow(
-            event = AnalyticsEvent.INTERESTS_CATEGORY_SELECTED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.CATEGORY_ID to categoryId,
-                AnalyticsParameter.NAME to categoryName,
-                AnalyticsParameter.IS_SELECTED to isSelected,
-            ),
-        )
-    }
-
-    fun trackInterestsContinueTapped(flow: String, categories: List<String>) {
-        trackWithFlow(
-            event = AnalyticsEvent.INTERESTS_CONTINUE_TAPPED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.CATEGORIES to categories.joinToString(", "),
-            ),
-        )
-    }
-
-    fun trackRecommendationsShown(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.RECOMMENDATIONS_SHOWN, flow = flow)
-    }
-
-    fun trackRecommendationsSearchTapped(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.RECOMMENDATIONS_SEARCH_TAPPED, flow = flow)
-    }
-
-    fun trackRecommendationsImportTapped(flow: String) {
-        trackWithFlow(event = AnalyticsEvent.RECOMMENDATIONS_IMPORT_TAPPED, flow = flow)
-    }
-
-    fun trackRecommendationsDismissed(flow: String, subscriptions: Int) {
-        trackWithFlow(
-            event = AnalyticsEvent.RECOMMENDATIONS_DISMISSED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.SUBSCRIPTIONS to subscriptions,
-            ),
-        )
-    }
-
-    fun trackRecommendationsContinueTapped(flow: String, subscriptions: Int) {
-        trackWithFlow(
-            event = AnalyticsEvent.RECOMMENDATIONS_CONTINUE_TAPPED,
-            flow = flow,
-            properties = mapOf(
-                AnalyticsParameter.SUBSCRIPTIONS to subscriptions,
             ),
         )
     }

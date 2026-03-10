@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.res.Resources
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -91,7 +90,6 @@ class OnboardingRecommendationsStartPageViewModelTest {
     private fun createViewModel() = OnboardingRecommendationsStartPageViewModel(
         podcastManager = podcastManager,
         playbackManager = playbackManager,
-        analyticsTracker = AnalyticsTracker.test(),
         eventHorizon = EventHorizon(TestEventSink()),
         repository = repository,
         settings = settings,

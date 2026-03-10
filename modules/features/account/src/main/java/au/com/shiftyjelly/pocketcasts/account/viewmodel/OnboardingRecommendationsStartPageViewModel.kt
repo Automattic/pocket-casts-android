@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -21,6 +20,11 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.RecommendationsContinueTappedEvent
+import com.automattic.eventhorizon.RecommendationsDismissedEvent
+import com.automattic.eventhorizon.RecommendationsImportTappedEvent
+import com.automattic.eventhorizon.RecommendationsSearchTappedEvent
+import com.automattic.eventhorizon.RecommendationsShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.min
@@ -39,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
-    val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val repository: ListRepository,
     private val settings: Settings,
@@ -172,36 +175,52 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     }
 
     fun onShown(flow: OnboardingFlow) {
-        analyticsTracker.trackRecommendationsShown(flow = flow.analyticsValue)
+        eventHorizon.track(
+            RecommendationsShownEvent(
+                flow = flow.eventHorizonValue,
+            ),
+        )
     }
 
     fun onBackPressed(flow: OnboardingFlow) {
         viewModelScope.launch(Dispatchers.IO) {
-            analyticsTracker.trackRecommendationsDismissed(
-                flow = flow.analyticsValue,
-                subscriptions = podcastManager.countSubscribed(),
+            eventHorizon.track(
+                RecommendationsDismissedEvent(
+                    flow = flow.eventHorizonValue,
+                    subscriptions = podcastManager.countSubscribed().toLong(),
+                ),
             )
         }
     }
 
     fun onSearch(flow: OnboardingFlow) {
-        analyticsTracker.trackRecommendationsSearchTapped(flow.analyticsValue)
+        eventHorizon.track(
+            RecommendationsSearchTappedEvent(
+                flow = flow.eventHorizonValue,
+            ),
+        )
     }
 
     fun onImportClick(flow: OnboardingFlow) {
-        analyticsTracker.trackRecommendationsImportTapped(flow.analyticsValue)
+        eventHorizon.track(
+            RecommendationsImportTappedEvent(
+                flow = flow.eventHorizonValue,
+            ),
+        )
     }
 
     fun onComplete(flow: OnboardingFlow) {
         viewModelScope.launch(Dispatchers.IO) {
-            analyticsTracker.trackRecommendationsContinueTapped(
-                flow = flow.analyticsValue,
-                subscriptions = podcastManager.countSubscribed(),
+            eventHorizon.track(
+                RecommendationsContinueTappedEvent(
+                    flow = flow.eventHorizonValue,
+                    subscriptions = podcastManager.countSubscribed().toLong(),
+                ),
             )
         }
     }
 
-    fun updateSubscribed(podcast: Podcast, flow: OnboardingFlow) {
+    fun updateSubscribed(podcast: Podcast) {
         val event = if (podcast.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, SourceView.ONBOARDING_RECOMMENDATIONS)
             PodcastUnsubscribedEvent(
