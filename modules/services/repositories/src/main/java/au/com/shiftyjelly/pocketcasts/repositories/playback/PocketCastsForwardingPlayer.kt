@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Looper
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -105,7 +106,13 @@ class PocketCastsForwardingPlayer(
 
         if (showArtwork && artworkBitmap != null) {
             val stream = java.io.ByteArrayOutputStream()
-            artworkBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Bitmap.CompressFormat.WEBP_LOSSY
+            } else {
+                @Suppress("DEPRECATION")
+                Bitmap.CompressFormat.WEBP
+            }
+            artworkBitmap.compress(format, 80, stream)
             metadataBuilder.setArtworkData(stream.toByteArray(), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
         }
 
