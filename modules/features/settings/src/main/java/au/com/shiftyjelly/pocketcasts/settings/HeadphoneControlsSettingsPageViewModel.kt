@@ -3,12 +3,15 @@ package au.com.shiftyjelly.pocketcasts.settings
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsHeadphoneControlsBookmarkSoundToggledEvent
+import com.automattic.eventhorizon.SettingsHeadphoneControlsNextChangedEvent
+import com.automattic.eventhorizon.SettingsHeadphoneControlsPreviousChangedEvent
+import com.automattic.eventhorizon.SettingsHeadphoneControlsShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +23,7 @@ import timber.log.Timber
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
 ) : ViewModel() {
 
@@ -62,20 +65,25 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_SHOWN)
+        eventHorizon.track(SettingsHeadphoneControlsShownEvent)
     }
 
     fun onConfirmationSoundChanged(playConfirmationSound: Boolean) {
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_SOUND_TOGGLED,
-            mapOf("enabled" to playConfirmationSound),
+        eventHorizon.track(
+            SettingsHeadphoneControlsBookmarkSoundToggledEvent(
+                enabled = playConfirmationSound,
+            ),
         )
     }
 
     fun onNextActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
             settings.headphoneControlsNextAction.set(action, updateModifiedAt = true)
-            trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED)
+            eventHorizon.track(
+                SettingsHeadphoneControlsNextChangedEvent(
+                    value = action.eventHorizonValue,
+                ),
+            )
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.NEXT) }
         }
@@ -84,7 +92,11 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     fun onPreviousActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
             settings.headphoneControlsPreviousAction.set(action, updateModifiedAt = true)
-            trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED)
+            eventHorizon.track(
+                SettingsHeadphoneControlsPreviousChangedEvent(
+                    value = action.eventHorizonValue,
+                ),
+            )
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.PREVIOUS) }
         }
@@ -98,10 +110,6 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     private fun resetUpsellSourceAction() {
         _state.update { it.copy(startUpsellFromSource = null) }
-    }
-
-    private fun trackHeadphoneAction(action: HeadphoneAction, event: AnalyticsEvent) {
-        analyticsTracker.track(event, mapOf("value" to action.analyticsValue))
     }
 
     private fun HeadphoneAction.canSave() = when (this) {
