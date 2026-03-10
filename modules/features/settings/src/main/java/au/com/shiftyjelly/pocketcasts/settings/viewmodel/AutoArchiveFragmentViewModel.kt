@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAutoArchiveInactiveChangedEvent
+import com.automattic.eventhorizon.SettingsAutoArchiveIncludeStarredToggledEvent
+import com.automattic.eventhorizon.SettingsAutoArchivePlayedChangedEvent
+import com.automattic.eventhorizon.SettingsAutoArchiveShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,39 +18,42 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class AutoArchiveFragmentViewModel @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow(initState())
     val state: StateFlow<State> = mutableState
 
     fun trackOnViewShownEvent() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
+        eventHorizon.track(SettingsAutoArchiveShownEvent)
     }
 
     fun onStarredChanged(newValue: Boolean) {
         settings.autoArchiveIncludesStarred.set(newValue, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
-            mapOf("enabled" to newValue),
+        eventHorizon.track(
+            SettingsAutoArchiveIncludeStarredToggledEvent(
+                enabled = newValue,
+            ),
         )
         mutableState.update { it.copy(starredEpisodes = newValue) }
     }
 
     fun onPlayedEpisodesAfterChanged(newValue: AutoArchiveAfterPlaying) {
         settings.autoArchiveAfterPlaying.set(newValue, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-            mapOf("value" to newValue.analyticsValue),
+        eventHorizon.track(
+            SettingsAutoArchivePlayedChangedEvent(
+                value = newValue.eventHorizonValue,
+            ),
         )
         mutableState.update { it.copy(archiveAfterPlaying = newValue) }
     }
 
     fun onInactiveChanged(newValue: AutoArchiveInactive) {
         settings.autoArchiveInactive.set(newValue, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-            mapOf("value" to newValue.analyticsValue),
+        eventHorizon.track(
+            SettingsAutoArchiveInactiveChangedEvent(
+                value = newValue.eventHorizonValue,
+            ),
         )
         mutableState.update { it.copy(archiveInactive = newValue) }
     }

@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.views.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
@@ -11,6 +9,11 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.SelectablePodcast
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SettingsAutoAddUpNextPodcastsChangedEvent
 import com.automattic.eventhorizon.SettingsNotificationsPodcastsChangedEvent
+import com.automattic.eventhorizon.SettingsSelectPodcastsDismissedEvent
+import com.automattic.eventhorizon.SettingsSelectPodcastsPodcastToggledEvent
+import com.automattic.eventhorizon.SettingsSelectPodcastsSelectAllTappedEvent
+import com.automattic.eventhorizon.SettingsSelectPodcastsSelectNoneTappedEvent
+import com.automattic.eventhorizon.SettingsSelectPodcastsShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +25,6 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 class PodcastSelectViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
@@ -44,23 +46,45 @@ class PodcastSelectViewModel @Inject constructor(
     }
 
     fun trackOnShown(source: PodcastSelectFragmentSource) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SHOWN, source.toEventProperty())
+        eventHorizon.track(
+            SettingsSelectPodcastsShownEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackOnPodcastToggled(source: PodcastSelectFragmentSource, podcastUuid: String, enabled: Boolean) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED, source.toEventProperty() + mapOf("uuid" to podcastUuid, "enabled" to enabled))
+        eventHorizon.track(
+            SettingsSelectPodcastsPodcastToggledEvent(
+                uuid = podcastUuid,
+                enabled = enabled,
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackOnSelectNoneTapped(source: PodcastSelectFragmentSource) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED, source.toEventProperty())
+        eventHorizon.track(
+            SettingsSelectPodcastsSelectNoneTappedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackOnSelectAllTapped(source: PodcastSelectFragmentSource) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED, source.toEventProperty())
+        eventHorizon.track(
+            SettingsSelectPodcastsSelectAllTappedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackOnDismissed(source: PodcastSelectFragmentSource) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_DISMISSED, source.toEventProperty())
+        eventHorizon.track(
+            SettingsSelectPodcastsDismissedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackAutoAddPodcastsChanged(count: Int) {
@@ -77,9 +101,5 @@ class PodcastSelectViewModel @Inject constructor(
                 numberSelected = count.toLong(),
             ),
         )
-    }
-
-    private fun PodcastSelectFragmentSource?.toEventProperty(): Map<String, String> {
-        return this?.analyticsValue?.let { mapOf("source" to it) } ?: emptyMap()
     }
 }

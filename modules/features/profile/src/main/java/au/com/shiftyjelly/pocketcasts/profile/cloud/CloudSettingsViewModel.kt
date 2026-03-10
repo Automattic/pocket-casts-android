@@ -3,20 +3,24 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsFilesAutoAddUpNextToggledEvent
+import com.automattic.eventhorizon.SettingsFilesAutoDownloadFromCloudToggledEvent
+import com.automattic.eventhorizon.SettingsFilesAutoUploadToCloudToggledEvent
+import com.automattic.eventhorizon.SettingsFilesDeleteCloudFileAfterPlayingToggledEvent
+import com.automattic.eventhorizon.SettingsFilesDeleteLocalFileAfterPlayingToggledEvent
+import com.automattic.eventhorizon.SettingsFilesOnlyOnWifiToggledEvent
+import com.automattic.eventhorizon.SettingsFilesShownEvent
 import com.automattic.eventhorizon.UpgradeBannerDismissedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class CloudSettingsViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
     userManager: UserManager,
@@ -28,7 +32,7 @@ class CloudSettingsViewModel @Inject constructor(
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_FILES_SHOWN)
+            eventHorizon.track(SettingsFilesShownEvent)
         }
     }
 
@@ -38,49 +42,55 @@ class CloudSettingsViewModel @Inject constructor(
 
     fun setAddToUpNext(enabled: Boolean) {
         settings.cloudAddToUpNext.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesAutoAddUpNextToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
     fun setDeleteLocalFileAfterPlaying(enabled: Boolean) {
         settings.deleteLocalFileAfterPlaying.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesDeleteLocalFileAfterPlayingToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
     fun setDeleteCloudFileAfterPlaying(enabled: Boolean) {
         settings.deleteCloudFileAfterPlaying.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesDeleteCloudFileAfterPlayingToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
     fun setCloudAutoUpload(enabled: Boolean) {
         settings.cloudAutoUpload.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesAutoUploadToCloudToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
     fun setCloudAutoDownload(enabled: Boolean) {
         settings.cloudAutoDownload.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesAutoDownloadFromCloudToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
     fun setCloudOnlyWifi(enabled: Boolean) {
         settings.cloudDownloadOnlyOnWifi.set(enabled, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED,
-            mapOf("enabled" to enabled),
+        eventHorizon.track(
+            SettingsFilesOnlyOnWifiToggledEvent(
+                enabled = enabled,
+            ),
         )
     }
 
