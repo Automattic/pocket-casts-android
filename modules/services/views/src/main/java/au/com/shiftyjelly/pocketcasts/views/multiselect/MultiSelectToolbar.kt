@@ -19,8 +19,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuShownEvent
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR

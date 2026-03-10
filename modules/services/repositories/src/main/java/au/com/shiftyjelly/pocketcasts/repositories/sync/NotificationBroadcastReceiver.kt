@@ -16,11 +16,11 @@ import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
 class NotificationBroadcastReceiver :

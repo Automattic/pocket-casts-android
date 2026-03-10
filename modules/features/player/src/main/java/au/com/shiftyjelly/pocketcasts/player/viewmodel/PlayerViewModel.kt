@@ -63,6 +63,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,11 +83,6 @@ import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel

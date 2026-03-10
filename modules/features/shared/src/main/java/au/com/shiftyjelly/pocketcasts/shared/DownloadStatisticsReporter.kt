@@ -7,11 +7,11 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import com.automattic.eventhorizon.EpisodeDownloadsStaleEvent
 import com.automattic.eventhorizon.EventHorizon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Singleton
 class DownloadStatisticsReporter @Inject constructor(

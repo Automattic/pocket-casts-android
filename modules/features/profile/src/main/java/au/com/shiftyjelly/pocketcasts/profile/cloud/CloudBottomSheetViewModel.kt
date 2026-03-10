@@ -31,10 +31,10 @@ import com.automattic.eventhorizon.UserFilePlayPauseButtonTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.Flowables
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(

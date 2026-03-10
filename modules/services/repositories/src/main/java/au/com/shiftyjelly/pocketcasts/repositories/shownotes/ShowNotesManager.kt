@@ -6,13 +6,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.CacheControl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import javax.inject.Inject
 
 class ShowNotesManager @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,

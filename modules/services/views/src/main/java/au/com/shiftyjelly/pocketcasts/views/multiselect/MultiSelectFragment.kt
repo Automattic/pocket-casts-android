@@ -24,10 +24,10 @@ import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeFinishedE
 import com.automattic.eventhorizon.ShelfActionSource
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
-import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint

@@ -88,11 +88,11 @@ import com.automattic.eventhorizon.EpisodeDetailTranscriptCardTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR

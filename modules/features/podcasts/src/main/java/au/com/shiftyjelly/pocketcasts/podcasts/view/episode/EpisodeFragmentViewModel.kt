@@ -39,6 +39,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,11 +55,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
-import java.util.Date
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(

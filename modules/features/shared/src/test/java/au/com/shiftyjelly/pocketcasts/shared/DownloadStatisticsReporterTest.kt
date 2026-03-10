@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import com.automattic.eventhorizon.EpisodeDownloadsStaleEvent
 import com.automattic.eventhorizon.EventHorizon
+import java.time.Instant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,7 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DownloadStatisticsReporterTest {

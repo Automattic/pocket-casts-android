@@ -41,13 +41,13 @@ import com.automattic.eventhorizon.EpisodeRemovedListeningHistoryEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.BackpressureStrategy
+import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR

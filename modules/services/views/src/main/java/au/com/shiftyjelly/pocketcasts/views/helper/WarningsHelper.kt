@@ -23,10 +23,10 @@ import com.automattic.eventhorizon.EpisodeUploadQueuedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 

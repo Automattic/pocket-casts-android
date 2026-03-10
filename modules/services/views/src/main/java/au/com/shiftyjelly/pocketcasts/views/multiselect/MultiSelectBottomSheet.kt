@@ -19,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeStartedEvent
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_ACTION_IDS = "actionids"

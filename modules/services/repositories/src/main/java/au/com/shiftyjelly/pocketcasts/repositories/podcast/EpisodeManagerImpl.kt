@@ -37,6 +37,11 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import java.io.File
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,11 +54,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class EpisodeManagerImpl @Inject constructor(

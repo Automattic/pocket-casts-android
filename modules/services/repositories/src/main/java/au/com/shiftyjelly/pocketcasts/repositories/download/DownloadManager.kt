@@ -39,6 +39,13 @@ import com.automattic.eventhorizon.EpisodeDownloadFinishedEvent
 import com.automattic.eventhorizon.EpisodeDownloadQueuedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.time.Clock
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.FlowPreview
@@ -55,13 +62,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.io.File
-import java.time.Clock
-import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
