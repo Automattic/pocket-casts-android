@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
 import androidx.annotation.MainThread
@@ -40,6 +41,7 @@ class PocketCastsForwardingPlayer(
     private val onStop: (() -> Unit)? = null,
     private val onPlay: (() -> Unit)? = null,
     private val onPause: (() -> Unit)? = null,
+    private val onSeekTo: ((Long) -> Unit)? = null,
     private val playGuard: (() -> Boolean) = { true },
 ) : ForwardingPlayer(wrappedPlayer) {
 
@@ -66,7 +68,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, playGuard).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard).also {
             it.currentMediaItem = this.currentMediaItem
             it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
@@ -78,13 +80,18 @@ class PocketCastsForwardingPlayer(
      * current episode changes or when metadata is refreshed (e.g., artwork loaded).
      */
     @MainThread
-    fun updateMetadata(episode: BaseEpisode, podcast: Podcast?) {
+    fun updateMetadata(
+        episode: BaseEpisode,
+        podcast: Podcast?,
+        showArtwork: Boolean = true,
+        artworkBitmap: Bitmap? = null,
+    ) {
         checkMainThread()
 
-        val artworkUri = resolveArtworkUri(episode, podcast)
+        val artworkUri = if (showArtwork) resolveArtworkUri(episode, podcast) else null
         val podcastTitle = episode.displaySubtitle(podcast)
 
-        val metadata = MediaMetadata.Builder()
+        val metadataBuilder = MediaMetadata.Builder()
             .setTitle(episode.title)
             .setArtist(podcastTitle)
             .setAlbumTitle(podcast?.author?.takeIf { it.isNotEmpty() })
@@ -95,7 +102,14 @@ class PocketCastsForwardingPlayer(
             .setIsPlayable(true)
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
             .setUserRating(buildRating(episode))
-            .build()
+
+        if (showArtwork && artworkBitmap != null) {
+            val stream = java.io.ByteArrayOutputStream()
+            artworkBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            metadataBuilder.setArtworkData(stream.toByteArray(), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+        }
+
+        val metadata = metadataBuilder.build()
 
         val episodeChanged = previousMediaId != episode.uuid
         previousMediaId = episode.uuid

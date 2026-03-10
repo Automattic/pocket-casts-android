@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -181,6 +182,7 @@ class MediaSessionManager(
             bookmarkHelper = bookmarkHelper,
             scope = scope,
             contextProvider = { context },
+            commandMutex = commandMutex,
         )
         media3LibraryCallback = Media3LibrarySessionCallback(
             sessionCallback = media3Callback!!,
@@ -198,6 +200,11 @@ class MediaSessionManager(
 
         media3Session = MediaLibraryService.MediaLibrarySession.Builder(service, forwardingPlayer!!, media3LibraryCallback!!)
             .setId("PocketCastsMedia3Session")
+            .setExtras(
+                Bundle().apply {
+                    putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
+                },
+            )
             .apply {
                 if (!Util.isAutomotive(context)) {
                     setSessionActivity(context.getLaunchActivityPendingIntent())
@@ -272,7 +279,17 @@ class MediaSessionManager(
                 onNext = { (episode, podcast, state) ->
                     val player = forwardingPlayer ?: return@subscribeBy
                     episode ?: return@subscribeBy
-                    player.updateMetadata(episode, podcast)
+                    val showArtwork = settings.showArtworkOnLockScreen.value
+                    val artworkBitmap = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
+                        AutoConverter.getPodcastArtworkBitmap(
+                            episode,
+                            context,
+                            settings.artworkConfiguration.value.useEpisodeArtwork,
+                        )
+                    } else {
+                        null
+                    }
+                    player.updateMetadata(episode, podcast, showArtwork, artworkBitmap)
                     player.isTransientLoss = state.transientLoss
                     updateMedia3CustomLayout()
                 },
