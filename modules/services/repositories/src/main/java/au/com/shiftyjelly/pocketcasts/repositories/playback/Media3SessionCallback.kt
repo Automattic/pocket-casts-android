@@ -168,14 +168,16 @@ internal class Media3SessionCallback(
         val mediaId = item.mediaId
         if (mediaId.isNotEmpty()) {
             scope.launch {
-                try {
-                    val autoMediaId = AutoMediaId.fromMediaId(mediaId)
-                    val episodeId = autoMediaId.episodeId
-                    episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                commandMutex.withLock {
+                    try {
+                        val autoMediaId = AutoMediaId.fromMediaId(mediaId)
+                        val episodeId = autoMediaId.episodeId
+                        episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
+                            playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Play from media ID failed: $mediaId")
                     }
-                } catch (e: Exception) {
-                    Timber.e(e, "Play from media ID failed: $mediaId")
                 }
             }
         }

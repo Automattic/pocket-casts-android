@@ -302,6 +302,7 @@ class MediaSessionManager(
                 }
             }
             .observeOn(Schedulers.io())
+            .filter { (episodeOpt, _) -> episodeOpt.isPresent() }
             .map { (episodeOpt, state) ->
                 val episode = episodeOpt.get()
                 val podcast = when (episode) {
