@@ -114,6 +114,7 @@ class MediaSessionManager(
     private var media3LibraryCallback: Media3LibrarySessionCallback? = null
     private var placeholderPlayer: androidx.media3.common.Player? = null
     private var pendingPlayer: androidx.media3.common.Player? = null
+    private var castStatePlayer: CastStatePlayer? = null
 
     internal fun getMedia3Session(): MediaLibraryService.MediaLibrarySession? = media3Session
 
@@ -233,12 +234,47 @@ class MediaSessionManager(
         // Avoid redundant swaps when called with the same player (e.g., multiple play() calls)
         if (currentPlayer.wrappedPlayer === exoPlayer) return
         pendingPlayer = null
+        castStatePlayer = null
         val swapped = currentPlayer.swapPlayer(exoPlayer)
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = null
         Timber.i("Media3 session player swapped")
+    }
+
+    /**
+     * Creates a [CastStatePlayer] and installs it into the Media3 session so that
+     * notifications and lock screen controls reflect cast playback state.
+     */
+    @OptIn(UnstableApi::class)
+    @MainThread
+    fun installCastPlayer() {
+        val player = CastStatePlayer(
+            applicationLooper = android.os.Looper.getMainLooper(),
+            onPlay = { scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = source) } } },
+            onPause = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+            onSeekTo = { ms ->
+                scope.launch {
+                    commandMutex.withLock {
+                        playbackManager.seekToTimeMsSuspend(ms.toInt())
+                        playbackManager.trackPlaybackSeek(ms.toInt(), source)
+                    }
+                }
+            },
+            onStop = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+        )
+        castStatePlayer = player
+        installPlayer(player)
+    }
+
+    /**
+     * Forwards cast playback state changes to the [CastStatePlayer] so that the
+     * Media3 session reflects the correct play/pause/buffering state during cast.
+     */
+    @MainThread
+    fun updateCastState(isPlaying: Boolean, isBuffering: Boolean, positionMs: Long) {
+        castStatePlayer?.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
     fun startServiceIfNeeded(context: Context) {

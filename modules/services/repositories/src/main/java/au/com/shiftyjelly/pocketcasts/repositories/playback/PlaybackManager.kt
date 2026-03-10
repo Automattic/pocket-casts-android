@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -1128,6 +1129,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+            mediaSessionManager.installCastPlayer()
             (player as? CastPlayer)?.updateFromRemoteIfRequired()
             Timber.i("Cast reconnected. Creating media player of type CastPlayer")
 
@@ -1235,6 +1237,9 @@ open class PlaybackManager @Inject constructor(
             withContext(Dispatchers.Main) {
                 playbackStateRelay.blockingFirst().let { playbackState ->
                     if (playbackState.isBuffering == isBuffering) {
+                        if (player is CastPlayer) {
+                            updateCastMediaSessionState()
+                        }
                         return@withContext
                     }
                     playbackStateRelay.accept(
@@ -1244,6 +1249,10 @@ open class PlaybackManager @Inject constructor(
                             lastChangeFrom = LastChangeFrom.OnBufferingStateChanged.value,
                         ),
                     )
+
+                    if (player is CastPlayer) {
+                        updateCastMediaSessionState()
+                    }
                 }
             }
         }
@@ -1255,6 +1264,10 @@ open class PlaybackManager @Inject constructor(
 
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, transientLoss = false, lastChangeFrom = LastChangeFrom.OnPlayerPlaying.value))
+        }
+
+        if (player is CastPlayer) {
+            launch(Dispatchers.Main) { updateCastMediaSessionState() }
         }
 
         episodeManager.updatePlayingStatusBlocking(episode, EpisodePlayingStatus.IN_PROGRESS)
@@ -1269,6 +1282,10 @@ open class PlaybackManager @Inject constructor(
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PAUSED, lastChangeFrom = LastChangeFrom.OnPlayerPaused.value))
+            }
+
+            if (player is CastPlayer) {
+                updateCastMediaSessionState()
             }
         }
 
@@ -1287,6 +1304,19 @@ open class PlaybackManager @Inject constructor(
 
         cancelUpdateTimer()
         setupPauseTimer()
+    }
+
+    /**
+     * Pushes the current cast playback state to the Media3 session.
+     * Must be called on the main thread.
+     */
+    @MainThread
+    private fun updateCastMediaSessionState() {
+        val state = playbackStateRelay.blockingFirst()
+        val isPlaying = state.state == PlaybackState.State.PLAYING
+        val isBuffering = state.isBuffering
+        val positionMs = state.positionMs.toLong()
+        mediaSessionManager.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
     private suspend fun onCompletion(episodeUUID: String?) {
@@ -2092,6 +2122,7 @@ open class PlaybackManager @Inject constructor(
             player?.stop()
             if (castManager.isConnected()) {
                 player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                mediaSessionManager.installCastPlayer()
                 Timber.i("Creating media player of type CastPlayer.")
             } else {
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
