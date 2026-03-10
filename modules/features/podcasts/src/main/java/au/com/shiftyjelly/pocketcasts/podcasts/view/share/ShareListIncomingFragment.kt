@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncomingBinding
@@ -120,7 +119,7 @@ class ShareListIncomingFragment :
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
-            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN, mapOf("source" to source.analyticsValue))
+            viewModel.trackIncomingShareListShown(source)
         }
 
         // add bottom padding to make sure the content isn't hidden by the mini player
@@ -160,10 +159,7 @@ class ShareListIncomingFragment :
     }
 
     override fun onSubscribeToAllClick(podcasts: List<Podcast>) {
-        viewModel.trackShareEvent(
-            AnalyticsEvent.INCOMING_SHARE_LIST_SUBSCRIBED_ALL,
-            AnalyticsProp.countMap(podcasts.size),
-        )
+        viewModel.trackIncomingShareListSubscribeAll(podcasts.size)
         for (podcastHeader in podcasts) {
             val uuid = podcastHeader.uuid
             viewModel.subscribeToPodcast(uuid)
@@ -174,10 +170,5 @@ class ShareListIncomingFragment :
     override fun onPause() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
-    }
-
-    private object AnalyticsProp {
-        private const val COUNT = "count"
-        fun countMap(count: Int) = mapOf(this.COUNT to count)
     }
 }
