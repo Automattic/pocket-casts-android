@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,9 +39,9 @@ class AdvancedSettingsViewModelTest {
         whenever(settings.prioritizeSeekAccuracy).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.cacheEntirePlayingEpisode).thenReturn(UserSetting.Mock(false, mock()))
         viewModel = AdvancedSettingsViewModel(
-            settings,
-            AnalyticsTracker.test(),
-            context,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            context = context,
         )
     }
 

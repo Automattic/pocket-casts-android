@@ -2,10 +2,13 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAdvancedCacheEntirePlayingEpisodeEvent
+import com.automattic.eventhorizon.SettingsAdvancedPrioritizeSeekAccuracyEvent
+import com.automattic.eventhorizon.SettingsAdvancedShownEvent
+import com.automattic.eventhorizon.SettingsAdvancedSyncOnMeteredEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -13,10 +16,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
-class AdvancedSettingsViewModel
-@Inject constructor(
+class AdvancedSettingsViewModel @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(initState())
@@ -31,9 +33,10 @@ class AdvancedSettingsViewModel
                 // here we disable the functionality
                 if (settings.backgroundRefreshPodcasts.value) {
                     onSyncOnMeteredCheckedChange(it)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_ADVANCED_SYNC_ON_METERED,
-                        mapOf("enabled" to it),
+                    eventHorizon.track(
+                        SettingsAdvancedSyncOnMeteredEvent(
+                            enabled = it,
+                        ),
                     )
                 }
             },
@@ -43,9 +46,10 @@ class AdvancedSettingsViewModel
             onCheckedChange = {
                 settings.prioritizeSeekAccuracy.set(it, updateModifiedAt = false)
                 updatePrioritizeSeekAccuracyState()
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY,
-                    mapOf("enabled" to it),
+                eventHorizon.track(
+                    SettingsAdvancedPrioritizeSeekAccuracyEvent(
+                        enabled = it,
+                    ),
                 )
             },
         ),
@@ -54,9 +58,10 @@ class AdvancedSettingsViewModel
             onCheckedChange = {
                 settings.cacheEntirePlayingEpisode.set(it, updateModifiedAt = false)
                 updateCacheEntirePlayingEpisodeState()
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_ADVANCED_CACHE_ENTIRE_PLAYING_EPISODE,
-                    mapOf("enabled" to it),
+                eventHorizon.track(
+                    SettingsAdvancedCacheEntirePlayingEpisodeEvent(
+                        enabled = it,
+                    ),
                 )
             },
         ),
@@ -95,7 +100,7 @@ class AdvancedSettingsViewModel
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_SHOWN)
+        eventHorizon.track(SettingsAdvancedShownEvent)
     }
 
     data class State(
