@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
@@ -334,7 +335,16 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         val notificationJob = notificationObserver.observeNotificationUpdates(episode)
         this.notificationJob = notificationJob
         val foregroundInfo = createForegroundInfo(notificationJob.id, notificationJob.notification)
-        setForegroundAsync(foregroundInfo).get()
+        try {
+            setForegroundAsync(foregroundInfo).get()
+        } catch (e: Throwable) {
+            // https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start
+            // This is an Android limitation related to foreground services.
+            // Therefore, we cannot move the process to the foreground.
+            // Ignore this exception and continue running in the background.
+            notificationJob.cancel()
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, e, "Failed to start foreground work for downloads")
+        }
     }
 
     private fun createForegroundInfo(id: Int, notification: Notification): ForegroundInfo {
