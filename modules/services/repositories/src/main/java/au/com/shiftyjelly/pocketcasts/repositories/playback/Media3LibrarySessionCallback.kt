@@ -218,8 +218,8 @@ internal class Media3LibrarySessionCallback(
     ): ListenableFuture<LibraryResult<Void>> {
         scope.launch {
             try {
-                browseTreeProvider.search(query, contextProvider())
-                session.notifySearchResultChanged(browser, query, 0, params)
+                val results = browseTreeProvider.search(query, contextProvider())
+                session.notifySearchResultChanged(browser, query, results?.size ?: 0, params)
             } catch (e: Exception) {
                 Timber.e(e, "Search failed for query: $query")
             }

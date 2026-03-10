@@ -26,6 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -326,6 +327,28 @@ class Media3LibrarySessionCallbackTest {
 
         val exception = assertThrows(ExecutionException::class.java) { result.get() }
         assertTrue(exception.cause is UnsupportedOperationException)
+    }
+
+    @Test
+    fun `onSearch notifies with actual result count`() = runTest {
+        val items = listOf(
+            createMediaItem("podcast1", "My Podcast", browsable = true),
+            createMediaItem("podcast2", "Other Podcast", browsable = true),
+        )
+        whenever(browseTreeProvider.search(eq("test"), any())).thenReturn(items)
+
+        callback.onSearch(mockSession, mockController, "test", null)
+
+        verify(mockSession).notifySearchResultChanged(eq(mockController), eq("test"), eq(2), anyOrNull())
+    }
+
+    @Test
+    fun `onSearch notifies with zero when search returns null`() = runTest {
+        whenever(browseTreeProvider.search(eq("empty"), any())).thenReturn(null)
+
+        callback.onSearch(mockSession, mockController, "empty", null)
+
+        verify(mockSession).notifySearchResultChanged(eq(mockController), eq("empty"), eq(0), anyOrNull())
     }
 
     private fun createMediaItem(
