@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.settings
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
@@ -13,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsNotificationsShownEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -32,11 +33,10 @@ internal class NotificationsSettingsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    private val eventSink = TestEventSink()
+
     @Mock
     private lateinit var repository: NotificationsPreferenceRepository
-
-    @Mock(lenient = true)
-    private lateinit var analytics: AnalyticsTracker
 
     @Mock
     private lateinit var podcastManager: PodcastManager
@@ -86,7 +86,10 @@ internal class NotificationsSettingsViewModelTest {
 
         viewModel.onShown()
 
-        verify(analytics).track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
+        assertEquals(
+            SettingsNotificationsShownEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -151,7 +154,7 @@ internal class NotificationsSettingsViewModelTest {
 
     private fun createViewModel() = NotificationsSettingsViewModel(
         preferenceRepository = repository,
-        analyticsTracker = analytics,
+        eventHorizon = EventHorizon(eventSink),
         podcastManager = podcastManager,
         notificationScheduler = notificationScheduler,
         notificationHelper = notificationHelper,

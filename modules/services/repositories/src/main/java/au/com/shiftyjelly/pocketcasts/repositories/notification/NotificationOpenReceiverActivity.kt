@@ -6,8 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.NotificationOpenedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -15,7 +15,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class NotificationOpenReceiverActivity : AppCompatActivity() {
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,25 +30,22 @@ class NotificationOpenReceiverActivity : AppCompatActivity() {
     }
 
     private fun trackOpen(intent: Intent) {
-        val properties = buildMap {
-            when (intent.action) {
-                ACTION_REVAMP_NOTIFICATION_OPENED -> {
-                    intent.getStringExtra(EXTRA_REVAMPED_TYPE)?.let {
-                        NotificationType.fromSubCategory(it)?.let { type ->
-                            put("type", type.analyticsType)
-                            put("category", CATEGORY_DEEP_LINK)
-                        }
-                    }
-                }
-
-                else -> {
-                    intent.getStringExtra(EXTRA_CATEGORY)?.let {
-                        put("category", it)
-                    }
-                }
-            }
-        }
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATION_OPENED, properties)
+        eventHorizon.track(
+            NotificationOpenedEvent(
+                category = if (intent.action == ACTION_REVAMP_NOTIFICATION_OPENED) {
+                    intent.getStringExtra(EXTRA_REVAMPED_TYPE)?.let { CATEGORY_DEEP_LINK }
+                } else {
+                    intent.getStringExtra(EXTRA_CATEGORY)
+                },
+                type = if (intent.action == ACTION_REVAMP_NOTIFICATION_OPENED) {
+                    intent.getStringExtra(EXTRA_REVAMPED_TYPE)
+                        ?.let(NotificationType::fromSubCategory)
+                        ?.analyticsType
+                } else {
+                    null
+                },
+            ),
+        )
     }
 
     private fun tryLaunchIntent(intent: Intent) {

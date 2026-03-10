@@ -3,7 +3,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.notifications
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -153,7 +152,6 @@ class EnableNotificationsPromptViewModelTest {
 
     private fun createViewModel() = EnableNotificationsPromptViewModel(
         settings = settings,
-        analyticsTracker = AnalyticsTracker.test(),
         eventHorizon = EventHorizon(TestEventSink()),
         userManager = userManager,
     )

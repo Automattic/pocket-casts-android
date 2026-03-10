@@ -387,7 +387,7 @@ class Support @Inject constructor(
                 output.append(eol)
 
                 output.append("Notifications").append(eol)
-                output.append("Play over notifications? ").append(settings.playOverNotification.value.analyticsString).append(eol)
+                output.append("Play over notifications? ").append(settings.playOverNotification.value.eventHorizonValue).append(eol)
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.value) "yes" else "no").append(eol)
                 output.append(eol)
 
