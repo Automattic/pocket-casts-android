@@ -17,8 +17,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.IntentCompat
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -39,6 +37,9 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -74,7 +75,7 @@ class MediaSessionManager(
     val playlistManager: PlaylistManager,
     val settings: Settings,
     val context: Context,
-    val episodeAnalytics: EpisodeAnalytics,
+    val eventHorizon: EventHorizon,
     val bookmarkManager: BookmarkManager,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
@@ -763,7 +764,12 @@ class MediaSessionManager(
             val episode = playbackManager.getCurrentEpisode()
             episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
             episode?.let {
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, it.uuid)
+                eventHorizon.track(
+                    EpisodeMarkedAsPlayedEvent(
+                        episodeUuid = it.uuid,
+                        source = source.eventHorizonValue,
+                    ),
+                )
             }
         }
     }
@@ -831,7 +837,12 @@ class MediaSessionManager(
                 if (it is PodcastEpisode) {
                     it.isArchived = true
                     episodeManager.archiveBlocking(it, playbackManager)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, it.uuid)
+                    eventHorizon.track(
+                        EpisodeArchivedEvent(
+                            episodeUuid = it.uuid,
+                            source = source.eventHorizonValue,
+                        ),
+                    )
                 }
             }
         }

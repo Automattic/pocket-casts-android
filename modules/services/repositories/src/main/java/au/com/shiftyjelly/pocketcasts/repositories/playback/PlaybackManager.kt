@@ -15,8 +15,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
@@ -68,6 +66,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.AutoplayFinishedLastEpisodeEvent
+import com.automattic.eventhorizon.EpisodeAddedToUpNextEvent
+import com.automattic.eventhorizon.EpisodeBulkAddToUpNextEvent
+import com.automattic.eventhorizon.EpisodeRemovedFromUpNextEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlaybackChapterSkippedEvent
 import com.automattic.eventhorizon.PlaybackContentType
@@ -143,7 +144,6 @@ open class PlaybackManager @Inject constructor(
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
     private val eventHorizon: EventHorizon,
-    private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
@@ -233,7 +233,7 @@ open class PlaybackManager @Inject constructor(
         playlistManager = playlistManager,
         settings = settings,
         context = application,
-        episodeAnalytics = episodeAnalytics,
+        eventHorizon = eventHorizon,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
     )
@@ -656,7 +656,13 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
+            eventHorizon.track(
+                EpisodeAddedToUpNextEvent(
+                    episodeUuid = episode.uuid,
+                    toTop = true,
+                    source = source.eventHorizonValue,
+                ),
+            )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
@@ -672,7 +678,13 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
+            eventHorizon.track(
+                EpisodeAddedToUpNextEvent(
+                    episodeUuid = episode.uuid,
+                    toTop = false,
+                    source = source.eventHorizonValue,
+                ),
+            )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
@@ -753,11 +765,12 @@ open class PlaybackManager @Inject constructor(
         }
         val currentEpisode = upNextQueue.currentEpisode?.uuid
         upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode })
-        episodeAnalytics.trackBulkEvent(
-            event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
-            count = episodes.size,
-            toTop = false,
-            source = source,
+        eventHorizon.track(
+            EpisodeBulkAddToUpNextEvent(
+                count = episodes.size.toLong(),
+                toTop = false,
+                source = source.eventHorizonValue,
+            ),
         )
         notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
     }
@@ -771,11 +784,12 @@ open class PlaybackManager @Inject constructor(
             val currentEpisode = upNextQueue.currentEpisode?.uuid
             val wasEmpty: Boolean = upNextQueue.isEmpty
             upNextQueue.playAllNext(episodes.filter { it.uuid != currentEpisode })
-            episodeAnalytics.trackBulkEvent(
-                event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
-                count = episodes.size,
-                toTop = true,
-                source = source,
+            eventHorizon.track(
+                EpisodeBulkAddToUpNextEvent(
+                    count = episodes.size.toLong(),
+                    toTop = true,
+                    source = source.eventHorizonValue,
+                ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
             if (wasEmpty) {
@@ -1138,7 +1152,12 @@ open class PlaybackManager @Inject constructor(
 
                 upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
                 if (userInitiated) {
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
+                    eventHorizon.track(
+                        EpisodeRemovedFromUpNextEvent(
+                            episodeUuid = episodeToRemove.uuid,
+                            source = source.eventHorizonValue,
+                        ),
+                    )
                 }
 
                 if (isCurrentEpisode) {

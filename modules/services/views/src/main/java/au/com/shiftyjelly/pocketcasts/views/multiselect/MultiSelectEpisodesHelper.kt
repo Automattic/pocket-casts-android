@@ -7,8 +7,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -33,6 +31,14 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.EpisodeBulkArchivedEvent
+import com.automattic.eventhorizon.EpisodeBulkMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EpisodeBulkMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeBulkStarredEvent
+import com.automattic.eventhorizon.EpisodeBulkUnarchivedEvent
+import com.automattic.eventhorizon.EpisodeBulkUnstarredEvent
+import com.automattic.eventhorizon.EpisodeRemovedListeningHistoryEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
@@ -54,7 +60,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val playbackManager: PlaybackManager,
     val downloadQueue: DownloadQueue,
     val settings: Settings,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val shareDialogFactory: ShareDialogFactory,
@@ -205,7 +211,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
 
             episodeManager.markAllAsPlayed(list, playbackManager, podcastManager)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_PLAYED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkMarkedAsPlayedEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             launch(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_played_singular, LR.string.marked_as_played_plural)
                 showSnackBar(snackText)
@@ -224,7 +235,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             val list = selectedList.toList()
 
             episodeManager.markAsUnplayed(list)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_UNPLAYED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkMarkedAsUnplayedEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             launch(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_unplayed_singular, LR.string.marked_as_unplayed_plural)
                 showSnackBar(snackText)
@@ -247,7 +263,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
 
             episodeManager.archiveAllInList(list, playbackManager)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkArchivedEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.archived_episodes_singular, LR.string.archived_episodes_plural)
                 showSnackBar(snackText)
@@ -266,7 +287,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
 
             episodeManager.unarchiveAllInListBlocking(episodes = list)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkUnarchivedEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.unarchived_episodes_singular, LR.string.unarchived_episodes_plural)
                 showSnackBar(snackText)
@@ -284,7 +310,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
         launch {
             val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = true)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_STARRED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkStarredEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.starred_episodes_singular, LR.string.starred_episodes_plural)
                 showSnackBar(snackText)
@@ -302,7 +333,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
         launch {
             val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = false)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNSTARRED, source, list.size)
+            eventHorizon.track(
+                EpisodeBulkUnstarredEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.unstarred_episodes_singular, LR.string.unstarred_episodes_plural)
                 showSnackBar(snackText)
@@ -320,7 +356,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
         launch {
             val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.clearEpisodeHistory(list)
-            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_REMOVED_LISTENING_HISTORY, source, list.size)
+            eventHorizon.track(
+                EpisodeRemovedListeningHistoryEvent(
+                    count = list.size.toLong(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.remove_listening_history_episodes_singular, LR.string.remove_listening_history_episodes_plural)
                 showSnackBar(snackText)

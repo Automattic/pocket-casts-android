@@ -9,8 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.combine
@@ -42,6 +40,11 @@ import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
 import coil3.toBitmap
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeUnarchivedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -76,7 +79,7 @@ class EpisodeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val downloadQueue: DownloadQueue,
     private val downloadProgressCache: DownloadProgressCache,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
@@ -382,21 +385,20 @@ class EpisodeViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            if (episode.isArchived) {
+            val event = if (episode.isArchived) {
                 episodeManager.unarchiveBlocking(episode)
-                episodeAnalytics.trackEvent(
-                    AnalyticsEvent.EPISODE_UNARCHIVED,
-                    sourceView,
-                    episode.uuid,
+                EpisodeUnarchivedEvent(
+                    episodeUuid = episode.uuid,
+                    source = sourceView.eventHorizonValue,
                 )
             } else {
                 episodeManager.archiveBlocking(episode, playbackManager)
-                episodeAnalytics.trackEvent(
-                    AnalyticsEvent.EPISODE_ARCHIVED,
-                    sourceView,
-                    episode.uuid,
+                EpisodeArchivedEvent(
+                    episodeUuid = episode.uuid,
+                    source = sourceView.eventHorizonValue,
                 )
             }
+            eventHorizon.track(event)
         }
     }
 
@@ -418,12 +420,18 @@ class EpisodeViewModel @Inject constructor(
             (stateFlow.value as? State.Loaded)?.episode?.let { episode ->
                 val event = if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
                     episodeManager.markAsNotPlayedBlocking(episode)
-                    AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
+                    EpisodeMarkedAsUnplayedEvent(
+                        episodeUuid = episode.uuid,
+                        source = sourceView.eventHorizonValue,
+                    )
                 } else {
                     episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
-                    AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
+                    EpisodeMarkedAsPlayedEvent(
+                        episodeUuid = episode.uuid,
+                        source = sourceView.eventHorizonValue,
+                    )
                 }
-                episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
+                eventHorizon.track(event)
             }
         }
     }

@@ -37,20 +37,6 @@ class ShowNotesManager @Inject constructor(
         },
     )
 
-    suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(
-        podcastUuid = podcastUuid,
-        episodeUuid = episodeUuid,
-        processShowNotes = { showNotes ->
-            scope.launch {
-                showNotesProcessor.process(
-                    podcastUuid = podcastUuid,
-                    episodeUuid = episodeUuid,
-                    showNotes = showNotes,
-                )
-            }
-        },
-    )
-
     suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
         showNotesServiceManager.downloadToCacheShowNotes(
             podcastUuid = podcastUuid,
@@ -69,4 +55,18 @@ class ShowNotesManager @Inject constructor(
             },
         )
     }
+
+    suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(
+        podcastUuid = podcastUuid,
+        episodeUuid = episodeUuid,
+        processShowNotes = { showNotes ->
+            scope.launch {
+                showNotesProcessor.process(
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    showNotes = showNotes,
+                )
+            }
+        },
+    )
 }

@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
@@ -25,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
 import java.util.Calendar
 import java.util.Date
@@ -88,7 +88,7 @@ class AutoArchiveTest {
             podcastCacheServiceManager = podcastCacheServiceManager,
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = testDispatcher,
-            episodeAnalytics = EpisodeAnalytics(AnalyticsTracker.test()),
+            eventHorizon = EventHorizon(TestEventSink()),
         )
     }
 

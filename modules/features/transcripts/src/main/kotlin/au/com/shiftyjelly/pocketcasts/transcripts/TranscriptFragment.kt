@@ -21,6 +21,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -37,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.EpisodeTranscriptShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -80,13 +82,13 @@ class TranscriptFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         CallOnce {
-            viewModel.track(
-                AnalyticsEvent.EPISODE_TRANSCRIPT_SHOWN,
-                buildMap {
-                    put("episode_uuid", args.episodeUuid)
-                    args.podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
-                },
-            )
+            viewModel.track { source, _, _ ->
+                EpisodeTranscriptShownEvent(
+                    episodeUuid = args.episodeUuid,
+                    podcastUuid = args.podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                    source = source,
+                )
+            }
         }
 
         DialogBox {
