@@ -186,7 +186,7 @@ class FolderAdapter(
             button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
-            podcastTitle.hide()
+            podcastTitle.showIf(isListLayout)
             author?.text = podcast.author
 
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
@@ -216,8 +216,10 @@ class FolderAdapter(
                 .newBuilder()
                 .listener(
                     onSuccess = { _, _ ->
-                        podcastTitle.hide()
-                        podcastOverlay?.hide()
+                        if (!isListLayout) {
+                            podcastTitle.hide()
+                            podcastOverlay?.hide()
+                        }
                     },
                     onError = { _, _ ->
                         if (!isListLayout) {
