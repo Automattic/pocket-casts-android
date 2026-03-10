@@ -710,7 +710,7 @@ class PlayerViewModel @Inject constructor(
             source = upNextSource,
             removeNowPlaying = false,
             playbackManager = playbackManager,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = eventHorizon,
             context = context,
         )
         val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextSource != UpNextSource.UP_NEXT_TAB

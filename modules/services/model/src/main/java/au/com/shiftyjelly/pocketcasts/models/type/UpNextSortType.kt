@@ -2,14 +2,15 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import com.automattic.eventhorizon.UpNextSortOrderType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class UpNextSortType(
-    val analyticsValue: String,
+    val eventHorizonValue: UpNextSortOrderType,
     @StringRes val descriptionId: Int,
 ) : Comparator<BaseEpisode> {
     NewestToOldest(
-        analyticsValue = "newest_to_oldest",
+        eventHorizonValue = UpNextSortOrderType.NewestToOldest,
         descriptionId = LR.string.sort_newest_to_oldest,
     ) {
         private val comparatorDelegate = Comparator.comparing(BaseEpisode::publishedDate)
@@ -20,7 +21,7 @@ enum class UpNextSortType(
         }
     },
     OldestToNewest(
-        analyticsValue = "oldest_to_newest",
+        eventHorizonValue = UpNextSortOrderType.OldestToNewest,
         descriptionId = LR.string.sort_oldest_to_newest,
     ) {
         private val comparatorDelegate = Comparator.comparing(BaseEpisode::publishedDate)
