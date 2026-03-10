@@ -30,6 +30,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 /**
@@ -50,6 +52,7 @@ internal class Media3SessionCallback(
     private val scope: CoroutineScope,
     private val contextProvider: () -> Context,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+    internal val commandMutex: Mutex = Mutex(),
 ) : MediaSession.Callback {
 
     private val mediaEventQueue = MediaEventQueue(scope = scope)
@@ -96,36 +99,52 @@ internal class Media3SessionCallback(
     ): ListenableFuture<SessionResult> {
         when (customCommand.customAction) {
             APP_ACTION_SKIP_BACK -> scope.launch {
-                try {
-                    playbackManager.skipBackwardSuspend()
-                } catch (e: Exception) {
-                    Timber.e(e, "Skip back failed")
+                commandMutex.withLock {
+                    try {
+                        playbackManager.skipBackwardSuspend()
+                    } catch (e: Exception) {
+                        Timber.e(e, "Skip back failed")
+                    }
                 }
             }
 
             APP_ACTION_SKIP_FWD -> scope.launch {
-                try {
-                    playbackManager.skipForwardSuspend()
-                } catch (e: Exception) {
-                    Timber.e(e, "Skip forward failed")
+                commandMutex.withLock {
+                    try {
+                        playbackManager.skipForwardSuspend()
+                    } catch (e: Exception) {
+                        Timber.e(e, "Skip forward failed")
+                    }
                 }
             }
 
-            APP_ACTION_MARK_AS_PLAYED -> actions.markAsPlayed()
+            APP_ACTION_MARK_AS_PLAYED -> scope.launch {
+                commandMutex.withLock { actions.markAsPlayed() }
+            }
 
-            APP_ACTION_STAR -> actions.starEpisode()
+            APP_ACTION_STAR -> scope.launch {
+                commandMutex.withLock { actions.starEpisode() }
+            }
 
-            APP_ACTION_UNSTAR -> actions.unstarEpisode()
+            APP_ACTION_UNSTAR -> scope.launch {
+                commandMutex.withLock { actions.unstarEpisode() }
+            }
 
-            APP_ACTION_CHANGE_SPEED -> actions.changePlaybackSpeed()
+            APP_ACTION_CHANGE_SPEED -> scope.launch {
+                commandMutex.withLock { actions.changePlaybackSpeed() }
+            }
 
-            APP_ACTION_ARCHIVE -> actions.archive()
+            APP_ACTION_ARCHIVE -> scope.launch {
+                commandMutex.withLock { actions.archive() }
+            }
 
             APP_ACTION_PLAY_NEXT -> scope.launch {
-                try {
-                    playbackManager.playNextInQueue()
-                } catch (e: Exception) {
-                    Timber.e(e, "Play next failed")
+                commandMutex.withLock {
+                    try {
+                        playbackManager.playNextInQueue()
+                    } catch (e: Exception) {
+                        Timber.e(e, "Play next failed")
+                    }
                 }
             }
         }

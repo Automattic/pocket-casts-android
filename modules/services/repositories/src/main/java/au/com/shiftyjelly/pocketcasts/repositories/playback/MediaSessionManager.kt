@@ -47,6 +47,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -87,6 +89,7 @@ class MediaSessionManager(
     val disposables = CompositeDisposable()
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val commandMutex = Mutex()
 
     internal val actions = MediaSessionActions(
         playbackManager = playbackManager,
@@ -138,19 +141,27 @@ class MediaSessionManager(
 
         forwardingPlayer = PocketCastsForwardingPlayer(
             wrappedPlayer = placeholder,
-            onSkipForward = { scope.launch { playbackManager.skipForwardSuspend() } },
-            onSkipBack = { scope.launch { playbackManager.skipBackwardSuspend() } },
+            onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
+            onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             onStop = {
                 if (playbackManager.player !is CastPlayer) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                    scope.launch { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
+                    scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
                 }
             },
             onPlay = {
-                scope.launch { playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
+                scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
             },
             onPause = {
-                scope.launch { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) }
+                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+            },
+            onSeekTo = { positionMs ->
+                scope.launch {
+                    commandMutex.withLock {
+                        playbackManager.seekToTimeMsSuspend(positionMs.toInt())
+                        playbackManager.trackPlaybackSeek(positionMs.toInt(), source)
+                    }
+                }
             },
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {

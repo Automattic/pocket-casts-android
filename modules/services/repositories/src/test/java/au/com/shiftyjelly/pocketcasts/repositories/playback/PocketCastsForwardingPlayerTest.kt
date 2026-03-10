@@ -434,6 +434,87 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `seekTo delegates to onSeekTo callback`() {
+        var seekPosition: Long? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekTo = { seekPosition = it },
+        )
+
+        player.seekTo(42_000L)
+
+        assertEquals(42_000L, seekPosition)
+        verify(mockPlayer).seekTo(42_000L)
+    }
+
+    @Test
+    fun `seekTo with mediaItemIndex delegates to onSeekTo callback`() {
+        var seekPosition: Long? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekTo = { seekPosition = it },
+        )
+
+        player.seekTo(0, 99_000L)
+
+        assertEquals(99_000L, seekPosition)
+        verify(mockPlayer).seekTo(0, 99_000L)
+    }
+
+    @Test
+    fun `seekTo falls through when no onSeekTo callback`() {
+        forwardingPlayer.seekTo(50_000L)
+
+        verify(mockPlayer).seekTo(50_000L)
+    }
+
+    @Test
+    fun `updateMetadata hides artwork when showArtwork is false`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, showArtwork = false)
+
+        assertNull(forwardingPlayer.mediaMetadata.artworkUri)
+        assertNull(forwardingPlayer.mediaMetadata.artworkData)
+    }
+
+    @Test
+    fun `updateMetadata shows artwork when showArtwork is true`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, showArtwork = true)
+
+        assertEquals(Uri.parse("https://example.com/art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
+    }
+
+    @Test
+    fun `swapPlayer preserves onSeekTo callback`() {
+        var seekPosition: Long? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekTo = { seekPosition = it },
+        )
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = player.swapPlayer(newWrappedPlayer)
+        swapped.seekTo(77_000L)
+
+        assertEquals(77_000L, seekPosition)
+    }
+
+    @Test
     fun `swapPlayer preserves skip lambdas`() {
         var skipForwardCalled = false
         var skipBackCalled = false
