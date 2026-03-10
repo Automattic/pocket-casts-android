@@ -165,6 +165,15 @@ enum class Feature(
         hasDevToggle = true,
     ),
 
+    MEDIA3_SESSION(
+        key = "media3_session",
+        title = "Media3 MediaSession",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
         key = "test_free_feature",

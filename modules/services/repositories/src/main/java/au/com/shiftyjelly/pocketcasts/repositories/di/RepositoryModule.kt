@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelperImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -159,6 +161,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesNotificationHelper(notificationHelperImpl: NotificationHelperImpl): NotificationHelper
+
+    @Binds
+    @Singleton
+    abstract fun providesNotificationDrawer(notificationDrawerImpl: NotificationDrawerImpl): NotificationDrawer
 
     @Binds
     @Singleton

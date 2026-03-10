@@ -233,6 +233,9 @@ open class PlaybackManager @Inject constructor(
         applicationScope = applicationScope,
     )
 
+    val mediaSession: android.support.v4.media.session.MediaSessionCompat?
+        get() = mediaSessionManager.mediaSession
+
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
