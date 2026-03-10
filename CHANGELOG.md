@@ -18,8 +18,6 @@
         ([#5017](https://github.com/Automattic/pocket-casts-android/pull/5017))
     *   Retry playing streamed episodes in case of failures.
         ([#5060](https://github.com/Automattic/pocket-casts-android/pull/5060))
-    *   Optimize battery usage by enabling audio offload mode
-        ([#5059](https://github.com/Automattic/pocket-casts-android/pull/5059))
 *   Bug Fixes
     *   Respect global auto download setting
         ([#5013](https://github.com/Automattic/pocket-casts-android/pull/5013))
