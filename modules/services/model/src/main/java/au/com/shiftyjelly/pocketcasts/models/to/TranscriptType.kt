@@ -1,23 +1,25 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import com.automattic.eventhorizon.TranscriptType as EventHorizonTranscriptType
+
 enum class TranscriptType(
-    val analyticsValue: String,
+    val eventHorizonValue: EventHorizonTranscriptType,
     private val associatedMimeTypes: Set<String>,
 ) {
     Vtt(
-        analyticsValue = "vtt",
+        eventHorizonValue = EventHorizonTranscriptType.Vtt,
         associatedMimeTypes = setOf("text/vtt"),
     ),
     Srt(
-        analyticsValue = "srt",
+        eventHorizonValue = EventHorizonTranscriptType.Srt,
         associatedMimeTypes = setOf("application/srt", "application/x-subrip"),
     ),
     Json(
-        analyticsValue = "json",
+        eventHorizonValue = EventHorizonTranscriptType.Json,
         associatedMimeTypes = setOf("application/json"),
     ),
     Html(
-        analyticsValue = "html",
+        eventHorizonValue = EventHorizonTranscriptType.Html,
         associatedMimeTypes = setOf("text/html"),
     ),
     ;
