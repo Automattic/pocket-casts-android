@@ -155,6 +155,7 @@ open class PlaybackManager @Inject constructor(
     private val upNextHistoryManager: UpNextHistoryManager,
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
+    private val browseTreeProvider: BrowseTreeProvider,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -235,8 +236,12 @@ open class PlaybackManager @Inject constructor(
         context = application,
         eventHorizon = eventHorizon,
         bookmarkManager = bookmarkManager,
+        browseTreeProvider = browseTreeProvider,
         applicationScope = applicationScope,
     )
+
+    val mediaSession: MediaSessionCompat?
+        get() = mediaSessionManager.mediaSession
 
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
@@ -246,9 +251,6 @@ open class PlaybackManager @Inject constructor(
         set(value) {
             _playerFlow.value = value
         }
-
-    val mediaSession: MediaSessionCompat
-        get() = mediaSessionManager.mediaSession
 
     @SuppressLint("CheckResult")
     fun setup() {

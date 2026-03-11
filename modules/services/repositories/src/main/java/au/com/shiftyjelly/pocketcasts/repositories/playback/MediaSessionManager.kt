@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -36,9 +35,9 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.automattic.eventhorizon.EpisodeArchivedEvent
-import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -54,6 +53,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -63,7 +63,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -77,6 +77,7 @@ class MediaSessionManager(
     val context: Context,
     val eventHorizon: EventHorizon,
     val bookmarkManager: BookmarkManager,
+    val browseTreeProvider: BrowseTreeProvider,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -101,11 +102,29 @@ class MediaSessionManager(
         }
     }
 
-    val mediaSession = MediaSessionCompat(context, "PocketCastsMediaSession")
+    internal val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
+    internal val scope: CoroutineScope = CoroutineScope(applicationScope.coroutineContext + SupervisorJob())
+    internal val commandMutex = Mutex()
+
+    var mediaSession: MediaSessionCompat? = null
+        private set
     val disposables = CompositeDisposable()
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
     private var bookmarkHelper: BookmarkHelper
+
+    internal val actions = MediaSessionActions(
+        playbackManager = playbackManager,
+        podcastManager = podcastManager,
+        episodeManager = episodeManager,
+        playlistManager = playlistManager,
+        settings = settings,
+        eventHorizon = eventHorizon,
+        scope = scope,
+        onSearchFailed = { message ->
+            launch(Dispatchers.Main) { errorPlaybackState(message) }
+        },
+    )
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -116,30 +135,35 @@ class MediaSessionManager(
     )
 
     init {
-        mediaSession.setCallback(
-            MediaSessionCallback(
-                playbackManager,
-                episodeManager,
-                enqueueCommand = { tag, command ->
-                    val added = commandQueue.tryEmit(Pair(tag, command))
-                    if (added) {
-                        Timber.i("Added command to queue: $tag")
-                    } else {
-                        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
-                    }
-                },
-            ),
-        )
+        if (!useMedia3Session) {
+            val session = MediaSessionCompat(context, "PocketCastsMediaSession")
+            session.setCallback(
+                MediaSessionCallback(
+                    playbackManager,
+                    episodeManager,
+                    enqueueCommand = { tag, command ->
+                        val added = commandQueue.tryEmit(Pair(tag, command))
+                        if (added) {
+                            Timber.i("Added command to queue: $tag")
+                        } else {
+                            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
+                        }
+                    },
+                ),
+            )
 
-        if (!Util.isAutomotive(context)) { // We can't start activities on automotive
-            mediaSession.setSessionActivity(context.getLaunchActivityPendingIntent())
+            if (!Util.isAutomotive(context)) { // We can't start activities on automotive
+                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+            }
+            session.setRatingType(RatingCompat.RATING_HEART)
+
+            // this tells the session not to shuffle all our buttons over one when there's no playlist currently loaded. This keeps our skip buttons on either side of play/pause
+            val extras = Bundle()
+            extras.putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
+            session.setExtras(extras)
+
+            mediaSession = session
         }
-        mediaSession.setRatingType(RatingCompat.RATING_HEART)
-
-        // this tells the session not to shuffle all our buttons over one when there's no playlist currently loaded. This keeps our skip buttons on either side of play/pause
-        val extras = Bundle()
-        extras.putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
-        mediaSession.setExtras(extras)
 
         bookmarkHelper = BookmarkHelper(
             playbackManager,
@@ -147,7 +171,9 @@ class MediaSessionManager(
             settings,
         )
 
-        connect()
+        if (!useMedia3Session) {
+            connect()
+        }
 
         applicationScope.launch {
             commandQueue.collect { (tag, command) ->
@@ -158,6 +184,7 @@ class MediaSessionManager(
     }
 
     fun startObserving() {
+        if (useMedia3Session) return
         observePlaybackState()
         observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
@@ -215,12 +242,12 @@ class MediaSessionManager(
 
     private fun updatePlaybackState(playbackState: PlaybackStateCompat) {
         Timber.i("MediaSession playback state. $playbackState")
-        mediaSession.setPlaybackState(playbackState)
+        mediaSession?.setPlaybackState(playbackState)
     }
 
     private fun getPlaybackStateCompat(playbackState: PlaybackState, currentEpisode: BaseEpisode?): PlaybackStateCompat {
         if (playbackState.isError) {
-            mediaSession.isActive = false
+            mediaSession?.isActive = false
             return PlaybackStateCompat.Builder()
                 .setState(PlaybackStateCompat.STATE_ERROR, 0, 0f)
                 .setErrorMessage(PlaybackStateCompat.ERROR_CODE_APP_ERROR, playbackState.lastErrorMessage)
@@ -228,7 +255,7 @@ class MediaSessionManager(
         }
 
         if (playbackState.isPlaying || playbackState.transientLoss) {
-            mediaSession.isActive = true
+            mediaSession?.isActive = true
         }
 
         if (playbackState.isEmpty || currentEpisode == null) {
@@ -298,7 +325,7 @@ class MediaSessionManager(
 
     private fun updateUpNext(upNext: UpNextQueue.State, useEpisodeArtwork: Boolean) {
         try {
-            mediaSession.setQueueTitle("Up Next")
+            mediaSession?.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
                 updateMetadata(upNext.episode, useEpisodeArtwork)
 
@@ -317,10 +344,10 @@ class MediaSessionManager(
 
                     return@map MediaSessionCompat.QueueItem(description, episode.adapterId)
                 }
-                mediaSession.setQueue(items)
+                mediaSession?.setQueue(items)
             } else {
                 updateMetadata(null, useEpisodeArtwork)
-                mediaSession.setQueue(emptyList())
+                mediaSession?.setQueue(emptyList())
 
                 val playbackStateCompat = getPlaybackStateCompat(PlaybackState(state = PlaybackState.State.EMPTY), currentEpisode = null)
                 updatePlaybackState(playbackStateCompat)
@@ -381,7 +408,7 @@ class MediaSessionManager(
     private fun updateMetadata(episode: BaseEpisode?, useEpisodeArtwork: Boolean) {
         if (episode == null) {
             Timber.i("MediaSession metadata. Nothing Playing.")
-            mediaSession.setMetadata(NOTHING_PLAYING)
+            mediaSession?.setMetadata(NOTHING_PLAYING)
             return
         }
 
@@ -423,7 +450,7 @@ class MediaSessionManager(
         }
 
         val nowPlaying = nowPlayingBuilder.build()
-        mediaSession.setMetadata(nowPlaying)
+        mediaSession?.setMetadata(nowPlaying)
     }
 
     private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: BaseEpisode, playbackState: PlaybackState) {
@@ -584,8 +611,8 @@ class MediaSessionManager(
 
         private fun logEvent(action: String) {
             val userInfo = runCatching {
-                val info = mediaSession.currentControllerInfo
-                "Controller: ${info.packageName} pid: ${info.pid} uid: ${info.uid}"
+                val info = mediaSession?.currentControllerInfo
+                "Controller: ${info?.packageName} pid: ${info?.pid} uid: ${info?.uid}"
             }.getOrNull()
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
@@ -759,172 +786,19 @@ class MediaSessionManager(
         }
     }
 
-    private fun markAsPlayed() {
-        launch {
-            val episode = playbackManager.getCurrentEpisode()
-            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
-            episode?.let {
-                eventHorizon.track(
-                    EpisodeMarkedAsPlayedEvent(
-                        episodeUuid = it.uuid,
-                        source = source.eventHorizonValue,
-                    ),
-                )
-            }
-        }
-    }
+    private fun markAsPlayed() = actions.markAsPlayed()
 
-    private fun starEpisode() {
-        launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isStarred = true
-                    episodeManager.starEpisode(episode = it, starred = true, sourceView = source)
-                }
-            }
-        }
-    }
+    private fun starEpisode() = actions.starEpisode()
 
-    private fun unstarEpisode() {
-        launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isStarred = false
-                    episodeManager.starEpisode(episode = it, starred = false, sourceView = source)
-                }
-            }
-        }
-    }
+    private fun unstarEpisode() = actions.unstarEpisode()
 
-    private fun changePlaybackSpeed() {
-        launch {
-            val newSpeed = when (playbackManager.getPlaybackSpeed()) {
-                in 0.0..<0.60 -> 0.6
-                in 0.60..<0.80 -> 0.8
-                in 0.80..<1.00 -> 1.0
-                in 1.00..<1.20 -> 1.2
-                in 1.20..<1.40 -> 1.4
-                in 1.40..<1.60 -> 1.6
-                in 1.60..<1.80 -> 1.8
-                in 1.80..<2.00 -> 2.0
-                in 2.00..<3.00 -> 3.0
-                in 3.00..<3.05 -> 0.6
-                else -> 1.0
-            }
+    private fun changePlaybackSpeed() = actions.changePlaybackSpeed()
 
-            val episode = playbackManager.getCurrentEpisode() ?: return@launch
-            if (episode is PodcastEpisode) {
-                // update per podcast playback speed
-                val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
-                if (podcast != null && podcast.overrideGlobalEffects) {
-                    podcast.playbackSpeed = newSpeed
-                    podcastManager.updatePlaybackSpeedBlocking(podcast = podcast, speed = newSpeed)
-                    playbackManager.updatePlayerEffects(effects = podcast.playbackEffects)
-                    return@launch
-                }
-            }
-            // update global playback speed
-            val effects = settings.globalPlaybackEffects.value
-            effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
-            playbackManager.updatePlayerEffects(effects = effects)
-        }
-    }
+    private fun archive() = actions.archive()
 
-    private fun archive() {
-        launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isArchived = true
-                    episodeManager.archiveBlocking(it, playbackManager)
-                    eventHorizon.track(
-                        EpisodeArchivedEvent(
-                            episodeUuid = it.uuid,
-                            source = source.eventHorizonValue,
-                        ),
-                    )
-                }
-            }
-        }
-    }
+    fun playFromSearchExternal(query: String) = actions.performPlayFromSearch(query)
 
-    fun playFromSearchExternal(query: String) {
-        performPlayFromSearch(query)
-    }
-
-    /**
-     * Test the search using the following terminal command
-     * adb shell am start -a android.media.action.MEDIA_PLAY_FROM_SEARCH -p au.com.shiftyjelly.pocketcasts -n au.com.shiftyjelly.pocketcasts/.ui.MainActivity --es query "next\ episode\ in"
-     * In the debug you can use the following
-     * adb shell am start -a android.media.action.MEDIA_PLAY_FROM_SEARCH -p au.com.shiftyjelly.pocketcasts.debug --es query "The\ Daily\ in"
-     * Say the phrase ‘OK, Google’ followed by one of the following
-     * ‘Listen to [podcast name] in Pocket Casts’
-     * ‘Listen to [filter name] in Pocket Casts’
-     * ‘Listen to Up Next in Pocket Casts’
-     * ‘Play Up Next in Pocket Casts’
-     * ‘Play New Releases Next in Pocket Casts’
-     */
-    private fun performPlayFromSearch(searchTerm: String?) {
-        Timber.d("performSearch $searchTerm")
-        val query: String = searchTerm?.trim { it <= ' ' }?.lowercase() ?: return
-
-        Timber.i("performPlayFromSearch query: $query")
-
-        val sourceView = SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
-        launch {
-            if (query.startsWith("up next")) {
-                playbackManager.playQueue(sourceView = sourceView)
-                return@launch
-            }
-
-            if (query.startsWith("next episode") || query.startsWith("next podcast")) {
-                val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
-                queueEpisodes.firstOrNull()?.let { episode ->
-                    launch { playbackManager.playNext(episode = episode, source = source) }
-                    return@launch
-                }
-            }
-
-            val options = calculateSearchQueryOptions(query)
-            for (option in options) {
-                val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
-                if (matchingPodcast != null) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
-                    playPodcast(podcast = matchingPodcast, sourceView = sourceView)
-                    return@launch
-                }
-            }
-
-            for (option in options) {
-                val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
-                playbackManager.playNow(episode = matchingEpisode, sourceView = sourceView)
-                return@launch
-            }
-
-            for (option in options) {
-                val playlist = runBlocking {
-                    val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
-                    val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) } ?: return@runBlocking null
-
-                    playlistManager.smartPlaylistFlow(playlistPreview.uuid).first() ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
-                } ?: continue
-
-                val episodes = playlist.episodes.mapNotNull(PlaylistEpisode::toPodcastEpisode)
-                if (episodes.isEmpty()) {
-                    return@launch
-                }
-                playEpisodes(episodes, sourceView)
-                return@launch
-            }
-
-            withContext(Dispatchers.Main) {
-                Timber.i("No search results")
-                // couldn't find a match if we get here
-                errorPlaybackState("No search results")
-            }
-        }
-    }
+    private fun performPlayFromSearch(searchTerm: String?) = actions.performPlayFromSearch(searchTerm)
 
     private fun errorPlaybackState(message: String) {
         val stateBuilder = PlaybackStateCompat.Builder()
@@ -933,24 +807,17 @@ class MediaSessionManager(
             .setActions(getSupportedActions(PlaybackState()))
 
         Timber.i("MediaSession playback state. Error: $message")
-        mediaSession.setPlaybackState(stateBuilder.build())
+        mediaSession?.setPlaybackState(stateBuilder.build())
     }
 
     private fun performPlayFromSearchRx(searchTerm: String?): Completable {
-        return Completable.fromAction { performPlayFromSearch(searchTerm) }
+        return actions.performPlayFromSearchRx(searchTerm)
     }
 
-    private fun playEpisodes(episodes: List<PodcastEpisode>, sourceView: SourceView) {
-        if (episodes.isEmpty()) {
-            return
-        }
-
-        playbackManager.playEpisodes(episodes = episodes, sourceView = sourceView)
-    }
-
-    private suspend fun playPodcast(podcast: Podcast, sourceView: SourceView = SourceView.UNKNOWN) {
-        val latestEpisode = withContext(Dispatchers.Default) { episodeManager.findLatestUnfinishedEpisodeByPodcastBlocking(podcast) } ?: return
-        playbackManager.playNow(episode = latestEpisode, sourceView = sourceView)
+    fun release() {
+        disposables.clear()
+        scope.cancel()
+        mediaSession?.release()
     }
 
     private fun useCustomSkipButtons(): Boolean {
@@ -961,14 +828,14 @@ class MediaSessionManager(
 
 typealias QueuedCommand = Pair<String, suspend () -> Unit>
 
-private const val APP_ACTION_STAR = "star"
-private const val APP_ACTION_UNSTAR = "unstar"
-private const val APP_ACTION_SKIP_BACK = "jumpBack"
-private const val APP_ACTION_SKIP_FWD = "jumpFwd"
-private const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
-private const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
-private const val APP_ACTION_ARCHIVE = "archive"
-private const val APP_ACTION_PLAY_NEXT = "playNext"
+internal const val APP_ACTION_STAR = "star"
+internal const val APP_ACTION_UNSTAR = "unstar"
+internal const val APP_ACTION_SKIP_BACK = "jumpBack"
+internal const val APP_ACTION_SKIP_FWD = "jumpFwd"
+internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
+internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
+internal const val APP_ACTION_ARCHIVE = "archive"
+internal const val APP_ACTION_PLAY_NEXT = "playNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

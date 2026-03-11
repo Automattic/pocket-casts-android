@@ -177,7 +177,7 @@ open class PlaybackService :
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback service created")
 
-        val mediaSession = playbackManager.mediaSession
+        val mediaSession = playbackManager.mediaSession ?: return
         sessionToken = mediaSession.sessionToken
 
         mediaController = MediaControllerCompat(this, mediaSession)
