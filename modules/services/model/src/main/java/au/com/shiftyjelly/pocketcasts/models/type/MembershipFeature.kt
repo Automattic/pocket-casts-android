@@ -15,7 +15,7 @@ data class Membership(
         subscription?.tier == SubscriptionTier.Plus -> UserType.Paid
         subscription?.tier == SubscriptionTier.Patron -> UserType.Paid
         createdAt != null -> UserType.Free
-        else -> UserType.Free
+        else -> UserType.Unsigned
     }
 
     fun hasFeature(feature: MembershipFeature): Boolean {
