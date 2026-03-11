@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewFeaturesAndTipsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -11,6 +9,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SuggestedFoldersCreateCustomFolderTappedEvent
+import com.automattic.eventhorizon.SuggestedFoldersPageDismissedEvent
+import com.automattic.eventhorizon.SuggestedFoldersPageShownEvent
+import com.automattic.eventhorizon.SuggestedFoldersPreviewFolderTappedEvent
+import com.automattic.eventhorizon.SuggestedFoldersReplaceFoldersConfirmTappedEvent
+import com.automattic.eventhorizon.SuggestedFoldersReplaceFoldersTappedEvent
+import com.automattic.eventhorizon.SuggestedFoldersUseSuggestedFoldersTappedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -35,7 +41,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val podcastManager: PodcastManager,
     private val userManager: UserManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
 ) : ViewModel() {
 
@@ -106,69 +112,62 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     }
 
     fun trackPageShown() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_SHOWN,
-            mapOf(
-                "source" to source.analyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersPageShownEvent(
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackPageDismissed() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_DISMISSED,
-            mapOf(
-                "source" to source.analyticsValue,
-                "user_type" to state.value.userTypeAnalyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersPageDismissedEvent(
+                userType = state.value.signInState.eventHorizonValue,
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackUseSuggestedFoldersTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
-                "user_type" to state.value.userTypeAnalyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersUseSuggestedFoldersTappedEvent(
+                userType = state.value.signInState.eventHorizonValue,
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackCreateCustomFolderTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
-                "user_type" to state.value.userTypeAnalyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersCreateCustomFolderTappedEvent(
+                userType = state.value.signInState.eventHorizonValue,
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackReplaceFolderTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersReplaceFoldersTappedEvent(
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackReplaceFoldersConfirmationTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
+        eventHorizon.track(
+            SuggestedFoldersReplaceFoldersConfirmTappedEvent(
+                source = source.eventHorizonValue,
             ),
         )
     }
 
     fun trackPreviewFolderTapped(folder: SuggestedFolder) {
-        analyticsTracker.track(
-            AnalyticsEvent.SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED,
-            mapOf(
-                "source" to source.analyticsValue,
-                "folder_name" to folder.name,
-                "podcast_count" to folder.podcastIds.size,
+        eventHorizon.track(
+            SuggestedFoldersPreviewFolderTappedEvent(
+                folderName = folder.name,
+                podcastCount = folder.podcastIds.size.toLong(),
+                source = source.eventHorizonValue,
             ),
         )
     }
@@ -192,12 +191,6 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
                 }
             } else {
                 SuggestedAction.UseFolders
-            }
-
-        val userTypeAnalyticsValue
-            get() = when (signInState) {
-                is SignInState.SignedOut -> "unsigned"
-                is SignInState.SignedIn -> if (signInState.subscription == null) "free" else "paid"
             }
 
         companion object {

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import com.automattic.eventhorizon.UserType
 import java.time.Instant
 
 sealed interface SignInState {
@@ -25,6 +26,8 @@ sealed interface SignInState {
 
     val isExpiredTrial: Boolean
 
+    val eventHorizonValue: UserType
+
     data class SignedIn(
         val email: String,
         val subscription: Subscription?,
@@ -46,6 +49,13 @@ sealed interface SignInState {
 
         override val isExpiredTrial: Boolean
             get() = subscription?.platform == SubscriptionPlatform.Gift && subscription.expiryDate < Instant.now()
+
+        override val eventHorizonValue: UserType
+            get() = if (subscription == null) {
+                UserType.Free
+            } else {
+                UserType.Paid
+            }
     }
 
     data object SignedOut : SignInState {
@@ -66,5 +76,8 @@ sealed interface SignInState {
 
         override val isExpiredTrial: Boolean
             get() = false
+
+        override val eventHorizonValue: UserType
+            get() = UserType.Unsigned
     }
 }
