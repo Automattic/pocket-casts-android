@@ -127,7 +127,6 @@ class StatsViewModel @Inject constructor(
             inAppReviewHelper.launchReviewDialog(
                 activity = activity,
                 delayInMs = IN_APP_REVIEW_LAUNCH_DELAY_IN_MS,
-                sourceView = SourceView.STATS,
             )
         }
     }

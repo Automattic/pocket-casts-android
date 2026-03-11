@@ -1,12 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.images.PocketCastsIcons
 import au.com.shiftyjelly.pocketcasts.images.icons.StarEmpty
 import au.com.shiftyjelly.pocketcasts.images.icons.StarFull
@@ -14,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.images.icons.StarHalf
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.RatingStarsTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
@@ -30,10 +29,9 @@ import timber.log.Timber
 private const val MAX_STARS = 5
 
 @HiltViewModel
-class PodcastRatingsViewModel
-@Inject constructor(
+class PodcastRatingsViewModel @Inject constructor(
     private val ratingsManager: RatingsManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel(),
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -66,13 +64,10 @@ class PodcastRatingsViewModel
     fun onRatingStarsTapped(
         podcastUuid: String,
         fragmentManager: FragmentManager,
-        source: RatingTappedSource,
     ) {
-        analyticsTracker.track(
-            AnalyticsEvent.RATING_STARS_TAPPED,
-            mapOf(
-                "uuid" to podcastUuid,
-                "source" to source.analyticsValue,
+        eventHorizon.track(
+            RatingStarsTappedEvent(
+                uuid = podcastUuid,
             ),
         )
         val fragment = GiveRatingFragment.newInstance(podcastUuid)
@@ -128,10 +123,5 @@ class PodcastRatingsViewModel
         FilledStar(PocketCastsIcons.StarFull),
         HalfStar(PocketCastsIcons.StarHalf),
         BorderedStar(PocketCastsIcons.StarEmpty),
-    }
-
-    enum class RatingTappedSource(val analyticsValue: String) {
-        BUTTON("button"),
-        STARS("stars"),
     }
 }

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import com.automattic.eventhorizon.UserType
 import com.squareup.moshi.JsonClass
 import java.time.Instant
 
@@ -10,6 +11,13 @@ data class Membership(
     val createdAt: Instant?,
     val features: List<MembershipFeature>,
 ) {
+    val eventHorizonValue get() = when {
+        subscription?.tier == SubscriptionTier.Plus -> UserType.Paid
+        subscription?.tier == SubscriptionTier.Patron -> UserType.Paid
+        createdAt != null -> UserType.Free
+        else -> UserType.Free
+    }
+
     fun hasFeature(feature: MembershipFeature): Boolean {
         val isSubscriptionFeature = subscription?.tier?.hasFeature(feature) == true
         return isSubscriptionFeature || feature in features

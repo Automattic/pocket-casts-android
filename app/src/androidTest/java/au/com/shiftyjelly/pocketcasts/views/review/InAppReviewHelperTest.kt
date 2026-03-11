@@ -2,10 +2,11 @@ package au.com.shiftyjelly.pocketcasts.views.review
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.testing.FakeReviewManager
 import java.util.Date
@@ -55,14 +56,13 @@ class InAppReviewHelperTest {
         inAppReviewHelper.launchReviewDialog(
             activity = mock(),
             delayInMs = 100,
-            sourceView = SourceView.UNKNOWN,
         )
     }
 
     private fun initInAppReviewHelper() {
         inAppReviewHelper = InAppReviewHelper(
             settings = settings,
-            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             reviewManager = reviewManager,
             crashLogging = FakeCrashLogging(),
         )

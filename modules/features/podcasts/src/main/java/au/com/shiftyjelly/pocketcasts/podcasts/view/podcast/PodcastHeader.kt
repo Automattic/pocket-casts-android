@@ -112,7 +112,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRating
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil3.compose.rememberAsyncImagePainter
@@ -139,7 +138,7 @@ internal fun PodcastHeader(
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
     onClickCategory: () -> Unit,
-    onClickRating: (RatingTappedSource) -> Unit,
+    onClickRating: () -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
@@ -243,7 +242,7 @@ private fun PodcastControls(
     isHeaderExpanded: Boolean,
     onClickTitle: () -> Unit,
     onClickCategory: () -> Unit,
-    onClickRating: (RatingTappedSource) -> Unit,
+    onClickRating: () -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
@@ -354,7 +353,7 @@ private fun PodcastCategoriesLabel(
 @Composable
 private fun PodcastRatingOrSpacing(
     rating: RatingState,
-    onClickRating: (RatingTappedSource) -> Unit,
+    onClickRating: () -> Unit,
 ) {
     SubcomposeLayout { constraints ->
         val anyRating = RatingState.Loaded(

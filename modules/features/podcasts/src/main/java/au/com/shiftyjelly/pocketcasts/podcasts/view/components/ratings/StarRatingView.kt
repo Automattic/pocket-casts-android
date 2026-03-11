@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -27,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PodcastRating(
     state: RatingState.Loaded,
-    onClick: (RatingTappedSource) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val starsContentDescription = stringResource(LR.string.podcast_star_rating_content_description)
@@ -35,7 +34,7 @@ fun PodcastRating(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .clickable { onClick(RatingTappedSource.STARS) }
+            .clickable { onClick() }
             .semantics {
                 this.contentDescription = starsContentDescription
             }

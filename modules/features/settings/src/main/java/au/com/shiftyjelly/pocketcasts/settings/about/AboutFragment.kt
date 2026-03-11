@@ -51,8 +51,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -73,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LegalAndMoreRowType
+import com.automattic.eventhorizon.RateUsTappedEvent
 import com.automattic.eventhorizon.SettingsAboutAutomatticFamilyTappedEvent
 import com.automattic.eventhorizon.SettingsAboutInstagramTappedEvent
 import com.automattic.eventhorizon.SettingsAboutLegalAndMoreTappedEvent
@@ -90,8 +89,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class AboutFragment : BaseFragment() {
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var eventHorizon: EventHorizon
 
@@ -120,7 +117,11 @@ class AboutFragment : BaseFragment() {
                 onBackPress = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 onRateUsClick = {
-                    analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
+                    eventHorizon.track(
+                        RateUsTappedEvent(
+                            source = SourceView.ABOUT.eventHorizonValue,
+                        ),
+                    )
                 },
                 onShareWithFriendsClick = {
                     eventHorizon.track(SettingsAboutShareWithFriendsTappedEvent)
