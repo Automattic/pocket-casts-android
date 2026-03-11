@@ -1,23 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FreeUpSpaceManageDownloadsTappedEvent
+import com.automattic.eventhorizon.FreeUpSpaceMaybeLaterTappedEvent
+import com.automattic.eventhorizon.FreeUpSpaceModalShownEvent
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class LowStorageDialogPresenter(
     val context: Context,
-    val analyticsTracker: AnalyticsTracker,
+    val eventHorizon: EventHorizon,
     val settings: Settings,
 ) {
-
     suspend fun shouldShow(downloadedFiles: Long): Boolean = isDeviceRunningOnLowStorage() &&
         downloadedFiles != 0L &&
         settings.shouldShowLowStorageModalAfterSnooze()
@@ -29,7 +30,11 @@ class LowStorageDialogPresenter(
     ): ConfirmationDialog {
         val formattedTotalDownloadSize = Util.formattedBytes(bytes = totalDownloadSize, context = context)
 
-        analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
+        eventHorizon.track(
+            FreeUpSpaceModalShownEvent(
+                source = sourceView.eventHorizonValue,
+            ),
+        )
 
         return ConfirmationDialog()
             .setTitle(context.getString(LR.string.need_to_free_up_space))
@@ -44,11 +49,19 @@ class LowStorageDialogPresenter(
             .setDisplayConfirmButtonFirst(true)
             .setRemoveSecondaryButtonBorder(true)
             .setOnConfirm {
-                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to sourceView.analyticsValue))
+                eventHorizon.track(
+                    FreeUpSpaceManageDownloadsTappedEvent(
+                        source = sourceView.eventHorizonValue,
+                    ),
+                )
                 onManageDownloadsClick.invoke()
             }
             .setOnSecondary {
-                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
+                eventHorizon.track(
+                    FreeUpSpaceMaybeLaterTappedEvent(
+                        source = sourceView.eventHorizonValue,
+                    ),
+                )
                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())
             }
     }

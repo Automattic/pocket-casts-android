@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
@@ -14,6 +12,11 @@ import au.com.shiftyjelly.pocketcasts.payment.onFailure
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ReferralPassBannerHideTappedEvent
+import com.automattic.eventhorizon.ReferralPassBannerShownEvent
+import com.automattic.eventhorizon.ReferralTooltipShownEvent
+import com.automattic.eventhorizon.ReferralTooltipTappedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -30,7 +33,7 @@ class ReferralsViewModel @Inject constructor(
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
@@ -78,7 +81,7 @@ class ReferralsViewModel @Inject constructor(
 
     fun onTooltipClick() {
         hideTooltip()
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_TAPPED)
+        eventHorizon.track(ReferralTooltipTappedEvent)
     }
 
     private fun hideTooltip() {
@@ -92,20 +95,20 @@ class ReferralsViewModel @Inject constructor(
 
     fun onTooltipShown() {
         if ((_state.value as? UiState.Loaded)?.showTooltip == true) {
-            analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_SHOWN)
+            eventHorizon.track(ReferralTooltipShownEvent)
         }
     }
 
     fun onBannerShown() {
         if ((_state.value as? UiState.Loaded)?.showProfileBanner == true) {
-            analyticsTracker.track(AnalyticsEvent.REFERRAL_PASS_BANNER_SHOWN)
+            eventHorizon.track(ReferralPassBannerShownEvent)
         }
     }
 
     fun onHideBannerClick() {
         (_state.value as? UiState.Loaded)?.let { loadedState ->
             settings.referralClaimCode.set("", updateModifiedAt = false)
-            analyticsTracker.track(AnalyticsEvent.REFERRAL_PASS_BANNER_HIDE_TAPPED)
+            eventHorizon.track(ReferralPassBannerHideTappedEvent)
             _state.update {
                 loadedState.copy(
                     showProfileBanner = false,

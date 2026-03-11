@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
 import com.pocketcasts.service.api.ReferralValidationResponse
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,7 +55,6 @@ class ReferralsClaimGuestPassViewModelTest {
     private val paymentClient = PaymentClient.test(paymentDataSource)
     private val referralManager = mock<ReferralManager>()
     private val userManager = mock<UserManager>()
-    private val analyticsTracker = mock<AnalyticsTracker>()
     private val experimentProvider = mock<ExperimentProvider>()
     private val settings = mock<Settings>()
     private lateinit var viewModel: ReferralsClaimGuestPassViewModel
@@ -312,7 +312,7 @@ class ReferralsClaimGuestPassViewModelTest {
             referralManager = referralManager,
             userManager = userManager,
             settings = settings,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             experimentProvider = experimentProvider,
         )
     }
