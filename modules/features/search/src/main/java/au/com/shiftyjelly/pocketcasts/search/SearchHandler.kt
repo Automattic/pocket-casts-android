@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -19,6 +17,9 @@ import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SearchFailedEvent
+import com.automattic.eventhorizon.SearchPerformedEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -27,7 +28,6 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -50,7 +50,7 @@ class SearchHandler @Inject constructor(
     val userManager: UserManager,
     val settings: Settings,
     private val cacheServiceManager: PodcastCacheServiceManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     folderManager: FolderManager,
 ) {
     private var source: SourceView = SourceView.UNKNOWN
@@ -246,7 +246,11 @@ class SearchHandler @Inject constructor(
             if (it.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
-                analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
+                eventHorizon.track(
+                    SearchPerformedEvent(
+                        source = source.eventHorizonValue,
+                    ),
+                )
                 loadingObservable.accept(true)
 
                 var globalSearch = GlobalServerSearch(searchTerm = it)
@@ -290,7 +294,12 @@ class SearchHandler @Inject constructor(
         if (loading) {
             SearchUiState.SearchOperation.Loading(searchTerm.term)
         } else if (serverSearchResults.error != null) {
-            analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
+            eventHorizon.track(
+                SearchFailedEvent(
+                    term = searchTerm.term,
+                    source = source.eventHorizonValue,
+                ),
+            )
             SearchUiState.SearchOperation.Error(searchTerm = searchTerm.term, error = serverSearchResults.error!!)
         } else if (searchTerm.term.isBlank()) {
             SearchUiState.SearchOperation.Success(searchTerm = searchTerm.term, results = SearchResults.SegregatedResults(podcasts = emptyList(), episodes = emptyList()))
@@ -316,7 +325,12 @@ class SearchHandler @Inject constructor(
     }
         .doOnError { Timber.e(it) }
         .onErrorReturn { exception ->
-            analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
+            eventHorizon.track(
+                SearchFailedEvent(
+                    term = searchQuery.value?.term.orEmpty(),
+                    source = source.eventHorizonValue,
+                ),
+            )
             SearchUiState.SearchOperation.Error(
                 searchTerm = searchQuery.value?.term.orEmpty(),
                 error = exception,
@@ -350,7 +364,11 @@ class SearchHandler @Inject constructor(
                             .searchForPodcastsRx(query)
                             .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
                             .await()
-                        analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
+                        eventHorizon.track(
+                            SearchPerformedEvent(
+                                source = source.eventHorizonValue,
+                            ),
+                        )
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
                         val localResults = localPodcasts.map {
@@ -363,7 +381,11 @@ class SearchHandler @Inject constructor(
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
                         val apiResults = try {
-                            analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
+                            eventHorizon.track(
+                                SearchPerformedEvent(
+                                    source = source.eventHorizonValue,
+                                ),
+                            )
                             improvedSearchManager.combinedSearch(query).map {
                                 if (it is ImprovedSearchResultItem.PodcastItem) {
                                     it.copy(isFollowed = subscribedUuids.contains(it.uuid))
@@ -408,10 +430,5 @@ class SearchHandler @Inject constructor(
 
         data class Suggestions(override val term: String) : Query
         data class SearchResults(override val term: String, val immediate: Boolean = false) : Query
-    }
-
-    private object AnalyticsProp {
-        private const val SOURCE = "source"
-        fun sourceMap(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
     }
 }

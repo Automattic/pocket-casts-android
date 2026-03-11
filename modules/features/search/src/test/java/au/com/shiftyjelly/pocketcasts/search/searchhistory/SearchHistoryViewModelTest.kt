@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search.searchhistory
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,10 +91,13 @@ class SearchHistoryViewModelTest {
                     ),
                 ),
             )
-        whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
-            .thenReturn(mock())
-        val viewModel =
-            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher(), AnalyticsTracker.test())
+        whenever(searchHistoryManager.findAll(showFolders = anyBoolean())).thenReturn(mock())
+        val viewModel = SearchHistoryViewModel(
+            searchHistoryManager = searchHistoryManager,
+            userManager = userManager,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            eventHorizon = EventHorizon(TestEventSink()),
+        )
         viewModel.setOnlySearchRemote(isOnlySearchRemote)
         return viewModel
     }

@@ -4,8 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -16,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.SearchDismissedEvent
+import com.automattic.eventhorizon.SearchShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingRecommendationsSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val searchHandler: SearchHandler,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
@@ -100,9 +99,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 _state.value = it
             }
         }
-        analyticsTracker.track(
-            AnalyticsEvent.SEARCH_SHOWN,
-            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue),
+        eventHorizon.track(
+            SearchShownEvent(
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+            ),
         )
     }
 
@@ -154,15 +154,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     }
 
     fun onBackPressed() {
-        analyticsTracker.track(
-            AnalyticsEvent.SEARCH_DISMISSED,
-            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue),
+        eventHorizon.track(
+            SearchDismissedEvent(
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+            ),
         )
-    }
-
-    companion object {
-        private object AnalyticsProp {
-            const val SOURCE = "source"
-        }
     }
 }
