@@ -56,7 +56,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -100,6 +99,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.BannerAdImpressionEvent
+import com.automattic.eventhorizon.BannerAdTappedEvent
 import com.automattic.eventhorizon.CreateFolderSource
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
@@ -148,9 +149,6 @@ class PodcastsFragment :
 
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -740,11 +738,21 @@ class PodcastsFragment :
     }
 
     private fun trackAdImpression(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdImpression(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdImpressionEvent(
+                id = ad.id,
+                location = ad.location.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackAdTapped(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdTapped(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdTappedEvent(
+                id = ad.id,
+                location = ad.location.eventHorizonValue,
+            ),
+        )
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

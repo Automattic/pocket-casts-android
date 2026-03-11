@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -42,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.BannerAdImpressionEvent
+import com.automattic.eventhorizon.BannerAdTappedEvent
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
@@ -95,7 +96,6 @@ class PlayerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     blazeAdsManager: BlazeAdsManager,
     @ApplicationContext private val context: Context,
@@ -776,11 +776,21 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun trackAdImpression(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdImpression(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdImpressionEvent(
+                id = ad.id,
+                location = ad.location.eventHorizonValue,
+            ),
+        )
     }
 
     fun trackAdTapped(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdTapped(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdTappedEvent(
+                id = ad.id,
+                location = ad.location.eventHorizonValue,
+            ),
+        )
     }
 
     sealed interface NavigationState {

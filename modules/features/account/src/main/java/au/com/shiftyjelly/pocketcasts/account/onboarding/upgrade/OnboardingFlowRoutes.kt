@@ -279,7 +279,7 @@ object OnboardingFlowRoutes {
                         exitOnboarding(OnboardingExitInfo.Simple)
                     },
                     onShowBenefit = { benefit ->
-                        viewModel.onBenefitShown(benefit.analyticsValue)
+                        viewModel.onBenefitShown(benefit.eventHorizonValue)
                     },
                     modifier = Modifier.fillMaxSize(),
                 )

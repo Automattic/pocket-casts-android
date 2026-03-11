@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -64,7 +63,6 @@ class EndOfYearViewModel @AssistedInject constructor(
     settings: Settings,
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val accessibilityManager: AccessibilityManager,
 ) : ViewModel() {

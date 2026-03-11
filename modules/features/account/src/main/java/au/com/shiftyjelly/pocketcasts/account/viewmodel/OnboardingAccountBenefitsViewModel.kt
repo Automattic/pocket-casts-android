@@ -1,32 +1,41 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.InformationalModalViewCardShowedEvent
+import com.automattic.eventhorizon.InformationalModalViewDismissedEvent
+import com.automattic.eventhorizon.InformationalModalViewGetStartedTapEvent
+import com.automattic.eventhorizon.InformationalModalViewLoginTapEvent
+import com.automattic.eventhorizon.InformationalModalViewShowedEvent
+import com.automattic.eventhorizon.OnboardingBenefitType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingAccountBenefitsViewModel @Inject constructor(
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     fun onScreenShown() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_SHOWED)
+        eventHorizon.track(InformationalModalViewShowedEvent)
     }
 
     fun onGetStartedClick() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_GET_STARTED_TAP)
+        eventHorizon.track(InformationalModalViewGetStartedTapEvent)
     }
 
     fun onLogInClick() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_LOGIN_TAP)
+        eventHorizon.track(InformationalModalViewLoginTapEvent)
     }
 
     fun onDismissClick() {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_DISMISSED)
+        eventHorizon.track(InformationalModalViewDismissedEvent)
     }
 
-    fun onBenefitShown(cardAnalyticsValue: String) {
-        tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_CARD_SHOWED, mapOf("card" to cardAnalyticsValue))
+    fun onBenefitShown(benefitType: OnboardingBenefitType) {
+        eventHorizon.track(
+            InformationalModalViewCardShowedEvent(
+                card = benefitType,
+            ),
+        )
     }
 }

@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -51,7 +49,6 @@ import kotlinx.coroutines.rx2.asFlow
 @HiltViewModel
 class ShelfSharedViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val chromeCastAnalytics: ChromeCastAnalytics,
     private val episodeManager: EpisodeManager,
@@ -316,10 +313,6 @@ class ShelfSharedViewModel @Inject constructor(
         if (shelfItem == ShelfItem.Cast) {
             chromeCastAnalytics.trackChromeCastViewShown()
         }
-    }
-
-    fun track(event: AnalyticsEvent) {
-        analyticsTracker.track(event)
     }
 
     data class UiState(

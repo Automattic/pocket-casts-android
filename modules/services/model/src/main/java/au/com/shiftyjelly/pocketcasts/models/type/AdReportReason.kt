@@ -1,8 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
-enum class AdReportReason(val analyticsName: String) {
-    Broken(analyticsName = "broken"),
-    Malicious(analyticsName = "malicious"),
-    TooFrequent(analyticsName = "too_often"),
-    Other(analyticsName = "other"),
+import com.automattic.eventhorizon.BlazeAdReportType
+
+enum class AdReportReason(
+    val eventHorizonValue: BlazeAdReportType,
+) {
+    Broken(
+        eventHorizonValue = BlazeAdReportType.Broken,
+    ),
+    Malicious(
+        eventHorizonValue = BlazeAdReportType.Malicious,
+    ),
+    TooFrequent(
+        eventHorizonValue = BlazeAdReportType.TooOften,
+    ),
+    Other(
+        eventHorizonValue = BlazeAdReportType.Other,
+    ),
 }
