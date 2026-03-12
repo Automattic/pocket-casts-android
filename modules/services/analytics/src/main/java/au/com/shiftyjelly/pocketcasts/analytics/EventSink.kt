@@ -4,8 +4,9 @@ import com.automattic.eventhorizon.Trackable
 
 class EventSink(
     private val trackers: Set<Tracker>,
-    private val listeners: Set<AnalyticsTracker.Listener>,
-) : (Trackable) -> Unit {
+    private val listeners: Set<AnalyticsListener>,
+) : (Trackable) -> Unit,
+    AnalyticsController {
     override fun invoke(event: Trackable) {
         val analyticsEvent = EVENT_MAP[event.analyticsName] ?: return
         val trackedEvents = trackers.associate { tracker ->
@@ -20,6 +21,34 @@ class EventSink(
             listener.onEvent(analyticsEvent, event.analyticsProperties, trackedEvents)
         }
     }
+
+    override fun refreshMetadata() {
+        trackers.forEach(Tracker::refreshMetadata)
+    }
+
+    override fun flush() {
+        trackers.forEach(Tracker::flush)
+    }
+
+    override fun clearAllData() {
+        trackers.forEach(Tracker::clearAllData)
+    }
+}
+
+interface AnalyticsListener {
+    fun onEvent(
+        event: AnalyticsEvent,
+        properties: Map<String, Any>,
+        trackedEvents: Map<String, TrackedEvent?>,
+    )
+}
+
+interface AnalyticsController {
+    fun refreshMetadata()
+
+    fun flush()
+
+    fun clearAllData()
 }
 
 private val EVENT_MAP = AnalyticsEvent.entries.associateBy(AnalyticsEvent::key)

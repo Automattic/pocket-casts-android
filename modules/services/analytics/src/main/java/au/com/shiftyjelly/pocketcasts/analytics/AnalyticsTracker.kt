@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 class AnalyticsTracker(
     private val trackers: Set<Tracker>,
-    private val listeners: Set<Listener>,
+    private val listeners: Set<AnalyticsListener>,
 ) {
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         val trackedEvents = trackers.associate { tracker ->
@@ -18,26 +18,6 @@ class AnalyticsTracker(
         }
     }
 
-    fun refreshMetadata() {
-        trackers.forEach(Tracker::refreshMetadata)
-    }
-
-    fun flush() {
-        trackers.forEach(Tracker::flush)
-    }
-
-    fun clearAllData() {
-        trackers.forEach(Tracker::clearAllData)
-    }
-
-    interface Listener {
-        fun onEvent(
-            event: AnalyticsEvent,
-            properties: Map<String, Any>,
-            trackedEvents: Map<String, TrackedEvent?>,
-        )
-    }
-
     companion object {
         fun test() = AnalyticsTracker(emptySet(), emptySet())
 
@@ -46,7 +26,7 @@ class AnalyticsTracker(
             listeners = emptySet(),
         )
 
-        fun test(listener: Listener) = AnalyticsTracker(
+        fun test(listener: AnalyticsListener) = AnalyticsTracker(
             trackers = emptySet(),
             listeners = setOf(listener),
         )

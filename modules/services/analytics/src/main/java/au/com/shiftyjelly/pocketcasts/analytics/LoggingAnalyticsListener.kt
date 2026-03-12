@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import timber.log.Timber
 
-internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
+internal class LoggingAnalyticsListener : AnalyticsListener {
     override fun onEvent(
         event: AnalyticsEvent,
         properties: Map<String, Any>,

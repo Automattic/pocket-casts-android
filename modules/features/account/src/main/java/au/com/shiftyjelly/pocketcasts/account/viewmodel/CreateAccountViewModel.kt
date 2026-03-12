@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -23,7 +23,7 @@ class CreateAccountViewModel
 @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val analyticsController: AnalyticsController,
     private val eventHorizon: EventHorizon,
     private val podcastManager: PodcastManager,
 ) : AccountViewModel() {
@@ -137,7 +137,7 @@ class CreateAccountViewModel
         viewModelScope.launch {
             when (val result = syncManager.createUserWithEmailAndPassword(emailString, passwordString, SignInSource.UserInitiated.SignInViewModel)) {
                 is LoginResult.Success -> {
-                    analyticsTracker.refreshMetadata()
+                    analyticsController.refreshMetadata()
                     podcastManager.refreshPodcastsAfterSignIn()
                     createAccountState.postValue(CreateAccountState.AccountCreated)
                 }

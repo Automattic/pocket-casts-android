@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.privacy
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.automattic.eventhorizon.AnalyticsOptInEvent
 import com.automattic.eventhorizon.AnalyticsOptOutEvent
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class UserAnalyticsSettings @Inject constructor(
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
-    private val analyticsTracker: AnalyticsTracker,
+    private val analyticsController: AnalyticsController,
 ) {
 
     fun updateAnalyticsSetting(enabled: Boolean) {
@@ -21,7 +21,7 @@ class UserAnalyticsSettings @Inject constructor(
         } else {
             eventHorizon.track(AnalyticsOptOutEvent)
             settings.collectAnalytics.set(false, updateModifiedAt = false)
-            analyticsTracker.clearAllData()
+            analyticsController.clearAllData()
         }
     }
 
