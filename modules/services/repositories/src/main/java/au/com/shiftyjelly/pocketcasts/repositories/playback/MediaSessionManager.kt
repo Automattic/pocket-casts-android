@@ -1,12 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
@@ -146,7 +144,7 @@ class MediaSessionManager(
             settings,
         )
 
-        connect()
+        // Temporary hard-disable while CI onboarding e2e ANRs are being investigated.
 
         applicationScope.launch {
             commandQueue.collect { (tag, command) ->
@@ -197,13 +195,6 @@ class MediaSessionManager(
                 }
             }
         }
-    }
-
-    private fun connect() {
-        // start the foreground service
-        val connectionCallback = object : MediaBrowserCompat.ConnectionCallback() {}
-        val mediaBrowser = MediaBrowserCompat(context, ComponentName(context, PlaybackService::class.java), connectionCallback, null)
-        mediaBrowser.connect()
     }
 
     private fun getPlaybackStateRx(playbackState: PlaybackState, currentEpisode: Optional<BaseEpisode>): Single<PlaybackStateCompat> {

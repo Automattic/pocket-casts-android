@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DEFAULT_TEST_CLASSES="au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.LogInFullAppTest,"
+DEFAULT_TEST_CLASSES+="au.com.shiftyjelly.pocketcasts.account.onboarding.e2e.OnboardingFullAppTest"
+TEST_CLASSES="${ONBOARDING_E2E_TEST_CLASSES:-$DEFAULT_TEST_CLASSES}"
+
 adb devices
 adb logcat -c || true
 
-set +e
-./gradlew :app:connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class=au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLinkTest \
-  --stacktrace \
+gradle_args=(
+  :app:connectedDebugAndroidTest
+  "-Pandroid.testInstrumentationRunnerArguments.class=$TEST_CLASSES"
+  --stacktrace
   --info
+)
+
+set +e
+./gradlew "${gradle_args[@]}"
 status=$?
 set -e
 
