@@ -99,7 +99,13 @@ project.apply {
         // Secrets
         set("settingsEncryptSecret", secretProperties.getProperty("pocketcastsSettingsEncryptSecret", ""))
         set("sharingServerSecret", secretProperties.getProperty("pocketcastsSharingServerSecret", ""))
-        set("pocketcastsSentryDsn", secretProperties.getProperty("pocketcastsSentryDsn", ""))
+        val sentryAndroidDsn = secretProperties.getProperty("sentryAndroidDsn", "")
+        val sentryDsn = when {
+            isAutomotiveBuild -> secretProperties.getProperty("sentryAutomotiveDsn", "").ifBlank { sentryAndroidDsn }
+            isWearBuild -> secretProperties.getProperty("sentryWearDsn", "").ifBlank { sentryAndroidDsn }
+            else -> sentryAndroidDsn
+        }
+        set("pocketcastsSentryDsn", sentryDsn)
         set("googleSignInServerClientId", secretProperties.getProperty("googleSignInServerClientId", ""))
         set("measureBuildsEnabled", secretProperties.getProperty("measureBuildsEnabled", ""))
         set("appsMetricsToken", secretProperties.getProperty("appsMetricsToken", ""))
