@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
+import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -20,7 +21,7 @@ class TracksAnalyticsTracker @Inject constructor(
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : Tracker,
+) : AnalyticsTracker,
     CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
 
@@ -30,44 +31,45 @@ class TracksAnalyticsTracker @Inject constructor(
 
     override val id get() = ID
 
-    override fun shouldTrack(event: AnalyticsEvent): Boolean {
-        return tracksClient != null && settings.collectAnalytics.value
-    }
+    override fun track(event: Trackable): TrackedEvent? {
+        if (tracksClient == null || !settings.collectAnalytics.value) {
+            return null
+        }
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        if (tracksClient != null) {
-            launch {
-                val eventKey = event.key
-                val userIds = accountStatusInfo.getUserIds()
-                val userType = if (userIds.accountId != null) {
-                    TracksClient.NosaraUserType.POCKETCASTS
-                } else {
-                    TracksClient.NosaraUserType.ANON
-                }
-
-                // Create the merged JSON Object of properties.
-                // Properties defined by the user have precedence over the default ones pre-defined at "event level"
-                val propertiesToJSON = JSONObject(properties)
-                predefinedEventProperties.forEach { (key, value) ->
-                    if (propertiesToJSON.has(key)) {
-                        Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
-                        Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
-                    } else {
-                        propertiesToJSON.put(key, value)
-                    }
-                }
-
-                tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, userIds.id, userType)
+        val eventKey = "$EVENTS_PREFIX${event.analyticsName}"
+        launch {
+            val userIds = accountStatusInfo.getUserIds()
+            val userType = if (userIds.accountId != null) {
+                TracksClient.NosaraUserType.POCKETCASTS
+            } else {
+                TracksClient.NosaraUserType.ANON
             }
+
+            // Create the merged JSON Object of properties.
+            // Properties defined by the user have precedence over the default ones pre-defined at "event level"
+            val propertiesToJSON = JSONObject(event.analyticsProperties)
+            predefinedEventProperties.forEach { (key, value) ->
+                if (propertiesToJSON.has(key)) {
+                    Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
+                    Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
+                } else {
+                    propertiesToJSON.put(key, value)
+                }
+            }
+
+            tracksClient.track(eventKey, propertiesToJSON, userIds.id, userType)
         }
 
         val usedProperties = buildMap {
-            putAll(properties)
+            putAll(event.analyticsProperties)
             predefinedEventProperties.forEach { (key, value) ->
                 putIfAbsent(key, value)
             }
         }
-        return TrackedEvent(event, usedProperties)
+        return TrackedEvent(
+            key = eventKey,
+            properties = usedProperties,
+        )
     }
 
     private fun updatePredefinedEventProperties() {
@@ -75,9 +77,9 @@ class TracksAnalyticsTracker @Inject constructor(
         val isLoggedIn = accountStatusInfo.isLoggedIn()
         val hasSubscription = subscription != null
         val isPocketCastsChampion = subscription?.isChampion == true
-        val subscriptionTier = subscription?.tier?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
-        val subscriptionPlatform = subscription?.platform?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
-        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
+        val subscriptionTier = subscription?.tier?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
+        val subscriptionPlatform = subscription?.platform?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
+        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
 
         predefinedEventProperties = mapOf(
             PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),

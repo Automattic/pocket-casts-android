@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.EventSink
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.LoggingAnalyticsListener
 import au.com.shiftyjelly.pocketcasts.analytics.NoOpTracker
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
@@ -41,12 +40,12 @@ abstract class AnalyticsModule {
         // Necessary to satisfy Dagger injection
         @Provides
         @IntoSet
-        fun provideNoOpTracker(): Tracker = NoOpTracker
+        fun provideNoOpTracker(): AnalyticsTracker = NoOpTracker
 
         @Provides
         @Singleton
         fun provideEventSink(
-            trackers: Set<@JvmSuppressWildcards Tracker>,
+            trackers: Set<@JvmSuppressWildcards AnalyticsTracker>,
             listeners: Set<@JvmSuppressWildcards AnalyticsListener>,
         ): EventSink = EventSink(trackers, listeners)
 
@@ -55,12 +54,6 @@ abstract class AnalyticsModule {
         fun provideEventHorizon(eventSink: EventSink): EventHorizon {
             return EventHorizon(eventSink)
         }
-
-        @Provides
-        @Singleton
-        fun provideAnalyticsTracker(
-            trackers: Set<@JvmSuppressWildcards Tracker>,
-        ): AnalyticsTracker = AnalyticsTracker(trackers)
 
         @Provides
         @Singleton

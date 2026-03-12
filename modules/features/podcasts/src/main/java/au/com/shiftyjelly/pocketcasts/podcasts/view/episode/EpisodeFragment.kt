@@ -35,8 +35,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -598,7 +598,7 @@ class EpisodeFragment : BaseFragment() {
                                         eventHorizon.track(
                                             EpisodeDetailTranscriptCardTappedEvent(
                                                 episodeUuid = episodeUuid,
-                                                podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                                podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                                             ),
                                         )
                                     },
@@ -609,7 +609,7 @@ class EpisodeFragment : BaseFragment() {
                             eventHorizon.track(
                                 EpisodeDetailTranscriptCardShownEvent(
                                     episodeUuid = episodeUuid,
-                                    podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                    podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                                 ),
                             )
                         }

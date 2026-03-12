@@ -2,27 +2,48 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.os.Bundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import com.automattic.eventhorizon.BannerAdImpressionEvent
+import com.automattic.eventhorizon.BannerAdReportEvent
+import com.automattic.eventhorizon.BannerAdTappedEvent
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastTappedEvent
+import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
+import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
+import com.automattic.eventhorizon.DiscoverListImpressionEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
+import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
+import com.automattic.eventhorizon.PlaybackPlayEvent
+import com.automattic.eventhorizon.PlusPromotionDismissedEvent
+import com.automattic.eventhorizon.PlusPromotionNotNowButtonTappedEvent
+import com.automattic.eventhorizon.PlusPromotionShownEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PurchaseSuccessfulEvent
+import com.automattic.eventhorizon.Trackable
 import javax.inject.Inject
 
 class FirebaseAnalyticsTracker @Inject constructor(
     private val firebaseAnalytics: FirebaseAnalyticsWrapper,
     private val settings: Settings,
-) : Tracker {
+) : AnalyticsTracker {
     override val id get() = ID
 
-    override fun shouldTrack(event: AnalyticsEvent): Boolean {
-        return event in EVENTS && settings.collectAnalytics.value
-    }
+    override fun track(event: Trackable): TrackedEvent? {
+        if (!settings.collectAnalytics.value || event::class.java !in EVENTS) {
+            return null
+        }
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        val name = ANALYTIC_EVENT_TO_FIREBASE_NAME[event] ?: event.key
+        val name = ANALYTIC_EVENT_TO_FIREBASE_NAME[event::class.java] ?: event.analyticsName
         val bundle = Bundle().apply {
-            properties.forEach { (key, value) ->
+            event.analyticsProperties.forEach { (key, value) ->
                 putString(key, value.toString())
             }
         }
         firebaseAnalytics.logEvent(name, bundle)
-        return TrackedEvent(event, properties, usedKey = name)
+        return TrackedEvent(
+            key = name,
+            properties = event.analyticsProperties,
+        )
     }
 
     override fun refreshMetadata() = Unit
@@ -35,31 +56,32 @@ class FirebaseAnalyticsTracker @Inject constructor(
         private const val ID = "Firebase"
 
         private val EVENTS = listOf(
-            AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED,
-            AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
-            AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY,
-            AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-            AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
-            AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
-            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
-            AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED,
-            AnalyticsEvent.PURCHASE_SUCCESSFUL,
-            AnalyticsEvent.PLUS_PROMOTION_SHOWN,
-            AnalyticsEvent.PLUS_PROMOTION_DISMISSED,
-            AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED,
-            AnalyticsEvent.PLAYBACK_PLAY,
-            AnalyticsEvent.PODCAST_SUBSCRIBED,
-            AnalyticsEvent.BANNER_AD_IMPRESSION,
-            AnalyticsEvent.BANNER_AD_TAPPED,
-            AnalyticsEvent.BANNER_AD_REPORT,
+            DiscoverFeaturedPodcastSubscribedEvent::class.java,
+            DiscoverFeaturedPodcastTappedEvent::class.java,
+            DiscoverListEpisodePlayEvent::class.java,
+            DiscoverListEpisodeTappedEvent::class.java,
+            DiscoverListImpressionEvent::class.java,
+            DiscoverListPodcastSubscribedEvent::class.java,
+            DiscoverListPodcastTappedEvent::class.java,
+            DiscoverListShowAllTappedEvent::class.java,
+            DiscoverListShowAllTappedEvent::class.java,
+            PurchaseSuccessfulEvent::class.java,
+            PlusPromotionShownEvent::class.java,
+            PlusPromotionDismissedEvent::class.java,
+            PlusPromotionNotNowButtonTappedEvent::class.java,
+            PlaybackPlayEvent::class.java,
+            PodcastSubscribedEvent::class.java,
+            BannerAdImpressionEvent::class.java,
+            BannerAdTappedEvent::class.java,
+            BannerAdReportEvent::class.java,
         )
 
         // Firebase event names that are different to Tracks
         private val ANALYTIC_EVENT_TO_FIREBASE_NAME = mapOf(
-            AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED to "discover_list_podcast_episode_tap",
-            AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED to "discover_list_podcast_subscribe",
-            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED to "discover_list_podcast_tap",
-            AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED to "discover_list_show_all",
+            DiscoverListEpisodeTappedEvent::class.java to "discover_list_podcast_episode_tap",
+            DiscoverListPodcastSubscribedEvent::class.java to "discover_list_podcast_subscribe",
+            DiscoverListPodcastTappedEvent::class.java to "discover_list_podcast_tap",
+            DiscoverListShowAllTappedEvent::class.java to "discover_list_show_all",
         )
     }
 }

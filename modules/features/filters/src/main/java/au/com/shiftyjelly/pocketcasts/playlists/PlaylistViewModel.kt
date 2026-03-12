@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
@@ -471,7 +471,7 @@ class PlaylistViewModel @AssistedInject constructor(
         val playlistName = uiState.value.playlist?.title
         eventHorizon.track(
             EpisodeRemovedFromListEvent(
-                playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                playlistName = playlistName ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                 playlistUuid = playlistUuid,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,

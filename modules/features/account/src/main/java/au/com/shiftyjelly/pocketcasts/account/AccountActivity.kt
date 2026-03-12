@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -156,7 +156,7 @@ class AccountActivity : AppCompatActivity() {
                 source = when (viewModel.createAccountState.value) {
                     CreateAccountState.AccountCreated -> AccountUpdatedSource.CREATE_ACCOUNT.analyticsValue
                     CreateAccountState.SubscriptionCreated -> AccountUpdatedSource.CONFIRM_PAYMENT.analyticsValue
-                    else -> Tracker.INVALID_OR_NULL_VALUE
+                    else -> AnalyticsTracker.INVALID_OR_NULL_VALUE
                 },
             )
 

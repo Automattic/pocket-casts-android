@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.transcripts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -260,8 +260,8 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     fun track(event: (TranscriptSource, podcastUuid: String, episodeUuid: String) -> Trackable) {
-        val podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE
-        val episodeUuid = episodeUuid ?: Tracker.INVALID_OR_NULL_VALUE
+        val podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
+        val episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val event = event(source.eventHorizonValue, podcastUuid, episodeUuid)
         eventHorizon.track(event)
     }

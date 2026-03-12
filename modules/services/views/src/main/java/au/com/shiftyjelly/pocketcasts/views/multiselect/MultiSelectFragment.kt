@@ -9,8 +9,8 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -163,7 +163,7 @@ class MultiSelectFragment :
 
     private fun trackItemMovedEvent(position: Int) {
         dragStartPosition?.let {
-            val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
+            val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
             val movedFrom = sectionTitleAt(it)
             val movedTo = sectionTitleAt(position)
             val newPosition = if (movedTo == ShelfActionSource.Shelf) {

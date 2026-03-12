@@ -3,19 +3,13 @@ package au.com.shiftyjelly.pocketcasts.analytics
 import com.automattic.eventhorizon.Trackable
 
 class EventSink(
-    private val trackers: Set<Tracker>,
+    private val trackers: Set<AnalyticsTracker>,
     private val listeners: Set<AnalyticsListener>,
 ) : (Trackable) -> Unit,
     AnalyticsController {
     override fun invoke(event: Trackable) {
-        val analyticsEvent = EVENT_MAP[event.analyticsName] ?: return
         val trackedEvents = trackers.associate { tracker ->
-            val trackedEvent = if (tracker.shouldTrack(analyticsEvent)) {
-                tracker.track(analyticsEvent, event.analyticsProperties)
-            } else {
-                null
-            }
-            tracker.id to trackedEvent
+            tracker.id to tracker.track(event)
         }
         listeners.forEach { listener ->
             listener.onEvent(event, trackedEvents)
@@ -23,15 +17,36 @@ class EventSink(
     }
 
     override fun refreshMetadata() {
-        trackers.forEach(Tracker::refreshMetadata)
+        trackers.forEach(AnalyticsTracker::refreshMetadata)
     }
 
     override fun flush() {
-        trackers.forEach(Tracker::flush)
+        trackers.forEach(AnalyticsTracker::flush)
     }
 
     override fun clearAllData() {
-        trackers.forEach(Tracker::clearAllData)
+        trackers.forEach(AnalyticsTracker::clearAllData)
+    }
+}
+
+data class TrackedEvent(
+    val key: String,
+    val properties: Map<String, Any>,
+)
+
+interface AnalyticsTracker {
+    val id: String
+
+    fun track(event: Trackable): TrackedEvent?
+
+    fun refreshMetadata() = Unit
+
+    fun flush() = Unit
+
+    fun clearAllData() = Unit
+
+    companion object {
+        const val INVALID_OR_NULL_VALUE = "none"
     }
 }
 
@@ -50,4 +65,8 @@ interface AnalyticsController {
     fun clearAllData()
 }
 
-private val EVENT_MAP = AnalyticsEvent.entries.associateBy(AnalyticsEvent::key)
+internal object NoOpTracker : AnalyticsTracker {
+    override val id = "no-op"
+
+    override fun track(event: Trackable) = null
+}

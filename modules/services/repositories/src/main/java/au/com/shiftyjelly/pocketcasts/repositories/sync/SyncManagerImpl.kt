@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -521,7 +521,7 @@ class SyncManagerImpl @Inject constructor(
             }
 
             is LoginResult.Failed -> {
-                val errorCodeValue = loginResult.messageId ?: Tracker.INVALID_OR_NULL_VALUE
+                val errorCodeValue = loginResult.messageId ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
                 when (signInSource) {
                     SignInSource.WatchPhoneSync -> {
                         UserSigninWatchFromPhoneFailedEvent(
@@ -556,7 +556,7 @@ class SyncManagerImpl @Inject constructor(
             }
 
             is LoginResult.Failed -> {
-                val errorCodeValue = loginResult.messageId ?: Tracker.INVALID_OR_NULL_VALUE
+                val errorCodeValue = loginResult.messageId ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
                 UserAccountCreationFailedEvent(
                     errorCode = errorCodeValue,
                 )
