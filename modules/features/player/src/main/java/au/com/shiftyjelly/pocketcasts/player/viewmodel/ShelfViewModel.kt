@@ -123,9 +123,9 @@ class ShelfViewModel @AssistedInject constructor(
     }
 
     private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) {
-        ShelActionSource.Shelf
+        ShelfActionSource.Shelf
     } else {
-        ShelActionSource.OverflowMenu
+        ShelfActionSource.OverflowMenu
     }
 
     fun onEditButtonClick() {
@@ -140,8 +140,8 @@ class ShelfViewModel @AssistedInject constructor(
         val movedFrom = sectionTitleAt(fromPosition)
         val movedTo = sectionTitleAt(toPosition)
         val newPosition = when (movedTo) {
-            ShelActionSource.Shelf -> toPosition - 1
-            ShelActionSource.OverflowMenu -> toPosition - (_uiState.value.shelfRowItems.indexOf(moreActionsTitle) + 1)
+            ShelfActionSource.Shelf -> toPosition - 1
+            ShelfActionSource.OverflowMenu -> toPosition - (_uiState.value.shelfRowItems.indexOf(moreActionsTitle) + 1)
         }
         eventHorizon.track(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
@@ -160,7 +160,7 @@ class ShelfViewModel @AssistedInject constructor(
         val isTranscriptAvailable: Boolean = false,
     )
 
-    enum class ShelActionSource(
+    enum class ShelfActionSource(
         val analyticsValue: ShelfActionSourceType,
     ) {
         Shelf(
