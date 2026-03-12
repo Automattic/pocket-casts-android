@@ -64,7 +64,6 @@ class FirebaseAnalyticsTracker @Inject constructor(
             DiscoverListPodcastSubscribedEvent::class.java,
             DiscoverListPodcastTappedEvent::class.java,
             DiscoverListShowAllTappedEvent::class.java,
-            DiscoverListShowAllTappedEvent::class.java,
             PurchaseSuccessfulEvent::class.java,
             PlusPromotionShownEvent::class.java,
             PlusPromotionDismissedEvent::class.java,
