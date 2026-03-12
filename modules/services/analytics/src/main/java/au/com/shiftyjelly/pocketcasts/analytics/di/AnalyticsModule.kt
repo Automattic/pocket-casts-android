@@ -44,6 +44,7 @@ abstract class AnalyticsModule {
         fun provideNoOpTracker(): Tracker = NoOpTracker
 
         @Provides
+        @Singleton
         fun provideEventSink(
             trackers: Set<@JvmSuppressWildcards Tracker>,
             listeners: Set<@JvmSuppressWildcards AnalyticsListener>,
