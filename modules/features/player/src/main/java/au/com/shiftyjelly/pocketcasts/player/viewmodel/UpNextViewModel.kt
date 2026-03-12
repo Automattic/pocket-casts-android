@@ -34,7 +34,7 @@ class UpNextViewModel @Inject constructor(
     fun sortUpNext(sortType: UpNextSortType) {
         eventHorizon.track(
             UpNextSortEvent(
-                sortType = sortType.eventHorizonValue,
+                sortType = sortType.analyticsValue,
             ),
         )
         upNextQueue.sortUpNext(sortType)

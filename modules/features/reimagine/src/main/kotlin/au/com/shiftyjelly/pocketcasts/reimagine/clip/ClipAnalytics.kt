@@ -27,7 +27,7 @@ class ClipAnalytics @AssistedInject constructor(
                 podcastUuid = podcastId,
                 episodeUuid = episodeId,
                 clipUuid = clipId,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionMediaType.Clip,
             ),
         )
@@ -39,7 +39,7 @@ class ClipAnalytics @AssistedInject constructor(
                 episodeUuid = episodeId,
                 podcastUuid = podcastId,
                 clipUuid = clipId,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -50,7 +50,7 @@ class ClipAnalytics @AssistedInject constructor(
                 episodeUuid = episodeId,
                 podcastUuid = podcastId,
                 clipUuid = clipId,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -68,12 +68,12 @@ class ClipAnalytics @AssistedInject constructor(
                 startModified = isStartModified,
                 end = clipRange.endInSeconds.toLong(),
                 endModified = isEndModified,
-                type = shareType.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                type = shareType.analyticsValue,
+                cardType = cardType.analyticsValue,
                 episodeUuid = episodeId,
                 podcastUuid = podcastId,
                 clipUuid = clipId,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }

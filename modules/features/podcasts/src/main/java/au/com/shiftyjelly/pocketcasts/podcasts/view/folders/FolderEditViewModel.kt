@@ -197,7 +197,7 @@ class FolderEditViewModel
         settings.setSelectPodcastsSortType(order)
         eventHorizon.track(
             FolderPodcastPickerFilterChangedEvent(
-                sortOrder = order.eventHorizonValue,
+                sortOrder = order.analyticsValue,
             ),
         )
     }

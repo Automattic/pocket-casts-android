@@ -8,25 +8,25 @@ enum class PlayOverNotificationSetting(
     val preferenceInt: Int,
     val serverId: Int,
     @StringRes val titleRes: Int,
-    val eventHorizonValue: PlayOverNotificationType,
+    val analyticsValue: PlayOverNotificationType,
 ) {
     NEVER(
         preferenceInt = 2,
         serverId = 0,
         titleRes = LR.string.settings_notification_play_over_never,
-        eventHorizonValue = PlayOverNotificationType.Never,
+        analyticsValue = PlayOverNotificationType.Never,
     ),
     DUCK(
         preferenceInt = 1,
         serverId = 2,
         titleRes = LR.string.settings_notification_play_over_duck,
-        eventHorizonValue = PlayOverNotificationType.Duck,
+        analyticsValue = PlayOverNotificationType.Duck,
     ),
     ALWAYS(
         preferenceInt = 0,
         serverId = 1,
         titleRes = LR.string.settings_notification_play_over_always,
-        eventHorizonValue = PlayOverNotificationType.Always,
+        analyticsValue = PlayOverNotificationType.Always,
     ),
     ;
 

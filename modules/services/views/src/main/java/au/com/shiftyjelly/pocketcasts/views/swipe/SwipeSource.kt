@@ -3,27 +3,27 @@ package au.com.shiftyjelly.pocketcasts.views.swipe
 import com.automattic.eventhorizon.SwipeSourceType
 
 enum class SwipeSource(
-    val eventHorizonValue: SwipeSourceType,
+    val analyticsValue: SwipeSourceType,
 ) {
     PodcastDetails(
-        eventHorizonValue = SwipeSourceType.PodcastDetails,
+        analyticsValue = SwipeSourceType.PodcastDetails,
     ),
     Filters(
-        eventHorizonValue = SwipeSourceType.Filters,
+        analyticsValue = SwipeSourceType.Filters,
     ),
     Downloads(
-        eventHorizonValue = SwipeSourceType.Downloads,
+        analyticsValue = SwipeSourceType.Downloads,
     ),
     ListeningHistory(
-        eventHorizonValue = SwipeSourceType.ListeningHistory,
+        analyticsValue = SwipeSourceType.ListeningHistory,
     ),
     Starred(
-        eventHorizonValue = SwipeSourceType.Starred,
+        analyticsValue = SwipeSourceType.Starred,
     ),
     Files(
-        eventHorizonValue = SwipeSourceType.Files,
+        analyticsValue = SwipeSourceType.Files,
     ),
     UpNext(
-        eventHorizonValue = SwipeSourceType.UpNext,
+        analyticsValue = SwipeSourceType.UpNext,
     ),
 }

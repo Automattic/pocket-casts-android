@@ -4,27 +4,27 @@ import com.automattic.eventhorizon.PlaylistEpisodeSortType as EventHorizonSortTy
 
 enum class PlaylistEpisodeSortType(
     val serverId: Int,
-    val eventHorizonValue: EventHorizonSortType,
+    val analyticsValue: EventHorizonSortType,
 ) {
     NewestToOldest(
         serverId = 0,
-        eventHorizonValue = EventHorizonSortType.NewestToOldest,
+        analyticsValue = EventHorizonSortType.NewestToOldest,
     ),
     OldestToNewest(
         serverId = 1,
-        eventHorizonValue = EventHorizonSortType.OldestToNewest,
+        analyticsValue = EventHorizonSortType.OldestToNewest,
     ),
     ShortestToLongest(
         serverId = 2,
-        eventHorizonValue = EventHorizonSortType.ShortestToLongest,
+        analyticsValue = EventHorizonSortType.ShortestToLongest,
     ),
     LongestToShortest(
         serverId = 3,
-        eventHorizonValue = EventHorizonSortType.LongestToShortest,
+        analyticsValue = EventHorizonSortType.LongestToShortest,
     ),
     DragAndDrop(
         serverId = 4,
-        eventHorizonValue = EventHorizonSortType.DragAndDrop,
+        analyticsValue = EventHorizonSortType.DragAndDrop,
     ),
     ;
 

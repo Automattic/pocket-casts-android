@@ -321,23 +321,23 @@ class StoriesActivity : ComponentActivity() {
 
     enum class StoriesSource(
         val key: String,
-        val eventHorizonValue: EndOfYearStoryOpenSourceType,
+        val analyticsValue: EndOfYearStoryOpenSourceType,
     ) {
         MODAL(
             key = "modal",
-            eventHorizonValue = EndOfYearStoryOpenSourceType.Modal,
+            analyticsValue = EndOfYearStoryOpenSourceType.Modal,
         ),
         PROFILE(
             key = "profile",
-            eventHorizonValue = EndOfYearStoryOpenSourceType.Profile,
+            analyticsValue = EndOfYearStoryOpenSourceType.Profile,
         ),
         USER_LOGIN(
             key = "user_login",
-            eventHorizonValue = EndOfYearStoryOpenSourceType.UserLogin,
+            analyticsValue = EndOfYearStoryOpenSourceType.UserLogin,
         ),
         UNKNOWN(
             key = "unknown",
-            eventHorizonValue = EndOfYearStoryOpenSourceType.Unknown,
+            analyticsValue = EndOfYearStoryOpenSourceType.Unknown,
         ),
         ;
 

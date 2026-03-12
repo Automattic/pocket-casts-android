@@ -148,7 +148,7 @@ class PlayerContainerFragment :
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     eventHorizon.track(
                         UpNextShownEvent(
-                            source = UpNextSource.NOW_PLAYING.eventHorizonValue,
+                            source = UpNextSource.NOW_PLAYING.analyticsValue,
                         ),
                     )
 
@@ -237,7 +237,7 @@ class PlayerContainerFragment :
             binding.upNextButton.setOnClickListener {
                 eventHorizon.track(
                     UpNextShownEvent(
-                        source = UpNextSource.PLAYER.eventHorizonValue,
+                        source = UpNextSource.PLAYER.analyticsValue,
                     ),
                 )
                 openUpNext()

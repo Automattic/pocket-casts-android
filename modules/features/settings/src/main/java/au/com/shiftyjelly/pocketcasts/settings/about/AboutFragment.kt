@@ -119,7 +119,7 @@ class AboutFragment : BaseFragment() {
                 onRateUsClick = {
                     eventHorizon.track(
                         RateUsTappedEvent(
-                            source = SourceView.ABOUT.eventHorizonValue,
+                            source = SourceView.ABOUT.analyticsValue,
                         ),
                     )
                 },

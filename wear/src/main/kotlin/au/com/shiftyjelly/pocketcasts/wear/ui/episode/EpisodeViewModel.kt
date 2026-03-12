@@ -389,13 +389,13 @@ class EpisodeViewModel @Inject constructor(
                 episodeManager.unarchiveBlocking(episode)
                 EpisodeUnarchivedEvent(
                     episodeUuid = episode.uuid,
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                 )
             } else {
                 episodeManager.archiveBlocking(episode, playbackManager)
                 EpisodeArchivedEvent(
                     episodeUuid = episode.uuid,
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                 )
             }
             eventHorizon.track(event)
@@ -422,13 +422,13 @@ class EpisodeViewModel @Inject constructor(
                     episodeManager.markAsNotPlayedBlocking(episode)
                     EpisodeMarkedAsUnplayedEvent(
                         episodeUuid = episode.uuid,
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     )
                 } else {
                     episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
                     EpisodeMarkedAsPlayedEvent(
                         episodeUuid = episode.uuid,
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     )
                 }
                 eventHorizon.track(event)

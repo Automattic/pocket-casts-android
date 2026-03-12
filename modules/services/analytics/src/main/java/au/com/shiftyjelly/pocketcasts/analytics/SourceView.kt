@@ -2,71 +2,241 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import com.automattic.eventhorizon.SourceViewType
 
-enum class SourceView(val analyticsValue: String) {
-    AUTO_PAUSE("auto_pause"),
-    AUTO_PLAY("auto_play"),
-    AUTO_DOWNLOAD("auto_download"),
-    BOTTOM_SHELF("bottom_shelf"),
-    CLIP_SHARING("clip_sharing"),
-    CHROMECAST("chromecast"),
-    DISCOVER("discover"),
-    DISCOVER_PLAIN_LIST("discover_plain_list"),
-    DISCOVER_PODCAST_LIST("discover_podcast_list"),
-    DISCOVER_RANKED_LIST("discover_ranked_list"),
-    DOWNLOADS("downloads"),
-    ENGAGE_SDK_CONTINUATION("engage_sdk_continuation"),
-    ENGAGE_SDK_FEATURED("engage_sdk_featured"),
-    ENGAGE_SDK_RECOMMENDATIONS("engage_sdk_recommendations"),
-    ENGAGE_SDK_SIGN_IN("engage_sdk_sign_in"),
-    EPISODE_DETAILS("episode_details"),
-    EPISODE_SWIPE_ACTION("episode_swipe_action"),
-    EPISODE_TRANSCRIPT("episode_transcript"),
-    FILES("files"),
-    FILES_SETTINGS("files_settings"),
-    FILTERS("filters"),
-    FULL_SCREEN_VIDEO("full_screen_video"),
-    LISTENING_HISTORY("listening_history"),
-    MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
-    MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
-    METERED_NETWORK_CHANGE("metered_network_change"),
-    MINIPLAYER("miniplayer"),
-    MULTI_SELECT("multi_select"),
-    NOTIFICATION("notification"),
-    NOTIFICATION_BOOKMARK("notification_bookmark"),
-    ONBOARDING_RECOMMENDATIONS("onboarding_recommendations"),
-    ONBOARDING_RECOMMENDATIONS_SEARCH("onboarding_recommendations_search"),
-    PLAYER("player"),
-    PLAYER_BROADCAST_ACTION("player_broadcast_action"),
-    PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
-    PODCAST_LIST("podcast_list"),
-    PODCAST_SCREEN("podcast_screen"),
-    PODCAST_SETTINGS("podcast_settings"),
-    PROFILE("profile"),
-    REFERRALS("referrals"),
-    SEARCH("search"),
-    SEARCH_RESULTS("search_results"),
-    SHARE_LIST("share_list"),
-    STARRED("starred"),
-    STATS("stats"),
-    TASKER("tasker"),
-    UNKNOWN("unknown"),
-    UP_NEXT("up_next"),
-    UP_NEXT_HISTORY("up_next_history"),
-    WHATS_NEW("whats_new"),
-    ABOUT("about"),
-    APPEARANCE("appearance_settings"),
-    STORAGE_AND_DATA_USAGE("storage_and_data_usage"),
-    WIDGET_PLAYER_LARGE("widget_player_large"),
-    WIDGET_PLAYER_MEDIUM("widget_player_medium"),
-    WIDGET_PLAYER_OLD("widget_player_old"),
-    WIDGET_PLAYER_SMALL("widget_player_small"),
+enum class SourceView(
+    val key: String,
+    val analyticsValue: SourceViewType,
+) {
+    AUTO_PAUSE(
+        key = "auto_pause",
+        analyticsValue = SourceViewType.AutoPause,
+    ),
+    AUTO_PLAY(
+        key = "auto_play",
+        analyticsValue = SourceViewType.AutoPlay,
+    ),
+    AUTO_DOWNLOAD(
+        key = "auto_download",
+        analyticsValue = SourceViewType.AutoDownload,
+    ),
+    BOTTOM_SHELF(
+        key = "bottom_shelf",
+        analyticsValue = SourceViewType.BottomShelf,
+    ),
+    CLIP_SHARING(
+        key = "clip_sharing",
+        analyticsValue = SourceViewType.ClipSharing,
+    ),
+    CHROMECAST(
+        key = "chromecast",
+        analyticsValue = SourceViewType.Chromecast,
+    ),
+    DISCOVER(
+        key = "discover",
+        analyticsValue = SourceViewType.Discover,
+    ),
+    DISCOVER_PLAIN_LIST(
+        key = "discover_plain_list",
+        analyticsValue = SourceViewType.DiscoverPlainList,
+    ),
+    DISCOVER_PODCAST_LIST(
+        key = "discover_podcast_list",
+        analyticsValue = SourceViewType.DiscoverPodcastList,
+    ),
+    DISCOVER_RANKED_LIST(
+        key = "discover_ranked_list",
+        analyticsValue = SourceViewType.DiscoverRankedList,
+    ),
+    DOWNLOADS(
+        key = "downloads",
+        analyticsValue = SourceViewType.Downloads,
+    ),
+    ENGAGE_SDK_CONTINUATION(
+        key = "engage_sdk_continuation",
+        analyticsValue = SourceViewType.EngageSdkContinuation,
+    ),
+    ENGAGE_SDK_FEATURED(
+        key = "engage_sdk_featured",
+        analyticsValue = SourceViewType.EngageSdkFeatured,
+    ),
+    ENGAGE_SDK_RECOMMENDATIONS(
+        key = "engage_sdk_recommendations",
+        analyticsValue = SourceViewType.EngageSdkRecommendations,
+    ),
+    ENGAGE_SDK_SIGN_IN(
+        key = "engage_sdk_sign_in",
+        analyticsValue = SourceViewType.EngageSdkSignIn,
+    ),
+    EPISODE_DETAILS(
+        key = "episode_details",
+        analyticsValue = SourceViewType.EpisodeDetails,
+    ),
+    EPISODE_SWIPE_ACTION(
+        key = "episode_swipe_action",
+        analyticsValue = SourceViewType.EpisodeSwipeAction,
+    ),
+    EPISODE_TRANSCRIPT(
+        key = "episode_transcript",
+        analyticsValue = SourceViewType.EpisodeTranscript,
+    ),
+    FILES(
+        key = "files",
+        analyticsValue = SourceViewType.Files,
+    ),
+    FILES_SETTINGS(
+        key = "files_settings",
+        analyticsValue = SourceViewType.FilesSettings,
+    ),
+    FILTERS(
+        key = "filters",
+        analyticsValue = SourceViewType.Filters,
+    ),
+    FULL_SCREEN_VIDEO(
+        key = "full_screen_video",
+        analyticsValue = SourceViewType.FullScreenVideo,
+    ),
+    LISTENING_HISTORY(
+        key = "listening_history",
+        analyticsValue = SourceViewType.ListeningHistory,
+    ),
+    MEDIA_BUTTON_BROADCAST_ACTION(
+        key = "media_button_broadcast_action",
+        analyticsValue = SourceViewType.MediaButtonBroadcastAction,
+    ),
+    MEDIA_BUTTON_BROADCAST_SEARCH_ACTION(
+        key = "media_button_broadcast_search_action",
+        analyticsValue = SourceViewType.MediaButtonBroadcastSearchAction,
+    ),
+    METERED_NETWORK_CHANGE(
+        key = "metered_network_change",
+        analyticsValue = SourceViewType.MeteredNetworkChange,
+    ),
+    MINIPLAYER(
+        key = "miniplayer",
+        analyticsValue = SourceViewType.Miniplayer,
+    ),
+    MULTI_SELECT(
+        key = "multi_select",
+        analyticsValue = SourceViewType.MultiSelect,
+    ),
+    NOTIFICATION(
+        key = "notification",
+        analyticsValue = SourceViewType.Notification,
+    ),
+    NOTIFICATION_BOOKMARK(
+        key = "notification_bookmark",
+        analyticsValue = SourceViewType.NotificationBookmark,
+    ),
+    ONBOARDING_RECOMMENDATIONS(
+        key = "onboarding_recommendations",
+        analyticsValue = SourceViewType.OnboardingRecommendations,
+    ),
+    ONBOARDING_RECOMMENDATIONS_SEARCH(
+        key = "onboarding_recommendations_search",
+        analyticsValue = SourceViewType.OnboardingRecommendationsSearch,
+    ),
+    PLAYER(
+        key = "player",
+        analyticsValue = SourceViewType.Player,
+    ),
+    PLAYER_BROADCAST_ACTION(
+        key = "player_broadcast_action",
+        analyticsValue = SourceViewType.PlayerBroadcastAction,
+    ),
+    PLAYER_PLAYBACK_EFFECTS(
+        key = "player_playback_effects",
+        analyticsValue = SourceViewType.PlayerPlaybackEffects,
+    ),
+    PODCAST_LIST(
+        key = "podcast_list",
+        analyticsValue = SourceViewType.PodcastList,
+    ),
+    PODCAST_SCREEN(
+        key = "podcast_screen",
+        analyticsValue = SourceViewType.PodcastScreen,
+    ),
+    PODCAST_SETTINGS(
+        key = "podcast_settings",
+        analyticsValue = SourceViewType.PodcastSettings,
+    ),
+    PROFILE(
+        key = "profile",
+        analyticsValue = SourceViewType.Profile,
+    ),
+    REFERRALS(
+        key = "referrals",
+        analyticsValue = SourceViewType.Referrals,
+    ),
+    SEARCH(
+        key = "search",
+        analyticsValue = SourceViewType.Search,
+    ),
+    SEARCH_RESULTS(
+        key = "search_results",
+        analyticsValue = SourceViewType.SearchResults,
+    ),
+    SHARE_LIST(
+        key = "share_list",
+        analyticsValue = SourceViewType.ShareList,
+    ),
+    STARRED(
+        key = "starred",
+        analyticsValue = SourceViewType.Starred,
+    ),
+    STATS(
+        key = "stats",
+        analyticsValue = SourceViewType.Stats,
+    ),
+    TASKER(
+        key = "tasker",
+        analyticsValue = SourceViewType.Tasker,
+    ),
+    UNKNOWN(
+        key = "unknown",
+        analyticsValue = SourceViewType.Unknown,
+    ),
+    UP_NEXT(
+        key = "up_next",
+        analyticsValue = SourceViewType.UpNext,
+    ),
+    UP_NEXT_HISTORY(
+        key = "up_next_history",
+        analyticsValue = SourceViewType.UpNextHistory,
+    ),
+    WHATS_NEW(
+        key = "whats_new",
+        analyticsValue = SourceViewType.WhatsNew,
+    ),
+    ABOUT(
+        key = "about",
+        analyticsValue = SourceViewType.About,
+    ),
+    APPEARANCE(
+        key = "appearance_settings",
+        analyticsValue = SourceViewType.AppearanceSettings,
+    ),
+    STORAGE_AND_DATA_USAGE(
+        key = "storage_and_data_usage",
+        analyticsValue = SourceViewType.StorageAndDataUsage,
+    ),
+    WIDGET_PLAYER_LARGE(
+        key = "widget_player_large",
+        analyticsValue = SourceViewType.WidgetPlayerLarge,
+    ),
+    WIDGET_PLAYER_MEDIUM(
+        key = "widget_player_medium",
+        analyticsValue = SourceViewType.WidgetPlayerMedium,
+    ),
+    WIDGET_PLAYER_OLD(
+        key = "widget_player_old",
+        analyticsValue = SourceViewType.WidgetPlayerOld,
+    ),
+    WIDGET_PLAYER_SMALL(
+        key = "widget_player_small",
+        analyticsValue = SourceViewType.WidgetPlayerSmall,
+    ),
     ;
 
-    val eventHorizonValue get() = EVENT_MAP[analyticsValue] ?: SourceViewType.Unknown
-
     companion object {
-        fun fromString(source: String?) = SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
+        fun fromString(source: String?) = SourceView.entries.find { it.key == source } ?: UNKNOWN
     }
 }
-
-private val EVENT_MAP = SourceViewType.entries.associateBy(SourceViewType::toString)

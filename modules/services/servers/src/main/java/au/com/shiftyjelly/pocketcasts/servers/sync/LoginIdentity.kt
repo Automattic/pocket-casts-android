@@ -6,16 +6,16 @@ import com.squareup.moshi.ToJson
 
 sealed class LoginIdentity(
     val key: String,
-    val eventHorizonValue: LoginIdentityType,
+    val analyticsValue: LoginIdentityType,
 ) {
     object PocketCasts : LoginIdentity(
         key = "PocketCasts",
-        eventHorizonValue = LoginIdentityType.Password,
+        analyticsValue = LoginIdentityType.Password,
     )
 
     object Google : LoginIdentity(
         key = "Google",
-        eventHorizonValue = LoginIdentityType.Google,
+        analyticsValue = LoginIdentityType.Google,
     )
 
     companion object {

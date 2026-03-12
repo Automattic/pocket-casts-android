@@ -640,7 +640,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeDownloadQueuedEvent(
                         episodeUuid = episodes.first().uuid,
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }
@@ -649,7 +649,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeBulkDownloadQueuedEvent(
                         count = episodes.size.toLong(),
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }
@@ -662,7 +662,7 @@ private class DownloadAnalytics(
             eventHorizon.track(
                 EpisodeDownloadFinishedEvent(
                     episodeUuid = info.episodeUuid,
-                    source = info.sourceView.eventHorizonValue,
+                    source = info.sourceView.analyticsValue,
                 ),
             )
         }
@@ -701,7 +701,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeDownloadCancelledEvent(
                         episodeUuid = episodes.first().uuid,
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }
@@ -710,7 +710,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeBulkDownloadCancelledEvent(
                         count = episodes.size.toLong(),
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }
@@ -728,7 +728,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeDownloadDeletedEvent(
                         episodeUuid = episodes.first().uuid,
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }
@@ -737,7 +737,7 @@ private class DownloadAnalytics(
                 eventHorizon.track(
                     EpisodeBulkDownloadDeletedEvent(
                         count = episodes.size.toLong(),
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
             }

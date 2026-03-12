@@ -81,7 +81,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
             settings.headphoneControlsNextAction.set(action, updateModifiedAt = true)
             eventHorizon.track(
                 SettingsHeadphoneControlsNextChangedEvent(
-                    value = action.eventHorizonValue,
+                    value = action.analyticsValue,
                 ),
             )
         } else {
@@ -94,7 +94,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
             settings.headphoneControlsPreviousAction.set(action, updateModifiedAt = true)
             eventHorizon.track(
                 SettingsHeadphoneControlsPreviousChangedEvent(
-                    value = action.eventHorizonValue,
+                    value = action.analyticsValue,
                 ),
             )
         } else {

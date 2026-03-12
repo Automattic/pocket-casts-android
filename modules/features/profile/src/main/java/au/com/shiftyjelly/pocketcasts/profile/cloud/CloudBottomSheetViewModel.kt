@@ -81,7 +81,7 @@ class CloudBottomSheetViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeDeletedFromCloudEvent(
                     episodeUuid = episode.uuid,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -95,7 +95,7 @@ class CloudBottomSheetViewModel @Inject constructor(
         eventHorizon.track(
             EpisodeUploadQueuedEvent(
                 episodeUuid = episode.uuid,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -106,7 +106,7 @@ class CloudBottomSheetViewModel @Inject constructor(
         eventHorizon.track(
             EpisodeDeletedFromCloudEvent(
                 episodeUuid = episode.uuid,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -117,7 +117,7 @@ class CloudBottomSheetViewModel @Inject constructor(
         eventHorizon.track(
             EpisodeUploadCancelledEvent(
                 episodeUuid = episode.uuid,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -156,7 +156,7 @@ class CloudBottomSheetViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeMarkedAsPlayedEvent(
                     episodeUuid = episode.uuid,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             trackOptionTapped(UploadedFileDetailModalOptionType.MarkPlayed)
@@ -169,7 +169,7 @@ class CloudBottomSheetViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeMarkedAsUnplayedEvent(
                     episodeUuid = episode.uuid,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             trackOptionTapped(UploadedFileDetailModalOptionType.MarkUnplayed)

@@ -132,7 +132,7 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[2].eventHorizonValue,
+                action = ShelfItem.entries[2].analyticsValue,
                 position = 0,
                 movedFrom = ShelfActionSourceType.Shelf,
                 movedTo = ShelfActionSourceType.OverflowMenu,
@@ -147,7 +147,7 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[4].eventHorizonValue,
+                action = ShelfItem.entries[4].analyticsValue,
                 position = 2,
                 movedFrom = ShelfActionSourceType.OverflowMenu,
                 movedTo = ShelfActionSourceType.Shelf,
@@ -162,7 +162,7 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[0].eventHorizonValue,
+                action = ShelfItem.entries[0].analyticsValue,
                 position = 1,
                 movedFrom = ShelfActionSourceType.Shelf,
                 movedTo = ShelfActionSourceType.Shelf,
@@ -177,7 +177,7 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[4].eventHorizonValue,
+                action = ShelfItem.entries[4].analyticsValue,
                 position = 1,
                 movedFrom = ShelfActionSourceType.OverflowMenu,
                 movedTo = ShelfActionSourceType.OverflowMenu,

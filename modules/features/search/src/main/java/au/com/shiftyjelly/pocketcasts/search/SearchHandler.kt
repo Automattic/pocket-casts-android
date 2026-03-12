@@ -248,7 +248,7 @@ class SearchHandler @Inject constructor(
             } else {
                 eventHorizon.track(
                     SearchPerformedEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     ),
                 )
                 loadingObservable.accept(true)
@@ -297,7 +297,7 @@ class SearchHandler @Inject constructor(
             eventHorizon.track(
                 SearchFailedEvent(
                     term = searchTerm.term,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             SearchUiState.SearchOperation.Error(searchTerm = searchTerm.term, error = serverSearchResults.error!!)
@@ -328,7 +328,7 @@ class SearchHandler @Inject constructor(
             eventHorizon.track(
                 SearchFailedEvent(
                     term = searchQuery.value?.term.orEmpty(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             SearchUiState.SearchOperation.Error(
@@ -366,7 +366,7 @@ class SearchHandler @Inject constructor(
                             .await()
                         eventHorizon.track(
                             SearchPerformedEvent(
-                                source = source.eventHorizonValue,
+                                source = source.analyticsValue,
                             ),
                         )
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
@@ -383,7 +383,7 @@ class SearchHandler @Inject constructor(
                         val apiResults = try {
                             eventHorizon.track(
                                 SearchPerformedEvent(
-                                    source = source.eventHorizonValue,
+                                    source = source.analyticsValue,
                                 ),
                             )
                             improvedSearchManager.combinedSearch(query).map {

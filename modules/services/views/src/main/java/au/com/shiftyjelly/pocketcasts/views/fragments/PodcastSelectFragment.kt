@@ -281,15 +281,15 @@ private data class PodcastSelectFragmentArgs(
 ) : Parcelable
 
 enum class PodcastSelectFragmentSource(
-    val eventHorizonValue: SelectPodcastsSourceType,
+    val analyticsValue: SelectPodcastsSourceType,
 ) {
     AUTO_ADD(
-        eventHorizonValue = SelectPodcastsSourceType.AutoAdd,
+        analyticsValue = SelectPodcastsSourceType.AutoAdd,
     ),
     NOTIFICATIONS(
-        eventHorizonValue = SelectPodcastsSourceType.Notifications,
+        analyticsValue = SelectPodcastsSourceType.Notifications,
     ),
     FILTERS(
-        eventHorizonValue = SelectPodcastsSourceType.Filters,
+        analyticsValue = SelectPodcastsSourceType.Filters,
     ),
 }

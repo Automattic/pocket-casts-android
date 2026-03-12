@@ -14,39 +14,39 @@ data class ArtworkConfiguration(
 
     enum class Element(
         internal val key: String,
-        val eventHorizonValue: EpisodeArtworkElementType,
+        val analyticsValue: EpisodeArtworkElementType,
     ) {
         Filters(
             key = "filters",
-            eventHorizonValue = EpisodeArtworkElementType.Filters,
+            analyticsValue = EpisodeArtworkElementType.Filters,
         ),
         UpNext(
             key = "up_next",
-            eventHorizonValue = EpisodeArtworkElementType.Upnext,
+            analyticsValue = EpisodeArtworkElementType.Upnext,
         ),
         Downloads(
             key = "downloads",
-            eventHorizonValue = EpisodeArtworkElementType.Downloads,
+            analyticsValue = EpisodeArtworkElementType.Downloads,
         ),
         Files(
             key = "files",
-            eventHorizonValue = EpisodeArtworkElementType.Files,
+            analyticsValue = EpisodeArtworkElementType.Files,
         ),
         Starred(
             key = "starred",
-            eventHorizonValue = EpisodeArtworkElementType.Starred,
+            analyticsValue = EpisodeArtworkElementType.Starred,
         ),
         Bookmarks(
             key = "bookmarks",
-            eventHorizonValue = EpisodeArtworkElementType.Bookmarks,
+            analyticsValue = EpisodeArtworkElementType.Bookmarks,
         ),
         ListeningHistory(
             key = "listening_history",
-            eventHorizonValue = EpisodeArtworkElementType.Listeninghistory,
+            analyticsValue = EpisodeArtworkElementType.Listeninghistory,
         ),
         Podcasts(
             key = "podcasts",
-            eventHorizonValue = EpisodeArtworkElementType.Podcasts,
+            analyticsValue = EpisodeArtworkElementType.Podcasts,
         ),
         ;
 

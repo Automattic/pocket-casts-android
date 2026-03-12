@@ -660,7 +660,7 @@ open class PlaybackManager @Inject constructor(
                 EpisodeAddedToUpNextEvent(
                     episodeUuid = episode.uuid,
                     toTop = true,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -682,7 +682,7 @@ open class PlaybackManager @Inject constructor(
                 EpisodeAddedToUpNextEvent(
                     episodeUuid = episode.uuid,
                     toTop = false,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -769,7 +769,7 @@ open class PlaybackManager @Inject constructor(
             EpisodeBulkAddToUpNextEvent(
                 count = episodes.size.toLong(),
                 toTop = false,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
         notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -788,7 +788,7 @@ open class PlaybackManager @Inject constructor(
                 EpisodeBulkAddToUpNextEvent(
                     count = episodes.size.toLong(),
                     toTop = true,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -819,7 +819,7 @@ open class PlaybackManager @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
             trackPlaybackEvent(sourceView) { source, contentType ->
                 PlaybackPauseEvent(
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                     contentType = contentType,
                 )
             }
@@ -840,7 +840,7 @@ open class PlaybackManager @Inject constructor(
             if (!isAudioFocusFailed) {
                 trackPlaybackEvent(sourceView) { source, contentType ->
                     PlaybackStopEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                         contentType = contentType,
                     )
                 }
@@ -993,7 +993,7 @@ open class PlaybackManager @Inject constructor(
 
         trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackSkipForwardEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 contentType = contentType,
             )
         }
@@ -1019,7 +1019,7 @@ open class PlaybackManager @Inject constructor(
 
         trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackSkipBackEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 contentType = contentType,
             )
         }
@@ -1033,7 +1033,7 @@ open class PlaybackManager @Inject constructor(
                 seekToTimeMsInternal(chapter.startTime)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                         contentType = contentType,
                     )
                 }
@@ -1049,7 +1049,7 @@ open class PlaybackManager @Inject constructor(
                 seekToTimeMsInternal(chapter.startTime)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                         contentType = contentType,
                     )
                 }
@@ -1063,7 +1063,7 @@ open class PlaybackManager @Inject constructor(
                 seekToTimeMsInternal(chapter.endTime)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                         contentType = contentType,
                     )
                 }
@@ -1155,7 +1155,7 @@ open class PlaybackManager @Inject constructor(
                     eventHorizon.track(
                         EpisodeRemovedFromUpNextEvent(
                             episodeUuid = episodeToRemove.uuid,
-                            source = source.eventHorizonValue,
+                            source = source.analyticsValue,
                         ),
                     )
                 }
@@ -2122,7 +2122,7 @@ open class PlaybackManager @Inject constructor(
 
         trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackPlayEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 contentType = contentType,
             )
         }
@@ -2510,7 +2510,7 @@ open class PlaybackManager @Inject constructor(
 
             eventHorizon.track(
                 PlaybackSeekEvent(
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                     seekFromPercent = seekFromPercent.toLong(),
                     seekToPercent = seekToPercent.toLong(),
                 ),

@@ -376,8 +376,8 @@ class WinbackViewModel @Inject constructor(
         val currentSubscription = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.currentSubscription
         eventHorizon.track(
             WinbackMainScreenRowTapEvent(
-                tier = currentSubscription?.tier?.eventHorizonValue,
-                frequency = currentSubscription?.billingCycle?.eventHorizonValue,
+                tier = currentSubscription?.tier?.analyticsValue,
+                frequency = currentSubscription?.billingCycle?.analyticsValue,
                 isInstallment = currentSubscription?.isInstallment,
                 row = WinbackRowType.ClaimOffer,
             ),

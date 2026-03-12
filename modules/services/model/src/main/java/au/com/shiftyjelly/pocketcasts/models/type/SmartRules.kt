@@ -77,16 +77,16 @@ data class SmartRules(
     }
 
     enum class MediaTypeRule(
-        val eventHorizonValue: PlaylistMediaType,
+        val analyticsValue: PlaylistMediaType,
     ) : SmartRule {
         Any(
-            eventHorizonValue = PlaylistMediaType.All,
+            analyticsValue = PlaylistMediaType.All,
         ),
         Audio(
-            eventHorizonValue = PlaylistMediaType.Audio,
+            analyticsValue = PlaylistMediaType.Audio,
         ),
         Video(
-            eventHorizonValue = PlaylistMediaType.Video,
+            analyticsValue = PlaylistMediaType.Video,
         ),
         ;
 
@@ -101,31 +101,31 @@ data class SmartRules(
 
     enum class ReleaseDateRule(
         private val duration: Duration,
-        val eventHorizonValue: PlaylistReleaseDateType,
+        val analyticsValue: PlaylistReleaseDateType,
     ) : SmartRule {
         AnyTime(
             duration = Duration.INFINITE,
-            eventHorizonValue = PlaylistReleaseDateType.Anytime,
+            analyticsValue = PlaylistReleaseDateType.Anytime,
         ),
         Last24Hours(
             duration = 1.days,
-            eventHorizonValue = PlaylistReleaseDateType.Last24Hours,
+            analyticsValue = PlaylistReleaseDateType.Last24Hours,
         ),
         Last3Days(
             duration = 3.days,
-            eventHorizonValue = PlaylistReleaseDateType.Last3Days,
+            analyticsValue = PlaylistReleaseDateType.Last3Days,
         ),
         LastWeek(
             duration = 7.days,
-            eventHorizonValue = PlaylistReleaseDateType.LastWeek,
+            analyticsValue = PlaylistReleaseDateType.LastWeek,
         ),
         Last2Weeks(
             duration = 14.days,
-            eventHorizonValue = PlaylistReleaseDateType.Last2Weeks,
+            analyticsValue = PlaylistReleaseDateType.Last2Weeks,
         ),
         LastMonth(
             duration = 31.days,
-            eventHorizonValue = PlaylistReleaseDateType.LastMonth,
+            analyticsValue = PlaylistReleaseDateType.LastMonth,
         ),
         ;
 

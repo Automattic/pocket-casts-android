@@ -77,8 +77,8 @@ class SearchHistoryViewModel @Inject constructor(
             eventHorizon.track(
                 SearchHistoryItemDeleteButtonTappedEvent(
                     uuid = entry.uuid(),
-                    type = entry.eventHorizonValue,
-                    source = source.eventHorizonValue,
+                    type = entry.analyticsValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -90,7 +90,7 @@ class SearchHistoryViewModel @Inject constructor(
             loadSearchHistory()
             eventHorizon.track(
                 SearchHistoryClearedEvent(
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -100,8 +100,8 @@ class SearchHistoryViewModel @Inject constructor(
         eventHorizon.track(
             SearchHistoryItemTappedEvent(
                 uuid = entry.uuid(),
-                type = entry.eventHorizonValue,
-                source = source.eventHorizonValue,
+                type = entry.analyticsValue,
+                source = source.analyticsValue,
             ),
         )
     }

@@ -156,7 +156,7 @@ class MultiSelectFragment :
     private fun trackRearrangeFinishedEvent() {
         eventHorizon.track(
             MultiSelectViewOverflowMenuRearrangeFinishedEvent(
-                source = args.source.eventHorizonValue,
+                source = args.source.analyticsValue,
             ),
         )
     }
@@ -173,7 +173,7 @@ class MultiSelectFragment :
             }
             eventHorizon.track(
                 MultiSelectViewOverflowMenuRearrangeActionMovedEvent(
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                     title = title,
                     position = newPosition.toLong(),
                     movedFrom = movedFrom,

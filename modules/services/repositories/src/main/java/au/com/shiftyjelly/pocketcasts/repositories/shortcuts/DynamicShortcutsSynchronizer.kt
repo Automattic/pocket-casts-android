@@ -55,7 +55,7 @@ class DynamicShortcutsSynchronizer @Inject constructor(
         val type = if (playlist.isManual) Playlist.Type.Manual else Playlist.Type.Smart
         val deepLink = ShowPlaylistDeepLink(
             playlistUuid = playlist.uuid,
-            playlistType = type.analyticsValue,
+            playlistType = type.key,
         )
         val shortcut = ShortcutInfo.Builder(context, TOP_FILTER_SHORTCUT_ID)
             .setShortLabel(title)

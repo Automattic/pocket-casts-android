@@ -216,13 +216,13 @@ class EpisodeFragmentViewModel @Inject constructor(
                     episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
                     EpisodeMarkedAsPlayedEvent(
                         episodeUuid = episode.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     )
                 } else {
                     episodeManager.markAsNotPlayedBlocking(episode)
                     EpisodeMarkedAsUnplayedEvent(
                         episodeUuid = episode.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     )
                 }
                 eventHorizon.track(event)
@@ -271,13 +271,13 @@ class EpisodeFragmentViewModel @Inject constructor(
                     episodeManager.archiveBlocking(episode, playbackManager)
                     EpisodeArchivedEvent(
                         episodeUuid = episode.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     )
                 } else {
                     episodeManager.unarchiveBlocking(episode)
                     EpisodeUnarchivedEvent(
                         episodeUuid = episode.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     )
                 }
                 eventHorizon.track(event)

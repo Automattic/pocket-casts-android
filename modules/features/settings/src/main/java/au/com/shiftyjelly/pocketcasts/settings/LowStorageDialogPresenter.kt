@@ -32,7 +32,7 @@ class LowStorageDialogPresenter(
 
         eventHorizon.track(
             FreeUpSpaceModalShownEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
 
@@ -51,7 +51,7 @@ class LowStorageDialogPresenter(
             .setOnConfirm {
                 eventHorizon.track(
                     FreeUpSpaceManageDownloadsTappedEvent(
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
                 onManageDownloadsClick.invoke()
@@ -59,7 +59,7 @@ class LowStorageDialogPresenter(
             .setOnSecondary {
                 eventHorizon.track(
                     FreeUpSpaceMaybeLaterTappedEvent(
-                        source = sourceView.eventHorizonValue,
+                        source = sourceView.analyticsValue,
                     ),
                 )
                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())

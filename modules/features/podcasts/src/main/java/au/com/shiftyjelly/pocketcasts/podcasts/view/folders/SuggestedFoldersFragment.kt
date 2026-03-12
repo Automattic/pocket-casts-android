@@ -249,16 +249,16 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     }
 
     enum class Source(
-        val eventHorizonValue: SuggestedFolderSourceType,
+        val analyticsValue: SuggestedFolderSourceType,
     ) {
         Popup(
-            eventHorizonValue = SuggestedFolderSourceType.Popup,
+            analyticsValue = SuggestedFolderSourceType.Popup,
         ),
         ToolbarButton(
-            eventHorizonValue = SuggestedFolderSourceType.PodcastsList,
+            analyticsValue = SuggestedFolderSourceType.PodcastsList,
         ),
         DEEPLINK(
-            eventHorizonValue = SuggestedFolderSourceType.Deeplink,
+            analyticsValue = SuggestedFolderSourceType.Deeplink,
         ),
     }
 

@@ -48,7 +48,7 @@ class PodcastSelectViewModel @Inject constructor(
     fun trackOnShown(source: PodcastSelectFragmentSource) {
         eventHorizon.track(
             SettingsSelectPodcastsShownEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -58,7 +58,7 @@ class PodcastSelectViewModel @Inject constructor(
             SettingsSelectPodcastsPodcastToggledEvent(
                 uuid = podcastUuid,
                 enabled = enabled,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -66,7 +66,7 @@ class PodcastSelectViewModel @Inject constructor(
     fun trackOnSelectNoneTapped(source: PodcastSelectFragmentSource) {
         eventHorizon.track(
             SettingsSelectPodcastsSelectNoneTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -74,7 +74,7 @@ class PodcastSelectViewModel @Inject constructor(
     fun trackOnSelectAllTapped(source: PodcastSelectFragmentSource) {
         eventHorizon.track(
             SettingsSelectPodcastsSelectAllTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -82,7 +82,7 @@ class PodcastSelectViewModel @Inject constructor(
     fun trackOnDismissed(source: PodcastSelectFragmentSource) {
         eventHorizon.track(
             SettingsSelectPodcastsDismissedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }

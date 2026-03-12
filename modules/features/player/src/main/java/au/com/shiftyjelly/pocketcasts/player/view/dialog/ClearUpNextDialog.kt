@@ -35,7 +35,7 @@ class ClearUpNextDialog(
     private fun clear() {
         eventHorizon.track(
             UpNextQueueClearedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
         if (removeNowPlaying) {

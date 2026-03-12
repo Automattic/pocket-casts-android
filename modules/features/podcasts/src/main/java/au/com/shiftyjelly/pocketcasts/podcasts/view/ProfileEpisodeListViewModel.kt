@@ -114,13 +114,13 @@ class ProfileEpisodeListViewModel @Inject constructor(
         if (oldValue.isEmpty() && searchQuery.isNotEmpty()) {
             eventHorizon.track(
                 SearchPerformedEvent(
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         } else if (oldValue.isNotEmpty() && searchQuery.isEmpty()) {
             eventHorizon.track(
                 SearchClearedEvent(
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -140,7 +140,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     internal fun onCreateFreeAccountClick() {
         eventHorizon.track(
             InformationalBannerViewCreateAccountTapEvent(
-                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+                source = SourceView.LISTENING_HISTORY.analyticsValue,
             ),
         )
     }
@@ -148,7 +148,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     internal fun dismissFreeAccountBanner() {
         eventHorizon.track(
             InformationalBannerViewDismissedEvent(
-                source = SourceView.LISTENING_HISTORY.eventHorizonValue,
+                source = SourceView.LISTENING_HISTORY.analyticsValue,
             ),
         )
         settings.isFreeAccountHistoryBannerDismissed.set(true, updateModifiedAt = true)

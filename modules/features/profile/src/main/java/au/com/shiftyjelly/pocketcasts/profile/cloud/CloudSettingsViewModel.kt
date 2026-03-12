@@ -97,7 +97,7 @@ class CloudSettingsViewModel @Inject constructor(
     fun onUpgradeBannerDismissed(source: SourceView) {
         eventHorizon.track(
             UpgradeBannerDismissedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }

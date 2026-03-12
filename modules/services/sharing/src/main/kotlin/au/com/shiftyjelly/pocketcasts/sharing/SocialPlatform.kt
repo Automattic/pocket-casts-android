@@ -50,7 +50,7 @@ enum class SocialPlatform(
     ),
     ;
 
-    val eventHorizonValue get() = when (this) {
+    val analyticsValue get() = when (this) {
         Instagram -> ShareActionPlatformType.IgStory
         WhatsApp -> ShareActionPlatformType.WhatsApp
         Telegram -> ShareActionPlatformType.Telegram

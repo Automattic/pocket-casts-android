@@ -273,7 +273,7 @@ class SharingClient(
                     context = context,
                     event = EndOfYearStorySharedEvent(
                         from = EndOfYearShareSourceType.Button,
-                        story = data.story.eventHorizonValue,
+                        story = data.story.analyticsValue,
                         currentYear = data.year.value.toLong(),
                     ),
                 )
@@ -378,10 +378,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.Podcast(podcast),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.Podcast,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -396,10 +396,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.Episode(podcast, episode),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.Episode,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -415,10 +415,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.EpisodePosition(podcast, episode, position, TimestampType.Episode),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.CurrentTime,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -434,10 +434,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.BookmarkTime,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -450,7 +450,7 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.EpisodeFile(podcast, episode),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.EpisodeFile,
                 action = ShareActionPlatformType.SystemSheet,
             ),
@@ -466,10 +466,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.ClipLink(podcast, episode, range),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.ClipLink,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -483,7 +483,7 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.ClipAudio(podcast, episode, range),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.ClipAudio,
                 action = ShareActionPlatformType.SystemSheet,
                 cardType = ShareActionCardType.Audio,
@@ -503,10 +503,10 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.ClipVideo(podcast, episode, range),
             trackable = PodcastSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 type = ShareActionType.ClipVideo,
-                action = platform.eventHorizonValue,
-                cardType = cardType.eventHorizonValue,
+                action = platform.analyticsValue,
+                cardType = cardType.analyticsValue,
             ),
             platform = platform,
             cardType = cardType,
@@ -520,7 +520,7 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.ReferralLink(referralCode, offerName, offerDuration),
             trackable = ReferralPassSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 code = referralCode,
             ),
         )
@@ -532,7 +532,7 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.EndOfYearStory(story, year, screenshot),
             trackable = EndOfYearStoryShareEvent(
-                story = story.eventHorizonValue,
+                story = story.analyticsValue,
                 currentYear = year.value.toLong(),
             ),
         )
@@ -546,7 +546,7 @@ data class SharingRequest internal constructor(
         ) = Builder(
             data = Data.Transcript(episodeUuid, episodeTitle, transcript),
             trackable = TranscriptSharedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 podcastUuid = podcastUuid,
                 episodeUuid = episodeUuid,
             ),

@@ -4,15 +4,15 @@ import com.automattic.eventhorizon.AutoAddToUpNextLimitBehaviorType
 
 enum class AutoAddUpNextLimitBehaviour(
     val serverId: Int,
-    val eventHorizonValue: AutoAddToUpNextLimitBehaviorType,
+    val analyticsValue: AutoAddToUpNextLimitBehaviorType,
 ) {
     STOP_ADDING(
         serverId = 1,
-        eventHorizonValue = AutoAddToUpNextLimitBehaviorType.StopAdding,
+        analyticsValue = AutoAddToUpNextLimitBehaviorType.StopAdding,
     ),
     ONLY_ADD_TO_TOP(
         serverId = 0,
-        eventHorizonValue = AutoAddToUpNextLimitBehaviorType.OnlyAddTop,
+        analyticsValue = AutoAddToUpNextLimitBehaviorType.OnlyAddTop,
     ),
     ;
 

@@ -428,7 +428,7 @@ class PodcastsFragment :
             val onSortTypeChanged = { sort: PodcastsSortType ->
                 eventHorizon.track(
                     FolderSortByChangedEvent(
-                        sortOrder = sort.eventHorizonValue,
+                        sortOrder = sort.analyticsValue,
                     ),
                 )
                 viewModel.updateFolderSort(folder.uuid, sort)
@@ -741,7 +741,7 @@ class PodcastsFragment :
         eventHorizon.track(
             BannerAdImpressionEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }
@@ -750,7 +750,7 @@ class PodcastsFragment :
         eventHorizon.track(
             BannerAdTappedEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }

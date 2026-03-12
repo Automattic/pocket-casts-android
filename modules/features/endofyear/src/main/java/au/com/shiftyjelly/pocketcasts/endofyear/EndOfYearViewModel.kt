@@ -319,7 +319,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         trackEvent { year ->
             EndOfYearStoriesShownEvent(
                 currentYear = year,
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             )
         }
     }
@@ -350,7 +350,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         trackEvent { year ->
             EndOfYearStoriesDismissedEvent(
                 source = source,
-                story = story?.eventHorizonValue,
+                story = story?.analyticsValue,
                 currentYear = year,
             )
         }
@@ -359,7 +359,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal fun trackStoryShown(story: Story) {
         trackEvent { year ->
             EndOfYearStoryShownEvent(
-                story = story.eventHorizonValue,
+                story = story.analyticsValue,
                 currentYear = year,
             )
         }
@@ -416,7 +416,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         eventHorizon.track(
             EndOfYearStorySharedEvent(
                 from = EndOfYearShareSourceType.Screenshot,
-                story = story.eventHorizonValue,
+                story = story.analyticsValue,
                 currentYear = year.value.toLong(),
                 activity = activity.javaClass.name,
             ),

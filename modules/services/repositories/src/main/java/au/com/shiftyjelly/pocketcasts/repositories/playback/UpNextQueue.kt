@@ -149,22 +149,22 @@ interface UpNextQueue {
 }
 
 enum class UpNextSource(
-    val eventHorizonValue: UpNextSourceType,
+    val analyticsValue: UpNextSourceType,
 ) {
     MINI_PLAYER(
-        eventHorizonValue = UpNextSourceType.MiniPlayer,
+        analyticsValue = UpNextSourceType.MiniPlayer,
     ),
     PLAYER(
-        eventHorizonValue = UpNextSourceType.Player,
+        analyticsValue = UpNextSourceType.Player,
     ),
     NOW_PLAYING(
-        eventHorizonValue = UpNextSourceType.NowPlaying,
+        analyticsValue = UpNextSourceType.NowPlaying,
     ),
     UP_NEXT_SHORTCUT(
-        eventHorizonValue = UpNextSourceType.UpNextShortcut,
+        analyticsValue = UpNextSourceType.UpNextShortcut,
     ),
     UP_NEXT_TAB(
-        eventHorizonValue = UpNextSourceType.UpNextTab,
+        analyticsValue = UpNextSourceType.UpNextTab,
     ),
 }
 

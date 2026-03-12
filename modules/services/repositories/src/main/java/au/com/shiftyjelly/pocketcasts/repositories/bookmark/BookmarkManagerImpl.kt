@@ -88,7 +88,7 @@ class BookmarkManagerImpl @Inject constructor(
         )
         eventHorizon.track(
             BookmarkUpdateTitleEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
     }

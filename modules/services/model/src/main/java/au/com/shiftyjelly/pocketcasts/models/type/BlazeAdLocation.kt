@@ -8,22 +8,22 @@ import com.squareup.moshi.JsonWriter
 
 enum class BlazeAdLocation(
     val key: String,
-    val eventHorizonValue: BlazeAdSourceType,
+    val analyticsValue: BlazeAdSourceType,
     val feature: Feature?,
 ) {
     PodcastList(
         key = "podcast_list",
-        eventHorizonValue = BlazeAdSourceType.PodcastList,
+        analyticsValue = BlazeAdSourceType.PodcastList,
         feature = Feature.BANNER_ADS_PODCASTS,
     ),
     Player(
         key = "player",
-        eventHorizonValue = BlazeAdSourceType.Player,
+        analyticsValue = BlazeAdSourceType.Player,
         feature = Feature.BANNER_ADS_PLAYER,
     ),
     Unknown(
         key = "",
-        eventHorizonValue = BlazeAdSourceType.Unknown,
+        analyticsValue = BlazeAdSourceType.Unknown,
         feature = null,
     ),
     ;

@@ -9,13 +9,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 enum class NotificationVibrateSetting(
     val intValue: Int,
     @StringRes val summary: Int,
-    val eventHorizonValue: NotificationVibrationType,
+    val analyticsValue: NotificationVibrationType,
 ) {
 
     Never(
         intValue = 0,
         summary = LR.string.settings_notification_vibrate_never,
-        eventHorizonValue = NotificationVibrationType.Never,
+        analyticsValue = NotificationVibrationType.Never,
     ) {
         override fun isNotificationVibrateOn(context: Context) = false
     },
@@ -23,7 +23,7 @@ enum class NotificationVibrateSetting(
     OnlyWhenSilent(
         intValue = 1,
         summary = LR.string.settings_notification_vibrate_in_silent,
-        eventHorizonValue = NotificationVibrationType.Silent,
+        analyticsValue = NotificationVibrationType.Silent,
     ) {
 
         override fun isNotificationVibrateOn(context: Context): Boolean {
@@ -35,7 +35,7 @@ enum class NotificationVibrateSetting(
     NewEpisodes(
         intValue = 2,
         summary = LR.string.settings_notification_vibrate_new_episodes,
-        eventHorizonValue = NotificationVibrationType.NewEpisodes,
+        analyticsValue = NotificationVibrationType.NewEpisodes,
     ) {
         override fun isNotificationVibrateOn(context: Context) = true
     }, ;

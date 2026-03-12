@@ -91,7 +91,7 @@ class DiscoverFragment :
         eventHorizon.track(
             PodcastSubscribedEvent(
                 uuid = podcast.uuid,
-                source = SourceView.DISCOVER.eventHorizonValue,
+                source = SourceView.DISCOVER.analyticsValue,
             ),
         )
     }

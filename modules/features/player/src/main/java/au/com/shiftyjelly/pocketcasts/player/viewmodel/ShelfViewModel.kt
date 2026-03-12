@@ -145,7 +145,7 @@ class ShelfViewModel @AssistedInject constructor(
         }
         eventHorizon.track(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = shelfItem.eventHorizonValue,
+                action = shelfItem.analyticsValue,
                 position = newPosition.toLong(),
                 movedFrom = movedFrom.analyticsValue,
                 movedTo = movedTo.analyticsValue,

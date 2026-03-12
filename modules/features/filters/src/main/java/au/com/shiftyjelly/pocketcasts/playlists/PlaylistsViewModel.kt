@@ -136,7 +136,7 @@ class PlaylistsViewModel @Inject constructor(
     fun trackPlaylistDeleteTriggered(playlist: PlaylistPreview) {
         eventHorizon.track(
             FilterDeleteTriggeredEvent(
-                filterType = playlist.type.eventHorizonValue,
+                filterType = playlist.type.analyticsValue,
             ),
         )
     }
@@ -144,7 +144,7 @@ class PlaylistsViewModel @Inject constructor(
     fun trackPlaylistDeleteDismissed(playlist: PlaylistPreview) {
         eventHorizon.track(
             FilterDeleteDismissedEvent(
-                filterType = playlist.type.eventHorizonValue,
+                filterType = playlist.type.analyticsValue,
             ),
         )
     }
@@ -152,7 +152,7 @@ class PlaylistsViewModel @Inject constructor(
     fun trackPlaylistDeleted(playlist: PlaylistPreview) {
         eventHorizon.track(
             FilterDeletedEvent(
-                filterType = playlist.type.eventHorizonValue,
+                filterType = playlist.type.analyticsValue,
             ),
         )
     }
@@ -172,7 +172,7 @@ class PlaylistsViewModel @Inject constructor(
     fun trackFreeAccountCtaClicked() {
         eventHorizon.track(
             InformationalBannerViewCreateAccountTapEvent(
-                source = SourceView.FILTERS.eventHorizonValue,
+                source = SourceView.FILTERS.analyticsValue,
             ),
         )
     }
@@ -180,7 +180,7 @@ class PlaylistsViewModel @Inject constructor(
     fun trackFreeAccountBannerDismissed() {
         eventHorizon.track(
             InformationalBannerViewDismissedEvent(
-                source = SourceView.FILTERS.eventHorizonValue,
+                source = SourceView.FILTERS.analyticsValue,
             ),
         )
     }

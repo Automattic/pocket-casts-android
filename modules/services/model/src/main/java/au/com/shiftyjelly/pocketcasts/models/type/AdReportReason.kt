@@ -3,18 +3,18 @@ package au.com.shiftyjelly.pocketcasts.models.type
 import com.automattic.eventhorizon.BlazeAdReportType
 
 enum class AdReportReason(
-    val eventHorizonValue: BlazeAdReportType,
+    val analyticsValue: BlazeAdReportType,
 ) {
     Broken(
-        eventHorizonValue = BlazeAdReportType.Broken,
+        analyticsValue = BlazeAdReportType.Broken,
     ),
     Malicious(
-        eventHorizonValue = BlazeAdReportType.Malicious,
+        analyticsValue = BlazeAdReportType.Malicious,
     ),
     TooFrequent(
-        eventHorizonValue = BlazeAdReportType.TooOften,
+        analyticsValue = BlazeAdReportType.TooOften,
     ),
     Other(
-        eventHorizonValue = BlazeAdReportType.Other,
+        analyticsValue = BlazeAdReportType.Other,
     ),
 }

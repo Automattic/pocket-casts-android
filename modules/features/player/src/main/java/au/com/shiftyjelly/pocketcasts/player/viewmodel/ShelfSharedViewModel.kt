@@ -306,8 +306,8 @@ class ShelfSharedViewModel @Inject constructor(
     ) {
         eventHorizon.track(
             PlayerShelfActionTappedEvent(
-                from = shelfItemSource.eventHorizonValue,
-                action = shelfItem.eventHorizonValue,
+                from = shelfItemSource.analyticsValue,
+                action = shelfItem.analyticsValue,
             ),
         )
         if (shelfItem == ShelfItem.Cast) {
@@ -379,24 +379,17 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     enum class ShelfItemSource(
-        val eventHorizonValue: ShelfActionSourceType,
+        val analyticsValue: ShelfActionSourceType,
     ) {
         Shelf(
-            eventHorizonValue = ShelfActionSourceType.Shelf,
+            analyticsValue = ShelfActionSourceType.Shelf,
         ),
         OverflowMenu(
-            eventHorizonValue = ShelfActionSourceType.OverflowMenu,
+            analyticsValue = ShelfActionSourceType.OverflowMenu,
         ),
     }
 
     companion object {
         const val MIN_SHELF_ITEMS_SIZE = 4
-
-        object AnalyticsProp {
-            const val FROM = "from"
-            const val ACTION = "action"
-            const val SHELF = "shelf"
-            const val OVERFLOW_MENU = "overflow_menu"
-        }
     }
 }

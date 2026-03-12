@@ -507,13 +507,13 @@ class SyncManagerImpl @Inject constructor(
                         if (loginResult.result.isNewAccount) {
                             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
                             UserAccountCreatedEvent(
-                                source = loginIdentity.eventHorizonValue,
-                                sourceInCode = signInSource.eventHorizonValue,
+                                source = loginIdentity.analyticsValue,
+                                sourceInCode = signInSource.analyticsValue,
                             )
                         } else {
                             UserSignedInEvent(
-                                source = loginIdentity.eventHorizonValue,
-                                sourceInCode = signInSource.eventHorizonValue,
+                                source = loginIdentity.analyticsValue,
+                                sourceInCode = signInSource.analyticsValue,
                             )
                         }
                     }
@@ -531,8 +531,8 @@ class SyncManagerImpl @Inject constructor(
 
                     is SignInSource.UserInitiated -> {
                         UserSigninFailedEvent(
-                            source = loginIdentity.eventHorizonValue,
-                            sourceInCode = signInSource.eventHorizonValue,
+                            source = loginIdentity.analyticsValue,
+                            sourceInCode = signInSource.analyticsValue,
                             errorCode = errorCodeValue,
                         )
                     }
@@ -551,7 +551,7 @@ class SyncManagerImpl @Inject constructor(
                 notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
                 UserAccountCreatedEvent(
                     source = LoginIdentityType.Password,
-                    sourceInCode = signInSource.eventHorizonValue,
+                    sourceInCode = signInSource.analyticsValue,
                 )
             }
 

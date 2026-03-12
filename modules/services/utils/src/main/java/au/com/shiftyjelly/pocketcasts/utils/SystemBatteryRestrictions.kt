@@ -15,19 +15,19 @@ import timber.log.Timber
 class SystemBatteryRestrictions @Inject constructor(@ApplicationContext private val context: Context) {
 
     enum class Status(
-        val eventHorizonValue: BatteryRestrictionType,
+        val analyticsValue: BatteryRestrictionType,
     ) {
         Unrestricted(
-            eventHorizonValue = BatteryRestrictionType.Unrestricted,
+            analyticsValue = BatteryRestrictionType.Unrestricted,
         ),
         Optimized(
-            eventHorizonValue = BatteryRestrictionType.Optimized,
+            analyticsValue = BatteryRestrictionType.Optimized,
         ),
         Restricted(
-            eventHorizonValue = BatteryRestrictionType.Restricted,
+            analyticsValue = BatteryRestrictionType.Restricted,
         ),
         Other(
-            eventHorizonValue = BatteryRestrictionType.Other,
+            analyticsValue = BatteryRestrictionType.Other,
         ),
         ;
 

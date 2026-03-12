@@ -561,7 +561,7 @@ class ProfileEpisodeListFragment :
                                 onManageDownloadsClick = {
                                     eventHorizon.track(
                                         FreeUpSpaceManageDownloadsTappedEvent(
-                                            source = SourceView.DOWNLOADS.eventHorizonValue,
+                                            source = SourceView.DOWNLOADS.analyticsValue,
                                         ),
                                     )
                                     showFragment(ManualCleanupFragment.newInstance())
@@ -580,7 +580,7 @@ class ProfileEpisodeListFragment :
     private fun onDismissManageDownloadTapped() {
         eventHorizon.track(
             FreeUpSpaceMaybeLaterTappedEvent(
-                source = SourceView.DOWNLOADS.eventHorizonValue,
+                source = SourceView.DOWNLOADS.analyticsValue,
             ),
         )
         settings.setDismissLowStorageBannerTime(System.currentTimeMillis())

@@ -96,7 +96,7 @@ class SearchFragment : BaseFragment() {
             val arguments = Bundle().apply {
                 putBoolean(ARG_FLOATING, floating)
                 putBoolean(ARG_ONLY_SEARCH_REMOTE, onlySearchRemote)
-                putString(ARG_SOURCE, source.analyticsValue)
+                putString(ARG_SOURCE, source.key)
             }
             fragment.arguments = arguments
             return fragment
@@ -238,7 +238,7 @@ class SearchFragment : BaseFragment() {
         searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn)?.setOnClickListener {
             eventHorizon.track(
                 SearchClearedEvent(
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             searchView.setQuery("", false)

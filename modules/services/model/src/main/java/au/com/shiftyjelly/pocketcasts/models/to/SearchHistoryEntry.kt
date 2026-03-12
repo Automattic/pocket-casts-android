@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 sealed class SearchHistoryEntry(
     val id: Long? = null,
 ) {
-    abstract val eventHorizonValue: SearchHistoryType
+    abstract val analyticsValue: SearchHistoryType
 
     class Episode(
         id: Long? = null,
@@ -20,7 +20,7 @@ sealed class SearchHistoryEntry(
         val podcastTitle: String,
         val artworkUrl: String? = null,
     ) : SearchHistoryEntry(id = id) {
-        override val eventHorizonValue get() = SearchHistoryType.Episode
+        override val analyticsValue get() = SearchHistoryType.Episode
     }
 
     class Folder(
@@ -30,7 +30,7 @@ sealed class SearchHistoryEntry(
         val color: Int,
         val podcastIds: List<String>,
     ) : SearchHistoryEntry(id = id) {
-        override val eventHorizonValue get() = SearchHistoryType.Folder
+        override val analyticsValue get() = SearchHistoryType.Folder
     }
 
     class Podcast(
@@ -39,14 +39,14 @@ sealed class SearchHistoryEntry(
         val title: String,
         val author: String,
     ) : SearchHistoryEntry(id = id) {
-        override val eventHorizonValue get() = SearchHistoryType.Podcast
+        override val analyticsValue get() = SearchHistoryType.Podcast
     }
 
     class SearchTerm(
         id: Long? = null,
         val term: String,
     ) : SearchHistoryEntry(id = id) {
-        override val eventHorizonValue get() = SearchHistoryType.SearchTerm
+        override val analyticsValue get() = SearchHistoryType.SearchTerm
     }
 
     fun toSearchHistoryItem() = when (this) {

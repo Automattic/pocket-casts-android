@@ -254,7 +254,7 @@ class SharingAnalyticsTest {
             analytics.onShare(request)
 
             val event = eventSink.pollEvent() as PodcastSharedEvent
-            assertEquals(source.eventHorizonValue, event.source)
+            assertEquals(source.analyticsValue, event.source)
         }
     }
 

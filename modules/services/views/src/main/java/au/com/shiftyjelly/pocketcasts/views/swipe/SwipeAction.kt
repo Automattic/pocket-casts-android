@@ -9,38 +9,36 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 enum class SwipeAction(
-    val eventHorizonValue: SwipeActionType,
+    val analyticsValue: SwipeActionType,
 ) : SwipeButton.UiState {
     AddToUpNextTop(
-        eventHorizonValue = SwipeActionType.UpNextAddTop,
+        analyticsValue = SwipeActionType.UpNextAddTop,
     ),
     AddToUpNextBottom(
-        eventHorizonValue = SwipeActionType.UpNextAddBottom,
+        analyticsValue = SwipeActionType.UpNextAddBottom,
     ),
     RemoveFromUpNext(
-        eventHorizonValue = SwipeActionType.UpNextRemove,
+        analyticsValue = SwipeActionType.UpNextRemove,
     ),
     Share(
-        eventHorizonValue = SwipeActionType.Share,
+        analyticsValue = SwipeActionType.Share,
     ),
     Archive(
-        eventHorizonValue = SwipeActionType.Archive,
+        analyticsValue = SwipeActionType.Archive,
     ),
     Unarchive(
-        eventHorizonValue = SwipeActionType.Unarchive,
+        analyticsValue = SwipeActionType.Unarchive,
     ),
     RemoveFromPlaylist(
-        eventHorizonValue = SwipeActionType.RemoveFromPlaylist,
+        analyticsValue = SwipeActionType.RemoveFromPlaylist,
     ),
     DeleteUserEpisode(
-        eventHorizonValue = SwipeActionType.Delete,
+        analyticsValue = SwipeActionType.Delete,
     ),
     AddToPlaylist(
-        eventHorizonValue = SwipeActionType.AddToPlaylist,
+        analyticsValue = SwipeActionType.AddToPlaylist,
     ),
     ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 
     override fun contentDescription(context: Context) = when (this) {
         AddToUpNextTop -> context.getString(LR.string.add_to_up_next_top)

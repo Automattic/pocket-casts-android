@@ -84,8 +84,8 @@ class AdReportFragment : BaseDialogFragment() {
         eventHorizon.track(
             BannerAdReportEvent(
                 id = args.ad.id,
-                reason = reason.eventHorizonValue,
-                location = args.ad.location.eventHorizonValue,
+                reason = reason.analyticsValue,
+                location = args.ad.location.analyticsValue,
             ),
         )
 

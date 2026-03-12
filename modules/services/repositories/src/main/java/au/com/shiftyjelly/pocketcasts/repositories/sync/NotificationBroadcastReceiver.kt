@@ -127,7 +127,7 @@ class NotificationBroadcastReceiver :
                 eventHorizon.track(
                     EpisodeMarkedAsPlayedEvent(
                         episodeUuid = episodeUuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     ),
                 )
             }
@@ -141,7 +141,7 @@ class NotificationBroadcastReceiver :
                 eventHorizon.track(
                     EpisodeArchivedEvent(
                         episodeUuid = episode.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     ),
                 )
             }

@@ -89,7 +89,7 @@ class MiniPlayerDialog(
         eventHorizon.track(
             EpisodeMarkedAsPlayedEvent(
                 episodeUuid = episode.uuid,
-                source = SourceView.MINIPLAYER.eventHorizonValue,
+                source = SourceView.MINIPLAYER.analyticsValue,
             ),
         )
     }

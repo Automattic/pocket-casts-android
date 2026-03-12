@@ -9,31 +9,29 @@ enum class BadgeType(
     internal val persistedInt: Int,
     val serverId: Int,
     @StringRes val labelId: Int,
-    val eventHorizonValue: PodcastListBadgeType,
+    val analyticsValue: PodcastListBadgeType,
 ) {
     OFF(
         persistedInt = 0,
         serverId = 0,
         labelId = R.string.podcasts_badges_off,
-        eventHorizonValue = PodcastListBadgeType.Off,
+        analyticsValue = PodcastListBadgeType.Off,
     ),
 
     LATEST_EPISODE(
         persistedInt = 1,
         serverId = 1,
         labelId = R.string.podcasts_badges_only_latest_episode,
-        eventHorizonValue = PodcastListBadgeType.OnlyLatestEpisode,
+        analyticsValue = PodcastListBadgeType.OnlyLatestEpisode,
     ),
 
     ALL_UNFINISHED(
         persistedInt = 2,
         serverId = 2,
         labelId = R.string.podcasts_badges_all_unfinished,
-        eventHorizonValue = PodcastListBadgeType.UnfinishedEpisodes,
+        analyticsValue = PodcastListBadgeType.UnfinishedEpisodes,
     ),
     ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 
     companion object {
         val defaultValue = OFF

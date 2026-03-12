@@ -9,41 +9,41 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 enum class RuleType(
     @DrawableRes val iconId: Int,
     @StringRes val titleId: Int,
-    val eventHorizonValue: SmartRuleType,
+    val analyticsValue: SmartRuleType,
 ) {
     Podcasts(
         iconId = IR.drawable.ic_podcasts,
         titleId = LR.string.podcasts,
-        eventHorizonValue = SmartRuleType.Podcasts,
+        analyticsValue = SmartRuleType.Podcasts,
     ),
     EpisodeStatus(
         iconId = IR.drawable.ic_filters_play,
         titleId = LR.string.filters_chip_episode_status,
-        eventHorizonValue = SmartRuleType.EpisodeStatus,
+        analyticsValue = SmartRuleType.EpisodeStatus,
     ),
     ReleaseDate(
         iconId = IR.drawable.ic_filters_calendar,
         titleId = LR.string.filters_release_date,
-        eventHorizonValue = SmartRuleType.ReleaseDate,
+        analyticsValue = SmartRuleType.ReleaseDate,
     ),
     EpisodeDuration(
         iconId = IR.drawable.ic_filters_clock,
         titleId = LR.string.filters_duration,
-        eventHorizonValue = SmartRuleType.EpisodeDuration,
+        analyticsValue = SmartRuleType.EpisodeDuration,
     ),
     DownloadStatus(
         iconId = IR.drawable.ic_profile_download,
         titleId = LR.string.filters_chip_download_status,
-        eventHorizonValue = SmartRuleType.DownloadStatus,
+        analyticsValue = SmartRuleType.DownloadStatus,
     ),
     MediaType(
         iconId = IR.drawable.ic_headphone,
         titleId = LR.string.filters_chip_media_type,
-        eventHorizonValue = SmartRuleType.MediaType,
+        analyticsValue = SmartRuleType.MediaType,
     ),
     Starred(
         iconId = IR.drawable.ic_star,
         titleId = LR.string.filters_chip_starred,
-        eventHorizonValue = SmartRuleType.Starred,
+        analyticsValue = SmartRuleType.Starred,
     ),
 }

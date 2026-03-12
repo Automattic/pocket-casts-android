@@ -77,9 +77,9 @@ class TracksAnalyticsTracker @Inject constructor(
         val isLoggedIn = accountStatusInfo.isLoggedIn()
         val hasSubscription = subscription != null
         val isPocketCastsChampion = subscription?.isChampion == true
-        val subscriptionTier = subscription?.tier?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
+        val subscriptionTier = subscription?.tier?.analyticsValue?.toString() ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val subscriptionPlatform = subscription?.platform?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
-        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
+        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue?.toString() ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
 
         predefinedEventProperties = mapOf(
             PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),

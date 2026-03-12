@@ -189,7 +189,7 @@ open class SyncAccountManagerImpl @Inject constructor(
 }
 
 sealed class SignInSource {
-    sealed class UserInitiated(val eventHorizonValue: SignInSourceType) : SignInSource() {
+    sealed class UserInitiated(val analyticsValue: SignInSourceType) : SignInSource() {
         object SignInViewModel : UserInitiated(SignInSourceType.SignInViewModel)
         object Onboarding : UserInitiated(SignInSourceType.Onboarding)
         object Watch : UserInitiated(SignInSourceType.Watch)

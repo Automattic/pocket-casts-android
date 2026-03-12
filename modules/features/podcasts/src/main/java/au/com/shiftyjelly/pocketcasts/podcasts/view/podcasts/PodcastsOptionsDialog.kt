@@ -178,7 +178,7 @@ class PodcastsOptionsDialog(
     private fun trackTapOnModalOption(option: ModalOption) {
         eventHorizon.track(
             PodcastsListModalOptionTappedEvent(
-                option = option.eventHorizonValue,
+                option = option.analyticsValue,
             ),
         )
     }
@@ -186,7 +186,7 @@ class PodcastsOptionsDialog(
     private fun trackSortByChanged(order: PodcastsSortType) {
         eventHorizon.track(
             PodcastsListSortOrderChangedEvent(
-                sortBy = order.eventHorizonValue,
+                sortBy = order.analyticsValue,
             ),
         )
     }
@@ -194,7 +194,7 @@ class PodcastsOptionsDialog(
     private fun trackLayoutChanged(layoutType: PodcastGridLayoutType) {
         eventHorizon.track(
             PodcastsListLayoutChangedEvent(
-                layout = layoutType.eventHorizonValue,
+                layout = layoutType.analyticsValue,
             ),
         )
     }
@@ -202,32 +202,25 @@ class PodcastsOptionsDialog(
     private fun trackBadgeChanged(badgeType: BadgeType) {
         eventHorizon.track(
             PodcastsListBadgesChangedEvent(
-                badge = badgeType.eventHorizonValue,
+                badge = badgeType.analyticsValue,
             ),
         )
     }
 
     enum class ModalOption(
-        val eventHorizonValue: PodcastListModalOptionType,
+        val analyticsValue: PodcastListModalOptionType,
     ) {
         SORT_BY(
-            eventHorizonValue = PodcastListModalOptionType.SortBy,
+            analyticsValue = PodcastListModalOptionType.SortBy,
         ),
         LAYOUT(
-            eventHorizonValue = PodcastListModalOptionType.Layout,
+            analyticsValue = PodcastListModalOptionType.Layout,
         ),
         BADGE(
-            eventHorizonValue = PodcastListModalOptionType.Badge,
+            analyticsValue = PodcastListModalOptionType.Badge,
         ),
         SHARE(
-            eventHorizonValue = PodcastListModalOptionType.Share,
+            analyticsValue = PodcastListModalOptionType.Share,
         ),
-    }
-
-    companion object {
-        private const val OPTION_KEY = "option"
-        private const val SORT_BY_KEY = "sort_by"
-        private const val LAYOUT_KEY = "layout"
-        private const val TYPE_KEY = "type"
     }
 }

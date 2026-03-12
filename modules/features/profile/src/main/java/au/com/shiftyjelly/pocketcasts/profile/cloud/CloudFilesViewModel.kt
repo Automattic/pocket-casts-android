@@ -79,7 +79,7 @@ class CloudFilesViewModel @Inject constructor(
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
         eventHorizon.track(
             UploadedFilesSortByChangedEvent(
-                sortBy = sortOrder.eventHorizonValue,
+                sortBy = sortOrder.analyticsValue,
             ),
         )
         settings.cloudSortOrder.set(sortOrder, updateModifiedAt = true)

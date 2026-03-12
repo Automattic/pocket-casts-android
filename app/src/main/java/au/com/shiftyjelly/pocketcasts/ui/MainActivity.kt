@@ -910,7 +910,7 @@ class MainActivity :
     private fun showUpNextFragment(source: UpNextSource) {
         eventHorizon.track(
             UpNextShownEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
         showBottomSheet(UpNextFragment.newInstance(source = source))

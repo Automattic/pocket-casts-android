@@ -107,7 +107,7 @@ class WarningsHelper @Inject constructor(
                     eventHorizon.track(
                         EpisodeUploadQueuedEvent(
                             episodeUuid = it.uuid,
-                            source = source.eventHorizonValue,
+                            source = source.analyticsValue,
                         ),
                     )
                 }

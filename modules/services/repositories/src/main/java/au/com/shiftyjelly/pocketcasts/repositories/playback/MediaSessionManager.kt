@@ -767,7 +767,7 @@ class MediaSessionManager(
                 eventHorizon.track(
                     EpisodeMarkedAsPlayedEvent(
                         episodeUuid = it.uuid,
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     ),
                 )
             }
@@ -840,7 +840,7 @@ class MediaSessionManager(
                     eventHorizon.track(
                         EpisodeArchivedEvent(
                             episodeUuid = it.uuid,
-                            source = source.eventHorizonValue,
+                            source = source.analyticsValue,
                         ),
                     )
                 }

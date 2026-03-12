@@ -4,31 +4,31 @@ import com.automattic.eventhorizon.EpisodeSortType
 
 enum class EpisodesSortType(
     val serverId: Int,
-    val eventHorizonValue: EpisodeSortType,
+    val analyticsValue: EpisodeSortType,
 ) {
     EPISODES_SORT_BY_TITLE_ASC(
         serverId = 0,
-        eventHorizonValue = EpisodeSortType.TitleAToZ,
+        analyticsValue = EpisodeSortType.TitleAToZ,
     ),
     EPISODES_SORT_BY_TITLE_DESC(
         serverId = 1,
-        eventHorizonValue = EpisodeSortType.TitleZToA,
+        analyticsValue = EpisodeSortType.TitleZToA,
     ),
     EPISODES_SORT_BY_DATE_ASC(
         serverId = 2,
-        eventHorizonValue = EpisodeSortType.OldestToNewest,
+        analyticsValue = EpisodeSortType.OldestToNewest,
     ),
     EPISODES_SORT_BY_DATE_DESC(
         serverId = 3,
-        eventHorizonValue = EpisodeSortType.NewestToOldest,
+        analyticsValue = EpisodeSortType.NewestToOldest,
     ),
     EPISODES_SORT_BY_LENGTH_ASC(
         serverId = 4,
-        eventHorizonValue = EpisodeSortType.ShortestToLongest,
+        analyticsValue = EpisodeSortType.ShortestToLongest,
     ),
     EPISODES_SORT_BY_LENGTH_DESC(
         serverId = 5,
-        eventHorizonValue = EpisodeSortType.LongestToShortest,
+        analyticsValue = EpisodeSortType.LongestToShortest,
     ),
     ;
 

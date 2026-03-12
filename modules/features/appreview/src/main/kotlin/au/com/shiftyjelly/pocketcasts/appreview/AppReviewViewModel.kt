@@ -44,7 +44,7 @@ class AppReviewViewModel @AssistedInject constructor(
         eventHorizon.track(
             UserSatisfactionSurveyShownEvent(
                 triggerEvent = appReviewReason.analyticsValue,
-                userType = settings.cachedMembership.value.eventHorizonValue,
+                userType = settings.cachedMembership.value.analyticsValue,
             ),
         )
     }
@@ -53,7 +53,7 @@ class AppReviewViewModel @AssistedInject constructor(
         eventHorizon.track(
             UserSatisfactionSurveyDismissedEvent(
                 triggerEvent = appReviewReason.analyticsValue,
-                userType = settings.cachedMembership.value.eventHorizonValue,
+                userType = settings.cachedMembership.value.analyticsValue,
             ),
         )
     }
@@ -62,7 +62,7 @@ class AppReviewViewModel @AssistedInject constructor(
         eventHorizon.track(
             UserSatisfactionSurveyNoResponseEvent(
                 triggerEvent = appReviewReason.analyticsValue,
-                userType = settings.cachedMembership.value.eventHorizonValue,
+                userType = settings.cachedMembership.value.analyticsValue,
             ),
         )
     }
@@ -71,7 +71,7 @@ class AppReviewViewModel @AssistedInject constructor(
         eventHorizon.track(
             UserSatisfactionSurveyYesResponseEvent(
                 triggerEvent = appReviewReason.analyticsValue,
-                userType = settings.cachedMembership.value.eventHorizonValue,
+                userType = settings.cachedMembership.value.analyticsValue,
             ),
         )
     }

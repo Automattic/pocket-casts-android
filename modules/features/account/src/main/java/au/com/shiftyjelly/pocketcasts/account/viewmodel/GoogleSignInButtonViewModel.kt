@@ -74,7 +74,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
             )
             eventHorizon.track(
                 SetupAccountButtonTappedEvent(
-                    flow = flow.eventHorizonValue,
+                    flow = flow.analyticsValue,
                     button = SetupAccountButtonType.ContinueWithGoogle,
                 ),
             )

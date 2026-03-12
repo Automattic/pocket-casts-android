@@ -47,7 +47,7 @@ class AccountBenefitsFragment : BaseDialogFragment() {
                 onShowBenefit = { benefit ->
                     eventHorizon.track(
                         InformationalModalViewCardShowedEvent(
-                            card = benefit.eventHorizonValue,
+                            card = benefit.analyticsValue,
                         ),
                     )
                 },

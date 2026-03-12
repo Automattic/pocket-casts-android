@@ -11,19 +11,18 @@ sealed interface Story {
     val previewDuration: Duration? get() = 7.seconds
     val isFree: Boolean get() = true
     val isShareable: Boolean get() = true
-    val eventHorizonValue: EndOfYearStoryType
-    val analyticsValue get() = eventHorizonValue.toString()
+    val analyticsValue: EndOfYearStoryType
 
     data object PlaceholderWhileLoading : Story {
         override val isShareable = false
-        override val eventHorizonValue get() = EndOfYearStoryType.LoadingPlaceholder
+        override val analyticsValue get() = EndOfYearStoryType.LoadingPlaceholder
         override val previewDuration: Duration
             get() = Duration.INFINITE
     }
 
     data object Cover : Story {
         override val isShareable = false
-        override val eventHorizonValue get() = EndOfYearStoryType.Cover
+        override val analyticsValue get() = EndOfYearStoryType.Cover
     }
 
     data class NumberOfShows(
@@ -31,39 +30,39 @@ sealed interface Story {
         val episodeCount: Int,
         val randomShowIds: List<String>,
     ) : Story {
-        override val eventHorizonValue get() = EndOfYearStoryType.NumberOfShows
+        override val analyticsValue get() = EndOfYearStoryType.NumberOfShows
     }
 
     data class TopShow(
         val show: TopPodcast,
     ) : Story {
-        override val eventHorizonValue get() = EndOfYearStoryType.Top1Show
+        override val analyticsValue get() = EndOfYearStoryType.Top1Show
     }
 
     data class TopShows(
         val shows: List<TopPodcast>,
         val podcastListUrl: String?,
     ) : Story {
-        override val eventHorizonValue get() = EndOfYearStoryType.Top5Shows
+        override val analyticsValue get() = EndOfYearStoryType.Top5Shows
     }
 
     data class Ratings(
         val stats: RatingStats,
     ) : Story {
         override val isShareable get() = stats.max().second != 0
-        override val eventHorizonValue get() = EndOfYearStoryType.Ratings
+        override val analyticsValue get() = EndOfYearStoryType.Ratings
     }
 
     data class TotalTime(
         val duration: Duration,
     ) : Story {
-        override val eventHorizonValue get() = EndOfYearStoryType.TotalTime
+        override val analyticsValue get() = EndOfYearStoryType.TotalTime
     }
 
     data class LongestEpisode(
         val episode: LongestEpisodeData,
     ) : Story {
-        override val eventHorizonValue get() = EndOfYearStoryType.LongestEpisode
+        override val analyticsValue get() = EndOfYearStoryType.LongestEpisode
     }
 
     data class PlusInterstitial(
@@ -71,7 +70,7 @@ sealed interface Story {
     ) : Story {
         override val previewDuration = null
         override val isShareable = false
-        override val eventHorizonValue get() = EndOfYearStoryType.PlusInterstitial
+        override val analyticsValue get() = EndOfYearStoryType.PlusInterstitial
     }
 
     data class YearVsYear(
@@ -80,7 +79,7 @@ sealed interface Story {
         val subscriptionTier: SubscriptionTier?,
     ) : Story {
         override val isFree = false
-        override val eventHorizonValue get() = EndOfYearStoryType.YearVsYear
+        override val analyticsValue get() = EndOfYearStoryType.YearVsYear
 
         val percentageChange = when (lastYearDuration) {
             thisYearDuration -> 0
@@ -115,7 +114,7 @@ sealed interface Story {
         val subscriptionTier: SubscriptionTier?,
     ) : Story {
         override val isFree = false
-        override val eventHorizonValue get() = EndOfYearStoryType.CompletionRate
+        override val analyticsValue get() = EndOfYearStoryType.CompletionRate
 
         val completionRate
             get() = when {
@@ -129,6 +128,6 @@ sealed interface Story {
 
     data object Ending : Story {
         override val isShareable get() = false
-        override val eventHorizonValue get() = EndOfYearStoryType.Ending
+        override val analyticsValue get() = EndOfYearStoryType.Ending
     }
 }

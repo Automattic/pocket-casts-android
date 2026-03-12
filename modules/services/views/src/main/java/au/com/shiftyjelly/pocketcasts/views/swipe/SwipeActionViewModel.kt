@@ -168,7 +168,7 @@ class SwipeActionViewModel @AssistedInject constructor(
                     eventHorizon.track(
                         EpisodeDeletedFromCloudEvent(
                             episodeUuid = episode.uuid,
-                            source = swipeSource.toSourceView().eventHorizonValue,
+                            source = swipeSource.toSourceView().analyticsValue,
                         ),
                     )
                 }
@@ -196,8 +196,8 @@ class SwipeActionViewModel @AssistedInject constructor(
     private fun trackAction(action: SwipeAction) {
         eventHorizon.track(
             EpisodeSwipeActionPerformedEvent(
-                source = swipeSource.eventHorizonValue,
-                action = action.eventHorizonValue,
+                source = swipeSource.analyticsValue,
+                action = action.analyticsValue,
             ),
         )
     }

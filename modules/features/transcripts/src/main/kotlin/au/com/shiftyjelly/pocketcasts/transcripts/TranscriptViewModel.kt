@@ -262,7 +262,7 @@ class TranscriptViewModel @AssistedInject constructor(
     fun track(event: (TranscriptSourceType, podcastUuid: String, episodeUuid: String) -> Trackable) {
         val podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
-        val event = event(source.eventHorizonValue, podcastUuid, episodeUuid)
+        val event = event(source.analyticsValue, podcastUuid, episodeUuid)
         eventHorizon.track(event)
     }
 
@@ -274,17 +274,14 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     enum class Source(
-        val eventHorizonValue: TranscriptSourceType,
+        val analyticsValue: TranscriptSourceType,
     ) {
         Episode(
-            eventHorizonValue = TranscriptSourceType.Episode,
+            analyticsValue = TranscriptSourceType.Episode,
         ),
         Player(
-            eventHorizonValue = TranscriptSourceType.Player,
+            analyticsValue = TranscriptSourceType.Player,
         ),
-        ;
-
-        val analyticsValue get() = eventHorizonValue.toString()
     }
 
     @AssistedFactory

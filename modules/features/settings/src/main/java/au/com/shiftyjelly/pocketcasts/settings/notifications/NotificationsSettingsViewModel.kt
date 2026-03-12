@@ -88,7 +88,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     eventHorizon.track(
                         SettingsNotificationsPlayOverNotificationsToggledEvent(
                             enabled = preference.value != PlayOverNotificationSetting.NEVER,
-                            value = preference.value.eventHorizonValue,
+                            value = preference.value.analyticsValue,
                         ),
                     )
                 }
@@ -97,7 +97,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     preferenceRepository.setPreference(preference)
                     eventHorizon.track(
                         SettingsNotificationsVibrationChangedEvent(
-                            value = preference.value.eventHorizonValue,
+                            value = preference.value.analyticsValue,
                         ),
                     )
                 }

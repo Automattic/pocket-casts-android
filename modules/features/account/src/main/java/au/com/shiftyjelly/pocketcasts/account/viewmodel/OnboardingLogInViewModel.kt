@@ -69,7 +69,7 @@ class OnboardingLogInViewModel @Inject constructor(
     fun onSignInButtonTapped(flow: OnboardingFlow) {
         eventHorizon.track(
             SigninButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -77,7 +77,7 @@ class OnboardingLogInViewModel @Inject constructor(
     fun onForgotPasswordTapped(flow: OnboardingFlow) {
         eventHorizon.track(
             SigninForgotPasswordTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
