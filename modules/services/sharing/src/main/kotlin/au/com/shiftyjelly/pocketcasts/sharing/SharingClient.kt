@@ -37,13 +37,13 @@ import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.toBitmap
-import com.automattic.eventhorizon.EndOfYearShareSource
+import com.automattic.eventhorizon.EndOfYearShareSourceType
 import com.automattic.eventhorizon.EndOfYearStoryShareEvent
 import com.automattic.eventhorizon.EndOfYearStorySharedEvent
 import com.automattic.eventhorizon.PodcastSharedEvent
 import com.automattic.eventhorizon.ReferralPassSharedEvent
 import com.automattic.eventhorizon.ShareActionCardType
-import com.automattic.eventhorizon.ShareActionPlatform
+import com.automattic.eventhorizon.ShareActionPlatformType
 import com.automattic.eventhorizon.ShareActionType
 import com.automattic.eventhorizon.Trackable
 import com.automattic.eventhorizon.TranscriptSharedEvent
@@ -272,7 +272,7 @@ class SharingClient(
                 val pendingIntent = ItemSharedReceiver.intent(
                     context = context,
                     event = EndOfYearStorySharedEvent(
-                        from = EndOfYearShareSource.Button,
+                        from = EndOfYearShareSourceType.Button,
                         story = data.story.eventHorizonValue,
                         currentYear = data.year.value.toLong(),
                     ),
@@ -452,7 +452,7 @@ data class SharingRequest internal constructor(
             trackable = PodcastSharedEvent(
                 source = source.eventHorizonValue,
                 type = ShareActionType.EpisodeFile,
-                action = ShareActionPlatform.SystemSheet,
+                action = ShareActionPlatformType.SystemSheet,
             ),
         )
 
@@ -485,7 +485,7 @@ data class SharingRequest internal constructor(
             trackable = PodcastSharedEvent(
                 source = source.eventHorizonValue,
                 type = ShareActionType.ClipAudio,
-                action = ShareActionPlatform.SystemSheet,
+                action = ShareActionPlatformType.SystemSheet,
                 cardType = ShareActionCardType.Audio,
             ),
             platform = More,

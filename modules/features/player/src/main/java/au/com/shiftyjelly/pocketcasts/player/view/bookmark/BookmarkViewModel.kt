@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
-import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -102,7 +102,7 @@ class BookmarkViewModel
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = state.title.text,
-                        creationSource = BookmarkSource.Player,
+                        creationSource = BookmarkSourceType.Player,
                     )
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, state.title.text)

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
+import com.automattic.eventhorizon.SourceViewType
 
 enum class SourceView(val analyticsValue: String) {
     AUTO_PAUSE("auto_pause"),
@@ -62,11 +62,11 @@ enum class SourceView(val analyticsValue: String) {
     WIDGET_PLAYER_SMALL("widget_player_small"),
     ;
 
-    val eventHorizonValue get() = EVENT_MAP[analyticsValue] ?: EventHorizonSourceView.Unknown
+    val eventHorizonValue get() = EVENT_MAP[analyticsValue] ?: SourceViewType.Unknown
 
     companion object {
         fun fromString(source: String?) = SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
     }
 }
 
-private val EVENT_MAP = EventHorizonSourceView.entries.associateBy(EventHorizonSourceView::toString)
+private val EVENT_MAP = SourceViewType.entries.associateBy(SourceViewType::toString)

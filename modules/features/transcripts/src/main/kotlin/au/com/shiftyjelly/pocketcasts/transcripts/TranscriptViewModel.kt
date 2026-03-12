@@ -24,7 +24,7 @@ import com.automattic.eventhorizon.TranscriptErrorEvent
 import com.automattic.eventhorizon.TranscriptSearchNextResultEvent
 import com.automattic.eventhorizon.TranscriptSearchPreviousResultEvent
 import com.automattic.eventhorizon.TranscriptSearchShownEvent
-import com.automattic.eventhorizon.TranscriptSource
+import com.automattic.eventhorizon.TranscriptSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -259,7 +259,7 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    fun track(event: (TranscriptSource, podcastUuid: String, episodeUuid: String) -> Trackable) {
+    fun track(event: (TranscriptSourceType, podcastUuid: String, episodeUuid: String) -> Trackable) {
         val podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val event = event(source.eventHorizonValue, podcastUuid, episodeUuid)
@@ -274,13 +274,13 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     enum class Source(
-        val eventHorizonValue: TranscriptSource,
+        val eventHorizonValue: TranscriptSourceType,
     ) {
         Episode(
-            eventHorizonValue = TranscriptSource.Episode,
+            eventHorizonValue = TranscriptSourceType.Episode,
         ),
         Player(
-            eventHorizonValue = TranscriptSource.Player,
+            eventHorizonValue = TranscriptSourceType.Player,
         ),
         ;
 

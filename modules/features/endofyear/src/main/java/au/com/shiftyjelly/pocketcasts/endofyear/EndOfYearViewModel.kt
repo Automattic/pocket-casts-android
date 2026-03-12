@@ -20,11 +20,11 @@ import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import com.automattic.eventhorizon.EndOfYearLearnRatingsShownEvent
 import com.automattic.eventhorizon.EndOfYearPlusContinuedEvent
-import com.automattic.eventhorizon.EndOfYearShareSource
+import com.automattic.eventhorizon.EndOfYearShareSourceType
 import com.automattic.eventhorizon.EndOfYearStoriesDismissedEvent
 import com.automattic.eventhorizon.EndOfYearStoriesFailedToLoadEvent
 import com.automattic.eventhorizon.EndOfYearStoriesShownEvent
-import com.automattic.eventhorizon.EndOfYearStoryCloseSource
+import com.automattic.eventhorizon.EndOfYearStoryCloseSourceType
 import com.automattic.eventhorizon.EndOfYearStoryReplayButtonTappedEvent
 import com.automattic.eventhorizon.EndOfYearStorySharedEvent
 import com.automattic.eventhorizon.EndOfYearStoryShownEvent
@@ -324,7 +324,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         }
     }
 
-    internal fun trackStoriesClosed(source: EndOfYearStoryCloseSource, story: Story?) {
+    internal fun trackStoriesClosed(source: EndOfYearStoryCloseSourceType, story: Story?) {
         trackStoriesDismissed(
             story = story,
             source = source,
@@ -342,11 +342,11 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal fun trackStoriesAutoFinished(story: Story) {
         trackStoriesDismissed(
             story = story,
-            source = EndOfYearStoryCloseSource.AutoProgress,
+            source = EndOfYearStoryCloseSourceType.AutoProgress,
         )
     }
 
-    private fun trackStoriesDismissed(source: EndOfYearStoryCloseSource, story: Story?) {
+    private fun trackStoriesDismissed(source: EndOfYearStoryCloseSourceType, story: Story?) {
         trackEvent { year ->
             EndOfYearStoriesDismissedEvent(
                 source = source,
@@ -415,7 +415,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     fun screenshotDetected(story: Story, activity: Activity) {
         eventHorizon.track(
             EndOfYearStorySharedEvent(
-                from = EndOfYearShareSource.Screenshot,
+                from = EndOfYearShareSourceType.Screenshot,
                 story = story.eventHorizonValue,
                 currentYear = year.value.toLong(),
                 activity = activity.javaClass.name,

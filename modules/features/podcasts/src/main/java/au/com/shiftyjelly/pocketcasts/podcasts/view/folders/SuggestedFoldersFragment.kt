@@ -36,8 +36,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.automattic.eventhorizon.CreateFolderSource
-import com.automattic.eventhorizon.SuggestedFolderSource
+import com.automattic.eventhorizon.CreateFolderSourceType
+import com.automattic.eventhorizon.SuggestedFolderSourceType
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
@@ -184,7 +184,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         viewModel.trackCreateCustomFolderTapped()
         if (isUserPlusOrPatreon) {
             FolderCreateFragment
-                .newInstance(source = CreateFolderSource.SuggestedFolders)
+                .newInstance(source = CreateFolderSourceType.SuggestedFolders)
                 .show(parentFragmentManager, "create_folder_card")
             finalizeAndDismiss()
         } else {
@@ -249,16 +249,16 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     }
 
     enum class Source(
-        val eventHorizonValue: SuggestedFolderSource,
+        val eventHorizonValue: SuggestedFolderSourceType,
     ) {
         Popup(
-            eventHorizonValue = SuggestedFolderSource.Popup,
+            eventHorizonValue = SuggestedFolderSourceType.Popup,
         ),
         ToolbarButton(
-            eventHorizonValue = SuggestedFolderSource.PodcastsList,
+            eventHorizonValue = SuggestedFolderSourceType.PodcastsList,
         ),
         DEEPLINK(
-            eventHorizonValue = SuggestedFolderSource.Deeplink,
+            eventHorizonValue = SuggestedFolderSourceType.Deeplink,
         ),
     }
 

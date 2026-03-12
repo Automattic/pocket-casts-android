@@ -1,21 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
+import com.automattic.eventhorizon.LoginIdentityType
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
-import com.automattic.eventhorizon.LoginIdentity as EventHorizonLoginIdentity
 
 sealed class LoginIdentity(
     val key: String,
-    val eventHorizonValue: EventHorizonLoginIdentity,
+    val eventHorizonValue: LoginIdentityType,
 ) {
     object PocketCasts : LoginIdentity(
         key = "PocketCasts",
-        eventHorizonValue = EventHorizonLoginIdentity.Password,
+        eventHorizonValue = LoginIdentityType.Password,
     )
 
     object Google : LoginIdentity(
         key = "Google",
-        eventHorizonValue = EventHorizonLoginIdentity.Google,
+        eventHorizonValue = LoginIdentityType.Google,
     )
 
     companion object {

@@ -25,7 +25,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
-import com.automattic.eventhorizon.ShelfActionSource
+import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -379,13 +379,13 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     enum class ShelfItemSource(
-        val eventHorizonValue: ShelfActionSource,
+        val eventHorizonValue: ShelfActionSourceType,
     ) {
         Shelf(
-            eventHorizonValue = ShelfActionSource.Shelf,
+            eventHorizonValue = ShelfActionSourceType.Shelf,
         ),
         OverflowMenu(
-            eventHorizonValue = ShelfActionSource.OverflowMenu,
+            eventHorizonValue = ShelfActionSourceType.OverflowMenu,
         ),
     }
 

@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.LoginIdentity
+import com.automattic.eventhorizon.LoginIdentityType
 import com.automattic.eventhorizon.SetupAccountButtonTappedEvent
 import com.automattic.eventhorizon.SetupAccountButtonType
 import com.automattic.eventhorizon.SsoStartedEvent
@@ -69,7 +69,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
         if (flow != null) {
             eventHorizon.track(
                 SsoStartedEvent(
-                    source = LoginIdentity.Google,
+                    source = LoginIdentityType.Google,
                 ),
             )
             eventHorizon.track(

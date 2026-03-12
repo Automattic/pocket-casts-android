@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsRoute
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.SelectPodcastsSource
+import com.automattic.eventhorizon.SelectPodcastsSourceType
 import com.automattic.eventhorizon.SettingsAutoDownloadClearDownloadErrorsEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadFiltersChangedEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadLimitDownloadsChangedEvent
@@ -168,7 +168,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
             SettingsSelectPodcastsPodcastToggledEvent(
                 uuid = podcastUuid,
                 enabled = enable,
-                source = SelectPodcastsSource.Downloads,
+                source = SelectPodcastsSourceType.Downloads,
             ),
         )
 
@@ -184,11 +184,11 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun changeAllPodcastsAutoDownload(enable: Boolean) {
         val event = if (enable) {
             SettingsSelectPodcastsSelectAllTappedEvent(
-                source = SelectPodcastsSource.Downloads,
+                source = SelectPodcastsSourceType.Downloads,
             )
         } else {
             SettingsSelectPodcastsSelectNoneTappedEvent(
-                source = SelectPodcastsSource.Downloads,
+                source = SelectPodcastsSourceType.Downloads,
             )
         }
         eventHorizon.track(event)
@@ -288,7 +288,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
             AutoDownloadSettingsRoute.Podcasts -> {
                 eventHorizon.track(
                     SettingsSelectPodcastsShownEvent(
-                        source = SelectPodcastsSource.Downloads,
+                        source = SelectPodcastsSourceType.Downloads,
                     ),
                 )
             }

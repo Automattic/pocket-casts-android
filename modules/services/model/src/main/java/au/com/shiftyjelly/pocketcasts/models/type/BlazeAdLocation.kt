@@ -1,29 +1,29 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import com.automattic.eventhorizon.BlazeAdSource
+import com.automattic.eventhorizon.BlazeAdSourceType
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 
 enum class BlazeAdLocation(
     val key: String,
-    val eventHorizonValue: BlazeAdSource,
+    val eventHorizonValue: BlazeAdSourceType,
     val feature: Feature?,
 ) {
     PodcastList(
         key = "podcast_list",
-        eventHorizonValue = BlazeAdSource.PodcastList,
+        eventHorizonValue = BlazeAdSourceType.PodcastList,
         feature = Feature.BANNER_ADS_PODCASTS,
     ),
     Player(
         key = "player",
-        eventHorizonValue = BlazeAdSource.Player,
+        eventHorizonValue = BlazeAdSourceType.Player,
         feature = Feature.BANNER_ADS_PLAYER,
     ),
     Unknown(
         key = "",
-        eventHorizonValue = BlazeAdSource.Unknown,
+        eventHorizonValue = BlazeAdSourceType.Unknown,
         feature = null,
     ),
     ;

@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FilterManualEpisodesRearrangedEvent
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -65,7 +65,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
                     playlistUuid = playlistUuid,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
-                    source = PlaylistRemoveEpisodeSource.PlaylistRearrange,
+                    source = PlaylistRemoveEpisodeSourceType.PlaylistRearrange,
                 ),
             )
         }

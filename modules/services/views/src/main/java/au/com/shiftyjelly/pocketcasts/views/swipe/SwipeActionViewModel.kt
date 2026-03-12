@@ -22,7 +22,7 @@ import com.automattic.eventhorizon.EpisodeDeletedFromCloudEvent
 import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
 import com.automattic.eventhorizon.EpisodeSwipeActionPerformedEvent
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -121,7 +121,7 @@ class SwipeActionViewModel @AssistedInject constructor(
                     playlistUuid = playlistUuid,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
-                    source = PlaylistRemoveEpisodeSource.SwipeRemove,
+                    source = PlaylistRemoveEpisodeSourceType.SwipeRemove,
                 ),
             )
         }

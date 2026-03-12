@@ -14,8 +14,9 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSharedEvent
 import com.automattic.eventhorizon.ReferralPassSharedEvent
 import com.automattic.eventhorizon.ShareActionCardType
-import com.automattic.eventhorizon.ShareActionPlatform
+import com.automattic.eventhorizon.ShareActionPlatformType
 import com.automattic.eventhorizon.ShareActionType
+import com.automattic.eventhorizon.SourceViewType
 import java.time.Year
 import java.util.Date
 import kotlin.time.Duration
@@ -24,7 +25,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
 
 class SharingAnalyticsTest {
     @get:Rule
@@ -54,9 +54,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.Podcast,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -79,9 +79,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.Episode,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -105,9 +105,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.CurrentTime,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -131,9 +131,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.BookmarkTime,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -154,9 +154,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.EpisodeFile,
-                action = ShareActionPlatform.SystemSheet,
+                action = ShareActionPlatformType.SystemSheet,
             ),
             eventSink.pollEvent(),
         )
@@ -179,9 +179,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.ClipLink,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -203,9 +203,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.ClipAudio,
-                action = ShareActionPlatform.SystemSheet,
+                action = ShareActionPlatformType.SystemSheet,
                 cardType = ShareActionCardType.Audio,
             ),
             eventSink.pollEvent(),
@@ -230,9 +230,9 @@ class SharingAnalyticsTest {
 
         assertEquals(
             PodcastSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 type = ShareActionType.ClipVideo,
-                action = ShareActionPlatform.Url,
+                action = ShareActionPlatformType.Url,
                 cardType = ShareActionCardType.Vertical,
             ),
             eventSink.pollEvent(),
@@ -272,7 +272,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.IgStory, event.action)
+        assertEquals(ShareActionPlatformType.IgStory, event.action)
     }
 
     @Test
@@ -289,7 +289,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.WhatsApp, event.action)
+        assertEquals(ShareActionPlatformType.WhatsApp, event.action)
     }
 
     @Test
@@ -306,7 +306,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.Telegram, event.action)
+        assertEquals(ShareActionPlatformType.Telegram, event.action)
     }
 
     @Test
@@ -323,7 +323,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.Twitter, event.action)
+        assertEquals(ShareActionPlatformType.Twitter, event.action)
     }
 
     @Test
@@ -340,7 +340,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.Tumblr, event.action)
+        assertEquals(ShareActionPlatformType.Tumblr, event.action)
     }
 
     @Test
@@ -357,7 +357,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.Url, event.action)
+        assertEquals(ShareActionPlatformType.Url, event.action)
     }
 
     @Test
@@ -374,7 +374,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
 
         val event = eventSink.pollEvent() as PodcastSharedEvent
-        assertEquals(ShareActionPlatform.SystemSheet, event.action)
+        assertEquals(ShareActionPlatformType.SystemSheet, event.action)
     }
 
     @Test
@@ -461,7 +461,7 @@ class SharingAnalyticsTest {
 
         assertEquals(
             ReferralPassSharedEvent(
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 code = referralCode,
             ),
             eventSink.pollEvent(),

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
-import com.automattic.eventhorizon.SwipeSource as SwipeSourceType
+import com.automattic.eventhorizon.SwipeSourceType
 
 enum class SwipeSource(
     val eventHorizonValue: SwipeSourceType,

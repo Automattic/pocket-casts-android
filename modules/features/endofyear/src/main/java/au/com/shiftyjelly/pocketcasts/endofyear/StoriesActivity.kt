@@ -53,8 +53,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.utils.ScreenshotCaptureDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
-import com.automattic.eventhorizon.EndOfYearStoryCloseSource
-import com.automattic.eventhorizon.EndOfYearStoryOpenSource
+import com.automattic.eventhorizon.EndOfYearStoryCloseSourceType
+import com.automattic.eventhorizon.EndOfYearStoryOpenSourceType
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.File
@@ -161,7 +161,7 @@ class StoriesActivity : ComponentActivity() {
 
         BackHandler {
             val story = state.stories.getOrNull(pagerState.currentPage)
-            viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSource.BackButton, story = story)
+            viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSourceType.BackButton, story = story)
             finish()
         }
 
@@ -185,7 +185,7 @@ class StoriesActivity : ComponentActivity() {
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
                     val story = state.stories.getOrNull(pagerState.currentPage)
-                    viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSource.CloseButton, story = story)
+                    viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSourceType.CloseButton, story = story)
                     finish()
                 },
             )
@@ -321,23 +321,23 @@ class StoriesActivity : ComponentActivity() {
 
     enum class StoriesSource(
         val key: String,
-        val eventHorizonValue: EndOfYearStoryOpenSource,
+        val eventHorizonValue: EndOfYearStoryOpenSourceType,
     ) {
         MODAL(
             key = "modal",
-            eventHorizonValue = EndOfYearStoryOpenSource.Modal,
+            eventHorizonValue = EndOfYearStoryOpenSourceType.Modal,
         ),
         PROFILE(
             key = "profile",
-            eventHorizonValue = EndOfYearStoryOpenSource.Profile,
+            eventHorizonValue = EndOfYearStoryOpenSourceType.Profile,
         ),
         USER_LOGIN(
             key = "user_login",
-            eventHorizonValue = EndOfYearStoryOpenSource.UserLogin,
+            eventHorizonValue = EndOfYearStoryOpenSourceType.UserLogin,
         ),
         UNKNOWN(
             key = "unknown",
-            eventHorizonValue = EndOfYearStoryOpenSource.Unknown,
+            eventHorizonValue = EndOfYearStoryOpenSourceType.Unknown,
         ),
         ;
 

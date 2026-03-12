@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.LoginIdentityType
 import com.automattic.eventhorizon.UserAccountCreatedEvent
 import com.automattic.eventhorizon.UserAccountCreationFailedEvent
 import com.automattic.eventhorizon.UserAccountDeletedEvent
@@ -87,7 +88,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import com.automattic.eventhorizon.LoginIdentity as EventHorizonLoginIdentity
 import com.pocketcasts.service.api.UpNextSyncRequest as UpNextSyncRequestProtobuf
 
 @Singleton
@@ -550,7 +550,7 @@ class SyncManagerImpl @Inject constructor(
             is LoginResult.Success -> {
                 notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
                 UserAccountCreatedEvent(
-                    source = EventHorizonLoginIdentity.Password,
+                    source = LoginIdentityType.Password,
                     sourceInCode = signInSource.eventHorizonValue,
                 )
             }

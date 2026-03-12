@@ -101,7 +101,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.BannerAdImpressionEvent
 import com.automattic.eventhorizon.BannerAdTappedEvent
-import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
 import com.automattic.eventhorizon.FolderChoosePodcastsShownEvent
@@ -469,7 +469,7 @@ class PodcastsFragment :
 
     private fun showCustomFolderCreation() {
         FolderCreateFragment
-            .newInstance(CreateFolderSource.PodcastsList)
+            .newInstance(CreateFolderSourceType.PodcastsList)
             .show(parentFragmentManager, "create_folder_card")
     }
 

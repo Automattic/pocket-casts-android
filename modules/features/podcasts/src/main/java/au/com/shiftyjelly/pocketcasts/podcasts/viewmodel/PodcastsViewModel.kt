@@ -25,7 +25,7 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderShownEvent
 import com.automattic.eventhorizon.PodcastsListReorderedEvent
 import com.automattic.eventhorizon.PodcastsListShownEvent
-import com.automattic.eventhorizon.PullToRefreshSource
+import com.automattic.eventhorizon.PullToRefreshSourceType
 import com.automattic.eventhorizon.PulledToRefreshEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -245,7 +245,7 @@ class PodcastsViewModel @AssistedInject constructor(
     fun refreshPodcasts() {
         eventHorizon.track(
             PulledToRefreshEvent(
-                source = PullToRefreshSource.PodcastsList,
+                source = PullToRefreshSourceType.PodcastsList,
             ),
         )
         podcastManager.refreshPodcasts("Pull down")

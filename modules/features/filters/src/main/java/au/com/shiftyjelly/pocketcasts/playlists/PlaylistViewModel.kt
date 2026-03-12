@@ -51,7 +51,7 @@ import com.automattic.eventhorizon.FilterShownEvent
 import com.automattic.eventhorizon.FilterSortByChangedEvent
 import com.automattic.eventhorizon.FilterSortByTappedEvent
 import com.automattic.eventhorizon.FilterUnarchiveAllTappedEvent
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -475,7 +475,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 playlistUuid = playlistUuid,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
-                source = PlaylistRemoveEpisodeSource.UnavailableEpisode,
+                source = PlaylistRemoveEpisodeSourceType.UnavailableEpisode,
             ),
         )
     }

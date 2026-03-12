@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import com.automattic.eventhorizon.BookmarkCreatedEvent
-import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
@@ -45,7 +45,7 @@ class BookmarkManagerImpl @Inject constructor(
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        creationSource: BookmarkSource,
+        creationSource: BookmarkSourceType,
         addedAt: Instant,
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
