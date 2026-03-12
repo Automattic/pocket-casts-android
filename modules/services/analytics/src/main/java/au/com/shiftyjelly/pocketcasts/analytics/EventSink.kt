@@ -18,7 +18,7 @@ class EventSink(
             tracker.id to trackedEvent
         }
         listeners.forEach { listener ->
-            listener.onEvent(analyticsEvent, event.analyticsProperties, trackedEvents)
+            listener.onEvent(event, trackedEvents)
         }
     }
 
@@ -37,9 +37,8 @@ class EventSink(
 
 interface AnalyticsListener {
     fun onEvent(
-        event: AnalyticsEvent,
-        properties: Map<String, Any>,
-        trackedEvents: Map<String, TrackedEvent?>,
+        event: Trackable,
+        trackedEvents: Map<String, TrackedEvent?> = emptyMap(),
     )
 }
 

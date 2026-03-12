@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
+import com.automattic.eventhorizon.Trackable
 import timber.log.Timber
 
 internal class LoggingAnalyticsListener : AnalyticsListener {
     override fun onEvent(
-        event: AnalyticsEvent,
-        properties: Map<String, Any>,
+        event: Trackable,
         trackedEvents: Map<String, TrackedEvent?>,
     ) {
         if (BuildConfig.DEBUG) {
@@ -13,10 +13,10 @@ internal class LoggingAnalyticsListener : AnalyticsListener {
             Timber.tag("Analytics").i(
                 buildString {
                     append("\uD83D\uDD35 Event: ")
-                    append(event.key)
-                    if (properties.isNotEmpty()) {
+                    append(event.analyticsName)
+                    if (event.analyticsProperties.isNotEmpty()) {
                         append(", Properties: ")
-                        append(properties.toSortedMap())
+                        append(event.analyticsProperties.toSortedMap())
                     }
 
                     if (realEvents.isNotEmpty()) {
