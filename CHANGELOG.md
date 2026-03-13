@@ -3,6 +3,9 @@
 *   Updates
     *   Improve detection of generated transcripts.
         ([#5097](https://github.com/Automattic/pocket-casts-android/pull/5097))
+*   Bug Fixes
+    *   Fix multi-selection counter indicator showing wrong count.
+        ([#5127](https://github.com/Automattic/pocket-casts-android/pull/5127))
 
 8.7
 -----
