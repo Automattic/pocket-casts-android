@@ -36,7 +36,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
     val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
 
-    protected val selectedSet = linkedSetOf<T>()
+    protected val selectedSet: LinkedHashSet<T> = linkedSetOf<T>()
     protected val _selectedListLive = MutableLiveData<List<T>>().apply { value = listOf() }
     val selectedListLive: LiveData<List<T>> = _selectedListLive
     val selectedCount: LiveData<Int> = _selectedListLive.map { it.size }
