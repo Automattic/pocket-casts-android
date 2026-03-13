@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,7 +27,7 @@ object HelpScreen {
 @Composable
 fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsState().value
-    val context = LocalContext.current
+    val statusMessage by viewModel.statusMessage.collectAsState()
     val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
@@ -42,7 +42,8 @@ fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
                 return@ScalingLazyColumn
             } else if (state.isPhoneAvailable) {
                 phoneAvailableContent(
-                    onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) },
+                    statusMessage = statusMessage,
+                    onEmailLogsToSupport = { viewModel.emailLogsToSupport() },
                 )
             } else {
                 noPhoneAvailableContent()
@@ -52,11 +53,12 @@ fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
 }
 
 private fun ScalingLazyListScope.phoneAvailableContent(
+    statusMessage: Int,
     onEmailLogsToSupport: () -> Unit,
 ) {
     item {
         Text(
-            text = stringResource(id = LR.string.settings_help_contact_support_wear_requires_nearby_phone),
+            text = stringResource(id = statusMessage),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.caption3,
             color = MaterialTheme.colors.onSecondary,

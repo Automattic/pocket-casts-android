@@ -24,6 +24,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
+import com.automattic.eventhorizon.ShelfActionSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -48,6 +52,7 @@ import kotlinx.coroutines.rx2.asFlow
 class ShelfSharedViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val chromeCastAnalytics: ChromeCastAnalytics,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
@@ -292,7 +297,7 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     fun onMoreClick() {
-        track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
+        eventHorizon.track(PlayerShelfOverflowMenuShownEvent)
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowMoreActions)
         }
@@ -302,14 +307,10 @@ class ShelfSharedViewModel @Inject constructor(
         shelfItem: ShelfItem,
         shelfItemSource: ShelfItemSource,
     ) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(
-                AnalyticsProp.FROM to when (shelfItemSource) {
-                    ShelfItemSource.Shelf -> AnalyticsProp.SHELF
-                    ShelfItemSource.OverflowMenu -> AnalyticsProp.OVERFLOW_MENU
-                },
-                AnalyticsProp.ACTION to shelfItem.analyticsValue,
+        eventHorizon.track(
+            PlayerShelfActionTappedEvent(
+                from = shelfItemSource.eventHorizonValue,
+                action = shelfItem.eventHorizonValue,
             ),
         )
         if (shelfItem == ShelfItem.Cast) {
@@ -384,9 +385,15 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShareNotAvailable : SnackbarMessage
     }
 
-    enum class ShelfItemSource {
-        Shelf,
-        OverflowMenu,
+    enum class ShelfItemSource(
+        val eventHorizonValue: ShelfActionSource,
+    ) {
+        Shelf(
+            eventHorizonValue = ShelfActionSource.Shelf,
+        ),
+        OverflowMenu(
+            eventHorizonValue = ShelfActionSource.OverflowMenu,
+        ),
     }
 
     companion object {

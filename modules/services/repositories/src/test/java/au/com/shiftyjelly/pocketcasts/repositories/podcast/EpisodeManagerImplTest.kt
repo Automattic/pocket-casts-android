@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -52,7 +54,7 @@ class EpisodeManagerImplTest {
             podcastCacheServiceManager = mock(),
             userEpisodeManager = mock(),
             ioDispatcher = coroutineRule.testDispatcher,
-            episodeAnalytics = mock(),
+            eventHorizon = EventHorizon(TestEventSink()),
         )
     }
 

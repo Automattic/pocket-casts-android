@@ -2,9 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
@@ -21,6 +20,38 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterAddEpisodesCtaEmptyTappedEvent
+import com.automattic.eventhorizon.FilterAddEpisodesTappedEvent
+import com.automattic.eventhorizon.FilterArchiveAllTappedEvent
+import com.automattic.eventhorizon.FilterAutoDownloadLimitUpdatedEvent
+import com.automattic.eventhorizon.FilterAutoDownloadUpdatedEvent
+import com.automattic.eventhorizon.FilterBrowseShowsCtaEmptyTappedEvent
+import com.automattic.eventhorizon.FilterChromeCastTappedEvent
+import com.automattic.eventhorizon.FilterDeleteDismissedEvent
+import com.automattic.eventhorizon.FilterDeleteTriggeredEvent
+import com.automattic.eventhorizon.FilterDeletedEvent
+import com.automattic.eventhorizon.FilterDownloadAllTappedEvent
+import com.automattic.eventhorizon.FilterEditDismissedEvent
+import com.automattic.eventhorizon.FilterEditRulesCtaEmptyTappedEvent
+import com.automattic.eventhorizon.FilterEditRulesTappedEvent
+import com.automattic.eventhorizon.FilterHideArchivedTappedEvent
+import com.automattic.eventhorizon.FilterNameUpdatedEvent
+import com.automattic.eventhorizon.FilterOptionsButtonTappedEvent
+import com.automattic.eventhorizon.FilterOptionsTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllDismissedEvent
+import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllTappedEvent
+import com.automattic.eventhorizon.FilterRearrangeEpisodesTappedEvent
+import com.automattic.eventhorizon.FilterSelectEpisodesTappedEvent
+import com.automattic.eventhorizon.FilterShowArchivedCtaEmptyTappedEvent
+import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
+import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.FilterSortByChangedEvent
+import com.automattic.eventhorizon.FilterSortByTappedEvent
+import com.automattic.eventhorizon.FilterUnarchiveAllTappedEvent
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -51,7 +82,7 @@ class PlaylistViewModel @AssistedInject constructor(
     private val downloadQueue: DownloadQueue,
     private val settings: Settings,
     playAllHandlerFactory: PlayAllHandler.Factory,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
 
@@ -114,11 +145,10 @@ class PlaylistViewModel @AssistedInject constructor(
     private var playAllJob: Job? = null
 
     fun saveUpNextAsPlaylist(saveUpNext: Boolean, upNextTranslation: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED,
-            mapOf(
-                "filter_type" to playlistType.analyticsValue,
-                "save_up_next" to saveUpNext,
+        eventHorizon.track(
+            FilterPlayAllReplaceAndPlayTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+                saveUpNext = saveUpNext,
             ),
         )
         settings.saveUpNextAsPlaylist.set(saveUpNext, updateModifiedAt = false)
@@ -227,9 +257,10 @@ class PlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch(NonCancellable) {
             delay(300) // Some small delay to navigate back to the main UI first.
             playlistManager.deletePlaylist(playlistUuid)
-            analyticsTracker.track(
-                AnalyticsEvent.FILTER_DELETED,
-                mapOf("filter_type" to playlistType.analyticsValue),
+            eventHorizon.track(
+                FilterDeletedEvent(
+                    filterType = playlistType.eventHorizonValue,
+                ),
             )
         }
     }
@@ -250,147 +281,157 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackDeleteTriggered() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_DELETE_TRIGGERED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterDeleteTriggeredEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackDeleteDismissed() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_DELETE_DISMISSED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterDeleteDismissedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackFilterShown() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_SHOWN,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterShownEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackAddEpisodesTapped() {
         val episodeCount = uiState.value.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_ADD_EPISODES_TAPPED,
-            mapOf("is_playlist_full" to (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)),
+        eventHorizon.track(
+            FilterAddEpisodesTappedEvent(
+                isPlaylistFull = episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT,
+            ),
         )
     }
 
     fun trackEditRulesTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
+        eventHorizon.track(FilterEditRulesTappedEvent)
     }
 
     fun trackPlayAllTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterPlayAllTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackPlayAllDismissed() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_DISMISSED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterPlayAllDismissedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackSelectEpisodesTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_SELECT_EPISODES_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterSelectEpisodesTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackSortByTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_SORT_BY_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterSortByTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackDownloadAllTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_DOWNLOAD_ALL_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterDownloadAllTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackChromeCastTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_CHROME_CAST_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterChromeCastTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackFilterOptionsButtonTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_OPTIONS_BUTTON_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterOptionsButtonTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackFilterOptionsTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_OPTIONS_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
+        eventHorizon.track(
+            FilterOptionsTappedEvent(
+                filterType = playlistType.eventHorizonValue,
+            ),
         )
     }
 
     fun trackSortByChanged(type: PlaylistEpisodeSortType) {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_SORT_BY_CHANGED,
-            mapOf(
-                "sort_order" to type.analyticsValue,
-                "filter_type" to playlistType.analyticsValue,
+        eventHorizon.track(
+            FilterSortByChangedEvent(
+                sortOrder = type.eventHorizonValue,
+                filterType = playlistType.eventHorizonValue,
             ),
         )
     }
 
     fun trackAutoDownloadChanged(isEnabled: Boolean) {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED,
-            mapOf(
-                "source" to "filters",
-                "enabled" to isEnabled,
-                "filter_type" to playlistType.analyticsValue,
+        eventHorizon.track(
+            FilterAutoDownloadUpdatedEvent(
+                source = SourceView.FILTERS.eventHorizonValue,
+                enabled = isEnabled,
+                filterType = playlistType.eventHorizonValue,
             ),
         )
     }
 
     fun trackAutoDownloadLimitChanged(limit: Int) {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED,
-            mapOf("limit" to limit),
+        eventHorizon.track(
+            FilterAutoDownloadLimitUpdatedEvent(
+                limit = limit.toLong(),
+            ),
         )
     }
 
     fun trackEditDismissed() {
         if (isNameChanged) {
-            analyticsTracker.track(AnalyticsEvent.FILTER_NAME_UPDATED)
+            eventHorizon.track(FilterNameUpdatedEvent)
         }
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_EDIT_DISMISSED,
-            mapOf(
-                "did_change_name" to isNameChanged,
-                "did_change_auto_download" to isAutoDownloadChanged,
-                "did_change_episode_count" to isAutoDownloadLimitChanged,
-                "filter_type" to playlistType.analyticsValue,
+        eventHorizon.track(
+            FilterEditDismissedEvent(
+                didChangeName = isNameChanged,
+                didChangeAutoDownload = isAutoDownloadChanged,
+                didChangeEpisodeCount = isAutoDownloadLimitChanged,
+                filterType = playlistType.eventHorizonValue,
             ),
         )
     }
 
     fun trackArchiveAllTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_ARCHIVE_ALL_TAPPED)
+        eventHorizon.track(FilterArchiveAllTappedEvent)
     }
 
     fun trackUnarchiveAllTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_UNARCHIVE_ALL_TAPPED)
+        eventHorizon.track(FilterUnarchiveAllTappedEvent)
     }
 
     fun trackRearrangeEpisodesTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_REARRANGE_EPISODES_TAPPED)
+        eventHorizon.track(FilterRearrangeEpisodesTappedEvent)
     }
 
     fun trackToggleShowArchived() {
@@ -403,42 +444,39 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackShowArchivedTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_TAPPED)
+        eventHorizon.track(FilterShowArchivedTappedEvent)
     }
 
     fun trackHideArchivedTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_HIDE_ARCHIVED_TAPPED)
+        eventHorizon.track(FilterHideArchivedTappedEvent)
     }
 
     fun trackAddEpisodeCtaTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_CTA_EMPTY_TAPPED)
+        eventHorizon.track(FilterAddEpisodesCtaEmptyTappedEvent)
     }
 
     fun trackBrowseShowsCtaTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_BROWSE_SHOWS_CTA_EMPTY_TAPPED)
+        eventHorizon.track(FilterBrowseShowsCtaEmptyTappedEvent)
     }
 
     fun trackEditRulesCtaTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_CTA_EMPTY_TAPPED)
+        eventHorizon.track(FilterEditRulesCtaEmptyTappedEvent)
     }
 
     fun trackShowArchivedCtaTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED)
+        eventHorizon.track(FilterShowArchivedCtaEmptyTappedEvent)
     }
 
     fun trackDeleteUnavailableEpisode(episodeUuid: String, podcastUuid: String) {
         val playlistName = uiState.value.playlist?.title
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
-            buildMap {
-                if (playlistName != null) {
-                    put("playlist_name", playlistName)
-                }
-                put("playlist_uuid", playlistUuid)
-                put("episode_uuid", episodeUuid)
-                put("podcast_uuid", podcastUuid)
-                put("source", "unavailable_episode")
-            },
+        eventHorizon.track(
+            EpisodeRemovedFromListEvent(
+                playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                playlistUuid = playlistUuid,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                source = PlaylistRemoveEpisodeSource.UnavailableEpisode,
+            ),
         )
     }
 

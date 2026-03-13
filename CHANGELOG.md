@@ -1,6 +1,8 @@
 8.8
 -----
-
+*   Updates
+    *   Improve detection of generated transcripts.
+        ([#5097](https://github.com/Automattic/pocket-casts-android/pull/5097))
 
 8.7
 -----

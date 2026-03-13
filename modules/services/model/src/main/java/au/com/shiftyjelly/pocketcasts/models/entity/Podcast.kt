@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
+import com.automattic.eventhorizon.AutoAddToUpNextType
 import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
@@ -108,25 +109,27 @@ data class Podcast(
 
     enum class AutoAddUpNext(
         val databaseInt: Int,
-        val analyticsValue: String,
+        val eventHorizonValue: AutoAddToUpNextType,
         val labelId: Int,
     ) {
         OFF(
             databaseInt = 0,
-            analyticsValue = "off",
+            eventHorizonValue = AutoAddToUpNextType.Off,
             labelId = LR.string.off,
         ),
         PLAY_LAST(
             databaseInt = 1,
-            analyticsValue = "add_last",
+            eventHorizonValue = AutoAddToUpNextType.AddLast,
             labelId = LR.string.play_last,
         ),
         PLAY_NEXT(
             databaseInt = 2,
-            analyticsValue = "add_first",
+            eventHorizonValue = AutoAddToUpNextType.AddFirst,
             labelId = LR.string.play_next,
         ),
         ;
+
+        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromDatabaseInt(int: Int?) = entries.firstOrNull { it.databaseInt == int }

@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -20,6 +18,25 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.decrementByOrRound
 import au.com.shiftyjelly.pocketcasts.utils.extensions.incrementByOrRound
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSpeedChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceAmountChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceToggledEvent
+import com.automattic.eventhorizon.PlaybackEffectVolumeBoostToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoAddUpNextPositionOptionChangedEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoAddUpNextToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoArchiveEpisodeLimitChangedEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoArchiveInactiveChangedEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoArchivePlayedChangedEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoArchiveToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsAutoDownloadToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsCustomPlaybackEffectsToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsNotificationsToggledEvent
+import com.automattic.eventhorizon.PodcastSettingsSkipFirstChangedEvent
+import com.automattic.eventhorizon.PodcastSettingsSkipLastChangedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.SettingType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -43,7 +60,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @Assisted private val podcastUuid: String,
 ) : ViewModel() {
     private val podcastFlow = MutableStateFlow<Podcast?>(null)
@@ -89,9 +106,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeNotifications(enable: Boolean) {
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
-                mapOf("enabled" to enable),
+            eventHorizon.track(
+                PodcastSettingsNotificationsToggledEvent(
+                    enabled = enable,
+                ),
             )
             podcastFlow.update { it?.copy(isShowNotifications = enable) }
             podcastManager.updateShowNotifications(podcastUuid, show = enable)
@@ -101,9 +119,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeAutoDownload(enable: Boolean) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
-                mapOf("enabled" to enable),
+            eventHorizon.track(
+                PodcastSettingsAutoDownloadToggledEvent(
+                    enabled = enable,
+                ),
             )
             val status = if (enable) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
             podcastFlow.update { it?.copy(autoDownloadStatus = status) }
@@ -115,9 +134,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast = podcastFlow.value ?: return
         val mode = if (enable) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
-                mapOf("enabled" to enable),
+            eventHorizon.track(
+                PodcastSettingsAutoAddUpNextToggledEvent(
+                    enabled = enable,
+                ),
             )
             podcastFlow.update { it?.copy(autoAddToUpNext = mode) }
             podcastManager.updateAutoAddToUpNext(podcast, mode)
@@ -127,9 +147,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeAddToUpNext(mode: Podcast.AutoAddUpNext) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
-                mapOf("value" to mode.analyticsValue),
+            eventHorizon.track(
+                PodcastSettingsAutoAddUpNextPositionOptionChangedEvent(
+                    value = mode.eventHorizonValue,
+                ),
             )
             podcastFlow.update { it?.copy(autoAddToUpNext = mode) }
             podcastManager.updateAutoAddToUpNext(podcast, mode)
@@ -138,9 +159,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchive(enable: Boolean) {
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED,
-                mapOf("enabled" to enable),
+            eventHorizon.track(
+                PodcastSettingsAutoArchiveToggledEvent(
+                    enabled = enable,
+                ),
             )
 
             podcastFlow.update {
@@ -161,9 +183,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchiveAfterPlaying(mode: AutoArchiveAfterPlaying) {
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-                mapOf("value" to mode.analyticsValue),
+            eventHorizon.track(
+                PodcastSettingsAutoArchivePlayedChangedEvent(
+                    value = mode.eventHorizonValue,
+                ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveAfterPlaying = mode) }
             podcastManager.updateArchiveAfterPlaying(podcastUuid, mode)
@@ -172,9 +195,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchiveAfterInactive(mode: AutoArchiveInactive) {
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-                mapOf("value" to mode.analyticsValue),
+            eventHorizon.track(
+                PodcastSettingsAutoArchiveInactiveChangedEvent(
+                    value = mode.eventHorizonValue,
+                ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveInactive = mode) }
             podcastManager.updateArchiveAfterInactive(podcastUuid, mode)
@@ -183,9 +207,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchiveLimit(limit: AutoArchiveLimit) {
         viewModelScope.launch {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
-                mapOf("value" to limit.analyticsValue),
+            eventHorizon.track(
+                PodcastSettingsAutoArchiveEpisodeLimitChangedEvent(
+                    value = limit.eventHorizonValue,
+                ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveEpisodeLimit = limit) }
             podcastManager.updateArchiveEpisodeLimit(podcastUuid, limit)
@@ -195,11 +220,9 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changePlaybackEffects(enable: Boolean) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED,
-                mapOf(
-                    "enabled" to enable,
-                    "settings" to "local",
+            eventHorizon.track(
+                PodcastSettingsCustomPlaybackEffectsToggledEvent(
+                    enabled = enable,
                 ),
             )
             podcastFlow.update { it?.copy(overrideGlobalEffects = enable) }
@@ -220,11 +243,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private fun changePlaybackSpeed(podcast: Podcast, change: Double) {
         val newPlaybackSpeed = (podcast.playbackSpeed + change).roundedSpeed()
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED,
-                mapOf(
-                    "speed" to newPlaybackSpeed,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectSpeedChangedEvent(
+                    speed = newPlaybackSpeed,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -238,11 +262,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast = podcastFlow.value ?: return
         val mode = if (enable) TrimMode.LOW else TrimMode.OFF
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
-                mapOf(
-                    "enabled" to enable,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectTrimSilenceToggledEvent(
+                    enabled = enable,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -255,11 +280,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeTrimMode(mode: TrimMode) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
-                mapOf(
-                    "amount" to mode.analyticsVale,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectTrimSilenceAmountChangedEvent(
+                    amount = mode.eventHorizonValue,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -272,11 +298,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeVolumeBoost(enable: Boolean) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            tracker.track(
-                AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED,
-                mapOf(
-                    "enabled" to enable,
-                    "settings" to "local",
+            eventHorizon.track(
+                PlaybackEffectVolumeBoostToggledEvent(
+                    enabled = enable,
+                    settings = SettingType.Local,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    contentType = PlaybackContentType.Audio,
                 ),
             )
 
@@ -302,9 +329,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
             val newValue = block(podcast.startFromSecs)
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
-                mapOf("value" to newValue),
+            eventHorizon.track(
+                PodcastSettingsSkipFirstChangedEvent(
+                    value = newValue.toLong(),
+                ),
             )
 
             podcastFlow.update { it?.copy(startFromSecs = newValue) }
@@ -328,9 +356,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
             val newValue = block(podcast.skipLastSecs)
-            tracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
-                mapOf("value" to newValue),
+            eventHorizon.track(
+                PodcastSettingsSkipLastChangedEvent(
+                    value = newValue.toLong(),
+                ),
             )
 
             podcastFlow.update { it?.copy(skipLastSecs = newValue) }
@@ -341,11 +370,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun unfollow() {
         viewModelScope.launch(NonCancellable) {
             podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SETTINGS)
-            tracker.track(
-                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                mapOf(
-                    "source" to SourceView.PODCAST_SETTINGS.analyticsValue,
-                    "uuid" to podcastUuid,
+            eventHorizon.track(
+                PodcastUnsubscribedEvent(
+                    uuid = podcastUuid,
+                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
                 ),
             )
         }

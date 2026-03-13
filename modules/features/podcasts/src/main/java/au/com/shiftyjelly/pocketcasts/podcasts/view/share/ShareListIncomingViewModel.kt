@@ -4,13 +4,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.IncomingShareListShownEvent
+import com.automattic.eventhorizon.IncomingShareListSubscribedAllEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -25,7 +28,7 @@ class ShareListIncomingViewModel
     val podcastManager: PodcastManager,
     val listServiceManager: ListServiceManager,
     val playbackManager: PlaybackManager,
-    val analyticsTracker: AnalyticsTracker,
+    val eventHorizon: EventHorizon,
 ) : ViewModel(),
     CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -70,8 +73,38 @@ class ShareListIncomingViewModel
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    fun trackShareEvent(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        analyticsTracker.track(event, properties)
+    fun trackIncomingShareListShown(sourceView: SourceView) {
+        eventHorizon.track(
+            IncomingShareListShownEvent(
+                source = sourceView.eventHorizonValue,
+            ),
+        )
+    }
+
+    fun trackIncomingShareListSubscribeAll(podcastCount: Int) {
+        eventHorizon.track(
+            IncomingShareListSubscribedAllEvent(
+                count = podcastCount.toLong(),
+            ),
+        )
+    }
+
+    fun trackPodcastUnsubscribed(uuid: String) {
+        eventHorizon.track(
+            PodcastUnsubscribedEvent(
+                uuid = uuid,
+                source = SourceView.SHARE_LIST.eventHorizonValue,
+            ),
+        )
+    }
+
+    fun trackPodcastSubscribed(uuid: String) {
+        eventHorizon.track(
+            PodcastSubscribedEvent(
+                uuid = uuid,
+                source = SourceView.SHARE_LIST.eventHorizonValue,
+            ),
+        )
     }
 }
 

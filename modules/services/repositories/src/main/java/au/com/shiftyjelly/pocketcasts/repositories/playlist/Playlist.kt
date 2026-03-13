@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import com.automattic.eventhorizon.PlaylistType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,15 +52,17 @@ sealed interface Playlist {
     }
 
     enum class Type(
-        val analyticsValue: String,
+        val eventHorizonValue: PlaylistType,
     ) {
         Manual(
-            analyticsValue = "manual",
+            eventHorizonValue = PlaylistType.Manual,
         ),
         Smart(
-            analyticsValue = "smart",
+            eventHorizonValue = PlaylistType.Smart,
         ),
         ;
+
+        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromValue(value: String) = entries.firstOrNull { it.analyticsValue == value }

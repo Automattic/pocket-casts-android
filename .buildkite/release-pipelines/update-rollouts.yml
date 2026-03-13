@@ -5,6 +5,9 @@
 
 # Expected variables passed to the pipeline by ReleasesV2: `TRACK`, `ROLLOUT_PERCENT`
 
+env:
+  IMAGE_ID: "xcode-26.2"
+
 steps:
   - label: "🚂 Update Rollouts"
     command: |
@@ -18,7 +21,7 @@ steps:
       bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"
     plugins: [$CI_TOOLKIT]
     agents:
-      queue: "mac-metal"
+      queue: "mac"
     retry:
       manual:
         reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
@@ -38,7 +41,7 @@ steps:
       bundle exec fastlane publish_gh_release skip_confirm:true track:"$TRACK"
     plugins: [$CI_TOOLKIT]
     agents:
-      queue: "mac-metal"
+      queue: "mac"
     retry:
       manual:
         reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite

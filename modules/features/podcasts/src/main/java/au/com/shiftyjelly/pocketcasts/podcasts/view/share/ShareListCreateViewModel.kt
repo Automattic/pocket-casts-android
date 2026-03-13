@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SharePodcastsListPublishFailedEvent
+import com.automattic.eventhorizon.SharePodcastsListPublishStartedEvent
+import com.automattic.eventhorizon.SharePodcastsListPublishSucceededEvent
+import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +23,7 @@ import timber.log.Timber
 class ShareListCreateViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val listServiceManager: ListServiceManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     data class State(
@@ -81,9 +84,10 @@ class ShareListCreateViewModel @Inject constructor(
         val description = stateValue.description
 
         val selectedPodcasts = stateValue.selectedPodcastsOrdered
-        trackShareEvent(
-            AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_STARTED,
-            AnalyticsProp.countMap(selectedPodcasts.size),
+        track(
+            SharePodcastsListPublishStartedEvent(
+                count = selectedPodcasts.size.toLong(),
+            ),
         )
         onBefore()
         viewModelScope.launch {
@@ -99,17 +103,19 @@ class ShareListCreateViewModel @Inject constructor(
                     putExtra(Intent.EXTRA_TEXT, url)
                 }
                 context.startActivity(Intent.createChooser(intent, label), null)
-                trackShareEvent(
-                    AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED,
-                    AnalyticsProp.countMap(selectedPodcasts.size),
+                track(
+                    SharePodcastsListPublishSucceededEvent(
+                        count = selectedPodcasts.size.toLong(),
+                    ),
                 )
 
                 onSuccess()
             } catch (ex: Exception) {
                 Timber.e(ex)
-                trackShareEvent(
-                    AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_FAILED,
-                    AnalyticsProp.countMap(selectedPodcasts.size),
+                track(
+                    SharePodcastsListPublishFailedEvent(
+                        count = selectedPodcasts.size.toLong(),
+                    ),
                 )
                 onFailure()
             }
@@ -120,12 +126,7 @@ class ShareListCreateViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    fun trackShareEvent(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        analyticsTracker.track(event, properties)
-    }
-
-    private object AnalyticsProp {
-        private const val COUNT = "count"
-        fun countMap(count: Int) = mapOf(this.COUNT to count)
+    fun track(event: Trackable) {
+        eventHorizon.track(event)
     }
 }

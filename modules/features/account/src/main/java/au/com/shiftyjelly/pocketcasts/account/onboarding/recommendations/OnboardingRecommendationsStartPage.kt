@@ -112,10 +112,7 @@ fun OnboardingRecommendationsStartPage(
             onImportClick()
         },
         onSubscribeClick = { podcast ->
-            viewModel.updateSubscribed(
-                podcast = podcast,
-                flow = flow,
-            )
+            viewModel.updateSubscribed(podcast = podcast)
         },
         onSearch = {
             viewModel.onSearch(flow)

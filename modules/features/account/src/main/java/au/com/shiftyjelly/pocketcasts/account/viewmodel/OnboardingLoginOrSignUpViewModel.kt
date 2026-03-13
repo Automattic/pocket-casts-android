@@ -4,13 +4,17 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.OnboardingCarouselShownEvent
+import com.automattic.eventhorizon.OnboardingGetStartedEvent
+import com.automattic.eventhorizon.SetupAccountButtonTappedEvent
+import com.automattic.eventhorizon.SetupAccountButtonType
+import com.automattic.eventhorizon.SetupAccountDismissedEvent
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,7 +27,7 @@ data class GoogleSignInState(val isNewAccount: Boolean)
 
 @HiltViewModel
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
 ) : AndroidViewModel(context as Application) {
@@ -49,35 +53,50 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     }
 
     fun onShown(flow: OnboardingFlow) {
-        analyticsTracker.trackOnboardingIntroCarouselShown(flow.analyticsValue)
+        eventHorizon.track(
+            OnboardingCarouselShownEvent(
+                flow = flow.eventHorizonValue,
+            ),
+        )
     }
 
     fun onDismiss(flow: OnboardingFlow) {
-        analyticsTracker.trackSetupAccountDismissed(flow.analyticsValue)
+        eventHorizon.track(
+            SetupAccountDismissedEvent(
+                flow = flow.eventHorizonValue,
+            ),
+        )
     }
 
     fun onSignUpClicked(flow: OnboardingFlow) {
-        analyticsTracker.trackSetupAccountButtonTapped(
-            flow = flow.analyticsValue,
-            button = AnalyticsParameter.SetupAccountButton.CreateAccount,
+        eventHorizon.track(
+            SetupAccountButtonTappedEvent(
+                flow = flow.eventHorizonValue,
+                button = SetupAccountButtonType.CreateAccount,
+            ),
         )
     }
 
     fun onGetStartedClicked(flow: OnboardingFlow) {
-        analyticsTracker.trackOnboardingGetStarted(
-            flow = flow.analyticsValue,
+        eventHorizon.track(
+            OnboardingGetStartedEvent(
+                flow = flow.eventHorizonValue,
+            ),
         )
-        // keep it consistent with iOS
-        analyticsTracker.trackSetupAccountButtonTapped(
-            flow = flow.analyticsValue,
-            button = AnalyticsParameter.SetupAccountButton.GetStarted,
+        eventHorizon.track(
+            SetupAccountButtonTappedEvent(
+                flow = flow.eventHorizonValue,
+                button = SetupAccountButtonType.GetStarted,
+            ),
         )
     }
 
     fun onLoginClicked(flow: OnboardingFlow) {
-        analyticsTracker.trackSetupAccountButtonTapped(
-            flow = flow.analyticsValue,
-            button = AnalyticsParameter.SetupAccountButton.SignIn,
+        eventHorizon.track(
+            SetupAccountButtonTappedEvent(
+                flow = flow.eventHorizonValue,
+                button = SetupAccountButtonType.SignIn,
+            ),
         )
     }
 }

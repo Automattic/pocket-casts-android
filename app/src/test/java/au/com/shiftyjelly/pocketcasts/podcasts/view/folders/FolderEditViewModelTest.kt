@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -10,6 +10,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotifi
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderCreateColorShownEvent
+import com.automattic.eventhorizon.FolderSavedEvent
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,7 +69,7 @@ class FolderEditViewModelTest {
             podcastManager = podcastManager,
             folderManager = folderManager,
             settings = settings,
-            analyticsTracker = mock(),
+            eventHorizon = EventHorizon(TestEventSink()),
             notificationManager = notificationManager,
         )
     }
@@ -88,7 +91,7 @@ class FolderEditViewModelTest {
 
     @Test
     fun `should track interacted feature when saving folder`() = runTest {
-        viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_SAVED, mapOf("foo" to "bar"))
+        viewModel.trackCreateFolderNavigation { FolderSavedEvent("color", 12) }
 
         advanceUntilIdle()
 
@@ -97,7 +100,7 @@ class FolderEditViewModelTest {
 
     @Test
     fun `should not track interacted feature when it did not save folder`() = runTest {
-        viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN, mapOf("foo" to "bar"))
+        viewModel.trackCreateFolderNavigation { FolderCreateColorShownEvent(100) }
 
         advanceUntilIdle()
 

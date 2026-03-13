@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -20,6 +18,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeDeletedFromCloudEvent
+import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
+import com.automattic.eventhorizon.EpisodeSwipeActionPerformedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -40,8 +43,7 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val shareDialogFactory: ShareDialogFactory,
     private val downloadQueue: DownloadQueue,
     private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
-    private val tracker: AnalyticsTracker,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val swipeSource: SwipeSource,
@@ -113,17 +115,14 @@ class SwipeActionViewModel @AssistedInject constructor(
                 playlistUuid = playlistUuid,
             )
             val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
-            tracker.track(
-                AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
-                buildMap {
-                    if (playlistName != null) {
-                        put("playlist_name", playlistName)
-                    }
-                    put("playlist_uuid", playlistUuid)
-                    put("episode_uuid", episodeUuid)
-                    put("podcast_uuid", podcastUuid)
-                    put("source", "swipe_remove")
-                },
+            eventHorizon.track(
+                EpisodeRemovedFromListEvent(
+                    playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                    playlistUuid = playlistUuid,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    source = PlaylistRemoveEpisodeSource.SwipeRemove,
+                ),
             )
         }
     }
@@ -166,10 +165,11 @@ class SwipeActionViewModel @AssistedInject constructor(
                     applicationScope = applicationScope,
                 )
                 if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
-                    episodeAnalytics.trackEvent(
-                        event = AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD,
-                        source = swipeSource.toSourceView(),
-                        uuid = episode.uuid,
+                    eventHorizon.track(
+                        EpisodeDeletedFromCloudEvent(
+                            episodeUuid = episode.uuid,
+                            source = swipeSource.toSourceView().eventHorizonValue,
+                        ),
                     )
                 }
                 viewModelScope.launch {
@@ -194,11 +194,10 @@ class SwipeActionViewModel @AssistedInject constructor(
     }
 
     private fun trackAction(action: SwipeAction) {
-        tracker.track(
-            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            mapOf(
-                "action" to action.analyticsValue,
-                "source" to swipeSource.analyticsValue,
+        eventHorizon.track(
+            EpisodeSwipeActionPerformedEvent(
+                source = swipeSource.eventHorizonValue,
+                action = action.eventHorizonValue,
             ),
         )
     }

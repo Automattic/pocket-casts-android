@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,7 +23,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -47,6 +46,14 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSettingsViewAppearedEvent
+import com.automattic.eventhorizon.PlaybackEffectSpeedChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceAmountChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceToggledEvent
+import com.automattic.eventhorizon.PlaybackEffectVolumeBoostToggledEvent
+import com.automattic.eventhorizon.SettingType
+import com.automattic.eventhorizon.Trackable
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -80,7 +87,13 @@ class EffectsFragment :
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED)
+            viewModel.trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+                PlaybackEffectSettingsViewAppearedEvent(
+                    source = sourceView.eventHorizonValue,
+                    contentType = contentType,
+                    settings = settingType,
+                )
+            }
         }
     }
 
@@ -175,10 +188,14 @@ class EffectsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             playbackSpeedTrackingDebouncer.debounce {
                 viewModel.effectsLive.value?.effects?.playbackSpeed?.roundedSpeed()?.let { currentSpeed ->
-                    trackPlaybackEffectsEvent(
-                        event = AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED,
-                        props = mapOf(PlaybackManager.SPEED_KEY to currentSpeed),
-                    )
+                    trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+                        PlaybackEffectSpeedChangedEvent(
+                            speed = currentSpeed,
+                            source = sourceView.eventHorizonValue,
+                            contentType = contentType,
+                            settings = settingType,
+                        )
+                    }
                 }
             }
         }
@@ -211,7 +228,14 @@ class EffectsFragment :
         val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
+            trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+                PlaybackEffectTrimSilenceToggledEvent(
+                    enabled = isChecked,
+                    source = sourceView.eventHorizonValue,
+                    contentType = contentType,
+                    settings = settingType,
+                )
+            }
             if (effects.trimMode == TrimMode.OFF && isChecked) {
                 effects.trimMode = TrimMode.LOW
                 this.binding?.trimToggleGroup?.check(R.id.trimLow)
@@ -222,7 +246,14 @@ class EffectsFragment :
 
             updateTrimState()
         } else if (buttonView.id == binding.switchVolume.id) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
+            trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+                PlaybackEffectVolumeBoostToggledEvent(
+                    enabled = isChecked,
+                    source = sourceView.eventHorizonValue,
+                    contentType = contentType,
+                    settings = settingType,
+                )
+            }
             effects.isVolumeBoosted = isChecked
             viewModel.saveEffects(effects, podcast)
         }
@@ -234,10 +265,17 @@ class EffectsFragment :
 
         if (group.id == binding.trimToggleGroup.id && isChecked) {
             val index = trimToggleGroupButtonIds.indexOf(checkedId)
-            val newTrimMode = TrimMode.values()[index + 1]
+            val newTrimMode = TrimMode.entries[index + 1]
             if (effects.trimMode != newTrimMode) {
                 effects.trimMode = newTrimMode
-                trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to newTrimMode.analyticsVale))
+                trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+                    PlaybackEffectTrimSilenceAmountChangedEvent(
+                        amount = newTrimMode.eventHorizonValue,
+                        source = sourceView.eventHorizonValue,
+                        contentType = contentType,
+                        settings = settingType,
+                    )
+                }
                 viewModel.saveEffects(effects, podcast)
             }
         }
@@ -262,8 +300,8 @@ class EffectsFragment :
         }
     }
 
-    private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        viewModel.trackPlaybackEffectsEvent(event, props)
+    private fun trackPlaybackEffectsEvent(event: (SourceView, PlaybackContentType, SettingType) -> Trackable) {
+        viewModel.trackPlaybackEffectsEvent(event)
     }
 
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {

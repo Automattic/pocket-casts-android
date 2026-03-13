@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
@@ -60,9 +62,6 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var applicationScope: CoroutineScope
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     private lateinit var chromeCastAnalytics: ChromeCastAnalytics
@@ -326,7 +325,8 @@ class ShelfSharedViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
         shelfSharedViewModel = ShelfSharedViewModel(
-            analyticsTracker = analyticsTracker,
+            analyticsTracker = AnalyticsTracker.test(),
+            eventHorizon = EventHorizon(TestEventSink()),
             applicationScope = applicationScope,
             chromeCastAnalytics = chromeCastAnalytics,
             episodeManager = episodeManager,

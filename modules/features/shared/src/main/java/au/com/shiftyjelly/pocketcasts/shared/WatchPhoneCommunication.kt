@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.shared
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.EMIL_LOGS_TO_SUPPORT
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -12,6 +14,7 @@ import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,12 +38,13 @@ class WatchPhoneCommunication {
         private const val CAPABILITY_NAME = "pocket_casts_wear_listener"
     }
 
+    @Singleton
     class Watch @Inject constructor(
         @ApplicationContext private val appContext: Context,
         private val support: Support,
+        @ApplicationScope private val coroutineScope: CoroutineScope,
     ) {
 
-        private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
         private val capabilityInfoFlow = MutableStateFlow<CapabilityInfo?>(null)
         private val availableNodeFlow = capabilityInfoFlow
             .map { it?.nodes?.firstOrNull() } // just using the first available node
@@ -53,24 +57,31 @@ class WatchPhoneCommunication {
                 }
             }.stateIn(coroutineScope, SharingStarted.Lazily, WatchPhoneCommunicationState.NOT_CONNECTED)
 
-        private val onCapabilityChangedListener = CapabilityClient.OnCapabilityChangedListener {
-            capabilityInfoFlow.value = it
+        private val onCapabilityChangedListener = CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
+            Timber.d("Capability changed: nodes=${capabilityInfo.nodes.map { "${it.displayName}(${it.id})" }}")
+            capabilityInfoFlow.value = capabilityInfo
         }
 
         init {
 
             coroutineScope.launch {
-                val capabilityInfo =
-                    Wearable.getCapabilityClient(appContext)
-                        .getCapability(CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE)
-                        .await()
-                onCapabilityChangedListener.onCapabilityChanged(capabilityInfo)
+                try {
+                    val capabilityInfo =
+                        Wearable.getCapabilityClient(appContext)
+                            .getCapability(CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE)
+                            .await()
+                    onCapabilityChangedListener.onCapabilityChanged(capabilityInfo)
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to query initial capability")
+                }
             }
 
             Wearable.getCapabilityClient(appContext)
-                .addListener({
-                    onCapabilityChangedListener.onCapabilityChanged(it)
-                }, CAPABILITY_NAME)
+                .addListener(
+                    { onCapabilityChangedListener.onCapabilityChanged(it) },
+                    Uri.parse("wear://*/$CAPABILITY_NAME"),
+                    CapabilityClient.FILTER_REACHABLE,
+                )
         }
 
         suspend fun emailLogsToSupportMessage(): WatchMessageSendState {

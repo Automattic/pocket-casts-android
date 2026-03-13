@@ -19,8 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
@@ -44,6 +42,12 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.AccountDetailsCancelTappedEvent
+import com.automattic.eventhorizon.AccountDetailsChangeAvatarEvent
+import com.automattic.eventhorizon.AccountDetailsShowPrivacyPolicyEvent
+import com.automattic.eventhorizon.AccountDetailsShowTosEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlusPromotionBannerButtonTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -61,7 +65,7 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var episodeManager: EpisodeManager
 
@@ -110,7 +114,7 @@ class AccountDetailsFragment : BaseFragment() {
                 }
             },
             onChangeAvatar = { email ->
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                eventHorizon.track(AccountDetailsChangeAvatarEvent)
                 Gravatar.refreshGravatarTimestamp()
                 requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Gravatar.getGravatarChangeAvatarUrl(email).toUri()))
             },
@@ -126,7 +130,7 @@ class AccountDetailsFragment : BaseFragment() {
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
             onCancelSubscription = { winbackParams ->
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
+                eventHorizon.track(AccountDetailsCancelTappedEvent)
                 WinbackFragment
                     .create(winbackParams)
                     .show(childFragmentManager, "subscription_winback")
@@ -135,24 +139,23 @@ class AccountDetailsFragment : BaseFragment() {
                 accountViewModel.updateNewsletter(isChecked)
             },
             onShowPrivacyPolicy = {
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
+                eventHorizon.track(AccountDetailsShowPrivacyPolicyEvent)
                 requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
             },
             onShowTermsOfUse = {
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
+                eventHorizon.track(AccountDetailsShowTosEvent)
                 requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
             },
             onSignOut = { signOut() },
             onDeleteAccount = { deleteAccount() },
             onAccountUpgradeClick = {
-                analyticsTracker.track(
-                    AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED,
-                    mapOf(
-                        "source" to OnboardingUpgradeSource.PROFILE.analyticsValue,
-                        "flow" to OnboardingFlow.AccountUpgrade.analyticsValue,
+                val onboardingFlow = OnboardingFlow.AccountUpgrade
+                eventHorizon.track(
+                    PlusPromotionBannerButtonTappedEvent(
+                        source = OnboardingUpgradeSource.PROFILE.eventHorizonValue,
+                        flow = onboardingFlow.eventHorizonValue,
                     ),
                 )
-                val onboardingFlow = OnboardingFlow.AccountUpgrade
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
         )

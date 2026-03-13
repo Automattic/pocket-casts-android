@@ -8,9 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -44,6 +42,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSettingsChangedEvent
+import com.automattic.eventhorizon.PlayerNextChapterTappedEvent
+import com.automattic.eventhorizon.PlayerPreviousChapterTappedEvent
+import com.automattic.eventhorizon.SettingType
+import com.automattic.eventhorizon.Trackable
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -88,7 +96,7 @@ class PlayerViewModel @Inject constructor(
     private val settings: Settings,
     private val theme: Theme,
     private val analyticsTracker: AnalyticsTracker,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     blazeAdsManager: BlazeAdsManager,
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -166,6 +174,7 @@ class PlayerViewModel @Inject constructor(
         var upNextEpisodes: List<BaseEpisode>,
         var upNextSummary: UpNextSummary,
     )
+
     private val source = SourceView.PLAYER
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
@@ -175,8 +184,9 @@ class PlayerViewModel @Inject constructor(
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
-    val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-        .observeOn(Schedulers.io())
+    val upNextStateObservable: Observable<UpNextQueue.State> =
+        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+            .observeOn(Schedulers.io())
 
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
@@ -229,7 +239,8 @@ class PlayerViewModel @Inject constructor(
             null
         }
 
-        val upNextSummary = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
+        val upNextSummary =
+            UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return@map listOfNotNull(nowPlayingInfo, upNextSummary) + upNextEpisodes
     }
@@ -266,7 +277,6 @@ class PlayerViewModel @Inject constructor(
     val snackbarMessages = _snackbarMessages.asSharedFlow()
 
     private val _episodeFlow = MutableStateFlow<BaseEpisode?>(null)
-    val episodeFlow = _episodeFlow.asStateFlow()
     var episode: BaseEpisode?
         get() = _episodeFlow.value
         set(value) {
@@ -426,7 +436,8 @@ class PlayerViewModel @Inject constructor(
                 }
             }
         }
-        val upNextFooter = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
+        val upNextFooter =
+            UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return ListData(
             podcastHeader = podcastHeader,
@@ -510,14 +521,24 @@ class PlayerViewModel @Inject constructor(
     fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
             episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeMarkedAsPlayedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
     fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
             episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
+            eventHorizon.track(
+                EpisodeArchivedEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -684,7 +705,13 @@ class PlayerViewModel @Inject constructor(
             podcast.overrideGlobalEffects = override
             saveEffects(effects, podcast)
         }
-        trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_CHANGED)
+        trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
+            PlaybackEffectSettingsChangedEvent(
+                source = sourceView.eventHorizonValue,
+                contentType = contentType,
+                settings = settingType,
+            )
+        }
     }
 
     fun clearUpNext(context: Context, upNextSource: UpNextSource): ClearUpNextDialog {
@@ -692,7 +719,7 @@ class PlayerViewModel @Inject constructor(
             source = upNextSource,
             removeNowPlaying = false,
             playbackManager = playbackManager,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = eventHorizon,
             context = context,
         )
         val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextSource != UpNextSource.UP_NEXT_TAB
@@ -707,12 +734,12 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextChapterClick() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
+        eventHorizon.track(PlayerNextChapterTappedEvent)
         playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun onPreviousChapterClick() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_PREVIOUS_CHAPTER_TAPPED)
+        eventHorizon.track(PlayerPreviousChapterTappedEvent)
         playbackManager.skipToPreviousSelectedOrLastChapter()
     }
 
@@ -724,11 +751,10 @@ class PlayerViewModel @Inject constructor(
 
     fun onPodcastTitleClick(episodeUuid: String, podcastUuid: String?) {
         if (podcastUuid == null) return
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-            mapOf(
-                ShelfViewModel.Companion.AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
-                ShelfViewModel.Companion.AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+        eventHorizon.track(
+            EpisodeDetailPodcastNameTappedEvent(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.NOW_PLAYING.eventHorizonValue,
             ),
         )
         viewModelScope.launch {
@@ -737,22 +763,16 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun trackPlaybackEffectsEvent(
-        event: AnalyticsEvent,
-        properties: Map<String, Any> = emptyMap(),
+        event: (SourceView, PlaybackContentType, SettingType) -> Trackable,
     ) {
-        playbackManager.trackPlaybackEffectsEvent(
-            event = event,
-            props = buildMap {
-                putAll(properties)
-                val settings = if (effectsLive.value?.podcast?.overrideGlobalEffects == true) {
-                    PlaybackEffectsSettingsTab.ThisPodcast.analyticsValue
-                } else {
-                    PlaybackEffectsSettingsTab.AllPodcasts.analyticsValue
-                }
-                put(AnalyticsProp.SETTINGS, settings)
-            },
-            sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
-        )
+        playbackManager.trackPlaybackEvent(SourceView.PLAYER_PLAYBACK_EFFECTS) { source, contentType ->
+            val settingTab = if (effectsLive.value?.podcast?.overrideGlobalEffects == true) {
+                PlaybackEffectsSettingsTab.ThisPodcast
+            } else {
+                PlaybackEffectsSettingsTab.AllPodcasts
+            }
+            event(source, contentType, settingTab.eventHorizonValue)
+        }
     }
 
     fun trackAdImpression(ad: BlazeAd) {
@@ -775,12 +795,17 @@ class PlayerViewModel @Inject constructor(
         data object ShowBatteryWarningIfAppropriate : SnackbarMessage
     }
 
-    private object AnalyticsProp {
-        const val SETTINGS = "settings"
-    }
-
-    enum class PlaybackEffectsSettingsTab(@StringRes val labelResId: Int, val analyticsValue: String) {
-        AllPodcasts(LR.string.podcasts_all, "global"),
-        ThisPodcast(LR.string.podcast_this, "local"),
+    enum class PlaybackEffectsSettingsTab(
+        @StringRes val labelResId: Int,
+        val eventHorizonValue: SettingType,
+    ) {
+        AllPodcasts(
+            labelResId = LR.string.podcasts_all,
+            eventHorizonValue = SettingType.Global,
+        ),
+        ThisPodcast(
+            labelResId = LR.string.podcast_this,
+            eventHorizonValue = SettingType.Local,
+        ),
     }
 }

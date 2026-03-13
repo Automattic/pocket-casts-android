@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 object AnalyticsParameter {
-
     const val LIST_ID = "list_id"
     const val LIST_DATE = "list_datetime"
     const val PODCAST_UUID = "podcast_uuid"
@@ -15,11 +14,4 @@ object AnalyticsParameter {
     const val SOURCE = "source"
     const val BUTTON = "button"
     const val YEAR = "current_year"
-
-    enum class SetupAccountButton(val value: String) {
-        SignIn("sign_in"),
-        CreateAccount("create_account"),
-        ContinueWithGoogle("continue_with_google"),
-        GetStarted("get_started"),
-    }
 }

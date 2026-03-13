@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -45,6 +47,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
     private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -77,7 +80,7 @@ class ChaptersViewModel @AssistedInject constructor(
     val showPlayer = _showPlayer.asSharedFlow()
 
     fun playChapter(chapter: Chapter) {
-        tracker.track(AnalyticsEvent.PLAYER_CHAPTER_SELECTED)
+        eventHorizon.track(PlayerChapterSelectedEvent)
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
             val playbackState = playbackManager.playbackStateFlow.first()

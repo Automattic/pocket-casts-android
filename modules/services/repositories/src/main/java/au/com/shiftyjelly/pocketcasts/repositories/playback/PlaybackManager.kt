@@ -15,9 +15,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
@@ -68,6 +65,24 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.AutoplayFinishedLastEpisodeEvent
+import com.automattic.eventhorizon.EpisodeAddedToUpNextEvent
+import com.automattic.eventhorizon.EpisodeBulkAddToUpNextEvent
+import com.automattic.eventhorizon.EpisodeRemovedFromUpNextEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackChapterSkippedEvent
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEpisodeAutoplayedEvent
+import com.automattic.eventhorizon.PlaybackEpisodeDurationChangedEvent
+import com.automattic.eventhorizon.PlaybackFailedEvent
+import com.automattic.eventhorizon.PlaybackPauseEvent
+import com.automattic.eventhorizon.PlaybackPlayEvent
+import com.automattic.eventhorizon.PlaybackSeekEvent
+import com.automattic.eventhorizon.PlaybackSkipBackEvent
+import com.automattic.eventhorizon.PlaybackSkipForwardEvent
+import com.automattic.eventhorizon.PlaybackStopEvent
+import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
+import com.automattic.eventhorizon.Trackable
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -128,8 +143,7 @@ open class PlaybackManager @Inject constructor(
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTracker,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     private val syncManager: SyncManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
@@ -151,13 +165,6 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
-        private const val CONTENT_TYPE_KEY = "content_type"
-        private const val SOURCE_KEY = "source"
-        private const val SEEK_TO_PERCENT_KEY = "seek_to_percent"
-        private const val SEEK_FROM_PERCENT_KEY = "seek_from_percent"
-        const val SPEED_KEY = "speed"
-        const val AMOUNT_KEY = "amount"
-        const val ENABLED_KEY = "enabled"
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -226,7 +233,7 @@ open class PlaybackManager @Inject constructor(
         playlistManager = playlistManager,
         settings = settings,
         context = application,
-        episodeAnalytics = episodeAnalytics,
+        eventHorizon = eventHorizon,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
     )
@@ -311,9 +318,10 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYBACK_EPISODE_AUTOPLAYED,
-            mapOf("episode_uuid" to autoPlayEpisode.uuid),
+        eventHorizon.track(
+            PlaybackEpisodeAutoplayedEvent(
+                episodeUuid = autoPlayEpisode.uuid,
+            ),
         )
         return autoPlayEpisode
     }
@@ -648,7 +656,13 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
+            eventHorizon.track(
+                EpisodeAddedToUpNextEvent(
+                    episodeUuid = episode.uuid,
+                    toTop = true,
+                    source = source.eventHorizonValue,
+                ),
+            )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
@@ -664,7 +678,13 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
+            eventHorizon.track(
+                EpisodeAddedToUpNextEvent(
+                    episodeUuid = episode.uuid,
+                    toTop = false,
+                    source = source.eventHorizonValue,
+                ),
+            )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
@@ -745,11 +765,12 @@ open class PlaybackManager @Inject constructor(
         }
         val currentEpisode = upNextQueue.currentEpisode?.uuid
         upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode })
-        episodeAnalytics.trackBulkEvent(
-            event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
-            count = episodes.size,
-            toTop = false,
-            source = source,
+        eventHorizon.track(
+            EpisodeBulkAddToUpNextEvent(
+                count = episodes.size.toLong(),
+                toTop = false,
+                source = source.eventHorizonValue,
+            ),
         )
         notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
     }
@@ -763,11 +784,12 @@ open class PlaybackManager @Inject constructor(
             val currentEpisode = upNextQueue.currentEpisode?.uuid
             val wasEmpty: Boolean = upNextQueue.isEmpty
             upNextQueue.playAllNext(episodes.filter { it.uuid != currentEpisode })
-            episodeAnalytics.trackBulkEvent(
-                event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
-                count = episodes.size,
-                toTop = true,
-                source = source,
+            eventHorizon.track(
+                EpisodeBulkAddToUpNextEvent(
+                    count = episodes.size.toLong(),
+                    toTop = true,
+                    source = source.eventHorizonValue,
+                ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
             if (wasEmpty) {
@@ -795,7 +817,12 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, sourceView)
+            trackPlaybackEvent(sourceView) { source, contentType ->
+                PlaybackPauseEvent(
+                    source = source.eventHorizonValue,
+                    contentType = contentType,
+                )
+            }
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -811,7 +838,12 @@ open class PlaybackManager @Inject constructor(
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             if (!isAudioFocusFailed) {
-                trackPlayback(AnalyticsEvent.PLAYBACK_STOP, sourceView)
+                trackPlaybackEvent(sourceView) { source, contentType ->
+                    PlaybackStopEvent(
+                        source = source.eventHorizonValue,
+                        contentType = contentType,
+                    )
+                }
             }
             stop()
         }
@@ -959,7 +991,12 @@ open class PlaybackManager @Inject constructor(
             onCompletion(episode.uuid)
         }
 
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
+        trackPlaybackEvent(sourceView) { source, contentType ->
+            PlaybackSkipForwardEvent(
+                source = source.eventHorizonValue,
+                contentType = contentType,
+            )
+        }
     }
 
     fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
@@ -980,7 +1017,12 @@ open class PlaybackManager @Inject constructor(
         val newPositionMs = (currentTimeMs - jumpAmountMs).coerceAtLeast(0)
         seekToTimeMsInternal(newPositionMs)
 
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, sourceView)
+        trackPlaybackEvent(sourceView) { source, contentType ->
+            PlaybackSkipBackEvent(
+                source = source.eventHorizonValue,
+                contentType = contentType,
+            )
+        }
     }
 
     fun skipToNextSelectedOrLastChapter() {
@@ -989,7 +1031,12 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode = episode)
             playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
-                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
+                trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
+                    PlaybackChapterSkippedEvent(
+                        source = source.eventHorizonValue,
+                        contentType = contentType,
+                    )
+                }
             } ?: skipToEndOfLastChapter()
         }
     }
@@ -1000,7 +1047,12 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode)
             playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
-                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
+                trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
+                    PlaybackChapterSkippedEvent(
+                        source = source.eventHorizonValue,
+                        contentType = contentType,
+                    )
+                }
             }
         }
     }
@@ -1009,7 +1061,12 @@ open class PlaybackManager @Inject constructor(
         launch {
             playbackStateRelay.blockingFirst().chapters.lastOrNull()?.let { chapter ->
                 seekToTimeMsInternal(chapter.endTime)
-                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
+                trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
+                    PlaybackChapterSkippedEvent(
+                        source = source.eventHorizonValue,
+                        contentType = contentType,
+                    )
+                }
             }
         }
     }
@@ -1095,7 +1152,12 @@ open class PlaybackManager @Inject constructor(
 
                 upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
                 if (userInitiated) {
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
+                    eventHorizon.track(
+                        EpisodeRemovedFromUpNextEvent(
+                            episodeUuid = episodeToRemove.uuid,
+                            source = source.eventHorizonValue,
+                        ),
+                    )
                 }
 
                 if (isCurrentEpisode) {
@@ -1212,9 +1274,11 @@ open class PlaybackManager @Inject constructor(
                     event.message
                 }
 
-                analyticsTracker.track(
-                    AnalyticsEvent.PLAYBACK_FAILED,
-                    mapOf("error" to errorMessage, "episode_uuid" to episode?.uuid.orEmpty()),
+                eventHorizon.track(
+                    PlaybackFailedEvent(
+                        episodeUuid = episode?.uuid.orEmpty(),
+                        error = errorMessage,
+                    ),
                 )
 
                 crashLogging.sendReport(
@@ -1321,11 +1385,10 @@ open class PlaybackManager @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
                 return
             }
-            analyticsTracker.track(
-                AnalyticsEvent.PLAYER_EPISODE_COMPLETED,
-                mapOf(
-                    "podcast_uuid" to episode.podcastOrSubstituteUuid,
-                    "episode_uuid" to episode.uuid,
+            eventHorizon.track(
+                PlayerEpisodeCompletedEvent(
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    episodeUuid = episode.uuid,
                 ),
             )
 
@@ -1407,7 +1470,11 @@ open class PlaybackManager @Inject constructor(
             AppPlatform.Phone -> {
                 if (episodeWithSource != null) {
                     val (_, source) = episodeWithSource
-                    analyticsTracker.track(AnalyticsEvent.AUTOPLAY_FINISHED_LAST_EPISODE, mapOf("episode_source" to source.analyticsValue))
+                    eventHorizon.track(
+                        AutoplayFinishedLastEpisodeEvent(
+                            episodeSource = source.analyticsValue,
+                        ),
+                    )
                 }
                 episodeWithSource?.first
             }
@@ -1459,15 +1526,14 @@ open class PlaybackManager @Inject constructor(
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
-            analyticsTracker.track(
-                AnalyticsEvent.PLAYBACK_EPISODE_DURATION_CHANGED,
-                mapOf(
-                    "duration_change" to durationDiffSeconds,
-                    "duration" to durationMs / 1000,
-                    "is_user_file" to (episode is UserEpisode),
-                    "is_downloaded" to episode.isDownloaded,
-                    "episode_uuid" to episode.uuid,
-                    "podcast_uuid" to episode.podcastOrSubstituteUuid,
+            eventHorizon.track(
+                PlaybackEpisodeDurationChangedEvent(
+                    durationChange = durationDiffSeconds.toLong(),
+                    duration = durationMs.toLong() / 1000,
+                    isUserFile = episode is UserEpisode,
+                    isDownloaded = episode.isDownloaded,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
                 ),
             )
         }
@@ -2057,7 +2123,12 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
-        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
+        trackPlaybackEvent(sourceView) { source, contentType ->
+            PlaybackPlayEvent(
+                source = source.eventHorizonValue,
+                contentType = contentType,
+            )
+        }
     }
 
     private suspend fun addPodcastStartFromSettings(episode: PodcastEpisode, podcast: Podcast?, isPlaying: Boolean) {
@@ -2170,11 +2241,10 @@ open class PlaybackManager @Inject constructor(
                     sleepEndOfEpisode(episode)
                     episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
                 } else {
-                    analyticsTracker.track(
-                        AnalyticsEvent.PLAYER_EPISODE_COMPLETED,
-                        mapOf(
-                            "podcast_uuid" to episode.podcastOrSubstituteUuid,
-                            "episode_uuid" to episode.uuid,
+                    eventHorizon.track(
+                        PlayerEpisodeCompletedEvent(
+                            podcastUuid = episode.podcastOrSubstituteUuid,
+                            episodeUuid = episode.uuid,
                         ),
                     )
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
@@ -2415,20 +2485,19 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun trackPlayback(event: AnalyticsEvent, sourceView: SourceView) {
-        if (sourceView == SourceView.UNKNOWN) {
+    fun trackPlaybackEvent(source: SourceView, event: (SourceView, PlaybackContentType) -> Trackable) {
+        if (source == SourceView.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
-        if (!sourceView.skipTracking()) {
-            val contentType = if (getCurrentEpisode()?.isVideo == true) ContentType.VIDEO else ContentType.AUDIO
-            analyticsTracker.track(
-                event,
-                mapOf(
-                    SOURCE_KEY to sourceView.analyticsValue,
-                    CONTENT_TYPE_KEY to contentType.analyticsValue,
-                ),
-            )
+        if (source == SourceView.AUTO_PLAY || source == SourceView.AUTO_PAUSE) {
+            return
         }
+        val contentType = if (getCurrentEpisode()?.isVideo == true) {
+            PlaybackContentType.Video
+        } else {
+            PlaybackContentType.Audio
+        }
+        eventHorizon.track(event(source, contentType))
     }
 
     fun trackPlaybackSeek(
@@ -2442,31 +2511,14 @@ open class PlaybackManager @Inject constructor(
             val seekFromPercent = ((fromPositionMs / durationMs) * 100).toInt()
             val seekToPercent = ((positionMs / durationMs) * 100).toInt()
 
-            analyticsTracker.track(
-                AnalyticsEvent.PLAYBACK_SEEK,
-                mapOf(
-                    SOURCE_KEY to sourceView.analyticsValue,
-                    SEEK_FROM_PERCENT_KEY to seekFromPercent,
-                    SEEK_TO_PERCENT_KEY to seekToPercent,
+            eventHorizon.track(
+                PlaybackSeekEvent(
+                    source = sourceView.eventHorizonValue,
+                    seekFromPercent = seekFromPercent.toLong(),
+                    seekToPercent = seekToPercent.toLong(),
                 ),
             )
         }
-    }
-
-    fun trackPlaybackEffectsEvent(
-        event: AnalyticsEvent,
-        props: Map<String, Any> = emptyMap(),
-        sourceView: SourceView,
-    ) {
-        val contentType = if (getCurrentEpisode()?.isVideo == true) ContentType.VIDEO else ContentType.AUDIO
-        analyticsTracker.track(
-            event = event,
-            properties = buildMap {
-                put(SOURCE_KEY, sourceView.analyticsValue)
-                put(CONTENT_TYPE_KEY, contentType.analyticsValue)
-                putAll(props)
-            },
-        )
     }
 
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
@@ -2486,11 +2538,6 @@ open class PlaybackManager @Inject constructor(
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
         return currentChapter?.let { it.title + it.startTime }
-    }
-
-    enum class ContentType(val analyticsValue: String) {
-        AUDIO("audio"),
-        VIDEO("video"),
     }
 
     data class EpisodeBufferStatus(val episodeUuid: String, val bufferedUpToMs: Int)
