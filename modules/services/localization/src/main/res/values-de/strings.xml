@@ -18,9 +18,6 @@ Language: de
     <string name="error_download_suspicious_content_size">Die Folge konnte nicht heruntergeladen werden. Die heruntergeladene Datei ist zu klein. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="error_download_invalid_content_type">Die Folge konnte nicht heruntergeladen werden. Inhaltstyp %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="error_download_http_failure">Die Folge konnte nicht heruntergeladen werden. HTTP-Statuscode %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
-    <string name="wear_connectivity_streaming_warning">Das Streaming kann beeinträchtigt sein</string>
-    <string name="wear_connectivity_restored">Verbunden</string>
-    <string name="wear_connectivity_lost">Verbindung unterbrochen</string>
     <string name="episode_row_waiting_for_storage">Auf Speicherplatz warten</string>
     <string name="podcasts_download_storage">Download wartet auf Speicherplatz</string>
     <string name="watch_sync_failed">Synchronisierung mit Watch fehlgeschlagen</string>
@@ -1582,7 +1579,6 @@ Language: de
     <string name="settings_auto_archive_limit_5">Die letzten 5 Folgen</string>
     <string name="settings_auto_archive_limit_2">Die letzten 2 Folgen</string>
     <string name="settings_auto_archive_limit_10">Die letzten 10 Folgen</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Wenn die Warteschlange %d Folgen enthält, wird die letzte Folge in der Warteschlange entfernt, wenn neue Folgen automatisch am Anfang hinzugefügt werden. Es werden keine neuen Folgen am Ende hinzugefügt.</string>
     <string name="settings_row_action">Aktion für aufgelistete Folgen</string>
     <string name="settings_stats_funny_lightning">In dieser Zeit sind %1$,.0f Blitze eingeschlagen. Rums!</string>
     <string name="settings_stats_funny_empty">Du hörst nicht so oft Podcasts, oder?</string>

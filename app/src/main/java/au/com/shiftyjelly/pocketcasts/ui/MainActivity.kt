@@ -55,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.appreview.AppReviewDialogFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -192,6 +191,9 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.DiscoverTabOpenedEvent
+import com.automattic.eventhorizon.EndOfYearModalDismissedEvent
+import com.automattic.eventhorizon.EndOfYearModalShownEvent
+import com.automattic.eventhorizon.EndOfYearModalTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FiltersTabOpenedEvent
 import com.automattic.eventhorizon.PodcastsTabOpenedEvent
@@ -278,9 +280,6 @@ class MainActivity :
 
     @Inject
     lateinit var warningsHelper: WarningsHelper
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -929,15 +928,27 @@ class MainActivity :
                             parent = viewGroup,
                             shouldShow = shouldShow,
                             onClick = {
-                                analyticsTracker.trackEndOfYearModalTapped(year = EndOfYearManager.YEAR_TO_SYNC.value)
-                                showStoriesOrAccount(StoriesSource.MODAL.value)
+                                eventHorizon.track(
+                                    EndOfYearModalTappedEvent(
+                                        currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
+                                    ),
+                                )
+                                showStoriesOrAccount(StoriesSource.MODAL.key)
                             },
                             onExpand = {
-                                analyticsTracker.trackEndOfYearModalShown(year = EndOfYearManager.YEAR_TO_SYNC.value)
+                                eventHorizon.track(
+                                    EndOfYearModalShownEvent(
+                                        currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
+                                    ),
+                                )
                                 settings.setEndOfYearShowModal(false)
                             },
                             onCollapse = {
-                                analyticsTracker.trackEndOfYearModalDismissed(year = EndOfYearManager.YEAR_TO_SYNC.value)
+                                eventHorizon.track(
+                                    EndOfYearModalDismissedEvent(
+                                        currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
+                                    ),
+                                )
                             },
                         )
                     }

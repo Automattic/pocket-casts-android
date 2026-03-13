@@ -18,9 +18,6 @@ Language: it
     <string name="error_download_suspicious_content_size">Impossibile scaricare l\'episodio. Il file scaricato è troppo piccolo. Contatta l\'autore del podcast.</string>
     <string name="error_download_invalid_content_type">Impossibile scaricare l\'episodio. Tipo di contenuto ricevuto %1$s. Contatta l\'autore del podcast.</string>
     <string name="error_download_http_failure">Impossibile scaricare l\'episodio. Codice dello stato HTTP ricevuto %1$s. Contatta l\'autore del podcast.</string>
-    <string name="wear_connectivity_streaming_warning">Lo streaming potrebbe subire delle interruzioni</string>
-    <string name="wear_connectivity_restored">Connesso</string>
-    <string name="wear_connectivity_lost">Connessione persa</string>
     <string name="episode_row_waiting_for_storage">In attesa dello spazio di archiviazione</string>
     <string name="podcasts_download_storage">Download in attesa dello spazio di archiviazione</string>
     <string name="watch_sync_failed">Impossibile sincronizzare l\'orologio</string>
@@ -1591,7 +1588,6 @@ Language: it
     <string name="settings_auto_archive_episode_limit">Numero massimo di episodi</string>
     <string name="settings_auto_archive_limit_1">Episodio più recente</string>
     <string name="settings_auto_archive_episode_limit_summary">Alcuni podcast rilasciano diversi episodi all\'ora o al giorno. In questi casi è una buona idea impostare un limite per conservare solo gli episodi più recenti e archiviare quelli più vecchi.</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Quando Prossimo raggiunge %d, i nuovi episodi verranno aggiunti automaticamente e gli ultimi in coda verranno rimossi. Nessun nuovo episodio verrà aggiunto alla fine.</string>
     <string name="settings_auto_up_next_title">Aggiungi automaticamente a Prossimo</string>
     <string name="settings_up_next_tap_summary">Se attivo, potrai riprodurre il prossimo elemento in coda con un semplice tocco. Se tieni premuto, potrai visualizzare le opzioni dell\'episodio.</string>
     <string name="settings_up_next_tap">Tocca per riprodurre il prossimo episodio</string>

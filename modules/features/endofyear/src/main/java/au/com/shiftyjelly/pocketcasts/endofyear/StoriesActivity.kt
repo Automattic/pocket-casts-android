@@ -53,6 +53,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.utils.ScreenshotCaptureDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
+import com.automattic.eventhorizon.EndOfYearStoryCloseSource
+import com.automattic.eventhorizon.EndOfYearStoryOpenSource
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.File
@@ -159,7 +161,7 @@ class StoriesActivity : ComponentActivity() {
 
         BackHandler {
             val story = state.stories.getOrNull(pagerState.currentPage)
-            viewModel.trackStoriesClosed(source = "back_button", story = story)
+            viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSource.BackButton, story = story)
             finish()
         }
 
@@ -183,7 +185,7 @@ class StoriesActivity : ComponentActivity() {
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
                     val story = state.stories.getOrNull(pagerState.currentPage)
-                    viewModel.trackStoriesClosed(source = "close_button", story = story)
+                    viewModel.trackStoriesClosed(source = EndOfYearStoryCloseSource.CloseButton, story = story)
                     finish()
                 },
             )
@@ -317,15 +319,30 @@ class StoriesActivity : ComponentActivity() {
         viewModel.share(story, file)
     }
 
-    enum class StoriesSource(val value: String) {
-        MODAL("modal"),
-        PROFILE("profile"),
-        USER_LOGIN("user_login"),
-        UNKNOWN("unknown"),
+    enum class StoriesSource(
+        val key: String,
+        val eventHorizonValue: EndOfYearStoryOpenSource,
+    ) {
+        MODAL(
+            key = "modal",
+            eventHorizonValue = EndOfYearStoryOpenSource.Modal,
+        ),
+        PROFILE(
+            key = "profile",
+            eventHorizonValue = EndOfYearStoryOpenSource.Profile,
+        ),
+        USER_LOGIN(
+            key = "user_login",
+            eventHorizonValue = EndOfYearStoryOpenSource.UserLogin,
+        ),
+        UNKNOWN(
+            key = "unknown",
+            eventHorizonValue = EndOfYearStoryOpenSource.Unknown,
+        ),
         ;
 
         companion object {
-            fun fromString(source: String) = entries.find { it.value == source } ?: UNKNOWN
+            fun fromString(source: String) = entries.find { it.key == source } ?: UNKNOWN
         }
     }
 
