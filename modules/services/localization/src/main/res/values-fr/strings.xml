@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-17 10:54:16+0000
+Translation-Revision-Date: 2026-02-27 12:54:50+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
-    <string name="wear_connectivity_streaming_warning">Le streaming peut être affecté</string>
-    <string name="wear_connectivity_restored">Connecté</string>
-    <string name="wear_connectivity_lost">Connexion perdue</string>
+    <string name="referrals_claim_guest_pass_description_installment">Gratuit pendant %1$s, puis %2$s/mois pendant %3$d mois. Engagement total : %4$s sur 1 an.</string>
+    <string name="winback_claimed_offer_message_6">Merci d’avoir choisi Pocket Casts. La remise sur le prochain plan de paiement de 12 mois débutera à la fin de votre période de facturation actuelle.</string>
+    <string name="winback_claimed_offer_message_5">Avec les paiements mensuels, bénéficiez de 50 % de remise l’année prochaine !</string>
+    <string name="winback_offer_free_offer_installment_description">Profitez d’une année de Pocket Casts Plus à moitié prix avec 12 paiements mensuels de %1$s. Cette offre à prix réduit commence une fois votre plan de paiement actuel achevé.</string>
+    <string name="winback_offer_free_offer_installment_title">Bénéficiez d’une réduction de 50 %% sur la prochaine année et économisez %2$s en payant %1$s/mois</string>
+    <string name="plus_yearly_installments">Plan annuel, paiement mensuel</string>
+    <string name="error_download_too_many_attempts">Téléchargement annulé après plusieurs tentatives. Veuillez vérifier votre connexion Internet et votre espace de stockage disponible, puis réessayez.</string>
+    <string name="error_download_io_failure">Échec du téléchargement de l’épisode. Veuillez vérifier votre connexion Internet et votre espace de stockage disponible.</string>
+    <string name="error_download_socket_timeout">La connexion au serveur de l’auteur du podcast a été interrompue. Veuillez vérifier votre connexion Internet.</string>
+    <string name="error_download_suspicious_content_size">Échec du téléchargement de l’épisode. Le fichier téléchargé est d’une taille trop petite. Veuillez contacter l’auteur du podcast.</string>
+    <string name="error_download_invalid_content_type">Échec du téléchargement de l’épisode. Type de contenu reçu : %1$s. Veuillez contacter l’auteur du podcast.</string>
+    <string name="error_download_http_failure">Échec du téléchargement de l’épisode. Code d’état HTTP reçu : %1$s. Veuillez contacter l’auteur du podcast.</string>
     <string name="episode_row_waiting_for_storage">En attente d’espace de stockage</string>
     <string name="podcasts_download_storage">Téléchargement en attente d’espace de stockage</string>
     <string name="watch_sync_failed">Échec de la synchronisation avec la montre</string>
@@ -26,6 +35,13 @@ Language: fr
     <string name="watch_sync_success">Connecté depuis le téléphone !</string>
     <string name="watch_sync_syncing">Synchronisation avec le téléphone…</string>
     <string name="error_download_generic_failure">Échec du téléchargement de l’épisode. %1$s</string>
+    <string name="error_download_ssl_failure">Échec de l’établissement d’une connexion sécurisée au serveur de l’auteur du podcast. Veuillez vérifier que votre appareil est à jour.</string>
+    <string name="error_download_connection_error">Échec de la connexion au serveur de l’auteur du podcast. Veuillez vérifier votre connexion Internet.</string>
+    <string name="error_download_unknown_host">Impossible d’atteindre le serveur de l’auteur du podcast. Veuillez vérifier votre connexion Internet.</string>
+    <string name="error_download_no_storage">Échec du téléchargement de l’épisode. Veuillez vérifier que vous avez suffisamment d’espace de stockage libre sur votre appareil.</string>
+    <string name="error_download_invalid_url">L’URL de l’épisode n’est pas valide. Veuillez contacter l’auteur du podcast.</string>
+    <string name="error_download_no_episode_file">Impossible de créer un fichier à télécharger pour l’épisode. Veuillez vérifier que vous avez suffisamment d’espace de stockage libre sur votre appareil.</string>
+    <string name="error_download_missing_episode">Données de l’épisode introuvables sur cet appareil. Veuillez contacter l’assistance.</string>
     <string name="downloading">%s en cours de téléchargement</string>
     <string name="playlist_only_podcast_episodes_allowed">Les playlists ne peuvent contenir que des épisodes de podcast.</string>
     <string name="playlist_limit_reached">Les playlists ne peuvent contenir que jusqu’à %d épisodes.</string>
@@ -1581,7 +1597,6 @@ Language: fr
     <string name="settings_apply_group_by">Souhaitez-vous que tous vos podcasts existants soient regroupés par %s ?</string>
     <string name="settings">Réglages </string>
     <string name="settings_status_page">Page de statut</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Lorsque la file d\'attente atteint %d, chaque nouvel épisode ajouté automatiquement au début supprimera le dernier épisode. Aucun nouvel épisode ne sera ajouté en bas.</string>
     <string name="settings_auto_up_next_limit_reached_top">Ajouter uniquement au début</string>
     <string name="plus_slash_month">%s /mois</string>
     <string name="settings_notification_vibrate_never">Jamais</string>

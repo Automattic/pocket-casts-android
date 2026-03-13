@@ -18,9 +18,6 @@ Language: ar
     <string name="error_download_suspicious_content_size">فشل تنزيل الحلقة. الملف الذي تم تنزيله صغير للغاية. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="error_download_invalid_content_type">فشل تنزيل الحلقة. تم استلام نوع المحتوى ⁦%1$s⁩. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="error_download_http_failure">فشل تنزيل الحلقة. تم تلقي كود حالة HTTP %1$s. يُرجى الاتصال بمؤلف البث الصوتي.</string>
-    <string name="wear_connectivity_streaming_warning">قد يتأثر البث</string>
-    <string name="wear_connectivity_restored">متصل</string>
-    <string name="wear_connectivity_lost">انقطع الاتصال</string>
     <string name="episode_row_waiting_for_storage">بانتظار توفر مساحة تخزين</string>
     <string name="podcasts_download_storage">التنزيل متوقف بانتظار توفر مساحة تخزين</string>
     <string name="watch_sync_failed">تعذّرت المزامنة مع الساعة</string>
@@ -1418,7 +1415,6 @@ Language: ar
     <string name="settings_stats_funny_empty">إنك لا تستمتع كثيرًا حقًا، أليس كذلك؟</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">ستتوقف إضافة حلقات جديدة عند وصول التالي إلى %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">إيقاف الإضافة</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">عند وصول التالي إلى %d، ستقوم الحلقات الجديدة التي تمت إضافتها تلقائيًا إلى الجزء العلوي بإزالة الحلقة الأخيرة في قائمة الانتظار. لن تتم إضافة أي حلقات جديدة إلى الجزء السفلي.</string>
     <string name="settings_auto_up_next_limit_reached_top">إضافة فقط إلى الجزء العلوي</string>
     <string name="settings_auto_up_next_limit_reached">إذا تم الوصول إلى الحد</string>
     <string name="settings_auto_up_next_to_bottom">إلى الجزء السفلي</string>
@@ -1721,9 +1717,9 @@ Language: ar
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_add_custom_image">إضافة صورة مخصصة</string>
     <string name="profile_file_locked">مقفل</string>
     <string name="profile_file">الملف</string>

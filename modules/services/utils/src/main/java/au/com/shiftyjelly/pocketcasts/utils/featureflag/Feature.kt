@@ -156,14 +156,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    AUDIO_OFFLOAD(
-        key = "audio_offload",
-        title = "Audio Offload",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
@@ -201,9 +193,17 @@ enum class Feature(
     NEXT_EPISODE_PREFETCH(
         key = "next_episode_prefetch",
         title = "Next Episode Prefetch",
-        defaultValue = true,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    LOAD_ERROR_HANDLING_POLICY(
+        key = "load_error_handling_policy",
+        title = "Custom load error handling policy for the player",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     UP_NEXT_SYNC_PROTOBUF(

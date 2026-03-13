@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 11:56:48+0000
+Translation-Revision-Date: 2026-02-27 14:58:01+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
-    <string name="referrals_claim_guest_pass_description_installment">Gratis voor %1$s, daarna %2$s/maand voor %3$d maanden. Totale inzet: langer %4$s dan 1 jaar.</string>
-    <string name="winback_claimed_offer_message_6">Bedankt dat je voor Pocket Casts kiest. Je abonnement met een jaar lang korting gaat in na je huidige factuurperiode.</string>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis voor %1$s, daarna %2$s per maand voor %3$d maanden. Totale betaling: %4$s gedurende 1 jaar.</string>
+    <string name="winback_claimed_offer_message_6">Bedankt dat je voor Pocket Casts kiest. Je abonnement van 12 maanden met korting gaat in na je huidige factuurperiode.</string>
     <string name="winback_claimed_offer_message_5">50% korting op je volgende jaar met maandelijkse betalingen!</string>
-    <string name="winback_offer_free_offer_installment_description">Sluit een jaar Pocket Casts Plus af voor de helft van de prijs met 12 maandelijkse betalingen van %1$s. Je jaar met korting begint nadat je huidige abonnement is afgelopen.</string>
     <string name="plus_yearly_installments">Jaarabonnement - betaal maandelijks</string>
-    <string name="error_download_too_many_attempts">Download geannuleerd na meerdere pogingen. Controleer je internetverbinding en probeer het opnieuw.</string>
-    <string name="error_download_io_failure">Downloaden van aflevering mislukt. Controleer je internet verbinding en probeer het opnieuw.</string>
+    <string name="winback_offer_free_offer_installment_description">Sluit een jaarabonnement Pocket Casts Plus af voor de helft van de prijs met 12 maandelijkse betalingen van %1$s. Je betaalplan met korting begint nadat je huidige abonnement is afgelopen.</string>
+    <string name="winback_offer_free_offer_installment_title">Krijg 50%% korting op je volgende jaar — je betaalt slechts %1$s per maand en bespaart %2$s</string>
     <string name="error_download_socket_timeout">Time-out bij verbinding met de server van de podcastauteur. Controleer je internetverbinding.</string>
+    <string name="error_download_too_many_attempts">Download geannuleerd na meerdere pogingen. Controleer je internetverbinding en opslag, probeer het daarna opnieuw.</string>
+    <string name="error_download_io_failure">Downloaden van aflevering mislukt. Controleer je internet verbinding en opslag.</string>
     <string name="error_download_suspicious_content_size">Downloaden van aflevering mislukt. Het gedownloade bestand is te klein. Neem contact op met de auteur van de podcast.</string>
     <string name="error_download_invalid_content_type">Downloaden van aflevering mislukt. Ontvangen contenttype %1$s. Neem contact op met de auteur van de podcast.</string>
-    <string name="error_download_http_failure">Downloaden van aflevering mislukt. HTTP-statuscode ontvangen %1$s. Neem contact op met de auteur van de podcast.</string>
-    <string name="wear_connectivity_streaming_warning">Streaming kan worden beïnvloed</string>
-    <string name="wear_connectivity_restored">Gekoppeld</string>
-    <string name="wear_connectivity_lost">Verbinding verloren</string>
+    <string name="error_download_http_failure">Downloaden van aflevering mislukt. HTTP-statuscode %1$s ontvangen. Neem contact op met de auteur van de podcast.</string>
     <string name="episode_row_waiting_for_storage">Wachten op opslagruimte</string>
     <string name="podcasts_download_storage">Download wacht op opslagruimte</string>
     <string name="watch_sync_failed">Kon niet gesynchroniseerd worden om te bekijken</string>
@@ -38,10 +36,10 @@ Language: nl
     <string name="watch_sync_syncing">Synchroniseren met telefoon …</string>
     <string name="error_download_generic_failure">Downloaden van aflevering is mislukt. %1$s</string>
     <string name="error_download_ssl_failure">Kan geen veilige verbinding maken met de server van de podcast-auteur. Controleer of je apparaat up-to-date is.</string>
-    <string name="error_download_connection_error">Kon geen verbinding maken met de server. Controleer je internetverbinding.</string>
-    <string name="error_download_unknown_host">Kan de server van de podcast-auteur niet bereiken. Controleer je internetverbinding.</string>
+    <string name="error_download_connection_error">Kon geen verbinding maken met de server van de podcastauteur. Controleer je internetverbinding.</string>
     <string name="error_download_no_storage">Downloaden van aflevering mislukt. Controleer of je genoeg opslagruimte op je apparaat hebt.</string>
-    <string name="error_download_invalid_url">De site url is ongeldig. Neem contact op met de auteur van de podcast.</string>
+    <string name="error_download_unknown_host">Kan de server van de podcastauteur niet bereiken. Controleer je internetverbinding.</string>
+    <string name="error_download_invalid_url">De afleverings-URL is ongeldig. Neem contact op met de auteur van de podcast.</string>
     <string name="error_download_no_episode_file">Kan geen downloadbestand voor de aflevering aanmaken. Controleer of je genoeg opslagruimte op je apparaat hebt.</string>
     <string name="error_download_missing_episode">Kan de afleveringgegevens niet vinden op dit apparaat. Neem contact op met de ondersteuning.</string>
     <string name="downloading">%s downloaden</string>
@@ -1445,7 +1443,6 @@ Language: nl
     <string name="settings_stats_funny_babies">In de tussentijd zijn %1$,.0f baby\'s geboren. Wêh!</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Nieuwe afleveringen worden niet toegevoegd wanneer Hierna \'%d\' bereikt.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Stoppen met toevoegen</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Wanneer Hierna \'%d\' bereikt, wordt de laatste aflevering in de wachtrij automatisch verwijderd wanneer nieuwe afleveringen automatisch bovenaan worden toegevoegd. Er worden geen nieuwe afleveringen onderaan toegevoegd.</string>
     <string name="settings_auto_up_next_limit_reached_top">Alleen bovenaan toevoegen</string>
     <string name="settings_auto_up_next_limit_reached">Als limiet is bereikt</string>
     <string name="settings_auto_up_next_to_bottom">Onderaan</string>
