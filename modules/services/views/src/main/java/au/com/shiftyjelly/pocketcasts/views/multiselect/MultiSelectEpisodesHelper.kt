@@ -80,7 +80,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
         }
 
-    override fun isSelected(multiSelectable: BaseEpisode) = selectedSet.contains(multiSelectable)
+    override fun isSelected(multiSelectable: BaseEpisode) = selectedSet.any { it.uuid == multiSelectable.uuid }
 
     override fun onMenuItemSelected(itemId: Int, resources: Resources, activity: FragmentActivity): Boolean {
         val fragmentManager = activity.supportFragmentManager
@@ -186,8 +186,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
     override fun deselect(multiSelectable: BaseEpisode) {
         if (isSelected(multiSelectable)) {
-            val selectedItem = selectedSet.firstOrNull { it.uuid == multiSelectable.uuid }
-            selectedItem?.let { selectedSet.remove(it) }
+            selectedSet.removeIf { it.uuid == multiSelectable.uuid }
         }
 
         _selectedListLive.value = selectedSet.toList()

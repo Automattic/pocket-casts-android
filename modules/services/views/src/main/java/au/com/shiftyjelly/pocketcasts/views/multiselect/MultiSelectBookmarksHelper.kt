@@ -57,7 +57,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
     }
 
-    override fun isSelected(multiSelectable: Bookmark) = selectedSet.contains(multiSelectable)
+    override fun isSelected(multiSelectable: Bookmark) = selectedSet.any { it.uuid == multiSelectable.uuid }
 
     override fun onMenuItemSelected(
         itemId: Int,
@@ -91,8 +91,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
     override fun deselect(multiSelectable: Bookmark) {
         if (isSelected(multiSelectable)) {
-            val selectedItem = selectedSet.firstOrNull { it.uuid == multiSelectable.uuid }
-            selectedItem?.let { selectedSet.remove(it) }
+            selectedSet.removeIf { it.uuid == multiSelectable.uuid }
         }
 
         _selectedListLive.value = selectedSet.toList()
