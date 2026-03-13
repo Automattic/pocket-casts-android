@@ -643,7 +643,6 @@ Language: en_GB
     <string name="settings_stats_funny_empty">You really don\'t listen much, do you?</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">New episodes will stop being added when Up Next reaches %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Stop adding</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">When Up Next reaches %d, new episodes auto-added to the top will remove the last episode in the queue. No new episodes will be added to the bottom.</string>
     <string name="settings_auto_up_next_limit_reached_top">Only add to top</string>
     <string name="settings_auto_up_next_limit_reached">If limit reached</string>
     <string name="settings_auto_up_next_to_bottom">To bottom</string>

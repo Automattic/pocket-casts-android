@@ -18,9 +18,6 @@ Language: zh_CN
     <string name="error_download_suspicious_content_size">下载该集失败。 下载的文件过小。 请联系播客作者。</string>
     <string name="error_download_invalid_content_type">下载该集失败。 已收到内容类型 %1$s。 请联系播客作者。</string>
     <string name="error_download_http_failure">下载该集失败。 已收到 HTTP 状态代码 %1$s。 请联系播客作者。</string>
-    <string name="wear_connectivity_streaming_warning">流式传输可能会受到影响</string>
-    <string name="wear_connectivity_restored">已连接</string>
-    <string name="wear_connectivity_lost">连接丢失</string>
     <string name="episode_row_waiting_for_storage">正在等待存储空间</string>
     <string name="podcasts_download_storage">下载正在等待存储空间</string>
     <string name="watch_sync_failed">无法同步至手表</string>
@@ -1449,7 +1446,6 @@ Language: zh_CN
     <string name="settings_stats_funny_babies">在此期间，有 %1$,.0f 名婴儿出生。 哇哦！</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">当“接下来播放”达到 %d，系统将停止添加新剧集。</string>
     <string name="settings_auto_up_next_limit_reached_stop">停止添加</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">当“接下来播放”达到 %d，自动添加到顶部的新剧集将删除队列中的最后一集。 底部不会添加新剧集。</string>
     <string name="settings_auto_up_next_limit_reached_top">仅添加到顶部</string>
     <string name="settings_auto_up_next_limit_reached">如果达到极限</string>
     <string name="settings_auto_up_next_to_bottom">至底部</string>
