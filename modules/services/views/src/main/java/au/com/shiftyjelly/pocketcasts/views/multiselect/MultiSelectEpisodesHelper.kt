@@ -80,7 +80,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
         }
 
-    override fun isSelected(multiSelectable: BaseEpisode) = selectedList.count { it.uuid == multiSelectable.uuid } > 0
+    override fun isSelected(multiSelectable: BaseEpisode) = selectedSet.any { it.uuid == multiSelectable.uuid }
 
     override fun onMenuItemSelected(itemId: Int, resources: Resources, activity: FragmentActivity): Boolean {
         val fragmentManager = activity.supportFragmentManager
@@ -186,25 +186,24 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
     override fun deselect(multiSelectable: BaseEpisode) {
         if (isSelected(multiSelectable)) {
-            val selectedItem = selectedList.firstOrNull { it.uuid == multiSelectable.uuid }
-            selectedItem?.let { selectedList.remove(it) }
+            selectedSet.removeIf { it.uuid == multiSelectable.uuid }
         }
 
-        _selectedListLive.value = selectedList
+        _selectedListLive.value = selectedSet.toList()
 
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
         }
     }
 
     fun markAsPlayed(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.toList()
+            val list = selectedSet.toList()
             if (!shownWarning && list.size > WARNING_LIMIT) {
                 playedWarning(list.size, resources = resources, fragmentManager = fragmentManager)
                 return@launch
@@ -218,7 +217,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             launch(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_played_singular, LR.string.marked_as_played_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.marked_as_played_singular, LR.string.marked_as_played_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -226,13 +225,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun markAsUnplayed(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.toList()
+            val list = selectedSet.toList()
 
             episodeManager.markAsUnplayed(list)
             eventHorizon.track(
@@ -242,7 +241,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             launch(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_unplayed_singular, LR.string.marked_as_unplayed_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.marked_as_unplayed_singular, LR.string.marked_as_unplayed_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -250,13 +249,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun archive(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            val list = selectedSet.filterIsInstance<PodcastEpisode>().toList()
             if (!shownWarning && list.size > WARNING_LIMIT) {
                 archiveWarning(list.size, resources = resources, fragmentManager = fragmentManager)
                 return@launch
@@ -270,7 +269,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.archived_episodes_singular, LR.string.archived_episodes_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.archived_episodes_singular, LR.string.archived_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -278,13 +277,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun unarchive(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            val list = selectedSet.filterIsInstance<PodcastEpisode>().toList()
 
             episodeManager.unarchiveAllInListBlocking(episodes = list)
             eventHorizon.track(
@@ -294,7 +293,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.unarchived_episodes_singular, LR.string.unarchived_episodes_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.unarchived_episodes_singular, LR.string.unarchived_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -302,13 +301,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun star(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            val list = selectedSet.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = true)
             eventHorizon.track(
                 EpisodeBulkStarredEvent(
@@ -317,7 +316,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.starred_episodes_singular, LR.string.starred_episodes_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.starred_episodes_singular, LR.string.starred_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -325,13 +324,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun unstar(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            val list = selectedSet.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = false)
             eventHorizon.track(
                 EpisodeBulkUnstarredEvent(
@@ -340,7 +339,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.unstarred_episodes_singular, LR.string.unstarred_episodes_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.unstarred_episodes_singular, LR.string.unstarred_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -348,13 +347,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun removeListeningHistory(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         launch {
-            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            val list = selectedSet.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.clearEpisodeHistory(list)
             eventHorizon.track(
                 EpisodeRemovedListeningHistoryEvent(
@@ -363,7 +362,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 ),
             )
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.remove_listening_history_episodes_singular, LR.string.remove_listening_history_episodes_plural)
+                val snackText = resources.getStringPlural(selectedSet.size, LR.string.remove_listening_history_episodes_singular, LR.string.remove_listening_history_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }
@@ -394,13 +393,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun download(resources: Resources, fragmentManager: FragmentManager) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
-        val list = selectedList.toList()
-        val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).map(BaseEpisode::uuid)
+        val list = selectedSet.toList()
+        val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedSet.count())).map(BaseEpisode::uuid)
         ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
             downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi = false), source)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
@@ -410,12 +409,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun deleteDownload(resources: Resources, fragmentManager: FragmentManager) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
-        val list = selectedList.toList()
+        val list = selectedSet.toList()
         ConfirmationDialog.deleteDownloadWarningDialog(
             episodeCount = list.size,
             warningLimit = WARNING_LIMIT,
@@ -438,13 +437,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun playNext(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
-        val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
-        val trimmedList = selectedList.subList(0, size).toList()
+        val size = min(settings.getMaxUpNextEpisodes(), selectedSet.count())
+        val trimmedList = selectedSet.take(size).toList()
         launch {
             playbackManager.playEpisodesNext(episodes = trimmedList, source = source)
             withContext(Dispatchers.Main) {
@@ -456,13 +455,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun playLast(resources: Resources) {
-        if (selectedList.isEmpty()) {
+        if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
         }
 
-        val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
-        val trimmedList = selectedList.subList(0, size).toList()
+        val size = min(settings.getMaxUpNextEpisodes(), selectedSet.count())
+        val trimmedList = selectedSet.take(size).toList()
         launch {
             playbackManager.playEpisodesLast(episodes = trimmedList, source = source)
             withContext(Dispatchers.Main) {
@@ -474,7 +473,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun delete(resources: Resources, fragmentManager: FragmentManager) {
-        val episodes = selectedList.filterIsInstance<UserEpisode>()
+        val episodes = selectedSet.filterIsInstance<UserEpisode>()
         if (episodes.isEmpty()) return
 
         val onServer = episodes.count { it.isUploaded }
@@ -501,9 +500,9 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun share(fragmentManager: FragmentManager) {
-        val episode = selectedList.let { list ->
+        val episode = selectedSet.let { list ->
             if (list.size != 1) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedList.size} episodes when multi selecting")
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedSet.size} episodes when multi selecting")
                 return
             } else {
                 list.first()
@@ -531,7 +530,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun removeFromUpNext(resources: Resources) {
-        val list = selectedList.toList()
+        val list = selectedSet.toList()
         launch {
             list.forEach {
                 playbackManager.upNextQueue.removeEpisode(it)
@@ -547,19 +546,19 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     private fun moveToTop() {
-        val list = selectedList.toList()
+        val list = selectedSet.toList()
         playbackManager.playEpisodesNext(episodes = list, source = source)
         closeMultiSelect()
     }
 
     private fun moveToBottom() {
-        val list = selectedList.toList()
+        val list = selectedSet.toList()
         playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
     }
 
     private fun addToPlaylist(activity: FragmentActivity) {
-        if (selectedList.any { episode -> episode !is PodcastEpisode }) {
+        if (selectedSet.any { episode -> episode !is PodcastEpisode }) {
             val snackbarView = (activity as? FragmentHostListener)?.snackBarView()
             if (snackbarView != null) {
                 Snackbar.make(snackbarView, LR.string.playlist_only_podcast_episodes_allowed, Snackbar.LENGTH_LONG).show()
@@ -567,7 +566,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             return
         }
 
-        val episodeUuids = selectedList.mapNotNull { episode ->
+        val episodeUuids = selectedSet.mapNotNull { episode ->
             when (episode) {
                 is PodcastEpisode -> episode.uuidPair
                 is UserEpisode -> null
