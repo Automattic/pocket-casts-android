@@ -20,6 +20,8 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.Lazy
@@ -98,9 +100,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }
-        return factory
-            .setLoadErrorHandlingPolicy(PocketCastsLoadErrorHandlingPolicy())
-            .createMediaSource(mediaItem)
+        if (FeatureFlag.isEnabled(Feature.LOAD_ERROR_HANDLING_POLICY)) {
+            factory.setLoadErrorHandlingPolicy(PocketCastsLoadErrorHandlingPolicy())
+        }
+        return factory.createMediaSource(mediaItem)
     }
 
     private fun startCachingEntireEpisodeIfNeeded(
