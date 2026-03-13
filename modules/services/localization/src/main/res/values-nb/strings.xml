@@ -630,7 +630,6 @@ Language: nb_NO
     <string name="settings_stats_funny_empty">Du lytter ikke spesielt mye, vel?</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Nye episoder slutter å bli lagt til når Neste når %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Slutt å legge til</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Når Neste når %d, vil nye episoder som legges til automatisk øverst, slette den siste episoden i køen. Ingen nye episoder legges til nederst.</string>
     <string name="settings_auto_up_next_limit_reached_top">Legg bare til øverst</string>
     <string name="settings_auto_up_next_limit_reached">Hvis grensen er nådd</string>
     <string name="settings_auto_up_next_to_bottom">Til nederst</string>

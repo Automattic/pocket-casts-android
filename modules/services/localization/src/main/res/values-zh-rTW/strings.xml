@@ -18,9 +18,6 @@ Language: zh_TW
     <string name="error_download_suspicious_content_size">無法下載本集。 下載的檔案太小。 請聯絡 Podcast 作者。</string>
     <string name="error_download_invalid_content_type">無法下載本集。 已收到內容類型 %1$s。 請聯絡 Podcast 作者。</string>
     <string name="error_download_http_failure">無法下載本集。 已收到 HTTP 狀態碼 %1$s。 請聯絡 Podcast 作者。</string>
-    <string name="wear_connectivity_streaming_warning">串流可能會受影響</string>
-    <string name="wear_connectivity_restored">已連線</string>
-    <string name="wear_connectivity_lost">連線遺失</string>
     <string name="episode_row_waiting_for_storage">等待儲存空間</string>
     <string name="podcasts_download_storage">等待儲存空間的下載</string>
     <string name="watch_sync_failed">無法同步處理以觀看</string>
@@ -1597,7 +1594,6 @@ Language: zh_TW
     <string name="settings_learn_more">進一步了解</string>
     <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微退回一點，讓你能更輕鬆跟上進度。</string>
     <string name="settings_storage_data_warning_car">請注意，此設定不適用於透過 Android Auto 播放的單集。未下載的單集將透過計量付費網路串流，並且不會顯示警告。</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">「接下來播放」到達 %d 集時，新單集將自動新增至頂端，並移除佇列中的最後一集。新單集不會新增至底端。</string>
     <string name="settings_stats_funny_skin">這段時間裡，你有 %1$,.0f 個皮膚細胞脫落下來。啥？</string>
     <string name="settings_stats_funny_sneezed">這段時間裡，某個太空人打了 %1$,.0f 次噴嚏。哈啾！</string>
     <string name="settings_stats_funny_emails">這段時間裡，全世界寄出 %1$,.0f 封電子郵件。</string>

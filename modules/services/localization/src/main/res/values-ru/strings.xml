@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-27 09:58:31+0000
+Translation-Revision-Date: 2026-02-27 14:58:25+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
@@ -10,17 +10,14 @@ Language: ru
     <string name="winback_claimed_offer_message_6">Благодарим за то, что вы выбрали Pocket Casts. Ваш льготный тарифный план с рассрочкой на 12 месяцев начнёт действовать по окончании текущего расчётного периода.</string>
     <string name="winback_claimed_offer_message_5">Скидка 50 % на следующий год с помесячной оплатой!</string>
     <string name="winback_offer_free_offer_installment_description">Оформите годовую подписку на Pocket Casts Plus за полцены, совершив 12 ежемесячных платежей в размере %1$s. Ваш льготный тарифный план с рассрочкой начнёт действовать по истечении срока текущего тарифного плана.</string>
-    <string name="winback_offer_free_offer_installment_title">Получите скидку 50%% на следующий год — платите всего %1$s в месяц и сэкономьте %2$s</string>
     <string name="plus_yearly_installments">Годовой тарифный план с помесячной оплатой</string>
+    <string name="winback_offer_free_offer_installment_title">Получите скидку 50 %% на следующий год — платите всего %1$s в месяц и сэкономьте %2$s</string>
     <string name="error_download_too_many_attempts">Скачивание отменено после нескольких попыток. Проверьте подключение к Интернету и наличие свободного дискового пространства, а затем повторите попытку.</string>
     <string name="error_download_io_failure">Не удалось загрузить выпуск. Проверьте подключение к Интернету и наличие свободного дискового пространства.</string>
     <string name="error_download_socket_timeout">Время подключения к серверу автора подкаста истекло. Проверьте подключение к Интернету.</string>
     <string name="error_download_suspicious_content_size">Не удалось загрузить выпуск. Загруженный файл слишком мал. Обратитесь к автору подкаста.</string>
     <string name="error_download_invalid_content_type">Не удалось загрузить выпуск. Полученный тип контента %1$s. Обратитесь к автору подкаста.</string>
     <string name="error_download_http_failure">Не удалось загрузить выпуск. Получен код статуса HTTP %1$s. Обратитесь к автору подкаста.</string>
-    <string name="wear_connectivity_streaming_warning">Это может повлиять на потоковую передачу</string>
-    <string name="wear_connectivity_restored">Подключено</string>
-    <string name="wear_connectivity_lost">Нет подключения</string>
     <string name="episode_row_waiting_for_storage">Ожидание места для загрузки</string>
     <string name="podcasts_download_storage">Для начала загрузки требуется свободное место</string>
     <string name="watch_sync_failed">Не удалось синхронизировать с часами</string>
@@ -1447,7 +1444,6 @@ Language: ru
     <string name="settings_stats_funny_babies">За это время родилось %1$,.0f детей. Вау!</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Новые выпуски перестанут добавляться, когда размер очереди «Следующие» достигнет %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Больше не добавлять</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Когда размер очереди «Следующие» достигает %d вып., каждый новый выпуск, автоматически добавляемый в начало, будет удалять из очереди самый старый выпуск. Новые выпуски снизу добавляться не будут.</string>
     <string name="settings_auto_up_next_limit_reached_top">Добавлять только в начало</string>
     <string name="settings_auto_up_next_limit_reached">Если достигнут порог</string>
     <string name="settings_auto_up_next_to_bottom">Вниз</string>

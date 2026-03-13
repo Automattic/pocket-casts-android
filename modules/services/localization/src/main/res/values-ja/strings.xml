@@ -18,9 +18,6 @@ Language: ja_JP
     <string name="error_download_suspicious_content_size">エピソードをダウンロードできませんでした。 ダウンロードしたファイルが小さすぎます。 ポッドキャスト投稿者に連絡してください。</string>
     <string name="error_download_invalid_content_type">エピソードをダウンロードできませんでした。 受信したコンテンツタイプは %1$s です。 ポッドキャスト投稿者に連絡してください。</string>
     <string name="error_download_http_failure">エピソードをダウンロードできませんでした。 HTTP ステータスコード %1$s を受信しました。 ポッドキャスト投稿者に連絡してください。</string>
-    <string name="wear_connectivity_streaming_warning">ストリーミングに影響する可能性があります</string>
-    <string name="wear_connectivity_restored">接続しました</string>
-    <string name="wear_connectivity_lost">接続が失われました</string>
     <string name="episode_row_waiting_for_storage">保存スペース待ち</string>
     <string name="podcasts_download_storage">ダウンロードが保存スペース待ち</string>
     <string name="watch_sync_failed">同期して視聴できませんでした</string>
@@ -1450,7 +1447,6 @@ Language: ja_JP
     <string name="settings_stats_funny_babies">その間に%1$,.0f人の赤ちゃんが誕生しました。 すごいですね !</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">次のエピソード数が%d件に達したときに新しいエピソードは追加されなくなります。</string>
     <string name="settings_auto_up_next_limit_reached_stop">追加を停止</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">次のエピソード数が%d件に達すると、待機リストの一番上に新しいエピソードが自動的に追加されたときに最後のエピソードが削除されます。 新しいエピソードは一番下に追加されません。</string>
     <string name="settings_auto_up_next_limit_reached_top">一番上にのみ追加</string>
     <string name="settings_auto_up_next_limit_reached">上限に達した場合</string>
     <string name="settings_auto_up_next_to_bottom">一番下へ</string>

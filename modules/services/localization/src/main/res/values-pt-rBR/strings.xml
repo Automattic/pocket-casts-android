@@ -18,9 +18,6 @@ Language: pt_BR
     <string name="error_download_suspicious_content_size">Falha ao baixar o episódio. O arquivo baixado é muito pequeno. Entre em contato com o autor do podcast.</string>
     <string name="error_download_invalid_content_type">Falha ao baixar o episódio. Tipo de conteúdo recebido %1$s. Entre em contato com o autor do podcast.</string>
     <string name="error_download_http_failure">Falha ao baixar o episódio. Código de status HTTP recebido %1$s. Entre em contato com o autor do podcast.</string>
-    <string name="wear_connectivity_streaming_warning">A transmissão pode ser afetada</string>
-    <string name="wear_connectivity_restored">Conectado</string>
-    <string name="wear_connectivity_lost">Conexão perdida</string>
     <string name="episode_row_waiting_for_storage">Aguardando espaço de armazenamento</string>
     <string name="podcasts_download_storage">Download aguardando espaço de armazenamento</string>
     <string name="watch_sync_failed">Não foi possível sincronizar com o relógio</string>
@@ -1450,7 +1447,6 @@ Language: pt_BR
     <string name="settings_stats_funny_babies">Nesse período, nasceram %1$,.0f bebês. Buá!</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Novos episódios vão parar de ser adicionados quando a lista de Próximos chegar a %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Parar de adicionar</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Quando a fila de Próximos chega a %d, os novos episódios adicionados automaticamente ao topo removerão os últimos. Nenhum episódio novo será adicionado na parte inferior.</string>
     <string name="settings_auto_up_next_limit_reached_top">Adicionar somente ao topo</string>
     <string name="settings_auto_up_next_limit_reached">Se o limite for alcançado</string>
     <string name="settings_auto_up_next_to_bottom">Até o fim</string>
@@ -1755,10 +1751,10 @@ Language: pt_BR
     <string name="profile_files_remove_image">Trocar imagem</string>
     <string name="profile_files_empty_summary">Quer ouvir seus próprios arquivos?\nClique no botão + para abri-los no Pocket Casts e eles aparecerão aqui.</string>
     <string name="profile_files_add_filename">Nome</string>
-    <string name="profile_license_agreement">O Pocket Casts valoriza a sua privacidade. Esta Política de privacidade explica quais informações nós coletamos sobre você, por quê, o que podemos fazer com elas e como as tratamos. Isso se aplica aos aplicativos Pocket Casts para iOS e Android e aos serviços web do Pocket Casts com aplicativos do macOS e Windows associados (responsável solidário, o Serviço). Ao usar o Serviço, você concorda com esta Política de privacidade. Se você ativar as notificações por push no aplicativo, nós armazenaremos o token de push que a Apple nos fornece para enviar as notificações por push para o seu aparelho. Se você comprar o aplicativo web, nós armazenaremos uma identidade de transação para sua compra. Se você optar por não criar uma conta e não usar notificações por push, nenhum dado sobre você será armazenado em nossos servidores. O serviço web Pocket Casts também usa cookies e tecnologias similares para manter você conectado. Caso você decida gerar uma solicitação de suporte pelo Serviço, nós podemos gerar um anexo contendo dados adicionais para ajudar a identificar a sua solicitação de suporte. Você pode visualizar o anexo antes de enviar a solicitação.</string>
     <string name="profile_file_locked">bloqueado</string>
     <string name="profile_file">Arquivo</string>
     <string name="profile_feature_requires">Esta funcionalidade exige o\nPocket Casts Plus</string>
+    <string name="profile_license_agreement">O Pocket Casts valoriza a sua privacidade. Esta Política de privacidade explica quais informações nós coletamos sobre você, por quê, o que podemos fazer com elas e como as tratamos. Isso se aplica aos aplicativos Pocket Casts para iOS e Android e aos serviços web do Pocket Casts com aplicativos do macOS e Windows associados (responsável solidário, o Serviço). Ao usar o Serviço, você concorda com esta Política de privacidade. Se você ativar as notificações por push no aplicativo, nós armazenaremos o token de push que a Apple nos fornece para enviar as notificações por push para o seu aparelho. Se você comprar o aplicativo web, nós armazenaremos uma identidade de transação para sua compra. Se você optar por não criar uma conta e não usar notificações por push, nenhum dado sobre você será armazenado em nossos servidores. O serviço web Pocket Casts também usa cookies e tecnologias similares para manter você conectado. Caso você decida gerar uma solicitação de suporte pelo Serviço, nós podemos gerar um anexo contendo dados adicionais para ajudar a identificar a sua solicitação de suporte. Você pode visualizar o anexo antes de enviar a solicitação.</string>
     <string name="profile_ends">Termina em %s</string>
     <string name="profile_ended">Terminou em %s</string>
     <string name="profile_end_tour">FINALIZAR TOUR</string>

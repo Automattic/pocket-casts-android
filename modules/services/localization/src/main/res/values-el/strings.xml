@@ -1029,7 +1029,6 @@ Language: el_GR
     <string name="server_files_invalid_content_type">Δεν είναι δυνατή η μεταφόρτωση, καθώς δεν μπορούμε να προσδιορίσουμε τον τύπο περιεχομένου αυτού του αρχείου.</string>
     <string name="server_login_user_register_failed">Αδυναμία δημιουργίας λογαριασμού, παρακαλώ προσπάθησε ξανά αργότερα</string>
     <string name="settings_stats_funny_empty">Δεν ακούς πολύ, ε;</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">Όταν το Επόμενο φτάσε το %d, τα νέα επεισόδια που προστίθενται αυτόματα στην κορυφή θα αφαιρέσουν το τελευταίο επεισόδιο στην ουρά. Δεν θα προστεθούν νέα επεισόδια στον πάτο.</string>
     <string name="settings_auto_play_summary">Όταν δεν έχει μείνει τίποτα για αναπαραγωγή, επίλεξε αυτόματα ένα επεισόδιο για μένα</string>
     <string name="settings_up_next_swipe_summary">Όταν σύρεις από αριστερά προς τα δεξιά σε ένα επεισόδιο, η προεπιλεγμένη ενέργεια θα είναι %s.</string>
     <string name="settings_whats_new">Τι Νέο Υπάρχει</string>

@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 09:56:06+0000
+Translation-Revision-Date: 2026-02-27 14:56:38+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
-    <string name="referrals_claim_guest_pass_description_installment">Gratis %1$s, därefter %2$s/månad i %3$d månader. Totalt åtagande: över %4$s 1 år.</string>
-    <string name="winback_claimed_offer_message_6">Tack för att du väljer Pocket Casts. Din rabatterade år börjar efter din nuvarande faktureringsperiod.</string>
-    <string name="winback_claimed_offer_message_5">50 % rabatt på ditt nästa år med månadsbetalningar!</string>
-    <string name="winback_offer_free_offer_installment_description">Lås in ett år med Pocket Casts Plus till halva priset med 12 månadsbetalningar på %1$s. Ditt rabatterade år börjar efter att ditt nuvarande paket löper ut.</string>
+    <string name="referrals_claim_guest_pass_description_installment">Gratis i %1$s, därefter %2$s/månad i %3$d månader. Totalt åtagande: %4$s under 1 år.</string>
+    <string name="winback_claimed_offer_message_6">Tack för att du väljer Pocket Casts. Din rabatterade 12 månader långa betalningsplan börjar efter din nuvarande faktureringsperiod.</string>
     <string name="plus_yearly_installments">Årligt paket – betala månadsvis</string>
-    <string name="error_download_too_many_attempts">Nedladdningen avbröts efter flera försök. Kontrollera din internetanslutning och försök igen.</string>
-    <string name="error_download_io_failure">Misslyckades att ladda ner avsnittet. Kontrollera din internet-anslutning och försök igen.</string>
+    <string name="winback_claimed_offer_message_5">50 % rabatt under ditt nästa år med månadsbetalningar!</string>
+    <string name="winback_offer_free_offer_installment_description">Säkra ett år med Pocket Casts Plus till halva priset med 12 månadsbetalningar på %1$s. Din rabatterade betalningsplan börjar efter att ditt nuvarande prenumeration löper ut.</string>
+    <string name="winback_offer_free_offer_installment_title">Få 50 %% rabatt under ditt nästa år. Betala bara %1$s/månad och spara %2$s</string>
     <string name="error_download_socket_timeout">Tidsgränsen för anslutning till podcastförfattarens server uppnåddes. Kontrollera din internetanslutning.</string>
-    <string name="error_download_suspicious_content_size">Misslyckades att ladda ner avsnittet. Den nedladdade filen är för liten. Kontakta podcastens skapare.</string>
-    <string name="error_download_invalid_content_type">Misslyckades att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastens skapare.</string>
-    <string name="error_download_http_failure">Misslyckades att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastens skapare.</string>
-    <string name="wear_connectivity_restored">Ansluten</string>
-    <string name="wear_connectivity_lost">Anslutning förlorad</string>
-    <string name="wear_connectivity_streaming_warning">Streaming kan påverkas</string>
+    <string name="error_download_too_many_attempts">Nedladdningen avbröts efter flera försök. Kontrollera din internetanslutning och ditt lagringsutrymme. Försök sedan igen.</string>
+    <string name="error_download_io_failure">Det gick inte att ladda ner avsnittet. Kontrollera din internet-anslutning och ditt lagringsutrymme.</string>
+    <string name="error_download_suspicious_content_size">Det gick inte att ladda ner avsnittet. Den nedladdade filen är för liten. Kontakta podcastförfattaren.</string>
+    <string name="error_download_invalid_content_type">Det gick inte att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastförfattaren.</string>
+    <string name="error_download_http_failure">Det gick inte att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastförfattaren.</string>
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
     <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
     <string name="watch_sync_retry">Försök igen</string>
@@ -37,13 +35,13 @@ Language: sv_SE
     <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
     <string name="watch_synced_successfully">Klockan har synkroniserats</string>
     <string name="watch_sync_waiting_for_phone">Väntar på att telefonen ska synkroniseras…</string>
-    <string name="error_download_ssl_failure">Misslyckades att upprätta en säker anslutning till podcastförfattarens server. Kontrollera att din enhet är uppdaterad.</string>
-    <string name="error_download_connection_error">Det gick inte att ansluta till servern. Kontrollera din internetanslutning.</string>
+    <string name="error_download_ssl_failure">Det gick inte att upprätta en säker anslutning till podcastförfattarens server. Kontrollera att din enhet är uppdaterad.</string>
+    <string name="error_download_connection_error">Det gick inte att ansluta till podcastförfattarens server. Kontrollera din internetanslutning.</string>
     <string name="error_download_unknown_host">Det gick inte att nå podcastförfattarens server. Kontrollera din internetanslutning.</string>
-    <string name="error_download_no_storage">Misslyckades att ladda ner avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
-    <string name="error_download_invalid_url">Webbplatsens URL är ogiltig. Kontakta podcastens skapare.</string>
+    <string name="error_download_no_storage">Det gick inte att ladda ner avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
+    <string name="error_download_invalid_url">Avsnittets URL är ogiltig. Kontakta podcastförfattaren.</string>
     <string name="error_download_no_episode_file">Kan inte skapa en nedladdningsfil för avsnittet. Kontrollera att du har tillräckligt med lagringsutrymme på din enhet.</string>
-    <string name="error_download_missing_episode">Kan inte hitta avsnittsdata på denna enhet. Kontakta supporten.</string>
+    <string name="error_download_missing_episode">Kan inte hitta avsnittsinformation på den här enheten. Kontakta supporten.</string>
     <string name="downloading">Laddar ner %s</string>
     <string name="playlist_only_podcast_episodes_allowed">Spellistor kan endast innehålla podcastavsnitt.</string>
     <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
@@ -1445,7 +1443,6 @@ Language: sv_SE
     <string name="settings_stats_funny_babies">Under den här tiden föddes %1$,.0f bebisar. Wahhh!</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Nya avsnitt slutar att läggas till när Nästa når %d.</string>
     <string name="settings_auto_up_next_limit_reached_stop">Sluta lägga till</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">När Nästa når %d läggs nya avsnitt automatiskt till överst, varpå det sista avsnittet i kön tas bort. Inga nya avsnitt läggs till längst ner.</string>
     <string name="settings_auto_up_next_limit_reached_top">Lägg endast till överst</string>
     <string name="settings_auto_up_next_limit_reached">Om gränsen nås</string>
     <string name="settings_auto_up_next_to_bottom">Till botten</string>
@@ -1744,10 +1741,10 @@ Language: sv_SE
     <string name="profile_newsletter_detail">Få nyheter, app-uppdateringar, temabaserade spellistor, intervjuer med mera.</string>
     <string name="profile_new_password">Nytt lösenord</string>
     <string name="profile_new_email_address">Ny e-postadress</string>
-    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_last_refresh">Senaste uppdatering: %s sedan</string>
     <string name="profile_joined">Gick med:</string>
     <string name="profile_get_plus">Skaffa Pocket Casts Plus för att låsa upp den här funktionen, samt mycket mer!</string>
+    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_files_remove_image">Byt bild</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
