@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -57,9 +56,6 @@ class SettingsAppearanceViewModelTest {
     private lateinit var appIcon: AppIcon
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
     private lateinit var notificationManager: NotificationManager
 
     private lateinit var viewModel: SettingsAppearanceViewModel
@@ -90,7 +86,6 @@ class SettingsAppearanceViewModelTest {
             userEpisodeManager = userEpisodeManager,
             theme = theme,
             appIcon = appIcon,
-            analyticsTracker = analyticsTracker,
             eventHorizon = EventHorizon(TestEventSink()),
             notificationManager = notificationManager,
         )

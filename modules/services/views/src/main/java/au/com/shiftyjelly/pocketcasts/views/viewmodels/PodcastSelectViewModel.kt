@@ -8,6 +8,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.fragments.SelectablePodcast
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAutoAddUpNextPodcastsChangedEvent
+import com.automattic.eventhorizon.SettingsNotificationsPodcastsChangedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -15,12 +18,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @HiltViewModel
 class PodcastSelectViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _selectablePodcasts = MutableStateFlow<List<SelectablePodcast>>(emptyList())
@@ -60,24 +63,20 @@ class PodcastSelectViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_DISMISSED, source.toEventProperty())
     }
 
-    fun trackChange(source: PodcastSelectFragmentSource?, props: Map<String, Int>) {
-        when (source) {
-            PodcastSelectFragmentSource.AUTO_ADD -> {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED, props)
-            }
+    fun trackAutoAddPodcastsChanged(count: Int) {
+        eventHorizon.track(
+            SettingsAutoAddUpNextPodcastsChangedEvent(
+                numberSelected = count.toLong(),
+            ),
+        )
+    }
 
-            PodcastSelectFragmentSource.NOTIFICATIONS -> {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED, props)
-            }
-
-            PodcastSelectFragmentSource.FILTERS -> {
-                // Do not track because the filter_updated event was tracked when the change was persisted
-            }
-
-            null -> {
-                Timber.e("No source set for ${this::class.java.simpleName}")
-            }
-        }
+    fun trackNotificationsChanged(count: Int) {
+        eventHorizon.track(
+            SettingsNotificationsPodcastsChangedEvent(
+                numberSelected = count.toLong(),
+            ),
+        )
     }
 
     private fun PodcastSelectFragmentSource?.toEventProperty(): Map<String, String> {

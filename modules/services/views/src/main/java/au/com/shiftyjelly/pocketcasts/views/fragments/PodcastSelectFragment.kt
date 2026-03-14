@@ -188,13 +188,13 @@ class PodcastSelectFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         source?.let { viewModel.trackOnDismissed(it) }
-        if (userChanged) {
-            val props = buildMap {
-                adapter?.selectedPodcasts?.size?.let {
-                    put("number_selected", it)
-                }
+        val podcastCount = adapter?.selectedPodcasts?.size
+        if (userChanged && podcastCount != null) {
+            when (source) {
+                PodcastSelectFragmentSource.AUTO_ADD -> viewModel.trackAutoAddPodcastsChanged(podcastCount)
+                PodcastSelectFragmentSource.NOTIFICATIONS -> viewModel.trackNotificationsChanged(podcastCount)
+                PodcastSelectFragmentSource.FILTERS, null -> Unit
             }
-            viewModel.trackChange(source, props)
         }
         binding = null
     }
