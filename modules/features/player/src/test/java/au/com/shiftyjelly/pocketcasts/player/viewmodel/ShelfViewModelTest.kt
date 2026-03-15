@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_MINIMUM_SHELF_ITEMS
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_SHELF_ITEM_INVALID_MOVE_POSITION
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -14,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
+import com.automattic.eventhorizon.ShelfActionSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -40,10 +40,9 @@ class ShelfViewModelTest {
     private lateinit var transcriptManager: TranscriptManager
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
     private lateinit var settings: Settings
+
+    private val eventSink = TestEventSink()
 
     private lateinit var shelfViewModel: ShelfViewModel
 
@@ -131,14 +130,14 @@ class ShelfViewModelTest {
     fun `given valid positions, when item moved from shelf to overflow section, then rearrange action is properly tracked`() = runTest {
         moveShelfItem(3, 6)
 
-        verify(analyticsTracker).track(
-            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-            mapOf(
-                AnalyticsProp.Key.ACTION to ShelfItem.entries[2].analyticsValue,
-                AnalyticsProp.Key.POSITION to 0, // it is the new position in section it was moved to
-                AnalyticsProp.Key.MOVED_FROM to AnalyticsProp.Value.SHELF,
-                AnalyticsProp.Key.MOVED_TO to AnalyticsProp.Value.OVERFLOW_MENU,
+        assertEquals(
+            PlayerShelfOverflowMenuRearrangeActionMovedEvent(
+                action = ShelfItem.entries[2].eventHorizonValue,
+                position = 0,
+                movedFrom = ShelfActionSource.Shelf,
+                movedTo = ShelfActionSource.OverflowMenu,
             ),
+            eventSink.pollEvent(),
         )
     }
 
@@ -146,14 +145,14 @@ class ShelfViewModelTest {
     fun `given valid positions, when item moved from overflow to shelf section, then rearrange action is properly tracked`() = runTest {
         moveShelfItem(6, 3)
 
-        verify(analyticsTracker).track(
-            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-            mapOf(
-                AnalyticsProp.Key.ACTION to ShelfItem.entries[4].analyticsValue,
-                AnalyticsProp.Key.POSITION to 2, // it is the new position in section it was moved to
-                AnalyticsProp.Key.MOVED_FROM to AnalyticsProp.Value.OVERFLOW_MENU,
-                AnalyticsProp.Key.MOVED_TO to AnalyticsProp.Value.SHELF,
+        assertEquals(
+            PlayerShelfOverflowMenuRearrangeActionMovedEvent(
+                action = ShelfItem.entries[4].eventHorizonValue,
+                position = 2,
+                movedFrom = ShelfActionSource.OverflowMenu,
+                movedTo = ShelfActionSource.Shelf,
             ),
+            eventSink.pollEvent(),
         )
     }
 
@@ -161,14 +160,14 @@ class ShelfViewModelTest {
     fun `given valid positions, when item moved from shelf to shelf section, then rearrange action is properly tracked`() = runTest {
         moveShelfItem(1, 2)
 
-        verify(analyticsTracker).track(
-            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-            mapOf(
-                AnalyticsProp.Key.ACTION to ShelfItem.entries[0].analyticsValue,
-                AnalyticsProp.Key.POSITION to 1, // it is the new position in section it was moved to
-                AnalyticsProp.Key.MOVED_FROM to AnalyticsProp.Value.SHELF,
-                AnalyticsProp.Key.MOVED_TO to AnalyticsProp.Value.SHELF,
+        assertEquals(
+            PlayerShelfOverflowMenuRearrangeActionMovedEvent(
+                action = ShelfItem.entries[0].eventHorizonValue,
+                position = 1,
+                movedFrom = ShelfActionSource.Shelf,
+                movedTo = ShelfActionSource.Shelf,
             ),
+            eventSink.pollEvent(),
         )
     }
 
@@ -176,14 +175,14 @@ class ShelfViewModelTest {
     fun `given valid positions, when item moved from overflow to overflow section, then rearrange action is properly tracked`() = runTest {
         moveShelfItem(6, 7)
 
-        verify(analyticsTracker).track(
-            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-            mapOf(
-                AnalyticsProp.Key.ACTION to ShelfItem.entries[4].analyticsValue,
-                AnalyticsProp.Key.POSITION to 1, // it is the new position in section it was moved to
-                AnalyticsProp.Key.MOVED_FROM to AnalyticsProp.Value.OVERFLOW_MENU,
-                AnalyticsProp.Key.MOVED_TO to AnalyticsProp.Value.OVERFLOW_MENU,
+        assertEquals(
+            PlayerShelfOverflowMenuRearrangeActionMovedEvent(
+                action = ShelfItem.entries[4].eventHorizonValue,
+                position = 1,
+                movedFrom = ShelfActionSource.OverflowMenu,
+                movedTo = ShelfActionSource.OverflowMenu,
             ),
+            eventSink.pollEvent(),
         )
     }
 
@@ -221,7 +220,7 @@ class ShelfViewModelTest {
             episodeId = episodeId,
             isEditable = isEditable,
             transcriptManager = transcriptManager,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(eventSink),
             settings = settings,
         )
     }

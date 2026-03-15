@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -21,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.CreateAccountNextButtonTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class CreateEmailFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var currentEditText: TextInputEditText? = null
@@ -128,7 +128,7 @@ class CreateEmailFragment : BaseFragment() {
             ) {
                 txtError.text = ""
                 UiUtil.hideKeyboard(v)
-                analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_NEXT_BUTTON_TAPPED)
+                eventHorizon.track(CreateAccountNextButtonTappedEvent)
                 viewModel.sendCreateAccount()
             }
         }

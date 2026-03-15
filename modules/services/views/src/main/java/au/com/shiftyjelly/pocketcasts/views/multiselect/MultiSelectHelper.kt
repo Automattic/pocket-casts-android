@@ -36,7 +36,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
     val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
 
-    protected val selectedList: MutableList<T> = mutableListOf()
+    protected val selectedSet: LinkedHashSet<T> = linkedSetOf<T>()
     protected val _selectedListLive = MutableLiveData<List<T>>().apply { value = listOf() }
     val selectedListLive: LiveData<List<T>> = _selectedListLive
     val selectedCount: LiveData<Int> = _selectedListLive.map { it.size }
@@ -45,7 +45,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         set(value) {
             field = value
             _isMultiSelectingLive.value = value
-            selectedList.clear()
+            selectedSet.clear()
             _selectedListLive.value = emptyList()
         }
 
@@ -72,19 +72,19 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             isMultiSelecting = !isMultiSelecting
             select(multiSelectable)
         } else {
-            val selectAllAbove = if (isSelected(multiSelectable) && selectedList.size > 1) {
+            val selectAllAbove = if (isSelected(multiSelectable) && selectedSet.size > 1) {
                 R.string.deselect_all_above
             } else {
                 R.string.select_all_above
             }
 
-            val selectAll = if (selectedList.contains(multiSelectable) && selectedList.size > 1) {
+            val selectAll = if (selectedSet.contains(multiSelectable) && selectedSet.size > 1) {
                 R.string.deselect_all
             } else {
                 R.string.select_all
             }
 
-            val selectAllBelow = if (isSelected(multiSelectable) && selectedList.size > 1) {
+            val selectAllBelow = if (isSelected(multiSelectable) && selectedSet.size > 1) {
                 R.string.deselect_all_below
             } else {
                 R.string.select_all_below
@@ -95,18 +95,18 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
                 .addTextOption(
                     titleId = selectAllAbove,
                     click = { toggleSelectAllAbove(multiSelectable) },
-                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up,
+                    imageId = if (isSelected(multiSelectable) && selectedSet.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up,
 
                 )
                 .addTextOption(
                     titleId = selectAll,
                     click = { toggleSelectAll(multiSelectable) },
-                    imageId = if (selectedList.contains(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall,
+                    imageId = if (selectedSet.contains(multiSelectable) && selectedSet.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall,
                 )
                 .addTextOption(
                     titleId = selectAllBelow,
                     click = { toggleSelectAllBelow(multiSelectable) },
-                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down,
+                    imageId = if (isSelected(multiSelectable) && selectedSet.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down,
                 )
                 .show(fragmentManager, "multi_select_select_dialog")
         }
@@ -114,9 +114,9 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
 
     fun select(multiSelectable: T) {
         if (!isSelected(multiSelectable)) {
-            selectedList.add(multiSelectable)
+            selectedSet.add(multiSelectable)
         }
-        _selectedListLive.value = selectedList
+        _selectedListLive.value = selectedSet.toList()
     }
 
     fun selectAll() {
@@ -136,32 +136,32 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     }
 
     fun selectAllInList(multiSelectables: List<T>) {
-        val trimmed = multiSelectables.filter { !selectedList.contains(it) }
-        selectedList.addAll(trimmed)
-        _selectedListLive.value = selectedList
+        val trimmed = multiSelectables.filter { !selectedSet.contains(it) }
+        selectedSet.addAll(trimmed)
+        _selectedListLive.value = selectedSet.toList()
     }
 
     fun deselectAllInList(multiSelectables: List<T>) {
-        selectedList.removeAll(multiSelectables)
-        _selectedListLive.value = selectedList
+        selectedSet.removeAll(multiSelectables)
+        _selectedListLive.value = selectedSet.toList()
     }
 
     private fun toggleSelectAll(multiSelectable: T) {
-        if (selectedList.contains(multiSelectable) && selectedList.size > 1) {
+        if (selectedSet.contains(multiSelectable) && selectedSet.size > 1) {
             deselectAll()
         } else {
             selectAll()
         }
     }
     private fun toggleSelectAllAbove(multiSelectable: T) {
-        if (isSelected(multiSelectable) && selectedList.size > 1) {
+        if (isSelected(multiSelectable) && selectedSet.size > 1) {
             deselectAllAbove(multiSelectable)
         } else {
             selectAllAbove(multiSelectable)
         }
     }
     private fun toggleSelectAllBelow(multiSelectable: T) {
-        if (isSelected(multiSelectable) && selectedList.size > 1) {
+        if (isSelected(multiSelectable) && selectedSet.size > 1) {
             deselectAllBelow(multiSelectable)
         } else {
             selectAllBelow(multiSelectable)
@@ -191,8 +191,8 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     }
 
     fun closeMultiSelect() {
-        selectedList.clear()
-        _selectedListLive.value = selectedList
+        selectedSet.clear()
+        _selectedListLive.value = selectedSet.toList()
         isMultiSelecting = false
     }
 

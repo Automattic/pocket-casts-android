@@ -88,8 +88,13 @@ import com.automattic.eventhorizon.DownloadsSelectAllAboveTappedEvent
 import com.automattic.eventhorizon.DownloadsSelectAllBelowTappedEvent
 import com.automattic.eventhorizon.DownloadsSelectAllTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ListeningHistoryClearHistoryButtonTappedEvent
+import com.automattic.eventhorizon.ListeningHistoryDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.ListeningHistoryModalOptionType
 import com.automattic.eventhorizon.ListeningHistoryMultiSelectEnteredEvent
 import com.automattic.eventhorizon.ListeningHistoryMultiSelectExitedEvent
+import com.automattic.eventhorizon.ListeningHistoryOptionsButtonTappedEvent
+import com.automattic.eventhorizon.ListeningHistoryOptionsModalOptionTappedEvent
 import com.automattic.eventhorizon.ListeningHistorySelectAllAboveTappedEvent
 import com.automattic.eventhorizon.ListeningHistorySelectAllBelowTappedEvent
 import com.automattic.eventhorizon.ListeningHistorySelectAllTappedEvent
@@ -512,7 +517,7 @@ class ProfileEpisodeListFragment :
                             iconResourceId = state.iconRes,
                             primaryButtonText = buttonText,
                             onPrimaryButtonClick = {
-                                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
+                                eventHorizon.track(ListeningHistoryDiscoverButtonTappedEvent)
                                 (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
                             },
                         )
@@ -590,7 +595,7 @@ class ProfileEpisodeListFragment :
                 }
                 dialog.addTextOption(LR.string.profile_clean_up, imageId = VR.drawable.ic_delete, click = this::showCleanupSettings)
             } else if (mode is Mode.History) {
-                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_BUTTON_TAPPED)
+                eventHorizon.track(ListeningHistoryOptionsButtonTappedEvent)
                 dialog.addTextOption(LR.string.profile_clear_listening_history, imageId = R.drawable.ic_history, click = this::clearListeningHistory)
             }
             dialog.show(parentFragmentManager, "more_options")
@@ -631,14 +636,18 @@ class ProfileEpisodeListFragment :
     }
 
     private fun clearListeningHistory() {
-        analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAR_HISTORY))
+        eventHorizon.track(
+            ListeningHistoryOptionsModalOptionTappedEvent(
+                option = ListeningHistoryModalOptionType.ClearHistory,
+            ),
+        )
         val dialog = ConfirmationDialog()
             .setIconId(R.drawable.ic_history)
             .setTitle(resources.getString(LR.string.profile_clear_listening_history_title))
             .setSummary(resources.getString(LR.string.profile_clear_cannot_be_undone))
             .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.profile_clear_all)))
             .setOnConfirm {
-                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED)
+                eventHorizon.track(ListeningHistoryClearHistoryButtonTappedEvent)
                 viewModel.clearAllEpisodeHistory()
             }
         dialog.show(parentFragmentManager, "clear_history")

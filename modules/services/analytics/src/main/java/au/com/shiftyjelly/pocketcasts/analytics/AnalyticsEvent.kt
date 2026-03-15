@@ -57,9 +57,6 @@ enum class AnalyticsEvent(val key: String) {
     UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
     PLUS_PROMOTION_BANNER_BUTTON_TAPPED("plus_promotion_banner_button_tapped"),
 
-    /* Pull to refresh */
-    PULLED_TO_REFRESH("pulled_to_refresh"),
-
     /* Setup Account */
     SETUP_ACCOUNT_SHOWN("setup_account_shown"),
     SETUP_ACCOUNT_DISMISSED("setup_account_dismissed"),
@@ -102,6 +99,9 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
     ACCOUNT_DETAILS_CHANGE_AVATAR("account_details_change_avatar"),
+
+    /* Pull to refresh */
+    PULLED_TO_REFRESH("pulled_to_refresh"),
 
     /* Podcasts List */
     PODCASTS_LIST_SHOWN("podcasts_list_shown"),

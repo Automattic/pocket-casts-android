@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -21,6 +19,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManag
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent
+import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipShownEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderShownEvent
+import com.automattic.eventhorizon.PodcastsListReorderedEvent
+import com.automattic.eventhorizon.PodcastsListShownEvent
+import com.automattic.eventhorizon.PullToRefreshSource
+import com.automattic.eventhorizon.PulledToRefreshEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -51,7 +57,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val folderManager: FolderManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val userManager: UserManager,
@@ -214,7 +220,7 @@ class PodcastsViewModel @AssistedInject constructor(
     val refreshStateFlow = settings.refreshStateFlow
 
     suspend fun reorderItems(items: List<FolderItem>) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_REORDERED)
+        eventHorizon.track(PodcastsListReorderedEvent)
         viewModelScope.launch {
             if (folderUuid == null) {
                 settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, updateModifiedAt = true)
@@ -237,9 +243,10 @@ class PodcastsViewModel @AssistedInject constructor(
     }
 
     fun refreshPodcasts() {
-        analyticsTracker.track(
-            AnalyticsEvent.PULLED_TO_REFRESH,
-            mapOf("source" to "podcasts_list"),
+        eventHorizon.track(
+            PulledToRefreshEvent(
+                source = PullToRefreshSource.PodcastsList,
+            ),
         )
         podcastManager.refreshPodcasts("Pull down")
     }
@@ -264,24 +271,26 @@ class PodcastsViewModel @AssistedInject constructor(
 
     private fun trackPodcastsListShown() {
         viewModelScope.launch {
-            val properties = mapOf(
-                NUMBER_OF_FOLDERS_KEY to folderManager.countFolders(),
-                NUMBER_OF_PODCASTS_KEY to podcastManager.countSubscribed(),
-                BADGE_TYPE_KEY to settings.podcastBadgeType.value.analyticsValue,
-                LAYOUT_KEY to settings.podcastGridLayout.value.analyticsValue,
-                SORT_ORDER_KEY to settings.podcastsSortType.value.analyticsValue,
+            eventHorizon.track(
+                PodcastsListShownEvent(
+                    numberOfFolders = folderManager.countFolders().toLong(),
+                    numberOfPodcasts = podcastManager.countSubscribed().toLong(),
+                    badgeType = settings.podcastBadgeType.value.eventHorizonValue,
+                    layout = settings.podcastGridLayout.value.eventHorizonValue,
+                    sortOrder = settings.podcastsSortType.value.eventHorizonValue,
+                ),
             )
-            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
         }
     }
 
     private fun trackFolderShown(folderUuid: String) {
         viewModelScope.launch {
-            val properties = mapOf(
-                SORT_ORDER_KEY to (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).analyticsValue,
-                NUMBER_OF_PODCASTS_KEY to folderManager.findFolderPodcastsSorted(folderUuid).size,
+            eventHorizon.track(
+                FolderShownEvent(
+                    sortOrder = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).eventHorizonValue,
+                    numberOfPodcasts = folderManager.findFolderPodcastsSorted(folderUuid).size.toLong(),
+                ),
             )
-            analyticsTracker.track(AnalyticsEvent.FOLDER_SHOWN, properties)
         }
     }
 
@@ -302,12 +311,12 @@ class PodcastsViewModel @AssistedInject constructor(
     fun shouldShowTooltip() = FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
 
     fun onTooltipShown() {
-        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN)
+        eventHorizon.track(EpisodeRecentlyPlayedSortOptionTooltipShownEvent)
     }
 
     fun onTooltipClosed() {
         settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
-        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED)
+        eventHorizon.track(EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent)
     }
 
     data class UiState(
@@ -326,12 +335,4 @@ class PodcastsViewModel @AssistedInject constructor(
         val hasPermission: Boolean,
         val hasShownPromptBefore: Boolean,
     )
-
-    companion object {
-        private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"
-        private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
-        private const val BADGE_TYPE_KEY = "badge_type"
-        private const val LAYOUT_KEY = "layout"
-        private const val SORT_ORDER_KEY = "sort_order"
-    }
 }

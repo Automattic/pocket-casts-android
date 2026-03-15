@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.res.Resources
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,6 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
     private val podcastManager = mock<PodcastManager>()
     private val playbackManager = mock<PlaybackManager>()
-    private val analyticsTracker = mock<AnalyticsTracker>()
     private val repository = mock<ListRepository>()
     private val settings = mock<Settings>()
     private val categoriesManager = mock<CategoriesManager>()
@@ -90,7 +90,7 @@ class OnboardingRecommendationsStartPageViewModelTest {
     private fun createViewModel() = OnboardingRecommendationsStartPageViewModel(
         podcastManager = podcastManager,
         playbackManager = playbackManager,
-        analyticsTracker = analyticsTracker,
+        eventHorizon = EventHorizon(TestEventSink()),
         repository = repository,
         settings = settings,
         app = application,

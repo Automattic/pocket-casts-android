@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -35,7 +36,6 @@ class OnboardingUpgradeFeaturesViewModelTest {
 
     private val paymentDataSource = FakePaymentDataSource()
     private val paymentClient = PaymentClient.test(paymentDataSource)
-    private val analyticsTracker = mock<AnalyticsTracker>()
     private val notificationManager = mock<NotificationManager>()
     private val experimentProvider = mock<ExperimentProvider>()
     private val flow = OnboardingFlow.InitialOnboarding
@@ -171,7 +171,7 @@ class OnboardingUpgradeFeaturesViewModelTest {
     private fun createViewModel(): OnboardingUpgradeFeaturesViewModel {
         return OnboardingUpgradeFeaturesViewModel(
             paymentClient = paymentClient,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
             notificationManager = notificationManager,
             experimentProvider = experimentProvider,
             flow = flow,

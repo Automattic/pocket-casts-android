@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastSubscribedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,7 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -242,9 +245,11 @@ class SearchViewModel @Inject constructor(
             }
         }
 
-        analyticsTracker.track(
-            AnalyticsEvent.PODCAST_SUBSCRIBED,
-            AnalyticsProp.podcastSubscribed(uuid = uuid, source = source),
+        eventHorizon.track(
+            PodcastSubscribedEvent(
+                uuid = uuid,
+                source = source.eventHorizonValue,
+            ),
         )
     }
 
@@ -340,8 +345,6 @@ class SearchViewModel @Inject constructor(
         fun searchResultTapped(source: SourceView, uuid: String, type: SearchResultType) = mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
 
         fun searchShownOrDismissed(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
-
-        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to source.analyticsValue, UUID to uuid)
 
         fun searchListShown(source: SourceView, type: ResultsType) = mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }

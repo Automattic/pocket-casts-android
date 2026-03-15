@@ -56,7 +56,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -69,7 +68,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -102,6 +100,20 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
+import com.automattic.eventhorizon.FolderChoosePodcastsShownEvent
+import com.automattic.eventhorizon.FolderEditShownEvent
+import com.automattic.eventhorizon.FolderModalOptionType
+import com.automattic.eventhorizon.FolderOptionsButtonTappedEvent
+import com.automattic.eventhorizon.FolderOptionsModalOptionTappedEvent
+import com.automattic.eventhorizon.FolderSortByChangedEvent
+import com.automattic.eventhorizon.PodcastsListDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.PodcastsListFolderButtonTappedEvent
+import com.automattic.eventhorizon.PodcastsListFolderTappedEvent
+import com.automattic.eventhorizon.PodcastsListOptionsButtonTappedEvent
+import com.automattic.eventhorizon.PodcastsListPodcastTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -123,11 +135,6 @@ class PodcastsFragment :
 
     companion object {
         private const val LAST_ORIENTATION_NOT_SET = -1
-        private const val PODCASTS_LIST = "podcasts_list"
-        private const val SORT_ORDER_KEY = "sort_order"
-        private const val OPTION_KEY = "option"
-        private const val SORT_BY = "sort_by"
-        private const val EDIT_FOLDER = "edit_folder"
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -144,6 +151,9 @@ class PodcastsFragment :
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -376,8 +386,12 @@ class PodcastsFragment :
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.more_options -> {
-                val event = folderUuid?.let { AnalyticsEvent.FOLDER_OPTIONS_BUTTON_TAPPED } ?: AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED
-                analyticsTracker.track(event)
+                val event = if (folderUuid != null) {
+                    FolderOptionsButtonTappedEvent
+                } else {
+                    PodcastsListOptionsButtonTappedEvent
+                }
+                eventHorizon.track(event)
                 openOptions()
                 true
             }
@@ -388,7 +402,7 @@ class PodcastsFragment :
             }
 
             R.id.create_folder -> {
-                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
+                eventHorizon.track(PodcastsListFolderButtonTappedEvent)
                 handleFolderCreation()
                 true
             }
@@ -407,21 +421,33 @@ class PodcastsFragment :
         if (folderUuid != null) {
             val folder = viewModel.uiState.value.folder ?: return
             val onOpenSortOptions = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
+                eventHorizon.track(
+                    FolderOptionsModalOptionTappedEvent(
+                        option = FolderModalOptionType.SortBy,
+                    ),
+                )
             }
             val onSortTypeChanged = { sort: PodcastsSortType ->
-                analyticsTracker.track(AnalyticsEvent.FOLDER_SORT_BY_CHANGED, mapOf(SORT_ORDER_KEY to sort.analyticsValue))
+                eventHorizon.track(
+                    FolderSortByChangedEvent(
+                        sortOrder = sort.eventHorizonValue,
+                    ),
+                )
                 viewModel.updateFolderSort(folder.uuid, sort)
             }
             val onEditFolder = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to EDIT_FOLDER))
-                analyticsTracker.track(AnalyticsEvent.FOLDER_EDIT_SHOWN)
+                eventHorizon.track(
+                    FolderOptionsModalOptionTappedEvent(
+                        option = FolderModalOptionType.EditFolder,
+                    ),
+                )
+                eventHorizon.track(FolderEditShownEvent)
                 val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "edit_folder_card")
             }
             val onAddOrRemovePodcast = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_ADD_PODCASTS_BUTTON_TAPPED)
-                analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_SHOWN)
+                eventHorizon.track(FolderAddPodcastsButtonTappedEvent)
+                eventHorizon.track(FolderChoosePodcastsShownEvent)
                 val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "add_podcasts_card")
             }
@@ -429,7 +455,7 @@ class PodcastsFragment :
                 show()
             }
         } else {
-            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, analyticsTracker).apply {
+            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, eventHorizon).apply {
                 show()
             }
         }
@@ -444,7 +470,9 @@ class PodcastsFragment :
     }
 
     private fun showCustomFolderCreation() {
-        FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+        FolderCreateFragment
+            .newInstance(CreateFolderSource.PodcastsList)
+            .show(parentFragmentManager, "create_folder_card")
     }
 
     private fun showSuggestedFoldersCreation(
@@ -557,7 +585,7 @@ class PodcastsFragment :
                     } else {
                         NoPodcastsBanner(
                             onClickButton = {
-                                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
+                                eventHorizon.track(PodcastsListDiscoverButtonTappedEvent)
                                 (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
                             },
                         )
@@ -621,14 +649,14 @@ class PodcastsFragment :
     }
 
     override fun onPodcastClick(podcast: Podcast, view: View) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_PODCAST_TAPPED)
+        eventHorizon.track(PodcastsListPodcastTappedEvent)
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, sourceView = SourceView.PODCAST_LIST)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     override fun onFolderClick(folderUuid: String, isUserInitiated: Boolean) {
         if (isUserInitiated) {
-            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_TAPPED)
+            eventHorizon.track(PodcastsListFolderTappedEvent)
         }
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.time.Instant
 import junit.framework.TestCase.assertEquals
@@ -62,6 +63,6 @@ class UpNextViewModelTest {
                     ),
                 ),
             )
-        return UpNextViewModel(userManager, mock(), AnalyticsTracker.test())
+        return UpNextViewModel(userManager, mock(), EventHorizon(TestEventSink()))
     }
 }

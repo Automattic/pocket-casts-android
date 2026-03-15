@@ -2,9 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -13,6 +10,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.MiniPlayerLongPressMenuDismissedEvent
+import com.automattic.eventhorizon.MiniPlayerLongPressMenuOptionTappedEvent
+import com.automattic.eventhorizon.MiniPlayerLongPressMenuShownEvent
+import com.automattic.eventhorizon.MiniPlayerModalOptionType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -25,13 +28,12 @@ class MiniPlayerDialog(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val fragmentManager: FragmentManager,
-    private val analyticsTracker: AnalyticsTracker,
-    private val episodeAnalytics: EpisodeAnalytics,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
 ) {
     private var isOptionClicked = false
     fun show(context: Context) {
-        analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_SHOWN)
+        eventHorizon.track(MiniPlayerLongPressMenuShownEvent)
         val dangerColor = context.getThemeColor(UR.attr.support_05)
         OptionsDialog()
             .addTextOption(
@@ -39,7 +41,11 @@ class MiniPlayerDialog(
                 imageId = IR.drawable.ic_markasplayed,
                 click = {
                     isOptionClicked = true
-                    analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to MARK_PLAYED))
+                    eventHorizon.track(
+                        MiniPlayerLongPressMenuOptionTappedEvent(
+                            option = MiniPlayerModalOptionType.MarkPlayed,
+                        ),
+                    )
                     markAsPlayed()
                 },
             )
@@ -50,13 +56,17 @@ class MiniPlayerDialog(
                 imageColor = dangerColor,
                 click = {
                     isOptionClicked = true
-                    analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to CLOSE_AND_CLEAR_UP_NEXT))
+                    eventHorizon.track(
+                        MiniPlayerLongPressMenuOptionTappedEvent(
+                            option = MiniPlayerModalOptionType.CloseAndClearUpNext,
+                        ),
+                    )
                     endPlaybackAndClearUpNext(context)
                 },
             )
             .setOnDismiss {
                 if (!isOptionClicked) {
-                    analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_DISMISSED)
+                    eventHorizon.track(MiniPlayerLongPressMenuDismissedEvent)
                 }
             }
             .show(fragmentManager, "mini_player_dialog")
@@ -67,7 +77,7 @@ class MiniPlayerDialog(
             source = UpNextSource.MINI_PLAYER,
             removeNowPlaying = true,
             playbackManager = playbackManager,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = eventHorizon,
             context = context,
         )
         dialog.showOrClear(fragmentManager, tag = "mini_player_clear_dialog")
@@ -76,12 +86,11 @@ class MiniPlayerDialog(
     private fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
         episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager, settings.upNextShuffle.value)
-        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, SourceView.MINIPLAYER, episode.uuid)
-    }
-
-    companion object {
-        private const val OPTION_KEY = "option"
-        private const val MARK_PLAYED = "mark_played"
-        private const val CLOSE_AND_CLEAR_UP_NEXT = "close_and_clear_up_next"
+        eventHorizon.track(
+            EpisodeMarkedAsPlayedEvent(
+                episodeUuid = episode.uuid,
+                source = SourceView.MINIPLAYER.eventHorizonValue,
+            ),
+        )
     }
 }

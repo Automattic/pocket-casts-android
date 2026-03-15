@@ -2,12 +2,12 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpNextQueueClearedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -16,10 +16,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  */
 @AndroidEntryPoint
 class ClearUpNextDialog(
-    private val source: UpNextSource = UpNextSource.UNKNOWN,
+    private val source: UpNextSource,
     private val removeNowPlaying: Boolean,
     private val playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     context: Context,
 ) : ConfirmationDialog() {
 
@@ -33,7 +33,11 @@ class ClearUpNextDialog(
     }
 
     private fun clear() {
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_CLEARED, mapOf(SOURCE_KEY to source.analyticsValue))
+        eventHorizon.track(
+            UpNextQueueClearedEvent(
+                source = source.eventHorizonValue,
+            ),
+        )
         if (removeNowPlaying) {
             playbackManager.endPlaybackAndClearUpNextAsync()
         } else {
@@ -51,8 +55,4 @@ class ClearUpNextDialog(
     }
 
     fun showClearUpNextConfirmationDialog(fragmentManager: FragmentManager, tag: String) = show(fragmentManager, tag)
-
-    companion object {
-        private const val SOURCE_KEY = "source"
-    }
 }

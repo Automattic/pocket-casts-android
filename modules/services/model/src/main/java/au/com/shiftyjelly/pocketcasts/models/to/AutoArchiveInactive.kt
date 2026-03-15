@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.to
 import android.content.Context
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
+import com.automattic.eventhorizon.AutoArchiveInactiveType
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -10,9 +11,11 @@ sealed class AutoArchiveInactive(
     val timeSeconds: Int,
     val serverId: Int,
     val index: Int,
-    val analyticsValue: String,
+    val eventHorizonValue: AutoArchiveInactiveType,
     @StringRes val stringRes: Int,
 ) {
+    val analyticsValue get() = eventHorizonValue.toString()
+
     companion object {
         val All get() = listOf(Never, Hours24, Days2, Weeks1, Weeks2, Days30, Days90)
 
@@ -29,7 +32,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = -1,
         serverId = 0,
         index = 0,
-        analyticsValue = "never",
+        eventHorizonValue = AutoArchiveInactiveType.Never,
         stringRes = R.string.settings_auto_archive_inactive_never,
     )
 
@@ -37,7 +40,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 24.hours.inWholeSeconds.toInt(),
         serverId = 1,
         index = 1,
-        analyticsValue = "after_24_hours",
+        eventHorizonValue = AutoArchiveInactiveType.After24Hours,
         stringRes = R.string.settings_auto_archive_inactive_24_hours,
     )
 
@@ -45,7 +48,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 2.days.inWholeSeconds.toInt(),
         serverId = 2,
         index = 2,
-        analyticsValue = "after_2_days",
+        eventHorizonValue = AutoArchiveInactiveType.After2Days,
         stringRes = R.string.settings_auto_archive_inactive_2_days,
     )
 
@@ -53,7 +56,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 7.days.inWholeSeconds.toInt(),
         serverId = 3,
         index = 3,
-        analyticsValue = "after_1_week",
+        eventHorizonValue = AutoArchiveInactiveType.After1Week,
         stringRes = R.string.settings_auto_archive_inactive_1_week,
     )
 
@@ -61,7 +64,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 14.days.inWholeSeconds.toInt(),
         serverId = 4,
         index = 4,
-        analyticsValue = "after_2_weeks",
+        eventHorizonValue = AutoArchiveInactiveType.After2Weeks,
         stringRes = R.string.settings_auto_archive_inactive_2_weeks,
     )
 
@@ -69,7 +72,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 30.days.inWholeSeconds.toInt(),
         serverId = 5,
         index = 5,
-        analyticsValue = "after_30_days",
+        eventHorizonValue = AutoArchiveInactiveType.After30Days,
         stringRes = R.string.settings_auto_archive_inactive_30_days,
     )
 
@@ -77,7 +80,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 90.days.inWholeSeconds.toInt(),
         serverId = 6,
         index = 6,
-        analyticsValue = "after_3_months",
+        eventHorizonValue = AutoArchiveInactiveType.After3Months,
         stringRes = R.string.settings_auto_archive_inactive_3_months,
     )
 }

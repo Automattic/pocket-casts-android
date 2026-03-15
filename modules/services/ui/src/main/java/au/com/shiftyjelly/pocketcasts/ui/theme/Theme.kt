@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import com.automattic.eventhorizon.AppThemeType
 import javax.inject.Inject
 import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -71,6 +72,7 @@ class Theme @Inject constructor(private val settings: Settings) {
         @StringRes val labelId: Int,
         @StyleRes val resourceId: Int,
         @DrawableRes val iconResourceId: Int,
+        val eventHorizonValue: AppThemeType,
         val toolbarLightIcons: Boolean,
         val backgroundLightIcons: Boolean,
         val darkTheme: Boolean,
@@ -81,6 +83,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light,
             resourceId = R.style.ThemeLight,
             iconResourceId = IR.drawable.ic_apptheme0,
+            eventHorizonValue = AppThemeType.DefaultLight,
             toolbarLightIcons = false,
             backgroundLightIcons = false,
             darkTheme = false,
@@ -91,6 +94,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark,
             resourceId = R.style.ThemeDark,
             iconResourceId = IR.drawable.ic_apptheme1,
+            eventHorizonValue = AppThemeType.DefaultDark,
             toolbarLightIcons = true,
             backgroundLightIcons = true,
             darkTheme = true,
@@ -101,6 +105,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_rose,
             resourceId = R.style.Rose,
             iconResourceId = IR.drawable.ic_theme_rose,
+            eventHorizonValue = AppThemeType.Rose,
             toolbarLightIcons = false,
             backgroundLightIcons = false,
             darkTheme = false,
@@ -111,6 +116,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_indigo,
             resourceId = R.style.Indigo,
             iconResourceId = IR.drawable.ic_indigo,
+            eventHorizonValue = AppThemeType.Indigo,
             toolbarLightIcons = true,
             backgroundLightIcons = false,
             darkTheme = false,
@@ -121,6 +127,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_extra_dark,
             resourceId = R.style.ExtraThemeDark,
             iconResourceId = IR.drawable.ic_apptheme2,
+            eventHorizonValue = AppThemeType.ExtraDark,
             toolbarLightIcons = true,
             backgroundLightIcons = true,
             darkTheme = true,
@@ -131,6 +138,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark_contrast,
             resourceId = R.style.DarkContrast,
             iconResourceId = IR.drawable.ic_apptheme6,
+            eventHorizonValue = AppThemeType.DarkContrast,
             toolbarLightIcons = true,
             backgroundLightIcons = true,
             darkTheme = true,
@@ -141,6 +149,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light_contrast,
             resourceId = R.style.LightContrast,
             iconResourceId = IR.drawable.ic_apptheme7,
+            eventHorizonValue = AppThemeType.LightContrast,
             toolbarLightIcons = false,
             backgroundLightIcons = false,
             darkTheme = false,
@@ -151,6 +160,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_electricity,
             resourceId = R.style.Electric,
             iconResourceId = IR.drawable.ic_apptheme5,
+            eventHorizonValue = AppThemeType.Electric,
             toolbarLightIcons = true,
             backgroundLightIcons = true,
             darkTheme = true,
@@ -161,6 +171,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_classic, // "Classic Light"
             resourceId = R.style.ClassicLight,
             iconResourceId = IR.drawable.ic_apptheme3,
+            eventHorizonValue = AppThemeType.Classic,
             toolbarLightIcons = true,
             backgroundLightIcons = false,
             darkTheme = false,

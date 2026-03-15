@@ -21,8 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -34,6 +32,10 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAdvancedEpisodeArtworkCustomizationElementToggledEvent
+import com.automattic.eventhorizon.SettingsAdvancedEpisodeArtworkShownEvent
+import com.automattic.eventhorizon.SettingsAdvancedEpisodeArtworkUseEpisodeArtworkToggledEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -44,7 +46,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
     lateinit var settings: Settings
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +60,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
             val artworkConfiguration by settings.artworkConfiguration.flow.collectAsState()
 
             CallOnce {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_SHOWN)
+                eventHorizon.track(SettingsAdvancedEpisodeArtworkShownEvent)
             }
 
             EpisodeArtworkSettings(
@@ -67,7 +69,11 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                 bottomInset = LocalDensity.current.run { bottomInset.toDp() },
                 onUpdateConfiguration = { configuration ->
                     if (artworkConfiguration.useEpisodeArtwork != configuration.useEpisodeArtwork) {
-                        analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_USE_EPISODE_ARTWORK_TOGGLED, mapOf("enabled" to configuration.useEpisodeArtwork))
+                        eventHorizon.track(
+                            SettingsAdvancedEpisodeArtworkUseEpisodeArtworkToggledEvent(
+                                enabled = configuration.useEpisodeArtwork,
+                            ),
+                        )
                     }
                     settings.artworkConfiguration.set(configuration, updateModifiedAt = true)
                 },
@@ -142,7 +148,12 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
             toggle = SettingRowToggle.Checkbox(checked = configuration.useEpisodeArtwork(element), enabled = configuration.useEpisodeArtwork),
             modifier = Modifier.toggleable(value = configuration.useEpisodeArtwork(element), role = Role.Checkbox) { newValue ->
                 if (configuration.useEpisodeArtwork) {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_CUSTOMIZATION_ELEMENT_TOGGLED, mapOf("enabled" to newValue, "element" to element.analyticsValue))
+                    eventHorizon.track(
+                        SettingsAdvancedEpisodeArtworkCustomizationElementToggledEvent(
+                            enabled = newValue,
+                            element = element.eventHorizonValue,
+                        ),
+                    )
                 }
                 onUpdateConfiguration(if (newValue) configuration.enable(element) else configuration.disable(element))
             },

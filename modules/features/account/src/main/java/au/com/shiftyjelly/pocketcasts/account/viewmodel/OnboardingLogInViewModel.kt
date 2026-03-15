@@ -4,8 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -17,6 +15,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SigninButtonTappedEvent
+import com.automattic.eventhorizon.SigninDismissedEvent
+import com.automattic.eventhorizon.SigninForgotPasswordTappedEvent
+import com.automattic.eventhorizon.SigninShownEvent
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -32,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingLogInViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val podcastManager: PodcastManager,
     private val subscriptionManager: SubscriptionManager,
     private val syncManager: SyncManager,
@@ -64,14 +67,18 @@ class OnboardingLogInViewModel @Inject constructor(
     }
 
     fun onSignInButtonTapped(flow: OnboardingFlow) {
-        analyticsTracker.trackSignInButtonTapped(
-            flow = flow.analyticsValue,
+        eventHorizon.track(
+            SigninButtonTappedEvent(
+                flow = flow.eventHorizonValue,
+            ),
         )
     }
 
     fun onForgotPasswordTapped(flow: OnboardingFlow) {
-        analyticsTracker.trackSignInForgotPasswordTapped(
-            flow = flow.analyticsValue,
+        eventHorizon.track(
+            SigninForgotPasswordTappedEvent(
+                flow = flow.eventHorizonValue,
+            ),
         )
     }
 
@@ -118,11 +125,11 @@ class OnboardingLogInViewModel @Inject constructor(
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SIGNIN_SHOWN)
+        eventHorizon.track(SigninShownEvent)
     }
 
     fun onBackPressed() {
-        analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
+        eventHorizon.track(SigninDismissedEvent)
     }
 }
 

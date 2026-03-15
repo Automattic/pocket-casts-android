@@ -3,12 +3,15 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAutoAddUpNextAutoAddLimitChangedEvent
+import com.automattic.eventhorizon.SettingsAutoAddUpNextLimitReachedChangedEvent
+import com.automattic.eventhorizon.SettingsAutoAddUpNextPodcastPositionOptionChangedEvent
+import com.automattic.eventhorizon.SettingsAutoAddUpNextShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
@@ -21,7 +24,7 @@ data class AutoAddSettingsState(val autoAddPodcasts: List<Podcast>, val limit: I
 
 @HiltViewModel
 class AutoAddSettingsViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
 ) : ViewModel() {
@@ -30,7 +33,7 @@ class AutoAddSettingsViewModel @Inject constructor(
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_SHOWN)
+            eventHorizon.track(SettingsAutoAddUpNextShownEvent)
         }
     }
 
@@ -55,9 +58,10 @@ class AutoAddSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             Timber.d("Updating ${podcast.title} to $autoAddOption")
             podcastManager.updateAutoAddToUpNext(podcast, autoAddOption)
-            analyticsTracker.track(
-                AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCAST_POSITION_OPTION_CHANGED,
-                mapOf("value" to autoAddOption.analyticsValue),
+            eventHorizon.track(
+                SettingsAutoAddUpNextPodcastPositionOptionChangedEvent(
+                    value = autoAddOption.eventHorizonValue,
+                ),
             )
         }
     }
@@ -74,21 +78,18 @@ class AutoAddSettingsViewModel @Inject constructor(
 
     fun autoAddUpNextLimitChanged(limit: Int) {
         settings.autoAddUpNextLimit.set(limit, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED,
-            mapOf("value" to limit),
+        eventHorizon.track(
+            SettingsAutoAddUpNextAutoAddLimitChangedEvent(
+                value = limit.toLong(),
+            ),
         )
     }
 
     fun autoAddUpNextLimitBehaviorChanged(behavior: AutoAddUpNextLimitBehaviour) {
         settings.autoAddUpNextLimitBehaviour.set(behavior, updateModifiedAt = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED,
-            mapOf(
-                "value" to when (behavior) {
-                    AutoAddUpNextLimitBehaviour.STOP_ADDING -> "stop_adding"
-                    AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> "only_add_top"
-                },
+        eventHorizon.track(
+            SettingsAutoAddUpNextLimitReachedChangedEvent(
+                value = behavior.eventHorizonValue,
             ),
         )
     }

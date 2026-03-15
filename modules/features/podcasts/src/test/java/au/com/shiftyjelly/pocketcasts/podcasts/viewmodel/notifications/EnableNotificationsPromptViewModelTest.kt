@@ -4,10 +4,12 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.notifications
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,9 +48,6 @@ class EnableNotificationsPromptViewModelTest {
 
     @Mock
     lateinit var settings: Settings
-
-    @Mock
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     lateinit var userManager: UserManager
@@ -154,7 +153,8 @@ class EnableNotificationsPromptViewModelTest {
 
     private fun createViewModel() = EnableNotificationsPromptViewModel(
         settings = settings,
-        analyticsTracker = analyticsTracker,
+        analyticsTracker = AnalyticsTracker.test(),
+        eventHorizon = EventHorizon(TestEventSink()),
         userManager = userManager,
     )
 }

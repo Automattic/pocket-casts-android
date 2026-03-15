@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryAdRow
 import au.com.shiftyjelly.pocketcasts.discover.view.ChangeRegionRow
@@ -17,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedImage
@@ -30,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.automattic.eventhorizon.DiscoverShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -57,9 +56,8 @@ class DiscoverViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
-    val userManager: UserManager,
     val categoriesManager: CategoriesManager,
-    val analyticsTracker: AnalyticsTracker,
+    val eventHorizon: EventHorizon,
     val crashLogging: CrashLogging,
     val syncManager: SyncManager,
 ) : ViewModel() {
@@ -82,7 +80,7 @@ class DiscoverViewModel @Inject constructor(
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOWN)
+            eventHorizon.track(DiscoverShownEvent)
         }
     }
 
