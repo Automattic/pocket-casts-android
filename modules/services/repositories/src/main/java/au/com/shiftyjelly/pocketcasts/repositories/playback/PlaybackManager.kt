@@ -1332,9 +1332,6 @@ open class PlaybackManager @Inject constructor(
             // remove from Up Next
             upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
 
-            // stop the downloads
-            downloadQueue.cancel(episode.uuid, SourceView.PLAYER)
-
             // mark as played
             episodeManager.updatePlayingStatusBlocking(episode, EpisodePlayingStatus.COMPLETED)
 
