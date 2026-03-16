@@ -42,7 +42,7 @@ internal class LoggingAnalyticsListener : AnalyticsListener {
                     Timber.tag(trackerId).i(
                         buildString {
                             append("\uD83D\uDD35 Event: ")
-                            append(trackedEvent.usedKey)
+                            append(trackedEvent.key)
                             if (trackedEvent.properties.isNotEmpty()) {
                                 append(", Properties: ")
                                 append(trackedEvent.properties)

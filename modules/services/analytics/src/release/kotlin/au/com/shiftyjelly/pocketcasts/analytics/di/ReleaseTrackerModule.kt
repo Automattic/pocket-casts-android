@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.analytics.di
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import dagger.Binds
 import dagger.Module
@@ -15,13 +15,13 @@ import dagger.multibindings.IntoSet
 abstract class ReleaseTrackerModule {
     @Binds
     @IntoSet
-    abstract fun bindTracksTracker(tracker: TracksAnalyticsTracker): Tracker
+    abstract fun bindTracksTracker(tracker: TracksAnalyticsTracker): AnalyticsTracker
 
     @Binds
     @IntoSet
-    abstract fun bindFirebaseTracker(tracker: FirebaseAnalyticsTracker): Tracker
+    abstract fun bindFirebaseTracker(tracker: FirebaseAnalyticsTracker): AnalyticsTracker
 
     @Binds
     @IntoSet
-    abstract fun bindBumpStatsTracker(tracker: AnonymousBumpStatsTracker): Tracker
+    abstract fun bindBumpStatsTracker(tracker: AnonymousBumpStatsTracker): AnalyticsTracker
 }

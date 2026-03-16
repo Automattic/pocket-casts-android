@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -87,7 +87,7 @@ class TranscriptFragment : BaseDialogFragment() {
             viewModel.track { source, _, _ ->
                 EpisodeTranscriptShownEvent(
                     episodeUuid = args.episodeUuid,
-                    podcastUuid = args.podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                    podcastUuid = args.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                     source = source,
                 )
             }

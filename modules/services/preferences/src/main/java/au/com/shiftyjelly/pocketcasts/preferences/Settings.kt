@@ -506,9 +506,7 @@ interface Settings {
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
 
-    // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
-    // should update this setting through the AnalyticsTracker.
-    val collectAnalytics: UserSetting<Boolean>
+    val collectAnalytics: ReadWriteSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 

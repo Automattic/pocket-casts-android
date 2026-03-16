@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -61,7 +61,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
             val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
             eventHorizon.track(
                 EpisodeRemovedFromListEvent(
-                    playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                    playlistName = playlistName ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                     playlistUuid = playlistUuid,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
