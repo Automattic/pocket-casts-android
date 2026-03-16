@@ -13,13 +13,14 @@ import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsStorageFixDownloadedFilesEndEvent
+import com.automattic.eventhorizon.SettingsStorageFixDownloadedFilesStartEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.fold
@@ -33,18 +34,22 @@ class FixDownloadsWorker @AssistedInject constructor(
     @Assisted parameters: WorkerParameters,
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val notificationHelper: NotificationHelper,
 ) : CoroutineWorker(context, parameters) {
     override suspend fun doWork(): Result {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_START)
+        eventHorizon.track(SettingsStorageFixDownloadedFilesStartEvent)
 
         val episodeCount = episodeManager.countEpisodes()
         initializeForegroundInfo(episodeCount)
         val fixedCount = fixDownloads(episodeCount)
         showCompleteNotification(fixedCount)
 
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_END, mapOf("fixed_count" to fixedCount))
+        eventHorizon.track(
+            SettingsStorageFixDownloadedFilesEndEvent(
+                fixedCount = fixedCount.toLong(),
+            ),
+        )
         return Result.success()
     }
 

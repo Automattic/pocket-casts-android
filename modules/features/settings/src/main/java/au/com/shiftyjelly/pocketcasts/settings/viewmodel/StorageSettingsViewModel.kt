@@ -6,8 +6,6 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonProperties
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.FixDownloadsWorker
@@ -17,6 +15,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsStorageBackgroundRefreshToggledEvent
+import com.automattic.eventhorizon.SettingsStorageClearDownloadCacheEvent
+import com.automattic.eventhorizon.SettingsStorageLocationEvent
+import com.automattic.eventhorizon.SettingsStorageSetFolderLocationEvent
+import com.automattic.eventhorizon.SettingsStorageShownEvent
+import com.automattic.eventhorizon.SettingsStorageWarnBeforeUsingDataToggledEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -32,13 +37,12 @@ import kotlinx.coroutines.reactive.collect
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
-class StorageSettingsViewModel
-@Inject constructor(
+class StorageSettingsViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(initState())
@@ -109,9 +113,10 @@ class StorageSettingsViewModel
             summary = storageChoiceSummary,
             onStateChange = { folderLocation ->
                 onStorageChoiceChange(folderLocation.filePath)
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_STORAGE_LOCATION,
-                    mapOf("location" to folderLocation.analyticsLabel),
+                eventHorizon.track(
+                    SettingsStorageLocationEvent(
+                        location = folderLocation.analyticsLabel,
+                    ),
                 )
             },
         ),
@@ -120,7 +125,7 @@ class StorageSettingsViewModel
             summary = storageFolderSummary,
             onStateChange = {
                 onStorageFolderChange(it)
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SET_FOLDER_LOCATION)
+                eventHorizon.track(SettingsStorageSetFolderLocationEvent)
             },
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
@@ -128,9 +133,10 @@ class StorageSettingsViewModel
             isChecked = settings.backgroundRefreshPodcasts.value,
             onCheckedChange = {
                 onBackgroundRefreshCheckedChange(it)
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED,
-                    mapOf("enabled" to it),
+                eventHorizon.track(
+                    SettingsStorageBackgroundRefreshToggledEvent(
+                        enabled = it,
+                    ),
                 )
             },
         ),
@@ -138,9 +144,10 @@ class StorageSettingsViewModel
             isChecked = settings.warnOnMeteredNetwork.value,
             onCheckedChange = {
                 onStorageDataWarningCheckedChange(it)
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED,
-                    mapOf("enabled" to it),
+                eventHorizon.track(
+                    SettingsStorageWarnBeforeUsingDataToggledEvent(
+                        enabled = it,
+                    ),
                 )
             },
         ),
@@ -156,7 +163,7 @@ class StorageSettingsViewModel
             fileUtil.deleteDirectoryContents(tempPath.absolutePath)
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE)
+        eventHorizon.track(SettingsStorageClearDownloadCacheEvent)
     }
 
     fun fixDownloadedFiles() {
@@ -426,7 +433,7 @@ class StorageSettingsViewModel
     )
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SHOWN)
+        eventHorizon.track(SettingsStorageShownEvent)
     }
 
     data class State(
