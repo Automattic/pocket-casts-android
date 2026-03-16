@@ -3,17 +3,18 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsGetSupportEvent
+import com.automattic.eventhorizon.SettingsLeaveFeedbackEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val support: Support,
     private val databaseExportHelper: DatabaseExportHelper,
 ) : ViewModel() {
@@ -22,7 +23,7 @@ class HelpViewModel @Inject constructor(
     }
 
     suspend fun getFeedbackIntent(activity: Activity): Intent {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_LEAVE_FEEDBACK)
+        eventHorizon.track(SettingsLeaveFeedbackEvent)
         return support.shareLogs(
             subject = "Android feedback.",
             intro = "It's a great app, but it really needs…",
@@ -32,7 +33,7 @@ class HelpViewModel @Inject constructor(
     }
 
     suspend fun getSupportIntent(activity: Activity): Intent {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
+        eventHorizon.track(SettingsGetSupportEvent)
         return support.shareLogs(
             subject = "Android support.",
             intro = "Hi there, just needed help with something…",

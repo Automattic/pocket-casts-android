@@ -17,6 +17,7 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     api(libs.dagger.hilt.android)
+    api(libs.eventhorizon)
     api(libs.moshi)
     api(libs.rx2.java)
     api(libs.rx2.relay)

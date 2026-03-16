@@ -9,12 +9,14 @@ import android.content.Intent
 import android.util.Xml
 import androidx.core.text.HtmlCompat
 import androidx.preference.PreferenceFragmentCompat
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsImportExportFailedEvent
+import com.automattic.eventhorizon.SettingsImportExportFinishedEvent
+import com.automattic.eventhorizon.SettingsImportExportStartedEvent
 import java.io.File
 import java.io.FileWriter
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +33,7 @@ class OpmlExporter(
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
     private val context: Context,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val applicationScope: CoroutineScope,
 ) {
 
@@ -47,7 +49,7 @@ class OpmlExporter(
     }
 
     private fun exportPodcasts(sendAsEmail: Boolean) {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_STARTED)
+        eventHorizon.track(SettingsImportExportStartedEvent)
         showProgressDialog()
 
         exportJob?.cancel()
@@ -71,7 +73,7 @@ class OpmlExporter(
             withContext(Dispatchers.Main) {
                 UiUtil.hideProgressDialog(progressDialog)
                 if (opmlFile != null) {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FINISHED)
+                    eventHorizon.track(SettingsImportExportFinishedEvent)
                     if (sendAsEmail) {
                         sendIntentEmail(opmlFile)
                     } else {
@@ -83,9 +85,10 @@ class OpmlExporter(
     }
 
     private fun trackFailure(reason: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FAILED,
-            mapOf("reason" to reason),
+        eventHorizon.track(
+            SettingsImportExportFailedEvent(
+                reason = reason,
+            ),
         )
     }
 
