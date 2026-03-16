@@ -3,9 +3,6 @@
 
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
-env:
-  IMAGE_ID: "xcode-26.2"
-
 steps:
   - label: "🚂 Finalize Release"
     command: |
@@ -24,7 +21,7 @@ steps:
       bundle exec fastlane finalize_release skip_confirm:true skip_translations_download:true
     plugins: [$CI_TOOLKIT]
     agents:
-      queue: "mac"
+      queue: "mac-metal"
     retry:
       manual:
         reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
