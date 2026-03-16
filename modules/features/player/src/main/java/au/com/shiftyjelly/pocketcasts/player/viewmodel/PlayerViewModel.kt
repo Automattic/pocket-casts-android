@@ -524,7 +524,7 @@ class PlayerViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeMarkedAsPlayedEvent(
                     episodeUuid = episode.uuid,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -536,7 +536,7 @@ class PlayerViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeArchivedEvent(
                     episodeUuid = episode.uuid,
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
         }
@@ -707,7 +707,7 @@ class PlayerViewModel @Inject constructor(
         }
         trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
             PlaybackEffectSettingsChangedEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
                 contentType = contentType,
                 settings = settingType,
             )
@@ -754,7 +754,7 @@ class PlayerViewModel @Inject constructor(
         eventHorizon.track(
             EpisodeDetailPodcastNameTappedEvent(
                 episodeUuid = episodeUuid,
-                source = EpisodeViewSource.NOW_PLAYING.eventHorizonValue,
+                source = EpisodeViewSource.NOW_PLAYING.analyticsValue,
             ),
         )
         viewModelScope.launch {
@@ -771,7 +771,7 @@ class PlayerViewModel @Inject constructor(
             } else {
                 PlaybackEffectsSettingsTab.AllPodcasts
             }
-            event(source, contentType, settingTab.eventHorizonValue)
+            event(source, contentType, settingTab.analyticsValue)
         }
     }
 
@@ -779,7 +779,7 @@ class PlayerViewModel @Inject constructor(
         eventHorizon.track(
             BannerAdImpressionEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }
@@ -788,7 +788,7 @@ class PlayerViewModel @Inject constructor(
         eventHorizon.track(
             BannerAdTappedEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }
@@ -807,15 +807,15 @@ class PlayerViewModel @Inject constructor(
 
     enum class PlaybackEffectsSettingsTab(
         @StringRes val labelResId: Int,
-        val eventHorizonValue: SettingType,
+        val analyticsValue: SettingType,
     ) {
         AllPodcasts(
             labelResId = LR.string.podcasts_all,
-            eventHorizonValue = SettingType.Global,
+            analyticsValue = SettingType.Global,
         ),
         ThisPodcast(
             labelResId = LR.string.podcast_this,
-            eventHorizonValue = SettingType.Local,
+            analyticsValue = SettingType.Local,
         ),
     }
 }

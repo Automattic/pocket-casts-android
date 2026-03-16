@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
-import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.BookmarkSourceType
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 
@@ -15,7 +15,7 @@ interface BookmarkManager {
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        creationSource: BookmarkSource,
+        creationSource: BookmarkSourceType,
         addedAt: Instant = Instant.now(),
     ): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)

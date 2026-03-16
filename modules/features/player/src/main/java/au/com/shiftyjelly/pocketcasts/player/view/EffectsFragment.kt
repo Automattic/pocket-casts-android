@@ -89,7 +89,7 @@ class EffectsFragment :
         if (savedInstanceState == null) {
             viewModel.trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
                 PlaybackEffectSettingsViewAppearedEvent(
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                     contentType = contentType,
                     settings = settingType,
                 )
@@ -191,7 +191,7 @@ class EffectsFragment :
                     trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
                         PlaybackEffectSpeedChangedEvent(
                             speed = currentSpeed,
-                            source = sourceView.eventHorizonValue,
+                            source = sourceView.analyticsValue,
                             contentType = contentType,
                             settings = settingType,
                         )
@@ -231,7 +231,7 @@ class EffectsFragment :
             trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
                 PlaybackEffectTrimSilenceToggledEvent(
                     enabled = isChecked,
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                     contentType = contentType,
                     settings = settingType,
                 )
@@ -249,7 +249,7 @@ class EffectsFragment :
             trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
                 PlaybackEffectVolumeBoostToggledEvent(
                     enabled = isChecked,
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                     contentType = contentType,
                     settings = settingType,
                 )
@@ -270,8 +270,8 @@ class EffectsFragment :
                 effects.trimMode = newTrimMode
                 trackPlaybackEffectsEvent { sourceView, contentType, settingType ->
                     PlaybackEffectTrimSilenceAmountChangedEvent(
-                        amount = newTrimMode.eventHorizonValue,
-                        source = sourceView.eventHorizonValue,
+                        amount = newTrimMode.analyticsValue,
+                        source = sourceView.analyticsValue,
                         contentType = contentType,
                         settings = settingType,
                     )

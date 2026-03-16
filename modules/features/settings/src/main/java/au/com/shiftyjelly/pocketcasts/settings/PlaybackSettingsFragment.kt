@@ -183,7 +183,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 onSave = { swipeAction ->
                                     eventHorizon.track(
                                         SettingsGeneralUpNextSwipeChangedEvent(
-                                            value = swipeAction.eventHorizonValue,
+                                            value = swipeAction.analyticsValue,
                                         ),
                                     )
                                     settings.upNextSwipe.set(swipeAction, updateModifiedAt = true)
@@ -197,7 +197,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 onSave = { grouping ->
                                     eventHorizon.track(
                                         SettingsGeneralEpisodeGroupingChangedEvent(
-                                            value = grouping.eventHorizonValue,
+                                            value = grouping.analyticsValue,
                                         ),
                                     )
                                     settings.podcastGroupingDefault.set(grouping, updateModifiedAt = true)

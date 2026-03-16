@@ -32,7 +32,7 @@ object PlaylistScreen {
     const val ARGUMENT_PLAYLIST_TYPE = "playlistType"
     const val ROUTE = "playlist/{$ARGUMENT_PLAYLIST_UUID}/{$ARGUMENT_PLAYLIST_TYPE}"
 
-    fun navigateRoute(playlistUuid: String, playlistType: Playlist.Type) = "playlist/$playlistUuid/${playlistType.analyticsValue}"
+    fun navigateRoute(playlistUuid: String, playlistType: Playlist.Type) = "playlist/$playlistUuid/${playlistType.key}"
 }
 
 @Composable

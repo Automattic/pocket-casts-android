@@ -16,9 +16,9 @@ internal class AnalyticsPaymentListener(
         val event = when (result) {
             is PurchaseResult.Purchased -> {
                 PurchaseSuccessfulEvent(
-                    tier = key.tier.eventHorizonValue,
-                    frequency = key.billingCycle.eventHorizonValue,
-                    offerType = key.offer?.eventHorizonValue,
+                    tier = key.tier.analyticsValue,
+                    frequency = key.billingCycle.analyticsValue,
+                    offerType = key.offer?.analyticsValue,
                     isInstallment = key.isInstallment,
                     source = purchaseSource,
                     flow = purchaseFlow,
@@ -27,9 +27,9 @@ internal class AnalyticsPaymentListener(
 
             is PurchaseResult.Cancelled -> {
                 PurchaseCancelledEvent(
-                    tier = key.tier.eventHorizonValue,
-                    frequency = key.billingCycle.eventHorizonValue,
-                    offerType = key.offer?.eventHorizonValue,
+                    tier = key.tier.analyticsValue,
+                    frequency = key.billingCycle.analyticsValue,
+                    offerType = key.offer?.analyticsValue,
                     isInstallment = key.isInstallment,
                     source = purchaseSource,
                     flow = purchaseFlow,
@@ -38,9 +38,9 @@ internal class AnalyticsPaymentListener(
 
             is PurchaseResult.Failure -> {
                 PurchaseFailedEvent(
-                    tier = key.tier.eventHorizonValue,
-                    frequency = key.billingCycle.eventHorizonValue,
-                    offerType = key.offer?.eventHorizonValue,
+                    tier = key.tier.analyticsValue,
+                    frequency = key.billingCycle.analyticsValue,
+                    offerType = key.offer?.analyticsValue,
                     isInstallment = key.isInstallment,
                     source = purchaseSource,
                     flow = purchaseFlow,

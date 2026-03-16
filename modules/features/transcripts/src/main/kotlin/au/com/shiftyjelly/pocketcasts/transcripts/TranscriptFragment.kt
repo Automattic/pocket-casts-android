@@ -128,7 +128,7 @@ class TranscriptFragment : BaseDialogFragment() {
                 onShowTranscript = { transcript ->
                     viewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptShownEvent(
-                            type = transcript.type.eventHorizonValue,
+                            type = transcript.type.analyticsValue,
                             showAsWebpage = transcript is Transcript.Web,
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,

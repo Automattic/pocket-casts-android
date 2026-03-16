@@ -114,7 +114,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackPageShown() {
         eventHorizon.track(
             SuggestedFoldersPageShownEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -122,8 +122,8 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackPageDismissed() {
         eventHorizon.track(
             SuggestedFoldersPageDismissedEvent(
-                userType = state.value.signInState.eventHorizonValue,
-                source = source.eventHorizonValue,
+                userType = state.value.signInState.analyticsValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -131,8 +131,8 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackUseSuggestedFoldersTapped() {
         eventHorizon.track(
             SuggestedFoldersUseSuggestedFoldersTappedEvent(
-                userType = state.value.signInState.eventHorizonValue,
-                source = source.eventHorizonValue,
+                userType = state.value.signInState.analyticsValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -140,8 +140,8 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackCreateCustomFolderTapped() {
         eventHorizon.track(
             SuggestedFoldersCreateCustomFolderTappedEvent(
-                userType = state.value.signInState.eventHorizonValue,
-                source = source.eventHorizonValue,
+                userType = state.value.signInState.analyticsValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -149,7 +149,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackReplaceFolderTapped() {
         eventHorizon.track(
             SuggestedFoldersReplaceFoldersTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -157,7 +157,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     fun trackReplaceFoldersConfirmationTapped() {
         eventHorizon.track(
             SuggestedFoldersReplaceFoldersConfirmTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }
@@ -167,7 +167,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
             SuggestedFoldersPreviewFolderTappedEvent(
                 folderName = folder.name,
                 podcastCount = folder.podcastIds.size.toLong(),
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
     }

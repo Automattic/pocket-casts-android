@@ -299,7 +299,7 @@ class PlayerHeaderFragment :
                         is PlayerViewModel.NavigationState.OpenPodcastPage -> {
                             (activity as? FragmentHostListener)?.let { listener ->
                                 listener.closePlayer()
-                                listener.openPodcastPage(navigationState.podcastUuid, navigationState.source.analyticsValue)
+                                listener.openPodcastPage(navigationState.podcastUuid, navigationState.source.key)
                             }
                         }
 
@@ -343,7 +343,7 @@ class PlayerHeaderFragment :
 
                         is NavigationState.ShowPodcast -> {
                             (activity as FragmentHostListener).closePlayer()
-                            (activity as? FragmentHostListener)?.openPodcastPage(navigationState.podcast.uuid, SourceView.PLAYER.analyticsValue)
+                            (activity as? FragmentHostListener)?.openPodcastPage(navigationState.podcast.uuid, SourceView.PLAYER.key)
                         }
 
                         is NavigationState.ShowCloudFiles -> {
@@ -956,7 +956,7 @@ class PlayerHeaderFragment :
                 onShowTranscript = { transcript ->
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptShownEvent(
-                            type = transcript.type.eventHorizonValue,
+                            type = transcript.type.analyticsValue,
                             showAsWebpage = transcript is Transcript.Web,
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,

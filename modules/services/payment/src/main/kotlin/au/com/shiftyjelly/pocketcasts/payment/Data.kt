@@ -401,52 +401,44 @@ sealed interface SubscriptionPlan {
 
 @Keep
 enum class SubscriptionTier(
-    val eventHorizonValue: SubscriptionTierType,
+    val analyticsValue: SubscriptionTierType,
 ) {
     Plus(
-        eventHorizonValue = SubscriptionTierType.Plus,
+        analyticsValue = SubscriptionTierType.Plus,
     ),
     Patron(
-        eventHorizonValue = SubscriptionTierType.Patron,
+        analyticsValue = SubscriptionTierType.Patron,
     ),
-    ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 }
 
 @Keep
 enum class BillingCycle(
-    val eventHorizonValue: SubscriptionFrequencyType,
+    val analyticsValue: SubscriptionFrequencyType,
 ) {
     Monthly(
-        eventHorizonValue = SubscriptionFrequencyType.Monthly,
+        analyticsValue = SubscriptionFrequencyType.Monthly,
     ),
     Yearly(
-        eventHorizonValue = SubscriptionFrequencyType.Yearly,
+        analyticsValue = SubscriptionFrequencyType.Yearly,
     ),
-    ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 }
 
 enum class SubscriptionOffer(
-    val eventHorizonValue: SubscriptionOfferType,
+    val analyticsValue: SubscriptionOfferType,
 ) {
     IntroOffer(
-        eventHorizonValue = SubscriptionOfferType.IntroOffer,
+        analyticsValue = SubscriptionOfferType.IntroOffer,
     ),
     Trial(
-        eventHorizonValue = SubscriptionOfferType.FreeTrial,
+        analyticsValue = SubscriptionOfferType.FreeTrial,
     ),
     Referral(
-        eventHorizonValue = SubscriptionOfferType.Referral,
+        analyticsValue = SubscriptionOfferType.Referral,
     ),
     Winback(
-        eventHorizonValue = SubscriptionOfferType.Winback,
+        analyticsValue = SubscriptionOfferType.Winback,
     ),
     ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 
     fun offerId(
         tier: SubscriptionTier,

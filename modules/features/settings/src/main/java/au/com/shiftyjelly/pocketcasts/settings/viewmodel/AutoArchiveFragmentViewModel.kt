@@ -42,7 +42,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         settings.autoArchiveAfterPlaying.set(newValue, updateModifiedAt = true)
         eventHorizon.track(
             SettingsAutoArchivePlayedChangedEvent(
-                value = newValue.eventHorizonValue,
+                value = newValue.analyticsValue,
             ),
         )
         mutableState.update { it.copy(archiveAfterPlaying = newValue) }
@@ -52,7 +52,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         settings.autoArchiveInactive.set(newValue, updateModifiedAt = true)
         eventHorizon.track(
             SettingsAutoArchiveInactiveChangedEvent(
-                value = newValue.eventHorizonValue,
+                value = newValue.analyticsValue,
             ),
         )
         mutableState.update { it.copy(archiveInactive = newValue) }

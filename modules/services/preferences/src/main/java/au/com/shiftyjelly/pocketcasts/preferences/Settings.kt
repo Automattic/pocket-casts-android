@@ -164,15 +164,15 @@ interface Settings {
 
     enum class UpNextAction(
         val serverId: Int,
-        val eventHorizonValue: UpNextSwipeActionType,
+        val analyticsValue: UpNextSwipeActionType,
     ) {
         PLAY_NEXT(
             serverId = 0,
-            eventHorizonValue = UpNextSwipeActionType.PlayNext,
+            analyticsValue = UpNextSwipeActionType.PlayNext,
         ),
         PLAY_LAST(
             serverId = 1,
-            eventHorizonValue = UpNextSwipeActionType.PlayLast,
+            analyticsValue = UpNextSwipeActionType.PlayLast,
         ),
         ;
 
@@ -183,35 +183,33 @@ interface Settings {
 
     enum class CloudSortOrder(
         val serverId: Int,
-        val eventHorizonValue: UploadedFilesSortType,
+        val analyticsValue: UploadedFilesSortType,
     ) {
         NEWEST_OLDEST(
             serverId = 0,
-            eventHorizonValue = UploadedFilesSortType.NewestToOldest,
+            analyticsValue = UploadedFilesSortType.NewestToOldest,
         ),
         OLDEST_NEWEST(
             serverId = 1,
-            eventHorizonValue = UploadedFilesSortType.OldestToNewest,
+            analyticsValue = UploadedFilesSortType.OldestToNewest,
         ),
         A_TO_Z(
             serverId = 2,
-            eventHorizonValue = UploadedFilesSortType.TitleAToZ,
+            analyticsValue = UploadedFilesSortType.TitleAToZ,
         ),
         Z_TO_A(
             serverId = 3,
-            eventHorizonValue = UploadedFilesSortType.TitleZToA,
+            analyticsValue = UploadedFilesSortType.TitleZToA,
         ),
         SHORT_LONG(
             serverId = 4,
-            eventHorizonValue = UploadedFilesSortType.ShortestToLongest,
+            analyticsValue = UploadedFilesSortType.ShortestToLongest,
         ),
         LONG_SHORT(
             serverId = 5,
-            eventHorizonValue = UploadedFilesSortType.LongestToShortest,
+            analyticsValue = UploadedFilesSortType.LongestToShortest,
         ),
         ;
-
-        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromServerId(id: Int) = entries.find { it.serverId == id }

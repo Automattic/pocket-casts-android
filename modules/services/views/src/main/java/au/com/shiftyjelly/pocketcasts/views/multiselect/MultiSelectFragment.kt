@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeFinishedEvent
-import com.automattic.eventhorizon.ShelfActionSource
+import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import java.util.Collections
@@ -148,15 +148,15 @@ class MultiSelectFragment :
     }
 
     private fun sectionTitleAt(position: Int) = if (position <= multiSelectEpisodesHelper.maxToolbarIcons) {
-        ShelfActionSource.Shelf
+        ShelfActionSourceType.Shelf
     } else {
-        ShelfActionSource.OverflowMenu
+        ShelfActionSourceType.OverflowMenu
     }
 
     private fun trackRearrangeFinishedEvent() {
         eventHorizon.track(
             MultiSelectViewOverflowMenuRearrangeFinishedEvent(
-                source = args.source.eventHorizonValue,
+                source = args.source.analyticsValue,
             ),
         )
     }
@@ -166,14 +166,14 @@ class MultiSelectFragment :
             val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
             val movedFrom = sectionTitleAt(it)
             val movedTo = sectionTitleAt(position)
-            val newPosition = if (movedTo == ShelfActionSource.Shelf) {
+            val newPosition = if (movedTo == ShelfActionSourceType.Shelf) {
                 position - 1
             } else {
                 position - (items.indexOf(multiSelectEpisodesHelper.maxToolbarIcons) + 1)
             }
             eventHorizon.track(
                 MultiSelectViewOverflowMenuRearrangeActionMovedEvent(
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                     title = title,
                     position = newPosition.toLong(),
                     movedFrom = movedFrom,

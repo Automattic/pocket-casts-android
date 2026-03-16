@@ -6,11 +6,11 @@ import com.automattic.eventhorizon.UpNextSortOrderType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class UpNextSortType(
-    val eventHorizonValue: UpNextSortOrderType,
+    val analyticsValue: UpNextSortOrderType,
     @StringRes val descriptionId: Int,
 ) : Comparator<BaseEpisode> {
     NewestToOldest(
-        eventHorizonValue = UpNextSortOrderType.NewestToOldest,
+        analyticsValue = UpNextSortOrderType.NewestToOldest,
         descriptionId = LR.string.sort_newest_to_oldest,
     ) {
         private val comparatorDelegate = Comparator.comparing(BaseEpisode::publishedDate)
@@ -21,7 +21,7 @@ enum class UpNextSortType(
         }
     },
     OldestToNewest(
-        eventHorizonValue = UpNextSortOrderType.OldestToNewest,
+        analyticsValue = UpNextSortOrderType.OldestToNewest,
         descriptionId = LR.string.sort_oldest_to_newest,
     ) {
         private val comparatorDelegate = Comparator.comparing(BaseEpisode::publishedDate)

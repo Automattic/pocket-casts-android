@@ -121,7 +121,7 @@ class UpNextAdapter(
                             eventHorizon.track(
                                 UpNextQueueEpisodeTappedEvent(
                                     willPlay = playOnTap,
-                                    source = upNextSource.eventHorizonValue,
+                                    source = upNextSource.analyticsValue,
                                 ),
                             )
                             listener.onEpisodeActionsClick(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
@@ -136,7 +136,7 @@ class UpNextAdapter(
                             eventHorizon.track(
                                 UpNextQueueEpisodeLongPressedEvent(
                                     willPlay = playOnLongPress,
-                                    source = upNextSource.eventHorizonValue,
+                                    source = upNextSource.analyticsValue,
                                 ),
                             )
                             listener.onEpisodeActionsLongPress(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
@@ -254,7 +254,7 @@ class UpNextAdapter(
                         eventHorizon.track(
                             UpNextShuffleEnabledEvent(
                                 value = newValue,
-                                source = upNextSource.eventHorizonValue,
+                                source = upNextSource.analyticsValue,
                             ),
                         )
 
@@ -322,7 +322,7 @@ class UpNextAdapter(
             binding.root.setOnClickListener {
                 eventHorizon.track(
                     UpNextNowPlayingTappedEvent(
-                        source = upNextSource.eventHorizonValue,
+                        source = upNextSource.analyticsValue,
                     ),
                 )
                 listener.onNowPlayingClick()

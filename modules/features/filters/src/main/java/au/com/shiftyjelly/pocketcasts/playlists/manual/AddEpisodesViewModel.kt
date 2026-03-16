@@ -17,7 +17,7 @@ import com.automattic.eventhorizon.FilterAddEpisodesEpisodeTappedEvent
 import com.automattic.eventhorizon.FilterAddEpisodesFolderTappedEvent
 import com.automattic.eventhorizon.FilterAddEpisodesPodcastTappedEvent
 import com.automattic.eventhorizon.FilterAddEpisodesShownEvent
-import com.automattic.eventhorizon.PlaylistAddEpisodeSource
+import com.automattic.eventhorizon.PlaylistAddEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -147,7 +147,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
         if (!isPlaylistFull) {
             eventHorizon.track(
                 EpisodeAddedToListEvent(
-                    source = PlaylistAddEpisodeSource.PlaylistEditor,
+                    source = PlaylistAddEpisodeSourceType.PlaylistEditor,
                     playlistName = playlist.title,
                     playlistUuid = playlist.uuid,
                     episodeUuid = episode.uuid,

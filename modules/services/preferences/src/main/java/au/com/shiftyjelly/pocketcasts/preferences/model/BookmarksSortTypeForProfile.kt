@@ -12,25 +12,25 @@ private const val SORT_TYPE_PODCAST_AND_EPISODE = "podcast_and_episode"
 enum class BookmarksSortTypeForProfile(
     override val labelId: Int,
     override val key: String,
-    override val eventHorizonValue: BookmarkSortType,
+    override val analyticsValue: BookmarkSortType,
     val serverId: Int,
 ) : BookmarksSortType {
     DATE_ADDED_NEWEST_TO_OLDEST(
         labelId = R.string.bookmarks_sort_newest_to_oldest,
         key = SORT_TYPE_DATE_ADDED_NEWEST_TO_OLDEST,
-        eventHorizonValue = BookmarkSortType.DateAddedNewestToOldest,
+        analyticsValue = BookmarkSortType.DateAddedNewestToOldest,
         serverId = 0,
     ),
     DATE_ADDED_OLDEST_TO_NEWEST(
         labelId = R.string.bookmarks_sort_oldest_to_newest,
         key = SORT_TYPE_DATE_ADDED_OLDEST_TO_NEWEST,
-        eventHorizonValue = BookmarkSortType.DateAddedOldestToNewest,
+        analyticsValue = BookmarkSortType.DateAddedOldestToNewest,
         serverId = 1,
     ),
     PODCAST_AND_EPISODE(
         labelId = R.string.podcast_and_episode,
         key = SORT_TYPE_PODCAST_AND_EPISODE,
-        eventHorizonValue = BookmarkSortType.PodcastAndEpisode,
+        analyticsValue = BookmarkSortType.PodcastAndEpisode,
         serverId = 2,
     ),
     ;

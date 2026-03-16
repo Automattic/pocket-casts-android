@@ -12,11 +12,9 @@ sealed class AutoArchiveAfterPlaying(
     val timeSeconds: Int,
     val serverId: Int,
     val index: Int,
-    val eventHorizonValue: AutoArchivePlayedType,
+    val analyticsValue: AutoArchivePlayedType,
     @StringRes val stringRes: Int,
 ) {
-    val analyticsValue get() = eventHorizonValue.toString()
-
     companion object {
         fun defaultValue(context: Context) = if (Util.isAutomotive(context)) Never else AfterPlaying
 
@@ -34,35 +32,35 @@ sealed class AutoArchiveAfterPlaying(
         timeSeconds = -1,
         serverId = 0,
         index = 0,
-        eventHorizonValue = AutoArchivePlayedType.Never,
+        analyticsValue = AutoArchivePlayedType.Never,
         stringRes = R.string.settings_auto_archive_played_never,
     )
     data object AfterPlaying : AutoArchiveAfterPlaying(
         timeSeconds = 0,
         serverId = 1,
         index = 1,
-        eventHorizonValue = AutoArchivePlayedType.AfterPlaying,
+        analyticsValue = AutoArchivePlayedType.AfterPlaying,
         stringRes = R.string.settings_auto_archive_played_after_playing,
     )
     data object Hours24 : AutoArchiveAfterPlaying(
         timeSeconds = 24.hours.inWholeSeconds.toInt(),
         serverId = 2,
         index = 2,
-        eventHorizonValue = AutoArchivePlayedType.After24Hours,
+        analyticsValue = AutoArchivePlayedType.After24Hours,
         stringRes = R.string.settings_auto_archive_played_after_24_hours,
     )
     data object Days2 : AutoArchiveAfterPlaying(
         timeSeconds = 2.days.inWholeSeconds.toInt(),
         serverId = 3,
         index = 3,
-        eventHorizonValue = AutoArchivePlayedType.After2Days,
+        analyticsValue = AutoArchivePlayedType.After2Days,
         stringRes = R.string.settings_auto_archive_played_after_2_days,
     )
     data object Weeks1 : AutoArchiveAfterPlaying(
         timeSeconds = 7.days.inWholeSeconds.toInt(),
         serverId = 4,
         index = 4,
-        eventHorizonValue = AutoArchivePlayedType.After1Week,
+        analyticsValue = AutoArchivePlayedType.After1Week,
         stringRes = R.string.settings_auto_archive_played_after_1_week,
     )
 }

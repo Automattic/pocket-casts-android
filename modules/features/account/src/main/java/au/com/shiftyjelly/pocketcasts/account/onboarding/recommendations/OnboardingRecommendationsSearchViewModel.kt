@@ -101,7 +101,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         }
         eventHorizon.track(
             SearchShownEvent(
-                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue,
             ),
         )
     }
@@ -129,13 +129,13 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             podcastManager.unsubscribeAsync(podcastUuid = uuid, SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH)
             PodcastUnsubscribedEvent(
                 uuid = uuid,
-                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.analyticsValue,
             )
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
             PodcastSubscribedEvent(
                 uuid = uuid,
-                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH.analyticsValue,
             )
         }
         eventHorizon.track(event)
@@ -156,7 +156,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     fun onBackPressed() {
         eventHorizon.track(
             SearchDismissedEvent(
-                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue,
             ),
         )
     }

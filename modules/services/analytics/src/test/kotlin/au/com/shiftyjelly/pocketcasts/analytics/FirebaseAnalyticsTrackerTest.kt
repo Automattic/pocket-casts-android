@@ -8,7 +8,7 @@ import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
 import com.automattic.eventhorizon.UpNextShownEvent
-import com.automattic.eventhorizon.UpNextSource
+import com.automattic.eventhorizon.UpNextSourceType
 import java.time.Clock
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +43,7 @@ class FirebaseAnalyticsTrackerTest {
     fun doNotTrackEventWhenShouldNotTrack() {
         tracker.track(
             UpNextShownEvent(
-                source = UpNextSource.UpNextShortcut,
+                source = UpNextSourceType.UpNextShortcut,
             ),
         )
 

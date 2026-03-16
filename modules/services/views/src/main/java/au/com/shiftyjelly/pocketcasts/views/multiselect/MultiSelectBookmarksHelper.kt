@@ -117,7 +117,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
         eventHorizon.track(
             BookmarkDeleteFormShownEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
 
@@ -147,7 +147,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
                 launch {
                     eventHorizon.track(
                         BookmarkDeleteFormSubmittedEvent(
-                            source = source.eventHorizonValue,
+                            source = source.analyticsValue,
                         ),
                     )
 
@@ -155,7 +155,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
                         bookmarkManager.deleteToSync(it.uuid)
                         eventHorizon.track(
                             BookmarkDeletedEvent(
-                                source = source.eventHorizonValue,
+                                source = source.analyticsValue,
                             ),
                         )
                     }

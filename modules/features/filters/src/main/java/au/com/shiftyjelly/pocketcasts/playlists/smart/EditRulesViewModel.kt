@@ -181,8 +181,8 @@ class EditRulesViewModel @AssistedInject constructor(
     fun trackRulesUpdated(type: RuleType) {
         eventHorizon.track(
             FilterUpdatedEvent(
-                group = type.eventHorizonValue,
-                source = SourceView.FILTERS.eventHorizonValue,
+                group = type.analyticsValue,
+                source = SourceView.FILTERS.analyticsValue,
             ),
         )
     }

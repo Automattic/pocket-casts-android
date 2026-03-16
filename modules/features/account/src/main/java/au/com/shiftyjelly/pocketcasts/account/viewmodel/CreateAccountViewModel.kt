@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.eventhorizon.AccountUpdatedDismissedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.NewsletterOptInChangedEvent
-import com.automattic.eventhorizon.NewsletterSource
+import com.automattic.eventhorizon.NewsletterSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -90,7 +90,7 @@ class CreateAccountViewModel
     fun updateNewsletter(isChecked: Boolean) {
         eventHorizon.track(
             NewsletterOptInChangedEvent(
-                source = NewsletterSource.AccountUpdated,
+                source = NewsletterSourceType.AccountUpdated,
                 enabled = isChecked,
             ),
         )

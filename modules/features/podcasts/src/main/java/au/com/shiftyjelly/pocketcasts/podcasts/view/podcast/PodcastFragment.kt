@@ -701,7 +701,7 @@ class PodcastFragment : BaseFragment() {
         if (savedInstanceState == null) {
             eventHorizon.track(
                 PodcastScreenShownEvent(
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                 ),
             )
         }

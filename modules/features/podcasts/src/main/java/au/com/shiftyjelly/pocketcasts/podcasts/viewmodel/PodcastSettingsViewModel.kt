@@ -149,7 +149,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             eventHorizon.track(
                 PodcastSettingsAutoAddUpNextPositionOptionChangedEvent(
-                    value = mode.eventHorizonValue,
+                    value = mode.analyticsValue,
                 ),
             )
             podcastFlow.update { it?.copy(autoAddToUpNext = mode) }
@@ -185,7 +185,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             eventHorizon.track(
                 PodcastSettingsAutoArchivePlayedChangedEvent(
-                    value = mode.eventHorizonValue,
+                    value = mode.analyticsValue,
                 ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveAfterPlaying = mode) }
@@ -197,7 +197,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             eventHorizon.track(
                 PodcastSettingsAutoArchiveInactiveChangedEvent(
-                    value = mode.eventHorizonValue,
+                    value = mode.analyticsValue,
                 ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveInactive = mode) }
@@ -247,7 +247,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 PlaybackEffectSpeedChangedEvent(
                     speed = newPlaybackSpeed,
                     settings = SettingType.Local,
-                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
                     contentType = PlaybackContentType.Audio,
                 ),
             )
@@ -266,7 +266,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 PlaybackEffectTrimSilenceToggledEvent(
                     enabled = enable,
                     settings = SettingType.Local,
-                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
                     contentType = PlaybackContentType.Audio,
                 ),
             )
@@ -282,9 +282,9 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             eventHorizon.track(
                 PlaybackEffectTrimSilenceAmountChangedEvent(
-                    amount = mode.eventHorizonValue,
+                    amount = mode.analyticsValue,
                     settings = SettingType.Local,
-                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
                     contentType = PlaybackContentType.Audio,
                 ),
             )
@@ -302,7 +302,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 PlaybackEffectVolumeBoostToggledEvent(
                     enabled = enable,
                     settings = SettingType.Local,
-                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
                     contentType = PlaybackContentType.Audio,
                 ),
             )
@@ -373,7 +373,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
             eventHorizon.track(
                 PodcastUnsubscribedEvent(
                     uuid = podcastUuid,
-                    source = SourceView.PODCAST_SETTINGS.eventHorizonValue,
+                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
                 ),
             )
         }

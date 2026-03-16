@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
-import com.automattic.eventhorizon.ShelfActionSource
+import com.automattic.eventhorizon.ShelfActionSourceType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -132,10 +132,10 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[2].eventHorizonValue,
+                action = ShelfItem.entries[2].analyticsValue,
                 position = 0,
-                movedFrom = ShelfActionSource.Shelf,
-                movedTo = ShelfActionSource.OverflowMenu,
+                movedFrom = ShelfActionSourceType.Shelf,
+                movedTo = ShelfActionSourceType.OverflowMenu,
             ),
             eventSink.pollEvent(),
         )
@@ -147,10 +147,10 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[4].eventHorizonValue,
+                action = ShelfItem.entries[4].analyticsValue,
                 position = 2,
-                movedFrom = ShelfActionSource.OverflowMenu,
-                movedTo = ShelfActionSource.Shelf,
+                movedFrom = ShelfActionSourceType.OverflowMenu,
+                movedTo = ShelfActionSourceType.Shelf,
             ),
             eventSink.pollEvent(),
         )
@@ -162,10 +162,10 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[0].eventHorizonValue,
+                action = ShelfItem.entries[0].analyticsValue,
                 position = 1,
-                movedFrom = ShelfActionSource.Shelf,
-                movedTo = ShelfActionSource.Shelf,
+                movedFrom = ShelfActionSourceType.Shelf,
+                movedTo = ShelfActionSourceType.Shelf,
             ),
             eventSink.pollEvent(),
         )
@@ -177,10 +177,10 @@ class ShelfViewModelTest {
 
         assertEquals(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = ShelfItem.entries[4].eventHorizonValue,
+                action = ShelfItem.entries[4].analyticsValue,
                 position = 1,
-                movedFrom = ShelfActionSource.OverflowMenu,
-                movedTo = ShelfActionSource.OverflowMenu,
+                movedFrom = ShelfActionSourceType.OverflowMenu,
+                movedTo = ShelfActionSourceType.OverflowMenu,
             ),
             eventSink.pollEvent(),
         )

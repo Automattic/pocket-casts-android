@@ -25,7 +25,7 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderShownEvent
 import com.automattic.eventhorizon.PodcastsListReorderedEvent
 import com.automattic.eventhorizon.PodcastsListShownEvent
-import com.automattic.eventhorizon.PullToRefreshSource
+import com.automattic.eventhorizon.PullToRefreshSourceType
 import com.automattic.eventhorizon.PulledToRefreshEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -245,7 +245,7 @@ class PodcastsViewModel @AssistedInject constructor(
     fun refreshPodcasts() {
         eventHorizon.track(
             PulledToRefreshEvent(
-                source = PullToRefreshSource.PodcastsList,
+                source = PullToRefreshSourceType.PodcastsList,
             ),
         )
         podcastManager.refreshPodcasts("Pull down")
@@ -275,9 +275,9 @@ class PodcastsViewModel @AssistedInject constructor(
                 PodcastsListShownEvent(
                     numberOfFolders = folderManager.countFolders().toLong(),
                     numberOfPodcasts = podcastManager.countSubscribed().toLong(),
-                    badgeType = settings.podcastBadgeType.value.eventHorizonValue,
-                    layout = settings.podcastGridLayout.value.eventHorizonValue,
-                    sortOrder = settings.podcastsSortType.value.eventHorizonValue,
+                    badgeType = settings.podcastBadgeType.value.analyticsValue,
+                    layout = settings.podcastGridLayout.value.analyticsValue,
+                    sortOrder = settings.podcastsSortType.value.analyticsValue,
                 ),
             )
         }
@@ -287,7 +287,7 @@ class PodcastsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             eventHorizon.track(
                 FolderShownEvent(
-                    sortOrder = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).eventHorizonValue,
+                    sortOrder = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST).analyticsValue,
                     numberOfPodcasts = folderManager.findFolderPodcastsSorted(folderUuid).size.toLong(),
                 ),
             )

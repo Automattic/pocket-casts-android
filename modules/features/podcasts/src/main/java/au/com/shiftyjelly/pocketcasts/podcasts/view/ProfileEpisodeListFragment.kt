@@ -77,7 +77,7 @@ import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
-import com.automattic.eventhorizon.DownloadModalOption
+import com.automattic.eventhorizon.DownloadModalOptionType
 import com.automattic.eventhorizon.DownloadsMultiSelectEnteredEvent
 import com.automattic.eventhorizon.DownloadsMultiSelectExitedEvent
 import com.automattic.eventhorizon.DownloadsOptionsButtonTappedEvent
@@ -561,7 +561,7 @@ class ProfileEpisodeListFragment :
                                 onManageDownloadsClick = {
                                     eventHorizon.track(
                                         FreeUpSpaceManageDownloadsTappedEvent(
-                                            source = SourceView.DOWNLOADS.eventHorizonValue,
+                                            source = SourceView.DOWNLOADS.analyticsValue,
                                         ),
                                     )
                                     showFragment(ManualCleanupFragment.newInstance())
@@ -580,7 +580,7 @@ class ProfileEpisodeListFragment :
     private fun onDismissManageDownloadTapped() {
         eventHorizon.track(
             FreeUpSpaceMaybeLaterTappedEvent(
-                source = SourceView.DOWNLOADS.eventHorizonValue,
+                source = SourceView.DOWNLOADS.analyticsValue,
             ),
         )
         settings.setDismissLowStorageBannerTime(System.currentTimeMillis())
@@ -613,7 +613,7 @@ class ProfileEpisodeListFragment :
         showFragment(fragment)
         eventHorizon.track(
             DownloadsOptionsModalOptionTappedEvent(
-                option = DownloadModalOption.AutoDownloadSettings,
+                option = DownloadModalOptionType.AutoDownloadSettings,
             ),
         )
         (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.profile_auto_download_settings)
@@ -622,7 +622,7 @@ class ProfileEpisodeListFragment :
     private fun stopAllDownloads() {
         eventHorizon.track(
             DownloadsOptionsModalOptionTappedEvent(
-                option = DownloadModalOption.StopAllDownloads,
+                option = DownloadModalOptionType.StopAllDownloads,
             ),
         )
         viewModel.cancelAllDownloads()
@@ -631,7 +631,7 @@ class ProfileEpisodeListFragment :
     private fun showCleanupSettings() {
         eventHorizon.track(
             DownloadsOptionsModalOptionTappedEvent(
-                option = DownloadModalOption.CleanUp,
+                option = DownloadModalOptionType.CleanUp,
             ),
         )
         val fragment = ManualCleanupFragment.newInstance()

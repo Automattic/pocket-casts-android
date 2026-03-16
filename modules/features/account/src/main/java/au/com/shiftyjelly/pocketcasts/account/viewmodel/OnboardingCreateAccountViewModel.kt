@@ -63,7 +63,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSetupAccountShown(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -71,7 +71,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onCreateAccountShown(flow: OnboardingFlow) {
         eventHorizon.track(
             CreateAccountShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -79,7 +79,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSetupAccountDismissed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -87,7 +87,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onCreateAccountDismissed(flow: OnboardingFlow) {
         eventHorizon.track(
             CreateAccountDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -95,7 +95,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSignUpEmailPressed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.CreateAccount,
             ),
         )
@@ -104,7 +104,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onLogInPressed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.SignIn,
             ),
         )

@@ -54,7 +54,7 @@ class ShareListIncomingFragment :
             return ShareListIncomingFragment().apply {
                 arguments = bundleOf(
                     EXTRA_URL to listPath,
-                    EXTRA_SOURCE to sourceView.analyticsValue,
+                    EXTRA_SOURCE to sourceView.key,
                 )
             }
         }

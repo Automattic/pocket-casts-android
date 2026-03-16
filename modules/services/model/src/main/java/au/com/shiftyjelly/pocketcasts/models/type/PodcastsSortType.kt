@@ -25,7 +25,7 @@ enum class PodcastsSortType(
     val labelId: Int,
     val podcastComparator: Comparator<Podcast>,
     val folderComparator: Comparator<FolderItem>,
-    val eventHorizonValue: PodcastListSortType,
+    val analyticsValue: PodcastListSortType,
 ) {
     DATE_ADDED_NEWEST_TO_OLDEST(
         clientId = 0,
@@ -33,7 +33,7 @@ enum class PodcastsSortType(
         labelId = R.string.podcasts_sort_by_date_added,
         podcastComparator = compareByDescending { it.addedDate },
         folderComparator = compareByDescending { it.addedDate },
-        eventHorizonValue = PodcastListSortType.DateAdded,
+        analyticsValue = PodcastListSortType.DateAdded,
     ),
     EPISODE_DATE_NEWEST_TO_OLDEST(
         clientId = 5,
@@ -42,7 +42,7 @@ enum class PodcastsSortType(
         // use a query to get the podcasts ordered by episode release date
         podcastComparator = Comparator { _, _ -> 0 },
         folderComparator = Comparator { _, _ -> 0 },
-        eventHorizonValue = PodcastListSortType.EpisodeReleaseDate,
+        analyticsValue = PodcastListSortType.EpisodeReleaseDate,
     ),
     RECENTLY_PLAYED(
         clientId = 7,
@@ -51,7 +51,7 @@ enum class PodcastsSortType(
         // use a query to get the podcasts ordered by recently played episodes
         podcastComparator = Comparator { _, _ -> 0 },
         folderComparator = Comparator { _, _ -> 0 },
-        eventHorizonValue = PodcastListSortType.EpisodeRecentlyPlayed,
+        analyticsValue = PodcastListSortType.EpisodeRecentlyPlayed,
     ),
     NAME_A_TO_Z(
         clientId = 2,
@@ -59,7 +59,7 @@ enum class PodcastsSortType(
         labelId = R.string.name,
         podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
         folderComparator = compareBy { cleanStringForSortInternal(it.title) },
-        eventHorizonValue = PodcastListSortType.Name,
+        analyticsValue = PodcastListSortType.Name,
     ),
     DRAG_DROP(
         clientId = 6,
@@ -67,11 +67,9 @@ enum class PodcastsSortType(
         labelId = R.string.podcasts_sort_by_drag_drop,
         podcastComparator = compareBy { it.sortPosition },
         folderComparator = compareBy { it.sortPosition },
-        eventHorizonValue = PodcastListSortType.DragAndDrop,
+        analyticsValue = PodcastListSortType.DragAndDrop,
     ),
     ;
-
-    val analyticsValue get() = eventHorizonValue.toString()
 
     companion object {
         val default = DATE_ADDED_NEWEST_TO_OLDEST

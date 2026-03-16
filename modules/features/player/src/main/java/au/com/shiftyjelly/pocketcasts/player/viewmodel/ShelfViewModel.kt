@@ -13,7 +13,7 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeStartedEvent
-import com.automattic.eventhorizon.ShelfActionSource
+import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -145,10 +145,10 @@ class ShelfViewModel @AssistedInject constructor(
         }
         eventHorizon.track(
             PlayerShelfOverflowMenuRearrangeActionMovedEvent(
-                action = shelfItem.eventHorizonValue,
+                action = shelfItem.analyticsValue,
                 position = newPosition.toLong(),
-                movedFrom = movedFrom,
-                movedTo = movedTo,
+                movedFrom = movedFrom.analyticsValue,
+                movedTo = movedTo.analyticsValue,
             ),
         )
     }
@@ -160,18 +160,22 @@ class ShelfViewModel @AssistedInject constructor(
         val isTranscriptAvailable: Boolean = false,
     )
 
+    enum class ShelfActionSource(
+        val analyticsValue: ShelfActionSourceType,
+    ) {
+        Shelf(
+            analyticsValue = ShelfActionSourceType.Shelf,
+        ),
+        OverflowMenu(
+            analyticsValue = ShelfActionSourceType.OverflowMenu,
+        ),
+    }
+
     companion object {
         const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
         const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
-
-        object AnalyticsProp {
-            object Key {
-                const val SOURCE = "source"
-                const val EPISODE_UUID = "episode_uuid"
-            }
-        }
     }
 
     @AssistedFactory

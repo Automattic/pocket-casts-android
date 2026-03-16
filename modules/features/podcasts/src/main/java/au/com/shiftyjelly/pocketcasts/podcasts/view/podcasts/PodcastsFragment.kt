@@ -101,7 +101,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.BannerAdImpressionEvent
 import com.automattic.eventhorizon.BannerAdTappedEvent
-import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
 import com.automattic.eventhorizon.FolderChoosePodcastsShownEvent
@@ -428,7 +428,7 @@ class PodcastsFragment :
             val onSortTypeChanged = { sort: PodcastsSortType ->
                 eventHorizon.track(
                     FolderSortByChangedEvent(
-                        sortOrder = sort.eventHorizonValue,
+                        sortOrder = sort.analyticsValue,
                     ),
                 )
                 viewModel.updateFolderSort(folder.uuid, sort)
@@ -469,7 +469,7 @@ class PodcastsFragment :
 
     private fun showCustomFolderCreation() {
         FolderCreateFragment
-            .newInstance(CreateFolderSource.PodcastsList)
+            .newInstance(CreateFolderSourceType.PodcastsList)
             .show(parentFragmentManager, "create_folder_card")
     }
 
@@ -741,7 +741,7 @@ class PodcastsFragment :
         eventHorizon.track(
             BannerAdImpressionEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }
@@ -750,7 +750,7 @@ class PodcastsFragment :
         eventHorizon.track(
             BannerAdTappedEvent(
                 id = ad.id,
-                location = ad.location.eventHorizonValue,
+                location = ad.location.analyticsValue,
             ),
         )
     }

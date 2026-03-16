@@ -402,7 +402,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         fun podcastTag(podcastUuid: String) = "$WORKER_PODCAST_TAG_PREFIX$podcastUuid"
 
-        fun sourceViewTag(sourceView: SourceView) = "$WORKER_SOURCE_VIEW_TAG_PREFIX${sourceView.analyticsValue}"
+        fun sourceViewTag(sourceView: SourceView) = "$WORKER_SOURCE_VIEW_TAG_PREFIX${sourceView.key}"
 
         fun createWorkRequest(args: Args): Pair<OneTimeWorkRequest, Constraints> {
             val constraints = Constraints.Builder()
@@ -606,7 +606,7 @@ private fun DownloadEpisodeWorker.Args.toData() = Data.Builder()
     .putString(PODCAST_UUID_KEY, podcastUuid)
     .putBoolean(WAIT_FOR_WIFI_KEY, waitForWifi)
     .putBoolean(WAIT_FOR_POWER_KEY, waitForPower)
-    .putString(SOURCE_VIEW_KEY, sourceView.analyticsValue)
+    .putString(SOURCE_VIEW_KEY, sourceView.key)
     .build()
 
 // Input keys

@@ -55,7 +55,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onShown(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingCarouselShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -63,7 +63,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onDismiss(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -71,7 +71,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onSignUpClicked(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.CreateAccount,
             ),
         )
@@ -80,12 +80,12 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onGetStartedClicked(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingGetStartedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.GetStarted,
             ),
         )
@@ -94,7 +94,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onLoginClicked(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.SignIn,
             ),
         )

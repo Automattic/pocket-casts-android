@@ -109,27 +109,25 @@ data class Podcast(
 
     enum class AutoAddUpNext(
         val databaseInt: Int,
-        val eventHorizonValue: AutoAddToUpNextType,
+        val analyticsValue: AutoAddToUpNextType,
         val labelId: Int,
     ) {
         OFF(
             databaseInt = 0,
-            eventHorizonValue = AutoAddToUpNextType.Off,
+            analyticsValue = AutoAddToUpNextType.Off,
             labelId = LR.string.off,
         ),
         PLAY_LAST(
             databaseInt = 1,
-            eventHorizonValue = AutoAddToUpNextType.AddLast,
+            analyticsValue = AutoAddToUpNextType.AddLast,
             labelId = LR.string.play_last,
         ),
         PLAY_NEXT(
             databaseInt = 2,
-            eventHorizonValue = AutoAddToUpNextType.AddFirst,
+            analyticsValue = AutoAddToUpNextType.AddFirst,
             labelId = LR.string.play_next,
         ),
         ;
-
-        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromDatabaseInt(int: Int?) = entries.firstOrNull { it.databaseInt == int }

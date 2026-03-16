@@ -285,8 +285,8 @@ class BookmarksViewModel
         sourceView.mapToBookmarksSortTypeUserSetting().set(order, updateModifiedAt = true)
         eventHorizon.track(
             BookmarksSortByChangedEvent(
-                source = sourceView.eventHorizonValue,
-                sortOrder = order.eventHorizonValue,
+                source = sourceView.analyticsValue,
+                sortOrder = order.analyticsValue,
             ),
         )
     }
@@ -308,7 +308,7 @@ class BookmarksViewModel
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                     episodeUuid = bookmark.episodeUuid,
                     podcastUuid = bookmark.podcastUuid,
                 ),
@@ -345,7 +345,7 @@ class BookmarksViewModel
     fun onHeadphoneControlsButtonTapped() {
         eventHorizon.track(
             BookmarksEmptyGoToHeadphoneSettingsEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
     }
@@ -353,7 +353,7 @@ class BookmarksViewModel
     fun onGetBookmarksButtonTapped() {
         eventHorizon.track(
             BookmarksGetBookmarksButtonTappedEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
     }
@@ -361,7 +361,7 @@ class BookmarksViewModel
     fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
         eventHorizon.track(
             BookmarkShareTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),

@@ -48,7 +48,7 @@ class ShareEpisodeTimestampViewModel @AssistedInject constructor(
             ShareScreenShownEvent(
                 podcastUuid = podcastUuid,
                 episodeUuid = episodeUuid,
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
                 type = ShareActionMediaType.EpisodeTimestamp,
             ),
         )

@@ -10,27 +10,27 @@ internal enum class AccountBenefit(
     @StringRes val description: Int,
     @DrawableRes val cardImage: Int,
     @DrawableRes val listIcon: Int,
-    val eventHorizonValue: OnboardingBenefitType,
+    val analyticsValue: OnboardingBenefitType,
 ) {
     Sync(
         title = R.string.account_benefit_sync_title,
         description = R.string.account_benefit_sync_description,
         cardImage = au.com.shiftyjelly.pocketcasts.images.R.drawable.account_benefit_sync,
         listIcon = au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_account_benefit_sync,
-        eventHorizonValue = OnboardingBenefitType.Sync,
+        analyticsValue = OnboardingBenefitType.Sync,
     ),
     Backups(
         title = R.string.account_benefit_backups_title,
         description = R.string.account_benefit_backups_description,
         cardImage = au.com.shiftyjelly.pocketcasts.images.R.drawable.account_benefit_backups,
         listIcon = au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_account_benefit_backups,
-        eventHorizonValue = OnboardingBenefitType.Backups,
+        analyticsValue = OnboardingBenefitType.Backups,
     ),
     Recommendations(
         title = R.string.account_benefit_recommendations_title,
         description = R.string.account_benefit_recommendations_description,
         cardImage = au.com.shiftyjelly.pocketcasts.images.R.drawable.account_benefit_recommendations,
         listIcon = au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_account_benefit_recommendations,
-        eventHorizonValue = OnboardingBenefitType.Recommendation,
+        analyticsValue = OnboardingBenefitType.Recommendation,
     ),
 }

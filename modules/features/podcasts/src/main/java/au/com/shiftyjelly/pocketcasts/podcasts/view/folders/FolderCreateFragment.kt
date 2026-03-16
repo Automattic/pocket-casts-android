@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.FolderCreateColorShownEvent
 import com.automattic.eventhorizon.FolderCreateNameShownEvent
 import com.automattic.eventhorizon.FolderSavedEvent
@@ -44,7 +44,7 @@ class FolderCreateFragment : BaseDialogFragment() {
     companion object {
         const val ARG_SOURCE = "ARG_SOURCE"
 
-        fun newInstance(source: CreateFolderSource): FolderCreateFragment {
+        fun newInstance(source: CreateFolderSourceType): FolderCreateFragment {
             return FolderCreateFragment().apply {
                 arguments = bundleOf(
                     ARG_SOURCE to source,
@@ -59,7 +59,7 @@ class FolderCreateFragment : BaseDialogFragment() {
         const val COLOR = "folder_color"
     }
 
-    private val source get() = requireArguments().requireSerializable<CreateFolderSource>(ARG_SOURCE)
+    private val source get() = requireArguments().requireSerializable<CreateFolderSourceType>(ARG_SOURCE)
 
     override fun onCreateView(
         inflater: LayoutInflater,

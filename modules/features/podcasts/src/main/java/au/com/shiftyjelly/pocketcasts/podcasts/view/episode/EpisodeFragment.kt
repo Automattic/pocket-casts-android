@@ -229,7 +229,7 @@ class EpisodeFragment : BaseFragment() {
         if (!viewModel.isFragmentChangingConfigurations) {
             eventHorizon.track(
                 EpisodeDetailShownEvent(
-                    source = episodeViewSource.eventHorizonValue,
+                    source = episodeViewSource.analyticsValue,
                 ),
             )
         }
@@ -240,7 +240,7 @@ class EpisodeFragment : BaseFragment() {
         if (!viewModel.isFragmentChangingConfigurations) {
             eventHorizon.track(
                 EpisodeDetailDismissedEvent(
-                    source = episodeViewSource.eventHorizonValue,
+                    source = episodeViewSource.analyticsValue,
                 ),
             )
             podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed?.invoke()
@@ -378,12 +378,12 @@ class EpisodeFragment : BaseFragment() {
                             eventHorizon.track(
                                 EpisodeDetailPodcastNameTappedEvent(
                                     episodeUuid = state.episode.uuid,
-                                    source = episodeViewSource.eventHorizonValue,
+                                    source = episodeViewSource.analyticsValue,
                                 ),
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
-                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.analyticsValue)
+                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.key)
                             }
                         }
 
@@ -664,7 +664,7 @@ class EpisodeFragment : BaseFragment() {
                                 eventHorizon.track(
                                     EpisodeDetailShowNotesLinkTappedEvent(
                                         episodeUuid = episodeUuid,
-                                        source = EpisodeViewSource.PODCAST_SCREEN.eventHorizonValue,
+                                        source = EpisodeViewSource.PODCAST_SCREEN.analyticsValue,
                                     ),
                                 )
                             }

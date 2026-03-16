@@ -7,10 +7,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.AppThemeType
 import com.automattic.eventhorizon.BookmarkCreatedEvent
-import com.automattic.eventhorizon.BookmarkSource
-import com.automattic.eventhorizon.EndOfYearShareSource
+import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.EndOfYearShareSourceType
 import com.automattic.eventhorizon.EndOfYearStoriesDismissedEvent
-import com.automattic.eventhorizon.EndOfYearStoryCloseSource
+import com.automattic.eventhorizon.EndOfYearStoryCloseSourceType
 import com.automattic.eventhorizon.EndOfYearStorySharedEvent
 import com.automattic.eventhorizon.EndOfYearStoryType
 import com.automattic.eventhorizon.EpisodeStarredEvent
@@ -22,10 +22,10 @@ import com.automattic.eventhorizon.RatingScreenSubmitTappedEvent
 import com.automattic.eventhorizon.ReferralPassSharedEvent
 import com.automattic.eventhorizon.SettingsAboutWebsiteTappedEvent
 import com.automattic.eventhorizon.SettingsAppearanceThemeChangedEvent
-import com.automattic.eventhorizon.SourceView
+import com.automattic.eventhorizon.SourceViewType
 import com.automattic.eventhorizon.SubscriptionFrequencyType
 import com.automattic.eventhorizon.SubscriptionTierType
-import com.automattic.eventhorizon.SuggestedFolderSource
+import com.automattic.eventhorizon.SuggestedFolderSourceType
 import com.automattic.eventhorizon.SuggestedFoldersReplaceFoldersConfirmTappedEvent
 import java.time.Instant
 import kotlin.time.Duration
@@ -83,7 +83,7 @@ class AppReviewAnalyticsListenerTest {
 
         listener.onEvent(
             EpisodeStarredEvent(
-                source = SourceView.Player,
+                source = SourceViewType.Player,
                 episodeUuid = "",
             ),
         )
@@ -96,7 +96,7 @@ class AppReviewAnalyticsListenerTest {
         listener.onEvent(
             EpisodeStarredEvent(
                 episodeUuid = "",
-                source = SourceView.Player,
+                source = SourceViewType.Player,
             ),
         )
 
@@ -152,7 +152,7 @@ class AppReviewAnalyticsListenerTest {
     fun `updates folderCreated setting on SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED event`() {
         listener.onEvent(
             SuggestedFoldersReplaceFoldersConfirmTappedEvent(
-                source = SuggestedFolderSource.Popup,
+                source = SuggestedFolderSourceType.Popup,
             ),
         )
 
@@ -166,7 +166,7 @@ class AppReviewAnalyticsListenerTest {
                 podcastUuid = "",
                 episodeUuid = "",
                 time = 0,
-                source = BookmarkSource.Player,
+                source = BookmarkSourceType.Player,
             ),
         )
 
@@ -189,7 +189,7 @@ class AppReviewAnalyticsListenerTest {
         listener.onEvent(
             ReferralPassSharedEvent(
                 code = "",
-                source = SourceView.Referrals,
+                source = SourceViewType.Referrals,
             ),
         )
 
@@ -202,7 +202,7 @@ class AppReviewAnalyticsListenerTest {
             EndOfYearStorySharedEvent(
                 currentYear = 0,
                 story = EndOfYearStoryType.YearVsYear,
-                from = EndOfYearShareSource.Screenshot,
+                from = EndOfYearShareSourceType.Screenshot,
             ),
         )
 
@@ -215,7 +215,7 @@ class AppReviewAnalyticsListenerTest {
             EndOfYearStoriesDismissedEvent(
                 currentYear = 0,
                 story = EndOfYearStoryType.Ending,
-                source = EndOfYearStoryCloseSource.CloseButton,
+                source = EndOfYearStoryCloseSourceType.CloseButton,
             ),
         )
 
@@ -228,7 +228,7 @@ class AppReviewAnalyticsListenerTest {
             EndOfYearStoriesDismissedEvent(
                 currentYear = 0,
                 story = EndOfYearStoryType.Top1Show,
-                source = EndOfYearStoryCloseSource.CloseButton,
+                source = EndOfYearStoryCloseSourceType.CloseButton,
             ),
         )
 
@@ -241,7 +241,7 @@ class AppReviewAnalyticsListenerTest {
             EndOfYearStoriesDismissedEvent(
                 currentYear = 0,
                 story = null,
-                source = EndOfYearStoryCloseSource.CloseButton,
+                source = EndOfYearStoryCloseSourceType.CloseButton,
             ),
         )
 
@@ -311,7 +311,7 @@ class AppReviewAnalyticsListenerTest {
         clock += Duration.parse("1h")
         listener.onEvent(
             EpisodeStarredEvent(
-                source = SourceView.Player,
+                source = SourceViewType.Player,
                 episodeUuid = "",
             ),
         )

@@ -76,7 +76,7 @@ class ShareListIncomingViewModel
     fun trackIncomingShareListShown(sourceView: SourceView) {
         eventHorizon.track(
             IncomingShareListShownEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
     }
@@ -93,7 +93,7 @@ class ShareListIncomingViewModel
         eventHorizon.track(
             PodcastUnsubscribedEvent(
                 uuid = uuid,
-                source = SourceView.SHARE_LIST.eventHorizonValue,
+                source = SourceView.SHARE_LIST.analyticsValue,
             ),
         )
     }
@@ -102,7 +102,7 @@ class ShareListIncomingViewModel
         eventHorizon.track(
             PodcastSubscribedEvent(
                 uuid = uuid,
-                source = SourceView.SHARE_LIST.eventHorizonValue,
+                source = SourceView.SHARE_LIST.analyticsValue,
             ),
         )
     }

@@ -37,7 +37,7 @@ class BookmarksContainerFragment : BaseDialogFragment() {
         ) = BookmarksContainerFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_UUID to episodeUuid,
-                ARG_SOURCE_VIEW to sourceView.analyticsValue,
+                ARG_SOURCE_VIEW to sourceView.key,
             )
         }
     }

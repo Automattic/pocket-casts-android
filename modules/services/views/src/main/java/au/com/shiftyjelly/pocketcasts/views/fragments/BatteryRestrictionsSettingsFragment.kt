@@ -113,7 +113,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                 onClick = {
                     eventHorizon.track(
                         BatteryRestrictionsToggledEvent(
-                            currentStatus = batteryRestrictions.status.eventHorizonValue,
+                            currentStatus = batteryRestrictions.status.analyticsValue,
                         ),
                     )
                     batteryRestrictions.promptToUpdateBatteryRestriction(context)

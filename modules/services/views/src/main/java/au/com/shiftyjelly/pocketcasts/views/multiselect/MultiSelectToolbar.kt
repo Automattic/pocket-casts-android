@@ -105,7 +105,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
                 if (multiSelectHelper is MultiSelectEpisodesHelper) {
                     eventHorizon.track(
                         MultiSelectViewOverflowMenuShownEvent(
-                            source = multiSelectHelper.source.eventHorizonValue,
+                            source = multiSelectHelper.source.analyticsValue,
                         ),
                     )
                     showOverflowBottomSheet(activity.supportFragmentManager, multiSelectHelper, sourceView)

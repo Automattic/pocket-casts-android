@@ -11,7 +11,7 @@ data class Membership(
     val createdAt: Instant?,
     val features: List<MembershipFeature>,
 ) {
-    val eventHorizonValue get() = when {
+    val analyticsValue get() = when {
         subscription?.tier == SubscriptionTier.Plus -> UserType.Paid
         subscription?.tier == SubscriptionTier.Patron -> UserType.Paid
         createdAt != null -> UserType.Free

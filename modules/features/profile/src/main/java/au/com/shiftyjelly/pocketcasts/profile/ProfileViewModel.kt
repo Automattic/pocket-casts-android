@@ -207,7 +207,7 @@ class ProfileViewModel @Inject constructor(
     internal fun closeUpgradeProfile(source: SourceView) {
         eventHorizon.track(
             UpgradeBannerDismissedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
             ),
         )
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
@@ -216,7 +216,7 @@ class ProfileViewModel @Inject constructor(
     internal fun onCreateFreeAccountClick() {
         eventHorizon.track(
             InformationalBannerViewCreateAccountTapEvent(
-                source = SourceView.PROFILE.eventHorizonValue,
+                source = SourceView.PROFILE.analyticsValue,
             ),
         )
     }
@@ -224,7 +224,7 @@ class ProfileViewModel @Inject constructor(
     internal fun dismissFreeAccountBanner() {
         eventHorizon.track(
             InformationalBannerViewDismissedEvent(
-                source = SourceView.PROFILE.eventHorizonValue,
+                source = SourceView.PROFILE.analyticsValue,
             ),
         )
         settings.isFreeAccountProfileBannerDismissed.set(true, updateModifiedAt = true)

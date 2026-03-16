@@ -147,13 +147,13 @@ class SearchResultsFragment : BaseFragment() {
         private const val NEW_INSTANCE_ARGS = "new_instance_args"
 
         enum class ResultsType(
-            val eventHorizonValue: SearchResultLegacyType,
+            val analyticsValue: SearchResultLegacyType,
         ) {
             PODCASTS(
-                eventHorizonValue = SearchResultLegacyType.Podcasts,
+                analyticsValue = SearchResultLegacyType.Podcasts,
             ),
             EPISODES(
-                eventHorizonValue = SearchResultLegacyType.Episodes,
+                analyticsValue = SearchResultLegacyType.Episodes,
             ),
         }
 

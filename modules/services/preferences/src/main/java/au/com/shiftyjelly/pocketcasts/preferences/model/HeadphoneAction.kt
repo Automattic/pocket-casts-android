@@ -12,27 +12,27 @@ import kotlinx.coroutines.launch
 
 enum class HeadphoneAction(
     val serverId: Int,
-    val eventHorizonValue: HeadphoneActionType,
+    val analyticsValue: HeadphoneActionType,
 ) {
     ADD_BOOKMARK(
         serverId = 0,
-        eventHorizonValue = HeadphoneActionType.AddBookmark,
+        analyticsValue = HeadphoneActionType.AddBookmark,
     ),
     SKIP_BACK(
         serverId = 1,
-        eventHorizonValue = HeadphoneActionType.SkipBack,
+        analyticsValue = HeadphoneActionType.SkipBack,
     ),
     SKIP_FORWARD(
         serverId = 2,
-        eventHorizonValue = HeadphoneActionType.SkipForward,
+        analyticsValue = HeadphoneActionType.SkipForward,
     ),
     NEXT_CHAPTER(
         serverId = 3,
-        eventHorizonValue = HeadphoneActionType.NextChapter,
+        analyticsValue = HeadphoneActionType.NextChapter,
     ),
     PREVIOUS_CHAPTER(
         serverId = 4,
-        eventHorizonValue = HeadphoneActionType.PreviousChapter,
+        analyticsValue = HeadphoneActionType.PreviousChapter,
     ),
     ;
 

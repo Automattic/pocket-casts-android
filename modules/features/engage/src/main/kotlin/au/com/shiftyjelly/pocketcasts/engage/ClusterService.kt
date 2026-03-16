@@ -269,7 +269,7 @@ internal class ClusterService(
                             .build(),
                     )
                     .setActionText(context.getString(LR.string.engage_sdk_sign_in))
-                    .setActionUri(SignInDeepLink(SourceView.ENGAGE_SDK_SIGN_IN.analyticsValue).toUri(SERVER_SHORT_HOST).also { Timber.tag(TAG).d(it.toString()) })
+                    .setActionUri(SignInDeepLink(SourceView.ENGAGE_SDK_SIGN_IN.key).toUri(SERVER_SHORT_HOST).also { Timber.tag(TAG).d(it.toString()) })
                     .build()
                 val request = PublishUserAccountManagementRequest.Builder().setSignInCardEntity(entity).build()
                 client.publishUserAccountManagementRequest(request)
@@ -290,24 +290,24 @@ internal class ClusterService(
 
     private fun ExternalPodcast.uri(source: SourceView) = ShowPodcastDeepLink(
         podcastUuid = id,
-        sourceView = source.analyticsValue,
+        sourceView = source.key,
     ).toUri(SERVER_SHORT_HOST)
 
     private fun ExternalEpisode.Podcast.uri(autoPlay: Boolean, source: SourceView) = ShowEpisodeDeepLink(
         episodeUuid = id,
         podcastUuid = podcastId,
-        sourceView = source.analyticsValue,
+        sourceView = source.key,
         autoPlay = autoPlay,
     ).toUri(SERVER_SHORT_HOST)
 
     private fun ExternalPodcastList.uri(source: SourceView) = ShareListDeepLink(
         path = id,
-        sourceView = source.analyticsValue,
+        sourceView = source.key,
     ).toUri(SERVER_LIST_HOST)
 
     private fun ExternalPodcastView.uri(source: SourceView) = ShowPodcastDeepLink(
         podcastUuid = id,
-        sourceView = source.analyticsValue,
+        sourceView = source.key,
     ).toUri(SERVER_SHORT_HOST)
 
     private fun PodcastSeriesEntity.Builder.addDescription(description: String?): PodcastSeriesEntity.Builder {

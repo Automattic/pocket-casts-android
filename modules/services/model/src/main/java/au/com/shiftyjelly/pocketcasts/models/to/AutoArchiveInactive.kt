@@ -11,11 +11,9 @@ sealed class AutoArchiveInactive(
     val timeSeconds: Int,
     val serverId: Int,
     val index: Int,
-    val eventHorizonValue: AutoArchiveInactiveType,
+    val analyticsValue: AutoArchiveInactiveType,
     @StringRes val stringRes: Int,
 ) {
-    val analyticsValue get() = eventHorizonValue.toString()
-
     companion object {
         val All get() = listOf(Never, Hours24, Days2, Weeks1, Weeks2, Days30, Days90)
 
@@ -32,7 +30,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = -1,
         serverId = 0,
         index = 0,
-        eventHorizonValue = AutoArchiveInactiveType.Never,
+        analyticsValue = AutoArchiveInactiveType.Never,
         stringRes = R.string.settings_auto_archive_inactive_never,
     )
 
@@ -40,7 +38,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 24.hours.inWholeSeconds.toInt(),
         serverId = 1,
         index = 1,
-        eventHorizonValue = AutoArchiveInactiveType.After24Hours,
+        analyticsValue = AutoArchiveInactiveType.After24Hours,
         stringRes = R.string.settings_auto_archive_inactive_24_hours,
     )
 
@@ -48,7 +46,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 2.days.inWholeSeconds.toInt(),
         serverId = 2,
         index = 2,
-        eventHorizonValue = AutoArchiveInactiveType.After2Days,
+        analyticsValue = AutoArchiveInactiveType.After2Days,
         stringRes = R.string.settings_auto_archive_inactive_2_days,
     )
 
@@ -56,7 +54,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 7.days.inWholeSeconds.toInt(),
         serverId = 3,
         index = 3,
-        eventHorizonValue = AutoArchiveInactiveType.After1Week,
+        analyticsValue = AutoArchiveInactiveType.After1Week,
         stringRes = R.string.settings_auto_archive_inactive_1_week,
     )
 
@@ -64,7 +62,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 14.days.inWholeSeconds.toInt(),
         serverId = 4,
         index = 4,
-        eventHorizonValue = AutoArchiveInactiveType.After2Weeks,
+        analyticsValue = AutoArchiveInactiveType.After2Weeks,
         stringRes = R.string.settings_auto_archive_inactive_2_weeks,
     )
 
@@ -72,7 +70,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 30.days.inWholeSeconds.toInt(),
         serverId = 5,
         index = 5,
-        eventHorizonValue = AutoArchiveInactiveType.After30Days,
+        analyticsValue = AutoArchiveInactiveType.After30Days,
         stringRes = R.string.settings_auto_archive_inactive_30_days,
     )
 
@@ -80,7 +78,7 @@ sealed class AutoArchiveInactive(
         timeSeconds = 90.days.inWholeSeconds.toInt(),
         serverId = 6,
         index = 6,
-        eventHorizonValue = AutoArchiveInactiveType.After3Months,
+        analyticsValue = AutoArchiveInactiveType.After3Months,
         stringRes = R.string.settings_auto_archive_inactive_3_months,
     )
 }

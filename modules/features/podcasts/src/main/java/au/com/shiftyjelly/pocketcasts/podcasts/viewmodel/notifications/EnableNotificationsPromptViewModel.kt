@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.NewsletterOptInChangedEvent
-import com.automattic.eventhorizon.NewsletterSource
+import com.automattic.eventhorizon.NewsletterSourceType
 import com.automattic.eventhorizon.NotificationsOptInAllowedEvent
 import com.automattic.eventhorizon.NotificationsOptInDeniedEvent
 import com.automattic.eventhorizon.NotificationsOptInShownEvent
@@ -61,7 +61,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
             is UiState.NewOnboarding -> {
                 eventHorizon.track(
                     NewsletterOptInChangedEvent(
-                        source = NewsletterSource.WelcomeNewAccount,
+                        source = NewsletterSourceType.WelcomeNewAccount,
                         enabled = state.subscribedToNewsletter,
                     ),
                 )

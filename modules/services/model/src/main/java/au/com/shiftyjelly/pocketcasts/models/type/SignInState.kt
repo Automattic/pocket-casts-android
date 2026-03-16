@@ -26,7 +26,7 @@ sealed interface SignInState {
 
     val isExpiredTrial: Boolean
 
-    val eventHorizonValue: UserType
+    val analyticsValue: UserType
 
     data class SignedIn(
         val email: String,
@@ -50,7 +50,7 @@ sealed interface SignInState {
         override val isExpiredTrial: Boolean
             get() = subscription?.platform == SubscriptionPlatform.Gift && subscription.expiryDate < Instant.now()
 
-        override val eventHorizonValue: UserType
+        override val analyticsValue: UserType
             get() = if (subscription == null) {
                 UserType.Free
             } else {
@@ -77,7 +77,7 @@ sealed interface SignInState {
         override val isExpiredTrial: Boolean
             get() = false
 
-        override val eventHorizonValue: UserType
+        override val analyticsValue: UserType
             get() = UserType.Unsigned
     }
 }

@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.NewsletterOptInChangedEvent
-import com.automattic.eventhorizon.NewsletterSource
+import com.automattic.eventhorizon.NewsletterSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -190,7 +190,7 @@ class AccountDetailsViewModel @Inject constructor(
     fun updateNewsletter(isChecked: Boolean) {
         eventHorizon.track(
             NewsletterOptInChangedEvent(
-                source = NewsletterSource.Profile,
+                source = NewsletterSourceType.Profile,
                 enabled = isChecked,
             ),
         )
