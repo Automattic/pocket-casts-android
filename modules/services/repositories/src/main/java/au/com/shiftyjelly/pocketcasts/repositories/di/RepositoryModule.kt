@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.di
 import android.content.Context
 import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
 import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
@@ -237,7 +237,7 @@ abstract class RepositoryModule {
 
     @Binds
     @IntoSet
-    abstract fun provideAppReviewAnalyticsListener(appReviewAnalyticsListener: AppReviewAnalyticsListener): AnalyticsTracker.Listener
+    abstract fun provideAppReviewAnalyticsListener(appReviewAnalyticsListener: AppReviewAnalyticsListener): AnalyticsListener
 
     @Binds
     abstract fun provideDownloadQueue(manager: DownloadManager): DownloadQueue

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
 import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class AppReviewAnalyticsListener @Inject constructor(
     private val settings: Settings,
     private val clock: Clock,
-) : AnalyticsTracker.Listener {
+) : AnalyticsListener {
     private val episodesCompletedSetting = settings.appReviewEpisodeCompletedTimestamps
     private val episodeStarredSetting = settings.appReviewEpisodeStarredTimestamp
     private val podcastRatedSetting = settings.appReviewPodcastRatedTimestamp

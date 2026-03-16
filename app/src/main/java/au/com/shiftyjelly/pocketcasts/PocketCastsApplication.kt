@@ -5,7 +5,7 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
@@ -103,7 +103,7 @@ class PocketCastsApplication :
 
     @Inject lateinit var userManager: UserManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var analyticsController: AnalyticsController
 
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
@@ -165,8 +165,8 @@ class PocketCastsApplication :
     }
 
     private fun setupAnalytics() {
-        analyticsTracker.clearAllData()
-        analyticsTracker.refreshMetadata()
+        analyticsController.clearAllData()
+        analyticsController.refreshMetadata()
         downloadStatisticsReporter.setup()
         experimentProvider.initialize()
     }
