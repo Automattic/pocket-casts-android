@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
@@ -24,6 +22,12 @@ import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ReferralActivateTappedEvent
+import com.automattic.eventhorizon.ReferralClaimScreenShownEvent
+import com.automattic.eventhorizon.ReferralNotNowTappedEvent
+import com.automattic.eventhorizon.ReferralPurchaseShownEvent
+import com.automattic.eventhorizon.ReferralPurchaseSuccessEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -42,7 +46,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val experimentProvider: ExperimentProvider,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
@@ -111,7 +115,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     }
 
     fun onActivatePassClick() {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_ACTIVATE_TAPPED)
+        eventHorizon.track(ReferralActivateTappedEvent)
         job = viewModelScope.launch {
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
@@ -159,20 +163,18 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         referralPlan: ReferralSubscriptionPlan,
         activity: Activity,
     ) {
-        analyticsTracker.track(
-            AnalyticsEvent.REFERRAL_PURCHASE_SHOWN,
-            mapOf(
-                "is_installment" to referralPlan.key.isInstallment.toString(),
+        eventHorizon.track(
+            ReferralPurchaseShownEvent(
+                isInstallment = referralPlan.key.isInstallment,
             ),
         )
         viewModelScope.launch {
             val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, purchaseSource = "referrals", activity)
             when (purchaseResult) {
                 PurchaseResult.Purchased -> {
-                    analyticsTracker.track(
-                        AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS,
-                        mapOf(
-                            "is_installment" to referralPlan.key.isInstallment.toString(),
+                    eventHorizon.track(
+                        ReferralPurchaseSuccessEvent(
+                            isInstallment = referralPlan.key.isInstallment,
                         ),
                     )
                     redeemReferralCode(settings.referralClaimCode.value)
@@ -236,14 +238,14 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_CLAIM_SCREEN_SHOWN)
+        eventHorizon.track(ReferralClaimScreenShownEvent)
     }
 
     fun onDispose() {
         val loadedState = state.value as? UiState.Loaded
         // No need to track not now event when page is auto-closed and disposed on flow complete
         if (loadedState?.flowComplete == false) {
-            analyticsTracker.track(AnalyticsEvent.REFERRAL_NOT_NOW_TAPPED)
+            eventHorizon.track(ReferralNotNowTappedEvent)
         }
     }
 

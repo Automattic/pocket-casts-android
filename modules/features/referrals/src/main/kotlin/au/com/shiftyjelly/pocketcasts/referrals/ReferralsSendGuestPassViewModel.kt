@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
@@ -20,6 +18,9 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ReferralShareScreenDismissedEvent
+import com.automattic.eventhorizon.ReferralShareScreenShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,7 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
     private val referralsManager: ReferralManager,
     private val paymentClient: PaymentClient,
     private val sharingClient: SharingClient,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -94,11 +95,11 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
     }
 
     fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_SHARE_SCREEN_SHOWN)
+        eventHorizon.track(ReferralShareScreenShownEvent)
     }
 
     fun onDispose() {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_SHARE_SCREEN_DISMISSED)
+        eventHorizon.track(ReferralShareScreenDismissedEvent)
     }
 
     sealed class UiState {

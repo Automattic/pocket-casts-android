@@ -7,17 +7,28 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import com.automattic.eventhorizon.BatteryRestrictionType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import timber.log.Timber
 
 class SystemBatteryRestrictions @Inject constructor(@ApplicationContext private val context: Context) {
 
-    enum class Status(val analyticsValue: String) {
-        Unrestricted("unrestricted"),
-        Optimized("optimized"),
-        Restricted("restricted"),
-        Other("other"),
+    enum class Status(
+        val eventHorizonValue: BatteryRestrictionType,
+    ) {
+        Unrestricted(
+            eventHorizonValue = BatteryRestrictionType.Unrestricted,
+        ),
+        Optimized(
+            eventHorizonValue = BatteryRestrictionType.Optimized,
+        ),
+        Restricted(
+            eventHorizonValue = BatteryRestrictionType.Restricted,
+        ),
+        Other(
+            eventHorizonValue = BatteryRestrictionType.Other,
+        ),
         ;
 
         // "Other" occurs when battery use is unrestricted but background processing is restricted

@@ -32,8 +32,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -88,6 +86,9 @@ import com.automattic.eventhorizon.DownloadsSelectAllAboveTappedEvent
 import com.automattic.eventhorizon.DownloadsSelectAllBelowTappedEvent
 import com.automattic.eventhorizon.DownloadsSelectAllTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FreeUpSpaceBannerShownEvent
+import com.automattic.eventhorizon.FreeUpSpaceManageDownloadsTappedEvent
+import com.automattic.eventhorizon.FreeUpSpaceMaybeLaterTappedEvent
 import com.automattic.eventhorizon.ListeningHistoryClearHistoryButtonTappedEvent
 import com.automattic.eventhorizon.ListeningHistoryDiscoverButtonTappedEvent
 import com.automattic.eventhorizon.ListeningHistoryModalOptionType
@@ -156,9 +157,6 @@ class ProfileEpisodeListFragment :
 
     @Inject
     lateinit var multiSelectHelper: MultiSelectEpisodesHelper
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -551,7 +549,7 @@ class ProfileEpisodeListFragment :
                 setContent {
                     AppTheme(theme.activeTheme) {
                         CallOnce {
-                            analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_BANNER_SHOWN)
+                            eventHorizon.track(FreeUpSpaceBannerShownEvent)
                         }
                         Box(
                             modifier = Modifier
@@ -561,7 +559,11 @@ class ProfileEpisodeListFragment :
                             ManageDownloadsCard(
                                 totalDownloadSize = downloadedEpisodesSize,
                                 onManageDownloadsClick = {
-                                    analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                    eventHorizon.track(
+                                        FreeUpSpaceManageDownloadsTappedEvent(
+                                            source = SourceView.DOWNLOADS.eventHorizonValue,
+                                        ),
+                                    )
                                     showFragment(ManualCleanupFragment.newInstance())
                                 },
                                 onDismissClick = {
@@ -576,9 +578,10 @@ class ProfileEpisodeListFragment :
     }
 
     private fun onDismissManageDownloadTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED,
-            mapOf("source" to SourceView.DOWNLOADS.analyticsValue),
+        eventHorizon.track(
+            FreeUpSpaceMaybeLaterTappedEvent(
+                source = SourceView.DOWNLOADS.eventHorizonValue,
+            ),
         )
         settings.setDismissLowStorageBannerTime(System.currentTimeMillis())
         binding?.manageDownloadsCard?.isVisible = false
