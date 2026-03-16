@@ -20,10 +20,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Listens for analytics events and forwards them in batches to a server to help us debug issues.
  */
+
+private const val MAX_BATCH_SIZE = 100
+private const val FLUSH_DELAY_MS = 500L
+private const val ERROR_BACKOFF_MS = 30_000L
+
 @Singleton
 class AnalyticsLiveDebugListener @Inject constructor(
     private val settings: Settings,
@@ -62,13 +68,18 @@ class AnalyticsLiveDebugListener @Inject constructor(
                 // Send the first event as soon as it comes in.
                 val first = pendingEvents.receiveCatching().getOrNull() ?: break
                 val batch = mutableListOf(first)
-                // Send events in batches is there are more available.
-                while (true) {
+                // Send events in batches if there are more available.
+                while (batch.size < MAX_BATCH_SIZE) {
                     val next = pendingEvents.tryReceive().getOrNull() ?: break
                     batch.add(next)
                 }
-                analyticsLiveServiceManager.sendEvents(url, batch)
-                delay(500)
+                try {
+                    analyticsLiveServiceManager.sendEvents(url, batch)
+                    delay(FLUSH_DELAY_MS)
+                } catch (exception: Exception) {
+                    Timber.e(exception, "Failed to send analytics events")
+                    delay(ERROR_BACKOFF_MS)
+                }
             }
         }
     }
