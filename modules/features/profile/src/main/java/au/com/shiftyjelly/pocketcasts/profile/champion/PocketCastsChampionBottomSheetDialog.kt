@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.doOnLayout
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PocketCastsChampionDialogRateButtonTappedEvent
+import com.automattic.eventhorizon.PocketCastsChampionDialogShownEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -25,7 +26,7 @@ class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
 
     @Inject lateinit var theme: Theme
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,12 +35,12 @@ class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
     ) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
             CallOnce {
-                analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_SHOWN)
+                eventHorizon.track(PocketCastsChampionDialogShownEvent)
             }
             val context = LocalContext.current
             ChampionDialog(
                 onRateClick = {
-                    analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED)
+                    eventHorizon.track(PocketCastsChampionDialogRateButtonTappedEvent)
                     rateUs(context)
                 },
             )

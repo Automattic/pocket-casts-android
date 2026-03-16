@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.appreview
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
+import com.automattic.eventhorizon.AppStoreReviewRequestedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UserSatisfactionSurveyDismissedEvent
+import com.automattic.eventhorizon.UserSatisfactionSurveyNoResponseEvent
+import com.automattic.eventhorizon.UserSatisfactionSurveyShownEvent
+import com.automattic.eventhorizon.UserSatisfactionSurveyYesResponseEvent
 import com.google.android.play.core.ktx.launchReview
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
@@ -21,7 +24,7 @@ class AppReviewViewModel @AssistedInject constructor(
     private val settings: Settings,
     private val clock: Clock,
     private val reviewManager: ReviewManager,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     @Assisted private val appReviewReason: AppReviewReason,
 ) : ViewModel() {
     fun declineAppReview() {
@@ -33,45 +36,45 @@ class AppReviewViewModel @AssistedInject constructor(
     }
 
     suspend fun launchReview(activity: Activity, reviewInfo: ReviewInfo) {
-        tracker.track(AnalyticsEvent.APP_STORE_REVIEW_REQUESTED)
+        eventHorizon.track(AppStoreReviewRequestedEvent)
         runCatching { reviewManager.launchReview(activity, reviewInfo) }
     }
 
     fun trackPageShown() {
-        tracker.track(
-            AnalyticsEvent.USER_SATISFACTION_SURVEY_SHOWN,
-            computeTrackingProperties(),
+        eventHorizon.track(
+            UserSatisfactionSurveyShownEvent(
+                triggerEvent = appReviewReason.analyticsValue,
+                userType = settings.cachedMembership.value.eventHorizonValue,
+            ),
         )
     }
 
     fun trackPageDismissed() {
-        tracker.track(
-            AnalyticsEvent.USER_SATISFACTION_SURVEY_DISMISSED,
-            computeTrackingProperties(),
+        eventHorizon.track(
+            UserSatisfactionSurveyDismissedEvent(
+                triggerEvent = appReviewReason.analyticsValue,
+                userType = settings.cachedMembership.value.eventHorizonValue,
+            ),
         )
     }
 
     fun trackNoResponse() {
-        tracker.track(
-            AnalyticsEvent.USER_SATISFACTION_SURVEY_NO_RESPONSE,
-            computeTrackingProperties(),
+        eventHorizon.track(
+            UserSatisfactionSurveyNoResponseEvent(
+                triggerEvent = appReviewReason.analyticsValue,
+                userType = settings.cachedMembership.value.eventHorizonValue,
+            ),
         )
     }
 
     fun trackYesResponse() {
-        tracker.track(
-            AnalyticsEvent.USER_SATISFACTION_SURVEY_YES_RESPONSE,
-            computeTrackingProperties(),
+        eventHorizon.track(
+            UserSatisfactionSurveyYesResponseEvent(
+                triggerEvent = appReviewReason.analyticsValue,
+                userType = settings.cachedMembership.value.eventHorizonValue,
+            ),
         )
     }
-
-    private fun computeTrackingProperties() = mapOf(
-        "trigger_event" to appReviewReason.analyticsValue,
-        "user_type" to when (settings.cachedMembership.value.subscription?.tier) {
-            SubscriptionTier.Plus, SubscriptionTier.Patron -> "plus"
-            null -> "free"
-        },
-    )
 
     @AssistedFactory
     interface Factory {

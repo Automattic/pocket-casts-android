@@ -49,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.RecommendedP
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -140,7 +139,7 @@ class PodcastAdapter(
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
-    private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
+    private val onClickRating: (Podcast) -> Unit,
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
@@ -785,7 +784,7 @@ class PodcastAdapter(
         private val theme: Theme,
         private val useBlurredArtwork: Boolean,
         private val onClickCategory: (Podcast) -> Unit,
-        private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
+        private val onClickRating: (Podcast) -> Unit,
         private val onClickFollow: () -> Unit,
         private val onClickUnfollow: () -> Unit,
         private val onClickFolder: () -> Unit,
@@ -851,7 +850,7 @@ class PodcastAdapter(
                         ),
                         useBlurredArtwork = useBlurredArtwork,
                         onClickCategory = { onClickCategory(podcast) },
-                        onClickRating = { source -> onClickRating(podcast, source) },
+                        onClickRating = { onClickRating(podcast) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,
                         onClickFolder = onClickFolder,

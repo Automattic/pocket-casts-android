@@ -2,10 +2,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.testing.FakeReviewManager
 import java.time.Instant
@@ -79,7 +80,7 @@ class AppReviewManagerTest {
             on { appReviewErrorSessionIds } doReturn errorSessionsSetting
             on { appReviewCrashTimestamp } doReturn crashTimestampSetting
         },
-        tracker = AnalyticsTracker.test(),
+        eventHorizon = EventHorizon(TestEventSink()),
         googleManager = googleManager,
         loopIdleDuration = loopIdleDuration,
     )

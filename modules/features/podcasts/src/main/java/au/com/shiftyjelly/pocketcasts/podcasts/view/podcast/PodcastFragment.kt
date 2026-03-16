@@ -770,11 +770,10 @@ class PodcastFragment : BaseFragment() {
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
             },
-            onClickRating = { podcast, source ->
+            onClickRating = { podcast ->
                 ratingsViewModel.onRatingStarsTapped(
                     podcastUuid = podcast.uuid,
                     fragmentManager = parentFragmentManager,
-                    source = source,
                 )
             },
             onClickCategory = { podcast ->

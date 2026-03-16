@@ -4,17 +4,20 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.PodcastRatingResult
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.NotAllowedToRateScreenDismissedEvent
+import com.automattic.eventhorizon.NotAllowedToRateScreenShownEvent
+import com.automattic.eventhorizon.RatingScreenDismissedEvent
+import com.automattic.eventhorizon.RatingScreenShownEvent
+import com.automattic.eventhorizon.RatingScreenSubmitTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
@@ -26,9 +29,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    private val userManager: UserManager,
     private val ratingManager: RatingsManager,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val syncManager: SyncManager,
 ) : ViewModel() {
 
@@ -49,13 +51,27 @@ class GiveRatingViewModel @Inject constructor(
         ) : State() {
             val currentSelectedRate: Stars = _currentSelectedRate ?: Stars.Zero
 
-            enum class Stars {
-                Zero,
-                One,
-                Two,
-                Three,
-                Four,
-                Five,
+            enum class Stars(
+                val value: Int,
+            ) {
+                Zero(
+                    value = 0,
+                ),
+                One(
+                    value = 1,
+                ),
+                Two(
+                    value = 2,
+                ),
+                Three(
+                    value = 3,
+                ),
+                Four(
+                    value = 4,
+                ),
+                Five(
+                    value = 5,
+                ),
             }
         }
         data class NotAllowedToRate(val podcastUuid: String) : State()
@@ -144,12 +160,14 @@ class GiveRatingViewModel @Inject constructor(
 
         val stars = (state.value as State.Loaded).currentSelectedRate
 
-        analyticsTracker.track(
-            AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED,
-            mapOf("uuid" to (state.value as State.Loaded).podcastUuid, "stars" to starsToRating(stars)),
+        eventHorizon.track(
+            RatingScreenSubmitTappedEvent(
+                uuid = (state.value as State.Loaded).podcastUuid,
+                stars = stars.value.toLong(),
+            ),
         )
 
-        val result = ratingManager.submitPodcastRating(UserPodcastRating(podcastUuid, starsToRating(stars), Date()))
+        val result = ratingManager.submitPodcastRating(UserPodcastRating(podcastUuid, stars.value, Date()))
 
         if (result is PodcastRatingResult.Success) {
             LogBuffer.i(TAG, "Submitted a rating of ${result.rating} for $podcastUuid")
@@ -172,17 +190,31 @@ class GiveRatingViewModel @Inject constructor(
 
     fun trackOnGiveRatingScreenShown(uuid: String) {
         shouldTrackDismissedEvent = true
-        analyticsTracker.track(AnalyticsEvent.RATING_SCREEN_SHOWN, mapOf("uuid" to uuid))
+        eventHorizon.track(
+            RatingScreenShownEvent(
+                uuid = uuid,
+            ),
+        )
     }
 
     fun trackOnNotAllowedToRateScreenShown(uuid: String) {
         shouldTrackDismissedEvent = true
-        analyticsTracker.track(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_SHOWN, mapOf("uuid" to uuid))
+        eventHorizon.track(
+            NotAllowedToRateScreenShownEvent(
+                uuid = uuid,
+            ),
+        )
     }
 
-    fun trackOnDismissed(event: AnalyticsEvent) {
+    fun trackRatingDismissedEvent() {
         if (shouldTrackDismissedEvent) {
-            analyticsTracker.track(event)
+            eventHorizon.track(RatingScreenDismissedEvent)
+        }
+    }
+
+    fun trackNotAllowedDismissedEvent() {
+        if (shouldTrackDismissedEvent) {
+            eventHorizon.track(NotAllowedToRateScreenDismissedEvent)
         }
     }
 }
@@ -194,30 +226,4 @@ fun ratingToStars(rating: Double) = when {
     rating <= 3 -> Stars.Three
     rating <= 4 -> Stars.Four
     else -> Stars.Five
-}
-
-fun starsToRating(star: Stars): Int = when (star) {
-    Stars.One -> {
-        1
-    }
-
-    Stars.Two -> {
-        2
-    }
-
-    Stars.Three -> {
-        3
-    }
-
-    Stars.Four -> {
-        4
-    }
-
-    Stars.Five -> {
-        5
-    }
-
-    else -> {
-        5
-    }
 }
