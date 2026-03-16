@@ -34,7 +34,7 @@ fun PodcastRating(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .clickable { onClick() }
+            .clickable(onClick = onClick)
             .semantics {
                 this.contentDescription = starsContentDescription
             }
