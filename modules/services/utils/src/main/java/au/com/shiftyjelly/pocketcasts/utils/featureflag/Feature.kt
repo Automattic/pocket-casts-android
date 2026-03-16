@@ -191,6 +191,15 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+
+    MEDIA3_SESSION(
+        key = "media3_session",
+        title = "Media3 MediaSession",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     NEXT_EPISODE_PREFETCH(
         key = "next_episode_prefetch",
         title = "Next Episode Prefetch",
