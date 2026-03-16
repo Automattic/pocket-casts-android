@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.transcripts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -22,6 +20,10 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.Trackable
+import com.automattic.eventhorizon.TranscriptErrorEvent
+import com.automattic.eventhorizon.TranscriptSearchNextResultEvent
+import com.automattic.eventhorizon.TranscriptSearchPreviousResultEvent
+import com.automattic.eventhorizon.TranscriptSearchShownEvent
 import com.automattic.eventhorizon.TranscriptSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -44,7 +46,6 @@ class TranscriptViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
 ) : ViewModel() {
@@ -92,7 +93,13 @@ class TranscriptViewModel @AssistedInject constructor(
                 is Transcript.Text -> if (transcript.entries.isNotEmpty()) {
                     TranscriptState.Loaded(transcript)
                 } else {
-                    track(AnalyticsEvent.TRANSCRIPT_ERROR)
+                    track { source, podcastUuid, episodeUuid ->
+                        TranscriptErrorEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                     TranscriptState.NoContent
                 }
 
@@ -101,7 +108,13 @@ class TranscriptViewModel @AssistedInject constructor(
                 }
 
                 null -> {
-                    track(AnalyticsEvent.TRANSCRIPT_ERROR)
+                    track { source, podcastUuid, episodeUuid ->
+                        TranscriptErrorEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                     TranscriptState.Failure
                 }
             }
@@ -121,7 +134,13 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     fun openSearch() {
-        track(AnalyticsEvent.TRANSCRIPT_SEARCH_SHOWN)
+        track { source, podcastUuid, episodeUuid ->
+            TranscriptSearchShownEvent(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = source,
+            )
+        }
         _uiState.update { state ->
             state.copy(searchState = state.searchState.copy(isSearchOpen = true))
         }
@@ -184,7 +203,13 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     fun selectPreviousSearchMatch() {
-        track(AnalyticsEvent.TRANSCRIPT_SEARCH_PREVIOUS_RESULT)
+        track { source, podcastUuid, episodeUuid ->
+            TranscriptSearchPreviousResultEvent(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = source,
+            )
+        }
         _uiState.update { state ->
             val previousMatches = state.searchState.matches.previous()
             state.copy(searchState = state.searchState.copy(matches = previousMatches))
@@ -192,7 +217,13 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     fun selectNextSearchMatch() {
-        track(AnalyticsEvent.TRANSCRIPT_SEARCH_NEXT_RESULT)
+        track { source, podcastUuid, episodeUuid ->
+            TranscriptSearchNextResultEvent(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = source,
+            )
+        }
         _uiState.update { state ->
             val nextMatches = state.searchState.matches.next()
             state.copy(searchState = state.searchState.copy(matches = nextMatches))
@@ -233,21 +264,6 @@ class TranscriptViewModel @AssistedInject constructor(
         val episodeUuid = episodeUuid ?: Tracker.INVALID_OR_NULL_VALUE
         val event = event(source.eventHorizonValue, podcastUuid, episodeUuid)
         eventHorizon.track(event)
-    }
-
-    fun track(
-        event: AnalyticsEvent,
-        additionalProperties: Map<String, Any> = emptyMap(),
-    ) {
-        analyticsTracker.track(
-            event,
-            buildMap {
-                putAll(additionalProperties)
-                put("source", source.analyticsValue)
-                episodeUuid?.let { uuid -> put("episode_uuid", uuid) }
-                podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
-            },
-        )
     }
 
     private suspend fun updateEpisodeMetadata(episodeUuid: String) {

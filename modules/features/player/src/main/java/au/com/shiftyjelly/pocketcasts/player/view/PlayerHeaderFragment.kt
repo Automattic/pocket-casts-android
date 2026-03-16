@@ -75,7 +75,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -120,7 +119,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -131,6 +129,11 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.TranscriptDismissedEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -425,12 +428,21 @@ class PlayerHeaderFragment :
                         val containerFragment = parentFragment as? PlayerContainerFragment
                         containerFragment?.updateTabsVisibility(false)
                     } else if (wasTranscriptOpen && !isTranscriptOpen) {
-                        val event = if (uiState.isPaywallVisible) {
-                            AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
-                        } else {
-                            AnalyticsEvent.TRANSCRIPT_DISMISSED
+                        transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                            if (uiState.isPaywallVisible) {
+                                TranscriptGeneratedPaywallDismissedEvent(
+                                    podcastUuid = podcastUuid,
+                                    episodeUuid = episodeUuid,
+                                    source = source,
+                                )
+                            } else {
+                                TranscriptDismissedEvent(
+                                    podcastUuid = podcastUuid,
+                                    episodeUuid = episodeUuid,
+                                    source = source,
+                                )
+                            }
                         }
-                        transcriptViewModel.track(event)
                         val containerFragment = parentFragment as? PlayerContainerFragment
                         containerFragment?.updateTabsVisibility(true)
                     }
@@ -932,18 +944,34 @@ class PlayerHeaderFragment :
                 onShowSearchBar = transcriptViewModel::openSearch,
                 onHideSearchBar = transcriptViewModel::hideSearch,
                 onClickSubscribe = {
-                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptGeneratedPaywallSubscribeTappedEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                 },
                 onShowTranscript = { transcript ->
-                    val properties = mapOf(
-                        "type" to transcript.type.analyticsValue,
-                        "show_as_webpage" to (transcript is Transcript.Web),
-                    )
-                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptShownEvent(
+                            type = transcript.type.eventHorizonValue,
+                            showAsWebpage = transcript is Transcript.Web,
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                 },
                 onShowTranscriptPaywall = {
-                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptGeneratedPaywallShownEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                 },
                 toolbarTrailingContent = { toolbarColors ->
                     if (state.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
