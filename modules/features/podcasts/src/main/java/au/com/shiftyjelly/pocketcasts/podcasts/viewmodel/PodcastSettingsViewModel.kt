@@ -209,7 +209,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             eventHorizon.track(
                 PodcastSettingsAutoArchiveEpisodeLimitChangedEvent(
-                    value = limit.eventHorizonValue,
+                    value = limit.value?.toLong() ?: 0,
                 ),
             )
             podcastFlow.update { it?.copy(rawAutoArchiveEpisodeLimit = limit) }
