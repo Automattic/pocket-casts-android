@@ -10,6 +10,7 @@ data class NamedSettingsSettings(
     @Json(name = "marketingOptIn") val marketingOptIn: Boolean? = null,
     @Json(name = "freeGiftAcknowledgement") val freeGiftAcknowledged: Boolean? = null,
     @Json(name = "gridOrder") val gridOrder: Int? = null,
+    @Json(name = "liveAnalyticsUrl") val liveAnalyticsUrl: String? = null,
 )
 
 @JsonClass(generateAdapter = true)
