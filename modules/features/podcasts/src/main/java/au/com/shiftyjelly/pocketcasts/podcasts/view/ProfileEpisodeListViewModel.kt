@@ -4,8 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
@@ -17,6 +15,8 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
 import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import com.automattic.eventhorizon.ListeningHistoryClearedEvent
+import com.automattic.eventhorizon.SearchClearedEvent
+import com.automattic.eventhorizon.SearchPerformedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class ProfileEpisodeListViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val downloadQueue: DownloadQueue,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
     private val userManager: UserManager,
@@ -111,11 +110,19 @@ class ProfileEpisodeListViewModel @Inject constructor(
         val oldValue = _searchQueryFlow.value
         _searchQueryFlow.value = searchQuery
 
-        // Track search events
+        val source = mode?.source ?: return
         if (oldValue.isEmpty() && searchQuery.isNotEmpty()) {
-            track(AnalyticsEvent.SEARCH_PERFORMED)
+            eventHorizon.track(
+                SearchPerformedEvent(
+                    source = source.eventHorizonValue,
+                ),
+            )
         } else if (oldValue.isNotEmpty() && searchQuery.isEmpty()) {
-            track(AnalyticsEvent.SEARCH_CLEARED)
+            eventHorizon.track(
+                SearchClearedEvent(
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
@@ -191,12 +198,6 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
 
         data object Loading : State()
-    }
-
-    private fun track(
-        analyticsEvent: AnalyticsEvent,
-    ) {
-        mode?.let { analyticsTracker.track(analyticsEvent, mapOf("source" to it.source.analyticsValue)) }
     }
 
     fun cancelAllDownloads() {

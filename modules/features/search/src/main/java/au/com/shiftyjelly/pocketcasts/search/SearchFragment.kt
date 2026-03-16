@@ -25,8 +25,6 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -53,6 +51,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SearchClearedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.flow.drop
@@ -72,7 +72,7 @@ private const val SEARCH_RESULTS_TAG = "search_results"
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var settings: Settings
@@ -128,7 +128,8 @@ class SearchFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_SHOWN, source)
+
+        viewModel.trackSearchShown(source)
         playButtonListener.source = source
     }
 
@@ -162,7 +163,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
-        searchHistoryViewModel.trackEventForEntry(AnalyticsEvent.SEARCH_HISTORY_ITEM_TAPPED, entry)
+        searchHistoryViewModel.trackHistoryItemTapped(entry)
         when (entry) {
             is SearchHistoryEntry.Episode -> listener?.onSearchEpisodeClick(
                 episodeUuid = entry.uuid,
@@ -235,7 +236,11 @@ class SearchFragment : BaseFragment() {
         }
 
         searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn)?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SEARCH_CLEARED, mapOf("source" to source.analyticsValue))
+            eventHorizon.track(
+                SearchClearedEvent(
+                    source = source.eventHorizonValue,
+                ),
+            )
             searchView.setQuery("", false)
         }
 
@@ -443,7 +448,7 @@ class SearchFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_DISMISSED, source)
+        viewModel.trackSearchDismissed(source)
         return super.onBackPressed()
     }
 }

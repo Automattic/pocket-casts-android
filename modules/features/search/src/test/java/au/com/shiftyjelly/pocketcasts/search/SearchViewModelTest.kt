@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -41,7 +40,6 @@ class SearchViewModelTest {
             searchHandler = searchHandler,
             searchHistoryManager = searchHistoryManager,
             podcastManager = podcastManager,
-            analyticsTracker = AnalyticsTracker.test(),
             eventHorizon = EventHorizon(TestEventSink()),
         )
     }
