@@ -60,8 +60,7 @@ abstract class AnalyticsModule {
         @Singleton
         fun provideAnalyticsTracker(
             trackers: Set<@JvmSuppressWildcards Tracker>,
-            listeners: Set<@JvmSuppressWildcards AnalyticsListener>,
-        ): AnalyticsTracker = AnalyticsTracker(trackers, listeners)
+        ): AnalyticsTracker = AnalyticsTracker(trackers)
 
         @Provides
         @Singleton

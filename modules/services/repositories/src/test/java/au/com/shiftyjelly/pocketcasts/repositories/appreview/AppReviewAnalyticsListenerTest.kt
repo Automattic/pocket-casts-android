@@ -1,12 +1,32 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.AppThemeType
+import com.automattic.eventhorizon.BookmarkCreatedEvent
+import com.automattic.eventhorizon.BookmarkSource
+import com.automattic.eventhorizon.EndOfYearShareSource
+import com.automattic.eventhorizon.EndOfYearStoriesDismissedEvent
+import com.automattic.eventhorizon.EndOfYearStoryCloseSource
+import com.automattic.eventhorizon.EndOfYearStorySharedEvent
+import com.automattic.eventhorizon.EndOfYearStoryType
+import com.automattic.eventhorizon.EpisodeStarredEvent
+import com.automattic.eventhorizon.FilterCreatedEvent
+import com.automattic.eventhorizon.FolderSavedEvent
+import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
+import com.automattic.eventhorizon.PurchaseSuccessfulEvent
+import com.automattic.eventhorizon.RatingScreenSubmitTappedEvent
+import com.automattic.eventhorizon.ReferralPassSharedEvent
+import com.automattic.eventhorizon.SettingsAboutWebsiteTappedEvent
+import com.automattic.eventhorizon.SettingsAppearanceThemeChangedEvent
+import com.automattic.eventhorizon.SourceView
+import com.automattic.eventhorizon.SubscriptionFrequencyType
+import com.automattic.eventhorizon.SubscriptionTierType
+import com.automattic.eventhorizon.SuggestedFolderSource
+import com.automattic.eventhorizon.SuggestedFoldersReplaceFoldersConfirmTappedEvent
 import java.time.Instant
 import kotlin.time.Duration
 import org.junit.Assert.assertEquals
@@ -50,7 +70,7 @@ class AppReviewAnalyticsListenerTest {
         on { appReviewEndOfYearCompletedTimestamp } doReturn endOfYearCompletedSetting
     }
 
-    private val tracker = AnalyticsTracker.test(AppReviewAnalyticsListener(settings, clock))
+    private val listener = AppReviewAnalyticsListener(settings, clock)
 
     @Before
     fun setup() {
@@ -61,109 +81,181 @@ class AppReviewAnalyticsListenerTest {
     fun `does not update settings when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.IMPROVE_APP_RATINGS, false)
 
-        tracker.track(AnalyticsEvent.EPISODE_STARRED)
+        listener.onEvent(
+            EpisodeStarredEvent(
+                source = SourceView.Player,
+                episodeUuid = "",
+            ),
+        )
 
         assertNull(episodeStarredSetting.value)
     }
 
     @Test
     fun `updates episodeStarred setting on EPISODE_STARRED event`() {
-        tracker.track(AnalyticsEvent.EPISODE_STARRED)
+        listener.onEvent(
+            EpisodeStarredEvent(
+                episodeUuid = "",
+                source = SourceView.Player,
+            ),
+        )
 
         assertEquals(clock.instant(), episodeStarredSetting.value)
     }
 
     @Test
     fun `updates podcastRated setting on RATING_SCREEN_SUBMIT_TAPPED event`() {
-        tracker.track(AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED)
+        listener.onEvent(
+            RatingScreenSubmitTappedEvent(
+                uuid = "",
+                stars = 0,
+            ),
+        )
 
         assertEquals(clock.instant(), podcastRatedSetting.value)
     }
 
     @Test
     fun `updates playlistCreated setting on FILTER_CREATED event`() {
-        tracker.track(AnalyticsEvent.FILTER_CREATED)
+        listener.onEvent(FilterCreatedEvent())
 
         assertEquals(clock.instant(), playlistCreatedSetting.value)
     }
 
     @Test
     fun `updates plusUpgraded setting on PURCHASE_SUCCESSFUL event`() {
-        tracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL)
+        listener.onEvent(
+            PurchaseSuccessfulEvent(
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = false,
+                source = "",
+            ),
+        )
 
         assertEquals(clock.instant(), plusUpgradedSetting.value)
     }
 
     @Test
     fun `updates folderCreated setting on FOLDER_SAVED event`() {
-        tracker.track(AnalyticsEvent.FOLDER_SAVED)
+        listener.onEvent(
+            FolderSavedEvent(
+                numberOfPodcasts = 0,
+                color = "",
+            ),
+        )
 
         assertEquals(clock.instant(), folderCreatedSetting.value)
     }
 
     @Test
     fun `updates folderCreated setting on SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED event`() {
-        tracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED)
+        listener.onEvent(
+            SuggestedFoldersReplaceFoldersConfirmTappedEvent(
+                source = SuggestedFolderSource.Popup,
+            ),
+        )
 
         assertEquals(clock.instant(), folderCreatedSetting.value)
     }
 
     @Test
     fun `updates bookmarkCreated setting on BOOKMARK_CREATED event`() {
-        tracker.track(AnalyticsEvent.BOOKMARK_CREATED)
+        listener.onEvent(
+            BookmarkCreatedEvent(
+                podcastUuid = "",
+                episodeUuid = "",
+                time = 0,
+                source = BookmarkSource.Player,
+            ),
+        )
 
         assertEquals(clock.instant(), bookmarkCreatedSetting.value)
     }
 
     @Test
     fun `updates themeChanged setting on SETTINGS_APPEARANCE_THEME_CHANGED event`() {
-        tracker.track(AnalyticsEvent.SETTINGS_APPEARANCE_THEME_CHANGED)
+        listener.onEvent(
+            SettingsAppearanceThemeChangedEvent(
+                value = AppThemeType.DarkContrast,
+            ),
+        )
 
         assertEquals(clock.instant(), themeChangedSetting.value)
     }
 
     @Test
     fun `updates referralShared setting on REFERRAL_PASS_SHARED event`() {
-        tracker.track(AnalyticsEvent.REFERRAL_PASS_SHARED)
+        listener.onEvent(
+            ReferralPassSharedEvent(
+                code = "",
+                source = SourceView.Referrals,
+            ),
+        )
 
         assertEquals(clock.instant(), referralSharedSetting.value)
     }
 
     @Test
     fun `updates endOfYearShared setting on END_OF_YEAR_STORY_SHARED event`() {
-        tracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARED)
+        listener.onEvent(
+            EndOfYearStorySharedEvent(
+                currentYear = 0,
+                story = EndOfYearStoryType.YearVsYear,
+                from = EndOfYearShareSource.Screenshot,
+            ),
+        )
 
         assertEquals(clock.instant(), endOfYearSharedSetting.value)
     }
 
     @Test
     fun `updates endOfYearCompleted setting when END_OF_YEAR_STORIES_DISMISSED with ending story`() {
-        val properties = mapOf("story" to "ending")
-
-        tracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, properties)
+        listener.onEvent(
+            EndOfYearStoriesDismissedEvent(
+                currentYear = 0,
+                story = EndOfYearStoryType.Ending,
+                source = EndOfYearStoryCloseSource.CloseButton,
+            ),
+        )
 
         assertEquals(clock.instant(), endOfYearCompletedSetting.value)
     }
 
     @Test
     fun `does not update endOfYearCompleted setting when END_OF_YEAR_STORIES_DISMISSED with another story`() {
-        val properties = mapOf("story" to "intro")
-
-        tracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, properties)
+        listener.onEvent(
+            EndOfYearStoriesDismissedEvent(
+                currentYear = 0,
+                story = EndOfYearStoryType.Top1Show,
+                source = EndOfYearStoryCloseSource.CloseButton,
+            ),
+        )
 
         assertNull(endOfYearCompletedSetting.value)
     }
 
     @Test
     fun `does not update endOfYearCompleted setting when END_OF_YEAR_STORIES_DISMISSED with no story property`() {
-        tracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED)
+        listener.onEvent(
+            EndOfYearStoriesDismissedEvent(
+                currentYear = 0,
+                story = null,
+                source = EndOfYearStoryCloseSource.CloseButton,
+            ),
+        )
 
         assertNull(endOfYearCompletedSetting.value)
     }
 
     @Test
     fun `adds first episode completed timestamp on PLAYER_EPISODE_COMPLETED event`() {
-        tracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
+        listener.onEvent(
+            PlayerEpisodeCompletedEvent(
+                podcastUuid = "",
+                episodeUuid = "",
+            ),
+        )
 
         assertEquals(1, episodesCompletedSetting.value.size)
         assertEquals(clock.instant(), episodesCompletedSetting.value[0])
@@ -173,7 +265,12 @@ class AppReviewAnalyticsListenerTest {
     fun `adds second episode completed timestamp on PLAYER_EPISODE_COMPLETED event`() {
         episodesCompletedSetting.set(listOf(clock.instant()))
 
-        tracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
+        listener.onEvent(
+            PlayerEpisodeCompletedEvent(
+                podcastUuid = "",
+                episodeUuid = "",
+            ),
+        )
 
         assertEquals(2, episodesCompletedSetting.value.size)
     }
@@ -182,7 +279,12 @@ class AppReviewAnalyticsListenerTest {
     fun `adds third episode completed timestamp on PLAYER_EPISODE_COMPLETED event`() {
         episodesCompletedSetting.set(listOf(clock.instant(), clock.instant()))
 
-        tracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
+        listener.onEvent(
+            PlayerEpisodeCompletedEvent(
+                podcastUuid = "",
+                episodeUuid = "",
+            ),
+        )
 
         assertEquals(3, episodesCompletedSetting.value.size)
     }
@@ -191,7 +293,12 @@ class AppReviewAnalyticsListenerTest {
     fun `does not add fourth episode completed timestamp on PLAYER_EPISODE_COMPLETED event`() {
         episodesCompletedSetting.set(listOf(clock.instant(), clock.instant(), clock.instant()))
 
-        tracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
+        listener.onEvent(
+            PlayerEpisodeCompletedEvent(
+                podcastUuid = "",
+                episodeUuid = "",
+            ),
+        )
 
         assertEquals(3, episodesCompletedSetting.value.size)
     }
@@ -202,14 +309,19 @@ class AppReviewAnalyticsListenerTest {
         episodeStarredSetting.set(firstTimestamp)
 
         clock += Duration.parse("1h")
-        tracker.track(AnalyticsEvent.EPISODE_STARRED)
+        listener.onEvent(
+            EpisodeStarredEvent(
+                source = SourceView.Player,
+                episodeUuid = "",
+            ),
+        )
 
         assertEquals(firstTimestamp, episodeStarredSetting.value)
     }
 
     @Test
     fun `ignores unknown events`() {
-        tracker.track(AnalyticsEvent.PLAYBACK_PLAY)
+        listener.onEvent(SettingsAboutWebsiteTappedEvent)
 
         assertNull(episodeStarredSetting.value)
         assertNull(podcastRatedSetting.value)
