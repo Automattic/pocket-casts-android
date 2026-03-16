@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.SuggestedFolderSource
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
@@ -248,16 +249,16 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     }
 
     enum class Source(
-        val analyticsValue: String,
+        val eventHorizonValue: SuggestedFolderSource,
     ) {
         Popup(
-            analyticsValue = "popup",
+            eventHorizonValue = SuggestedFolderSource.Popup,
         ),
         ToolbarButton(
-            analyticsValue = "podcasts_list",
+            eventHorizonValue = SuggestedFolderSource.PodcastsList,
         ),
         DEEPLINK(
-            analyticsValue = "deeplink",
+            eventHorizonValue = SuggestedFolderSource.Deeplink,
         ),
     }
 
