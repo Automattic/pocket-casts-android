@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
@@ -122,7 +121,6 @@ class EndOfYearViewModelTest {
             settings = settings,
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
-            analyticsTracker = AnalyticsTracker.test(),
             eventHorizon = EventHorizon {},
             accessibilityManager = FakeAccessibilityManager(isTalkBackEnabled = false),
         )

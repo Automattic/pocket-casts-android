@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -65,9 +64,6 @@ class PlayerContainerFragment :
     HasBackstack {
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon

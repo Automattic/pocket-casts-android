@@ -12,6 +12,6 @@ class BlazeAdLocationConverter {
 
     @TypeConverter
     fun toString(blazeAdLocation: BlazeAdLocation): String {
-        return blazeAdLocation.value
+        return blazeAdLocation.key
     }
 }

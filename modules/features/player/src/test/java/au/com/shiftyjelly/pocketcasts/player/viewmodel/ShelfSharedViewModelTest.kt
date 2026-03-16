@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -325,7 +324,6 @@ class ShelfSharedViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
         shelfSharedViewModel = ShelfSharedViewModel(
-            analyticsTracker = AnalyticsTracker.test(),
             eventHorizon = EventHorizon(TestEventSink()),
             applicationScope = applicationScope,
             chromeCastAnalytics = chromeCastAnalytics,
