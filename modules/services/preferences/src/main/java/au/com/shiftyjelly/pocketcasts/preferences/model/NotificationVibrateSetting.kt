@@ -3,18 +3,19 @@ package au.com.shiftyjelly.pocketcasts.preferences.model
 import android.content.Context
 import android.media.AudioManager
 import androidx.annotation.StringRes
+import com.automattic.eventhorizon.NotificationVibrationType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class NotificationVibrateSetting(
     val intValue: Int,
     @StringRes val summary: Int,
-    val analyticsString: String,
+    val eventHorizonValue: NotificationVibrationType,
 ) {
 
     Never(
         intValue = 0,
         summary = LR.string.settings_notification_vibrate_never,
-        analyticsString = "never",
+        eventHorizonValue = NotificationVibrationType.Never,
     ) {
         override fun isNotificationVibrateOn(context: Context) = false
     },
@@ -22,7 +23,7 @@ enum class NotificationVibrateSetting(
     OnlyWhenSilent(
         intValue = 1,
         summary = LR.string.settings_notification_vibrate_in_silent,
-        analyticsString = "silent",
+        eventHorizonValue = NotificationVibrationType.Silent,
     ) {
 
         override fun isNotificationVibrateOn(context: Context): Boolean {
@@ -34,7 +35,7 @@ enum class NotificationVibrateSetting(
     NewEpisodes(
         intValue = 2,
         summary = LR.string.settings_notification_vibrate_new_episodes,
-        analyticsString = "new_episodes",
+        eventHorizonValue = NotificationVibrationType.NewEpisodes,
     ) {
         override fun isNotificationVibrateOn(context: Context) = true
     }, ;
