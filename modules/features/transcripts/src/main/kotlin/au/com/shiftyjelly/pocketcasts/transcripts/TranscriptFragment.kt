@@ -18,9 +18,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -38,6 +37,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeTranscriptShownEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -86,7 +88,7 @@ class TranscriptFragment : BaseDialogFragment() {
             viewModel.track { source, _, _ ->
                 EpisodeTranscriptShownEvent(
                     episodeUuid = args.episodeUuid,
-                    podcastUuid = args.podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                    podcastUuid = args.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                     source = source,
                 )
             }
@@ -112,18 +114,37 @@ class TranscriptFragment : BaseDialogFragment() {
                 onShowSearchBar = viewModel::openSearch,
                 onHideSearchBar = viewModel::hideSearch,
                 onClickSubscribe = {
-                    viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptGeneratedPaywallSubscribeTappedEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
+                    OnboardingLauncher.openOnboardingFlow(
+                        requireActivity(),
+                        OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS),
+                    )
                 },
                 onShowTranscript = { transcript ->
-                    val properties = mapOf(
-                        "type" to transcript.type.analyticsValue,
-                        "show_as_webpage" to (transcript is Transcript.Web),
-                    )
-                    viewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptShownEvent(
+                            type = transcript.type.analyticsValue,
+                            showAsWebpage = transcript is Transcript.Web,
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                 },
                 onShowTranscriptPaywall = {
-                    viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptGeneratedPaywallShownEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                 },
                 toolbarTrailingContent = { toolbarColors ->
                     Row(

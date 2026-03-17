@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.UpNextSourceType
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
 import java.util.concurrent.TimeUnit
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
-import com.automattic.eventhorizon.UpNextSource as EventHorizonUpNextSource
 
 interface UpNextQueue {
     val isEmpty: Boolean
@@ -149,22 +149,22 @@ interface UpNextQueue {
 }
 
 enum class UpNextSource(
-    val eventHorizonValue: EventHorizonUpNextSource,
+    val analyticsValue: UpNextSourceType,
 ) {
     MINI_PLAYER(
-        eventHorizonValue = EventHorizonUpNextSource.MiniPlayer,
+        analyticsValue = UpNextSourceType.MiniPlayer,
     ),
     PLAYER(
-        eventHorizonValue = EventHorizonUpNextSource.Player,
+        analyticsValue = UpNextSourceType.Player,
     ),
     NOW_PLAYING(
-        eventHorizonValue = EventHorizonUpNextSource.NowPlaying,
+        analyticsValue = UpNextSourceType.NowPlaying,
     ),
     UP_NEXT_SHORTCUT(
-        eventHorizonValue = EventHorizonUpNextSource.UpNextShortcut,
+        analyticsValue = UpNextSourceType.UpNextShortcut,
     ),
     UP_NEXT_TAB(
-        eventHorizonValue = EventHorizonUpNextSource.UpNextTab,
+        analyticsValue = UpNextSourceType.UpNextTab,
     ),
 }
 

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.reactivex.Flowable
 import java.time.Instant
@@ -37,7 +38,6 @@ class ReferralsViewModelTest {
 
     private val userManager: UserManager = mock()
     private val settings: Settings = mock()
-    private val analyticsTracker: AnalyticsTracker = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
     private val referralClaimCode = "referral_code"
@@ -207,7 +207,7 @@ class ReferralsViewModelTest {
         }
     }
 
-    private suspend fun initViewModel(
+    private fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, subscription),
         referralCode: String = referralClaimCode,
         showReferralsTooltipUserSetting: UserSetting<Boolean> = UserSetting.Mock(true, mock()),
@@ -219,7 +219,7 @@ class ReferralsViewModelTest {
             userManager = userManager,
             paymentClient = paymentClient,
             settings = settings,
-            analyticsTracker = analyticsTracker,
+            eventHorizon = EventHorizon(TestEventSink()),
         )
     }
 }

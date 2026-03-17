@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -22,7 +22,7 @@ import com.automattic.eventhorizon.EpisodeDeletedFromCloudEvent
 import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
 import com.automattic.eventhorizon.EpisodeSwipeActionPerformedEvent
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -117,11 +117,11 @@ class SwipeActionViewModel @AssistedInject constructor(
             val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
             eventHorizon.track(
                 EpisodeRemovedFromListEvent(
-                    playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                    playlistName = playlistName ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                     playlistUuid = playlistUuid,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
-                    source = PlaylistRemoveEpisodeSource.SwipeRemove,
+                    source = PlaylistRemoveEpisodeSourceType.SwipeRemove,
                 ),
             )
         }
@@ -168,7 +168,7 @@ class SwipeActionViewModel @AssistedInject constructor(
                     eventHorizon.track(
                         EpisodeDeletedFromCloudEvent(
                             episodeUuid = episode.uuid,
-                            source = swipeSource.toSourceView().eventHorizonValue,
+                            source = swipeSource.toSourceView().analyticsValue,
                         ),
                     )
                 }
@@ -196,8 +196,8 @@ class SwipeActionViewModel @AssistedInject constructor(
     private fun trackAction(action: SwipeAction) {
         eventHorizon.track(
             EpisodeSwipeActionPerformedEvent(
-                source = swipeSource.eventHorizonValue,
-                action = action.eventHorizonValue,
+                source = swipeSource.analyticsValue,
+                action = action.analyticsValue,
             ),
         )
     }

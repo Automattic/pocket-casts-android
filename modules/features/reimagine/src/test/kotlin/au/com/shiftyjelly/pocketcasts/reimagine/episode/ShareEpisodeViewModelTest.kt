@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.ShareActionMediaType
 import com.automattic.eventhorizon.ShareScreenShownEvent
+import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
 
 @ExperimentalCoroutinesApi
 class ShareEpisodeViewModelTest {
@@ -87,7 +87,7 @@ class ShareEpisodeViewModelTest {
                 type = ShareActionMediaType.Episode,
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
             ),
             event,
         )

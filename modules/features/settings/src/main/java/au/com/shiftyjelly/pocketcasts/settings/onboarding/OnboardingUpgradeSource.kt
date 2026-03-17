@@ -1,38 +1,89 @@
 package au.com.shiftyjelly.pocketcasts.settings.onboarding
 
-import com.automattic.eventhorizon.OnboardingSource
+import com.automattic.eventhorizon.OnboardingSourceType
 
-enum class OnboardingUpgradeSource(val analyticsValue: String) {
-    ACCOUNT_DETAILS("account_details"),
-    APPEARANCE("appearance"),
-    BANNER_AD("banner_ad"),
-    ICONS("icons"),
-    THEMES("themes"),
-    BOOKMARKS("bookmarks"),
-    BOOKMARKS_SHELF_ACTION("bookmarks_shelf_action"),
-    END_OF_YEAR("end_of_year"),
-    FILES("files"),
-    FOLDERS("folders"),
-    SUGGESTED_FOLDERS("suggested_folders"),
-    FOLDERS_PODCAST_SCREEN("folders_podcast_screen"),
-    HEADPHONE_CONTROLS_SETTINGS("headphone_controls_settings"),
-    LOGIN("login"), // for login from within upsell screen
-    LOGIN_PLUS_PROMOTION("login_plus_promotion"), // for login from outside upsell screen
-    OVERFLOW_MENU("overflow_menu"),
-    PLUS_DETAILS("plus_details"),
-    PROFILE("profile"),
-    RECOMMENDATIONS("recommendations"),
-    SKIP_CHAPTERS("skip_chapters"),
-    SETTINGS("settings"),
-    SLUMBER_STUDIOS("slumber_studios"),
-    UP_NEXT_SHUFFLE("up_next_shuffle"),
-    GENERATED_TRANSCRIPTS("generated_transcripts"),
-    DEEP_LINK("deep_link"),
-    FINISHED_ONBOARDING("account_created"),
-    UNKNOWN("unknown"),
-    ;
-
-    val eventHorizonValue get() = SOURCE_MAP[analyticsValue] ?: OnboardingSource.Unknown
+enum class OnboardingUpgradeSource(
+    val analyticsValue: OnboardingSourceType,
+) {
+    ACCOUNT_DETAILS(
+        analyticsValue = OnboardingSourceType.AccountDetails,
+    ),
+    APPEARANCE(
+        analyticsValue = OnboardingSourceType.Appearance,
+    ),
+    BANNER_AD(
+        analyticsValue = OnboardingSourceType.BannerAd,
+    ),
+    ICONS(
+        analyticsValue = OnboardingSourceType.Icons,
+    ),
+    THEMES(
+        analyticsValue = OnboardingSourceType.Themes,
+    ),
+    BOOKMARKS(
+        analyticsValue = OnboardingSourceType.Bookmarks,
+    ),
+    BOOKMARKS_SHELF_ACTION(
+        analyticsValue = OnboardingSourceType.BookmarksShelfAction,
+    ),
+    END_OF_YEAR(
+        analyticsValue = OnboardingSourceType.EndOfYear,
+    ),
+    FILES(
+        analyticsValue = OnboardingSourceType.Files,
+    ),
+    FOLDERS(
+        analyticsValue = OnboardingSourceType.Folders,
+    ),
+    SUGGESTED_FOLDERS(
+        analyticsValue = OnboardingSourceType.SuggestedFolders,
+    ),
+    FOLDERS_PODCAST_SCREEN(
+        analyticsValue = OnboardingSourceType.FoldersPodcastScreen,
+    ),
+    HEADPHONE_CONTROLS_SETTINGS(
+        analyticsValue = OnboardingSourceType.HeadphoneControlsSettings,
+    ),
+    LOGIN(
+        analyticsValue = OnboardingSourceType.Login,
+    ),
+    LOGIN_PLUS_PROMOTION(
+        analyticsValue = OnboardingSourceType.LoginPlusPromotion,
+    ),
+    OVERFLOW_MENU(
+        analyticsValue = OnboardingSourceType.OverflowMenu,
+    ),
+    PLUS_DETAILS(
+        analyticsValue = OnboardingSourceType.PlusDetails,
+    ),
+    PROFILE(
+        analyticsValue = OnboardingSourceType.Profile,
+    ),
+    RECOMMENDATIONS(
+        analyticsValue = OnboardingSourceType.Recommendations,
+    ),
+    SKIP_CHAPTERS(
+        analyticsValue = OnboardingSourceType.SkipChapters,
+    ),
+    SETTINGS(
+        analyticsValue = OnboardingSourceType.Settings,
+    ),
+    SLUMBER_STUDIOS(
+        analyticsValue = OnboardingSourceType.SlumberStudios,
+    ),
+    UP_NEXT_SHUFFLE(
+        analyticsValue = OnboardingSourceType.UpNextShuffle,
+    ),
+    GENERATED_TRANSCRIPTS(
+        analyticsValue = OnboardingSourceType.GeneratedTranscripts,
+    ),
+    DEEP_LINK(
+        analyticsValue = OnboardingSourceType.DeepLink,
+    ),
+    FINISHED_ONBOARDING(
+        analyticsValue = OnboardingSourceType.AccountCreated,
+    ),
+    UNKNOWN(
+        analyticsValue = OnboardingSourceType.Unknown,
+    ),
 }
-
-private val SOURCE_MAP = OnboardingSource.entries.associateBy(OnboardingSource::toString)

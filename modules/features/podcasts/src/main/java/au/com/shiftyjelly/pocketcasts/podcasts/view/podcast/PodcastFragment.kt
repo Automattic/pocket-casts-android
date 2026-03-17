@@ -703,7 +703,7 @@ class PodcastFragment : BaseFragment() {
         if (savedInstanceState == null) {
             eventHorizon.track(
                 PodcastScreenShownEvent(
-                    source = sourceView.eventHorizonValue,
+                    source = sourceView.analyticsValue,
                 ),
             )
         }
@@ -772,11 +772,10 @@ class PodcastFragment : BaseFragment() {
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
             },
-            onClickRating = { podcast, source ->
+            onClickRating = { podcast ->
                 ratingsViewModel.onRatingStarsTapped(
                     podcastUuid = podcast.uuid,
                     fragmentManager = parentFragmentManager,
-                    source = source,
                 )
             },
             onClickCategory = { podcast ->

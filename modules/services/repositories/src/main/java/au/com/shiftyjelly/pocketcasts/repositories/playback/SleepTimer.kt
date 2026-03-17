@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerSleepTimerRestartedEvent
-import com.automattic.eventhorizon.SleepTimerRestartSource
+import com.automattic.eventhorizon.SleepTimerRestartSourceType
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
@@ -111,7 +111,7 @@ class SleepTimer @Inject constructor(
                     eventHorizon.track(
                         PlayerSleepTimerRestartedEvent(
                             numberOfChapters = settings.getlastSleepEndOfChapter().toLong(),
-                            source = SleepTimerRestartSource.Player,
+                            source = SleepTimerRestartSourceType.Player,
                         ),
                     )
                 }
@@ -125,7 +125,7 @@ class SleepTimer @Inject constructor(
                     eventHorizon.track(
                         PlayerSleepTimerRestartedEvent(
                             numberOfEpisodes = settings.getlastSleepEndOfEpisodes().toLong(),
-                            source = SleepTimerRestartSource.Player,
+                            source = SleepTimerRestartSourceType.Player,
                         ),
                     )
                 }
@@ -137,7 +137,7 @@ class SleepTimer @Inject constructor(
                     eventHorizon.track(
                         PlayerSleepTimerRestartedEvent(
                             seconds = history.lastSleepAfterTime.inWholeSeconds,
-                            source = SleepTimerRestartSource.Player,
+                            source = SleepTimerRestartSourceType.Player,
                         ),
                     )
                     LogBuffer.i(TAG, "Was restarted with ${history.lastSleepAfterTime.inWholeMinutes} minutes set")

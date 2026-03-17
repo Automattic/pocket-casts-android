@@ -172,7 +172,7 @@ open class PodcastGridListFragment :
         eventHorizon.track(
             PodcastSubscribedEvent(
                 uuid = podcastUuid,
-                source = podcastSubscribedSource.eventHorizonValue,
+                source = podcastSubscribedSource.analyticsValue,
             ),
         )
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)

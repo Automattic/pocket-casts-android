@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -9,6 +8,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WearMainListDownloadsTappedEvent
+import com.automattic.eventhorizon.WearMainListFilesTappedEvent
+import com.automattic.eventhorizon.WearMainListFiltersTappedEvent
+import com.automattic.eventhorizon.WearMainListNowPlayingTappedEvent
+import com.automattic.eventhorizon.WearMainListPodcastsTappedEvent
+import com.automattic.eventhorizon.WearMainListSettingsTappedEvent
+import com.automattic.eventhorizon.WearMainListStarredTappedEvent
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +36,7 @@ class WatchListScreenViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
+    private val eventSink = TestEventSink()
 
     @Mock
     private lateinit var settings: Settings
@@ -58,7 +64,13 @@ class WatchListScreenViewModelTest {
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
             .thenReturn(Observable.never())
-        viewModel = WatchListScreenViewModel(analyticsTracker, settings, episodeManager, playbackManager, podcastManager)
+        viewModel = WatchListScreenViewModel(
+            eventHorizon = EventHorizon(eventSink),
+            settings = settings,
+            episodeManager = episodeManager,
+            playbackManager = playbackManager,
+            podcastManager = podcastManager,
+        )
     }
 
     @After
@@ -69,43 +81,71 @@ class WatchListScreenViewModelTest {
     @Test
     fun `test onNowPlayingClicked tapped`() {
         viewModel.onNowPlayingClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_NOW_PLAYING_TAPPED)
+
+        assertEquals(
+            WearMainListNowPlayingTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onPodcastsClicked tapped`() {
         viewModel.onPodcastsClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_PODCASTS_TAPPED)
+
+        assertEquals(
+            WearMainListPodcastsTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onDownloadsClicked tapped`() {
         viewModel.onDownloadsClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_DOWNLOADS_TAPPED)
+
+        assertEquals(
+            WearMainListDownloadsTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onPlaylistsClicked tapped`() {
         viewModel.onPlaylistsClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_FILTERS_TAPPED)
+
+        assertEquals(
+            WearMainListFiltersTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onFilesClicked tapped`() {
         viewModel.onFilesClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_FILES_TAPPED)
+
+        assertEquals(
+            WearMainListFilesTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onStarredClicked tapped`() {
         viewModel.onStarredClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_STARRED_TAPPED)
+
+        assertEquals(
+            WearMainListStarredTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
     fun `test onSettingsClicked tapped`() {
         viewModel.onSettingsClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
+
+        assertEquals(
+            WearMainListSettingsTappedEvent,
+            eventSink.pollEvent(),
+        )
     }
 
     @Test

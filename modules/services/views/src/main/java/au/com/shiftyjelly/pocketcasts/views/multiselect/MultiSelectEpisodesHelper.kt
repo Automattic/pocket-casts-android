@@ -213,7 +213,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkMarkedAsPlayedEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             launch(Dispatchers.Main) {
@@ -237,7 +237,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkMarkedAsUnplayedEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             launch(Dispatchers.Main) {
@@ -265,7 +265,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkArchivedEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             withContext(Dispatchers.Main) {
@@ -289,7 +289,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkUnarchivedEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             withContext(Dispatchers.Main) {
@@ -312,7 +312,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkStarredEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             withContext(Dispatchers.Main) {
@@ -335,7 +335,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkUnstarredEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             withContext(Dispatchers.Main) {
@@ -358,7 +358,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             eventHorizon.track(
                 EpisodeRemovedListeningHistoryEvent(
                     count = list.size.toLong(),
-                    source = source.eventHorizonValue,
+                    source = source.analyticsValue,
                 ),
             )
             withContext(Dispatchers.Main) {

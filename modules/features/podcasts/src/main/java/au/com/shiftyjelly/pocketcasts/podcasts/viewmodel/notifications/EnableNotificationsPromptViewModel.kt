@@ -2,13 +2,17 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.NewsletterOptInChangedEvent
-import com.automattic.eventhorizon.NewsletterSource
+import com.automattic.eventhorizon.NewsletterSourceType
+import com.automattic.eventhorizon.NotificationsOptInAllowedEvent
+import com.automattic.eventhorizon.NotificationsOptInDeniedEvent
+import com.automattic.eventhorizon.NotificationsOptInShownEvent
+import com.automattic.eventhorizon.NotificationsPermissionsAllowTappedEvent
+import com.automattic.eventhorizon.NotificationsPermissionsNotNowTappedEvent
+import com.automattic.eventhorizon.NotificationsPermissionsShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +27,6 @@ import kotlinx.coroutines.reactive.asFlow
 @HiltViewModel
 class EnableNotificationsPromptViewModel @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTracker,
     private val eventHorizon: EventHorizon,
     private val userManager: UserManager,
 ) : ViewModel() {
@@ -47,7 +50,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     }
 
     fun handleCtaClick() {
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
+        eventHorizon.track(NotificationsPermissionsAllowTappedEvent)
         when (val state = stateFlow.value) {
             is UiState.PreNewOnboarding -> {
                 viewModelScope.launch {
@@ -58,7 +61,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
             is UiState.NewOnboarding -> {
                 eventHorizon.track(
                     NewsletterOptInChangedEvent(
-                        source = NewsletterSource.WelcomeNewAccount,
+                        source = NewsletterSourceType.WelcomeNewAccount,
                         enabled = state.subscribedToNewsletter,
                     ),
                 )
@@ -77,20 +80,25 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     }
 
     fun reportShown() {
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_SHOWN)
+        eventHorizon.track(NotificationsPermissionsShownEvent)
     }
 
     fun reportNotificationsOptInShown() {
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+        eventHorizon.track(NotificationsOptInShownEvent)
     }
 
     fun reportNotificationRequestResult(wasEnabled: Boolean) {
-        analyticsTracker.track(if (wasEnabled) AnalyticsEvent.NOTIFICATIONS_OPT_IN_ALLOWED else AnalyticsEvent.NOTIFICATIONS_OPT_IN_DENIED)
+        val event = if (wasEnabled) {
+            NotificationsOptInAllowedEvent
+        } else {
+            NotificationsOptInDeniedEvent
+        }
+        eventHorizon.track(event)
     }
 
     fun handleDismissedByUser() {
         settings.notificationsPromptAcknowledged.set(value = true, updateModifiedAt = true)
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
+        eventHorizon.track(NotificationsPermissionsNotNowTappedEvent)
     }
 
     fun changeNewsletterSubscription(isSubscribed: Boolean) {

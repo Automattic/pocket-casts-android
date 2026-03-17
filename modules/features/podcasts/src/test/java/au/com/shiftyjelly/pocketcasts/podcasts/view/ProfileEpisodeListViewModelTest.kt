@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
@@ -22,9 +21,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -37,7 +34,6 @@ class ProfileEpisodeListViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val episodeManager: EpisodeManager = mock()
-    private val analyticsTracker: AnalyticsTracker = mock()
 
     private val downloadedEpisodesMock = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
     private val starredEpisodesMock = listOf(PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
@@ -202,12 +198,10 @@ class ProfileEpisodeListViewModelTest {
         whenever(userManager.getSignInState()).thenReturn(Flowable.empty())
         whenever(settings.isFreeAccountHistoryBannerDismissed).thenReturn(bannerSetting)
         whenever(bannerSetting.flow).thenReturn(MutableStateFlow(false))
-        doNothing().whenever(analyticsTracker).track(any(), any())
 
         viewModel = ProfileEpisodeListViewModel(
             episodeManager = episodeManager,
             downloadQueue = mock(),
-            analyticsTracker = analyticsTracker,
             eventHorizon = EventHorizon(TestEventSink()),
             settings = settings,
             userManager = userManager,

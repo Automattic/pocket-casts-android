@@ -18,7 +18,7 @@ class OnboardingImportViewModel @Inject constructor(
     fun onImportStartPageShown(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingImportShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -26,7 +26,7 @@ class OnboardingImportViewModel @Inject constructor(
     fun onOpenApp(flow: OnboardingFlow, appName: String) {
         eventHorizon.track(
             OnboardingImportOpenAppSelectedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 app = appName,
             ),
         )
@@ -35,7 +35,7 @@ class OnboardingImportViewModel @Inject constructor(
     fun onAppSelected(flow: OnboardingFlow, appName: String) {
         eventHorizon.track(
             OnboardingImportAppSelectedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 app = appName,
             ),
         )
@@ -44,7 +44,7 @@ class OnboardingImportViewModel @Inject constructor(
     fun onImportDismissed(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingImportDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }

@@ -37,8 +37,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -51,6 +49,9 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
+import com.automattic.eventhorizon.BatteryRestrictionsShownEvent
+import com.automattic.eventhorizon.BatteryRestrictionsToggledEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -72,7 +73,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
     lateinit var batteryRestrictions: SystemBatteryRestrictions
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,7 +82,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
             CallOnce {
-                analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_SHOWN)
+                eventHorizon.track(BatteryRestrictionsShownEvent)
             }
             var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
             DisposableEffect(this) {
@@ -110,7 +111,11 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                     activity?.onBackPressedDispatcher?.onBackPressed()
                 },
                 onClick = {
-                    analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.analyticsValue))
+                    eventHorizon.track(
+                        BatteryRestrictionsToggledEvent(
+                            currentStatus = batteryRestrictions.status.analyticsValue,
+                        ),
+                    )
                     batteryRestrictions.promptToUpdateBatteryRestriction(context)
                 },
                 onOpenUrl = { url ->

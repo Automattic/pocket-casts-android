@@ -55,7 +55,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -99,7 +98,9 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.BannerAdImpressionEvent
+import com.automattic.eventhorizon.BannerAdTappedEvent
+import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
 import com.automattic.eventhorizon.FolderChoosePodcastsShownEvent
@@ -147,9 +148,6 @@ class PodcastsFragment :
 
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -429,7 +427,7 @@ class PodcastsFragment :
             val onSortTypeChanged = { sort: PodcastsSortType ->
                 eventHorizon.track(
                     FolderSortByChangedEvent(
-                        sortOrder = sort.eventHorizonValue,
+                        sortOrder = sort.analyticsValue,
                     ),
                 )
                 viewModel.updateFolderSort(folder.uuid, sort)
@@ -470,7 +468,7 @@ class PodcastsFragment :
 
     private fun showCustomFolderCreation() {
         FolderCreateFragment
-            .newInstance(CreateFolderSource.PodcastsList)
+            .newInstance(CreateFolderSourceType.PodcastsList)
             .show(parentFragmentManager, "create_folder_card")
     }
 
@@ -739,11 +737,21 @@ class PodcastsFragment :
     }
 
     private fun trackAdImpression(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdImpression(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdImpressionEvent(
+                id = ad.id,
+                location = ad.location.analyticsValue,
+            ),
+        )
     }
 
     fun trackAdTapped(ad: BlazeAd) {
-        analyticsTracker.trackBannerAdTapped(id = ad.id, location = ad.location.value)
+        eventHorizon.track(
+            BannerAdTappedEvent(
+                id = ad.id,
+                location = ad.location.analyticsValue,
+            ),
+        )
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

@@ -66,7 +66,7 @@ class BookmarksFragment : BaseFragment() {
             forceDarkTheme: Boolean = false,
         ) = BookmarksFragment().apply {
             arguments = Bundle().apply {
-                putString(ARG_SOURCE_VIEW, sourceView.analyticsValue)
+                putString(ARG_SOURCE_VIEW, sourceView.key)
                 putString(ARG_EPISODE_UUID, episodeUuid)
                 putBoolean(ARG_FORCE_DARK_THEME, forceDarkTheme)
             }

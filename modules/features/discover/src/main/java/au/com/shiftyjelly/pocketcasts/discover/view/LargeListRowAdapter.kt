@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
@@ -68,7 +68,7 @@ internal class LargeListRowAdapter(
                         DiscoverListPodcastTappedEvent(
                             listId = listId,
                             podcastUuid = podcast.uuid,
-                            listDatetime = list?.date ?: Tracker.INVALID_OR_NULL_VALUE,
+                            listDatetime = list?.date ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                         ),
                     )
                 }

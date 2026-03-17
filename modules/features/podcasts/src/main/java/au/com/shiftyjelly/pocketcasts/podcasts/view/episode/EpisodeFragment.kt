@@ -35,8 +35,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -229,7 +229,7 @@ class EpisodeFragment : BaseFragment() {
         if (!viewModel.isFragmentChangingConfigurations) {
             eventHorizon.track(
                 EpisodeDetailShownEvent(
-                    source = episodeViewSource.eventHorizonValue,
+                    source = episodeViewSource.analyticsValue,
                 ),
             )
         }
@@ -240,7 +240,7 @@ class EpisodeFragment : BaseFragment() {
         if (!viewModel.isFragmentChangingConfigurations) {
             eventHorizon.track(
                 EpisodeDetailDismissedEvent(
-                    source = episodeViewSource.eventHorizonValue,
+                    source = episodeViewSource.analyticsValue,
                 ),
             )
             podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed?.invoke()
@@ -378,12 +378,12 @@ class EpisodeFragment : BaseFragment() {
                             eventHorizon.track(
                                 EpisodeDetailPodcastNameTappedEvent(
                                     episodeUuid = state.episode.uuid,
-                                    source = episodeViewSource.eventHorizonValue,
+                                    source = episodeViewSource.analyticsValue,
                                 ),
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
-                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.analyticsValue)
+                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.key)
                             }
                         }
 
@@ -598,7 +598,7 @@ class EpisodeFragment : BaseFragment() {
                                         eventHorizon.track(
                                             EpisodeDetailTranscriptCardTappedEvent(
                                                 episodeUuid = episodeUuid,
-                                                podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                                podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                                             ),
                                         )
                                     },
@@ -609,7 +609,7 @@ class EpisodeFragment : BaseFragment() {
                             eventHorizon.track(
                                 EpisodeDetailTranscriptCardShownEvent(
                                     episodeUuid = episodeUuid,
-                                    podcastUuid = podcastUuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                    podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                                 ),
                             )
                         }
@@ -664,7 +664,7 @@ class EpisodeFragment : BaseFragment() {
                                 eventHorizon.track(
                                     EpisodeDetailShowNotesLinkTappedEvent(
                                         episodeUuid = episodeUuid,
-                                        source = EpisodeViewSource.PODCAST_SCREEN.eventHorizonValue,
+                                        source = EpisodeViewSource.PODCAST_SCREEN.analyticsValue,
                                     ),
                                 )
                             }

@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
@@ -19,6 +17,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WinbackAvailablePlansBackButtonTappedEvent
+import com.automattic.eventhorizon.WinbackAvailablePlansNewPlanPurchaseSuccessfulEvent
+import com.automattic.eventhorizon.WinbackAvailablePlansSelectPlanEvent
+import com.automattic.eventhorizon.WinbackCancelConfirmationCancelButtonTappedEvent
+import com.automattic.eventhorizon.WinbackCancelConfirmationStayButtonTappedEvent
+import com.automattic.eventhorizon.WinbackContinueButtonTapEvent
+import com.automattic.eventhorizon.WinbackMainScreenRowTapEvent
+import com.automattic.eventhorizon.WinbackOfferClaimedDoneButtonTappedEvent
+import com.automattic.eventhorizon.WinbackRowType
+import com.automattic.eventhorizon.WinbackScreenDismissedEvent
+import com.automattic.eventhorizon.WinbackScreenShownEvent
+import com.automattic.eventhorizon.WinbackWinbackOfferCancelButtonTappedEvent
 import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -37,7 +48,7 @@ class WinbackViewModel @Inject constructor(
     private val paymentClient: PaymentClient,
     private val referralManager: ReferralManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState.Empty)
     internal val uiState = _uiState.asStateFlow()
@@ -342,107 +353,88 @@ class WinbackViewModel @Inject constructor(
     }
 
     internal fun trackScreenShown(screen: String) {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_SCREEN_SHOWN,
-            properties = mapOf("screen" to screen),
+        eventHorizon.track(
+            WinbackScreenShownEvent(
+                screen = screen,
+            ),
         )
     }
 
     internal fun trackScreenDismissed(screen: String) {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_SCREEN_DISMISSED,
-            properties = mapOf("screen" to screen),
+        eventHorizon.track(
+            WinbackScreenDismissedEvent(
+                screen = screen,
+            ),
         )
     }
 
     internal fun trackContinueCancellationTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP,
-        )
+        eventHorizon.track(WinbackContinueButtonTapEvent)
     }
 
     private fun trackClaimOfferTapped() {
-        val currentScubscription = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.currentSubscription
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-            properties = buildMap {
-                put("row", "claim_offer")
-                currentScubscription?.tier?.let { tier ->
-                    put("tier", tier.analyticsValue)
-                }
-                currentScubscription?.billingCycle?.let { billingCycle ->
-                    put("frequency", billingCycle.analyticsValue)
-                }
-                put("is_installment", (currentScubscription?.isInstallment ?: false).toString())
-            },
+        val currentSubscription = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.currentSubscription
+        eventHorizon.track(
+            WinbackMainScreenRowTapEvent(
+                tier = currentSubscription?.tier?.analyticsValue,
+                frequency = currentSubscription?.billingCycle?.analyticsValue,
+                isInstallment = currentSubscription?.isInstallment,
+                row = WinbackRowType.ClaimOffer,
+            ),
         )
     }
 
     internal fun trackAvailablePlansTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-            properties = mapOf(
-                "row" to "available_plans",
+        eventHorizon.track(
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.AvailablePlans,
             ),
         )
     }
 
     internal fun trackHelpAndFeedbackTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-            properties = mapOf(
-                "row" to "help_and_feedback",
+        eventHorizon.track(
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.HelpAndFeedback,
             ),
         )
     }
 
     internal fun trackOfferClaimedConfirmationTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED,
-        )
+        eventHorizon.track(WinbackOfferClaimedDoneButtonTappedEvent)
     }
 
     internal fun trackPlansBackButtonTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED,
-        )
+        eventHorizon.track(WinbackAvailablePlansBackButtonTappedEvent)
     }
 
     private fun trackPlanSelected(productId: String) {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
-            properties = mapOf(
-                "product" to productId,
+        eventHorizon.track(
+            WinbackAvailablePlansSelectPlanEvent(
+                product = productId,
             ),
         )
     }
 
     private fun trackPlanPurchased(currentProductId: String, newProductId: String) {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
-            properties = mapOf(
-                "current_product" to currentProductId,
-                "new_product" to newProductId,
+        eventHorizon.track(
+            WinbackAvailablePlansNewPlanPurchaseSuccessfulEvent(
+                currentProduct = currentProductId,
+                newProduct = newProductId,
             ),
         )
     }
 
     internal fun trackKeepSubscriptionTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED,
-        )
+        eventHorizon.track(WinbackCancelConfirmationStayButtonTappedEvent)
     }
 
     internal fun trackCancelSubscriptionTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED,
-        )
+        eventHorizon.track(WinbackCancelConfirmationCancelButtonTappedEvent)
     }
 
     internal fun trackContinueWithCancellationTapped() {
-        tracker.track(
-            event = AnalyticsEvent.WINBACK_WINBACK_OFFER_CANCEL_BUTTON_TAPPED,
-        )
+        eventHorizon.track(WinbackWinbackOfferCancelButtonTappedEvent)
     }
 
     internal data class UiState(

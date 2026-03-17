@@ -241,7 +241,7 @@ class AddFileActivity :
         upgradeLayout.findViewById<View>(R.id.btnClose).setOnClickListener {
             eventHorizon.track(
                 UpgradeBannerDismissedEvent(
-                    source = SourceView.FILES.eventHorizonValue,
+                    source = SourceView.FILES.analyticsValue,
                 ),
             )
             settings.setUpgradeClosedAddFile(true)

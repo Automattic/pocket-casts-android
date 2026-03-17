@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -65,9 +64,6 @@ class PlayerContainerFragment :
     HasBackstack {
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var eventHorizon: EventHorizon
@@ -152,7 +148,7 @@ class PlayerContainerFragment :
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     eventHorizon.track(
                         UpNextShownEvent(
-                            source = UpNextSource.NOW_PLAYING.eventHorizonValue,
+                            source = UpNextSource.NOW_PLAYING.analyticsValue,
                         ),
                     )
 
@@ -241,7 +237,7 @@ class PlayerContainerFragment :
             binding.upNextButton.setOnClickListener {
                 eventHorizon.track(
                     UpNextShownEvent(
-                        source = UpNextSource.PLAYER.eventHorizonValue,
+                        source = UpNextSource.PLAYER.analyticsValue,
                     ),
                 )
                 openUpNext()

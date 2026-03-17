@@ -60,7 +60,7 @@ class AutoAddSettingsViewModel @Inject constructor(
             podcastManager.updateAutoAddToUpNext(podcast, autoAddOption)
             eventHorizon.track(
                 SettingsAutoAddUpNextPodcastPositionOptionChangedEvent(
-                    value = autoAddOption.eventHorizonValue,
+                    value = autoAddOption.analyticsValue,
                 ),
             )
         }
@@ -89,7 +89,7 @@ class AutoAddSettingsViewModel @Inject constructor(
         settings.autoAddUpNextLimitBehaviour.set(behavior, updateModifiedAt = true)
         eventHorizon.track(
             SettingsAutoAddUpNextLimitReachedChangedEvent(
-                value = behavior.eventHorizonValue,
+                value = behavior.analyticsValue,
             ),
         )
     }

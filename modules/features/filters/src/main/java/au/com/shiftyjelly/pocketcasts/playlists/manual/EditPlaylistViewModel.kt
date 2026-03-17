@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import com.automattic.eventhorizon.EpisodeRemovedFromListEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FilterManualEpisodesRearrangedEvent
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -61,11 +61,11 @@ class EditPlaylistViewModel @AssistedInject constructor(
             val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
             eventHorizon.track(
                 EpisodeRemovedFromListEvent(
-                    playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                    playlistName = playlistName ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                     playlistUuid = playlistUuid,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
-                    source = PlaylistRemoveEpisodeSource.PlaylistRearrange,
+                    source = PlaylistRemoveEpisodeSourceType.PlaylistRearrange,
                 ),
             )
         }

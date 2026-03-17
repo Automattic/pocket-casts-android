@@ -410,12 +410,12 @@ class EpisodeManagerImpl @Inject constructor(
         val event = if (starred) {
             EpisodeStarredEvent(
                 episodeUuid = episode.uuid,
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             )
         } else {
             EpisodeUnstarredEvent(
                 episodeUuid = episode.uuid,
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             )
         }
         eventHorizon.track(event)

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.viewmodels
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -27,7 +26,6 @@ class PodcastSelectViewModelTest {
     @Test
     fun `should load selectable podcasts`() = runTest {
         val podcastManager: PodcastManager = mock()
-        val analyticsTracker: AnalyticsTracker = mock()
 
         val uuid1 = "uuid1"
         val uuid2 = "uuid2"
@@ -39,7 +37,6 @@ class PodcastSelectViewModelTest {
 
         val viewModel = PodcastSelectViewModel(
             podcastManager = podcastManager,
-            analyticsTracker = analyticsTracker,
             eventHorizon = EventHorizon(TestEventSink()),
         )
 

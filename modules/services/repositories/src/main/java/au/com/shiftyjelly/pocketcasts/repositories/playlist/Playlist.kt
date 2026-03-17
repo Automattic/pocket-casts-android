@@ -52,20 +52,21 @@ sealed interface Playlist {
     }
 
     enum class Type(
-        val eventHorizonValue: PlaylistType,
+        val key: String,
+        val analyticsValue: PlaylistType,
     ) {
         Manual(
-            eventHorizonValue = PlaylistType.Manual,
+            key = "manual",
+            analyticsValue = PlaylistType.Manual,
         ),
         Smart(
-            eventHorizonValue = PlaylistType.Smart,
+            key = "smart",
+            analyticsValue = PlaylistType.Smart,
         ),
         ;
 
-        val analyticsValue get() = eventHorizonValue.toString()
-
         companion object {
-            fun fromValue(value: String) = entries.firstOrNull { it.analyticsValue == value }
+            fun fromValue(value: String) = entries.firstOrNull { it.key == value }
         }
     }
 

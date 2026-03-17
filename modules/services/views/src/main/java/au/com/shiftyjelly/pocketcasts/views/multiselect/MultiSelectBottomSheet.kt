@@ -101,7 +101,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
 
                 eventHorizon.track(
                     MultiSelectViewOverflowMenuRearrangeStartedEvent(
-                        source = source.eventHorizonValue,
+                        source = source.analyticsValue,
                     ),
                 )
                 (activity as FragmentHostListener).showModal(

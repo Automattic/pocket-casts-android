@@ -177,7 +177,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     fun onShown(flow: OnboardingFlow) {
         eventHorizon.track(
             RecommendationsShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -186,7 +186,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             eventHorizon.track(
                 RecommendationsDismissedEvent(
-                    flow = flow.eventHorizonValue,
+                    flow = flow.analyticsValue,
                     subscriptions = podcastManager.countSubscribed().toLong(),
                 ),
             )
@@ -196,7 +196,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     fun onSearch(flow: OnboardingFlow) {
         eventHorizon.track(
             RecommendationsSearchTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -204,7 +204,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     fun onImportClick(flow: OnboardingFlow) {
         eventHorizon.track(
             RecommendationsImportTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -213,7 +213,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             eventHorizon.track(
                 RecommendationsContinueTappedEvent(
-                    flow = flow.eventHorizonValue,
+                    flow = flow.analyticsValue,
                     subscriptions = podcastManager.countSubscribed().toLong(),
                 ),
             )
@@ -225,13 +225,13 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, SourceView.ONBOARDING_RECOMMENDATIONS)
             PodcastUnsubscribedEvent(
                 uuid = podcast.uuid,
-                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue,
             )
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
             PodcastSubscribedEvent(
                 uuid = podcast.uuid,
-                source = SourceView.ONBOARDING_RECOMMENDATIONS.eventHorizonValue,
+                source = SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue,
             )
         }
         eventHorizon.track(event)

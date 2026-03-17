@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -90,14 +89,13 @@ class ChaptersViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
-            Mode.Episode(episode.uuid),
-            chapterManager,
-            playbackManager,
-            episodeManager,
-            settings,
-            AnalyticsTracker.test(),
-            EventHorizon(TestEventSink()),
-            testDispatcher,
+            mode = Mode.Episode(episode.uuid),
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            ioDispatcher = testDispatcher,
         )
     }
 
@@ -226,14 +224,13 @@ class ChaptersViewModelTest {
     @Test
     fun `play chapter from different episode`() = runTest {
         chaptersViewModel = ChaptersViewModel(
-            Mode.Episode("id2"),
-            chapterManager,
-            playbackManager,
-            episodeManager,
-            settings,
-            AnalyticsTracker.test(),
-            EventHorizon(TestEventSink()),
-            testDispatcher,
+            mode = Mode.Episode("id2"),
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            ioDispatcher = testDispatcher,
         )
 
         val episode = PodcastEpisode(uuid = "id2", publishedDate = Date())

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpired
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelable
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.SignInSourceType
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import javax.inject.Inject
@@ -24,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
-import com.automattic.eventhorizon.SignInSource as EventHorizonSignInSource
 
 @Singleton
 open class SyncAccountManagerImpl @Inject constructor(
@@ -191,10 +191,10 @@ open class SyncAccountManagerImpl @Inject constructor(
 }
 
 sealed class SignInSource {
-    sealed class UserInitiated(val eventHorizonValue: EventHorizonSignInSource) : SignInSource() {
-        object SignInViewModel : UserInitiated(EventHorizonSignInSource.SignInViewModel)
-        object Onboarding : UserInitiated(EventHorizonSignInSource.Onboarding)
-        object Watch : UserInitiated(EventHorizonSignInSource.Watch)
+    sealed class UserInitiated(val analyticsValue: SignInSourceType) : SignInSource() {
+        object SignInViewModel : UserInitiated(SignInSourceType.SignInViewModel)
+        object Onboarding : UserInitiated(SignInSourceType.Onboarding)
+        object Watch : UserInitiated(SignInSourceType.Watch)
     }
     object WatchPhoneSync : SignInSource()
 }

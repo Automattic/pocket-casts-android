@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
 import io.reactivex.Observable
 import java.time.Instant
@@ -161,9 +162,18 @@ interface Settings {
         OFFERS(21483663),
     }
 
-    enum class UpNextAction(val serverId: Int) {
-        PLAY_NEXT(serverId = 0),
-        PLAY_LAST(serverId = 1),
+    enum class UpNextAction(
+        val serverId: Int,
+        val analyticsValue: UpNextSwipeActionType,
+    ) {
+        PLAY_NEXT(
+            serverId = 0,
+            analyticsValue = UpNextSwipeActionType.PlayNext,
+        ),
+        PLAY_LAST(
+            serverId = 1,
+            analyticsValue = UpNextSwipeActionType.PlayLast,
+        ),
         ;
 
         companion object {
@@ -173,35 +183,33 @@ interface Settings {
 
     enum class CloudSortOrder(
         val serverId: Int,
-        val eventHorizonValue: UploadedFilesSortType,
+        val analyticsValue: UploadedFilesSortType,
     ) {
         NEWEST_OLDEST(
             serverId = 0,
-            eventHorizonValue = UploadedFilesSortType.NewestToOldest,
+            analyticsValue = UploadedFilesSortType.NewestToOldest,
         ),
         OLDEST_NEWEST(
             serverId = 1,
-            eventHorizonValue = UploadedFilesSortType.OldestToNewest,
+            analyticsValue = UploadedFilesSortType.OldestToNewest,
         ),
         A_TO_Z(
             serverId = 2,
-            eventHorizonValue = UploadedFilesSortType.TitleAToZ,
+            analyticsValue = UploadedFilesSortType.TitleAToZ,
         ),
         Z_TO_A(
             serverId = 3,
-            eventHorizonValue = UploadedFilesSortType.TitleZToA,
+            analyticsValue = UploadedFilesSortType.TitleZToA,
         ),
         SHORT_LONG(
             serverId = 4,
-            eventHorizonValue = UploadedFilesSortType.ShortestToLongest,
+            analyticsValue = UploadedFilesSortType.ShortestToLongest,
         ),
         LONG_SHORT(
             serverId = 5,
-            eventHorizonValue = UploadedFilesSortType.LongestToShortest,
+            analyticsValue = UploadedFilesSortType.LongestToShortest,
         ),
         ;
-
-        val analyticsValue get() = eventHorizonValue.toString()
 
         companion object {
             fun fromServerId(id: Int) = entries.find { it.serverId == id }
@@ -496,9 +504,7 @@ interface Settings {
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
 
-    // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
-    // should update this setting through the AnalyticsTracker.
-    val collectAnalytics: UserSetting<Boolean>
+    val collectAnalytics: ReadWriteSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 

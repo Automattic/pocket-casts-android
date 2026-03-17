@@ -193,7 +193,7 @@ class MainActivityViewModel
                 bookmarkManager.deleteToSync(bookmarkUuid)
                 eventHorizon.track(
                     BookmarkDeletedEvent(
-                        source = SourceView.NOTIFICATION_BOOKMARK.eventHorizonValue,
+                        source = SourceView.NOTIFICATION_BOOKMARK.analyticsValue,
                     ),
                 )
             }

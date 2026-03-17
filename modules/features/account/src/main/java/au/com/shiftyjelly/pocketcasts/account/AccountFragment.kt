@@ -81,7 +81,7 @@ class AccountFragment : BaseFragment() {
         binding.btnClose?.setOnClickListener {
             eventHorizon.track(
                 SetupAccountDismissedEvent(
-                    flow = OnboardingFlow.LoggedOut.eventHorizonValue,
+                    flow = OnboardingFlow.LoggedOut.analyticsValue,
                 ),
             )
             activity?.finish()
@@ -103,7 +103,7 @@ class AccountFragment : BaseFragment() {
         binding.btnCreate.setOnClickListener {
             eventHorizon.track(
                 SetupAccountButtonTappedEvent(
-                    flow = OnboardingFlow.LoggedOut.eventHorizonValue,
+                    flow = OnboardingFlow.LoggedOut.analyticsValue,
                     button = SetupAccountButtonType.CreateAccount,
                 ),
             )
@@ -117,7 +117,7 @@ class AccountFragment : BaseFragment() {
         binding.btnSignIn.setOnClickListener {
             eventHorizon.track(
                 SetupAccountButtonTappedEvent(
-                    flow = OnboardingFlow.LoggedOut.eventHorizonValue,
+                    flow = OnboardingFlow.LoggedOut.analyticsValue,
                     button = SetupAccountButtonType.SignIn,
                 ),
             )

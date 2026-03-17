@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeFinishedEvent
-import com.automattic.eventhorizon.ShelfActionSource
+import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import java.util.Collections
@@ -147,32 +147,32 @@ class MultiSelectFragment :
     }
 
     private fun sectionTitleAt(position: Int) = if (position <= multiSelectEpisodesHelper.maxToolbarIcons) {
-        ShelfActionSource.Shelf
+        ShelfActionSourceType.Shelf
     } else {
-        ShelfActionSource.OverflowMenu
+        ShelfActionSourceType.OverflowMenu
     }
 
     private fun trackRearrangeFinishedEvent() {
         eventHorizon.track(
             MultiSelectViewOverflowMenuRearrangeFinishedEvent(
-                source = args.source.eventHorizonValue,
+                source = args.source.analyticsValue,
             ),
         )
     }
 
     private fun trackItemMovedEvent(position: Int) {
         dragStartPosition?.let {
-            val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: Tracker.INVALID_OR_NULL_VALUE
+            val title = (items[position] as? MultiSelectAction)?.analyticsValue ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
             val movedFrom = sectionTitleAt(it)
             val movedTo = sectionTitleAt(position)
-            val newPosition = if (movedTo == ShelfActionSource.Shelf) {
+            val newPosition = if (movedTo == ShelfActionSourceType.Shelf) {
                 position - 1
             } else {
                 position - (items.indexOf(multiSelectEpisodesHelper.maxToolbarIcons) + 1)
             }
             eventHorizon.track(
                 MultiSelectViewOverflowMenuRearrangeActionMovedEvent(
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                     title = title,
                     position = newPosition.toLong(),
                     movedFrom = movedFrom,

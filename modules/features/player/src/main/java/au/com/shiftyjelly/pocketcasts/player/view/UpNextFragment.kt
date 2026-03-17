@@ -166,7 +166,7 @@ class UpNextFragment :
             eventHorizon.track(
                 UpNextSelectAllTappedEvent(
                     selectAll = true,
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                 ),
             )
             multiSelectHelper.selectAllInList(upNextEpisodes)
@@ -177,7 +177,7 @@ class UpNextFragment :
             eventHorizon.track(
                 UpNextSelectAllTappedEvent(
                     selectAll = false,
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                 ),
             )
             multiSelectHelper.deselectAllInList(upNextEpisodes)
@@ -232,7 +232,7 @@ class UpNextFragment :
         if (args.source == UpNextSource.UP_NEXT_TAB) {
             eventHorizon.track(
                 UpNextShownEvent(
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                 ),
             )
         }
@@ -400,11 +400,11 @@ class UpNextFragment :
             if (!args.isEmbedded || isEmbeddedExpanded()) {
                 val event = if (isMultiSelecting) {
                     UpNextMultiSelectEnteredEvent(
-                        source = args.source.eventHorizonValue,
+                        source = args.source.analyticsValue,
                     )
                 } else {
                     UpNextMultiSelectExitedEvent(
-                        source = args.source.eventHorizonValue,
+                        source = args.source.analyticsValue,
                     )
                 }
                 eventHorizon.track(event)
@@ -467,7 +467,7 @@ class UpNextFragment :
         }
         eventHorizon.track(
             UpNextDiscoverButtonTappedEvent(
-                source = args.source.eventHorizonValue,
+                source = args.source.analyticsValue,
             ),
         )
         (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
@@ -546,7 +546,7 @@ class UpNextFragment :
                         slots = abs(position.minus(dragStartPosition)).toLong(),
                         direction = if (position > dragStartPosition) Down else Up,
                         isNext = position == UP_NEXT_ADAPTER_POSITION,
-                        source = args.source.eventHorizonValue,
+                        source = args.source.analyticsValue,
                     ),
                 )
             }

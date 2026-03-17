@@ -5,5 +5,5 @@ import com.automattic.eventhorizon.BookmarkSortType
 interface BookmarksSortType {
     val labelId: Int
     val key: String
-    val eventHorizonValue: BookmarkSortType
+    val analyticsValue: BookmarkSortType
 }

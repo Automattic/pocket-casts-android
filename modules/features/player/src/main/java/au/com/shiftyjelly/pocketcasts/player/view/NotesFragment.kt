@@ -13,7 +13,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentNotesBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -135,7 +135,7 @@ class NotesFragment : BaseFragment() {
 
                         eventHorizon.track(
                             PlayerShowNotesLinkTappedEvent(
-                                episodeUuid = viewModel.episode.value?.uuid ?: Tracker.INVALID_OR_NULL_VALUE,
+                                episodeUuid = viewModel.episode.value?.uuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                             ),
                         )
                         return IntentUtil.webViewShouldOverrideUrl(url, view.context)

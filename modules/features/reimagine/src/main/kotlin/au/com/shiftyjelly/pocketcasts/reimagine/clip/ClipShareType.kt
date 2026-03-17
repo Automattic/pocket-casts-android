@@ -8,7 +8,7 @@ enum class ClipShareType {
     Link,
     ;
 
-    val eventHorizonValue get() = when (this) {
+    val analyticsValue get() = when (this) {
         Audio -> ShareActionClipType.Audio
         Video -> ShareActionClipType.Video
         Link -> ShareActionClipType.Link

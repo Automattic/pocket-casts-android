@@ -105,9 +105,9 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun changeBillingCycle(billingCycle: BillingCycle, source: OnboardingUpgradeSource = OnboardingUpgradeSource.UNKNOWN) {
         eventHorizon.track(
             PlusPromotionSubscriptionFrequencyChangedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
-                value = billingCycle.eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
+                value = billingCycle.analyticsValue,
             ),
         )
         _state.update { state ->
@@ -119,9 +119,9 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun changeSubscriptionTier(tier: SubscriptionTier, source: OnboardingUpgradeSource = OnboardingUpgradeSource.UNKNOWN) {
         eventHorizon.track(
             PlusPromotionSubscriptionTierChangedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
-                value = tier.eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
+                value = tier.analyticsValue,
             ),
         )
         _state.update { state ->
@@ -142,9 +142,9 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             viewModelScope.launch {
                 val purchaseResult = paymentClient.purchaseSubscriptionPlan(
                     key = planKey,
-                    purchaseSource = source.analyticsValue,
+                    purchaseSource = source.analyticsValue.toString(),
                     activity = activity,
-                    purchaseFlow = flow.analyticsValue,
+                    purchaseFlow = flow.analyticsValue.toString(),
                 )
 
                 when (purchaseResult) {
@@ -166,8 +166,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private fun trackPaymentFrequencyButtonTapped(plan: SubscriptionPlan.Key, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionUpgradeButtonTappedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
                 isInstallment = plan.isInstallment,
             ),
         )
@@ -176,8 +176,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionShownEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -185,8 +185,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onDismiss(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionDismissedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -194,8 +194,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onNotNow(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionNotNowButtonTappedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -203,8 +203,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onPrivacyPolicyPressed(source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionPrivacyPolicyTappedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -212,8 +212,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onTermsAndConditionsPressed(source: OnboardingUpgradeSource) {
         eventHorizon.track(
             PlusPromotionTermsAndConditionsTappedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -221,8 +221,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onSelectPaymentFrequencyShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             SelectPaymentFrequencyShownEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -230,8 +230,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         eventHorizon.track(
             SelectPaymentFrequencyDismissedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }
@@ -241,8 +241,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     ) {
         eventHorizon.track(
             PlusPromotionDetailsTappedEvent(
-                source = source.eventHorizonValue,
-                flow = flow.adjustedFlow(source).eventHorizonValue,
+                source = source.analyticsValue,
+                flow = flow.adjustedFlow(source).analyticsValue,
             ),
         )
     }

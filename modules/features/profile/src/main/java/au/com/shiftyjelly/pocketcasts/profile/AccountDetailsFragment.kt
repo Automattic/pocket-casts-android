@@ -152,8 +152,8 @@ class AccountDetailsFragment : BaseFragment() {
                 val onboardingFlow = OnboardingFlow.AccountUpgrade
                 eventHorizon.track(
                     PlusPromotionBannerButtonTappedEvent(
-                        source = OnboardingUpgradeSource.PROFILE.eventHorizonValue,
-                        flow = onboardingFlow.eventHorizonValue,
+                        source = OnboardingUpgradeSource.PROFILE.analyticsValue,
+                        flow = onboardingFlow.analyticsValue,
                     ),
                 )
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)

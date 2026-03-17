@@ -29,8 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.FormFieldDialog
@@ -51,6 +49,28 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.ArchivedEpisodeBehaviorType
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.RowActionType
+import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralAutoSleepTimerRestartToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralAutoplayToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralIntelligentPlaybackToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralKeepScreenAwakeToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralOpenPlayerAutomaticallyToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralPlayUpNextOnTapToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralRowActionChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralShakeToResetSleepTimerToggledEvent
+import com.automattic.eventhorizon.SettingsGeneralShownEvent
+import com.automattic.eventhorizon.SettingsGeneralSkipBackChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralSkipForwardChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralUpNextSwipeChangedEvent
+import com.automattic.eventhorizon.SettingsUseRealTimeForPlaybackRemainingTimeEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 import javax.inject.Inject
@@ -69,7 +89,7 @@ class PlaybackSettingsFragment : BaseFragment() {
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -112,7 +132,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         }
 
         LaunchedEffect(Unit) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
+            eventHorizon.track(SettingsGeneralShownEvent)
         }
 
         Column {
@@ -142,17 +162,17 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_ROW_ACTION -> {
                             RowAction(
                                 saved = settings.streamingMode.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
-                                        mapOf(
-                                            "value" to when (it) {
-                                                true -> "play"
-                                                false -> "download"
+                                onSave = { isPlayActionUsed ->
+                                    eventHorizon.track(
+                                        SettingsGeneralRowActionChangedEvent(
+                                            value = if (isPlayActionUsed) {
+                                                RowActionType.Play
+                                            } else {
+                                                RowActionType.Download
                                             },
                                         ),
                                     )
-                                    settings.streamingMode.set(it, updateModifiedAt = true)
+                                    settings.streamingMode.set(isPlayActionUsed, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -160,17 +180,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_UP_NEXT_SWIPE -> {
                             UpNextSwipe(
                                 saved = settings.upNextSwipe.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
-                                        mapOf(
-                                            "value" to when (it) {
-                                                Settings.UpNextAction.PLAY_NEXT -> "play_next"
-                                                Settings.UpNextAction.PLAY_LAST -> "play_last"
-                                            },
+                                onSave = { swipeAction ->
+                                    eventHorizon.track(
+                                        SettingsGeneralUpNextSwipeChangedEvent(
+                                            value = swipeAction.analyticsValue,
                                         ),
                                     )
-                                    settings.upNextSwipe.set(it, updateModifiedAt = true)
+                                    settings.upNextSwipe.set(swipeAction, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -178,21 +194,14 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_EPISODE_GROUPING -> {
                             PodcastEpisodeGrouping(
                                 saved = settings.podcastGroupingDefault.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_CHANGED,
-                                        mapOf(
-                                            "value" to when (it) {
-                                                PodcastGrouping.Downloaded -> "downloaded"
-                                                PodcastGrouping.None -> "none"
-                                                PodcastGrouping.Season -> "season"
-                                                PodcastGrouping.Starred -> "starred"
-                                                PodcastGrouping.Unplayed -> "unplayed"
-                                            },
+                                onSave = { grouping ->
+                                    eventHorizon.track(
+                                        SettingsGeneralEpisodeGroupingChangedEvent(
+                                            value = grouping.analyticsValue,
                                         ),
                                     )
-                                    settings.podcastGroupingDefault.set(it, updateModifiedAt = true)
-                                    showSetAllGroupingDialog(it)
+                                    settings.podcastGroupingDefault.set(grouping, updateModifiedAt = true)
+                                    showSetAllGroupingDialog(grouping)
                                 },
                             )
                         }
@@ -200,18 +209,18 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_ARCHIVED_EPISODES -> {
                             ShowArchived(
                                 saved = settings.showArchivedDefault.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED,
-                                        mapOf(
-                                            "value" to when (it) {
-                                                true -> "show"
-                                                false -> "hide"
+                                onSave = { isShowArchivedUsed ->
+                                    eventHorizon.track(
+                                        SettingsGeneralArchivedEpisodesChangedEvent(
+                                            value = if (isShowArchivedUsed) {
+                                                ArchivedEpisodeBehaviorType.Show
+                                            } else {
+                                                ArchivedEpisodeBehaviorType.Hide
                                             },
                                         ),
                                     )
-                                    settings.showArchivedDefault.set(it, updateModifiedAt = true)
-                                    showSetAllArchiveDialog(it)
+                                    settings.showArchivedDefault.set(isShowArchivedUsed, updateModifiedAt = true)
+                                    showSetAllArchiveDialog(isShowArchivedUsed)
                                 },
                             )
                         }
@@ -240,15 +249,14 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_SKIP_FORWARD_TIME -> {
                             SkipTime(
                                 primaryText = stringResource(LR.string.settings_skip_forward_time),
-                                saved = settings.skipForwardInSecs.flow
-                                    .collectAsState()
-                                    .value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
-                                        mapOf("value" to it),
+                                saved = settings.skipForwardInSecs.flow.collectAsState().value,
+                                onSave = { seconds ->
+                                    eventHorizon.track(
+                                        SettingsGeneralSkipForwardChangedEvent(
+                                            value = seconds.toLong(),
+                                        ),
                                     )
-                                    settings.skipForwardInSecs.set(it, updateModifiedAt = true)
+                                    settings.skipForwardInSecs.set(seconds, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -257,12 +265,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                             SkipTime(
                                 primaryText = stringResource(LR.string.settings_skip_back_time),
                                 saved = settings.skipBackInSecs.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
-                                        mapOf("value" to it),
+                                onSave = { seconds ->
+                                    eventHorizon.track(
+                                        SettingsGeneralSkipBackChangedEvent(
+                                            value = seconds.toLong(),
+                                        ),
                                     )
-                                    settings.skipBackInSecs.set(it, updateModifiedAt = true)
+                                    settings.skipBackInSecs.set(seconds, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -270,12 +279,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_KEEP_SCREEN_AWAKE -> {
                             KeepScreenAwake(
                                 saved = settings.keepScreenAwake.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isKeepAwakeEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralKeepScreenAwakeToggledEvent(
+                                            enabled = isKeepAwakeEnabled,
+                                        ),
                                     )
-                                    settings.keepScreenAwake.set(it, updateModifiedAt = true)
+                                    settings.keepScreenAwake.set(isKeepAwakeEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -283,12 +293,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_OPEN_PLAYER_AUTOMATICALLY -> {
                             OpenPlayerAutomatically(
                                 saved = settings.openPlayerAutomatically.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isOpenPlayerEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralOpenPlayerAutomaticallyToggledEvent(
+                                            enabled = isOpenPlayerEnabled,
+                                        ),
                                     )
-                                    settings.openPlayerAutomatically.set(it, updateModifiedAt = true)
+                                    settings.openPlayerAutomatically.set(isOpenPlayerEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -296,12 +307,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_INTELLIGENT_PLAYBACK -> {
                             IntelligentPlaybackResumption(
                                 saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isIntelligentPlaybackEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralIntelligentPlaybackToggledEvent(
+                                            enabled = isIntelligentPlaybackEnabled,
+                                        ),
                                     )
-                                    settings.intelligentPlaybackResumption.set(it, updateModifiedAt = true)
+                                    settings.intelligentPlaybackResumption.set(isIntelligentPlaybackEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -309,12 +321,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE -> {
                             PlayUpNextOnTap(
                                 saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isPlayOnTapEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralPlayUpNextOnTapToggledEvent(
+                                            enabled = isPlayOnTapEnabled,
+                                        ),
                                     )
-                                    settings.tapOnUpNextShouldPlay.set(it, updateModifiedAt = true)
+                                    settings.tapOnUpNextShouldPlay.set(isPlayOnTapEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -322,12 +335,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_ADJUST_REMAINING_TIME -> {
                             UseRealTimeForPlaybackRemainingTime(
                                 saved = settings.useRealTimeForPlaybackRemaingTime.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME,
-                                        mapOf("enabled" to it),
+                                onSave = { isUseRealTimeEnabled ->
+                                    eventHorizon.track(
+                                        SettingsUseRealTimeForPlaybackRemainingTimeEvent(
+                                            enabled = isUseRealTimeEnabled,
+                                        ),
                                     )
-                                    settings.useRealTimeForPlaybackRemaingTime.set(it, updateModifiedAt = true)
+                                    settings.useRealTimeForPlaybackRemaingTime.set(isUseRealTimeEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -335,12 +349,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_GENERAL_AUTOPLAY -> {
                             AutoPlayNextOnEmpty(
                                 saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isAutoplayEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralAutoplayToggledEvent(
+                                            enabled = isAutoplayEnabled,
+                                        ),
                                     )
-                                    settings.autoPlayNextEpisodeOnEmpty.set(it, updateModifiedAt = true)
+                                    settings.autoPlayNextEpisodeOnEmpty.set(isAutoplayEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -358,12 +373,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_SLEEP_TIMER_RESTART -> {
                             AutoSleepTimerRestart(
                                 saved = settings.autoSleepTimerRestart.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isRestartEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralAutoSleepTimerRestartToggledEvent(
+                                            enabled = isRestartEnabled,
+                                        ),
                                     )
-                                    settings.autoSleepTimerRestart.set(it, updateModifiedAt = true)
+                                    settings.autoSleepTimerRestart.set(isRestartEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -371,12 +387,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         SettingsItems.SETTINGS_SLEEP_TIMER_SHAKE -> {
                             ShakeToResetSleepTimer(
                                 saved = settings.shakeToResetSleepTimer.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_SHAKE_TO_RESET_SLEEP_TIMER_TOGGLED,
-                                        mapOf("enabled" to it),
+                                onSave = { isShakeEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralShakeToResetSleepTimerToggledEvent(
+                                            enabled = isShakeEnabled,
+                                        ),
                                     )
-                                    settings.shakeToResetSleepTimer.set(it, updateModifiedAt = true)
+                                    settings.shakeToResetSleepTimer.set(isShakeEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -613,10 +630,10 @@ class PlaybackSettingsFragment : BaseFragment() {
             )
             .setIconId(R.drawable.ic_podcasts)
             .setOnSecondary {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_DO_NOT_APPLY_TO_EXISTING)
+                eventHorizon.track(SettingsGeneralEpisodeGroupingDoNotApplyToExistingEvent)
             }
             .setOnConfirm {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_APPLY_TO_EXISTING)
+                eventHorizon.track(SettingsGeneralEpisodeGroupingApplyToExistingEvent)
                 applicationScope.launch {
                     podcastManager.updateGroupingForAllBlocking(grouping)
                 }
@@ -632,10 +649,10 @@ class PlaybackSettingsFragment : BaseFragment() {
             .setSummary(getString(if (shouldShow) LR.string.settings_apply_archived_show else LR.string.settings_apply_archived_hide))
             .setIconId(R.drawable.ic_podcasts)
             .setOnSecondary {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_DO_NOT_APPLY_TO_EXISTING)
+                eventHorizon.track(SettingsGeneralArchivedEpisodesDoNotApplyToExistingEvent)
             }
             .setOnConfirm {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_APPLY_TO_EXISTING)
+                eventHorizon.track(SettingsGeneralArchivedEpisodesApplyToExistingEvent)
                 applicationScope.launch {
                     podcastManager.updateAllShowArchived(shouldShow)
                 }

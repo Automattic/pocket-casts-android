@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.search
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,30 +23,25 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.automattic.eventhorizon.SearchResultLegacyType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
-private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
-private const val ARG_SOURCE = "arg_source"
-private const val ARG_TYPE = "arg_type"
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class SearchResultsFragment : BaseFragment() {
-
     @Inject lateinit var settings: Settings
 
-    private val viewModel by viewModels<SearchViewModel>({ requireParentFragment() })
-    private val searchHistoryViewModel by viewModels<SearchHistoryViewModel>()
-    private var listener: SearchFragment.Listener? = null
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
 
-    private val onlySearchRemote: Boolean
-        get() = arguments?.getBoolean(ARG_ONLY_SEARCH_REMOTE) ?: false
-    private val source: SourceView
-        get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
-    private val type: ResultsType
-        get() = ResultsType.fromString(arguments?.getString(ARG_TYPE))
+    private val viewModel by viewModels<SearchViewModel>({ requireParentFragment() })
+
+    private val searchHistoryViewModel by viewModels<SearchHistoryViewModel>()
+
+    private var listener: SearchFragment.Listener? = null
 
     @SuppressLint("MissingSuperCall") // False positive
     override fun onAttach(context: Context) {
@@ -66,7 +62,7 @@ class SearchResultsFragment : BaseFragment() {
         val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
         val bottomInsetDp = bottomInset.pxToDp(LocalContext.current).dp
         AppThemeWithBackground(theme.activeTheme) {
-            when (type) {
+            when (args.type) {
                 ResultsType.PODCASTS -> {
                     SearchPodcastResultsPage(
                         viewModel = viewModel,
@@ -85,8 +81,6 @@ class SearchResultsFragment : BaseFragment() {
                         bottomInset = bottomInsetDp,
                     )
                 }
-
-                ResultsType.UNKNOWN -> throw IllegalStateException("Unknown search results type")
             }
         }
     }
@@ -100,7 +94,7 @@ class SearchResultsFragment : BaseFragment() {
 
     private fun onEpisodeClick(episodeItem: EpisodeItem) {
         viewModel.trackSearchResultTapped(
-            source = source,
+            source = args.source,
             uuid = episodeItem.uuid,
             type = SearchViewModel.SearchResultType.EPISODE,
         )
@@ -115,7 +109,7 @@ class SearchResultsFragment : BaseFragment() {
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
         viewModel.trackSearchResultTapped(
-            source = source,
+            source = args.source,
             uuid = folder.uuid,
             type = SearchViewModel.SearchResultType.FOLDER,
         )
@@ -125,9 +119,9 @@ class SearchResultsFragment : BaseFragment() {
 
     private fun onPodcastClick(podcast: Podcast) {
         viewModel.trackSearchResultTapped(
-            source = source,
+            source = args.source,
             uuid = podcast.uuid,
-            type = if (onlySearchRemote || !podcast.isSubscribed) {
+            type = if (args.onlySearchRemote || !podcast.isSubscribed) {
                 SearchViewModel.SearchResultType.PODCAST_REMOTE_RESULT
             } else {
                 SearchViewModel.SearchResultType.PODCAST_LOCAL_RESULT
@@ -141,31 +135,42 @@ class SearchResultsFragment : BaseFragment() {
         parentFragmentManager.popBackStack()
     }
 
-    companion object {
-        enum class ResultsType(val value: String) {
-            PODCASTS("podcasts"),
-            EPISODES("episodes"),
-            UNKNOWN("unknown"),
-            ;
+    @Parcelize
+    private class Args(
+        val type: ResultsType,
+        val onlySearchRemote: Boolean,
+        val source: SourceView,
+    ) : Parcelable
 
-            companion object {
-                fun fromString(value: String?) = ResultsType.values().find { it.value == value } ?: UNKNOWN
-            }
+    companion object {
+        private const val NEW_INSTANCE_ARGS = "new_instance_args"
+
+        enum class ResultsType(
+            val analyticsValue: SearchResultLegacyType,
+        ) {
+            PODCASTS(
+                analyticsValue = SearchResultLegacyType.Podcasts,
+            ),
+            EPISODES(
+                analyticsValue = SearchResultLegacyType.Episodes,
+            ),
         }
 
         fun newInstance(
             type: ResultsType,
-            onlySearchRemote: Boolean = false,
+            onlySearchRemote: Boolean,
             source: SourceView,
-        ): SearchResultsFragment {
-            val fragment = SearchResultsFragment()
-            val arguments = Bundle().apply {
-                putString(ARG_TYPE, type.value)
-                putBoolean(ARG_ONLY_SEARCH_REMOTE, onlySearchRemote)
-                putString(ARG_SOURCE, source.analyticsValue)
+        ) = SearchResultsFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(
+                        type = type,
+                        onlySearchRemote = onlySearchRemote,
+                        source = source,
+                    ),
+                )
             }
-            fragment.arguments = arguments
-            return fragment
         }
     }
 }

@@ -40,7 +40,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun onShow(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingInterestsShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -48,7 +48,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun skipSelection(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingInterestsNotNowTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
         categoriesManager.setInterestCategories(emptySet())
@@ -57,7 +57,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean, flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingInterestsCategorySelectedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 categoryId = category.id.toLong(),
                 name = category.name,
                 isSelected = isSelected,
@@ -77,7 +77,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun showMore(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingInterestsShowMoreTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
         _state.update {
@@ -90,7 +90,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun saveInterests(flow: OnboardingFlow) {
         eventHorizon.track(
             OnboardingInterestsContinueTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 categories = _state.value.selectedCategories.joinToString(separator = ", ") { it.name },
             ),
         )

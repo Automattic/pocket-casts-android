@@ -151,7 +151,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                     eventHorizon.track(
                         SettingsAdvancedEpisodeArtworkCustomizationElementToggledEvent(
                             enabled = newValue,
-                            element = element.eventHorizonValue,
+                            element = element.analyticsValue,
                         ),
                     )
                 }

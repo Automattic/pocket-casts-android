@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingCreateAccountViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val eventHorizon: EventHorizon,
-    private val analyticsTracker: AnalyticsTracker,
+    private val analyticsController: AnalyticsController,
     private val subscriptionManager: SubscriptionManager,
     private val podcastManager: PodcastManager,
     private val experimentProvider: ExperimentProvider,
@@ -63,7 +63,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSetupAccountShown(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -71,7 +71,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onCreateAccountShown(flow: OnboardingFlow) {
         eventHorizon.track(
             CreateAccountShownEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -79,7 +79,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSetupAccountDismissed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -87,7 +87,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onCreateAccountDismissed(flow: OnboardingFlow) {
         eventHorizon.track(
             CreateAccountDismissedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
             ),
         )
     }
@@ -95,7 +95,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onSignUpEmailPressed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.CreateAccount,
             ),
         )
@@ -104,7 +104,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     fun onLogInPressed(flow: OnboardingFlow) {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = flow.eventHorizonValue,
+                flow = flow.analyticsValue,
                 button = SetupAccountButtonType.SignIn,
             ),
         )
@@ -144,7 +144,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             when (result) {
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
-                    analyticsTracker.refreshMetadata()
+                    analyticsController.refreshMetadata()
                     experimentProvider.refreshExperiments()
                     onAccountCreated()
                 }

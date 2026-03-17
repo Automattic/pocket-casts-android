@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
@@ -51,7 +50,6 @@ class TranscriptViewModelTest {
                 on { getSignInState() } doReturn signInStateFlow.asFlowable()
             },
             paymentClient = PaymentClient.test(),
-            analyticsTracker = AnalyticsTracker.test(),
             eventHorizon = EventHorizon(TestEventSink()),
             source = TranscriptViewModel.Source.Player,
             sharingClient = object : TranscriptSharingClient {

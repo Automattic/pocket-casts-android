@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastS
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.viewmodels.PodcastSelectViewModel
+import com.automattic.eventhorizon.SelectPodcastsSourceType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -279,8 +280,16 @@ private data class PodcastSelectFragmentArgs(
     val source: PodcastSelectFragmentSource,
 ) : Parcelable
 
-enum class PodcastSelectFragmentSource(val analyticsValue: String) {
-    AUTO_ADD("auto_add"),
-    NOTIFICATIONS("notifications"),
-    FILTERS("filters"),
+enum class PodcastSelectFragmentSource(
+    val analyticsValue: SelectPodcastsSourceType,
+) {
+    AUTO_ADD(
+        analyticsValue = SelectPodcastsSourceType.AutoAdd,
+    ),
+    NOTIFICATIONS(
+        analyticsValue = SelectPodcastsSourceType.Notifications,
+    ),
+    FILTERS(
+        analyticsValue = SelectPodcastsSourceType.Filters,
+    ),
 }

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.preferences.model
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import com.automattic.eventhorizon.HeadphoneActionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -10,28 +11,28 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 enum class HeadphoneAction(
-    val analyticsValue: String,
     val serverId: Int,
+    val analyticsValue: HeadphoneActionType,
 ) {
     ADD_BOOKMARK(
-        analyticsValue = "add_bookmark",
         serverId = 0,
+        analyticsValue = HeadphoneActionType.AddBookmark,
     ),
     SKIP_BACK(
-        analyticsValue = "skip_back",
         serverId = 1,
+        analyticsValue = HeadphoneActionType.SkipBack,
     ),
     SKIP_FORWARD(
-        analyticsValue = "skip_forward",
         serverId = 2,
+        analyticsValue = HeadphoneActionType.SkipForward,
     ),
     NEXT_CHAPTER(
-        analyticsValue = "next_chapter",
         serverId = 3,
+        analyticsValue = HeadphoneActionType.NextChapter,
     ),
     PREVIOUS_CHAPTER(
-        analyticsValue = "previous_chapter",
         serverId = 4,
+        analyticsValue = HeadphoneActionType.PreviousChapter,
     ),
     ;
 

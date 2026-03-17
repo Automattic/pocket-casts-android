@@ -111,7 +111,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,
-                analyticsTracker = viewModel.analyticsTracker,
+                eventHorizon = viewModel.eventHorizon,
                 applicationScope = applicationScope,
             ).apply {
                 sendEmail()
@@ -127,7 +127,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,
-                analyticsTracker = viewModel.analyticsTracker,
+                eventHorizon = viewModel.eventHorizon,
                 applicationScope = applicationScope,
             ).apply {
                 saveFile()

@@ -33,7 +33,7 @@ class SharePodcastViewModel @AssistedInject constructor(
         eventHorizon.track(
             ShareScreenShownEvent(
                 podcastUuid = podcastUuid,
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
                 type = ShareActionMediaType.Podcast,
             ),
         )

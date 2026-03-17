@@ -463,7 +463,7 @@ class RefreshPodcastsThread(
             val showEpisodeDeepLink = ShowEpisodeDeepLink(
                 episodeUuid = episode.uuid,
                 podcastUuid = podcast.uuid,
-                sourceView = EpisodeViewSource.NOTIFICATION.value,
+                sourceView = EpisodeViewSource.NOTIFICATION.key,
                 autoPlay = false,
             )
 

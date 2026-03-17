@@ -2,9 +2,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.chromecast
 
 import android.content.Context
 import androidx.core.content.ContextCompat
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.ChromecastStartedCastingEvent
+import com.automattic.eventhorizon.ChromecastStoppedCastingEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.Session
 import com.google.android.gms.cast.framework.SessionManager
@@ -20,7 +21,7 @@ import timber.log.Timber
 
 class CastManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : CastManager {
 
     private val sessionManagerListener = CastSessionManagerListener()
@@ -113,7 +114,7 @@ class CastManagerImpl @Inject constructor(
 
         override fun onSessionStarted(session: Session, s: String) {
             Timber.i("Cast Session onSessionStarted")
-            analyticsTracker.track(AnalyticsEvent.CHROMECAST_STARTED_CASTING)
+            eventHorizon.track(ChromecastStartedCastingEvent)
             sessionListener?.sessionStarted()
             isConnectedObservable.accept(true)
         }
@@ -128,7 +129,7 @@ class CastManagerImpl @Inject constructor(
 
         override fun onSessionEnded(session: Session, i: Int) {
             Timber.i("Cast Session onSessionEnded")
-            analyticsTracker.track(AnalyticsEvent.CHROMECAST_STOPPED_CASTING)
+            eventHorizon.track(ChromecastStoppedCastingEvent)
             sessionListener?.sessionEnded()
             isConnectedObservable.accept(false)
         }

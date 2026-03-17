@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.PullToRefreshSource
+import com.automattic.eventhorizon.PullToRefreshSourceType
 import com.automattic.eventhorizon.PulledToRefreshEvent
 import com.automattic.eventhorizon.UploadedFilesSortByChangedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,9 +65,9 @@ class CloudFilesViewModel @Inject constructor(
                 eventHorizon.track(
                     PulledToRefreshEvent(
                         source = when (cloudFilesManager.sortedCloudFiles.firstOrNull()?.isEmpty()) {
-                            true -> PullToRefreshSource.NoFiles
-                            false -> PullToRefreshSource.Files
-                            else -> PullToRefreshSource.Unknown
+                            true -> PullToRefreshSourceType.NoFiles
+                            false -> PullToRefreshSourceType.Files
+                            else -> PullToRefreshSourceType.Unknown
                         },
                     ),
                 )
@@ -79,7 +79,7 @@ class CloudFilesViewModel @Inject constructor(
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
         eventHorizon.track(
             UploadedFilesSortByChangedEvent(
-                sortBy = sortOrder.eventHorizonValue,
+                sortBy = sortOrder.analyticsValue,
             ),
         )
         settings.cloudSortOrder.set(sortOrder, updateModifiedAt = true)

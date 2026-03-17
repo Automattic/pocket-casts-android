@@ -3,10 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 import android.app.Activity
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -23,6 +20,20 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SubscriptionFrequencyType
+import com.automattic.eventhorizon.SubscriptionTierType
+import com.automattic.eventhorizon.WinbackAvailablePlansBackButtonTappedEvent
+import com.automattic.eventhorizon.WinbackAvailablePlansNewPlanPurchaseSuccessfulEvent
+import com.automattic.eventhorizon.WinbackAvailablePlansSelectPlanEvent
+import com.automattic.eventhorizon.WinbackCancelConfirmationCancelButtonTappedEvent
+import com.automattic.eventhorizon.WinbackCancelConfirmationStayButtonTappedEvent
+import com.automattic.eventhorizon.WinbackContinueButtonTapEvent
+import com.automattic.eventhorizon.WinbackMainScreenRowTapEvent
+import com.automattic.eventhorizon.WinbackOfferClaimedDoneButtonTappedEvent
+import com.automattic.eventhorizon.WinbackRowType
+import com.automattic.eventhorizon.WinbackScreenDismissedEvent
+import com.automattic.eventhorizon.WinbackScreenShownEvent
 import com.pocketcasts.service.api.winbackResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -42,7 +53,7 @@ class WinbackViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val paymentDataSource = FakePaymentDataSource()
-    private val tracker = FakeTracker()
+    private val eventSink = TestEventSink()
     private val settings = mock<Settings>()
     private val referralManager = mock<ReferralManager>()
 
@@ -62,7 +73,7 @@ class WinbackViewModelTest {
             paymentClient = PaymentClient.test(paymentDataSource),
             referralManager = referralManager,
             settings = settings,
-            tracker = AnalyticsTracker.test(tracker),
+            eventHorizon = EventHorizon(eventSink),
         )
     }
 
@@ -376,7 +387,6 @@ class WinbackViewModelTest {
             orderId = "new-order-id",
             productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID),
         )
-        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Patron, BillingCycle.Yearly, isAutoRenewing = true)
 
         viewModel.loadWinbackData()
 
@@ -578,13 +588,11 @@ class WinbackViewModelTest {
     fun `track screen shown`() = runTest {
         viewModel.trackScreenShown("screen_key")
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_SCREEN_SHOWN,
-                mapOf("screen" to "screen_key"),
+            WinbackScreenShownEvent(
+                screen = "screen_key",
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -592,13 +600,11 @@ class WinbackViewModelTest {
     fun `track screen dismissed`() = runTest {
         viewModel.trackScreenDismissed("screen_key")
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_SCREEN_DISMISSED,
-                mapOf("screen" to "screen_key"),
+            WinbackScreenDismissedEvent(
+                screen = "screen_key",
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -606,10 +612,9 @@ class WinbackViewModelTest {
     fun `track continue cancellation tapped`() = runTest {
         viewModel.trackContinueCancellationTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP, emptyMap()),
-            event,
+            WinbackContinueButtonTapEvent,
+            eventSink.pollEvent(),
         )
     }
 
@@ -622,18 +627,14 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
         viewModel.claimOffer(mock<Activity>())
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf(
-                    "row" to "claim_offer",
-                    "tier" to "plus",
-                    "frequency" to "monthly",
-                    "is_installment" to "false",
-                ),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.ClaimOffer,
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Monthly,
+                isInstallment = false,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -646,18 +647,14 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
         viewModel.claimOffer(mock<Activity>())
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf(
-                    "row" to "claim_offer",
-                    "tier" to "plus",
-                    "frequency" to "yearly",
-                    "is_installment" to "false",
-                ),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.ClaimOffer,
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = false,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -670,18 +667,14 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
         viewModel.claimOffer(mock<Activity>())
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf(
-                    "row" to "claim_offer",
-                    "tier" to "patron",
-                    "frequency" to "monthly",
-                    "is_installment" to "false",
-                ),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.ClaimOffer,
+                tier = SubscriptionTierType.Patron,
+                frequency = SubscriptionFrequencyType.Monthly,
+                isInstallment = false,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -694,18 +687,14 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
         viewModel.claimOffer(mock<Activity>())
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf(
-                    "row" to "claim_offer",
-                    "tier" to "patron",
-                    "frequency" to "yearly",
-                    "is_installment" to "false",
-                ),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.ClaimOffer,
+                tier = SubscriptionTierType.Patron,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = false,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -766,18 +755,14 @@ class WinbackViewModelTest {
         viewModel.loadWinbackData()
         viewModel.claimOffer(mock<Activity>())
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf(
-                    "row" to "claim_offer",
-                    "tier" to "plus",
-                    "frequency" to "yearly",
-                    "is_installment" to "true",
-                ),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.ClaimOffer,
+                tier = SubscriptionTierType.Plus,
+                frequency = SubscriptionFrequencyType.Yearly,
+                isInstallment = true,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -800,13 +785,11 @@ class WinbackViewModelTest {
     fun `track available plans tapped`() = runTest {
         viewModel.trackAvailablePlansTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf("row" to "available_plans"),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.AvailablePlans,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -814,13 +797,11 @@ class WinbackViewModelTest {
     fun `track help and feedback tapped`() = runTest {
         viewModel.trackHelpAndFeedbackTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(
-                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
-                mapOf("row" to "help_and_feedback"),
+            WinbackMainScreenRowTapEvent(
+                row = WinbackRowType.HelpAndFeedback,
             ),
-            event,
+            eventSink.pollEvent(),
         )
     }
 
@@ -828,10 +809,9 @@ class WinbackViewModelTest {
     fun `track offer claimed confirmation tapped`() = runTest {
         viewModel.trackOfferClaimedConfirmationTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED, emptyMap()),
-            event,
+            WinbackOfferClaimedDoneButtonTappedEvent,
+            eventSink.pollEvent(),
         )
     }
 
@@ -839,10 +819,9 @@ class WinbackViewModelTest {
     fun `track plans back button tapped`() = runTest {
         viewModel.trackPlansBackButtonTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED, emptyMap()),
-            event,
+            WinbackAvailablePlansBackButtonTappedEvent,
+            eventSink.pollEvent(),
         )
     }
 
@@ -858,22 +837,17 @@ class WinbackViewModelTest {
         viewModel.changePlan(SubscriptionPlan.PlusMonthlyPreview, mock<Activity>())
 
         assertEquals(
-            listOf(
-                TrackedEvent(
-                    AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
-                    mapOf(
-                        "product" to SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
-                    ),
-                ),
-                TrackedEvent(
-                    AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
-                    mapOf(
-                        "current_product" to SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
-                        "new_product" to SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
-                    ),
-                ),
+            WinbackAvailablePlansSelectPlanEvent(
+                product = SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
             ),
-            tracker.events,
+            eventSink.pollEvent(),
+        )
+        assertEquals(
+            WinbackAvailablePlansNewPlanPurchaseSuccessfulEvent(
+                currentProduct = SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
+                newProduct = SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
+            ),
+            eventSink.pollEvent(),
         )
     }
 
@@ -881,10 +855,9 @@ class WinbackViewModelTest {
     fun `track keep subscription tapped`() = runTest {
         viewModel.trackKeepSubscriptionTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED, emptyMap()),
-            event,
+            WinbackCancelConfirmationStayButtonTappedEvent,
+            eventSink.pollEvent(),
         )
     }
 
@@ -892,10 +865,9 @@ class WinbackViewModelTest {
     fun `track cancel subscription tapped`() = runTest {
         viewModel.trackCancelSubscriptionTapped()
 
-        val event = tracker.events.single()
         assertEquals(
-            TrackedEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED, emptyMap()),
-            event,
+            WinbackCancelConfirmationCancelButtonTappedEvent,
+            eventSink.pollEvent(),
         )
     }
 }
@@ -930,25 +902,3 @@ private fun createSuccessReferralResult(
         this.offer = offerId
     },
 )
-
-class FakeTracker : Tracker {
-    private val _events = mutableListOf<TrackedEvent>()
-
-    val events get() = _events.toList()
-
-    override val id get() = "fake_tracker"
-
-    override fun shouldTrack(event: AnalyticsEvent) = true
-
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        val trackedEvent = TrackedEvent(event, properties)
-        _events += trackedEvent
-        return trackedEvent
-    }
-
-    override fun refreshMetadata() = Unit
-
-    override fun flush() = Unit
-
-    override fun clearAllData() = Unit
-}

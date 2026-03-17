@@ -232,7 +232,7 @@ class PodcastViewModel @Inject constructor(
         multiSelectBookmarksHelper.closeMultiSelect()
         eventHorizon.track(
             PodcastsScreenTabTappedEvent(
-                value = tab.eventHorizonValue,
+                value = tab.analyticsValue,
             ),
         )
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
@@ -266,7 +266,7 @@ class PodcastViewModel @Inject constructor(
             eventHorizon.track(
                 PodcastSubscribedEvent(
                     uuid = it.uuid,
-                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                    source = SourceView.PODCAST_SCREEN.analyticsValue,
                 ),
             )
         }
@@ -278,7 +278,7 @@ class PodcastViewModel @Inject constructor(
             eventHorizon.track(
                 PodcastUnsubscribedEvent(
                     uuid = it.uuid,
-                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                    source = SourceView.PODCAST_SCREEN.analyticsValue,
                 ),
             )
         }
@@ -305,7 +305,7 @@ class PodcastViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkUnarchivedEvent(
                     count = episodes.size.toLong(),
-                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                    source = SourceView.PODCAST_SCREEN.analyticsValue,
                 ),
             )
         }
@@ -319,7 +319,7 @@ class PodcastViewModel @Inject constructor(
                 eventHorizon.track(
                     EpisodeBulkArchivedEvent(
                         count = episodeState.episodes.size.toLong(),
-                        source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                        source = SourceView.PODCAST_SCREEN.analyticsValue,
                     ),
                 )
             }
@@ -345,7 +345,7 @@ class PodcastViewModel @Inject constructor(
                 podcastManager.updateEpisodesSortTypeBlocking(it, episodesSortType)
                 eventHorizon.track(
                     PodcastsScreenSortOrderChangedEvent(
-                        sortOrder = episodesSortType.eventHorizonValue,
+                        sortOrder = episodesSortType.analyticsValue,
                     ),
                 )
             }
@@ -358,7 +358,7 @@ class PodcastViewModel @Inject constructor(
                 podcastManager.updateGroupingBlocking(it, grouping)
                 eventHorizon.track(
                     PodcastsScreenEpisodeGroupingChangedEvent(
-                        value = grouping.eventHorizonValue,
+                        value = grouping.analyticsValue,
                     ),
                 )
             }
@@ -416,7 +416,7 @@ class PodcastViewModel @Inject constructor(
             eventHorizon.track(
                 EpisodeBulkArchivedEvent(
                     count = episodes.size.toLong(),
-                    source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                    source = SourceView.PODCAST_SCREEN.analyticsValue,
                 ),
             )
         }
@@ -463,8 +463,8 @@ class PodcastViewModel @Inject constructor(
         settings.podcastBookmarksSortType.set(order, updateModifiedAt = true)
         eventHorizon.track(
             BookmarksSortByChangedEvent(
-                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
-                sortOrder = order.eventHorizonValue,
+                source = SourceView.PODCAST_SCREEN.analyticsValue,
+                sortOrder = order.analyticsValue,
             ),
         )
     }
@@ -623,7 +623,7 @@ class PodcastViewModel @Inject constructor(
     fun onBookmarkShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
         eventHorizon.track(
             BookmarkShareTappedEvent(
-                source = source.eventHorizonValue,
+                source = source.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),
@@ -636,7 +636,7 @@ class PodcastViewModel @Inject constructor(
         eventHorizon.track(
             PodcastScreenRefreshEpisodeListEvent(
                 podcastUuid = podcast.uuid,
-                action = refreshType.eventHorizonValue,
+                action = refreshType.analyticsValue,
             ),
         )
 
@@ -647,13 +647,13 @@ class PodcastViewModel @Inject constructor(
             _refreshState.emit(RefreshState.NewEpisodeFound)
             PodcastScreenRefreshNewEpisodeFoundEvent(
                 podcastUuid = podcast.uuid,
-                action = refreshType.eventHorizonValue,
+                action = refreshType.analyticsValue,
             )
         } else {
             _refreshState.emit(RefreshState.NoEpisodesFound)
             PodcastScreenRefreshNoEpisodesFoundEvent(
                 podcastUuid = podcast.uuid,
-                action = refreshType.eventHorizonValue,
+                action = refreshType.analyticsValue,
             )
         }
         eventHorizon.track(event)
@@ -664,7 +664,7 @@ class PodcastViewModel @Inject constructor(
     fun onHeadsetSettingsClicked() {
         eventHorizon.track(
             BookmarksEmptyGoToHeadphoneSettingsEvent(
-                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                source = SourceView.PODCAST_SCREEN.analyticsValue,
             ),
         )
     }
@@ -672,7 +672,7 @@ class PodcastViewModel @Inject constructor(
     fun onGetBookmarksClicked() {
         eventHorizon.track(
             BookmarksGetBookmarksButtonTappedEvent(
-                source = SourceView.PODCAST_SCREEN.eventHorizonValue,
+                source = SourceView.PODCAST_SCREEN.analyticsValue,
             ),
         )
     }
@@ -735,19 +735,19 @@ class PodcastViewModel @Inject constructor(
 
     enum class PodcastTab(
         @StringRes val labelResId: Int,
-        val eventHorizonValue: PodcastTabType,
+        val analyticsValue: PodcastTabType,
     ) {
         EPISODES(
             labelResId = LR.string.episodes,
-            eventHorizonValue = PodcastTabType.Episodes,
+            analyticsValue = PodcastTabType.Episodes,
         ),
         BOOKMARKS(
             labelResId = LR.string.bookmarks,
-            eventHorizonValue = PodcastTabType.Bookmarks,
+            analyticsValue = PodcastTabType.Bookmarks,
         ),
         RECOMMENDATIONS(
             labelResId = LR.string.you_might_like,
-            eventHorizonValue = PodcastTabType.YouMightLike,
+            analyticsValue = PodcastTabType.YouMightLike,
         ),
     }
 
@@ -782,13 +782,13 @@ class PodcastViewModel @Inject constructor(
     }
 
     enum class RefreshType(
-        val eventHorizonValue: PodcastRefreshType,
+        val analyticsValue: PodcastRefreshType,
     ) {
         PULL_TO_REFRESH(
-            eventHorizonValue = PodcastRefreshType.PullToRefresh,
+            analyticsValue = PodcastRefreshType.PullToRefresh,
         ),
         REFRESH_BUTTON(
-            eventHorizonValue = PodcastRefreshType.RefreshButton,
+            analyticsValue = PodcastRefreshType.RefreshButton,
         ),
     }
 

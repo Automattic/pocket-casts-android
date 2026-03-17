@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UserSatisfactionSurveyNotShownEvent
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewInfo
@@ -32,7 +32,7 @@ import java.time.Duration as JavaDuration
 class AppReviewManagerImpl(
     private val settings: Settings,
     private val clock: Clock,
-    private val tracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val googleManager: GoogleReviewManager,
     private val loopIdleDuration: Duration,
 ) : AppReviewManager {
@@ -40,12 +40,12 @@ class AppReviewManagerImpl(
     constructor(
         settings: Settings,
         clock: Clock,
-        tracker: AnalyticsTracker,
+        eventHorizon: EventHorizon,
         googleManager: GoogleReviewManager,
     ) : this(
         settings = settings,
         clock = clock,
-        tracker = tracker,
+        eventHorizon = eventHorizon,
         googleManager = googleManager,
         loopIdleDuration = 5.seconds,
     )
@@ -72,9 +72,10 @@ class AppReviewManagerImpl(
                             clearAllUnusedReasons()
                         }
                         if (triggerData.reason.analyticsValue != null && trackedFailureEvents.add(triggerData.reason)) {
-                            tracker.track(
-                                AnalyticsEvent.USER_SATISFACTION_SURVEY_NOT_SHOWN,
-                                mapOf("policy" to triggerData.reason.analyticsValue),
+                            eventHorizon.track(
+                                UserSatisfactionSurveyNotShownEvent(
+                                    policy = triggerData.reason.analyticsValue,
+                                ),
                             )
                         }
                         if (triggerData.reason.isFinal) {

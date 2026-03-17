@@ -1,31 +1,32 @@
 package au.com.shiftyjelly.pocketcasts.preferences.model
 
 import androidx.annotation.StringRes
+import com.automattic.eventhorizon.PlayOverNotificationType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class PlayOverNotificationSetting(
     val preferenceInt: Int,
     val serverId: Int,
     @StringRes val titleRes: Int,
-    val analyticsString: String,
+    val analyticsValue: PlayOverNotificationType,
 ) {
     NEVER(
         preferenceInt = 2,
         serverId = 0,
         titleRes = LR.string.settings_notification_play_over_never,
-        analyticsString = "never",
+        analyticsValue = PlayOverNotificationType.Never,
     ),
     DUCK(
         preferenceInt = 1,
         serverId = 2,
         titleRes = LR.string.settings_notification_play_over_duck,
-        analyticsString = "duck",
+        analyticsValue = PlayOverNotificationType.Duck,
     ),
     ALWAYS(
         preferenceInt = 0,
         serverId = 1,
         titleRes = LR.string.settings_notification_play_over_always,
-        analyticsString = "always",
+        analyticsValue = PlayOverNotificationType.Always,
     ),
     ;
 

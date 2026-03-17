@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.views.swipe
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.automattic.eventhorizon.AddToPlaylistFlowSource
-import com.automattic.eventhorizon.PlaylistAddEpisodeSource
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.AddToPlaylistFlowSourceType
+import com.automattic.eventhorizon.PlaylistAddEpisodeSourceType
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 
 interface AddToPlaylistFragmentFactory {
     fun create(
@@ -31,29 +31,29 @@ interface AddToPlaylistFragmentFactory {
     )
 
     enum class Source(
-        val analyticsValue: AddToPlaylistFlowSource,
-        val episodeAddAnalyticsValue: PlaylistAddEpisodeSource,
-        val episodeRemoveAnalyticsValue: PlaylistRemoveEpisodeSource,
+        val analyticsValue: AddToPlaylistFlowSourceType,
+        val episodeAddAnalyticsValue: PlaylistAddEpisodeSourceType,
+        val episodeRemoveAnalyticsValue: PlaylistRemoveEpisodeSourceType,
     ) {
         Swipe(
-            analyticsValue = AddToPlaylistFlowSource.Swipe,
-            episodeAddAnalyticsValue = PlaylistAddEpisodeSource.SwipeEdit,
-            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSource.SwipeEdit,
+            analyticsValue = AddToPlaylistFlowSourceType.Swipe,
+            episodeAddAnalyticsValue = PlaylistAddEpisodeSourceType.SwipeEdit,
+            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSourceType.SwipeEdit,
         ),
         Shelf(
-            analyticsValue = AddToPlaylistFlowSource.Shelf,
-            episodeAddAnalyticsValue = PlaylistAddEpisodeSource.Shelf,
-            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSource.Shelf,
+            analyticsValue = AddToPlaylistFlowSourceType.Shelf,
+            episodeAddAnalyticsValue = PlaylistAddEpisodeSourceType.Shelf,
+            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSourceType.Shelf,
         ),
         EpisodeDetails(
-            analyticsValue = AddToPlaylistFlowSource.EpisodeDetails,
-            episodeAddAnalyticsValue = PlaylistAddEpisodeSource.EpisodeDetails,
-            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSource.EpisodeDetails,
+            analyticsValue = AddToPlaylistFlowSourceType.EpisodeDetails,
+            episodeAddAnalyticsValue = PlaylistAddEpisodeSourceType.EpisodeDetails,
+            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSourceType.EpisodeDetails,
         ),
         MultiSelect(
-            analyticsValue = AddToPlaylistFlowSource.MultiSelect,
-            episodeAddAnalyticsValue = PlaylistAddEpisodeSource.MultiSelect,
-            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSource.MultiSelect,
+            analyticsValue = AddToPlaylistFlowSourceType.MultiSelect,
+            episodeAddAnalyticsValue = PlaylistAddEpisodeSourceType.MultiSelect,
+            episodeRemoveAnalyticsValue = PlaylistRemoveEpisodeSourceType.MultiSelect,
         ),
     }
 

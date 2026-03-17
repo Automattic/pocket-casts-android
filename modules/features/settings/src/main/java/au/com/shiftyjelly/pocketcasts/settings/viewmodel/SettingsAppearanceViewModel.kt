@@ -60,7 +60,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     fun onThemeChanged(theme: Theme.ThemeType) {
         eventHorizon.track(
             SettingsAppearanceThemeChangedEvent(
-                value = theme.eventHorizonValue,
+                value = theme.analyticsValue,
             ),
         )
         viewModelScope.launch {
@@ -86,7 +86,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         appIcon.enableSelectedAlias(appIconType)
         eventHorizon.track(
             SettingsAppearanceAppIconChangedEvent(
-                value = appIconType.eventHorizonValue,
+                value = appIconType.analyticsValue,
             ),
         )
     }
@@ -148,7 +148,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     fun onUpgradeBannerDismissed(sourceView: SourceView) {
         eventHorizon.track(
             UpgradeBannerDismissedEvent(
-                source = sourceView.eventHorizonValue,
+                source = sourceView.analyticsValue,
             ),
         )
     }

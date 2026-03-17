@@ -106,7 +106,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
         if (savedInstanceState == null) {
             eventHorizon.track(
                 UserFileDetailShownEvent(
-                    source = args.source.eventHorizonValue,
+                    source = args.source.analyticsValue,
                 ),
             )
         }

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
+import com.automattic.eventhorizon.SearchHistoryType
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder as FolderModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeModel
@@ -8,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 sealed class SearchHistoryEntry(
     val id: Long? = null,
 ) {
+    abstract val analyticsValue: SearchHistoryType
+
     class Episode(
         id: Long? = null,
         val uuid: String,
@@ -16,7 +19,9 @@ sealed class SearchHistoryEntry(
         val podcastUuid: String,
         val podcastTitle: String,
         val artworkUrl: String? = null,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id) {
+        override val analyticsValue get() = SearchHistoryType.Episode
+    }
 
     class Folder(
         id: Long? = null,
@@ -24,19 +29,25 @@ sealed class SearchHistoryEntry(
         val title: String,
         val color: Int,
         val podcastIds: List<String>,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id) {
+        override val analyticsValue get() = SearchHistoryType.Folder
+    }
 
     class Podcast(
         id: Long? = null,
         val uuid: String,
         val title: String,
         val author: String,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id) {
+        override val analyticsValue get() = SearchHistoryType.Podcast
+    }
 
     class SearchTerm(
         id: Long? = null,
         val term: String,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id) {
+        override val analyticsValue get() = SearchHistoryType.SearchTerm
+    }
 
     fun toSearchHistoryItem() = when (this) {
         is Episode -> SearchHistoryItem(

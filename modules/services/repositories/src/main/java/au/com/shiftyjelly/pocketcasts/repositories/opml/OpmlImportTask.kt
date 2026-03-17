@@ -18,8 +18,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
@@ -28,6 +26,10 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.OpmlImportFailedEvent
+import com.automattic.eventhorizon.OpmlImportFinishedEvent
+import com.automattic.eventhorizon.OpmlImportStartedEvent
 import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -60,7 +62,7 @@ class OpmlImportTask @AssistedInject constructor(
     private val refreshServiceManager: RefreshServiceManager,
     @Downloads private val httpClient: Lazy<OkHttpClient>,
     private val notificationHelper: NotificationHelper,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val onboardingNotificationManager: OnboardingNotificationManager,
 ) : CoroutineWorker(context, parameters) {
 
@@ -103,7 +105,7 @@ class OpmlImportTask @AssistedInject constructor(
     override suspend fun doWork(): Result {
         try {
             onboardingNotificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Import)
-            analyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
+            eventHorizon.track(OpmlImportStartedEvent)
             val url = inputData.getString(INPUT_URL)?.toHttpUrlOrNull()
             val uri = inputData.getString(INPUT_URI)?.toUri()
             val source = when {
@@ -149,16 +151,18 @@ class OpmlImportTask @AssistedInject constructor(
     }
 
     private fun trackProcessed(numberParsed: Int) {
-        analyticsTracker.track(
-            AnalyticsEvent.OPML_IMPORT_FINISHED,
-            mapOf("number" to numberParsed),
+        eventHorizon.track(
+            OpmlImportFinishedEvent(
+                number = numberParsed.toLong(),
+            ),
         )
     }
 
     private fun trackFailure(reason: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.OPML_IMPORT_FAILED,
-            mapOf("reason" to reason),
+        eventHorizon.track(
+            OpmlImportFailedEvent(
+                reason = reason,
+            ),
         )
     }
 

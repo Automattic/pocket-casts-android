@@ -34,6 +34,7 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.robolectric)
 
     testImplementation(projects.modules.services.sharedtest)
     testImplementation(projects.modules.services.analytics.testing)

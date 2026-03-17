@@ -4,7 +4,7 @@ import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -62,7 +62,7 @@ class UserManagerImpl @Inject constructor(
     val userEpisodeManager: UserEpisodeManager,
     private val playlistDao: PlaylistDao,
     private val playlistsInitializer: DefaultPlaylistsInitializer,
-    private val analyticsTracker: AnalyticsTracker,
+    private val analyticsController: AnalyticsController,
     private val eventHorizon: EventHorizon,
     private val accountStatusInfo: AccountStatusInfo,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -117,7 +117,7 @@ class UserManagerImpl @Inject constructor(
                         }
                         .combineLatest(syncManager.emailFlowable())
                         .map { (maybeSubscription, maybeEmail) ->
-                            analyticsTracker.refreshMetadata()
+                            analyticsController.refreshMetadata()
                             SignInState.SignedIn(email = maybeEmail.get() ?: "", subscription = maybeSubscription.get())
                         }
                         .onErrorReturn {
@@ -149,9 +149,9 @@ class UserManagerImpl @Inject constructor(
                             userInitiated = wasInitiatedByUser,
                         ),
                     )
-                    analyticsTracker.flush()
-                    analyticsTracker.clearAllData()
-                    analyticsTracker.refreshMetadata()
+                    analyticsController.flush()
+                    analyticsController.clearAllData()
+                    analyticsController.refreshMetadata()
 
                     val anonId = accountStatusInfo.recreateAnonId()
                     experimentProvider.refreshExperiments(anonId)

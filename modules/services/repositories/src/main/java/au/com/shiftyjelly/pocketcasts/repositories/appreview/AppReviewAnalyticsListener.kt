@@ -1,12 +1,25 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
 import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkCreatedEvent
+import com.automattic.eventhorizon.EndOfYearStoriesDismissedEvent
+import com.automattic.eventhorizon.EndOfYearStorySharedEvent
+import com.automattic.eventhorizon.EndOfYearStoryType
+import com.automattic.eventhorizon.EpisodeStarredEvent
+import com.automattic.eventhorizon.FilterCreatedEvent
+import com.automattic.eventhorizon.FolderSavedEvent
+import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
+import com.automattic.eventhorizon.PurchaseSuccessfulEvent
+import com.automattic.eventhorizon.RatingScreenSubmitTappedEvent
+import com.automattic.eventhorizon.ReferralPassSharedEvent
+import com.automattic.eventhorizon.SettingsAppearanceThemeChangedEvent
+import com.automattic.eventhorizon.SuggestedFoldersReplaceFoldersConfirmTappedEvent
+import com.automattic.eventhorizon.Trackable
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
@@ -16,7 +29,7 @@ import javax.inject.Singleton
 class AppReviewAnalyticsListener @Inject constructor(
     private val settings: Settings,
     private val clock: Clock,
-) : AnalyticsTracker.Listener {
+) : AnalyticsListener {
     private val episodesCompletedSetting = settings.appReviewEpisodeCompletedTimestamps
     private val episodeStarredSetting = settings.appReviewEpisodeStarredTimestamp
     private val podcastRatedSetting = settings.appReviewPodcastRatedTimestamp
@@ -30,8 +43,7 @@ class AppReviewAnalyticsListener @Inject constructor(
     private val endOfYearCompletedSetting = settings.appReviewEndOfYearCompletedTimestamp
 
     override fun onEvent(
-        event: AnalyticsEvent,
-        properties: Map<String, Any>,
+        event: Trackable,
         trackedEvents: Map<String, TrackedEvent?>,
     ) {
         if (!FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS)) {
@@ -39,51 +51,51 @@ class AppReviewAnalyticsListener @Inject constructor(
         }
 
         when (event) {
-            AnalyticsEvent.PLAYER_EPISODE_COMPLETED -> {
+            is PlayerEpisodeCompletedEvent -> {
                 val timestamps = episodesCompletedSetting.value
                 if (timestamps.size < 3) {
                     episodesCompletedSetting.set(timestamps + clock.instant(), updateModifiedAt = false)
                 }
             }
 
-            AnalyticsEvent.EPISODE_STARRED -> {
+            is EpisodeStarredEvent -> {
                 updateSetting(episodeStarredSetting)
             }
 
-            AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED -> {
+            is RatingScreenSubmitTappedEvent -> {
                 updateSetting(podcastRatedSetting)
             }
 
-            AnalyticsEvent.FILTER_CREATED -> {
+            is FilterCreatedEvent -> {
                 updateSetting(playlistCreatedSetting)
             }
 
-            AnalyticsEvent.PURCHASE_SUCCESSFUL -> {
+            is PurchaseSuccessfulEvent -> {
                 updateSetting(plusUpgradedSetting)
             }
 
-            AnalyticsEvent.FOLDER_SAVED, AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED -> {
+            is FolderSavedEvent, is SuggestedFoldersReplaceFoldersConfirmTappedEvent -> {
                 updateSetting(folderCreatedSetting)
             }
 
-            AnalyticsEvent.BOOKMARK_CREATED -> {
+            is BookmarkCreatedEvent -> {
                 updateSetting(bookmarkCreatedSetting)
             }
 
-            AnalyticsEvent.SETTINGS_APPEARANCE_THEME_CHANGED -> {
+            is SettingsAppearanceThemeChangedEvent -> {
                 updateSetting(themeChangedSetting)
             }
 
-            AnalyticsEvent.REFERRAL_PASS_SHARED -> {
+            is ReferralPassSharedEvent -> {
                 updateSetting(referralSharedSetting)
             }
 
-            AnalyticsEvent.END_OF_YEAR_STORY_SHARED -> {
+            is EndOfYearStorySharedEvent -> {
                 updateSetting(endOfYearSharedSetting)
             }
 
-            AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED -> {
-                if (properties["story"] == "ending") {
+            is EndOfYearStoriesDismissedEvent -> {
+                if (event.story == EndOfYearStoryType.Ending) {
                     updateSetting(endOfYearCompletedSetting)
                 }
             }

@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.automattic.eventhorizon.CreateFolderSource
+import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderChooseFolderTappedEvent
 import com.automattic.eventhorizon.FolderChoosePodcastsDismissedEvent
@@ -197,7 +197,7 @@ class FolderEditViewModel
         settings.setSelectPodcastsSortType(order)
         eventHorizon.track(
             FolderPodcastPickerFilterChangedEvent(
-                sortOrder = order.eventHorizonValue,
+                sortOrder = order.analyticsValue,
             ),
         )
     }
@@ -340,7 +340,7 @@ class FolderEditViewModel
         }
     }
 
-    fun trackShown(source: CreateFolderSource) {
+    fun trackShown(source: CreateFolderSourceType) {
         eventHorizon.track(
             FolderCreateShownEvent(
                 source = source,

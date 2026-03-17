@@ -296,19 +296,19 @@ class EpisodeContainerFragment :
 
         private sealed class Section(
             @StringRes val titleRes: Int,
-            val eventHorizonValue: EpisodeTabType,
+            val analyticsValue: EpisodeTabType,
         ) {
             data object Details : Section(
                 titleRes = LR.string.details,
-                eventHorizonValue = EpisodeTabType.Details,
+                analyticsValue = EpisodeTabType.Details,
             )
             data object Chapters : Section(
                 titleRes = LR.string.chapters,
-                eventHorizonValue = EpisodeTabType.Chapters,
+                analyticsValue = EpisodeTabType.Chapters,
             )
             data object Bookmarks : Section(
                 titleRes = LR.string.bookmarks,
-                eventHorizonValue = EpisodeTabType.Bookmarks,
+                analyticsValue = EpisodeTabType.Bookmarks,
             )
         }
 
@@ -381,7 +381,7 @@ class EpisodeContainerFragment :
             return sections[position].titleRes
         }
 
-        fun tabType(position: Int) = sections[position].eventHorizonValue
+        fun tabType(position: Int) = sections[position].analyticsValue
 
         fun isDetailsTab(position: Int) = sections[position] is Section.Details
     }

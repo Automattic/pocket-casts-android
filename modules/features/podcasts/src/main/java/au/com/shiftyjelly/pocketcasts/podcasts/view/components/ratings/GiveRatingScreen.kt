@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.starsToRating
 
 @Composable
 fun GiveRatingScreen(
@@ -90,7 +89,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(32.dp))
 
                 SwipeableStars(
-                    initialRate = state.previousRate?.let { starsToRating(it) },
+                    initialRate = state.previousRate?.value,
                     onStarsChange = onRatingUpdate,
                     modifier = Modifier
                         .height(48.dp)

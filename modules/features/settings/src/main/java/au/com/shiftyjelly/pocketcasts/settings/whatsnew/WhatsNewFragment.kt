@@ -8,8 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -21,6 +19,10 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.Naviga
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsnewConfirmButtonTappedEvent
+import com.automattic.eventhorizon.WhatsnewDismissedEvent
+import com.automattic.eventhorizon.WhatsnewShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -28,7 +30,7 @@ import javax.inject.Inject
 class WhatsNewFragment : BaseFragment() {
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.ThemeNoToolbar
     override var backgroundTransparent: Boolean = true
@@ -40,9 +42,10 @@ class WhatsNewFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
             CallOnce {
-                analyticsTracker.track(
-                    AnalyticsEvent.WHATSNEW_SHOWN,
-                    mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
+                eventHorizon.track(
+                    WhatsnewShownEvent(
+                        version = Settings.WHATS_NEW_VERSION_CODE.toLong(),
+                    ),
                 )
             }
 
@@ -52,9 +55,10 @@ class WhatsNewFragment : BaseFragment() {
             var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
             WhatsNewPage(
                 onConfirm = {
-                    analyticsTracker.track(
-                        AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
-                        mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
+                    eventHorizon.track(
+                        WhatsnewConfirmButtonTappedEvent(
+                            version = Settings.WHATS_NEW_VERSION_CODE.toLong(),
+                        ),
                     )
                     if (it.shouldCloseOnConfirm) {
                         onClose()
@@ -63,9 +67,10 @@ class WhatsNewFragment : BaseFragment() {
                     confirmActionClicked = true
                 },
                 onClose = {
-                    analyticsTracker.track(
-                        AnalyticsEvent.WHATSNEW_DISMISSED,
-                        mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
+                    eventHorizon.track(
+                        WhatsnewDismissedEvent(
+                            version = Settings.WHATS_NEW_VERSION_CODE.toLong(),
+                        ),
                     )
                     onClose()
                 },

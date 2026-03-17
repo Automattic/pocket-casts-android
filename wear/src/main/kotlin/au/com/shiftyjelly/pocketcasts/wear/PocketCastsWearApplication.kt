@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -58,7 +58,7 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var analyticsController: AnalyticsController
 
     @Inject lateinit var experimentProvider: ExperimentProvider
 
@@ -123,8 +123,8 @@ class PocketCastsWearApplication :
     }
 
     private fun setupAnalytics() {
-        analyticsTracker.clearAllData()
-        analyticsTracker.refreshMetadata()
+        analyticsController.clearAllData()
+        analyticsController.refreshMetadata()
         experimentProvider.initialize()
         downloadStatisticsReporter.setup()
     }

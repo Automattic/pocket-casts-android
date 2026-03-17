@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
@@ -51,7 +51,7 @@ import com.automattic.eventhorizon.FilterShownEvent
 import com.automattic.eventhorizon.FilterSortByChangedEvent
 import com.automattic.eventhorizon.FilterSortByTappedEvent
 import com.automattic.eventhorizon.FilterUnarchiveAllTappedEvent
-import com.automattic.eventhorizon.PlaylistRemoveEpisodeSource
+import com.automattic.eventhorizon.PlaylistRemoveEpisodeSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -147,7 +147,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun saveUpNextAsPlaylist(saveUpNext: Boolean, upNextTranslation: String) {
         eventHorizon.track(
             FilterPlayAllReplaceAndPlayTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
                 saveUpNext = saveUpNext,
             ),
         )
@@ -259,7 +259,7 @@ class PlaylistViewModel @AssistedInject constructor(
             playlistManager.deletePlaylist(playlistUuid)
             eventHorizon.track(
                 FilterDeletedEvent(
-                    filterType = playlistType.eventHorizonValue,
+                    filterType = playlistType.analyticsValue,
                 ),
             )
         }
@@ -283,7 +283,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackDeleteTriggered() {
         eventHorizon.track(
             FilterDeleteTriggeredEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -291,7 +291,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackDeleteDismissed() {
         eventHorizon.track(
             FilterDeleteDismissedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -299,7 +299,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackFilterShown() {
         eventHorizon.track(
             FilterShownEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -320,7 +320,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackPlayAllTapped() {
         eventHorizon.track(
             FilterPlayAllTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -328,7 +328,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackPlayAllDismissed() {
         eventHorizon.track(
             FilterPlayAllDismissedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -336,7 +336,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackSelectEpisodesTapped() {
         eventHorizon.track(
             FilterSelectEpisodesTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -344,7 +344,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackSortByTapped() {
         eventHorizon.track(
             FilterSortByTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -352,7 +352,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackDownloadAllTapped() {
         eventHorizon.track(
             FilterDownloadAllTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -360,7 +360,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackChromeCastTapped() {
         eventHorizon.track(
             FilterChromeCastTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -368,7 +368,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackFilterOptionsButtonTapped() {
         eventHorizon.track(
             FilterOptionsButtonTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -376,7 +376,7 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackFilterOptionsTapped() {
         eventHorizon.track(
             FilterOptionsTappedEvent(
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -384,8 +384,8 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackSortByChanged(type: PlaylistEpisodeSortType) {
         eventHorizon.track(
             FilterSortByChangedEvent(
-                sortOrder = type.eventHorizonValue,
-                filterType = playlistType.eventHorizonValue,
+                sortOrder = type.analyticsValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -393,9 +393,9 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackAutoDownloadChanged(isEnabled: Boolean) {
         eventHorizon.track(
             FilterAutoDownloadUpdatedEvent(
-                source = SourceView.FILTERS.eventHorizonValue,
+                source = SourceView.FILTERS.analyticsValue,
                 enabled = isEnabled,
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -417,7 +417,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 didChangeName = isNameChanged,
                 didChangeAutoDownload = isAutoDownloadChanged,
                 didChangeEpisodeCount = isAutoDownloadLimitChanged,
-                filterType = playlistType.eventHorizonValue,
+                filterType = playlistType.analyticsValue,
             ),
         )
     }
@@ -471,11 +471,11 @@ class PlaylistViewModel @AssistedInject constructor(
         val playlistName = uiState.value.playlist?.title
         eventHorizon.track(
             EpisodeRemovedFromListEvent(
-                playlistName = playlistName ?: Tracker.INVALID_OR_NULL_VALUE,
+                playlistName = playlistName ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                 playlistUuid = playlistUuid,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
-                source = PlaylistRemoveEpisodeSource.UnavailableEpisode,
+                source = PlaylistRemoveEpisodeSourceType.UnavailableEpisode,
             ),
         )
     }
@@ -485,7 +485,7 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun setSelectedPlaylist() {
-        val playlist = SelectedPlaylist(playlistUuid, playlistType.analyticsValue)
+        val playlist = SelectedPlaylist(playlistUuid, playlistType.key)
         settings.selectedPlaylist.set(playlist, updateModifiedAt = false)
     }
 

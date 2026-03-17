@@ -8,8 +8,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -17,13 +15,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsGeneralMediaNotificationControlsShownEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MediaActionsFragment : BaseFragment() {
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var eventHorizon: EventHorizon
 
     @Inject
     lateinit var settings: Settings
@@ -32,7 +32,7 @@ class MediaActionsFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
         CallOnce {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN)
+            eventHorizon.track(SettingsGeneralMediaNotificationControlsShownEvent)
         }
 
         val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)

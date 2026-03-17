@@ -2,13 +2,15 @@ package au.com.shiftyjelly.pocketcasts.search.searchhistory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SearchHistoryClearedEvent
+import com.automattic.eventhorizon.SearchHistoryItemDeleteButtonTappedEvent
+import com.automattic.eventhorizon.SearchHistoryItemTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +24,7 @@ class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     userManager: UserManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val signInState = userManager.getSignInState().asFlow()
     private var isSignedInAsPlusOrPatron = false
@@ -72,7 +74,13 @@ class SearchHistoryViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             searchHistoryManager.remove(entry)
             loadSearchHistory()
-            trackEventForEntry(AnalyticsEvent.SEARCH_HISTORY_ITEM_DELETE_BUTTON_TAPPED, entry)
+            eventHorizon.track(
+                SearchHistoryItemDeleteButtonTappedEvent(
+                    uuid = entry.uuid(),
+                    type = entry.analyticsValue,
+                    source = source.analyticsValue,
+                ),
+            )
         }
     }
 
@@ -80,30 +88,22 @@ class SearchHistoryViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             searchHistoryManager.clearAll()
             loadSearchHistory()
-            analyticsTracker.track(
-                AnalyticsEvent.SEARCH_HISTORY_CLEARED,
-                AnalyticsProp.sourceMap(source = source),
+            eventHorizon.track(
+                SearchHistoryClearedEvent(
+                    source = source.analyticsValue,
+                ),
             )
         }
     }
 
-    fun trackEventForEntry(event: AnalyticsEvent, entry: SearchHistoryEntry) {
-        val type = entry.type()
-        analyticsTracker.track(
-            event,
-            AnalyticsProp.searchHistoryEntryMap(
-                source = source,
-                type = type,
+    fun trackHistoryItemTapped(entry: SearchHistoryEntry) {
+        eventHorizon.track(
+            SearchHistoryItemTappedEvent(
                 uuid = entry.uuid(),
+                type = entry.analyticsValue,
+                source = source.analyticsValue,
             ),
         )
-    }
-
-    private fun SearchHistoryEntry.type() = when (this) {
-        is SearchHistoryEntry.Episode -> SearchHistoryType.EPISODE
-        is SearchHistoryEntry.Folder -> SearchHistoryType.FOLDER
-        is SearchHistoryEntry.Podcast -> SearchHistoryType.PODCAST
-        is SearchHistoryEntry.SearchTerm -> SearchHistoryType.SEARCH_TERM
     }
 
     private fun SearchHistoryEntry.uuid() = when (this) {
@@ -111,30 +111,5 @@ class SearchHistoryViewModel @Inject constructor(
         is SearchHistoryEntry.Folder -> uuid
         is SearchHistoryEntry.Podcast -> uuid
         is SearchHistoryEntry.SearchTerm -> null
-    }
-
-    companion object {
-        private object AnalyticsProp {
-            const val SOURCE = "source"
-            const val TYPE = "type"
-            const val UUID = "uuid"
-            fun sourceMap(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
-            fun searchHistoryEntryMap(
-                source: SourceView,
-                type: SearchHistoryType,
-                uuid: String? = null,
-            ) = HashMap<String, String>().apply {
-                put(SOURCE, source.analyticsValue)
-                put(TYPE, type.value)
-                uuid?.let { put(UUID, it) }
-            } as Map<String, String>
-        }
-
-        enum class SearchHistoryType(val value: String) {
-            EPISODE("episode"),
-            FOLDER("folder"),
-            PODCAST("podcast"),
-            SEARCH_TERM("search_term"),
-        }
     }
 }

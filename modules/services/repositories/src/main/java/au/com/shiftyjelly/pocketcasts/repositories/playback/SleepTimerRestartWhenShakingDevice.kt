@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerSleepTimerRestartedEvent
-import com.automattic.eventhorizon.SleepTimerRestartSource
+import com.automattic.eventhorizon.SleepTimerRestartSourceType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -93,7 +93,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
             eventHorizon.track(
                 PlayerSleepTimerRestartedEvent(
                     seconds = time.inWholeSeconds,
-                    source = SleepTimerRestartSource.Shake,
+                    source = SleepTimerRestartSourceType.Shake,
                 ),
             )
             lastTrackTime = currentTime

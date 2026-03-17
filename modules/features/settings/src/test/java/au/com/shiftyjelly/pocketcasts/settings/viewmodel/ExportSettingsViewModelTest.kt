@@ -1,49 +1,64 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsImportByUrlEvent
+import com.automattic.eventhorizon.SettingsImportExportEmailTappedEvent
+import com.automattic.eventhorizon.SettingsImportExportFileTappedEvent
+import com.automattic.eventhorizon.SettingsImportSelectFileEvent
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.verify
 
-@RunWith(MockitoJUnitRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExportSettingsViewModelTest {
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
+
+    private val eventSink = TestEventSink()
+
     private lateinit var testSubject: ExportSettingsViewModel
 
     @Before
     fun setup() {
-        testSubject = ExportSettingsViewModel(analyticsTracker)
+        testSubject = ExportSettingsViewModel(
+            eventHorizon = EventHorizon(eventSink),
+        )
     }
 
     @Test
     fun `onImportSelectFile should track analytics event`() = runTest {
         testSubject.onImportSelectFile()
-        verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_SELECT_FILE)
+
+        val event = eventSink.pollEvent()
+
+        assertEquals(SettingsImportSelectFileEvent, event)
     }
 
     @Test
     fun `onImportByUrlClicked should track analytics event`() = runTest {
         testSubject.onImportByUrlClicked()
-        verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_BY_URL)
+
+        val event = eventSink.pollEvent()
+
+        assertEquals(SettingsImportByUrlEvent, event)
     }
 
     @Test
     fun `onExportByEmail should track analytics event`() = runTest {
         testSubject.onExportByEmail()
-        verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_EMAIL_TAPPED)
+
+        val event = eventSink.pollEvent()
+
+        assertEquals(SettingsImportExportEmailTappedEvent, event)
     }
 
     @Test
     fun `onExportFile should track analytics event`() = runTest {
         testSubject.onExportFile()
-        verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FILE_TAPPED)
+
+        val event = eventSink.pollEvent()
+
+        assertEquals(SettingsImportExportFileTappedEvent, event)
     }
 }

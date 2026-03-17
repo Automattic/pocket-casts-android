@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -10,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import java.io.File
@@ -17,7 +17,6 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -48,9 +47,6 @@ class StorageSettingsViewModelTest {
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
-    private lateinit var episodeDao: EpisodeDao
-
-    @Mock
     private lateinit var fileStorage: FileStorage
 
     @Mock
@@ -58,9 +54,6 @@ class StorageSettingsViewModelTest {
 
     @Mock
     private lateinit var settings: Settings
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     @ApplicationContext
@@ -80,12 +73,12 @@ class StorageSettingsViewModelTest {
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
-            episodeManager,
-            fileStorage,
-            fileUtil,
-            settings,
-            analyticsTracker,
-            context,
+            episodeManager = episodeManager,
+            fileStorage = fileStorage,
+            fileUtil = fileUtil,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            context = context,
         )
     }
 

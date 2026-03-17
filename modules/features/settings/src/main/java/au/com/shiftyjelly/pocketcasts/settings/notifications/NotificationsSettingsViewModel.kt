@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -12,6 +10,24 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.NotificationsPermissionsOpenSystemSettingsEvent
+import com.automattic.eventhorizon.SettingsDailyRemindersAdvancedSettingsTappedEvent
+import com.automattic.eventhorizon.SettingsNotificationsActionsChangedEvent
+import com.automattic.eventhorizon.SettingsNotificationsAdvancedSettingsTappedEvent
+import com.automattic.eventhorizon.SettingsNotificationsDailyRemindersToggleEvent
+import com.automattic.eventhorizon.SettingsNotificationsHidePlaybackNotificationOnPauseEvent
+import com.automattic.eventhorizon.SettingsNotificationsNewEpisodesToggledEvent
+import com.automattic.eventhorizon.SettingsNotificationsNewFeaturesAdvancedSettingsTappedEvent
+import com.automattic.eventhorizon.SettingsNotificationsNewFeaturesToggleEvent
+import com.automattic.eventhorizon.SettingsNotificationsOffersAdvancedSettingsTappedEvent
+import com.automattic.eventhorizon.SettingsNotificationsOffersToggleEvent
+import com.automattic.eventhorizon.SettingsNotificationsPlayOverNotificationsToggledEvent
+import com.automattic.eventhorizon.SettingsNotificationsShownEvent
+import com.automattic.eventhorizon.SettingsNotificationsSoundChangedEvent
+import com.automattic.eventhorizon.SettingsNotificationsTrendingToggleEvent
+import com.automattic.eventhorizon.SettingsNotificationsVibrationChangedEvent
+import com.automattic.eventhorizon.SettingsTrendingAdvancedSettingsTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +40,7 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 internal class NotificationsSettingsViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository,
-    private val analyticsTracker: AnalyticsTracker,
+    private val eventHorizon: EventHorizon,
     private val podcastManager: PodcastManager,
     private val notificationHelper: NotificationHelper,
     private val notificationScheduler: NotificationScheduler,
@@ -51,57 +67,59 @@ internal class NotificationsSettingsViewModel @Inject constructor(
             when (preference) {
                 is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsNewEpisodesToggledEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                 }
 
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsHidePlaybackNotificationOnPauseEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                 }
 
                 is NotificationPreferenceType.PlayOverNotifications -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
-                        mapOf(
-                            "enabled" to (preference.value != PlayOverNotificationSetting.NEVER),
-                            "value" to preference.value.analyticsString,
+                    eventHorizon.track(
+                        SettingsNotificationsPlayOverNotificationsToggledEvent(
+                            enabled = preference.value != PlayOverNotificationSetting.NEVER,
+                            value = preference.value.analyticsValue,
                         ),
                     )
                 }
 
                 is NotificationPreferenceType.NotificationVibration -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
-                        mapOf("value" to preference.value.analyticsString),
+                    eventHorizon.track(
+                        SettingsNotificationsVibrationChangedEvent(
+                            value = preference.value.analyticsValue,
+                        ),
                     )
                 }
 
                 is NotificationPreferenceType.AdvancedSettings -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
+                    eventHorizon.track(SettingsNotificationsAdvancedSettingsTappedEvent)
                 }
 
                 is NotificationPreferenceType.NotificationActions -> {
-                    val previousValue = state.value.categories.map { it.preferences }.flatten()
+                    val previousValue = state.value.categories
+                        .flatMap { it.preferences }
                         .find { it is NotificationPreferenceType.NotificationActions }
                     if ((previousValue as? NotificationPreferenceType.NotificationActions)?.value != preference.value) {
                         preferenceRepository.setPreference(preference)
 
-                        analyticsTracker.track(
-                            AnalyticsEvent.SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED,
-                            mapOf(
-                                "action_archive" to preference.value.contains(NewEpisodeNotificationAction.Archive),
-                                "action_download" to preference.value.contains(NewEpisodeNotificationAction.Download),
-                                "action_play" to preference.value.contains(NewEpisodeNotificationAction.Play),
-                                "action_play_next" to preference.value.contains(NewEpisodeNotificationAction.PlayNext),
-                                "action_play_last" to preference.value.contains(NewEpisodeNotificationAction.PlayLast),
+                        eventHorizon.track(
+                            SettingsNotificationsActionsChangedEvent(
+                                actionArchive = NewEpisodeNotificationAction.Archive in preference.value,
+                                actionDownload = NewEpisodeNotificationAction.Download in preference.value,
+                                actionPlay = NewEpisodeNotificationAction.Play in preference.value,
+                                actionPlayNext = NewEpisodeNotificationAction.PlayNext in preference.value,
+                                actionPlayLast = NewEpisodeNotificationAction.PlayLast in preference.value,
                             ),
                         )
                     }
@@ -109,14 +127,15 @@ internal class NotificationsSettingsViewModel @Inject constructor(
 
                 is NotificationPreferenceType.NotificationSoundPreference -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+                    eventHorizon.track(SettingsNotificationsSoundChangedEvent)
                 }
 
                 is NotificationPreferenceType.EnableDailyReminders -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsDailyRemindersToggleEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupOnboardingNotifications()
@@ -128,14 +147,15 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.DailyReminderSettings -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED)
+                    eventHorizon.track(SettingsDailyRemindersAdvancedSettingsTappedEvent)
                 }
 
                 is NotificationPreferenceType.EnableRecommendations -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsTrendingToggleEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupTrendingAndRecommendationsNotifications()
@@ -145,14 +165,15 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.RecommendationSettings -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED)
+                    eventHorizon.track(SettingsTrendingAdvancedSettingsTappedEvent)
                 }
 
                 is NotificationPreferenceType.EnableNewFeaturesAndTips -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_TOGGLED,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsNewFeaturesToggleEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupNewFeaturesAndTipsNotifications()
@@ -162,14 +183,15 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.NewFeaturesAndTipsSettings -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED)
+                    eventHorizon.track(SettingsNotificationsNewFeaturesAdvancedSettingsTappedEvent)
                 }
 
                 is NotificationPreferenceType.EnableOffers -> {
                     preferenceRepository.setPreference(preference)
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED,
-                        mapOf("enabled" to preference.isEnabled),
+                    eventHorizon.track(
+                        SettingsNotificationsOffersToggleEvent(
+                            enabled = preference.isEnabled,
+                        ),
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupOffersNotifications()
@@ -179,7 +201,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.OffersSettings -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED)
+                    eventHorizon.track(SettingsNotificationsOffersAdvancedSettingsTappedEvent)
                 }
 
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit
@@ -189,7 +211,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }
 
     internal fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
+        eventHorizon.track(SettingsNotificationsShownEvent)
     }
 
     internal fun checkNotificationPermission() {
@@ -208,7 +230,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }
 
     internal fun reportSystemNotificationsSettingsOpened() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS)
+        eventHorizon.track(NotificationsPermissionsOpenSystemSettingsEvent)
     }
 
     internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {

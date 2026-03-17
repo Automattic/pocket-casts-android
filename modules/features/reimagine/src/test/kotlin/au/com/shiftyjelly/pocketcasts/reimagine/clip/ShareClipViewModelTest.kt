@@ -25,6 +25,7 @@ import com.automattic.eventhorizon.ShareScreenClipSharedEvent
 import com.automattic.eventhorizon.ShareScreenPauseTappedEvent
 import com.automattic.eventhorizon.ShareScreenPlayTappedEvent
 import com.automattic.eventhorizon.ShareScreenShownEvent
+import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
@@ -40,7 +41,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import com.automattic.eventhorizon.SourceView as EventHorizonSourceView
 
 @ExperimentalCoroutinesApi
 class ShareClipViewModelTest {
@@ -187,7 +187,7 @@ class ShareClipViewModelTest {
                     podcastUuid = "podcast-id",
                     episodeUuid = "episode-id",
                     clipUuid = "clip-id",
-                    source = EventHorizonSourceView.Player,
+                    source = SourceViewType.Player,
                 ),
                 event,
             )
@@ -210,7 +210,7 @@ class ShareClipViewModelTest {
                     podcastUuid = "podcast-id",
                     episodeUuid = "episode-id",
                     clipUuid = "clip-id",
-                    source = EventHorizonSourceView.Player,
+                    source = SourceViewType.Player,
                 ),
                 event,
             )
@@ -231,7 +231,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
             ),
             event,
         )
@@ -256,7 +256,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 15,
                 startModified = false,
                 end = 30,
@@ -287,7 +287,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 15,
                 startModified = false,
                 end = 30,
@@ -318,7 +318,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 15,
                 startModified = false,
                 end = 30,
@@ -349,7 +349,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 7,
                 startModified = true,
                 end = 30,
@@ -380,7 +380,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 15,
                 startModified = false,
                 end = 20,
@@ -411,7 +411,7 @@ class ShareClipViewModelTest {
                 podcastUuid = "podcast-id",
                 episodeUuid = "episode-id",
                 clipUuid = "clip-id",
-                source = EventHorizonSourceView.Player,
+                source = SourceViewType.Player,
                 start = 17,
                 startModified = true,
                 end = 34,

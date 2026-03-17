@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -127,7 +126,6 @@ class StatsViewModel @Inject constructor(
             inAppReviewHelper.launchReviewDialog(
                 activity = activity,
                 delayInMs = IN_APP_REVIEW_LAUNCH_DELAY_IN_MS,
-                sourceView = SourceView.STATS,
             )
         }
     }
