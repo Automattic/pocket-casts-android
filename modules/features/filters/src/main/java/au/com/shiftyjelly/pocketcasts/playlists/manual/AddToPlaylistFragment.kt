@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.compose.rememberNavController
@@ -218,18 +217,21 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             podcastUuid: String,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARGS to Args(
-                    source = source,
-                    uuids = listOf(
-                        EpisodeUuidPair(
-                            episodeUuid = episodeUuid,
-                            podcastUuid = podcastUuid,
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(
+                        source = source,
+                        uuids = listOf(
+                            EpisodeUuidPair(
+                                episodeUuid = episodeUuid,
+                                podcastUuid = podcastUuid,
+                            ),
                         ),
+                        customTheme = customTheme,
                     ),
-                    customTheme = customTheme,
-                ),
-            )
+                )
+            }
         }
 
         fun newInstance(
@@ -237,13 +239,16 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             uuids: List<EpisodeUuidPair>,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARGS to Args(
-                    source = source,
-                    uuids = uuids,
-                    customTheme = customTheme,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(
+                        source = source,
+                        uuids = uuids,
+                        customTheme = customTheme,
+                    ),
+                )
+            }
         }
     }
 }

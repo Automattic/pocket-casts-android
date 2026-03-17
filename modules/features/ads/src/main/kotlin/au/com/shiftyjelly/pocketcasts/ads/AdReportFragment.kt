@@ -10,7 +10,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -45,7 +44,9 @@ class AdReportFragment : BaseDialogFragment() {
             ad: BlazeAd,
             podcastColors: PodcastColors?,
         ) = AdReportFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(ad, podcastColors))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_KEY, Args(ad, podcastColors))
+            }
         }
     }
 

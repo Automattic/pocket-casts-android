@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavController
@@ -157,7 +156,9 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARGS = "AddEpisodesFragmentArgs"
 
         fun newInstance(playlistUuid: String) = AddEpisodesFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_ARGS, Args(playlistUuid))
+            }
         }
     }
 }

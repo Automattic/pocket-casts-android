@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -224,7 +223,12 @@ class PodcastSettingsFragment :
             @ColorInt darkTint: Int,
             @ColorInt lightTint: Int,
         ) = PodcastSettingsFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(uuid, title, darkTint, lightTint))
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(uuid, title, darkTint, lightTint),
+                )
+            }
         }
     }
 }

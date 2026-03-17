@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavController
@@ -153,7 +152,9 @@ internal class EditRulesFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARGS = "SmartRulesEditFragmentArgs"
 
         fun newInstance(playlistUuid: String) = EditRulesFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_ARGS, Args(playlistUuid))
+            }
         }
     }
 }

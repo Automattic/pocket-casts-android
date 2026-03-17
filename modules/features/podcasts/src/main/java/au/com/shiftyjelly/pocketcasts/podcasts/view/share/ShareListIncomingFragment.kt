@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -52,10 +51,10 @@ class ShareListIncomingFragment :
             sourceView: SourceView = SourceView.UNKNOWN,
         ): ShareListIncomingFragment {
             return ShareListIncomingFragment().apply {
-                arguments = bundleOf(
-                    EXTRA_URL to listPath,
-                    EXTRA_SOURCE to sourceView.analyticsValue,
-                )
+                arguments = Bundle().apply {
+                    putString(EXTRA_URL, listPath)
+                    putString(EXTRA_SOURCE, sourceView.analyticsValue)
+                }
             }
         }
     }

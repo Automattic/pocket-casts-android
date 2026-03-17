@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.lifecycle.lifecycleScope
@@ -114,7 +113,9 @@ class AppReviewDialogFragment : BaseDialogFragment() {
             reason: AppReviewReason,
             reviewInfo: ReviewInfo,
         ) = AppReviewDialogFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(reason, reviewInfo))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_KEY, Args(reason, reviewInfo))
+            }
         }
     }
 }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavHostController
@@ -46,9 +45,9 @@ class FolderCreateFragment : BaseDialogFragment() {
 
         fun newInstance(source: CreateFolderSource): FolderCreateFragment {
             return FolderCreateFragment().apply {
-                arguments = bundleOf(
-                    ARG_SOURCE to source,
-                )
+                arguments = Bundle().apply {
+                    putSerializable(ARG_SOURCE, source)
+                }
             }
         }
     }

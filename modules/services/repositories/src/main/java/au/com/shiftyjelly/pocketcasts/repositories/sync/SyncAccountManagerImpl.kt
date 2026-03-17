@@ -7,7 +7,6 @@ import android.accounts.NetworkErrorException
 import android.accounts.OnAccountsUpdateListener
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
@@ -140,11 +139,14 @@ open class SyncAccountManagerImpl @Inject constructor(
 
     override fun addAccount(email: String, uuid: String, refreshToken: RefreshToken, accessToken: AccessToken, loginIdentity: LoginIdentity) {
         val account = Account(email, AccountConstants.ACCOUNT_TYPE)
-        val userData = bundleOf(
-            AccountConstants.UUID to uuid,
-            AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value,
-            AccountConstants.LOGIN_IDENTITY to loginIdentity.key,
-        )
+        val userData = Bundle().apply {
+            putString(AccountConstants.UUID, uuid)
+            putString(
+                AccountConstants.SIGN_IN_TYPE_KEY,
+                AccountConstants.SignInType.Tokens.value,
+            )
+            putString(AccountConstants.LOGIN_IDENTITY, loginIdentity.key)
+        }
         val accountAdded = accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
 

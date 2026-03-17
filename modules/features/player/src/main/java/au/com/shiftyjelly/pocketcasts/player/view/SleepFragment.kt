@@ -6,7 +6,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -132,7 +131,9 @@ class SleepFragment : BaseDialogFragment() {
             close()
             eventHorizon.track(PlayerSleepTimerSettingsTappedEvent)
             val fragment = PlaybackSettingsFragment().apply {
-                arguments = bundleOf(SCROLL_TO_SLEEP_TIMER to true)
+                arguments = Bundle().apply {
+                    putBoolean(SCROLL_TO_SLEEP_TIMER, true)
+                }
             }
             val fragmentHostListener = (activity as? FragmentHostListener)
             fragmentHostListener?.apply {
@@ -364,11 +365,14 @@ class SleepFragment : BaseDialogFragment() {
         fun newInstance(
             hasChapters: Boolean,
         ) = SleepFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    hasChapters = hasChapters,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        hasChapters = hasChapters,
+                    ),
+                )
+            }
         }
     }
 }

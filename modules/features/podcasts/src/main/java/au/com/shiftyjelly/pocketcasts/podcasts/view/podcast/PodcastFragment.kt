@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.util.lerp
-import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -141,15 +140,18 @@ class PodcastFragment : BaseFragment() {
             fromListDate: String? = null,
             featuredPodcast: Boolean = false,
         ): PodcastFragment = PodcastFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARGS to PodcastFragmentArgs(
-                    podcastUuid = podcastUuid,
-                    sourceView = sourceView,
-                    fromListUuid = fromListUuid,
-                    fromListDate = fromListDate,
-                    featuredPodcast = featuredPodcast,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    PodcastFragmentArgs(
+                        podcastUuid = podcastUuid,
+                        sourceView = sourceView,
+                        fromListUuid = fromListUuid,
+                        fromListDate = fromListDate,
+                        featuredPodcast = featuredPodcast,
+                    ),
+                )
+            }
         }
     }
 

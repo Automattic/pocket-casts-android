@@ -8,7 +8,6 @@ import android.accounts.NetworkErrorException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -39,11 +38,11 @@ class PocketCastsAccountAuthenticator(
         return try {
             val accessToken = runBlocking { syncManager.getAccessToken(account) }
 
-            bundleOf(
-                AccountManager.KEY_ACCOUNT_NAME to account.name,
-                AccountManager.KEY_ACCOUNT_TYPE to account.type,
-                AccountManager.KEY_AUTHTOKEN to accessToken.value,
-            )
+            Bundle().apply {
+                putString(AccountManager.KEY_ACCOUNT_NAME, account.name)
+                putString(AccountManager.KEY_ACCOUNT_TYPE, account.type)
+                putString(AccountManager.KEY_AUTHTOKEN, accessToken.value)
+            }
         } catch (e: Exception) {
             // the refresh token is invalid or expired so the user needs to sign in again
             if (e is RefreshTokenExpiredException) {
@@ -59,7 +58,9 @@ class PocketCastsAccountAuthenticator(
         val intent = Intent(context, AccountActivity::class.java).apply {
             putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
         }
-        return bundleOf(AccountManager.KEY_INTENT to intent)
+        return Bundle().apply {
+            putParcelable(AccountManager.KEY_INTENT, intent)
+        }
     }
 
     override fun hasFeatures(response: AccountAuthenticatorResponse?, account: Account?, features: Array<out String>?): Bundle {
@@ -74,6 +75,8 @@ class PocketCastsAccountAuthenticator(
         val intent = Intent(context, AccountActivity::class.java).apply {
             putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
         }
-        return bundleOf(AccountManager.KEY_INTENT to intent)
+        return Bundle().apply {
+            putParcelable(AccountManager.KEY_INTENT, intent)
+        }
     }
 }

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
@@ -35,10 +34,10 @@ class BookmarksContainerFragment : BaseDialogFragment() {
             episodeUuid: String? = null,
             sourceView: SourceView,
         ) = BookmarksContainerFragment().apply {
-            arguments = bundleOf(
-                ARG_EPISODE_UUID to episodeUuid,
-                ARG_SOURCE_VIEW to sourceView.analyticsValue,
-            )
+            arguments = Bundle().apply {
+                putString(ARG_EPISODE_UUID, episodeUuid)
+                putString(ARG_SOURCE_VIEW, sourceView.analyticsValue)
+            }
         }
     }
 

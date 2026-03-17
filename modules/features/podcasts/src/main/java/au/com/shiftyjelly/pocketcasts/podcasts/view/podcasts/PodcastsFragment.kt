@@ -40,7 +40,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -139,9 +138,9 @@ class PodcastsFragment :
 
         fun newInstance(folderUuid: String): PodcastsFragment {
             return PodcastsFragment().apply {
-                arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid,
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_FOLDER_UUID, folderUuid)
+                }
             }
         }
     }

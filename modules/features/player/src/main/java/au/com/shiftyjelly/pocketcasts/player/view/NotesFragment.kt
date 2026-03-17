@@ -11,7 +11,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
@@ -57,9 +56,9 @@ class NotesFragment : BaseFragment() {
 
         fun newInstance(episodeUuid: String): NotesFragment {
             return NotesFragment().apply {
-                arguments = bundleOf(
-                    ARG_EPISODE_UUID to episodeUuid,
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_EPISODE_UUID, episodeUuid)
+                }
             }
         }
     }

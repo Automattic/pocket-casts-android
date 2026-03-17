@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -68,7 +67,9 @@ internal class EditPlaylistFragment : BaseFragment() {
         private const val NEW_INSTANCE_ARGS = "EditPlaylistFragment"
 
         fun newInstance(playlistUuid: String) = EditPlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_ARGS, Args(playlistUuid))
+            }
         }
     }
 }

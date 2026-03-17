@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -36,9 +35,9 @@ class GiveRatingFragment : BaseDialogFragment() {
 
     companion object {
         fun newInstance(podcastUuid: String) = GiveRatingFragment().apply {
-            arguments = bundleOf(
-                ARG_PODCAST_UUID to podcastUuid,
-            )
+            arguments = Bundle().apply {
+                putString(ARG_PODCAST_UUID, podcastUuid)
+            }
         }
     }
 

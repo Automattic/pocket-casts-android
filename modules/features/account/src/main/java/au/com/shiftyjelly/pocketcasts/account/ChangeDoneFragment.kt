@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -18,7 +17,9 @@ class ChangeDoneFragment : BaseFragment() {
     companion object {
         fun newInstance(closeParent: Boolean = false): ChangeDoneFragment {
             return ChangeDoneFragment().apply {
-                arguments = bundleOf(ARG_CLOSE_PARENT to closeParent)
+                arguments = Bundle().apply {
+                    putBoolean(ARG_CLOSE_PARENT, closeParent)
+                }
             }
         }
     }

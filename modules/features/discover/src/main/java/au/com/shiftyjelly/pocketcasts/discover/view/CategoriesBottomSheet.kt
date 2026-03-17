@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -103,7 +102,9 @@ class CategoriesBottomSheet : BaseDialogFragment() {
         private const val REGION_KEY = "Region"
 
         fun newInstance(region: String) = CategoriesBottomSheet().apply {
-            arguments = bundleOf(REGION_KEY to region)
+            arguments = Bundle().apply {
+                putString(REGION_KEY, region)
+            }
         }
     }
 }

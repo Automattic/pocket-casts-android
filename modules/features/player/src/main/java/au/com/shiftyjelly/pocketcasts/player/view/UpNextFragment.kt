@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
@@ -102,7 +101,9 @@ class UpNextFragment :
             source: UpNextSource,
             embedded: Boolean = false,
         ) = UpNextFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(source, embedded))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_KEY, Args(source, embedded))
+            }
         }
     }
 
