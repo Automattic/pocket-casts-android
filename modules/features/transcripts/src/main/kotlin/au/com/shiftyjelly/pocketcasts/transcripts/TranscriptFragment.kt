@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -58,7 +57,9 @@ class TranscriptFragment : BaseDialogFragment() {
             episodeUuid: String,
             podcastUuid: String?,
         ) = TranscriptFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(episodeUuid, podcastUuid))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_KEY, Args(episodeUuid, podcastUuid))
+            }
         }
     }
 

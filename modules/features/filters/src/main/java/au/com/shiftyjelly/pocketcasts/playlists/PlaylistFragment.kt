@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.lerp
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -559,7 +558,9 @@ class PlaylistFragment :
             uuid: String,
             type: Playlist.Type,
         ) = PlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(uuid, type))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_ARGS, Args(uuid, type))
+            }
         }
     }
 }

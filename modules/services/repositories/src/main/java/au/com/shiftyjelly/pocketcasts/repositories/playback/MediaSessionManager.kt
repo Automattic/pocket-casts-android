@@ -15,7 +15,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.core.content.IntentCompat
-import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -247,10 +246,10 @@ class MediaSessionManager(
             .setState(state, playbackState.positionMs.toLong(), currentSpeed.toFloat(), SystemClock.elapsedRealtime())
             .setActions(getSupportedActions(playbackState))
             .setExtras(
-                bundleOf(
-                    PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID to currentEpisode.uuid,
-                    EXTRA_TRANSIENT to playbackState.transientLoss,
-                ),
+                Bundle().apply {
+                    putString(PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID, currentEpisode.uuid)
+                    putBoolean(EXTRA_TRANSIENT, playbackState.transientLoss)
+                },
             )
 
         // Do not add custom actions on Wear OS because there is a bug in Wear 3.5 that causes

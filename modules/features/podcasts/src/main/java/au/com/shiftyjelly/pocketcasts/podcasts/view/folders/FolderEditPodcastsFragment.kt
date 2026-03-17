@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -26,9 +25,9 @@ class FolderEditPodcastsFragment : BaseDialogFragment() {
 
         fun newInstance(folderUuid: String): FolderEditPodcastsFragment {
             return FolderEditPodcastsFragment().apply {
-                arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid,
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_FOLDER_UUID, folderUuid)
+                }
             }
         }
     }

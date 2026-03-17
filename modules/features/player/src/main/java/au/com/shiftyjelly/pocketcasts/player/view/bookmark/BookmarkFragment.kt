@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -35,7 +34,9 @@ class BookmarkFragment : BaseFragment() {
         private const val NEW_INSTANCE_KEY = "new_instance_key"
 
         fun newInstance(args: BookmarkArguments) = BookmarkFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to args)
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_KEY, args)
+            }
         }
     }
 

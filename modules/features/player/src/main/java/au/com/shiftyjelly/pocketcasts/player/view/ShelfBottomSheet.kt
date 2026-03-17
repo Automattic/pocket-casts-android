@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -70,9 +69,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
         fun newInstance(
             episodeId: String,
         ) = ShelfBottomSheet().apply {
-            arguments = bundleOf(
-                ARG_EPISODE_ID to episodeId,
-            )
+            arguments = Bundle().apply {
+                putString(ARG_EPISODE_ID, episodeId)
+            }
         }
     }
 }

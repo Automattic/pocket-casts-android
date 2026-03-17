@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -97,14 +96,17 @@ class ShareEpisodeFragment : BaseDialogFragment() {
             @ColorInt baseColor: Int,
             source: SourceView,
         ) = ShareEpisodeFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    podcastUuid = episode.podcastUuid,
-                    episodeUuid = episode.uuid,
-                    baseColor = Color(baseColor),
-                    source = source,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        podcastUuid = episode.podcastUuid,
+                        episodeUuid = episode.uuid,
+                        baseColor = Color(baseColor),
+                        source = source,
+                    ),
+                )
+            }
         }
     }
 }

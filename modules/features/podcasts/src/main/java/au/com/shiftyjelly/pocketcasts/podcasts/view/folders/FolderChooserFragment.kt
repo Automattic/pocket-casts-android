@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,9 +37,9 @@ class FolderChooserFragment : BaseDialogFragment() {
 
         fun newInstance(podcastUuid: String): FolderChooserFragment {
             return FolderChooserFragment().apply {
-                arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid,
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_PODCAST_UUID, podcastUuid)
+                }
             }
         }
     }

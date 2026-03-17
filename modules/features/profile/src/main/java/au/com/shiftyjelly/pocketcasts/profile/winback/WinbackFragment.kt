@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavBackStackEntry
@@ -343,7 +342,9 @@ class WinbackFragment : BaseDialogFragment() {
         private const val INPUT_ARGS = "WinbackFragment.Params"
 
         fun create(params: WinbackInitParams) = WinbackFragment().apply {
-            arguments = bundleOf(INPUT_ARGS to params)
+            arguments = Bundle().apply {
+                putParcelable(INPUT_ARGS, params)
+            }
         }
     }
 }

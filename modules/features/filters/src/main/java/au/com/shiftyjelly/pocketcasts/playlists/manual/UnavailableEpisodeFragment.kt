@@ -22,7 +22,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -92,12 +91,15 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
             episodeUuid: String,
             podcastUuid: String,
         ) = UnavailableEpisodeFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARGS to Args(
-                    episodeUuid = episodeUuid,
-                    podcastUuid = podcastUuid,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                    ),
+                )
+            }
         }
     }
 }

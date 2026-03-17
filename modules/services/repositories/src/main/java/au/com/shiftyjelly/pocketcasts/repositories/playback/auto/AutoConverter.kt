@@ -13,7 +13,6 @@ import android.support.v4.media.MediaDescriptionCompat.STATUS_DOWNLOADED
 import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 import androidx.annotation.DrawableRes
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
@@ -255,10 +254,13 @@ object AutoConverter {
             }
         }
 
-        return bundleOf(
-            EXTRA_DOWNLOAD_STATUS to downloadStatus,
-            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus,
-            DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE to completionPercentage,
-        )
+        return Bundle().apply {
+            putLong(EXTRA_DOWNLOAD_STATUS, downloadStatus)
+            putInt(DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS, completionStatus)
+            putDouble(
+                DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE,
+                completionPercentage,
+            )
+        }
     }
 }

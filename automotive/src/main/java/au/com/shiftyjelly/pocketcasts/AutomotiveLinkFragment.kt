@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.rememberQrPainter
@@ -36,7 +35,9 @@ class AutomotiveLinkFragment : Fragment() {
 
         fun newInstance(url: String): AutomotiveLinkFragment {
             return AutomotiveLinkFragment().apply {
-                arguments = bundleOf(ARGUMENT_URL to url)
+                arguments = Bundle().apply {
+                    putString(ARGUMENT_URL, url)
+                }
             }
         }
     }

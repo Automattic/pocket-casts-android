@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -32,10 +31,13 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     companion object {
         fun newInstance(itemIds: List<Int>, shouldShowRemoveListeningHistory: Boolean): MultiSelectBottomSheet {
             val instance = MultiSelectBottomSheet()
-            instance.arguments = bundleOf(
-                ARG_ACTION_IDS to itemIds.toIntArray(),
-                ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY to shouldShowRemoveListeningHistory,
-            )
+            instance.arguments = Bundle().apply {
+                putIntArray(ARG_ACTION_IDS, itemIds.toIntArray())
+                putBoolean(
+                    ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY,
+                    shouldShowRemoveListeningHistory,
+                )
+            }
             return instance
         }
     }

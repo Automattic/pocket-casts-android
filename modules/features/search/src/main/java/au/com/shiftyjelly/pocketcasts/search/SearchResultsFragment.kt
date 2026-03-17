@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -162,13 +161,16 @@ class SearchResultsFragment : BaseFragment() {
             onlySearchRemote: Boolean,
             source: SourceView,
         ) = SearchResultsFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARGS to Args(
-                    type = type,
-                    onlySearchRemote = onlySearchRemote,
-                    source = source,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARGS,
+                    Args(
+                        type = type,
+                        onlySearchRemote = onlySearchRemote,
+                        source = source,
+                    ),
+                )
+            }
         }
     }
 }

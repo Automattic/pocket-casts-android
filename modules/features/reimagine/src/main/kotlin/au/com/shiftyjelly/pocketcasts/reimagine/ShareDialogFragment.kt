@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
@@ -288,22 +287,25 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
             options: List<ShareDialogFragment.Options> = ShareDialogFragment.Options.entries,
             observePlayback: Boolean = false,
         ) = ShareDialogFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    podcastUuid = podcast.uuid,
-                    podcastTitle = podcast.title,
-                    episodeUuid = episode.uuid,
-                    episodeTitle = episode.title,
-                    episodePlayedUpTo = episode.playedUpTo.seconds,
-                    episodeFileType = episode.fileType,
-                    episodeDownloadStatus = episode.downloadStatus,
-                    episodeFilePath = episode.downloadedFilePath,
-                    backgroundColor = null,
-                    options = options,
-                    source = source,
-                    observePlayback = observePlayback,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        podcastUuid = podcast.uuid,
+                        podcastTitle = podcast.title,
+                        episodeUuid = episode.uuid,
+                        episodeTitle = episode.title,
+                        episodePlayedUpTo = episode.playedUpTo.seconds,
+                        episodeFileType = episode.fileType,
+                        episodeDownloadStatus = episode.downloadStatus,
+                        episodeFilePath = episode.downloadedFilePath,
+                        backgroundColor = null,
+                        options = options,
+                        source = source,
+                        observePlayback = observePlayback,
+                    ),
+                )
+            }
         }
 
         fun newThemedInstance(
@@ -314,22 +316,25 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
             options: List<ShareDialogFragment.Options> = ShareDialogFragment.Options.entries,
             observePlayback: Boolean = true,
         ) = ShareDialogFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    podcastUuid = podcast.uuid,
-                    podcastTitle = podcast.title,
-                    episodeUuid = episode.uuid,
-                    episodeTitle = episode.title,
-                    episodePlayedUpTo = episode.playedUpTo.seconds,
-                    episodeFileType = episode.fileType,
-                    episodeDownloadStatus = episode.downloadStatus,
-                    episodeFilePath = episode.downloadedFilePath,
-                    backgroundColor = Color(theme.playerBackgroundColor(podcast)),
-                    options = options,
-                    source = source,
-                    observePlayback = observePlayback,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        podcastUuid = podcast.uuid,
+                        podcastTitle = podcast.title,
+                        episodeUuid = episode.uuid,
+                        episodeTitle = episode.title,
+                        episodePlayedUpTo = episode.playedUpTo.seconds,
+                        episodeFileType = episode.fileType,
+                        episodeDownloadStatus = episode.downloadStatus,
+                        episodeFilePath = episode.downloadedFilePath,
+                        backgroundColor = Color(theme.playerBackgroundColor(podcast)),
+                        options = options,
+                        source = source,
+                        observePlayback = observePlayback,
+                    ),
+                )
+            }
         }
     }
 }

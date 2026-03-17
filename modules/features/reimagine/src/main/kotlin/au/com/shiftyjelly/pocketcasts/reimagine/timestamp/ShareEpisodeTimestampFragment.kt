@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -105,16 +104,19 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
             @ColorInt baseColor: Int,
             source: SourceView,
         ) = ShareEpisodeTimestampFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    podcastUuid = episode.podcastUuid,
-                    episodeUuid = episode.uuid,
-                    timestamp = episode.playedUpTo.seconds,
-                    baseColor = Color(baseColor),
-                    source = source,
-                    timestampType = TimestampType.Episode,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        podcastUuid = episode.podcastUuid,
+                        episodeUuid = episode.uuid,
+                        timestamp = episode.playedUpTo.seconds,
+                        baseColor = Color(baseColor),
+                        source = source,
+                        timestampType = TimestampType.Episode,
+                    ),
+                )
+            }
         }
 
         fun forBookmark(
@@ -123,16 +125,19 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
             @ColorInt baseColor: Int,
             source: SourceView,
         ) = ShareEpisodeTimestampFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(
-                    podcastUuid = episode.podcastUuid,
-                    episodeUuid = episode.uuid,
-                    timestamp = timestamp,
-                    baseColor = Color(baseColor),
-                    source = source,
-                    timestampType = TimestampType.Bookmark,
-                ),
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(
+                        podcastUuid = episode.podcastUuid,
+                        episodeUuid = episode.uuid,
+                        timestamp = timestamp,
+                        baseColor = Color(baseColor),
+                        source = source,
+                        timestampType = TimestampType.Bookmark,
+                    ),
+                )
+            }
         }
     }
 }

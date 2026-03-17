@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -93,7 +92,9 @@ class ReferralsGuestPassFragment : BaseFragment() {
     companion object {
         private const val NEW_INSTANCE_ARG = "ReferralsGuestPassFragment"
         fun newInstance(pageType: ReferralsPageType) = ReferralsGuestPassFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARG to Args(pageType))
+            arguments = Bundle().apply {
+                putParcelable(NEW_INSTANCE_ARG, Args(pageType))
+            }
         }
     }
 

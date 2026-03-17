@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -59,9 +58,9 @@ class ShelfFragment : BaseFragment() {
         fun newInstance(
             episodeId: String,
         ) = ShelfFragment().apply {
-            arguments = bundleOf(
-                ARG_EPISODE_ID to episodeId,
-            )
+            arguments = Bundle().apply {
+                putString(ARG_EPISODE_ID, episodeId)
+            }
         }
     }
 }

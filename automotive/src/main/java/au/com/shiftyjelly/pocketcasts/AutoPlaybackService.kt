@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -120,7 +119,12 @@ class AutoPlaybackService : PlaybackService() {
     }
 
     override suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
-        val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+        val extrasContentAsList = Bundle().apply {
+            putInt(
+                DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+                DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
+            )
+        }
 
         val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
         val filtersItem = buildListMediaItem(

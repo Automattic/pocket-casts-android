@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavType
@@ -56,9 +55,9 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             source: Source,
         ): SuggestedFoldersFragment {
             return SuggestedFoldersFragment().apply {
-                arguments = bundleOf(
-                    ARGS_KEY to Args(source),
-                )
+                arguments = Bundle().apply {
+                    putParcelable(ARGS_KEY, Args(source))
+                }
             }
         }
     }

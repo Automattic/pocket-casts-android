@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -67,7 +66,12 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
             forceDark: Boolean = false,
             source: EpisodeViewSource = EpisodeViewSource.UNKNOWN,
         ) = CloudFileBottomSheetFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARG to Args(userEpisodeId, forceDark, source))
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    Args(userEpisodeId, forceDark, source),
+                )
+            }
         }
     }
 

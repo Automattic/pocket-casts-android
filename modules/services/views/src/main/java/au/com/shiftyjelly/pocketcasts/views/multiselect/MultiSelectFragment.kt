@@ -5,7 +5,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -197,7 +196,12 @@ class MultiSelectFragment :
             source: SourceView,
             shouldShowRemoveListeningHistory: Boolean,
         ) = MultiSelectFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(source, shouldShowRemoveListeningHistory))
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_KEY,
+                    Args(source, shouldShowRemoveListeningHistory),
+                )
+            }
         }
     }
 }

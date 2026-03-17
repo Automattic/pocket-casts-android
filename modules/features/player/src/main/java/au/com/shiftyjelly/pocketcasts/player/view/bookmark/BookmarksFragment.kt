@@ -17,7 +17,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
@@ -66,11 +65,11 @@ class BookmarksFragment : BaseFragment() {
             episodeUuid: String? = null,
             forceDarkTheme: Boolean = false,
         ) = BookmarksFragment().apply {
-            arguments = bundleOf(
-                ARG_SOURCE_VIEW to sourceView.key,
-                ARG_EPISODE_UUID to episodeUuid,
-                ARG_FORCE_DARK_THEME to forceDarkTheme,
-            )
+            arguments = Bundle().apply {
+                putString(ARG_SOURCE_VIEW, sourceView.key)
+                putString(ARG_EPISODE_UUID, episodeUuid)
+                putBoolean(ARG_FORCE_DARK_THEME, forceDarkTheme)
+            }
         }
     }
 
