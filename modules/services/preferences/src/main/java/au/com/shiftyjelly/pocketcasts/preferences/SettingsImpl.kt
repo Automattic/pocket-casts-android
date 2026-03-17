@@ -186,6 +186,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val liveAnalyticsUrl = UserSetting.StringPref(
+        sharedPrefKey = "liveAnalyticsUrl",
+        defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun getCancelledAcknowledged(): Boolean {
         return getBoolean("cancelled_acknowledged", false)
     }

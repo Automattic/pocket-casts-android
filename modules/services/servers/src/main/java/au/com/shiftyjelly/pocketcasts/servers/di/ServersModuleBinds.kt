@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
+import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
@@ -33,4 +35,8 @@ abstract class ServersModuleBinds {
     @Binds
     @Singleton
     abstract fun providePodcastCacheServiceManager(podcastCacheServiceManagerImpl: PodcastCacheServiceManagerImpl): PodcastCacheServiceManager
+
+    @Binds
+    @Singleton
+    abstract fun provideAnalyticsLiveServiceManager(impl: AnalyticsLiveServiceManagerImpl): AnalyticsLiveServiceManager
 }

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.analytics.AnalyticsLiveDebugListener
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
@@ -238,6 +239,10 @@ abstract class RepositoryModule {
     @Binds
     @IntoSet
     abstract fun provideAppReviewAnalyticsListener(appReviewAnalyticsListener: AppReviewAnalyticsListener): AnalyticsListener
+
+    @Binds
+    @IntoSet
+    abstract fun provideAnalyticsLiveDebugListener(listener: AnalyticsLiveDebugListener): AnalyticsListener
 
     @Binds
     abstract fun provideDownloadQueue(manager: DownloadManager): DownloadQueue

@@ -57,6 +57,10 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                             "marketingOptIn" -> settings.marketingOptIn.set(value.value, updateModifiedAt = false)
                             "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, updateModifiedAt = false)
                         }
+                    } else if (value.value is String) {
+                        when (key) {
+                            "liveAnalyticsUrl" -> settings.liveAnalyticsUrl.set(value.value, updateModifiedAt = false)
+                        }
                     }
                 } else {
                     Timber.d("$key not changed")
