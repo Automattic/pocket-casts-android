@@ -255,7 +255,7 @@ object AutoConverter {
         }
 
         return Bundle().apply {
-            putInt(EXTRA_DOWNLOAD_STATUS, downloadStatus)
+            putLong(EXTRA_DOWNLOAD_STATUS, downloadStatus)
             putInt(DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS, completionStatus)
             putDouble(
                 DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE,
