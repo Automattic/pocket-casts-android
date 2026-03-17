@@ -12,7 +12,7 @@ enum class Feature(
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
-    // This is set of features used only for testing purposes.
+    // This is a set of features used only for testing purposes.
     TEST_FREE_FEATURE(
         key = "test_free_feature",
         title = "Free feature used for testing",
