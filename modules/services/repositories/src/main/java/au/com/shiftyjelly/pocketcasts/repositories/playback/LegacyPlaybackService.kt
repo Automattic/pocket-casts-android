@@ -87,7 +87,13 @@ open class LegacyPlaybackService :
     override fun onCreate() {
         super.onCreate()
 
-        val mediaSession = playbackManager.mediaSessionManager.mediaSession
+        @Suppress("SENSELESS_COMPARISON") // mediaSession becomes nullable in the Media3 integration PR
+        val mediaSession: MediaSessionCompat? = playbackManager.mediaSessionManager.mediaSession
+        if (mediaSession == null) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "LegacyPlaybackService created but mediaSession is null (flag mismatch), stopping")
+            stopSelf()
+            return
+        }
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Legacy playback service created")
 
@@ -104,8 +110,9 @@ open class LegacyPlaybackService :
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         if (Util.isAutomotive(this)) return
-        val session = playbackManager.mediaSessionManager.mediaSession
-        val state = session.controller?.playbackState?.state
+        @Suppress("SENSELESS_COMPARISON") // mediaSession becomes nullable in the Media3 integration PR
+        val session: MediaSessionCompat? = playbackManager.mediaSessionManager.mediaSession
+        val state = session?.controller?.playbackState?.state
         val isPlaying = state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING
         if (!isPlaying) {
             playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
@@ -308,9 +315,10 @@ open class LegacyPlaybackService :
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
+        @Suppress("USELESS_ELVIS") // mediaSession becomes nullable in the Media3 integration PR
         private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
             if (Util.isAutomotive(this@LegacyPlaybackService)) return null
-            val mediaSession = playbackManager.mediaSessionManager.mediaSession
+            val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return null
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
     }
