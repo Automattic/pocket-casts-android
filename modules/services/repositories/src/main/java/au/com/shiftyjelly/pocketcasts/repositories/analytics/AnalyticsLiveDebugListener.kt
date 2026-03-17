@@ -1,13 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.repositories.analytics
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
-import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.analytics.EventProperties
 import au.com.shiftyjelly.pocketcasts.servers.analytics.InputEvent
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.Trackable
 import java.net.URI
@@ -43,15 +45,18 @@ class AnalyticsLiveDebugListener @Inject constructor(
     private val pendingEvents = Channel<InputEvent>(capacity = 1_000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     private var flushJob: Job? = null
+    private var collectAnalytics: Boolean = true
 
     init {
         coroutineScope.launch {
             // Only send events if we turn it on server side, and analytics aren't turned off in the privacy settings.
             combine(
+                FeatureFlag.isEnabledFlow(Feature.LIVE_ANALYTICS),
                 settings.liveAnalyticsUrl.flow,
                 settings.collectAnalytics.flow,
-            ) { url, collectAnalytics ->
-                if (url.isNotBlank() && collectAnalytics && isAllowedUrl(url)) url else null
+            ) { featureFlag, url, settingsCollectAnalytics ->
+                collectAnalytics = settingsCollectAnalytics
+                if (url.isNotBlank() && collectAnalytics && isAllowedUrl(url) && featureFlag) url else null
             }
                 .distinctUntilChanged()
                 .collect { url ->
@@ -104,6 +109,9 @@ class AnalyticsLiveDebugListener @Inject constructor(
     }
 
     override fun onEvent(event: Trackable, trackedEvents: Map<String, TrackedEvent?>) {
+        if (!FeatureFlag.isEnabled(Feature.LIVE_ANALYTICS) || !collectAnalytics) {
+            return
+        }
         val inputEvent = InputEvent(
             name = event.analyticsName,
             timestamp = clock.instant(),
