@@ -43,11 +43,9 @@ class AnalyticsLiveDebugListenerTest {
         on { collectAnalytics } doReturn collectAnalyticsSetting
     }
 
-    private val testDispatcher = CoroutineScope(UnconfinedTestDispatcher())
-
     @Test
-    fun `does not send events when live analytics URL is blank`() = runTest {
-        val listener = createListener()
+    fun `does not send events when live analytics URL is blank`() = runTest(UnconfinedTestDispatcher()) {
+        val listener = createListener(backgroundScope)
 
         listener.onEvent(ProfileTabOpenedEvent(initial = true))
 
@@ -55,11 +53,11 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `does not send events when analytics collection is disabled`() = runTest {
+    fun `does not send events when analytics collection is disabled`() = runTest(UnconfinedTestDispatcher()) {
         collectAnalyticsSetting.set(false)
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
 
         listener.onEvent(ProfileTabOpenedEvent(initial = true))
 
@@ -67,10 +65,10 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `sends events when URL is set and analytics are enabled`() = runTest {
+    fun `sends events when URL is set and analytics are enabled`() = runTest(UnconfinedTestDispatcher()) {
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
         listener.onEvent(PodcastsListFolderTappedEvent)
 
         verify(serviceManager).sendEvents(
@@ -80,10 +78,10 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `sends event with correct properties`() = runTest {
+    fun `sends event with correct properties`() = runTest(UnconfinedTestDispatcher()) {
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
         listener.onEvent(PodcastsListSortOrderChangedEvent(sortBy = PodcastListSortType.Name))
 
         verify(serviceManager).sendEvents(
@@ -99,8 +97,8 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `batches multiple events together`() = runTest {
-        val listener = createListener()
+    fun `batches multiple events together`() = runTest(UnconfinedTestDispatcher()) {
+        val listener = createListener(backgroundScope)
         repeat(5) { _ ->
             listener.onEvent(PodcastsListFolderTappedEvent)
         }
@@ -114,10 +112,10 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `stops sending events when URL is cleared`() = runTest {
+    fun `stops sending events when URL is cleared`() = runTest(UnconfinedTestDispatcher()) {
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
 
         liveAnalyticsUrlFlow.value = ""
 
@@ -127,10 +125,10 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `stops sending events when analytics collection is disabled`() = runTest {
+    fun `stops sending events when analytics collection is disabled`() = runTest(UnconfinedTestDispatcher()) {
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
 
         collectAnalyticsSetting.set(false)
 
@@ -140,11 +138,11 @@ class AnalyticsLiveDebugListenerTest {
     }
 
     @Test
-    fun `uses correct timestamp from clock`() = runTest {
+    fun `uses correct timestamp from clock`() = runTest(UnconfinedTestDispatcher()) {
         liveAnalyticsUrlFlow.value = "https://live.pocketcasts.com/events"
         val expectedTimestamp = clock.instant()
 
-        val listener = createListener()
+        val listener = createListener(backgroundScope)
         listener.onEvent(ProfileTabOpenedEvent(initial = true))
 
         verify(serviceManager).sendEvents(
@@ -153,10 +151,10 @@ class AnalyticsLiveDebugListenerTest {
         )
     }
 
-    private fun createListener() = AnalyticsLiveDebugListener(
+    private fun createListener(scope: CoroutineScope) = AnalyticsLiveDebugListener(
         settings = settings,
         analyticsLiveServiceManager = serviceManager,
         clock = clock,
-        coroutineScope = testDispatcher,
+        coroutineScope = scope,
     )
 }
