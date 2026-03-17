@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.analytics
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
+import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.analytics.EventProperties
 import au.com.shiftyjelly.pocketcasts.servers.analytics.InputEvent
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.Trackable
+import java.net.URI
 import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Listens for analytics events and forwards them in batches to a server to help us debug issues.
@@ -48,7 +50,7 @@ class AnalyticsLiveDebugListener @Inject constructor(
                 settings.liveAnalyticsUrl.flow,
                 settings.collectAnalytics.flow,
             ) { url, collectAnalytics ->
-                if (url.isNotBlank() && collectAnalytics) url else null
+                if (url.isNotBlank() && collectAnalytics && isAllowedUrl(url)) url else null
             }
                 .distinctUntilChanged()
                 .collect { url ->
@@ -59,6 +61,14 @@ class AnalyticsLiveDebugListener @Inject constructor(
                     }
                 }
         }
+    }
+
+    // In release builds, only allow HTTPS URLs on the Pocket Casts domain.
+    private fun isAllowedUrl(url: String): Boolean {
+        if (BuildConfig.DEBUG) return true
+        val uri = runCatching { URI(url) }.getOrNull() ?: return false
+        val host = uri.host?.lowercase() ?: return false
+        return uri.scheme == "https" && host.endsWith(".${BuildConfig.WEB_BASE_HOST}")
     }
 
     private fun startFlushing(url: String) {
@@ -77,7 +87,7 @@ class AnalyticsLiveDebugListener @Inject constructor(
                     analyticsLiveServiceManager.sendEvents(url, batch)
                     delay(FLUSH_DELAY_MS)
                 } catch (exception: Exception) {
-                    Timber.e(exception, "Failed to send analytics events")
+                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Failed to send analytics events")
                     delay(ERROR_BACKOFF_MS)
                 }
             }
