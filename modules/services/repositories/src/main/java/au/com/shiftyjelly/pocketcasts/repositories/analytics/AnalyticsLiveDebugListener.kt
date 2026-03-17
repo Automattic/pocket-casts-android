@@ -14,6 +14,7 @@ import java.net.URI
 import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -87,6 +88,9 @@ class AnalyticsLiveDebugListener @Inject constructor(
                     analyticsLiveServiceManager.sendEvents(url, batch)
                     delay(FLUSH_DELAY_MS)
                 } catch (exception: Exception) {
+                    if (exception is CancellationException) {
+                        throw exception
+                    }
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Failed to send analytics events")
                     delay(ERROR_BACKOFF_MS)
                 }
