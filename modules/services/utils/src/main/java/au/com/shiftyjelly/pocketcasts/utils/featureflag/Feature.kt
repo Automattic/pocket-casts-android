@@ -45,6 +45,7 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
+
     // Here are the feature flags used by the app
     SYNC_EOY_DATA_ON_STARTUP(
         key = "sync_eoy_data_on_startup",
