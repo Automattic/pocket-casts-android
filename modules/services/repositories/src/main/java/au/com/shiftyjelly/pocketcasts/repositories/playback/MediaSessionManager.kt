@@ -960,14 +960,14 @@ class MediaSessionManager(
 
 typealias QueuedCommand = Pair<String, suspend () -> Unit>
 
-private const val APP_ACTION_STAR = "star"
-private const val APP_ACTION_UNSTAR = "unstar"
-private const val APP_ACTION_SKIP_BACK = "jumpBack"
-private const val APP_ACTION_SKIP_FWD = "jumpFwd"
-private const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
-private const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
-private const val APP_ACTION_ARCHIVE = "archive"
-private const val APP_ACTION_PLAY_NEXT = "playNext"
+internal const val APP_ACTION_STAR = "star"
+internal const val APP_ACTION_UNSTAR = "unstar"
+internal const val APP_ACTION_SKIP_BACK = "jumpBack"
+internal const val APP_ACTION_SKIP_FWD = "jumpFwd"
+internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
+internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
+internal const val APP_ACTION_ARCHIVE = "archive"
+internal const val APP_ACTION_PLAY_NEXT = "playNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
