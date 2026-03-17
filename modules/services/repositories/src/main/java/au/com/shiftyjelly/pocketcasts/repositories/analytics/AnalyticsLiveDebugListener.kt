@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.analytics
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
-import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
