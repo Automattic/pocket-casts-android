@@ -12,6 +12,41 @@ enum class Feature(
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
+    // This is a set of features used only for testing purposes.
+    TEST_FREE_FEATURE(
+        key = "test_free_feature",
+        title = "Free feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PLUS_FEATURE(
+        key = "test_plus_feature",
+        title = "Plus feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PLUS_RESTRICTED_FEATURE(
+        key = "test_plus_restricted_feature",
+        title = "Plus feature with Patron exclusive access used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Plus(ReleaseVersion(1, 0)),
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PATRON_FEATURE(
+        key = "test_patron_feature",
+        title = "Patron feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Patron,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+
+    // Here are the feature flags used by the app
     SYNC_EOY_DATA_ON_STARTUP(
         key = "sync_eoy_data_on_startup",
         title = "Whether the End of Year data should be synced on startup",
@@ -155,40 +190,6 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
-    ),
-
-    // This is set of features used only for testing purposes.
-    TEST_FREE_FEATURE(
-        key = "test_free_feature",
-        title = "Free feature used for testing",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
-    ),
-    TEST_PLUS_FEATURE(
-        key = "test_plus_feature",
-        title = "Plus feature used for testing",
-        defaultValue = true,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
-    ),
-    TEST_PLUS_RESTRICTED_FEATURE(
-        key = "test_plus_restricted_feature",
-        title = "Plus feature with Patron exclusive access used for testing",
-        defaultValue = true,
-        tier = FeatureTier.Plus(ReleaseVersion(1, 0)),
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
-    ),
-    TEST_PATRON_FEATURE(
-        key = "test_patron_feature",
-        title = "Patron feature used for testing",
-        defaultValue = true,
-        tier = FeatureTier.Patron,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
     ),
     NEXT_EPISODE_PREFETCH(
         key = "next_episode_prefetch",
