@@ -13,6 +13,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
+import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.DefaultLoadControl
@@ -59,6 +60,9 @@ class SimplePlayer(
 
     @Volatile
     private var prepared = false
+
+    @Volatile
+    private var stuckRecoveryAttempts = 0
 
     val exoPlayer: ExoPlayer?
         get() {
@@ -117,6 +121,7 @@ class SimplePlayer(
 
         player = null
         prepared = false
+        stuckRecoveryAttempts = 0
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -256,6 +261,29 @@ class SimplePlayer(
                     }
                     return
                 }
+
+                val stuckException = error.cause as? StuckPlayerException
+                if (stuckException != null && stuckException.stuckType != StuckPlayerException.STUCK_SUPPRESSED) {
+                    if (stuckRecoveryAttempts < MAX_STUCK_RECOVERY_ATTEMPTS) {
+                        stuckRecoveryAttempts++
+                        LogBuffer.i(
+                            LogBuffer.TAG_PLAYBACK,
+                            "Stuck player detected (type=${stuckException.stuckType}), recovery attempt $stuckRecoveryAttempts/$MAX_STUCK_RECOVERY_ATTEMPTS",
+                        )
+                        val currentPosition = player.currentPosition
+                        val wasPlaying = player.playWhenReady
+                        handleStop()
+                        prepare()
+                        this@SimplePlayer.player?.seekTo(currentPosition)
+                        this@SimplePlayer.player?.playWhenReady = wasPlaying
+                        return
+                    }
+                    LogBuffer.e(
+                        LogBuffer.TAG_PLAYBACK,
+                        "Stuck player recovery exhausted after $MAX_STUCK_RECOVERY_ATTEMPTS attempts (type=${stuckException.stuckType})",
+                    )
+                }
+
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
                 val event = PlayerEvent.PlayerError(error.message ?: "", error)
                 this@SimplePlayer.onError(event)
@@ -340,5 +368,9 @@ class SimplePlayer(
             it.setBoostVolume(playbackEffects.isVolumeBoosted)
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
+    }
+
+    companion object {
+        private const val MAX_STUCK_RECOVERY_ATTEMPTS = 3
     }
 }

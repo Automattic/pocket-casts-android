@@ -7,12 +7,15 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
+import androidx.media3.common.util.StuckPlayerException
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -1224,6 +1227,7 @@ open class PlaybackManager @Inject constructor(
 
     /** LISTENERS  */
 
+    @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
         settings.recordErrorSession()
         val episode = getCurrentEpisode()
@@ -1266,12 +1270,18 @@ open class PlaybackManager @Inject constructor(
         stop()
         onPlayerPaused()
 
+        val stuckException = event.error?.cause as? StuckPlayerException
+
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val errorMessage = if (event.error?.cause is HttpDataSource.HttpDataSourceException) {
-                    application.getString(LR.string.player_play_failed_check_internet)
-                } else {
-                    event.message
+                val errorMessage = when {
+                    stuckException != null -> application.getString(LR.string.player_stuck_error)
+
+                    event.error?.cause is HttpDataSource.HttpDataSourceException -> {
+                        application.getString(LR.string.player_play_failed_check_internet)
+                    }
+
+                    else -> event.message
                 }
 
                 eventHorizon.track(
@@ -1281,13 +1291,19 @@ open class PlaybackManager @Inject constructor(
                     ),
                 )
 
+                val properties = buildMap {
+                    put("episodeUuid", episode?.uuid.orEmpty())
+                    put("playedUpTo", episode?.playedUpTo?.roundToInt().toString())
+                    if (stuckException != null) {
+                        put("stuckType", stuckException.stuckType.toString())
+                        put("timeoutMs", stuckException.timeoutMs.toString())
+                    }
+                }
+
                 crashLogging.sendReport(
-                    message = "Illegal playback state encountered",
+                    message = if (stuckException != null) "Stuck player error" else "Illegal playback state encountered",
                     exception = event.error ?: IllegalStateException(event.message),
-                    tags = mapOf(
-                        "episodeUuid" to episode?.uuid.orEmpty(),
-                        "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
-                    ),
+                    tags = properties,
                 )
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
             }
