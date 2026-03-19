@@ -102,7 +102,6 @@ import com.automattic.eventhorizon.BannerAdImpressionEvent
 import com.automattic.eventhorizon.BannerAdTappedEvent
 import com.automattic.eventhorizon.CreateFolderSourceType
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.FolderAddPodcastsButtonTappedEvent
 import com.automattic.eventhorizon.FolderChoosePodcastsShownEvent
 import com.automattic.eventhorizon.FolderEditShownEvent
 import com.automattic.eventhorizon.FolderModalOptionType
@@ -443,8 +442,12 @@ class PodcastsFragment :
                 fragment.show(parentFragmentManager, "edit_folder_card")
             }
             val onAddOrRemovePodcast = {
-                eventHorizon.track(FolderAddPodcastsButtonTappedEvent)
                 eventHorizon.track(FolderChoosePodcastsShownEvent)
+                eventHorizon.track(
+                    FolderOptionsModalOptionTappedEvent(
+                        option = FolderModalOptionType.AddOrRemovePodcasts,
+                    ),
+                )
                 val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "add_podcasts_card")
             }

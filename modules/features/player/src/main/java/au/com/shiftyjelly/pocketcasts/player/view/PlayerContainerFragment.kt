@@ -46,6 +46,7 @@ import com.automattic.eventhorizon.PlayerTabSelectedEvent
 import com.automattic.eventhorizon.PlayerTabType
 import com.automattic.eventhorizon.UpNextDismissedEvent
 import com.automattic.eventhorizon.UpNextShownEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,6 +72,8 @@ class PlayerContainerFragment :
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     var upNextBottomSheetBehavior: BottomSheetBehavior<View>? = null
+
+    private var upNextExpandedSource: UpNextSource? = null
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -148,7 +151,7 @@ class PlayerContainerFragment :
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     eventHorizon.track(
                         UpNextShownEvent(
-                            source = UpNextSource.NOW_PLAYING.analyticsValue,
+                            source = upNextExpandedSource?.analyticsValue ?: UpNextSourceType.Unknown,
                         ),
                     )
 
@@ -159,7 +162,11 @@ class PlayerContainerFragment :
 
                     upNextFragment.onExpanded()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    eventHorizon.track(UpNextDismissedEvent)
+                    eventHorizon.track(
+                        UpNextDismissedEvent(
+                            source = upNextExpandedSource?.analyticsValue ?: UpNextSourceType.Unknown,
+                        ),
+                    )
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
                     upNextFragment.onCollapsed()
@@ -235,12 +242,7 @@ class PlayerContainerFragment :
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
 
             binding.upNextButton.setOnClickListener {
-                eventHorizon.track(
-                    UpNextShownEvent(
-                        source = UpNextSource.PLAYER.analyticsValue,
-                    ),
-                )
-                openUpNext()
+                openUpNext(UpNextSource.PLAYER)
             }
         }
 
@@ -278,7 +280,8 @@ class PlayerContainerFragment :
         )
     }
 
-    fun openUpNext() {
+    fun openUpNext(source: UpNextSource) {
+        this.upNextExpandedSource = source
         updateUpNextVisibility(true)
         upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }

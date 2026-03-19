@@ -114,7 +114,6 @@ class PodcastAdapter(
     private val settings: Settings,
     private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val theme: Theme,
-    private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
@@ -139,6 +138,7 @@ class PodcastAdapter(
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
+    private val onDescriptionExpanded: (Boolean) -> Unit,
     private val onClickRating: (Podcast) -> Unit,
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
@@ -274,6 +274,7 @@ class PodcastAdapter(
                 },
                 onToggleDescription = {
                     isDescriptionExpanded = !isDescriptionExpanded
+                    onDescriptionExpanded(isDescriptionExpanded)
                     notifyItemChanged(0)
                 },
                 onLongClickArtwork = {
@@ -448,7 +449,6 @@ class PodcastAdapter(
             headerExpanded = !podcast.isSubscribed
             ratingsViewModel.loadRatings(podcast.uuid)
             ratingsViewModel.refreshPodcastRatings(podcast.uuid)
-            onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
         val isHtmlDescription = podcast.podcastHtmlDescription.isNotEmpty()

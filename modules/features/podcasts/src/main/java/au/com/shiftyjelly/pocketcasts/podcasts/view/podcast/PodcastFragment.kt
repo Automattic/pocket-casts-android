@@ -267,19 +267,6 @@ class PodcastFragment : BaseFragment() {
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
-    private val onHeaderSummaryToggled: (
-        expanded: Boolean,
-        userInitiated: Boolean,
-    ) -> Unit = { expanded, userInitiated ->
-        if (userInitiated) {
-            eventHorizon.track(
-                PodcastScreenToggleSummaryEvent(
-                    isExpanded = expanded,
-                ),
-            )
-        }
-    }
-
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let { fromListUuid ->
             eventHorizon.track(
@@ -745,7 +732,6 @@ class PodcastFragment : BaseFragment() {
             swipeRowActionsFactory = swipeRowActionsFactory,
             theme = theme,
             fromListUuid = fromListUuid,
-            onHeaderSummaryToggled = onHeaderSummaryToggled,
             onSubscribeClicked = onSubscribeClicked,
             onUnsubscribeClicked = onUnsubscribeClicked,
             onEpisodesOptionsClicked = onEpisodesOptionsClicked,
@@ -771,6 +757,13 @@ class PodcastFragment : BaseFragment() {
             onGetBookmarksClicked = ::onGetBookmarksClicked,
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
+            },
+            onDescriptionExpanded = { isExpanded ->
+                eventHorizon.track(
+                    PodcastScreenToggleSummaryEvent(
+                        isExpanded = isExpanded,
+                    ),
+                )
             },
             onClickRating = { podcast ->
                 ratingsViewModel.onRatingStarsTapped(

@@ -200,6 +200,7 @@ import com.automattic.eventhorizon.PodcastsTabOpenedEvent
 import com.automattic.eventhorizon.ProfileTabOpenedEvent
 import com.automattic.eventhorizon.UpNextDismissedEvent
 import com.automattic.eventhorizon.UpNextShownEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -1138,12 +1139,17 @@ class MainActivity :
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    if (bottomSheetTag == UpNextFragment::class.java.name) {
-                        eventHorizon.track(UpNextDismissedEvent)
+                    val fragment = supportFragmentManager.findFragmentByTag(bottomSheetTag)
+
+                    if (fragment is UpNextFragment) {
+                        val source = fragment.args?.source?.analyticsValue ?: UpNextSourceType.Unknown
+                        eventHorizon.track(
+                            UpNextDismissedEvent(
+                                source = source,
+                            ),
+                        )
                     }
-                    supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
-                        removeBottomSheetFragment(it)
-                    }
+                    fragment?.let(::removeBottomSheetFragment)
 
                     binding.playerBottomSheet.isDragEnabled = true
                     frameBottomSheetBehavior.swipeEnabled = false
