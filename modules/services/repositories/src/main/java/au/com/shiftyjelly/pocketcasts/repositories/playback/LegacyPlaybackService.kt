@@ -2,20 +2,19 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.widget.Toast
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.MediaItemCompatConverter
@@ -25,25 +24,15 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
@@ -85,8 +74,8 @@ open class LegacyPlaybackService :
 
     @Volatile
     private var isForeground: Boolean = false
-    private var sleepTimerDisposable: Disposable? = null
-    private var currentTimeLeft: Duration = ZERO
+
+    private var sleepTimerHandler: SleepTimerHandler? = null
 
     private var packageValidator: PackageValidator? = null
 
@@ -98,13 +87,7 @@ open class LegacyPlaybackService :
     override fun onCreate() {
         super.onCreate()
 
-        @Suppress("SENSELESS_COMPARISON") // mediaSession becomes nullable in the Media3 integration PR
-        val mediaSession: MediaSessionCompat? = playbackManager.mediaSessionManager.mediaSession
-        if (mediaSession == null) {
-            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "LegacyPlaybackService created but mediaSession is null (flag mismatch), stopping")
-            stopSelf()
-            return
-        }
+        val mediaSession = playbackManager.mediaSessionManager.mediaSession
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Legacy playback service created")
 
@@ -116,7 +99,18 @@ open class LegacyPlaybackService :
         mediaController = MediaControllerCompat(this, mediaSession.sessionToken)
         notificationManager = PlayerNotificationManagerImpl(this)
 
-        observeSleepTimer()
+        sleepTimerHandler = SleepTimerHandler(sleepTimer, playbackManager, { applicationContext }, this).also { it.observe() }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (Util.isAutomotive(this)) return
+        val session = playbackManager.mediaSessionManager.mediaSession
+        val state = session.controller?.playbackState?.state
+        val isPlaying = state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING
+        if (!isPlaying) {
+            playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
+            stopSelf()
+        }
     }
 
     override fun onDestroy() {
@@ -124,7 +118,7 @@ open class LegacyPlaybackService :
         isForeground = false
 
         disposables.clear()
-        sleepTimerDisposable?.dispose()
+        sleepTimerHandler?.dispose()
         job.cancel()
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Legacy playback service destroyed")
@@ -133,6 +127,7 @@ open class LegacyPlaybackService :
     fun isForegroundService(): Boolean {
         return isForeground
     }
+
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
         val validator = packageValidator
@@ -185,13 +180,14 @@ open class LegacyPlaybackService :
         launch {
             try {
                 val items = browseTreeProvider.search(query, this@LegacyPlaybackService)
-                result.sendResult(if (items != null) MediaItemCompatConverter.toCompatList(items) else emptyList())
+                result.sendResult(items?.let { MediaItemCompatConverter.toCompatList(it) })
             } catch (e: Exception) {
                 Timber.e(e, "Search failed for: $query")
                 result.sendResult(emptyList())
             }
         }
     }
+
 
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
         private val playbackStatusRelay = BehaviorRelay.create<PlaybackStateCompat>()
@@ -207,7 +203,7 @@ open class LegacyPlaybackService :
                 .observeOn(SchedulerProvider.io)
                 .distinctUntilChanged { (state1, metadata1, artworkConfiguration1), (state2, metadata2, artworkConfiguration2) ->
                     val isForegroundService = isForegroundService()
-                    (state1.state == state2.state && metadata1.id == metadata2.id && artworkConfiguration1 == artworkConfiguration2) &&
+                    (state1.state == state2.state && metadata1.getString(METADATA_KEY_MEDIA_ID) == metadata2.getString(METADATA_KEY_MEDIA_ID) && artworkConfiguration1 == artworkConfiguration2) &&
                         (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
                 }
                 .map { (playbackState, _, artworkConfiguration) -> playbackState to buildNotification(artworkConfiguration.useEpisodeArtwork) }
@@ -314,71 +310,10 @@ open class LegacyPlaybackService :
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        @Suppress("USELESS_ELVIS") // mediaSession becomes nullable in the Media3 integration PR
         private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
             if (Util.isAutomotive(this@LegacyPlaybackService)) return null
-            val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return null
+            val mediaSession = playbackManager.mediaSessionManager.mediaSession
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
-    }
-
-    private fun observeSleepTimer() {
-        sleepTimer.stateFlow
-            .onEach { state ->
-                onSleepTimerStateChange(state)
-            }
-            .catch { throwable ->
-                Timber.e(throwable, "Error observing SleepTimer state")
-            }
-            .launchIn(this)
-    }
-
-    private fun onSleepTimerStateChange(state: SleepTimerState) {
-        if (state.isSleepTimerRunning && state.timeLeft != ZERO) {
-            startOrUpdateSleepTimer(state.timeLeft)
-        } else {
-            cancelSleepTimer()
-        }
-    }
-
-    private fun startOrUpdateSleepTimer(newTimeLeft: Duration) {
-        if (newTimeLeft == ZERO || newTimeLeft.isNegative()) {
-            return
-        }
-
-        if (sleepTimerDisposable == null || sleepTimerDisposable!!.isDisposed) {
-            currentTimeLeft = newTimeLeft
-
-            sleepTimerDisposable = Observable.interval(1, TimeUnit.SECONDS, Schedulers.computation())
-                .takeWhile { currentTimeLeft > ZERO }
-                .doOnNext {
-                    currentTimeLeft = currentTimeLeft.minus(1.seconds)
-                    sleepTimer.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
-
-                    if (currentTimeLeft == 5.seconds) {
-                        playbackManager.performVolumeFadeOut(5.0)
-                    }
-
-                    if (currentTimeLeft <= ZERO) {
-                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
-                        launch(Dispatchers.Main) {
-                            Toast.makeText(applicationContext, applicationContext.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
-                            playbackManager.restorePlayerVolume()
-                        }
-                        playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
-                        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
-                        cancelSleepTimer()
-                    }
-                }
-                .subscribe()
-        } else {
-            currentTimeLeft = newTimeLeft
-        }
-    }
-
-    private fun cancelSleepTimer() {
-        sleepTimerDisposable?.dispose()
-        sleepTimerDisposable = null
-        currentTimeLeft = ZERO
     }
 }
