@@ -158,6 +158,8 @@ class PocketCastsApplication :
 
         super.onCreate()
 
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
+
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()
