@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.SurfaceView
-import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
@@ -130,12 +129,15 @@ class SimplePlayer(
     }
 
     override fun handleSeekToTimeMs(positionMs: Int) {
-        if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
-            Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
-        } else {
-            player?.seekTo(positionMs.toLong())
-            super.onSeekComplete(positionMs)
+        if (player?.isCurrentMediaItemSeekable == false) {
+            LogBuffer.w(
+                LogBuffer.TAG_PLAYBACK,
+                "Seeking to %dms on non-seekable media. CBR seeking enabled; attempting anyway.",
+                positionMs,
+            )
         }
+        player?.seekTo(positionMs.toLong())
+        super.onSeekComplete(positionMs)
     }
 
     override fun handleIsBuffering(): Boolean {

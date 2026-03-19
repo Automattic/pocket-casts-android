@@ -88,7 +88,7 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
     @VisibleForTesting
     internal fun classifyError(exception: java.io.IOException): ErrorClassification {
         if (exception is ParserException) {
-            return ErrorClassification.NonRetryable
+            return ErrorClassification.RetryableNetwork
         }
         if (exception is FileNotFoundException) {
             return ErrorClassification.NonRetryable

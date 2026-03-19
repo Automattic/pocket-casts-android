@@ -111,10 +111,10 @@ class PocketCastsLoadErrorHandlingPolicyTest {
     // region Error Classification — Exception types
 
     @Test
-    fun `ParserException is non-retryable`() {
+    fun `ParserException is retryable to handle transient parsing failures during streaming`() {
         val exception = ParserException.createForMalformedContainer("bad data", null)
         val classification = policy.classifyError(exception)
-        assertEquals(ErrorClassification.NonRetryable, classification)
+        assertEquals(ErrorClassification.RetryableNetwork, classification)
     }
 
     @Test
@@ -242,6 +242,30 @@ class PocketCastsLoadErrorHandlingPolicyTest {
             policy.exponentialBackoff(errorCount),
             policy.getRetryDelayMsFor(loadErrorInfo),
         )
+    }
+
+    @Test
+    fun `ParserException uses exponential backoff delay`() {
+        val errorCount = 2
+        val loadErrorInfo = createLoadErrorInfo(
+            exception = ParserException.createForMalformedContainer("bad data", null),
+            errorCount = errorCount,
+            dataType = C.DATA_TYPE_MEDIA,
+        )
+        assertEquals(
+            policy.exponentialBackoff(errorCount),
+            policy.getRetryDelayMsFor(loadErrorInfo),
+        )
+    }
+
+    @Test
+    fun `ParserException stops retrying after exceeding max media retries`() {
+        val loadErrorInfo = createLoadErrorInfo(
+            exception = ParserException.createForMalformedContainer("bad data", null),
+            errorCount = MAX_RETRIES_MEDIA + 1,
+            dataType = C.DATA_TYPE_MEDIA,
+        )
+        assertEquals(C.TIME_UNSET, policy.getRetryDelayMsFor(loadErrorInfo))
     }
 
     // endregion
