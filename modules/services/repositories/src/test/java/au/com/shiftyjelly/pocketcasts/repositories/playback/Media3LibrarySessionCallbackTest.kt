@@ -9,9 +9,12 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import java.util.concurrent.ExecutionException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +44,8 @@ class Media3LibrarySessionCallbackTest {
     private lateinit var sessionCallback: Media3SessionCallback
     private lateinit var browseTreeProvider: BrowseTreeProvider
     private lateinit var playbackManager: PlaybackManager
+    private lateinit var episodeManager: EpisodeManager
+    private lateinit var podcastManager: PodcastManager
     private lateinit var mockSettings: Settings
     private lateinit var callback: Media3LibrarySessionCallback
     private lateinit var mockSession: MediaLibraryService.MediaLibrarySession
@@ -53,6 +58,8 @@ class Media3LibrarySessionCallbackTest {
         sessionCallback = mock()
         browseTreeProvider = mock()
         playbackManager = mock()
+        episodeManager = mock()
+        podcastManager = mock()
         mockSettings = mock()
         mockSession = mock()
         mockController = mock()
@@ -69,9 +76,11 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = null,
-            scope = testScope,
+            scopeProvider = { testScope },
             contextProvider = { mockContext },
         )
     }
@@ -220,9 +229,11 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = packageValidator,
-            scope = testScope,
+            scopeProvider = { testScope },
             contextProvider = { mockContext },
         )
 
@@ -249,9 +260,11 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = packageValidator,
-            scope = testScope,
+            scopeProvider = { testScope },
             contextProvider = { mockContext },
         )
 
@@ -299,7 +312,8 @@ class Media3LibrarySessionCallbackTest {
     }
 
     @Test
-    fun `onPlaybackResumption returns current episode with position`() = runTest {
+    fun `onPlaybackResumption returns current episode with position and metadata`() = runTest {
+        val podcast = Podcast(uuid = "podcast-uuid", title = "My Podcast")
         val episode = PodcastEpisode(
             uuid = "resume-ep",
             title = "Resume Episode",
@@ -307,13 +321,17 @@ class Media3LibrarySessionCallbackTest {
             podcastUuid = "podcast-uuid",
         ).apply { playedUpTo = 42.5 }
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(podcastManager.findPodcastByUuid("podcast-uuid")).thenReturn(podcast)
 
         val mockMediaSession: MediaSession = mock()
         val result = callback.onPlaybackResumption(mockMediaSession, mockController, false)
 
         val itemsWithPosition = result.get()
         assertEquals(1, itemsWithPosition.mediaItems.size)
-        assertEquals("resume-ep", itemsWithPosition.mediaItems[0].mediaId)
+        val mediaItem = itemsWithPosition.mediaItems[0]
+        assertEquals("resume-ep", mediaItem.mediaId)
+        assertEquals("Resume Episode", mediaItem.mediaMetadata.title)
+        assertEquals("My Podcast", mediaItem.mediaMetadata.artist)
         assertEquals(0, itemsWithPosition.startIndex)
         assertEquals(42_500L, itemsWithPosition.startPositionMs)
     }
@@ -327,6 +345,43 @@ class Media3LibrarySessionCallbackTest {
 
         val exception = assertThrows(ExecutionException::class.java) { result.get() }
         assertTrue(exception.cause is UnsupportedOperationException)
+    }
+
+    @Test
+    fun `onPlaybackResumption sets automotive connected flag on automotive`() = runTest {
+        val automotiveContext: Context = mock()
+        val automotivePackageManager: PackageManager = mock()
+        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
+        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
+        whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
+        whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
+        whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+
+        val automotiveCallback = Media3LibrarySessionCallback(
+            sessionCallback = sessionCallback,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
+            settings = mockSettings,
+            packageValidator = null,
+            scopeProvider = { testScope },
+            contextProvider = { automotiveContext },
+        )
+
+        val episode = PodcastEpisode(
+            uuid = "ep-1",
+            title = "Episode",
+            publishedDate = Date(),
+            podcastUuid = "pod-1",
+        )
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(podcastManager.findPodcastByUuid("pod-1")).thenReturn(null)
+
+        val mockMediaSession: MediaSession = mock()
+        automotiveCallback.onPlaybackResumption(mockMediaSession, mockController, false)
+
+        verify(mockSettings).setAutomotiveConnectedToMediaSession(true)
     }
 
     @Test

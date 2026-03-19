@@ -195,7 +195,7 @@ enum class Feature(
     MEDIA3_SESSION(
         key = "media3_session",
         title = "Media3 MediaSession",
-        defaultValue = true,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,

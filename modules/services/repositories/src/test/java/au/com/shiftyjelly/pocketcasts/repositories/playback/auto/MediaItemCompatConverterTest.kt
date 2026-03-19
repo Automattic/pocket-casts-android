@@ -20,7 +20,7 @@ class MediaItemCompatConverterTest {
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle("Test Podcast")
-                    .setSubtitle("Test Author")
+                    .setArtist("Test Author")
                     .setDescription("A description")
                     .setArtworkUri("https://example.com/art.jpg".toUri())
                     .setIsBrowsable(true)
