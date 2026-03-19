@@ -11,7 +11,7 @@ import org.junit.Test
 class MediaEventQueueTest {
     @Test
     fun `single tap event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val event = handler.consumeEvent(MediaEvent.SingleTap)
 
@@ -20,7 +20,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `double tap event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val event = handler.consumeEvent(MediaEvent.DoubleTap)
 
@@ -29,7 +29,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `triple tap event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val event = handler.consumeEvent(MediaEvent.TripleTap)
 
@@ -38,7 +38,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to double tap event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -50,7 +50,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to triple tap event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -63,7 +63,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to triple tap event when event count is higher`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -77,7 +77,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to multi tap event in time window`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -89,7 +89,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to single tap events outside of time window`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -102,7 +102,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `do not reset single tap time window with each new event`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -124,7 +124,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `ignore single tap events while double tap window is active`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         handler.consumeEvent(MediaEvent.DoubleTap)
 
@@ -138,7 +138,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `ignore single tap events while triple tap window is active`() = runTest {
-        val handler = MediaEventQueue(this)
+        val handler = MediaEventQueue(scopeProvider = { this })
 
         handler.consumeEvent(MediaEvent.TripleTap)
 

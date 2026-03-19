@@ -275,7 +275,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `stop delegates to onStop callback`() {
+    fun `stop calls onStop callback instead of wrapped player when provided`() {
         var stopCalled = false
         val player = PocketCastsForwardingPlayer(
             wrappedPlayer = mockPlayer,
@@ -313,7 +313,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `play allowed when playGuard returns true`() {
+    fun `play delegates to wrapped player when playGuard true and no onPlay`() {
         val player = PocketCastsForwardingPlayer(
             wrappedPlayer = mockPlayer,
             playGuard = { true },
@@ -325,7 +325,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `play calls onPlay callback`() {
+    fun `play calls onPlay callback instead of wrapped player`() {
         var onPlayCalled = false
         val player = PocketCastsForwardingPlayer(
             wrappedPlayer = mockPlayer,
@@ -335,7 +335,8 @@ class PocketCastsForwardingPlayerTest {
         player.play()
 
         assertTrue(onPlayCalled)
-        verify(mockPlayer).play()
+        // onPlay takes precedence — wrapped player's play() should not be called
+        verify(mockPlayer, never()).play()
     }
 
     @Test
@@ -354,7 +355,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `pause calls onPause callback`() {
+    fun `pause calls onPause callback instead of wrapped player`() {
         var onPauseCalled = false
         val player = PocketCastsForwardingPlayer(
             wrappedPlayer = mockPlayer,
@@ -364,6 +365,19 @@ class PocketCastsForwardingPlayerTest {
         player.pause()
 
         assertTrue(onPauseCalled)
+        // onPause takes precedence — wrapped player's pause() should not be called
+        verify(mockPlayer, never()).pause()
+    }
+
+    @Test
+    fun `pause delegates to wrapped player when onPause is null`() {
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onPause = null,
+        )
+
+        player.pause()
+
         verify(mockPlayer).pause()
     }
 
@@ -391,6 +405,8 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(stopCalled)
         assertTrue(guardChecked)
         verify(newWrappedPlayer, never()).play()
+        // onStop takes precedence — wrapped player's stop() should not be called
+        verify(newWrappedPlayer, never()).stop()
     }
 
     @Test
@@ -534,6 +550,74 @@ class PocketCastsForwardingPlayerTest {
 
         assertTrue(skipForwardCalled)
         assertTrue(skipBackCalled)
+    }
+
+    // --- setMediaItems / addMediaItems / prepare interception tests ---
+
+    @Test
+    fun `setMediaItems updates currentMediaItem and fires listener events`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        val metadata = MediaMetadata.Builder()
+            .setTitle("Resolved Episode")
+            .setArtist("Podcast Name")
+            .setIsPlayable(true)
+            .build()
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("ep-resolved")
+            .setMediaMetadata(metadata)
+            .build()
+
+        forwardingPlayer.setMediaItems(mutableListOf(mediaItem))
+
+        assertEquals("ep-resolved", forwardingPlayer.currentMediaItem.mediaId)
+        assertEquals("Resolved Episode", forwardingPlayer.mediaMetadata.title)
+        verify(listener).onMediaMetadataChanged(metadata)
+        verify(listener).onMediaItemTransition(
+            forwardingPlayer.currentMediaItem,
+            Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
+        )
+    }
+
+    @Test
+    fun `setMediaItems does not delegate to wrapped player`() {
+        val metadata = MediaMetadata.Builder().setTitle("Test").build()
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("ep-1")
+            .setMediaMetadata(metadata)
+            .build()
+
+        forwardingPlayer.setMediaItems(mutableListOf(mediaItem))
+
+        verify(mockPlayer, never()).setMediaItems(any())
+        verify(mockPlayer, never()).setMediaItems(any(), any<Boolean>())
+        verify(mockPlayer, never()).setMediaItems(any(), any<Int>(), any())
+    }
+
+    @Test
+    fun `prepare does not delegate to wrapped player`() {
+        forwardingPlayer.prepare()
+
+        verify(mockPlayer, never()).prepare()
+    }
+
+    @Test
+    fun `setMediaItems does not fire onMediaItemTransition when mediaId unchanged`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        val metadata = MediaMetadata.Builder().setTitle("Test").build()
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("ep-same")
+            .setMediaMetadata(metadata)
+            .build()
+
+        forwardingPlayer.setMediaItems(mutableListOf(mediaItem))
+        forwardingPlayer.setMediaItems(mutableListOf(mediaItem))
+
+        verify(listener, times(2)).onMediaMetadataChanged(any())
+        verify(listener, times(1)).onMediaItemTransition(any(), any())
     }
 
     private fun createPodcastEpisode(

@@ -39,10 +39,9 @@ class CastStatePlayerTest {
     }
 
     @Test
-    fun `initial state is not playing and ready`() {
+    fun `initial state is idle before first update`() {
         assertFalse(player.playWhenReady)
-        assertEquals(Player.STATE_READY, player.playbackState)
-        assertEquals(0L, player.currentPosition)
+        assertEquals(Player.STATE_IDLE, player.playbackState)
     }
 
     @Test
@@ -97,6 +96,9 @@ class CastStatePlayerTest {
 
     @Test
     fun `play delegates to onPlay callback`() {
+        player.updateCastState(isPlaying = false, isBuffering = false, positionMs = 0L)
+        shadowOf(Looper.getMainLooper()).idle()
+
         player.play()
         shadowOf(Looper.getMainLooper()).idle()
 
@@ -105,6 +107,9 @@ class CastStatePlayerTest {
 
     @Test
     fun `pause delegates to onPause callback`() {
+        player.updateCastState(isPlaying = true, isBuffering = false, positionMs = 0L)
+        shadowOf(Looper.getMainLooper()).idle()
+
         player.pause()
         shadowOf(Looper.getMainLooper()).idle()
 
@@ -113,6 +118,9 @@ class CastStatePlayerTest {
 
     @Test
     fun `seekTo delegates to onSeekTo callback`() {
+        player.updateCastState(isPlaying = false, isBuffering = false, positionMs = 0L)
+        shadowOf(Looper.getMainLooper()).idle()
+
         player.seekTo(42_000L)
         shadowOf(Looper.getMainLooper()).idle()
 
@@ -121,6 +129,9 @@ class CastStatePlayerTest {
 
     @Test
     fun `stop delegates to onStop callback`() {
+        player.updateCastState(isPlaying = true, isBuffering = false, positionMs = 0L)
+        shadowOf(Looper.getMainLooper()).idle()
+
         player.stop()
         shadowOf(Looper.getMainLooper()).idle()
 
@@ -128,7 +139,10 @@ class CastStatePlayerTest {
     }
 
     @Test
-    fun `available commands include play pause seek and stop`() {
+    fun `available commands after update include play pause seek and stop`() {
+        player.updateCastState(isPlaying = false, isBuffering = false, positionMs = 0L)
+        shadowOf(Looper.getMainLooper()).idle()
+
         val commands = player.availableCommands
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))

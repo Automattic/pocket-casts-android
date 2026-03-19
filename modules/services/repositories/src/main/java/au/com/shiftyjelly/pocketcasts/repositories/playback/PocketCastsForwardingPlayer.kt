@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Looper
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -43,11 +41,11 @@ class PocketCastsForwardingPlayer(
     private val onPlay: (() -> Unit)? = null,
     private val onPause: (() -> Unit)? = null,
     private val onSeekTo: ((Long) -> Unit)? = null,
-    private val playGuard: (() -> Boolean) = { true },
+    internal val playGuard: (() -> Boolean) = { true },
 ) : ForwardingPlayer(wrappedPlayer) {
 
-    private var currentMediaItem: MediaItem = MediaItem.EMPTY
-    private var previousMediaId: String? = null
+    internal var currentMediaItem: MediaItem = MediaItem.EMPTY
+    internal var previousMediaId: String? = null
 
     /**
      * Indicates the player is in a transient loss state (e.g., audio focus lost temporarily).
@@ -79,13 +77,16 @@ class PocketCastsForwardingPlayer(
     /**
      * Updates the metadata exposed via [getCurrentMediaItem]. Call this when the
      * current episode changes or when metadata is refreshed (e.g., artwork loaded).
+     *
+     * @param artworkData Pre-compressed artwork bytes (e.g. WebP). Compression should
+     *   happen off the main thread before calling this method.
      */
     @MainThread
     fun updateMetadata(
         episode: BaseEpisode,
         podcast: Podcast?,
         showArtwork: Boolean = true,
-        artworkBitmap: Bitmap? = null,
+        artworkData: ByteArray? = null,
     ) {
         checkMainThread()
 
@@ -104,16 +105,8 @@ class PocketCastsForwardingPlayer(
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
             .setUserRating(buildRating(episode))
 
-        if (showArtwork && artworkBitmap != null) {
-            val stream = java.io.ByteArrayOutputStream()
-            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Bitmap.CompressFormat.WEBP_LOSSY
-            } else {
-                @Suppress("DEPRECATION")
-                Bitmap.CompressFormat.WEBP
-            }
-            artworkBitmap.compress(format, 80, stream)
-            metadataBuilder.setArtworkData(stream.toByteArray(), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+        if (showArtwork && artworkData != null) {
+            metadataBuilder.setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
         }
 
         val metadata = metadataBuilder.build()
@@ -137,6 +130,20 @@ class PocketCastsForwardingPlayer(
         }
     }
 
+    /**
+     * Clears metadata when nothing is playing, so the session doesn't show stale info.
+     */
+    @MainThread
+    fun clearMetadata() {
+        checkMainThread()
+        currentMediaItem = MediaItem.EMPTY
+        previousMediaId = null
+        isTransientLoss = false
+        listeners.forEach { listener ->
+            listener.onMediaMetadataChanged(MediaMetadata.EMPTY)
+        }
+    }
+
     override fun getCurrentMediaItem(): MediaItem = currentMediaItem
 
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
@@ -153,27 +160,18 @@ class PocketCastsForwardingPlayer(
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
-                Player.COMMAND_SET_MEDIA_ITEM,
             )
             .build()
     }
 
     override fun seekTo(positionMs: Long) {
-        if (onSeekTo != null) {
-            onSeekTo.invoke(positionMs)
-            super.seekTo(positionMs)
-        } else {
-            super.seekTo(positionMs)
-        }
+        onSeekTo?.invoke(positionMs)
+        super.seekTo(positionMs)
     }
 
     override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
-        if (onSeekTo != null) {
-            onSeekTo.invoke(positionMs)
-            super.seekTo(mediaItemIndex, positionMs)
-        } else {
-            super.seekTo(mediaItemIndex, positionMs)
-        }
+        onSeekTo?.invoke(positionMs)
+        super.seekTo(mediaItemIndex, positionMs)
     }
 
     override fun seekToNext() {
@@ -185,19 +183,98 @@ class PocketCastsForwardingPlayer(
     }
 
     override fun stop() {
+        // Either delegate to the app's stop handler (which pauses via PlaybackManager)
+        // or fall through to the wrapped player. Calling both would stop the ExoPlayer
+        // (releasing decoders) before PlaybackManager can interact with it.
         onStop?.invoke() ?: super.stop()
     }
 
     override fun play() {
         if (playGuard()) {
-            super.play()
-            onPlay?.invoke()
+            // Either delegate to the app's play handler (which plays via PlaybackManager)
+            // or fall through to the wrapped player. Calling both would cause double-play
+            // because PlaybackManager.playQueueSuspend() already drives the player.
+            onPlay?.invoke() ?: super.play()
         }
     }
 
     override fun pause() {
-        super.pause()
-        onPause?.invoke()
+        // Same pattern as play() and stop() — the pause callback drives the player
+        // through PlaybackManager, so calling both would cause double-pause.
+        onPause?.invoke() ?: super.pause()
+    }
+
+    // ---- Media3 controller protocol interception ----
+    // After onAddMediaItems resolves, Media3 calls setMediaItems → prepare → play.
+    // We intercept setMediaItems/addMediaItems to update metadata from the resolved
+    // MediaItem and intercept prepare() as a no-op, because actual playback preparation
+    // is handled by PlaybackManager through the side-channel (playNowSuspend).
+
+    override fun setMediaItems(mediaItems: MutableList<MediaItem>) {
+        applyResolvedMediaItems(mediaItems)
+    }
+
+    override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
+        applyResolvedMediaItems(mediaItems)
+    }
+
+    override fun setMediaItems(
+        mediaItems: MutableList<MediaItem>,
+        startIndex: Int,
+        startPositionMs: Long,
+    ) {
+        applyResolvedMediaItems(mediaItems)
+    }
+
+    override fun setMediaItem(mediaItem: MediaItem) {
+        applyResolvedMediaItems(mutableListOf(mediaItem))
+    }
+
+    override fun setMediaItem(mediaItem: MediaItem, resetPosition: Boolean) {
+        applyResolvedMediaItems(mutableListOf(mediaItem))
+    }
+
+    override fun setMediaItem(mediaItem: MediaItem, startPositionMs: Long) {
+        applyResolvedMediaItems(mutableListOf(mediaItem))
+    }
+
+    override fun addMediaItems(mediaItems: MutableList<MediaItem>) {
+        applyResolvedMediaItems(mediaItems)
+    }
+
+    override fun addMediaItems(index: Int, mediaItems: MutableList<MediaItem>) {
+        applyResolvedMediaItems(mediaItems)
+    }
+
+    override fun addMediaItem(mediaItem: MediaItem) {
+        applyResolvedMediaItems(mutableListOf(mediaItem))
+    }
+
+    override fun addMediaItem(index: Int, mediaItem: MediaItem) {
+        applyResolvedMediaItems(mutableListOf(mediaItem))
+    }
+
+    override fun prepare() {
+        // No-op — actual preparation is handled by PlaybackManager via playNowSuspend.
+    }
+
+    private fun applyResolvedMediaItems(mediaItems: List<MediaItem>) {
+        val item = mediaItems.firstOrNull() ?: return
+        val metadata = item.mediaMetadata
+        val episodeChanged = previousMediaId != item.mediaId
+
+        currentMediaItem = item
+        previousMediaId = item.mediaId
+
+        listeners.forEach { listener ->
+            listener.onMediaMetadataChanged(metadata)
+            if (episodeChanged) {
+                listener.onMediaItemTransition(
+                    currentMediaItem,
+                    Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
+                )
+            }
+        }
     }
 
     override fun getDuration(): Long {

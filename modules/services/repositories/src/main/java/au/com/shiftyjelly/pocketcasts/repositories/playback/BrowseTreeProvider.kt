@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
@@ -49,12 +50,12 @@ private const val FILES_ROOT = "__FILES__"
 private const val EPISODE_LIMIT = 100
 private const val NUM_SUGGESTED_ITEMS = 8
 
-const val FILTERS_ROOT = "__FILTERS__"
-const val DISCOVER_ROOT = "__DISCOVER__"
-const val PROFILE_ROOT = "__PROFILE__"
-const val PROFILE_FILES = "__PROFILE_FILES__"
-const val PROFILE_STARRED = "__PROFILE_STARRED__"
-const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
+internal const val FILTERS_ROOT = "__FILTERS__"
+internal const val DISCOVER_ROOT = "__DISCOVER__"
+internal const val PROFILE_ROOT = "__PROFILE__"
+internal const val PROFILE_FILES = "__PROFILE_FILES__"
+internal const val PROFILE_STARRED = "__PROFILE_STARRED__"
+internal const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 
 @Singleton
 class BrowseTreeProvider @Inject constructor(
@@ -126,13 +127,13 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    suspend fun loadRecentChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadRecentChildren(context: Context): List<MediaItem> {
         Timber.d("Loading recent children")
         val episodes = listOfNotNull(upNextQueue.currentEpisode)
         return convertEpisodesToMediaItems(episodes, context)
     }
 
-    suspend fun loadUpNextChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadUpNextChildren(context: Context): List<MediaItem> {
         Timber.d("Loading Up Next children")
         val episodes = mutableListOf<BaseEpisode>()
         upNextQueue.currentEpisode?.let { episodes.add(it) }
@@ -140,7 +141,7 @@ class BrowseTreeProvider @Inject constructor(
         return convertEpisodesToMediaItems(episodes, context)
     }
 
-    suspend fun loadSuggestedChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadSuggestedChildren(context: Context): List<MediaItem> {
         Timber.d("Loading suggested children")
         val episodes = mutableListOf<BaseEpisode>()
         val currentEpisode = upNextQueue.currentEpisode
@@ -180,20 +181,8 @@ class BrowseTreeProvider @Inject constructor(
         return convertEpisodesToMediaItems(episodes, context)
     }
 
-    suspend fun loadRootChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadRootChildren(context: Context): List<MediaItem> {
         val rootItems = ArrayList<MediaItem>()
-
-        val upNextMetadata = MediaMetadata.Builder()
-            .setTitle(context.getString(LR.string.up_next))
-            .setArtworkUri(AutoConverter.getBitmapUri(drawable = IR.drawable.ic_upnext, context))
-            .setIsBrowsable(true)
-            .setIsPlayable(false)
-            .build()
-        val upNextItem = MediaItem.Builder()
-            .setMediaId(UP_NEXT_ROOT)
-            .setMediaMetadata(upNextMetadata)
-            .build()
-        rootItems.add(upNextItem)
 
         val podcastsMetadata = MediaMetadata.Builder()
             .setTitle(context.getString(LR.string.podcasts))
@@ -241,7 +230,7 @@ class BrowseTreeProvider @Inject constructor(
         return rootItems
     }
 
-    suspend fun loadPodcastsChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadPodcastsChildren(context: Context): List<MediaItem> {
         return if (settings.cachedSubscription.value != null) {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
@@ -265,7 +254,7 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    suspend fun loadFolderPodcastsChildren(folderUuid: String, context: Context): List<MediaItem> {
+    internal suspend fun loadFolderPodcastsChildren(folderUuid: String, context: Context): List<MediaItem> {
         return if (settings.cachedSubscription.value != null) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
                 convertPodcastToMediaItem(
@@ -279,7 +268,7 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    suspend fun loadEpisodeChildren(parentId: String, context: Context): List<MediaItem> {
+    internal suspend fun loadEpisodeChildren(parentId: String, context: Context): List<MediaItem> {
         val episodeItems = mutableListOf<MediaItem>()
         val autoPlaySource: AutoPlaySource
 
@@ -354,7 +343,7 @@ class BrowseTreeProvider @Inject constructor(
         return episodeItems
     }
 
-    suspend fun loadFilesChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadFilesChildren(context: Context): List<MediaItem> {
         setAutoPlaySource(AutoPlaySource.Predefined.Files)
         return userEpisodeManager.findUserEpisodes().map {
             AutoConverter.convertEpisodeToMediaItem(
@@ -366,7 +355,7 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    suspend fun loadStarredChildren(context: Context): List<MediaItem> {
+    internal suspend fun loadStarredChildren(context: Context): List<MediaItem> {
         setAutoPlaySource(AutoPlaySource.Predefined.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
@@ -380,9 +369,10 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    suspend fun loadListeningHistoryChildren(context: Context): List<MediaItem> {
-        return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
-            setAutoPlaySource(AutoPlaySource.fromId(episode.podcastUuid))
+    internal suspend fun loadListeningHistoryChildren(context: Context): List<MediaItem> {
+        val episodes = episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT)
+        episodes.firstOrNull()?.let { setAutoPlaySource(AutoPlaySource.fromId(it.podcastUuid)) }
+        return episodes.mapNotNull { episode ->
             podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(
                     context = context,
@@ -397,7 +387,6 @@ class BrowseTreeProvider @Inject constructor(
     private suspend fun loadAutomotiveRootChildren(context: Context): List<MediaItem> {
         val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
-        val upNextItem = buildListMediaItem(context, id = UP_NEXT_ROOT, title = LR.string.up_next, drawable = IR.drawable.ic_upnext)
         val podcastsItem = buildListMediaItem(context, id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
         val filtersItem = buildListMediaItem(
             context,
@@ -410,9 +399,9 @@ class BrowseTreeProvider @Inject constructor(
         val profileItem = buildListMediaItem(context, id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
 
         return if (podcastManager.countSubscribed() > 0) {
-            listOf(upNextItem, podcastsItem, filtersItem, discoverItem, profileItem)
+            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
         } else {
-            listOf(upNextItem, discoverItem, podcastsItem, filtersItem, profileItem)
+            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
         }
     }
 
@@ -547,11 +536,13 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    private suspend fun getPlaylistPreviews(): List<PlaylistPreview> {
+    @VisibleForTesting
+    internal suspend fun getPlaylistPreviews(): List<PlaylistPreview> {
         return playlistManager.playlistPreviewsFlow().first()
     }
 
-    private suspend fun getPlaylistEpisodes(
+    @VisibleForTesting
+    internal suspend fun getPlaylistEpisodes(
         uuid: String,
         filterEpisode: (Playlist.Type, PodcastEpisode) -> Boolean,
     ): List<PodcastEpisode>? {

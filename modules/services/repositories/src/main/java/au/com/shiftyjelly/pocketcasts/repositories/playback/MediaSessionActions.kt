@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 /**
  * Shared action methods used by both the legacy [MediaSessionManager.MediaSessionCallback]
  * and the new [Media3SessionCallback]. Reduces duplication across the two callback
@@ -36,88 +37,98 @@ internal class MediaSessionActions(
 ) {
 
     fun markAsPlayed() {
-        scopeProvider().launch {
-            val episode = playbackManager.getCurrentEpisode()
-            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
-            episode?.let {
-                eventHorizon.track(
-                    EpisodeMarkedAsPlayedEvent(
-                        episodeUuid = it.uuid,
-                        source = source.eventHorizonValue,
-                    ),
-                )
-            }
+        scopeProvider().launch { markAsPlayedSuspend() }
+    }
+
+    suspend fun markAsPlayedSuspend() {
+        val episode = playbackManager.getCurrentEpisode()
+        episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+        episode?.let {
+            eventHorizon.track(
+                EpisodeMarkedAsPlayedEvent(
+                    episodeUuid = it.uuid,
+                    source = source.eventHorizonValue,
+                ),
+            )
         }
     }
 
     fun starEpisode() {
-        scopeProvider().launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isStarred = true
-                    episodeManager.starEpisode(episode = it, starred = true, sourceView = source)
-                }
+        scopeProvider().launch { starEpisodeSuspend() }
+    }
+
+    suspend fun starEpisodeSuspend() {
+        playbackManager.getCurrentEpisode()?.let {
+            if (it is PodcastEpisode) {
+                it.isStarred = true
+                episodeManager.starEpisode(episode = it, starred = true, sourceView = source)
             }
         }
     }
 
     fun unstarEpisode() {
-        scopeProvider().launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isStarred = false
-                    episodeManager.starEpisode(episode = it, starred = false, sourceView = source)
-                }
+        scopeProvider().launch { unstarEpisodeSuspend() }
+    }
+
+    suspend fun unstarEpisodeSuspend() {
+        playbackManager.getCurrentEpisode()?.let {
+            if (it is PodcastEpisode) {
+                it.isStarred = false
+                episodeManager.starEpisode(episode = it, starred = false, sourceView = source)
             }
         }
     }
 
     fun changePlaybackSpeed() {
-        scopeProvider().launch {
-            val newSpeed = when (playbackManager.getPlaybackSpeed()) {
-                in 0.0..<0.60 -> 0.6
-                in 0.60..<0.80 -> 0.8
-                in 0.80..<1.00 -> 1.0
-                in 1.00..<1.20 -> 1.2
-                in 1.20..<1.40 -> 1.4
-                in 1.40..<1.60 -> 1.6
-                in 1.60..<1.80 -> 1.8
-                in 1.80..<2.00 -> 2.0
-                in 2.00..<3.00 -> 3.0
-                in 3.00..<3.05 -> 0.6
-                else -> 1.0
-            }
+        scopeProvider().launch { changePlaybackSpeedSuspend() }
+    }
 
-            val episode = playbackManager.getCurrentEpisode() ?: return@launch
-            if (episode is PodcastEpisode) {
-                val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
-                if (podcast != null && podcast.overrideGlobalEffects) {
-                    podcast.playbackSpeed = newSpeed
-                    podcastManager.updatePlaybackSpeedBlocking(podcast = podcast, speed = newSpeed)
-                    playbackManager.updatePlayerEffects(effects = podcast.playbackEffects)
-                    return@launch
-                }
-            }
-            val effects = settings.globalPlaybackEffects.value
-            effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
-            playbackManager.updatePlayerEffects(effects = effects)
+    suspend fun changePlaybackSpeedSuspend() {
+        val newSpeed = when (playbackManager.getPlaybackSpeed()) {
+            in 0.0..<0.60 -> 0.6
+            in 0.60..<0.80 -> 0.8
+            in 0.80..<1.00 -> 1.0
+            in 1.00..<1.20 -> 1.2
+            in 1.20..<1.40 -> 1.4
+            in 1.40..<1.60 -> 1.6
+            in 1.60..<1.80 -> 1.8
+            in 1.80..<2.00 -> 2.0
+            in 2.00..<3.00 -> 3.0
+            in 3.00..<3.05 -> 0.6
+            else -> 1.0
         }
+
+        val episode = playbackManager.getCurrentEpisode() ?: return
+        if (episode is PodcastEpisode) {
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
+            if (podcast != null && podcast.overrideGlobalEffects) {
+                podcast.playbackSpeed = newSpeed
+                podcastManager.updatePlaybackSpeedBlocking(podcast = podcast, speed = newSpeed)
+                playbackManager.updatePlayerEffects(effects = podcast.playbackEffects)
+                return
+            }
+        }
+        val effects = settings.globalPlaybackEffects.value
+        effects.playbackSpeed = newSpeed
+        settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
+        playbackManager.updatePlayerEffects(effects = effects)
     }
 
     fun archive() {
-        scopeProvider().launch {
-            playbackManager.getCurrentEpisode()?.let {
-                if (it is PodcastEpisode) {
-                    it.isArchived = true
-                    episodeManager.archiveBlocking(it, playbackManager)
-                    eventHorizon.track(
-                        EpisodeArchivedEvent(
-                            episodeUuid = it.uuid,
-                            source = source.eventHorizonValue,
-                        ),
-                    )
-                }
+        scopeProvider().launch { archiveSuspend() }
+    }
+
+    suspend fun archiveSuspend() {
+        playbackManager.getCurrentEpisode()?.let {
+            if (it is PodcastEpisode) {
+                it.isArchived = true
+                episodeManager.archiveBlocking(it, playbackManager)
+                eventHorizon.track(
+                    EpisodeArchivedEvent(
+                        episodeUuid = it.uuid,
+                        source = source.eventHorizonValue,
+                    ),
+                )
             }
         }
     }
@@ -127,60 +138,63 @@ internal class MediaSessionActions(
     }
 
     fun performPlayFromSearch(searchTerm: String?) {
+        scopeProvider().launch { performPlayFromSearchSuspend(searchTerm) }
+    }
+
+    suspend fun performPlayFromSearchSuspend(searchTerm: String?) {
         val query: String = searchTerm?.trim()?.lowercase() ?: return
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "performPlayFromSearch query: %s", query)
 
         val sourceView = SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
-        scopeProvider().launch {
-            if (query.startsWith("up next")) {
-                playbackManager.playQueue(sourceView = sourceView)
-                return@launch
-            }
 
-            if (query.startsWith("next episode") || query.startsWith("next podcast")) {
-                val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
-                queueEpisodes.firstOrNull()?.let { episode ->
-                    launch { playbackManager.playNext(episode = episode, source = sourceView) }
-                    return@launch
-                }
-            }
-
-            val options = MediaSessionManager.calculateSearchQueryOptions(query)
-            for (option in options) {
-                val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
-                if (matchingPodcast != null) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
-                    playPodcast(podcast = matchingPodcast, sourceView = sourceView)
-                    return@launch
-                }
-            }
-
-            for (option in options) {
-                val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
-                playbackManager.playNow(episode = matchingEpisode, sourceView = sourceView)
-                return@launch
-            }
-
-            val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
-            for (option in options) {
-                val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) }
-                    ?: continue
-                val playlist = playlistManager.smartPlaylistFlow(playlistPreview.uuid).first()
-                    ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
-                    ?: continue
-                val episodes = playlist.episodes.toPodcastEpisodes()
-                if (episodes.isNotEmpty()) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played playlist from search %s.", option)
-                    playbackManager.playEpisodes(episodes = episodes, sourceView = sourceView)
-                    return@launch
-                }
-            }
-
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No search results for: %s", query)
-            onSearchFailed?.invoke("No search results")
+        if (query.startsWith("up next")) {
+            playbackManager.playQueue(sourceView = sourceView)
+            return
         }
+
+        if (query.startsWith("next episode") || query.startsWith("next podcast")) {
+            val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
+            queueEpisodes.firstOrNull()?.let { episode ->
+                playbackManager.playNext(episode = episode, source = sourceView)
+                return
+            }
+        }
+
+        val options = MediaSessionManager.calculateSearchQueryOptions(query)
+        for (option in options) {
+            val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
+            if (matchingPodcast != null) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
+                playPodcast(podcast = matchingPodcast, sourceView = sourceView)
+                return
+            }
+        }
+
+        for (option in options) {
+            val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
+            playbackManager.playNow(episode = matchingEpisode, sourceView = sourceView)
+            return
+        }
+
+        val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
+        for (option in options) {
+            val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) }
+                ?: continue
+            val playlist = playlistManager.smartPlaylistFlow(playlistPreview.uuid).first()
+                ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
+                ?: continue
+            val episodes = playlist.episodes.toPodcastEpisodes()
+            if (episodes.isNotEmpty()) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played playlist from search %s.", option)
+                playbackManager.playEpisodes(episodes = episodes, sourceView = sourceView)
+                return
+            }
+        }
+
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No search results for: %s", query)
+        onSearchFailed?.invoke("No search results")
     }
 
     fun findPodcast(episode: PodcastEpisode): Podcast? {
