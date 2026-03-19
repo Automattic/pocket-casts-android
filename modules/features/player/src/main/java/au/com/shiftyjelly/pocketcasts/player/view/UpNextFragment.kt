@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
@@ -108,7 +109,7 @@ class UpNextFragment :
     }
 
     @Parcelize
-    private class Args(
+    class Args(
         val source: UpNextSource,
         val isEmbedded: Boolean,
     ) : Parcelable
@@ -156,17 +157,18 @@ class UpNextFragment :
     private val upNextEpisodes: List<BaseEpisode>
         get() = upNextItems.filterIsInstance<BaseEpisode>()
 
-    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_KEY)
+    val args get() = arguments?.findParcelable<Args>(NEW_INSTANCE_KEY)
+    private val requiredArgs get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_KEY)
 
     val overrideTheme: Theme.ThemeType
-        get() = theme.getUpNextTheme(isFullScreen = args.source != UpNextSource.UP_NEXT_TAB)
+        get() = theme.getUpNextTheme(isFullScreen = requiredArgs.source != UpNextSource.UP_NEXT_TAB)
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
             eventHorizon.track(
                 UpNextSelectAllTappedEvent(
                     selectAll = true,
-                    source = args.source.analyticsValue,
+                    source = requiredArgs.source.analyticsValue,
                 ),
             )
             multiSelectHelper.selectAllInList(upNextEpisodes)
@@ -177,7 +179,7 @@ class UpNextFragment :
             eventHorizon.track(
                 UpNextSelectAllTappedEvent(
                     selectAll = false,
-                    source = args.source.analyticsValue,
+                    source = requiredArgs.source.analyticsValue,
                 ),
             )
             multiSelectHelper.deselectAllInList(upNextEpisodes)
@@ -229,10 +231,10 @@ class UpNextFragment :
         val binding = FragmentUpnextBinding.inflate(themedInflater, container, false).also {
             realBinding = it
         }
-        if (args.source == UpNextSource.UP_NEXT_TAB) {
+        if (requiredArgs.source == UpNextSource.UP_NEXT_TAB) {
             eventHorizon.track(
                 UpNextShownEvent(
-                    source = args.source.analyticsValue,
+                    source = requiredArgs.source.analyticsValue,
                 ),
             )
         }
@@ -279,7 +281,7 @@ class UpNextFragment :
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             eventHorizon = eventHorizon,
-            upNextSource = args.source,
+            upNextSource = requiredArgs.source,
             settings = settings,
             playbackManager = playbackManager,
             swipeRowActionsFactory = swipeRowActionsFactory,
@@ -300,7 +302,7 @@ class UpNextFragment :
 
     override fun onResume() {
         super.onResume()
-        if (!args.isEmbedded) {
+        if (!requiredArgs.isEmbedded) {
             updateStatusAndNavColors()
         }
     }
@@ -322,7 +324,7 @@ class UpNextFragment :
             toolbar = binding.toolbar,
             title = getString(LR.string.up_next),
             menu = R.menu.upnext,
-            navigationIcon = if (args.source != UpNextSource.UP_NEXT_TAB) {
+            navigationIcon = if (requiredArgs.source != UpNextSource.UP_NEXT_TAB) {
                 NavigationIcon.Close
             } else {
                 NavigationIcon.None
@@ -331,10 +333,10 @@ class UpNextFragment :
             onNavigationClick = { close() },
             toolbarColors = null,
         )
-        if (args.source != UpNextSource.UP_NEXT_TAB) {
+        if (requiredArgs.source != UpNextSource.UP_NEXT_TAB) {
             toolbar.setNavigationIcon(IR.drawable.ic_close)
         }
-        toolbar.menu.findItem(R.id.media_route_menu_item)?.isVisible = args.source == UpNextSource.UP_NEXT_TAB
+        toolbar.menu.findItem(R.id.media_route_menu_item)?.isVisible = requiredArgs.source == UpNextSource.UP_NEXT_TAB
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.menu.tintIcons(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.setOnMenuItemClickListener {
@@ -397,14 +399,14 @@ class UpNextFragment :
             toolbar.isVisible = !isMultiSelecting
 
             /* Track only if not embedded. If it is an embedded fragment, then track only when in expanded state */
-            if (!args.isEmbedded || isEmbeddedExpanded()) {
+            if (!requiredArgs.isEmbedded || isEmbeddedExpanded()) {
                 val event = if (isMultiSelecting) {
                     UpNextMultiSelectEnteredEvent(
-                        source = args.source.analyticsValue,
+                        source = requiredArgs.source.analyticsValue,
                     )
                 } else {
                     UpNextMultiSelectExitedEvent(
-                        source = args.source.analyticsValue,
+                        source = requiredArgs.source.analyticsValue,
                     )
                 }
                 eventHorizon.track(event)
@@ -444,30 +446,30 @@ class UpNextFragment :
     }
 
     private fun close() {
-        if (!args.isEmbedded) {
+        if (!requiredArgs.isEmbedded) {
             (activity as? FragmentHostListener)?.closeBottomSheet()
         } else {
             (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
-    private fun isEmbeddedExpanded() = args.isEmbedded &&
+    private fun isEmbeddedExpanded() = requiredArgs.isEmbedded &&
         (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onClearUpNext() {
-        playerViewModel.clearUpNext(context = requireContext(), upNextSource = args.source)
+        playerViewModel.clearUpNext(context = requireContext(), upNextSource = requiredArgs.source)
             .showClearUpNextConfirmationDialog(parentFragmentManager, tag = "up_next_clear_dialog")
     }
 
     override fun onDiscoverTapped() {
-        if (args.source == UpNextSource.NOW_PLAYING) {
+        if (requiredArgs.source == UpNextSource.NOW_PLAYING) {
             (activity as FragmentHostListener).closePlayer()
-        } else if (args.source == UpNextSource.MINI_PLAYER) {
+        } else if (requiredArgs.source == UpNextSource.MINI_PLAYER) {
             close()
         }
         eventHorizon.track(
             UpNextDiscoverButtonTappedEvent(
-                source = args.source.analyticsValue,
+                source = requiredArgs.source.analyticsValue,
             ),
         )
         (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
@@ -546,7 +548,7 @@ class UpNextFragment :
                         slots = abs(position.minus(dragStartPosition)).toLong(),
                         direction = if (position > dragStartPosition) Down else Up,
                         isNext = position == UP_NEXT_ADAPTER_POSITION,
-                        source = args.source.analyticsValue,
+                        source = requiredArgs.source.analyticsValue,
                     ),
                 )
             }

@@ -110,6 +110,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Snac
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -186,7 +187,7 @@ class PlayerHeaderFragment :
     private val showUpNextFlingBehavior = object : FlingBehavior {
         override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
             if (isPlayerExpanded() && isUpNextCollapsed() && initialVelocity > 2000f) {
-                (parentFragment as PlayerContainerFragment).openUpNext()
+                (parentFragment as PlayerContainerFragment).openUpNext(UpNextSource.NOW_PLAYING)
             }
             return 0f
         }

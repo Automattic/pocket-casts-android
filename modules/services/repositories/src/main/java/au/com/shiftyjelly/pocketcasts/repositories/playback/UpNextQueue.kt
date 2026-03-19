@@ -164,7 +164,7 @@ enum class UpNextSource(
         analyticsValue = UpNextSourceType.UpNextShortcut,
     ),
     UP_NEXT_TAB(
-        analyticsValue = UpNextSourceType.UpNextTab,
+        analyticsValue = UpNextSourceType.TabBar,
     ),
 }
 
