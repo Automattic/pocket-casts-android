@@ -20,7 +20,7 @@ import com.automattic.eventhorizon.InformationalBannerViewCreateAccountTapEvent
 import com.automattic.eventhorizon.InformationalBannerViewDismissedEvent
 import com.automattic.eventhorizon.ListeningHistoryShownEvent
 import com.automattic.eventhorizon.ProfileAccountButtonTappedEvent
-import com.automattic.eventhorizon.ProfileBookmarksShownEvent
+import com.automattic.eventhorizon.ProfileBookmarksShowEvent
 import com.automattic.eventhorizon.ProfileRefreshButtonTappedEvent
 import com.automattic.eventhorizon.ProfileSettingsButtonTappedEvent
 import com.automattic.eventhorizon.ProfileShownEvent
@@ -185,7 +185,7 @@ class ProfileViewModel @Inject constructor(
             ProfileSection.Downloads -> DownloadsShownEvent
             ProfileSection.CloudFiles -> UploadedFilesShownEvent
             ProfileSection.Starred -> StarredShownEvent
-            ProfileSection.Bookmarks -> ProfileBookmarksShownEvent
+            ProfileSection.Bookmarks -> ProfileBookmarksShowEvent
             ProfileSection.ListeningHistory -> ListeningHistoryShownEvent
             ProfileSection.Help -> SettingsHelpShownEvent
         }
