@@ -87,13 +87,7 @@ open class LegacyPlaybackService :
     override fun onCreate() {
         super.onCreate()
 
-        @Suppress("SENSELESS_COMPARISON") // mediaSession becomes nullable in the Media3 integration PR
-        val mediaSession: MediaSessionCompat? = playbackManager.mediaSessionManager.mediaSession
-        if (mediaSession == null) {
-            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "LegacyPlaybackService created but mediaSession is null (flag mismatch), stopping")
-            stopSelf()
-            return
-        }
+        val mediaSession = playbackManager.mediaSessionManager.mediaSession
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Legacy playback service created")
 
@@ -134,6 +128,7 @@ open class LegacyPlaybackService :
     fun isForegroundService(): Boolean {
         return isForeground
     }
+
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
         val validator = packageValidator
@@ -193,6 +188,7 @@ open class LegacyPlaybackService :
             }
         }
     }
+
 
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
         private val playbackStatusRelay = BehaviorRelay.create<PlaybackStateCompat>()
@@ -315,10 +311,9 @@ open class LegacyPlaybackService :
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        @Suppress("USELESS_ELVIS") // mediaSession becomes nullable in the Media3 integration PR
         private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
             if (Util.isAutomotive(this@LegacyPlaybackService)) return null
-            val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return null
+            val mediaSession = playbackManager.mediaSessionManager.mediaSession
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
     }
