@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
+import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
@@ -1292,10 +1293,13 @@ open class PlaybackManager @Inject constructor(
         stop()
         onPlayerPaused()
 
+        val stuckException = event.error?.cause as? StuckPlayerException
+
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val cause = event.error?.cause
                 val playbackIssue = when {
+                    stuckException != null -> PlaybackIssue.StuckPlayer
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
                     cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
                     else -> null
@@ -1313,13 +1317,19 @@ open class PlaybackManager @Inject constructor(
                     ),
                 )
 
+                val crashTags = buildMap {
+                    put("episodeUuid", episode?.uuid.orEmpty())
+                    put("playedUpTo", episode?.playedUpTo?.roundToInt().toString())
+                    if (stuckException != null) {
+                        put("stuckType", stuckTypeToString(stuckException.stuckType))
+                        put("timeoutMs", stuckException.timeoutMs.toString())
+                    }
+                }
+
                 crashLogging.sendReport(
-                    message = "Illegal playback state encountered",
+                    message = if (stuckException != null) "Stuck player error" else "Illegal playback state encountered",
                     exception = event.error ?: IllegalStateException(event.message),
-                    tags = mapOf(
-                        "episodeUuid" to episode?.uuid.orEmpty(),
-                        "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
-                    ),
+                    tags = crashTags,
                 )
                 playbackStateRelay.accept(
                     playbackState.copy(
@@ -1336,6 +1346,16 @@ open class PlaybackManager @Inject constructor(
     @OptIn(UnstableApi::class)
     private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
         return application.getString(errorClassifier.classifyErrorStringId(event))
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun stuckTypeToString(stuckType: Int): String = when (stuckType) {
+        StuckPlayerException.STUCK_BUFFERING_NOT_LOADING -> "BUFFERING_NOT_LOADING"
+        StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS -> "BUFFERING_NO_PROGRESS"
+        StuckPlayerException.STUCK_PLAYING_NO_PROGRESS -> "PLAYING_NO_PROGRESS"
+        StuckPlayerException.STUCK_PLAYING_NOT_ENDING -> "PLAYING_NOT_ENDING"
+        StuckPlayerException.STUCK_SUPPRESSED -> "SUPPRESSED"
+        else -> "UNKNOWN($stuckType)"
     }
 
     suspend fun onBufferingStateChanged() {
