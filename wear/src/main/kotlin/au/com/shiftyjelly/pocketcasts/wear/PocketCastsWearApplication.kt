@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -70,6 +71,7 @@ class PocketCastsWearApplication :
 
     override fun onCreate() {
         super.onCreate()
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()

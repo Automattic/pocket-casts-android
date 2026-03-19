@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -65,6 +66,12 @@ class AutomotiveApplication :
 
     override fun onCreate() {
         super.onCreate()
+
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(
+            context = this,
+            media3Services = listOf(AutoPlaybackService::class.java.name),
+            legacyServices = listOf(LegacyAutoPlaybackService::class.java.name),
+        )
 
         RxJavaUncaughtExceptionHandling.setUp()
         setupRemoteLogging()
