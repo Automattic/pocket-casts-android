@@ -120,7 +120,9 @@ class CastManagerImpl @Inject constructor(
         }
 
         override fun onSessionStartFailed(session: Session, i: Int) {
-            Timber.i("Cast Session onSessionStartFailed")
+            Timber.i("Cast Session onSessionStartFailed errorCode=$i")
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session start failed with error code $i")
+            sessionListener?.sessionFailed(i)
         }
 
         override fun onSessionEnding(session: Session) {
@@ -145,7 +147,9 @@ class CastManagerImpl @Inject constructor(
         }
 
         override fun onSessionResumeFailed(session: Session, i: Int) {
-            Timber.i("Cast Session onSessionResumeFailed")
+            Timber.i("Cast Session onSessionResumeFailed errorCode=$i")
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session resume failed with error code $i")
+            sessionListener?.sessionFailed(i)
         }
 
         override fun onSessionSuspended(session: Session, i: Int) {

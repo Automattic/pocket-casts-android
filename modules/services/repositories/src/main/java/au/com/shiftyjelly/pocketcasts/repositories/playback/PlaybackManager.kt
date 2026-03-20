@@ -275,6 +275,21 @@ open class PlaybackManager @Inject constructor(
                 override fun sessionReconnected() {
                     castReconnected()
                 }
+
+                override fun sessionFailed(errorCode: Int) {
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session failed with error code $errorCode")
+                    val message = application.getString(LR.string.error_cast_connection_failed)
+                    Toast.makeText(application, message, Toast.LENGTH_LONG).show()
+                    playbackStateRelay.blockingFirst().let { playbackState ->
+                        playbackStateRelay.accept(
+                            playbackState.copy(
+                                state = PlaybackState.State.ERROR,
+                                lastErrorMessage = message,
+                                lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                            ),
+                        )
+                    }
+                }
             })
             playbackManagerNetworkWatcher.observeConnection()
         }
