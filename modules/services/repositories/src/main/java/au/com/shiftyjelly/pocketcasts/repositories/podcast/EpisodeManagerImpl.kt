@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.HttpDataSource
+import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -652,6 +654,8 @@ class EpisodeManagerImpl @Inject constructor(
             } else {
                 messageId = LR.string.error_unable_to_cast
             }
+        } else if (event.error != null && event.error.cause is DecoderInitializationException) {
+            messageId = LR.string.error_decoder_initialization
         } else if (event.error != null && event.error.cause is UnrecognizedInputFormatException) {
             messageId = LR.string.error_playing_format
         } else if (episode.isDownloaded) {
@@ -673,8 +677,17 @@ class EpisodeManagerImpl @Inject constructor(
         } else {
             if (Network.isConnected(context)) {
                 val chtblBlocked = event.error.anyMessageContains("chtbl.com")
+                val httpResponseCode = (event.error?.cause as? HttpDataSource.InvalidResponseCodeException)?.responseCode
                 if (chtblBlocked) {
                     messageId = LR.string.error_chartable_streaming
+                } else if (httpResponseCode != null) {
+                    messageId = when (httpResponseCode) {
+                        403 -> LR.string.error_streaming_access_denied
+                        404 -> LR.string.error_streaming_not_found
+                        410 -> LR.string.error_streaming_no_longer_available
+                        in 500..599 -> LR.string.error_streaming_server_error
+                        else -> LR.string.error_streaming_try_downloading
+                    }
                 } else {
                     messageId = LR.string.error_streaming_try_downloading
                 }

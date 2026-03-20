@@ -7,13 +7,17 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
+import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -1272,11 +1276,7 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val errorMessage = if (event.error?.cause is HttpDataSource.HttpDataSourceException) {
-                    application.getString(LR.string.player_play_failed_check_internet)
-                } else {
-                    event.message
-                }
+                val errorMessage = mapPlaybackErrorToUserMessage(event)
 
                 eventHorizon.track(
                     PlaybackFailedEvent(
@@ -1293,8 +1293,54 @@ open class PlaybackManager @Inject constructor(
                         "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
                     ),
                 )
-                playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
+
+                Toast.makeText(application, errorMessage, Toast.LENGTH_LONG).show()
+
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        state = PlaybackState.State.ERROR,
+                        lastErrorMessage = errorMessage,
+                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                    ),
+                )
             }
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
+        val error = event.error ?: return application.getString(LR.string.error_unable_to_play)
+        val cause = error.cause
+
+        return when {
+            cause is HttpDataSource.InvalidResponseCodeException -> {
+                when (cause.responseCode) {
+                    403 -> application.getString(LR.string.error_streaming_access_denied)
+                    404 -> application.getString(LR.string.error_streaming_not_found)
+                    410 -> application.getString(LR.string.error_streaming_no_longer_available)
+                    in 500..599 -> application.getString(LR.string.error_streaming_server_error)
+                    else -> application.getString(LR.string.player_play_failed_check_internet)
+                }
+            }
+
+            cause is HttpDataSource.HttpDataSourceException -> {
+                application.getString(LR.string.player_play_failed_check_internet)
+            }
+
+            cause is DecoderInitializationException -> {
+                application.getString(LR.string.error_decoder_initialization)
+            }
+
+            error.errorCode == PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED ||
+                error.errorCode == PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> {
+                application.getString(LR.string.error_audio_output)
+            }
+
+            error.errorCode == PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED -> {
+                application.getString(LR.string.error_playing_format)
+            }
+
+            else -> application.getString(LR.string.error_unable_to_play)
         }
     }
 
