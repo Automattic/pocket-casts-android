@@ -336,8 +336,17 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
         // Convert the remote playback states to media playback states.
         when (status) {
-            MediaStatus.PLAYER_STATE_IDLE -> if (idleReason == MediaStatus.IDLE_REASON_FINISHED) {
-                onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
+            MediaStatus.PLAYER_STATE_IDLE -> when (idleReason) {
+                MediaStatus.IDLE_REASON_FINISHED -> onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
+
+                MediaStatus.IDLE_REASON_ERROR -> {
+                    Timber.e("Cast player error for episode $episodeUuid")
+                    onPlayerEvent(this, PlayerEvent.PlayerError("Cast playback error"))
+                }
+
+                MediaStatus.IDLE_REASON_CANCELED -> onPlayerEvent(this, PlayerEvent.PlayerPaused)
+
+                MediaStatus.IDLE_REASON_INTERRUPTED -> Timber.i("Cast playback interrupted for episode $episodeUuid")
             }
 
             MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {

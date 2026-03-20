@@ -1242,13 +1242,17 @@ open class PlaybackManager @Inject constructor(
                 val path = episode.downloadedFilePath
                 if (path != null) {
                     val episodeFile = File(path)
-
-                    val episodeStream = FileInputStream(episodeFile)
-                    val descriptor = episodeStream.fd
-
                     output.append(if (episodeFile.exists()) "File exists. " else "File doesn't exist. ")
                         .append(if (episodeFile.canRead()) "File can be read. " else "File can't be read. ")
-                        .append(if (descriptor.valid()) "File descriptor is valid. " else "File descriptor is invalid! ")
+                    if (episodeFile.exists() && episodeFile.canRead()) {
+                        try {
+                            FileInputStream(episodeFile).use { episodeStream ->
+                                output.append(if (episodeStream.fd.valid()) "File descriptor is valid. " else "File descriptor is invalid! ")
+                            }
+                        } catch (e: Exception) {
+                            output.append("File descriptor check failed: ${e.message} ")
+                        }
+                    }
                 }
             }
             Timber.e(output.toString())
