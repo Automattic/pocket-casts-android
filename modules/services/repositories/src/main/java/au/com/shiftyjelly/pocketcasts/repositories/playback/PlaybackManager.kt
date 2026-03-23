@@ -1293,21 +1293,31 @@ open class PlaybackManager @Inject constructor(
 
                 val properties = buildMap {
                     put("episodeUuid", episode?.uuid.orEmpty())
-                    put("playedUpTo", episode?.playedUpTo?.roundToInt().toString())
+                    put("playedUpTo", episode?.playedUpTo?.roundToInt()?.toString().orEmpty())
                     if (stuckException != null) {
-                        put("stuckType", stuckException.stuckType.toString())
+                        put("stuckType", stuckTypeToString(stuckException.stuckType))
                         put("timeoutMs", stuckException.timeoutMs.toString())
                     }
                 }
 
                 crashLogging.sendReport(
-                    message = if (stuckException != null) "Stuck player error" else "Illegal playback state encountered",
+                    message = if (stuckException != null) "Stuck player error" else "Playback error",
                     exception = event.error ?: IllegalStateException(event.message),
                     tags = properties,
                 )
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
             }
         }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun stuckTypeToString(stuckType: Int): String = when (stuckType) {
+        StuckPlayerException.STUCK_BUFFERING_NOT_LOADING -> "BUFFERING_NOT_LOADING"
+        StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS -> "BUFFERING_NO_PROGRESS"
+        StuckPlayerException.STUCK_PLAYING_NO_PROGRESS -> "PLAYING_NO_PROGRESS"
+        StuckPlayerException.STUCK_PLAYING_NOT_ENDING -> "PLAYING_NOT_ENDING"
+        StuckPlayerException.STUCK_SUPPRESSED -> "SUPPRESSED"
+        else -> "UNKNOWN($stuckType)"
     }
 
     suspend fun onBufferingStateChanged() {
