@@ -731,7 +731,6 @@ class MediaSessionManager(
         }
     }
 
-
     private fun observeCustomMediaActionsVisibility() {
         scope.launch {
             settings.customMediaActionsVisibility.flow.collect {
@@ -1265,7 +1264,6 @@ class MediaSessionManager(
             }
         }
     }
-
 
     fun playFromSearchExternal(query: String) {
         actions.performPlayFromSearch(query)
