@@ -71,6 +71,20 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
                 )
                 delay
             }
+
+            ErrorClassification.RetryableParser -> {
+                val delay = exponentialBackoff(errorCount)
+                LogBuffer.i(
+                    LogBuffer.TAG_PLAYBACK,
+                    exception,
+                    "Retryable parser error, attempt %d/%d, delay %dms: %s",
+                    errorCount,
+                    maxRetries,
+                    delay,
+                    exception.message.orEmpty(),
+                )
+                delay
+            }
         }
     }
 
@@ -88,7 +102,7 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
     @VisibleForTesting
     internal fun classifyError(exception: java.io.IOException): ErrorClassification {
         if (exception is ParserException) {
-            return ErrorClassification.RetryableNetwork
+            return ErrorClassification.RetryableParser
         }
         if (exception is FileNotFoundException) {
             return ErrorClassification.NonRetryable
@@ -127,6 +141,7 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
         data object NonRetryable : ErrorClassification
         data class RetryableHttp(val responseCode: Int) : ErrorClassification
         data object RetryableNetwork : ErrorClassification
+        data object RetryableParser : ErrorClassification
     }
 
     internal companion object {

@@ -10,7 +10,6 @@ import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.BASE_DELAY_MS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_DELAY_MS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MANIFEST
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MEDIA
@@ -31,8 +30,6 @@ import org.robolectric.annotation.Config
 class PocketCastsLoadErrorHandlingPolicyTest {
 
     private val policy = PocketCastsLoadErrorHandlingPolicy()
-
-    // region Error Classification — HTTP codes
 
     @Test
     fun `HTTP 404 is non-retryable`() {
@@ -106,15 +103,11 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(ErrorClassification.RetryableHttp(599), classification)
     }
 
-    // endregion
-
-    // region Error Classification — Exception types
-
     @Test
-    fun `ParserException is retryable to handle transient parsing failures during streaming`() {
+    fun `ParserException is classified as retryable parser error`() {
         val exception = ParserException.createForMalformedContainer("bad data", null)
         val classification = policy.classifyError(exception)
-        assertEquals(ErrorClassification.RetryableNetwork, classification)
+        assertEquals(ErrorClassification.RetryableParser, classification)
     }
 
     @Test
@@ -131,10 +124,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(ErrorClassification.RetryableNetwork, classification)
     }
 
-    // endregion
-
-    // region Exponential Backoff (no jitter)
-
     @Test
     fun `exponential backoff follows expected progression`() {
         assertEquals(1_000L, policy.exponentialBackoff(1))
@@ -150,10 +139,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(MAX_DELAY_MS, policy.exponentialBackoff(10))
         assertEquals(MAX_DELAY_MS, policy.exponentialBackoff(100))
     }
-
-    // endregion
-
-    // region getRetryDelayMsFor — integration
 
     @Test
     fun `HTTP 416 returns TIME_UNSET on first attempt`() {
@@ -268,10 +253,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(C.TIME_UNSET, policy.getRetryDelayMsFor(loadErrorInfo))
     }
 
-    // endregion
-
-    // region getMinimumLoadableRetryCount
-
     @Test
     fun `getMinimumLoadableRetryCount returns MAX_VALUE for media`() {
         assertEquals(Int.MAX_VALUE, policy.getMinimumLoadableRetryCount(C.DATA_TYPE_MEDIA))
@@ -286,10 +267,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
     fun `getMinimumLoadableRetryCount returns MAX_VALUE for other`() {
         assertEquals(Int.MAX_VALUE, policy.getMinimumLoadableRetryCount(C.DATA_TYPE_DRM))
     }
-
-    // endregion
-
-    // region Helpers
 
     private fun createHttpException(responseCode: Int): InvalidResponseCodeException {
         val dataSpec = DataSpec(Uri.parse("https://example.com/episode.mp3"))
@@ -322,6 +299,4 @@ class PocketCastsLoadErrorHandlingPolicyTest {
             errorCount,
         )
     }
-
-    // endregion
 }
