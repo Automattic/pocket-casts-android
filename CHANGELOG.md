@@ -1,6 +1,8 @@
 8.9
 -----
-
+*   Updates
+    *   Show progress while mini player is buffering
+        ([#5165](https://github.com/Automattic/pocket-casts-android/pull/5165))
 
 8.8
 -----
