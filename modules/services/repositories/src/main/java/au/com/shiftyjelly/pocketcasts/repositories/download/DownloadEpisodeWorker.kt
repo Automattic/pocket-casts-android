@@ -386,6 +386,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         val podcastUuid: String,
         val waitForWifi: Boolean,
         val waitForPower: Boolean,
+        val waitForStorage: Boolean,
         val sourceView: SourceView,
     )
 
@@ -408,7 +409,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             val constraints = Constraints.Builder()
                 .setRequiresCharging(args.waitForPower)
                 .setRequiredNetworkType(if (args.waitForWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
-                .setRequiresStorageNotLow(true)
+                .setRequiresStorageNotLow(args.waitForStorage)
                 .build()
             val request = OneTimeWorkRequestBuilder<DownloadEpisodeWorker>()
                 .setConstraints(constraints)
@@ -598,6 +599,7 @@ private fun Data.toArgs() = DownloadEpisodeWorker.Args(
     podcastUuid = getString(PODCAST_UUID_KEY).orEmpty(),
     waitForWifi = getBoolean(WAIT_FOR_WIFI_KEY, true),
     waitForPower = getBoolean(WAIT_FOR_POWER_KEY, true),
+    waitForStorage = getBoolean(WAIT_FOR_STORAGE_KEY, true),
     sourceView = SourceView.fromString(getString(SOURCE_VIEW_KEY)),
 )
 
@@ -606,6 +608,7 @@ private fun DownloadEpisodeWorker.Args.toData() = Data.Builder()
     .putString(PODCAST_UUID_KEY, podcastUuid)
     .putBoolean(WAIT_FOR_WIFI_KEY, waitForWifi)
     .putBoolean(WAIT_FOR_POWER_KEY, waitForPower)
+    .putBoolean(WAIT_FOR_STORAGE_KEY, waitForStorage)
     .putString(SOURCE_VIEW_KEY, sourceView.key)
     .build()
 
@@ -614,7 +617,8 @@ private const val EPISODE_UUID_KEY = "${WORKER_TAG}episode_uuid"
 private const val PODCAST_UUID_KEY = "${WORKER_TAG}podcast_uuid"
 private const val WAIT_FOR_WIFI_KEY = "${WORKER_TAG}wait_for_wifi"
 private const val WAIT_FOR_POWER_KEY = "${WORKER_TAG}wait_for_power"
-internal const val SOURCE_VIEW_KEY = "${WORKER_TAG}source_view"
+private const val WAIT_FOR_STORAGE_KEY = "${WORKER_TAG}wait_for_storage"
+private const val SOURCE_VIEW_KEY = "${WORKER_TAG}source_view"
 
 // Progress keys
 internal const val IS_WORK_EXECUTING_KEY = "${WORKER_TAG}is_work_executing"

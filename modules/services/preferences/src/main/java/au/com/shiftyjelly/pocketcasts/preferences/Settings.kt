@@ -378,6 +378,7 @@ interface Settings {
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
+    val autoDownloadOnlyWhenEnoughStorage: UserSetting<Boolean>
     val autoDownloadUpNext: ReadWriteSetting<Boolean>
     val autoDownloadOnFollowPodcast: UserSetting<Boolean>
     val autoDownloadNewEpisodes: ReadWriteSetting<Int>

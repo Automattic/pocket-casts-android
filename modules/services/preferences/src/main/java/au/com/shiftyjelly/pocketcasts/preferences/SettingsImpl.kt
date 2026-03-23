@@ -671,6 +671,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val autoDownloadOnlyWhenEnoughStorage = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadOnlyWhenEnoughStorage",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val artworkConfiguration = object : UserSetting<ArtworkConfiguration>(
         sharedPrefKey = "artworkConfiguration",
         sharedPrefs = sharedPreferences,
