@@ -71,7 +71,6 @@ class PocketCastsWearApplication :
 
     override fun onCreate() {
         super.onCreate()
-        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()
@@ -97,6 +96,8 @@ class PocketCastsWearApplication :
         runBlocking {
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
+
+            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsWearApplication)
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
