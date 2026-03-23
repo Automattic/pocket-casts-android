@@ -39,6 +39,7 @@ internal fun AutoDownloadSettingsPage(
     onChangeAutoDownloadLimitSetting: () -> Unit,
     onChangeOnUnmeteredDownload: (Boolean) -> Unit,
     onChangeOnlyWhenChargingDownload: (Boolean) -> Unit,
+    onChangeOnlyWhenEnoughStorageDownload: (Boolean) -> Unit,
     onStopAllDownloads: () -> Unit,
     onClearDownloadErrors: () -> Unit,
     onChangePodcast: (String, Boolean) -> Unit,
@@ -106,6 +107,7 @@ internal fun AutoDownloadSettingsPage(
                         },
                         onChangeOnUnmeteredDownload = onChangeOnUnmeteredDownload,
                         onChangeOnlyWhenChargingDownload = onChangeOnlyWhenChargingDownload,
+                        onChangeOnlyWhenEnoughStorageDownload = onChangeOnlyWhenEnoughStorageDownload,
                         onStopAllDownloads = onStopAllDownloads,
                         onClearDownloadErrors = onClearDownloadErrors,
                     )

@@ -335,6 +335,7 @@ private class DownloadQueueController(
             pendingWork == null -> ExistingWorkPolicy.KEEP
             !args.waitForWifi && pendingWork.isWifiRequired -> ExistingWorkPolicy.REPLACE
             !args.waitForPower && pendingWork.isPowerRequired -> ExistingWorkPolicy.REPLACE
+            !args.waitForStorage && pendingWork.isStorageRequired -> ExistingWorkPolicy.REPLACE
             else -> ExistingWorkPolicy.KEEP
         }
 
@@ -349,32 +350,32 @@ private class DownloadQueueController(
     private fun BaseEpisode.toDownloadArgs(
         downloadType: DownloadType,
         sourceView: SourceView,
-    ) = when (this) {
-        is PodcastEpisode -> DownloadEpisodeWorker.Args(
-            episodeUuid = uuid,
-            podcastUuid = podcastUuid,
-            waitForWifi = when (downloadType) {
-                is DownloadType.UserTriggered -> downloadType.waitForWifi
-                is DownloadType.Automatic -> settings.autoDownloadUnmeteredOnly.value
-            },
-            waitForPower = when (downloadType) {
-                is DownloadType.UserTriggered -> false
-                is DownloadType.Automatic -> settings.autoDownloadOnlyWhenCharging.value
-            },
-            sourceView = sourceView,
-        )
+    ) = DownloadEpisodeWorker.Args(
+        episodeUuid = uuid,
+        podcastUuid = podcastOrSubstituteUuid,
+        waitForWifi = when (downloadType) {
+            is DownloadType.UserTriggered -> downloadType.waitForWifi
 
-        is UserEpisode -> DownloadEpisodeWorker.Args(
-            episodeUuid = uuid,
-            podcastUuid = podcastOrSubstituteUuid,
-            waitForWifi = when (downloadType) {
-                is DownloadType.UserTriggered -> downloadType.waitForWifi
-                is DownloadType.Automatic -> settings.cloudDownloadOnlyOnWifi.value
-            },
-            waitForPower = false,
-            sourceView = sourceView,
-        )
-    }
+            is DownloadType.Automatic -> when (this) {
+                is PodcastEpisode -> settings.autoDownloadUnmeteredOnly.value
+                is UserEpisode -> settings.cloudDownloadOnlyOnWifi.value
+            }
+        },
+        waitForPower = when (downloadType) {
+            is DownloadType.UserTriggered -> false
+            is DownloadType.Automatic -> settings.autoDownloadOnlyWhenCharging.value
+        },
+        waitForStorage = when (downloadType) {
+            is DownloadType.UserTriggered -> false
+
+            is DownloadType.Automatic -> if (settings.usingCustomFolderStorage()) {
+                false
+            } else {
+                settings.autoDownloadOnlyWhenEnoughStorage.value
+            }
+        },
+        sourceView = sourceView,
+    )
 
     private fun enqueueShowNotesUpdate(episode: BaseEpisode, constraints: Constraints) {
         when (episode) {

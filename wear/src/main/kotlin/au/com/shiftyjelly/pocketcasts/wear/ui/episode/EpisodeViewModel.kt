@@ -68,6 +68,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -318,7 +319,9 @@ class EpisodeViewModel @Inject constructor(
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch {
             if (episode.playErrorDetails != null) {
-                episodeManager.clearPlaybackErrorBlocking(episode)
+                withContext(Dispatchers.IO) {
+                    episodeManager.clearPlaybackErrorBlocking(episode)
+                }
             }
             playbackManager.playNowSync(
                 episode = episode,

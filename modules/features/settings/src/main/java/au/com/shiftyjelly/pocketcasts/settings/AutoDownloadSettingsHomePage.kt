@@ -36,6 +36,7 @@ internal fun AutoDownloadSettingsHomePage(
     onChangePlaylistsSetting: () -> Unit,
     onChangeOnUnmeteredDownload: (Boolean) -> Unit,
     onChangeOnlyWhenChargingDownload: (Boolean) -> Unit,
+    onChangeOnlyWhenEnoughStorageDownload: (Boolean) -> Unit,
     onStopAllDownloads: () -> Unit,
     onClearDownloadErrors: () -> Unit,
     modifier: Modifier = Modifier,
@@ -156,6 +157,7 @@ internal fun AutoDownloadSettingsHomePage(
             )
             SettingRow(
                 primaryText = stringResource(LR.string.settings_auto_download_charging),
+                secondaryText = stringResource(LR.string.settings_auto_download_charging_summary),
                 toggle = SettingRowToggle.Switch(
                     checked = uiState.isOnlyWhenChargingDownloadEnabled,
                 ),
@@ -163,6 +165,18 @@ internal fun AutoDownloadSettingsHomePage(
                     value = uiState.isOnlyWhenChargingDownloadEnabled,
                     role = Role.Switch,
                     onValueChange = onChangeOnlyWhenChargingDownload,
+                ),
+            )
+            SettingRow(
+                primaryText = stringResource(LR.string.settings_auto_download_storage),
+                secondaryText = stringResource(LR.string.settings_auto_download_storage_summary),
+                toggle = SettingRowToggle.Switch(
+                    checked = uiState.isOnlyWhenEnoughStorageDownloadEnabled,
+                ),
+                modifier = Modifier.toggleable(
+                    value = uiState.isOnlyWhenEnoughStorageDownloadEnabled,
+                    role = Role.Switch,
+                    onValueChange = onChangeOnlyWhenEnoughStorageDownload,
                 ),
             )
         }
@@ -201,6 +215,7 @@ private fun AutoDownloadSettingsHomePagePreview(
                 autoDownloadLimit = AutoDownloadLimitSetting.TEN_LATEST_EPISODE,
                 isOnUnmeteredDownloadEnabled = true,
                 isOnlyWhenChargingDownloadEnabled = true,
+                isOnlyWhenEnoughStorageDownloadEnabled = true,
                 podcasts = emptyList(),
                 playlists = emptyList(),
             ),
@@ -212,6 +227,7 @@ private fun AutoDownloadSettingsHomePagePreview(
             onChangePlaylistsSetting = {},
             onChangeOnUnmeteredDownload = {},
             onChangeOnlyWhenChargingDownload = {},
+            onChangeOnlyWhenEnoughStorageDownload = {},
             onStopAllDownloads = {},
             onClearDownloadErrors = {},
         )

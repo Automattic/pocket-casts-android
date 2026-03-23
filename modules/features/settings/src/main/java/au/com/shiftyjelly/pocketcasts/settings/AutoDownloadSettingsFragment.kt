@@ -84,6 +84,7 @@ class AutoDownloadSettingsFragment :
                     onChangeAutoDownloadLimitSetting = ::showEpisodeLimitDialog,
                     onChangeOnUnmeteredDownload = viewModel::changeOnUnmeteredDownload,
                     onChangeOnlyWhenChargingDownload = viewModel::changeOnlyWhenChargingDownload,
+                    onChangeOnlyWhenEnoughStorageDownload = viewModel::changeOnlyWhenEnoughStorage,
                     onChangePodcast = viewModel::changePodcastAutoDownload,
                     onChangeAllPodcasts = viewModel::changeAllPodcastsAutoDownload,
                     onChangePlaylist = viewModel::changePlaylistAutoDownload,
