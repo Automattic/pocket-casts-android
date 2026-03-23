@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
+import androidx.media3.common.PlaybackException
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -341,12 +342,15 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
                 MediaStatus.IDLE_REASON_ERROR -> {
                     Timber.e("Cast player error for episode $episodeUuid")
-                    onPlayerEvent(this, PlayerEvent.PlayerError("Cast playback error"))
+                    val error = PlaybackException("Cast playback error", null, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+                    onPlayerEvent(this, PlayerEvent.PlayerError("Cast playback error", error))
                 }
 
                 MediaStatus.IDLE_REASON_CANCELED -> onPlayerEvent(this, PlayerEvent.PlayerPaused)
 
                 MediaStatus.IDLE_REASON_INTERRUPTED -> Timber.i("Cast playback interrupted for episode $episodeUuid")
+
+                else -> Timber.w("Unknown Cast idle reason $idleReason for episode $episodeUuid")
             }
 
             MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {

@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.net.Uri
 import androidx.media3.common.Format
 import androidx.media3.common.PlaybackException
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
+import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,7 +14,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@UnstableApi
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class PlaybackErrorClassificationTest {
@@ -57,10 +56,10 @@ class PlaybackErrorClassificationTest {
     }
 
     @Test
-    fun `generic HTTP error maps to check internet`() {
+    fun `generic HTTP error maps to try downloading`() {
         val event = createHttpErrorEvent(418)
         val stringId = errorClassifier.classifyErrorStringId(event)
-        assertEquals(LR.string.player_play_failed_check_internet, stringId)
+        assertEquals(LR.string.error_streaming_try_downloading, stringId)
     }
 
     @Test
@@ -136,6 +135,23 @@ class PlaybackErrorClassificationTest {
     }
 
     @Test
+    fun `unrecognized input format maps to playing format`() {
+        val cause = UnrecognizedInputFormatException(
+            "Unrecognized format",
+            Uri.parse("https://example.com/audio.mp3"),
+            emptyList(),
+        )
+        val error = PlaybackException(
+            "Source error",
+            cause,
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
+        )
+        val event = PlayerEvent.PlayerError("Unrecognized format", error)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_playing_format, stringId)
+    }
+
+    @Test
     fun `null error maps to unable to play`() {
         val event = PlayerEvent.PlayerError("Unknown error", null)
         val stringId = errorClassifier.classifyErrorStringId(event)
@@ -169,37 +185,5 @@ class PlaybackErrorClassificationTest {
             PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS,
         )
         return PlayerEvent.PlayerError("HTTP error $responseCode", error)
-    }
-}
-
-@UnstableApi
-class PlaybackErrorClassifier {
-
-    fun classifyErrorStringId(event: PlayerEvent.PlayerError): Int {
-        val error = event.error ?: return LR.string.error_unable_to_play
-        val cause = error.cause
-
-        return when {
-            cause is HttpDataSource.InvalidResponseCodeException -> {
-                when (cause.responseCode) {
-                    403 -> LR.string.error_streaming_access_denied
-                    404 -> LR.string.error_streaming_not_found
-                    410 -> LR.string.error_streaming_no_longer_available
-                    in 500..599 -> LR.string.error_streaming_server_error
-                    else -> LR.string.player_play_failed_check_internet
-                }
-            }
-
-            cause is HttpDataSource.HttpDataSourceException -> LR.string.player_play_failed_check_internet
-
-            cause is DecoderInitializationException -> LR.string.error_decoder_initialization
-
-            error.errorCode == PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED ||
-                error.errorCode == PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> LR.string.error_audio_output
-
-            error.errorCode == PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED -> LR.string.error_playing_format
-
-            else -> LR.string.error_unable_to_play
-        }
     }
 }
