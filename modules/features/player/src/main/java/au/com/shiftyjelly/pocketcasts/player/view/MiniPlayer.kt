@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -108,6 +109,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             progress = playbackState.positionMs
             secondaryProgress = playbackState.bufferedMs
         }
+        binding.indeterminateProgressBar.isVisible = playbackState.isBuffering
+        binding.progressBar.isInvisible = playbackState.isBuffering
         updatePlaying(isPlaying = playbackState.isPlaying)
     }
 
@@ -137,6 +140,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             secondaryProgressTintList = ColorStateList.valueOf(bufferingColor)
             // track color
             setBackgroundColor(trackColor)
+        }
+        binding.indeterminateProgressBar.apply {
+            setIndicatorColor(progressColor)
+            this.trackColor = trackColor
         }
     }
 
