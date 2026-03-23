@@ -205,7 +205,7 @@ class EpisodeFragmentViewModel @Inject constructor(
             downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
         }
         launch {
-            episodeManager.clearPlaybackErrorBlocking(episode)
+            episodeManager.clearPlaybackError(episode)
         }
     }
 

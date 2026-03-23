@@ -135,7 +135,7 @@ abstract class UserEpisodeDao {
     abstract suspend fun updateDownloadError(uuid: String, error: String?)
 
     @Query("UPDATE user_episodes SET play_error_details = :error WHERE uuid = :uuid")
-    abstract fun updatePlayErrorBlocking(uuid: String, error: String?)
+    abstract suspend fun updatePlayError(uuid: String, error: String?)
 
     @Query("UPDATE user_episodes SET download_task_id = :taskId WHERE uuid = :uuid")
     abstract suspend fun updateDownloadTaskId(uuid: String, taskId: String?)

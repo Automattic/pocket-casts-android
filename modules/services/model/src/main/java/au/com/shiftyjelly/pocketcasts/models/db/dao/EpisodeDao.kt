@@ -359,7 +359,7 @@ abstract class EpisodeDao {
     }
 
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
-    abstract fun updatePlayErrorDetailsBlocking(playErrorDetails: String?, uuid: String)
+    abstract suspend fun updatePlayErrorDetails(playErrorDetails: String?, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
     abstract suspend fun updateEpisodeStatus(episodeStatus: EpisodeDownloadStatus, uuid: String)

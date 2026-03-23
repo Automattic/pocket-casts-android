@@ -1260,7 +1260,7 @@ open class PlaybackManager @Inject constructor(
 
         val currentEpisode = getCurrentEpisode()
         if (currentEpisode is BaseEpisode) {
-            episodeManager.markAsPlaybackErrorBlocking(currentEpisode, event, isPlaybackRemote())
+            episodeManager.markAsPlaybackError(currentEpisode, event, isPlaybackRemote())
         }
 
         stop()
@@ -2082,7 +2082,7 @@ open class PlaybackManager @Inject constructor(
 
         // clear the playback errors
         if (episode.playErrorDetails != null) {
-            episodeManager.clearPlaybackErrorBlocking(episode)
+            episodeManager.clearPlaybackError(episode)
         }
 
         audioNoisyManager.register(this)

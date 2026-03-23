@@ -551,11 +551,11 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateAll(episodes)
     }
 
-    override fun clearPlaybackErrorBlocking(episode: BaseEpisode?) {
+    override suspend fun clearPlaybackError(episode: BaseEpisode?) {
         if (episode?.playErrorDetails == null) {
             return
         }
-        markAsPlaybackErrorBlocking(episode, null)
+        markAsPlaybackError(episode, null)
     }
 
     override fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean) {
@@ -628,23 +628,23 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observeUuidToLatestEpisodeCount()
     }
 
-    override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?) {
+    override suspend fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?) {
         episode ?: return
         episode.playErrorDetails = errorMessage
 
         when (episode) {
-            is PodcastEpisode -> episodeDao.updatePlayErrorDetailsBlocking(errorMessage, episode.uuid)
-            is UserEpisode -> userEpisodeDao.updatePlayErrorBlocking(episode.uuid, errorMessage)
+            is PodcastEpisode -> episodeDao.updatePlayErrorDetails(errorMessage, episode.uuid)
+            is UserEpisode -> userEpisodeDao.updatePlayError(episode.uuid, errorMessage)
         }
     }
 
     @OptIn(UnstableApi::class)
-    override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
+    override suspend fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
         episode ?: return
         val messageId: Int
 
         if (event.error == null && !isPlaybackRemote) {
-            markAsPlaybackErrorBlocking(episode, event.message)
+            markAsPlaybackError(episode, event.message)
             return
         } else if (isPlaybackRemote) {
             if (episode is UserEpisode) {
@@ -686,8 +686,8 @@ class EpisodeManagerImpl @Inject constructor(
         val message = context.resources.getString(messageId)
 
         when (episode) {
-            is PodcastEpisode -> episodeDao.updatePlayErrorDetailsBlocking(message, episode.uuid)
-            is UserEpisode -> userEpisodeDao.updatePlayErrorBlocking(episode.uuid, message)
+            is PodcastEpisode -> episodeDao.updatePlayErrorDetails(message, episode.uuid)
+            is UserEpisode -> userEpisodeDao.updatePlayError(episode.uuid, message)
         }
     }
 
