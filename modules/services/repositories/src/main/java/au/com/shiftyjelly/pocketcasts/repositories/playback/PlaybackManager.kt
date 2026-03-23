@@ -1319,7 +1319,7 @@ open class PlaybackManager @Inject constructor(
 
                 val crashTags = buildMap {
                     put("episodeUuid", episode?.uuid.orEmpty())
-                    put("playedUpTo", episode?.playedUpTo?.roundToInt().toString())
+                    put("playedUpTo", episode?.playedUpTo?.roundToInt()?.toString().orEmpty())
                     if (stuckException != null) {
                         put("stuckType", stuckTypeToString(stuckException.stuckType))
                         put("timeoutMs", stuckException.timeoutMs.toString())
@@ -1327,7 +1327,7 @@ open class PlaybackManager @Inject constructor(
                 }
 
                 crashLogging.sendReport(
-                    message = if (stuckException != null) "Stuck player error" else "Illegal playback state encountered",
+                    message = if (stuckException != null) "Stuck player error" else "Playback error",
                     exception = event.error ?: IllegalStateException(event.message),
                     tags = crashTags,
                 )
