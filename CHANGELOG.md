@@ -7,6 +7,8 @@
 *   Updates
     *   Improve detection of generated transcripts.
         ([#5097](https://github.com/Automattic/pocket-casts-android/pull/5097))
+    *   Add a setting to control if auto downloads should wait for enough internal storage.
+        ([#5163](https://github.com/Automattic/pocket-casts-android/pull/5163))
 *   Bug Fixes
     *   Fix multi-selection counter indicator showing wrong count.
         ([#5127](https://github.com/Automattic/pocket-casts-android/pull/5127))

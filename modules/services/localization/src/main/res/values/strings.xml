@@ -1417,11 +1417,14 @@
     <string name="settings_auto_download_stop_all">Stop all downloads</string>
     <string name="settings_auto_download_stopping_all">Stopping all downloads</string>
     <string name="settings_auto_download_charging">Only when charging</string>
+    <string name="settings_auto_download_charging_summary">When disabled, downloads can occur without the device being connected to a charger.</string>
     <string name="settings_auto_download_clear_errors">Clear all download errors</string>
     <string name="settings_auto_download_clearing_errors">Clearing all download errors</string>
     <string name="settings_auto_download_playlists">Auto download playlists</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
     <string name="settings_auto_download_on_follow_podcast">On Follow</string>
+    <string name="settings_auto_download_storage">Only when enough storage</string>
+    <string name="settings_auto_download_storage_summary">When disabled, downloads can occur when the device is low on internal storage.</string>
 
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Automatically download the latest episode from new shows you follow.</item>
@@ -1446,7 +1449,7 @@
     <string name="settings_auto_download_limit_all_latest_episodes">All Latest Episode</string>
     <string name="settings_auto_download_limit_auto_downloads">Limit auto downloads</string>
     <string name="settings_auto_download_unmetered">Only on unmetered WiFi</string>
-    <string name="settings_auto_download_unmetered_summary">Turning this off will allow downloads on cellular as well as other metered networks. Check your network settings for more info.</string>
+    <string name="settings_auto_download_unmetered_summary">When disabled, downloads can occur on cellular as well as other metered networks. Check your network settings for more info.</string>
     <string name="settings_auto_download_up_next">Episodes added to Up Next</string>
     <string name="settings_auto_play">Auto play</string>
     <string name="settings_auto_play_summary">When there\'s nothing left to play, automatically pick an episode for me</string>
@@ -1867,7 +1870,7 @@
     <string name="error_download_invalid_url">The episode URL is invalid. Please contact the podcast author.</string>
     <string name="error_download_http_failure">Failed to download the episode. Received HTTP status code %1$s. Please contact the podcast author.</string>
     <string name="error_download_invalid_content_type">Failed to download the episode. Received content type %1$s. Please contact the podcast author.</string>
-    <string name="error_download_suspicious_content_size">Failed to download the episode. The downloaded file is too small. Please contact the podcast author.</string>
+    <string name="error_download_suspicious_content_size">Failed to download the episode. The downloaded file is too small. Please try again.</string>
     <string name="error_download_no_storage">Failed to download the episode. Please check that you have enough storage space on your device.</string>
     <string name="error_download_chartable" translatable="false">@string/error_chartable</string>
     <string name="error_download_unknown_host">Unable to reach the podcast author’s server. Please check your internet connection.</string>

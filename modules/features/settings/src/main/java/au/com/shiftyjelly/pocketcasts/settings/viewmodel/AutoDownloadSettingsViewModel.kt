@@ -24,6 +24,7 @@ import com.automattic.eventhorizon.SettingsAutoDownloadNewEpisodesToggledEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadOnFollowPodcastToggledEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadOnlyOnWifiToggledEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadOnlyWhenChargingToggledEvent
+import com.automattic.eventhorizon.SettingsAutoDownloadOnlyWhenEnoughStorageToggledEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadPodcastsChangedEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadShownEvent
 import com.automattic.eventhorizon.SettingsAutoDownloadStopAllDownloadsEvent
@@ -73,9 +74,10 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         settings.autoDownloadLimit.flow,
         settings.autoDownloadUnmeteredOnly.flow,
         settings.autoDownloadOnlyWhenCharging.flow,
+        settings.autoDownloadOnlyWhenEnoughStorage.flow,
         podcastsFlow,
         playlistsFlow,
-        transform = { upNext, newEpisodes, onFollow, limit, unmetered, whenCharging, podcasts, playlists ->
+        transform = { upNext, newEpisodes, onFollow, limit, unmetered, whenCharging, whenStorage, podcasts, playlists ->
             if (podcasts != null && playlists != null) {
                 UiState(
                     isUpNextDownloadEnabled = upNext,
@@ -84,6 +86,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
                     autoDownloadLimit = limit,
                     isOnUnmeteredDownloadEnabled = unmetered,
                     isOnlyWhenChargingDownloadEnabled = whenCharging,
+                    isOnlyWhenEnoughStorageDownloadEnabled = whenStorage,
                     podcasts = podcasts,
                     playlists = playlists,
                 )
@@ -160,6 +163,16 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
 
         settings.autoDownloadOnlyWhenCharging.set(enable, updateModifiedAt = true)
+    }
+
+    fun changeOnlyWhenEnoughStorage(enable: Boolean) {
+        eventHorizon.track(
+            SettingsAutoDownloadOnlyWhenEnoughStorageToggledEvent(
+                enabled = enable,
+            ),
+        )
+
+        settings.autoDownloadOnlyWhenEnoughStorage.set(enable, updateModifiedAt = true)
     }
 
     fun changePodcastAutoDownload(podcastUuid: String, enable: Boolean) {
@@ -305,6 +318,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         val autoDownloadLimit: AutoDownloadLimitSetting,
         val isOnUnmeteredDownloadEnabled: Boolean,
         val isOnlyWhenChargingDownloadEnabled: Boolean,
+        val isOnlyWhenEnoughStorageDownloadEnabled: Boolean,
         val podcasts: List<Podcast>,
         val playlists: List<PlaylistPreview>,
     )
