@@ -20,9 +20,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -40,6 +48,7 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -58,6 +67,8 @@ import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.appreview.AppReviewDialogFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.PlaybackErrorInfoBar
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
@@ -332,7 +343,7 @@ class MainActivity :
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
 
     private val bottomNavigationHeight: Int
-        get() = binding.bottomNavigation.height - binding.bottomNavigation.paddingBottom
+        get() = binding.bottomContainer.height
 
     private var bottomSheetTag: String? = null
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
@@ -464,14 +475,36 @@ class MainActivity :
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             binding.root.updatePadding(left = insets.left, right = insets.right)
-            binding.bottomNavigation.updatePadding(bottom = insets.bottom)
+            binding.bottomContainer.updatePadding(bottom = insets.bottom)
             windowInsets
         }
-        binding.bottomNavigation.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+        binding.bottomContainer.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
             binding.mainFragment.updatePadding(bottom = view.height)
 
             BottomSheetBehavior.from(binding.playerBottomSheet).apply {
                 peekHeight = miniPlayerHeight + view.height
+            }
+        }
+
+        binding.playbackIssueBar.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val playbackIssue by viewModel.playbackIssueFlow.collectAsStateWithLifecycle()
+                val playerOpen by viewModel.isPlayerOpenFlow.collectAsStateWithLifecycle()
+
+                AppTheme(theme.activeTheme) {
+                    AnimatedNonNullVisibility(
+                        item = if (playerOpen) null else playbackIssue,
+                        enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
+                        exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
+                    ) { issue ->
+                        PlaybackErrorInfoBar(
+                            message = issue.message,
+                            onClick = issue.onClick,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
         }
 
@@ -1245,7 +1278,7 @@ class MainActivity :
     }
 
     override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
-        val view = binding.bottomNavigation
+        val view = binding.bottomContainer
         view.doOnLayout {
             val targetPosition = 2 * view.height * slideOffset
             view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)

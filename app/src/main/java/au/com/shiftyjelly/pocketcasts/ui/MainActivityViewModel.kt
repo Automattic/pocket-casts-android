@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueInfo
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -29,8 +31,11 @@ import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -43,6 +48,7 @@ class MainActivityViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    playbackIssueManager: PlaybackIssueManager,
     userManager: UserManager,
     private val settings: Settings,
     private val endOfYearManager: EndOfYearManager,
@@ -63,8 +69,17 @@ class MainActivityViewModel
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
 
-    var isPlayerOpen: Boolean = false
+    private val _isPlayerOpen = MutableStateFlow(false)
+    val isPlayerOpenFlow: StateFlow<Boolean> = _isPlayerOpen.asStateFlow()
+    var isPlayerOpen: Boolean
+        get() = _isPlayerOpen.value
+        set(value) {
+            _isPlayerOpen.value = value
+        }
     var lastPlaybackState: PlaybackState? = null
+
+    val playbackIssueFlow: StateFlow<PlaybackIssueInfo?> = playbackIssueManager.playbackIssue
+        .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)
     val shouldShowStoriesModal = MutableStateFlow(false)
     var waitingForSignInToShowStories = false
 
