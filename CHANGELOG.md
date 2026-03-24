@@ -3,6 +3,8 @@
 *   Updates
     *   Show progress while mini player is buffering
         ([#5165](https://github.com/Automattic/pocket-casts-android/pull/5165))
+    *   Enhance error handling around sharing a downloaded episode
+        ([#5168](https://github.com/Automattic/pocket-casts-android/pull/5168))
 
 8.8
 -----
