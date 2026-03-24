@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -22,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackErrorClassifier
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
@@ -73,6 +72,8 @@ class EpisodeManagerImpl @Inject constructor(
 
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+
+    private val errorClassifier = PlaybackErrorClassifier()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
         val episode = findByUuid(uuid)
@@ -638,7 +639,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(UnstableApi::class)
+    @UnstableApi
     override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
         episode ?: return
         val messageId: Int
@@ -652,8 +653,6 @@ class EpisodeManagerImpl @Inject constructor(
             } else {
                 messageId = LR.string.error_unable_to_cast
             }
-        } else if (event.error != null && event.error.cause is UnrecognizedInputFormatException) {
-            messageId = LR.string.error_playing_format
         } else if (episode.isDownloaded) {
             val downloadedFilePath = episode.downloadedFilePath
             if (downloadedFilePath?.isNotBlank() == true) {
@@ -671,12 +670,16 @@ class EpisodeManagerImpl @Inject constructor(
                 messageId = LR.string.error_file_not_found
             }
         } else {
+            val error = event.error ?: run {
+                markAsPlaybackErrorBlocking(episode, event.message)
+                return
+            }
             if (Network.isConnected(context)) {
-                val chtblBlocked = event.error.anyMessageContains("chtbl.com")
+                val chtblBlocked = error.anyMessageContains("chtbl.com")
                 if (chtblBlocked) {
                     messageId = LR.string.error_chartable_streaming
                 } else {
-                    messageId = LR.string.error_streaming_try_downloading
+                    messageId = errorClassifier.classifyErrorStringId(event)
                 }
             } else {
                 messageId = LR.string.error_streaming_internet

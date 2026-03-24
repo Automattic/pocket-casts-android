@@ -7,13 +7,14 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
-import androidx.media3.datasource.HttpDataSource
+import androidx.media3.common.util.UnstableApi
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -224,6 +225,8 @@ open class PlaybackManager @Inject constructor(
 
     private val resumptionHelper = ResumptionHelper(settings)
 
+    private val errorClassifier = PlaybackErrorClassifier()
+
     var episodeSubscription: Disposable? = null
 
     val mediaSessionManager = MediaSessionManager(
@@ -270,6 +273,23 @@ open class PlaybackManager @Inject constructor(
 
                 override fun sessionReconnected() {
                     castReconnected()
+                }
+
+                override fun sessionFailed(errorCode: Int) {
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session failed with error code $errorCode")
+                    launch(Dispatchers.Main) {
+                        val message = application.getString(LR.string.error_cast_connection_failed)
+                        Toast.makeText(application, message, Toast.LENGTH_LONG).show()
+                        playbackStateRelay.blockingFirst().let { playbackState ->
+                            playbackStateRelay.accept(
+                                playbackState.copy(
+                                    state = PlaybackState.State.ERROR,
+                                    lastErrorMessage = message,
+                                    lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                                ),
+                            )
+                        }
+                    }
                 }
             })
             playbackManagerNetworkWatcher.observeConnection()
@@ -1242,13 +1262,17 @@ open class PlaybackManager @Inject constructor(
                 val path = episode.downloadedFilePath
                 if (path != null) {
                     val episodeFile = File(path)
-
-                    val episodeStream = FileInputStream(episodeFile)
-                    val descriptor = episodeStream.fd
-
                     output.append(if (episodeFile.exists()) "File exists. " else "File doesn't exist. ")
                         .append(if (episodeFile.canRead()) "File can be read. " else "File can't be read. ")
-                        .append(if (descriptor.valid()) "File descriptor is valid. " else "File descriptor is invalid! ")
+                    if (episodeFile.exists() && episodeFile.canRead()) {
+                        try {
+                            FileInputStream(episodeFile).use { episodeStream ->
+                                output.append(if (episodeStream.fd.valid()) "File descriptor is valid. " else "File descriptor is invalid! ")
+                            }
+                        } catch (e: Exception) {
+                            output.append("File descriptor check failed: ${e.message} ")
+                        }
+                    }
                 }
             }
             Timber.e(output.toString())
@@ -1268,11 +1292,7 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val errorMessage = if (event.error?.cause is HttpDataSource.HttpDataSourceException) {
-                    application.getString(LR.string.player_play_failed_check_internet)
-                } else {
-                    event.message
-                }
+                val errorMessage = mapPlaybackErrorToUserMessage(event)
 
                 eventHorizon.track(
                     PlaybackFailedEvent(
@@ -1289,9 +1309,23 @@ open class PlaybackManager @Inject constructor(
                         "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
                     ),
                 )
-                playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
+
+                Toast.makeText(application, errorMessage, Toast.LENGTH_LONG).show()
+
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        state = PlaybackState.State.ERROR,
+                        lastErrorMessage = errorMessage,
+                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                    ),
+                )
             }
         }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
+        return application.getString(errorClassifier.classifyErrorStringId(event))
     }
 
     suspend fun onBufferingStateChanged() {
