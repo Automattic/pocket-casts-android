@@ -64,6 +64,10 @@ class BottomNavigationView @JvmOverloads constructor(
             minimumHeight = attributes.getDimensionPixelSize(R.styleable.BottomNavigationView_android_minHeight, 0)
         }
         attributes.recycle()
+
+        // The parent container handles z-ordering. Zero out the style-driven
+        // elevation so this view doesn't cast its own shadow.
+        elevation = 0f
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
