@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
+import androidx.annotation.OptIn
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -318,6 +320,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         return null
     }
 
+    @OptIn(UnstableApi::class)
     private fun updatePlaybackState() {
         val remoteMediaClient = remoteMediaClient
         if (remoteMediaClient == null) {

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -1322,7 +1323,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    @UnstableApi
+    @OptIn(UnstableApi::class)
     private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
         return application.getString(errorClassifier.classifyErrorStringId(event))
     }

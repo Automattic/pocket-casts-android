@@ -21,6 +21,13 @@ class PlaybackErrorClassificationTest {
     private val errorClassifier = PlaybackErrorClassifier()
 
     @Test
+    fun `HTTP 401 maps to access denied`() {
+        val event = createHttpErrorEvent(401)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_streaming_access_denied, stringId)
+    }
+
+    @Test
     fun `HTTP 403 maps to access denied`() {
         val event = createHttpErrorEvent(403)
         val stringId = errorClassifier.classifyErrorStringId(event)
@@ -168,6 +175,18 @@ class PlaybackErrorClassificationTest {
         val event = PlayerEvent.PlayerError("Unknown", error)
         val stringId = errorClassifier.classifyErrorStringId(event)
         assertEquals(LR.string.error_unable_to_play, stringId)
+    }
+
+    @Test
+    fun `remote error maps to unable to cast`() {
+        val error = PlaybackException(
+            "Cast playback error",
+            null,
+            PlaybackException.ERROR_CODE_REMOTE_ERROR,
+        )
+        val event = PlayerEvent.PlayerError("Cast playback error", error)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_unable_to_cast, stringId)
     }
 
     private fun createHttpErrorEvent(responseCode: Int): PlayerEvent.PlayerError {

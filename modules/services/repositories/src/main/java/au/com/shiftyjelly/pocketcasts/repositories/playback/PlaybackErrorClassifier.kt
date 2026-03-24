@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
@@ -10,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class PlaybackErrorClassifier {
 
-    @UnstableApi
+    @OptIn(UnstableApi::class)
     @StringRes
     fun classifyErrorStringId(event: PlayerEvent.PlayerError): Int {
         val error = event.error ?: return LR.string.error_unable_to_play
@@ -30,6 +31,8 @@ class PlaybackErrorClassifier {
 
             error.errorCode == PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED -> LR.string.error_playing_format
 
+            error.errorCode == PlaybackException.ERROR_CODE_REMOTE_ERROR -> LR.string.error_unable_to_cast
+
             else -> LR.string.error_unable_to_play
         }
     }
@@ -37,7 +40,7 @@ class PlaybackErrorClassifier {
     @StringRes
     fun classifyHttpError(responseCode: Int): Int {
         return when (responseCode) {
-            403 -> LR.string.error_streaming_access_denied
+            401, 403 -> LR.string.error_streaming_access_denied
             404 -> LR.string.error_streaming_not_found
             410 -> LR.string.error_streaming_no_longer_available
             in 500..599 -> LR.string.error_streaming_server_error
