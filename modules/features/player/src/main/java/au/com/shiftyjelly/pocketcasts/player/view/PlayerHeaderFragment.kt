@@ -18,6 +18,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
@@ -85,6 +86,7 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtLeastMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtLeastMediumWidth
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.PlaybackErrorInfoBar
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLockableInteropConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -108,6 +110,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueInfo
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -217,6 +220,7 @@ class PlayerHeaderFragment :
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
         val activeAd by viewModel.activeAd.collectAsState()
+        val playbackIssue by viewModel.playbackIssue.collectAsState()
 
         val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
@@ -253,10 +257,11 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         transitionData = transitionData,
                         isPortraitPlayer = isPortraitPlayer,
+                        playbackIssue = playbackIssue,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                            .padding(top = 16.dp),
                     )
                 }
             }
@@ -629,26 +634,39 @@ class PlayerHeaderFragment :
         playerColors: PlayerColors,
         transitionData: TranscriptTransitionData,
         isPortraitPlayer: Boolean,
+        playbackIssue: PlaybackIssueInfo?,
         modifier: Modifier = Modifier,
     ) {
-        if (isPortraitPlayer) {
-            VerticalPlayerContent(
-                ad = ad,
-                artworkOrVideoState = artworkOrVideoState,
-                headerData = headerData,
-                playerColors = playerColors,
-                transitionData = transitionData,
-                modifier = modifier.navigationBarsPadding(),
-            )
-        } else {
-            HorizontalPlayerContent(
-                ad = ad,
-                artworkOrVideoState = artworkOrVideoState,
-                headerData = headerData,
-                playerColors = playerColors,
-                transitionData = transitionData,
-                modifier = modifier,
-            )
+        Column(modifier = modifier) {
+            if (isPortraitPlayer) {
+                VerticalPlayerContent(
+                    ad = ad,
+                    artworkOrVideoState = artworkOrVideoState,
+                    headerData = headerData,
+                    playerColors = playerColors,
+                    transitionData = transitionData,
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp).navigationBarsPadding(),
+                )
+            } else {
+                HorizontalPlayerContent(
+                    ad = ad,
+                    artworkOrVideoState = artworkOrVideoState,
+                    headerData = headerData,
+                    playerColors = playerColors,
+                    transitionData = transitionData,
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                )
+            }
+            AnimatedNonNullVisibility(
+                item = if (transitionData.isTranscriptOpen) null else playbackIssue,
+                enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
+                exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
+            ) { issue ->
+                PlaybackErrorInfoBar(
+                    message = issue.message,
+                    playerColors = playerColors,
+                )
+            }
         }
     }
 
