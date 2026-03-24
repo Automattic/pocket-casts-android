@@ -471,6 +471,7 @@
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
+    <string name="player_stuck_error">Playback got stuck. Please close the app and try again.</string>
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>

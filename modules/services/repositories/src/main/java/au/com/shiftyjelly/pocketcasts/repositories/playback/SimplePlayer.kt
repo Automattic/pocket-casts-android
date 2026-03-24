@@ -13,6 +13,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
+import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.DefaultLoadControl
@@ -60,6 +61,8 @@ class SimplePlayer(
     @Volatile
     private var prepared = false
 
+    private var stuckRecoveryAttempts = 0
+
     val exoPlayer: ExoPlayer?
         get() {
             return player
@@ -101,8 +104,7 @@ class SimplePlayer(
         prepare()
     }
 
-    @OptIn(UnstableApi::class)
-    override fun handleStop() {
+    private fun releasePlayer() {
         try {
             player?.stop()
         } catch (e: Exception) {
@@ -119,6 +121,11 @@ class SimplePlayer(
         prepared = false
 
         videoChangedListener?.videoNeedsReset()
+    }
+
+    override fun handleStop() {
+        releasePlayer()
+        stuckRecoveryAttempts = 0
     }
 
     override fun handlePause() {
@@ -212,7 +219,7 @@ class SimplePlayer(
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
         player.addAnalyticsListener(renderer)
 
-        handleStop()
+        releasePlayer()
         this.player = player
 
         setPlayerEffects()
@@ -231,6 +238,7 @@ class SimplePlayer(
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_READY -> {
+                        stuckRecoveryAttempts = 0
                         onBufferingStateChanged()
                         onDurationAvailable()
                     }
@@ -242,23 +250,7 @@ class SimplePlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                // Reset episode caching if 416 error response code is received
-                // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
-                // https://github.com/google/ExoPlayer/issues/10577
-                // Internal ref: p1730809737477079-slack-C02A333D8LQ
-                if ((error.cause as? InvalidResponseCodeException)?.responseCode == 416) {
-                    episodeLocation?.let {
-                        dataSourceFactory.resetEpisodeCaching(
-                            episodeLocation = it,
-                            onCachingReset = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingReset(episodeUuid)) },
-                            onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) },
-                        )
-                    }
-                    return
-                }
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
-                val event = PlayerEvent.PlayerError(error.message ?: "", error)
-                this@SimplePlayer.onError(event)
+                handlePlayerError(error)
             }
         })
 
@@ -281,6 +273,53 @@ class SimplePlayer(
         player.prepare()
 
         prepared = true
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun handlePlayerError(error: PlaybackException) {
+        // Reset episode caching if 416 error response code is received
+        // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
+        // https://github.com/google/ExoPlayer/issues/10577
+        // Internal ref: p1730809737477079-slack-C02A333D8LQ
+        if ((error.cause as? InvalidResponseCodeException)?.responseCode == 416) {
+            episodeLocation?.let {
+                dataSourceFactory.resetEpisodeCaching(
+                    episodeLocation = it,
+                    onCachingReset = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingReset(episodeUuid)) },
+                    onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) },
+                )
+            }
+            return
+        }
+
+        val stuckException = error.cause as? StuckPlayerException
+        // STUCK_SUPPRESSED means playback is suppressed (e.g., unsuitable audio output) — not a real stuck state
+        if (stuckException != null && stuckException.stuckType != StuckPlayerException.STUCK_SUPPRESSED) {
+            if (stuckRecoveryAttempts < MAX_STUCK_RECOVERY_ATTEMPTS) {
+                stuckRecoveryAttempts++
+                LogBuffer.i(
+                    LogBuffer.TAG_PLAYBACK,
+                    "Stuck player detected (type=${stuckException.stuckType}), recovery attempt $stuckRecoveryAttempts/$MAX_STUCK_RECOVERY_ATTEMPTS",
+                )
+                val currentPosition = player?.currentPosition ?: 0L
+                val wasPlaying = player?.playWhenReady ?: false
+                val currentVolume = player?.volume ?: 1.0f
+                prepare()
+                if (!prepared) return // prepare() already called onError()
+                player?.seekTo(currentPosition)
+                player?.playWhenReady = wasPlaying
+                player?.volume = currentVolume
+                return
+            }
+            LogBuffer.e(
+                LogBuffer.TAG_PLAYBACK,
+                "Stuck player recovery exhausted after $MAX_STUCK_RECOVERY_ATTEMPTS attempts (type=${stuckException.stuckType})",
+            )
+        }
+
+        LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
+        val event = PlayerEvent.PlayerError(error.message ?: "", error)
+        onError(event)
     }
 
     private fun addVideoListener(player: ExoPlayer) {
@@ -340,5 +379,9 @@ class SimplePlayer(
             it.setBoostVolume(playbackEffects.isVolumeBoosted)
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
+    }
+
+    companion object {
+        private const val MAX_STUCK_RECOVERY_ATTEMPTS = 3
     }
 }
