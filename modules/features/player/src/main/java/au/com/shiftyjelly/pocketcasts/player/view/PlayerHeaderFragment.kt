@@ -60,7 +60,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
@@ -94,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.view.PlaybackIssuesBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImage
@@ -110,7 +110,6 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueInfo
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueType
@@ -124,7 +123,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
-import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -679,12 +677,11 @@ class PlayerHeaderFragment :
                         .background(playerColors.contrast06)
                         .navigationBarsPadding(),
                 ) {
-                    val context = LocalContext.current
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
                         onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
-                            { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                            { PlaybackIssuesBottomSheetFragment.show(parentFragmentManager) }
                         } else {
                             null
                         },
