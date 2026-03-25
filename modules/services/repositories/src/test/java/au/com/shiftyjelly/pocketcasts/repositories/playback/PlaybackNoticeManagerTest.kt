@@ -238,6 +238,57 @@ class PlaybackNoticeManagerTest {
     }
 
     @Test
+    fun `playback error shown on return to foreground auto-dismisses after 5 seconds`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        isInForeground.value = false
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
+            runCurrent()
+            expectNoEvents()
+
+            isInForeground.value = true
+            assertEquals(PlaybackNoticeType.PLAYBACK, awaitItem()?.type)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
+        }
+    }
+
+    @Test
+    fun `no playback error on foreground return if playback resumed in background`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        isInForeground.value = false
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
+            runCurrent()
+            expectNoEvents()
+
+            // Playback resumes while in background
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.PLAYING)
+            runCurrent()
+            expectNoEvents()
+
+            // User returns to foreground - no error should be shown
+            isInForeground.value = true
+            runCurrent()
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `connection lost takes priority over playback error`() = runTest {
         FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
         networkCapabilities.value = onlineCapabilities()
