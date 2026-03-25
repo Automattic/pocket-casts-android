@@ -645,7 +645,8 @@ class PlayerHeaderFragment :
                     headerData = headerData,
                     playerColors = playerColors,
                     transitionData = transitionData,
-                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp).navigationBarsPadding(),
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                        .then(if (playbackIssue == null) Modifier.navigationBarsPadding() else Modifier),
                 )
             } else {
                 HorizontalPlayerContent(

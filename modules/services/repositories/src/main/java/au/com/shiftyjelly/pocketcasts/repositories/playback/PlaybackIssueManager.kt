@@ -9,6 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class PlaybackIssueInfo(
@@ -23,31 +25,35 @@ class PlaybackIssueManager @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     val playbackIssue: Flow<PlaybackIssueInfo?> = combine(
-        playbackManager.playbackStateFlow,
+        playbackManager.playbackStateFlow
+            .map { it.state to it.lastErrorMessage }
+            .distinctUntilChanged(),
         networkConnectionWatcher.networkCapabilities,
         FeatureFlag.isEnabledFlow(Feature.PLAYBACK_ERROR_INFO_BAR),
-    ) { playbackState, networkCapabilities, isEnabled ->
+    ) { (state, lastErrorMessage), networkCapabilities, isEnabled ->
         if (!isEnabled) return@combine null
-        resolveIssue(playbackState, networkCapabilities)
+        resolveIssue(state, lastErrorMessage, networkCapabilities)
     }
 
     private fun resolveIssue(
-        playbackState: PlaybackState,
+        state: PlaybackState.State,
+        lastErrorMessage: String?,
         networkCapabilities: NetworkCapabilities?,
     ): PlaybackIssueInfo? {
+        val isError = state == PlaybackState.State.ERROR
         val isOffline = networkCapabilities == null ||
             !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
         return when {
-            playbackState.isError && isOffline -> PlaybackIssueInfo(
+            isError && isOffline -> PlaybackIssueInfo(
                 message = context.getString(LR.string.error_playback_offline),
             )
 
-            playbackState.isError && playbackState.lastErrorMessage != null -> PlaybackIssueInfo(
-                message = playbackState.lastErrorMessage,
+            isError && lastErrorMessage != null -> PlaybackIssueInfo(
+                message = lastErrorMessage,
             )
 
-            playbackState.isError -> PlaybackIssueInfo(
+            isError -> PlaybackIssueInfo(
                 message = context.getString(LR.string.error_check_your_internet_connection),
             )
 
