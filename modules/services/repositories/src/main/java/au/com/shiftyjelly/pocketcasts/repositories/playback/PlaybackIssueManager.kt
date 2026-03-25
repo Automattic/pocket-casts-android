@@ -55,13 +55,8 @@ class PlaybackIssueManager @Inject constructor(
                 type = PlaybackIssueType.CONNECTION,
             )
 
-            playbackState.isError && playbackState.lastErrorMessage != null -> PlaybackIssueInfo(
-                message = playbackState.lastErrorMessage,
-                type = PlaybackIssueType.PLAYBACK,
-            )
-
-            isError -> PlaybackIssueInfo(
-                message = context.getString(LR.string.error_check_your_internet_connection),
+            playbackState.isError -> PlaybackIssueInfo(
+                message = context.getString(LR.string.error_episode_not_available),
                 type = PlaybackIssueType.PLAYBACK,
             )
 
