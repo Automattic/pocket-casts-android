@@ -20,6 +20,7 @@ data class PlaybackState(
     val showNotesImageUrl: String? = null,
     val chapters: Chapters = Chapters(),
     val lastChangeFrom: String? = null,
+    val isConnectionError: Boolean = false,
     val lastErrorMessage: String? = null,
     val playbackSpeed: Double = 1.0,
     val trimMode: TrimMode = TrimMode.OFF,

@@ -13,9 +13,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+enum class PlaybackIssueType {
+    CONNECTION,
+    PLAYBACK,
+}
+
 data class PlaybackIssueInfo(
     val message: String,
-    val onClick: (() -> Unit)? = null,
+    val type: PlaybackIssueType,
 )
 
 @Singleton
@@ -45,16 +50,19 @@ class PlaybackIssueManager @Inject constructor(
             !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
         return when {
-            isError && isOffline -> PlaybackIssueInfo(
+            playbackState.isError && (isOffline || playbackState.isConnectionError) -> PlaybackIssueInfo(
                 message = context.getString(LR.string.error_playback_offline),
+                type = PlaybackIssueType.CONNECTION,
             )
 
-            isError && lastErrorMessage != null -> PlaybackIssueInfo(
-                message = lastErrorMessage,
+            playbackState.isError && playbackState.lastErrorMessage != null -> PlaybackIssueInfo(
+                message = playbackState.lastErrorMessage,
+                type = PlaybackIssueType.PLAYBACK,
             )
 
             isError -> PlaybackIssueInfo(
                 message = context.getString(LR.string.error_check_your_internet_connection),
+                type = PlaybackIssueType.PLAYBACK,
             )
 
             else -> null

@@ -33,19 +33,36 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 fun PlaybackErrorInfoBar(
     message: String,
     playerColors: PlayerColors,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = message,
-        color = playerColors.contrast01,
-        fontSize = 14.nonScaledSp,
-        textAlign = TextAlign.Center,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
             .background(playerColors.contrast06)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-    )
+    ) {
+        Text(
+            text = message,
+            color = playerColors.contrast01,
+            fontSize = 14.nonScaledSp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        if (onClick != null) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Image(
+                painter = painterResource(IR.drawable.ic_chevron_right),
+                colorFilter = ColorFilter.tint(playerColors.contrast03),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
 }
 
 /**
