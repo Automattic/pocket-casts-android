@@ -27,6 +27,7 @@ class AppLifecycleObserver(
     @ApplicationContext private val appContext: Context,
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
+    private val appLifecycleProviderImpl: AppLifecycleProviderImpl,
     private val applicationScope: CoroutineScope,
     private val blazeAdsManager: BlazeAdsManager,
     private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
@@ -43,6 +44,7 @@ class AppLifecycleObserver(
         @ApplicationContext appContext: Context,
         @ApplicationScope applicationScope: CoroutineScope,
         appLifecycleAnalytics: AppLifecycleAnalytics,
+        appLifecycleProviderImpl: AppLifecycleProviderImpl,
         blazeAdsManager: BlazeAdsManager,
         defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
         networkConnectionWatcher: NetworkConnectionWatcherImpl,
@@ -55,6 +57,7 @@ class AppLifecycleObserver(
         applicationScope = applicationScope,
         appLifecycleAnalytics = appLifecycleAnalytics,
         appLifecycleOwner = ProcessLifecycleOwner.get(),
+        appLifecycleProviderImpl = appLifecycleProviderImpl,
         blazeAdsManager = blazeAdsManager,
         defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
         firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
@@ -67,6 +70,7 @@ class AppLifecycleObserver(
 
     fun setup() {
         appLifecycleOwner.lifecycle.addObserver(this)
+        appLifecycleOwner.lifecycle.addObserver(appLifecycleProviderImpl)
         handleNewInstallOrUpgrade()
         setupFeatureFlags()
         networkConnectionWatcher.startWatching()
