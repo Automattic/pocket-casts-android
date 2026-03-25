@@ -72,17 +72,18 @@ class PlaybackNoticeManager @Inject constructor(
 
         applicationScope.launch {
             networkConnectionWatcher.networkCapabilities.collect { capabilities ->
-                recoveryDismissJob?.cancel()
                 val isOffline = capabilities == null ||
                     !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
                 if (isOffline) {
+                    recoveryDismissJob?.cancel()
                     connectionNotice.value = PlaybackNoticeInfo(
                         message = context.getString(LR.string.error_playback_offline),
                         type = PlaybackNoticeType.CONNECTION_LOST,
                     )
                     if (!isFirstEmission) wasOffline = true
                 } else if (wasOffline) {
+                    wasOffline = false
                     connectionNotice.value = PlaybackNoticeInfo(
                         message = context.getString(LR.string.error_playback_connected),
                         type = PlaybackNoticeType.RECOVERY,
@@ -91,7 +92,7 @@ class PlaybackNoticeManager @Inject constructor(
                         delay(AUTO_DISMISS_DURATION)
                         connectionNotice.value = null
                     }
-                } else {
+                } else if (recoveryDismissJob?.isActive != true) {
                     connectionNotice.value = null
                 }
                 isFirstEmission = false
