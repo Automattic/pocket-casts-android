@@ -160,8 +160,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -495,23 +495,24 @@ class MainActivity :
         binding.playbackIssueBar.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val playbackIssue by viewModel.playbackIssueFlow.collectAsStateWithLifecycle()
+                val playbackNotice by viewModel.playbackNoticeFlow.collectAsStateWithLifecycle()
+                val playerOpen by viewModel.isPlayerOpenFlow.collectAsStateWithLifecycle()
 
                 AppTheme(theme.activeTheme) {
                     AnimatedNonNullVisibility(
-                        item = playbackIssue,
+                        item = if (playerOpen) null else playbackNotice,
                         enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
-                    ) { issue ->
-                        LaunchedEffect(issue) {
+                    ) { notice ->
+                        LaunchedEffect(notice) {
                             if (!viewModel.isPlayerOpen) {
                                 eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
                             }
                         }
                         PlaybackErrorInfoBar(
-                            message = issue.message,
-                            onClick = when (issue.type) {
-                                PlaybackIssueType.PLAYBACK -> {
+                            message = notice.message,
+                            onClick = when (notice.type) {
+                                PlaybackNoticeType.PLAYBACK -> {
                                     {
                                         if (!viewModel.isPlayerOpen) {
                                             eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
@@ -520,7 +521,9 @@ class MainActivity :
                                     }
                                 }
 
-                                PlaybackIssueType.CONNECTION -> null
+                                PlaybackNoticeType.CONNECTION_LOST -> null
+
+                                PlaybackNoticeType.RECOVERY -> null
                             },
                             modifier = Modifier.fillMaxWidth(),
                         )

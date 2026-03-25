@@ -111,9 +111,9 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueInfo
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeInfo
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -229,7 +229,7 @@ class PlayerHeaderFragment :
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
         val activeAd by viewModel.activeAd.collectAsState()
-        val playbackIssue by viewModel.playbackIssue.collectAsState()
+        val playbackNotice by viewModel.playbackNotice.collectAsState()
 
         val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
@@ -267,7 +267,7 @@ class PlayerHeaderFragment :
                         transitionData = transitionData,
                         isPortraitPlayer = isPortraitPlayer,
                         isPlayerOpen = isPlayerOpen,
-                        playbackIssue = playbackIssue,
+                        playbackNotice = playbackNotice,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
@@ -645,7 +645,7 @@ class PlayerHeaderFragment :
         transitionData: TranscriptTransitionData,
         isPortraitPlayer: Boolean,
         isPlayerOpen: Boolean,
-        playbackIssue: PlaybackIssueInfo?,
+        playbackNotice: PlaybackNoticeInfo?,
         modifier: Modifier = Modifier,
     ) {
         Column(modifier = modifier) {
@@ -658,7 +658,7 @@ class PlayerHeaderFragment :
                     transitionData = transitionData,
                     modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
                         .then(
-                            if (playbackIssue == null || transitionData.isTranscriptOpen) {
+                            if (playbackNotice == null || transitionData.isTranscriptOpen) {
                                 Modifier.navigationBarsPadding()
                             } else {
                                 Modifier
@@ -676,7 +676,7 @@ class PlayerHeaderFragment :
                 )
             }
             AnimatedNonNullVisibility(
-                item = if (transitionData.isTranscriptOpen) null else playbackIssue,
+                item = if (transitionData.isTranscriptOpen) null else playbackNotice,
                 modifier = Modifier.padding(top = 16.dp),
                 enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                 exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
@@ -695,7 +695,7 @@ class PlayerHeaderFragment :
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
-                        onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
+                        onClick = if (issue.type == PlaybackNoticeType.PLAYBACK) {
                             {
                                 if (isPlayerOpen) {
                                     eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
