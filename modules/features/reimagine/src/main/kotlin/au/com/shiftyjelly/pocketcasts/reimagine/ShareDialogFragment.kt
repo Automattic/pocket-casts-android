@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -209,11 +208,8 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                                     .episodeFile(podcast, episode, args.source)
                                     .build()
                                 val response = sharingClient.share(request)
-                                if (!response.isSuccessful) {
-                                    LogBuffer.i(LogBuffer.TAG_INVALID_STATE, "Failed to share episode ${episode.uuid}, response: ${response.feedbackMessage}, error: ${response.error?.toString()}")
-                                    if (response.feedbackMessage != null) {
-                                        Toast.makeText(appContext, response.feedbackMessage, Toast.LENGTH_SHORT).show()
-                                    }
+                                if (!response.isSuccessful && response.feedbackMessage != null) {
+                                    Toast.makeText(appContext, response.feedbackMessage, Toast.LENGTH_SHORT).show()
                                 }
                                 dismiss()
                             }
