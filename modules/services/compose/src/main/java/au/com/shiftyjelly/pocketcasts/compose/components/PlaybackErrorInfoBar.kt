@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -69,16 +70,18 @@ fun PlaybackErrorInfoBar(
         Text(
             text = message,
             color = colors.primaryText01,
-            fontSize = 14.sp,
+            fontSize = 14.nonScaledSp,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f, fill = false),
         )
-        Spacer(modifier = Modifier.width(4.dp))
-        Image(
-            painter = painterResource(IR.drawable.ic_chevron_right),
-            colorFilter = ColorFilter.tint(colors.primaryIcon02),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-        )
+        if (onClick != null) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Image(
+                painter = painterResource(IR.drawable.ic_chevron_right),
+                colorFilter = ColorFilter.tint(colors.primaryIcon02),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+            )
+        }
     }
 }

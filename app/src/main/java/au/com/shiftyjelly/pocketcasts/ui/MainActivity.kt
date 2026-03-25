@@ -343,7 +343,7 @@ class MainActivity :
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
 
     private val bottomNavigationHeight: Int
-        get() = binding.bottomContainer.height
+        get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
