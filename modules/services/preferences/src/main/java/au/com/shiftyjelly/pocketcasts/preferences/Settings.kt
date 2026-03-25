@@ -63,6 +63,7 @@ interface Settings {
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/knowledge-base/how-to-cancel-a-subscription/"
         const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
+        const val INFO_DOWNLOAD_AND_PLAYBACK_URL = "https://support.pocketcasts.com/knowledge-base/download-errors/"
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
