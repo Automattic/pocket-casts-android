@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -23,6 +24,7 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -52,6 +54,9 @@ class MainActivityViewModelTest {
 
     @Mock
     lateinit var playbackManager: PlaybackManager
+
+    @Mock
+    lateinit var playbackIssueManager: PlaybackIssueManager
 
     @Mock
     lateinit var userManager: UserManager
@@ -84,6 +89,7 @@ class MainActivityViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
+        whenever(playbackIssueManager.playbackIssue).thenReturn(emptyFlow())
     }
 
     /* What's new tests */
@@ -228,6 +234,7 @@ class MainActivityViewModelTest {
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,
             playbackManager = playbackManager,
+            playbackIssueManager = playbackIssueManager,
             userManager = userManager,
             settings = settings,
             endOfYearManager = endOfYearManager,

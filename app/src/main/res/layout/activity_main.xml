@@ -26,16 +26,31 @@
             app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"
             app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
-        <au.com.shiftyjelly.pocketcasts.views.component.BottomNavigationView
-            android:id="@+id/bottomNavigation"
+        <LinearLayout
+            android:id="@+id/bottomContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_gravity="bottom"
-            android:background="?attr/primary_ui_03"
             android:elevation="8dp"
-            app:itemIconTint="@color/navigation_color"
-            app:itemTextColor="@color/navigation_color"
-            app:labelVisibilityMode="labeled" />
+            android:outlineProvider="none"
+            android:background="?attr/primary_ui_03">
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/playbackIssueBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <au.com.shiftyjelly.pocketcasts.views.component.BottomNavigationView
+                android:id="@+id/bottomNavigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/primary_ui_03"
+                app:itemIconTint="@color/navigation_color"
+                app:itemTextColor="@color/navigation_color"
+                app:labelVisibilityMode="labeled" />
+
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/fragmentOverBottomNav"
