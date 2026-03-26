@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -320,6 +321,39 @@ class PlaybackNoticeManagerTest {
 
             networkCapabilities.value = onlineCapabilities()
             assertEquals(PlaybackNoticeType.RECOVERY, awaitItem()?.type)
+        }
+    }
+
+    @Test
+    fun `playback error dismissed while masked by connection lost`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            // Playback error is shown
+            assertEquals(PlaybackNoticeType.PLAYBACK, awaitItem()?.type)
+
+            // Connection lost masks the playback error (auto-dismiss timer continues)
+            networkCapabilities.value = null
+            assertEquals(PlaybackNoticeType.CONNECTION_LOST, awaitItem()?.type)
+
+            // Wait longer than auto-dismiss duration while masked
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION + 1.seconds)
+            runCurrent()
+
+            // Connection recovers — playback error was already auto-dismissed while masked
+            networkCapabilities.value = onlineCapabilities()
+            val notice = awaitItem()
+            // Recovery is shown (not the stale playback error)
+            assertEquals(PlaybackNoticeType.RECOVERY, notice?.type)
+
+            // After recovery auto-dismisses, notice clears completely
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
         }
     }
 
