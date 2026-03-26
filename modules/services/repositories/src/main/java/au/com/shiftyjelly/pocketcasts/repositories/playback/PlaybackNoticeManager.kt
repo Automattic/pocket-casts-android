@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,7 +52,7 @@ class PlaybackNoticeManager @Inject constructor(
         FeatureFlag.isEnabledFlow(Feature.PLAYBACK_ERROR_INFO_BAR),
     ) { conn, playback, enabled ->
         if (!enabled) null else conn ?: playback
-    }
+    }.distinctUntilChanged()
 
     private fun monitorConnectionIssues() {
         var wasOffline = false
