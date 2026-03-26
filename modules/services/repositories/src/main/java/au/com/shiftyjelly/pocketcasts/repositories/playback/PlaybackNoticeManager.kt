@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
@@ -12,13 +10,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,14 +51,6 @@ class PlaybackNoticeManager @Inject constructor(
         FeatureFlag.isEnabledFlow(Feature.PLAYBACK_ERROR_INFO_BAR),
     ) { conn, playback, enabled ->
         if (!enabled) null else conn ?: playback
-    }.transformLatest { notice ->
-        if (notice?.type == PlaybackNoticeType.PLAYBACK) {
-            emit(notice)
-            delay(AUTO_DISMISS_DURATION)
-            playbackErrorNotice.value = null
-        } else {
-            emit(notice)
-        }
     }
 
     private fun monitorConnectionIssues() {
@@ -101,6 +89,8 @@ class PlaybackNoticeManager @Inject constructor(
     }
 
     private fun monitorPlaybackIssues() {
+        var autoDismissJob: Job? = null
+
         applicationScope.launch {
             combine(
                 playbackManager.playbackStateFlow,
@@ -117,7 +107,14 @@ class PlaybackNoticeManager @Inject constructor(
                     else -> null
                 }
             }.collect { notice ->
+                autoDismissJob?.cancel()
                 playbackErrorNotice.value = notice
+                if (notice != null) {
+                    autoDismissJob = launch {
+                        delay(AUTO_DISMISS_DURATION)
+                        playbackErrorNotice.value = null
+                    }
+                }
             }
         }
     }
