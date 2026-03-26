@@ -223,6 +223,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    PLAYBACK_ERROR_INFO_BAR(
+        key = "playback_error_info_bar",
+        title = "Playback error info bar",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
