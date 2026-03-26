@@ -20,7 +20,7 @@ fun PlaybackErrorInfoBar(
 ) {
     Text(
         text = message,
-        color = playerColors.contrast03,
+        color = playerColors.contrast01,
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
         modifier = modifier
