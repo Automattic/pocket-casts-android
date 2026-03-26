@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
@@ -34,10 +34,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kevinnzou.web.LoadingState
 import com.kevinnzou.web.WebView
+import com.kevinnzou.web.WebViewState
 import com.kevinnzou.web.rememberWebViewState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
@@ -51,7 +52,7 @@ class PlaybackIssuesBottomSheetFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        DialogBox {
+        DialogBox(themeType = Theme.ThemeType.LIGHT) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Pill()
@@ -61,18 +62,11 @@ class PlaybackIssuesBottomSheetFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        bottomSheetView()?.let { bottomSheet ->
-            BottomSheetBehavior.from(bottomSheet).isDraggable = false
-        }
-    }
-
     companion object {
-        private const val TAG = "FaqBottomSheetFragment"
+        private const val TAG = "PlaybackIssuesBottomSheetFragment"
 
         fun show(fragmentManager: FragmentManager) {
-            if (fragmentManager.findFragmentByTag(TAG) == null) {
+            if (!fragmentManager.isStateSaved && fragmentManager.findFragmentByTag(TAG) == null) {
                 PlaybackIssuesBottomSheetFragment().show(fragmentManager, TAG)
             }
         }
@@ -164,7 +158,7 @@ private fun ErrorDisplay(modifier: Modifier = Modifier) {
 
 @Composable
 private fun WebViewContent(
-    state: com.kevinnzou.web.WebViewState,
+    state: WebViewState,
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = MaterialTheme.theme.colors.primaryUi01
@@ -178,6 +172,19 @@ private fun WebViewContent(
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 textZoom = 100
+            }
+            @SuppressLint("ClickableViewAccessibility")
+            webView.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                        v.parent.requestDisallowInterceptTouchEvent(v.canScrollVertically(-1))
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        v.parent.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                false
             }
         },
     )
