@@ -18,9 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -38,7 +38,7 @@ fun PlaybackErrorInfoBar(
     Text(
         text = message,
         color = playerColors.contrast01,
-        fontSize = 14.sp,
+        fontSize = 14.nonScaledSp,
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()
@@ -64,7 +64,7 @@ fun PlaybackErrorInfoBar(
         modifier = modifier
             .fillMaxWidth()
             .background(colors.secondaryUi01)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(
