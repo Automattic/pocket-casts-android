@@ -27,7 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 /**
- * Fullscreen player variant: centered text, uses player colors.
+ * Fullscreen player variant uses player colors.
  */
 @Composable
 fun PlaybackErrorInfoBar(
@@ -42,7 +42,7 @@ fun PlaybackErrorInfoBar(
         modifier = modifier
             .fillMaxWidth()
             .background(playerColors.contrast06)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
@@ -66,7 +66,7 @@ fun PlaybackErrorInfoBar(
 }
 
 /**
- * Miniplayer variant: centered text with trailing chevron.
+ * Miniplayer variant uses theme colors.
  */
 @Composable
 fun PlaybackErrorInfoBar(

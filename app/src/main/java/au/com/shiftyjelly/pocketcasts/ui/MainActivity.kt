@@ -345,7 +345,7 @@ class MainActivity :
     private val miniPlayerHeight: Int
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
 
-    private val bottomContainerHeight: Int
+    private val bottomNavigationHeight: Int
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
@@ -1270,7 +1270,7 @@ class MainActivity :
 
     private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomContainerHeight
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
         }
     }
 

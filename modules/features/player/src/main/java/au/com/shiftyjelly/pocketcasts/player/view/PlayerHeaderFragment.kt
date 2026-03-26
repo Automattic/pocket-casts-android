@@ -670,6 +670,7 @@ class PlayerHeaderFragment :
             }
             AnimatedNonNullVisibility(
                 item = if (transitionData.isTranscriptOpen) null else playbackIssue,
+                modifier = Modifier.padding(top = 8.dp),
                 enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                 exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
             ) { issue ->
@@ -677,12 +678,10 @@ class PlayerHeaderFragment :
                 PlaybackErrorInfoBar(
                     message = issue.message,
                     playerColors = playerColors,
-                    onClick = when (issue.type) {
-                        PlaybackIssueType.PLAYBACK -> {
-                            { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
-                        }
-
-                        PlaybackIssueType.CONNECTION -> null
+                    onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
+                        { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                    } else {
+                        null
                     },
                 )
             }
