@@ -69,13 +69,7 @@ class MainActivityViewModel
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
 
-    private val _isPlayerOpen = MutableStateFlow(false)
-    val isPlayerOpenFlow: StateFlow<Boolean> = _isPlayerOpen.asStateFlow()
-    var isPlayerOpen: Boolean
-        get() = _isPlayerOpen.value
-        set(value) {
-            _isPlayerOpen.value = value
-        }
+    var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
 
     val playbackIssueFlow: StateFlow<PlaybackIssueInfo?> = playbackIssueManager.playbackIssue

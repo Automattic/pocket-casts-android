@@ -490,11 +490,10 @@ class MainActivity :
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val playbackIssue by viewModel.playbackIssueFlow.collectAsStateWithLifecycle()
-                val playerOpen by viewModel.isPlayerOpenFlow.collectAsStateWithLifecycle()
 
                 AppTheme(theme.activeTheme) {
                     AnimatedNonNullVisibility(
-                        item = if (playerOpen) null else playbackIssue,
+                        item = playbackIssue,
                         enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) { issue ->
