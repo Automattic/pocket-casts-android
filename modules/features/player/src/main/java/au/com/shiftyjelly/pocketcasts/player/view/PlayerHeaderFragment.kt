@@ -646,7 +646,13 @@ class PlayerHeaderFragment :
                     playerColors = playerColors,
                     transitionData = transitionData,
                     modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
-                        .then(if (playbackIssue == null) Modifier.navigationBarsPadding() else Modifier),
+                        .then(
+                            if (playbackIssue == null || transitionData.isTranscriptOpen) {
+                                Modifier.navigationBarsPadding()
+                            } else {
+                                Modifier
+                            },
+                        ),
                 )
             } else {
                 HorizontalPlayerContent(
