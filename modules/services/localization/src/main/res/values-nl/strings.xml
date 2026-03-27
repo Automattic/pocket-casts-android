@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-27 14:58:01+0000
+Translation-Revision-Date: 2026-03-24 16:54:30+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">Wanneer Hierna de %d bereikt, wordt de laatste aflevering in de wachtrij automatisch verwijderd wanneer nieuwe afleveringen automatisch bovenaan worden toegevoegd. Afleveringen die zijn ingesteld op automatisch onderaan toevoegen worden pas toegevoegd als Hierna onder de limiet ligt.</string>
+    <string name="offline_icon_content_description">Offline-pictogram</string>
+    <string name="profile_last_refresh_at">Laatst vernieuwd: %s</string>
+    <string name="profile_just_now">Net</string>
     <string name="referrals_claim_guest_pass_description_installment">Gratis voor %1$s, daarna %2$s per maand voor %3$d maanden. Totale betaling: %4$s gedurende 1 jaar.</string>
     <string name="winback_claimed_offer_message_6">Bedankt dat je voor Pocket Casts kiest. Je abonnement van 12 maanden met korting gaat in na je huidige factuurperiode.</string>
     <string name="winback_claimed_offer_message_5">50% korting op je volgende jaar met maandelijkse betalingen!</string>
@@ -15,7 +19,6 @@ Language: nl
     <string name="error_download_socket_timeout">Time-out bij verbinding met de server van de podcastauteur. Controleer je internetverbinding.</string>
     <string name="error_download_too_many_attempts">Download geannuleerd na meerdere pogingen. Controleer je internetverbinding en opslag, probeer het daarna opnieuw.</string>
     <string name="error_download_io_failure">Downloaden van aflevering mislukt. Controleer je internet verbinding en opslag.</string>
-    <string name="error_download_suspicious_content_size">Downloaden van aflevering mislukt. Het gedownloade bestand is te klein. Neem contact op met de auteur van de podcast.</string>
     <string name="error_download_invalid_content_type">Downloaden van aflevering mislukt. Ontvangen contenttype %1$s. Neem contact op met de auteur van de podcast.</string>
     <string name="error_download_http_failure">Downloaden van aflevering mislukt. HTTP-statuscode %1$s ontvangen. Neem contact op met de auteur van de podcast.</string>
     <string name="episode_row_waiting_for_storage">Wachten op opslagruimte</string>
@@ -1387,7 +1390,6 @@ Language: nl
     <string name="error_playing_format">Bestand kan niet worden afgespeeld. Probeer het bestand om te zetten naar een andere indeling.</string>
     <string name="error_unable_to_play">Kan bestand niet afspelen</string>
     <string name="error_unable_to_cast">Kan deze aflevering niet casten. De aflevering is mogelijk niet beschikbaar bij de podcastauteur.</string>
-    <string name="error_streaming_try_downloading">Streaming is mislukt, probeer de podcast te downloaden.</string>
     <string name="error_streaming_internet">Streaming is mislukt, controleer je internetverbinding.</string>
     <string name="error_chartable_streaming">Streaming is mislukt. De producer gebruikt Chartable analytics dat geblokkeerd is. Als je een filterapp gebruikt zoals AdGuard, moet je chtbl.com op de whitelist zetten om de aflevering af te spelen.</string>
     <string name="error_chartable">De producer gebruikt Chartable analytics dat geblokkeerd is. Als je een filterapp gebruikt zoals AdGuard, moet je chtbl.com op de whitelist zetten om de aflevering af te spelen.</string>
@@ -1540,7 +1542,6 @@ Language: nl
     <string name="settings_auto_play_summary">Kies automatisch een aflevering voor me als er niets meer is om af te spelen</string>
     <string name="settings_auto_play">Automatisch afspelen</string>
     <string name="settings_auto_download_up_next">Afleveringen die zijn toegevoegd aan Hierna</string>
-    <string name="settings_auto_download_unmetered_summary">Door dit uit te schakelen worden ook downloads op mobiele netwerken en op andere netwerken met limiet ingeschakeld. Controleer je netwerkinstellingen voor meer informatie.</string>
     <string name="settings_auto_download_unmetered">Alleen wifi zonder limiet</string>
     <string name="settings_auto_download_podcasts">Podcasts automatisch downloaden</string>
     <string name="settings_auto_download_new_episodes">Nieuwe afleveringen</string>
