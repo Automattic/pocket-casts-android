@@ -162,10 +162,12 @@ class SharingClient(
         is SharingRequest.Data.EpisodeFile -> {
             val file = data.episode.downloadedFilePath?.let(::File)
             if (file?.exists() == true) {
+                val shareableFile = getShareableFile(file)
                 Intent()
                     .setAction(Intent.ACTION_SEND)
-                    .setType(data.episode.fileType)
-                    .setExtraStream(file)
+                    .setType(data.episode.fileType ?: "application/octet-stream")
+                    .setExtraStream(shareableFile)
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                     .toChooserIntent()
                     .share()
                 SharingResponse(
@@ -324,6 +326,19 @@ class SharingClient(
                 feedbackMessage = null,
                 error = null,
             )
+        }
+    }
+
+    private suspend fun getShareableFile(file: File): File {
+        return try {
+            FileUtil.getUriForFile(context, file)
+            file
+        } catch (_: IllegalArgumentException) {
+            withContext(Dispatchers.IO) {
+                val cacheFile = File(context.cacheDir, file.name)
+                FileUtil.copy(file, cacheFile)
+                cacheFile
+            }
         }
     }
 
@@ -635,7 +650,7 @@ data class SharingRequest internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
         ) : Data {
-            override fun toString() = "EpisodeFile(title=${episode.title}, uuid=${episode.uuid}"
+            override fun toString() = "EpisodeFile(title=${episode.title}, uuid=${episode.uuid}, path=${episode.downloadedFilePath}, fileType=${episode.fileType})"
         }
 
         class ClipLink internal constructor(

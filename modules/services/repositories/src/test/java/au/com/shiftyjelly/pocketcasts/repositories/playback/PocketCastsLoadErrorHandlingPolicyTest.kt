@@ -10,7 +10,6 @@ import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.BASE_DELAY_MS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_DELAY_MS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MANIFEST
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadErrorHandlingPolicy.Companion.MAX_RETRIES_MEDIA
@@ -31,8 +30,6 @@ import org.robolectric.annotation.Config
 class PocketCastsLoadErrorHandlingPolicyTest {
 
     private val policy = PocketCastsLoadErrorHandlingPolicy()
-
-    // region Error Classification — HTTP codes
 
     @Test
     fun `HTTP 404 is non-retryable`() {
@@ -106,15 +103,11 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(ErrorClassification.RetryableHttp(599), classification)
     }
 
-    // endregion
-
-    // region Error Classification — Exception types
-
     @Test
-    fun `ParserException is non-retryable`() {
+    fun `ParserException is classified as retryable parser error`() {
         val exception = ParserException.createForMalformedContainer("bad data", null)
         val classification = policy.classifyError(exception)
-        assertEquals(ErrorClassification.NonRetryable, classification)
+        assertEquals(ErrorClassification.RetryableParser, classification)
     }
 
     @Test
@@ -131,10 +124,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(ErrorClassification.RetryableNetwork, classification)
     }
 
-    // endregion
-
-    // region Exponential Backoff (no jitter)
-
     @Test
     fun `exponential backoff follows expected progression`() {
         assertEquals(1_000L, policy.exponentialBackoff(1))
@@ -150,10 +139,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         assertEquals(MAX_DELAY_MS, policy.exponentialBackoff(10))
         assertEquals(MAX_DELAY_MS, policy.exponentialBackoff(100))
     }
-
-    // endregion
-
-    // region getRetryDelayMsFor — integration
 
     @Test
     fun `HTTP 416 returns TIME_UNSET on first attempt`() {
@@ -244,9 +229,29 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         )
     }
 
-    // endregion
+    @Test
+    fun `ParserException uses exponential backoff delay`() {
+        val errorCount = 2
+        val loadErrorInfo = createLoadErrorInfo(
+            exception = ParserException.createForMalformedContainer("bad data", null),
+            errorCount = errorCount,
+            dataType = C.DATA_TYPE_MEDIA,
+        )
+        assertEquals(
+            policy.exponentialBackoff(errorCount),
+            policy.getRetryDelayMsFor(loadErrorInfo),
+        )
+    }
 
-    // region getMinimumLoadableRetryCount
+    @Test
+    fun `ParserException stops retrying after exceeding max media retries`() {
+        val loadErrorInfo = createLoadErrorInfo(
+            exception = ParserException.createForMalformedContainer("bad data", null),
+            errorCount = MAX_RETRIES_MEDIA + 1,
+            dataType = C.DATA_TYPE_MEDIA,
+        )
+        assertEquals(C.TIME_UNSET, policy.getRetryDelayMsFor(loadErrorInfo))
+    }
 
     @Test
     fun `getMinimumLoadableRetryCount returns MAX_VALUE for media`() {
@@ -262,10 +267,6 @@ class PocketCastsLoadErrorHandlingPolicyTest {
     fun `getMinimumLoadableRetryCount returns MAX_VALUE for other`() {
         assertEquals(Int.MAX_VALUE, policy.getMinimumLoadableRetryCount(C.DATA_TYPE_DRM))
     }
-
-    // endregion
-
-    // region Helpers
 
     private fun createHttpException(responseCode: Int): InvalidResponseCodeException {
         val dataSpec = DataSpec(Uri.parse("https://example.com/episode.mp3"))
@@ -298,6 +299,4 @@ class PocketCastsLoadErrorHandlingPolicyTest {
             errorCount,
         )
     }
-
-    // endregion
 }

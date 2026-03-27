@@ -1847,7 +1847,14 @@
     <string name="error_chartable">The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_chartable_streaming">Streaming failed. The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_streaming_internet">Streaming failed check your internet connection.</string>
-    <string name="error_streaming_try_downloading">Streaming failed try downloading the podcast.</string>
+    <string name="error_streaming_try_downloading">Streaming failed. Try downloading the episode.</string>
+    <string name="error_streaming_access_denied">You no longer have access to play this episode.</string>
+    <string name="error_streaming_not_found">This episode could not be found on the server. It may have been removed by the publisher.</string>
+    <string name="error_streaming_no_longer_available">This episode is no longer available from the publisher.</string>
+    <string name="error_streaming_server_error">The podcast server is experiencing issues. Please try again later.</string>
+    <string name="error_decoder_initialization">Unable to play this audio format on your device.</string>
+    <string name="error_audio_output">Could not play audio. Please check your audio output device and try again.</string>
+    <string name="error_cast_connection_failed">Could not connect to the Chromecast device. Please check the device and try again.</string>
     <string name="error_unable_to_cast_local">Unable to cast local file</string>
     <string name="error_unable_to_cast">Unable to cast this episode. It may not be available from the podcast author.</string>
     <string name="error_unable_to_play">Unable to play file</string>
@@ -1865,6 +1872,7 @@
     <string name="error_login_failed">Unable to login to your sync account, sorry. Please try again later.</string>
     <string name="error_search_failed">Search Failed</string>
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
+    <string name="error_playback_offline">You\'re offline</string>
     <string name="error_download_missing_episode">Unable to find the episode data on this device. Please contact support.</string>
     <string name="error_download_no_episode_file">Unable to create a download file for the episode. Please check that you have enough storage space on your device.</string>
     <string name="error_download_invalid_url">The episode URL is invalid. Please contact the podcast author.</string>

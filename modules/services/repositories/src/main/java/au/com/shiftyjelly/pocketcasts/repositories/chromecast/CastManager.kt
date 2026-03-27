@@ -17,5 +17,6 @@ interface CastManager {
         fun sessionStarted()
         fun sessionEnded()
         fun sessionReconnected()
+        fun sessionFailed(errorCode: Int) {}
     }
 }

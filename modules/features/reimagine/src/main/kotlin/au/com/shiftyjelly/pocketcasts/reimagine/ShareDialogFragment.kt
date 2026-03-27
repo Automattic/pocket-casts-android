@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -197,15 +198,20 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
             )
             if (episode.isDownloaded) {
                 add(
-                    shareOption(
-                        textId = LR.string.podcast_share_open_file_in,
-                        textColor = textColor,
-                        onClick = {
+                    OptionsDialogOption(
+                        titleId = LR.string.podcast_share_open_file_in,
+                        titleColor = textColor?.toArgb(),
+                        click = {
+                            val appContext = requireContext().applicationContext
                             lifecycleScope.launch(NonCancellable) {
                                 val request = SharingRequest
                                     .episodeFile(podcast, episode, args.source)
                                     .build()
-                                sharingClient.share(request)
+                                val response = sharingClient.share(request)
+                                if (!response.isSuccessful && response.feedbackMessage != null) {
+                                    Toast.makeText(appContext, response.feedbackMessage, Toast.LENGTH_SHORT).show()
+                                }
+                                dismiss()
                             }
                         },
                     ),
