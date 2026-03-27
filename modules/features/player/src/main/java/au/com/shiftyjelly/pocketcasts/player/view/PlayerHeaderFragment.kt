@@ -266,6 +266,7 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         transitionData = transitionData,
                         isPortraitPlayer = isPortraitPlayer,
+                        isPlayerOpen = isPlayerOpen,
                         playbackIssue = playbackIssue,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
@@ -643,6 +644,7 @@ class PlayerHeaderFragment :
         playerColors: PlayerColors,
         transitionData: TranscriptTransitionData,
         isPortraitPlayer: Boolean,
+        isPlayerOpen: Boolean,
         playbackIssue: PlaybackIssueInfo?,
         modifier: Modifier = Modifier,
     ) {
@@ -684,8 +686,10 @@ class PlayerHeaderFragment :
                         .background(playerColors.contrast06)
                         .navigationBarsPadding(),
                 ) {
-                    LaunchedEffect(issue) {
-                        eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                    LaunchedEffect(issue, isPlayerOpen) {
+                        if (isPlayerOpen) {
+                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        }
                     }
 
                     PlaybackErrorInfoBar(
@@ -693,7 +697,9 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
                             {
-                                eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                if (isPlayerOpen) {
+                                    eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                }
                                 PlaybackIssuesBottomSheetFragment.show(parentFragmentManager)
                             }
                         } else {

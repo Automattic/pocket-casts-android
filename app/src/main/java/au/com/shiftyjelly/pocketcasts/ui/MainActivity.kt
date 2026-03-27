@@ -504,14 +504,18 @@ class MainActivity :
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) { issue ->
                         LaunchedEffect(issue) {
-                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            if (!viewModel.isPlayerOpen) {
+                                eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            }
                         }
                         PlaybackErrorInfoBar(
                             message = issue.message,
                             onClick = when (issue.type) {
                                 PlaybackIssueType.PLAYBACK -> {
                                     {
-                                        eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        if (!viewModel.isPlayerOpen) {
+                                            eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        }
                                         PlaybackIssuesBottomSheetFragment.show(supportFragmentManager)
                                     }
                                 }
