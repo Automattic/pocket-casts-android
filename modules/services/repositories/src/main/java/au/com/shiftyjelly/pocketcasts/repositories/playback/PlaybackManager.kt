@@ -5,8 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
-import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -156,6 +156,7 @@ open class PlaybackManager @Inject constructor(
     private val upNextHistoryManager: UpNextHistoryManager,
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
+    private val browseTreeProvider: BrowseTreeProvider,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -238,8 +239,12 @@ open class PlaybackManager @Inject constructor(
         context = application,
         eventHorizon = eventHorizon,
         bookmarkManager = bookmarkManager,
+        browseTreeProvider = browseTreeProvider,
         applicationScope = applicationScope,
     )
+
+    val mediaSession: android.support.v4.media.session.MediaSessionCompat?
+        get() = mediaSessionManager.mediaSession
 
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
@@ -249,9 +254,6 @@ open class PlaybackManager @Inject constructor(
         set(value) {
             _playerFlow.value = value
         }
-
-    val mediaSession: MediaSessionCompat
-        get() = mediaSessionManager.mediaSession
 
     @SuppressLint("CheckResult")
     fun setup() {
@@ -1212,6 +1214,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+            mediaSessionManager.installCastPlayer()
             (player as? CastPlayer)?.updateFromRemoteIfRequired()
             Timber.i("Cast reconnected. Creating media player of type CastPlayer")
 
@@ -1335,6 +1338,9 @@ open class PlaybackManager @Inject constructor(
             withContext(Dispatchers.Main) {
                 playbackStateRelay.blockingFirst().let { playbackState ->
                     if (playbackState.isBuffering == isBuffering) {
+                        if (player is CastPlayer) {
+                            updateCastMediaSessionState()
+                        }
                         return@withContext
                     }
                     playbackStateRelay.accept(
@@ -1344,6 +1350,10 @@ open class PlaybackManager @Inject constructor(
                             lastChangeFrom = LastChangeFrom.OnBufferingStateChanged.value,
                         ),
                     )
+
+                    if (player is CastPlayer) {
+                        updateCastMediaSessionState()
+                    }
                 }
             }
         }
@@ -1355,6 +1365,10 @@ open class PlaybackManager @Inject constructor(
 
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, transientLoss = false, lastChangeFrom = LastChangeFrom.OnPlayerPlaying.value))
+        }
+
+        if (player is CastPlayer) {
+            launch(Dispatchers.Main) { updateCastMediaSessionState() }
         }
 
         episodeManager.updatePlayingStatusBlocking(episode, EpisodePlayingStatus.IN_PROGRESS)
@@ -1369,6 +1383,10 @@ open class PlaybackManager @Inject constructor(
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PAUSED, lastChangeFrom = LastChangeFrom.OnPlayerPaused.value))
+            }
+
+            if (player is CastPlayer) {
+                updateCastMediaSessionState()
             }
         }
 
@@ -1387,6 +1405,19 @@ open class PlaybackManager @Inject constructor(
 
         cancelUpdateTimer()
         setupPauseTimer()
+    }
+
+    /**
+     * Pushes the current cast playback state to the Media3 session.
+     * Must be called on the main thread.
+     */
+    @MainThread
+    private fun updateCastMediaSessionState() {
+        val state = playbackStateRelay.blockingFirst()
+        val isPlaying = state.state == PlaybackState.State.PLAYING
+        val isBuffering = state.isBuffering
+        val positionMs = state.positionMs.toLong()
+        mediaSessionManager.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
     private suspend fun onCompletion(episodeUUID: String?) {
@@ -2152,6 +2183,15 @@ open class PlaybackManager @Inject constructor(
 
         player?.play(currentTimeMs)
 
+        // SimplePlayer creates its ExoPlayer lazily in prepare(), which is called
+        // inside play(). Now that the ExoPlayer exists, install it into the Media3
+        // session so the notification system can monitor the player state.
+        withContext(Dispatchers.Main) {
+            (player as? SimplePlayer)?.exoPlayer?.let {
+                mediaSessionManager.installPlayer(it)
+            }
+        }
+
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
         trackPlaybackEvent(sourceView) { source, contentType ->
@@ -2187,9 +2227,13 @@ open class PlaybackManager @Inject constructor(
             player?.stop()
             if (castManager.isConnected()) {
                 player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                mediaSessionManager.installCastPlayer()
                 Timber.i("Creating media player of type CastPlayer.")
             } else {
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
+                // Start the service early so it's ready when we install the player later.
+                // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
+                mediaSessionManager.startServiceIfNeeded(application)
                 Timber.i("Creating media player of type SimplePlayer.")
             }
         }
