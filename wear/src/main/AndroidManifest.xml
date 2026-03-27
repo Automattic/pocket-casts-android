@@ -77,9 +77,23 @@
             </intent-filter>
         </activity>
 
+        <!-- Both services start disabled; PlaybackServiceToggle enables the correct one. -->
         <service
             android:name=".repositories.playback.PlaybackService"
             android:exported="true"
+            android:enabled="false"
+            android:foregroundServiceType="mediaPlayback"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+                <action android:name="androidx.media3.session.MediaLibraryService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".repositories.playback.LegacyPlaybackService"
+            android:exported="true"
+            android:enabled="false"
             android:foregroundServiceType="mediaPlayback"
             android:label="@string/app_name">
             <intent-filter>
