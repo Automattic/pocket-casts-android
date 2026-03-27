@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -30,18 +31,21 @@ internal class SleepTimerHandler(
     private val scope: CoroutineScope,
 ) {
     private var sleepTimerDisposable: Disposable? = null
+    private var observeJob: Job? = null
 
     @Volatile
     private var currentTimeLeft: Duration = ZERO
 
     fun observe() {
-        sleepTimer.stateFlow
+        observeJob = sleepTimer.stateFlow
             .onEach { state -> onSleepTimerStateChange(state) }
             .catch { throwable -> Timber.e(throwable, "Error observing SleepTimer state") }
             .launchIn(scope)
     }
 
     fun dispose() {
+        observeJob?.cancel()
+        observeJob = null
         sleepTimerDisposable?.dispose()
         sleepTimerDisposable = null
         currentTimeLeft = ZERO
@@ -85,7 +89,7 @@ internal class SleepTimerHandler(
                         dispose()
                     }
                 }
-                .subscribe()
+                .subscribe({}, { e -> Timber.e(e, "Sleep timer interval error") })
         } else {
             currentTimeLeft = newTimeLeft
         }
