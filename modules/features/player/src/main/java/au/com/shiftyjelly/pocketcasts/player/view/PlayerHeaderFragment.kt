@@ -688,8 +688,10 @@ class PlayerHeaderFragment :
                 ) {
                     val context = LocalContext.current
 
-                    LaunchedEffect(issue) {
-                        eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                    LaunchedEffect(issue, isPlayerOpen) {
+                        if (isPlayerOpen) {
+                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        }
                     }
 
                     PlaybackErrorInfoBar(
@@ -697,7 +699,9 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
                             {
-                                eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                if (isPlayerOpen) {
+                                    eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                }
                                 context.startActivityViewUrl(Settings.INFO_FAQ_URL)
                             }
                         } else {

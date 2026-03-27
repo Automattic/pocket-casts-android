@@ -506,14 +506,18 @@ class MainActivity :
                     ) { issue ->
                         val context = LocalContext.current
                         LaunchedEffect(issue) {
-                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            if (!viewModel.isPlayerOpen) {
+                                eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            }
                         }
                         PlaybackErrorInfoBar(
                             message = issue.message,
                             onClick = when (issue.type) {
                                 PlaybackIssueType.PLAYBACK -> {
                                     {
-                                        eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        if (!viewModel.isPlayerOpen) {
+                                            eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        }
                                         context.startActivityViewUrl(Settings.INFO_FAQ_URL)
                                     }
                                 }
