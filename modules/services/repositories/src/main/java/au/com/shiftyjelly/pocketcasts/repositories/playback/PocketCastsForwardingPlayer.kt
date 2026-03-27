@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Looper
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -85,7 +83,7 @@ class PocketCastsForwardingPlayer(
         episode: BaseEpisode,
         podcast: Podcast?,
         showArtwork: Boolean = true,
-        artworkBitmap: Bitmap? = null,
+        artworkData: ByteArray? = null,
     ) {
         checkMainThread()
 
@@ -104,16 +102,8 @@ class PocketCastsForwardingPlayer(
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
             .setUserRating(buildRating(episode))
 
-        if (showArtwork && artworkBitmap != null) {
-            val stream = java.io.ByteArrayOutputStream()
-            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Bitmap.CompressFormat.WEBP_LOSSY
-            } else {
-                @Suppress("DEPRECATION")
-                Bitmap.CompressFormat.WEBP
-            }
-            artworkBitmap.compress(format, 80, stream)
-            metadataBuilder.setArtworkData(stream.toByteArray(), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+        if (showArtwork && artworkData != null) {
+            metadataBuilder.setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
         }
 
         val metadata = metadataBuilder.build()
