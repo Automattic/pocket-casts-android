@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 13:57:05+0000
+Translation-Revision-Date: 2026-03-24 11:56:49+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">当“接下来播放”中的剧集数量达到 %d，自动添加到顶部的新剧集将删除队列中的最后一集。 设置为自动添加到底部的剧集将不会添加，直到“接下来播放”中的剧集数量低于限制。</string>
+    <string name="offline_icon_content_description">离线图标</string>
+    <string name="profile_last_refresh_at">上次刷新时间：%s</string>
+    <string name="profile_just_now">刚才</string>
     <string name="referrals_claim_guest_pass_description_installment">免费 %1$s，然后每月 %2$s，持续 %3$d 个月。 总承诺：%4$s，为期超过 1 年。</string>
     <string name="winback_claimed_offer_message_6">感谢您选用 Pocket Casts。 您的 12 个月分期付款优惠计划将在当前计费周期结束后开始生效。</string>
     <string name="winback_claimed_offer_message_5">按月付款即可享受次年半价优惠！</string>
@@ -15,7 +19,6 @@ Language: zh_CN
     <string name="error_download_too_many_attempts">多次尝试下载后已取消。 请检查您的互联网连接和存储空间，然后重试。</string>
     <string name="error_download_io_failure">下载该集失败。 请检查您的互联网连接和存储空间。</string>
     <string name="error_download_socket_timeout">与播客作者服务器的连接超时。 请检查您的互联网连接。</string>
-    <string name="error_download_suspicious_content_size">下载该集失败。 下载的文件过小。 请联系播客作者。</string>
     <string name="error_download_invalid_content_type">下载该集失败。 已收到内容类型 %1$s。 请联系播客作者。</string>
     <string name="error_download_http_failure">下载该集失败。 已收到 HTTP 状态代码 %1$s。 请联系播客作者。</string>
     <string name="episode_row_waiting_for_storage">正在等待存储空间</string>
@@ -1390,7 +1393,6 @@ Language: zh_CN
     <string name="error_playing_format">无法播放文件。 尝试转换为其他格式。</string>
     <string name="error_unable_to_play">无法播放文件</string>
     <string name="error_unable_to_cast">无法投射此剧集。 播客作者可能无法提供此功能。</string>
-    <string name="error_streaming_try_downloading">流式传输失败，请尝试下载播客。</string>
     <string name="error_streaming_internet">流式传输失败，请检查您的互联网连接。</string>
     <string name="error_chartable_streaming">流式传输失败。 制作人正在使用被屏蔽的 Chartable 分析，如果您运行任何筛选应用程序（如 AdGuard），则需要将 chtbl.com 列入白名单以播放剧集。</string>
     <string name="error_chartable">制作人正在使用被屏蔽的 Chartable 分析，如果您运行任何筛选应用程序（如 AdGuard），则需要将 chtbl.com 列入白名单以播放剧集。</string>
@@ -1549,7 +1551,6 @@ Language: zh_CN
     <string name="settings_auto_play_summary">当没有剩余内容可供播放时，自动为我选择一个剧集</string>
     <string name="settings_auto_play">自动播放</string>
     <string name="settings_auto_download_up_next">剧集已添加到“接下来播放”列表</string>
-    <string name="settings_auto_download_unmetered_summary">关闭此功能将允许在蜂窝网络和其他计量网络上下载。 有关详细信息，请检查您的网络设置。</string>
     <string name="settings_auto_download_unmetered">仅通过不计费的 WiFi 下载</string>
     <string name="settings_auto_download_podcasts">自动下载播客</string>
     <string name="settings_auto_download_new_episodes">新剧集</string>

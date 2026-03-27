@@ -229,12 +229,12 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
             is DownloadResult.InvalidContentType -> {
                 downloadError.reason = EpisodeDownloadError.Reason.ContentType
-                context.getString(LR.string.error_download_invalid_content_type, result.contentType) to false
+                context.getString(LR.string.error_download_invalid_content_type, result.contentType) to true
             }
 
             is DownloadResult.SuspiciousFileSize -> {
                 downloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
-                context.getString(LR.string.error_download_suspicious_content_size) to false
+                context.getString(LR.string.error_download_suspicious_content_size) to true
             }
 
             is DownloadResult.ExceptionFailure -> {
