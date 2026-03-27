@@ -180,7 +180,7 @@ open class LegacyPlaybackService :
         launch {
             try {
                 val items = browseTreeProvider.search(query, this@LegacyPlaybackService)
-                result.sendResult(items?.let { MediaItemCompatConverter.toCompatList(it) })
+                result.sendResult(items?.let { MediaItemCompatConverter.toCompatList(it) } ?: emptyList())
             } catch (e: Exception) {
                 Timber.e(e, "Search failed for: $query")
                 result.sendResult(emptyList())
