@@ -548,7 +548,6 @@ Language: nb_NO
     <string name="error_unable_to_play">Kan ikke spille av fil</string>
     <string name="error_unable_to_cast">Kan ikke sende denne episoden. Den er kanskje ikke tilgjengelig fra podcast-forfatteren.</string>
     <string name="error_unable_to_cast_local">Kan ikke sende lokal fil</string>
-    <string name="error_streaming_try_downloading">Strømming mislyktes. Prøv å laste ned podcasten.</string>
     <string name="error_streaming_internet">Strømming mislyktes. Sjekk Internett-tilkoblingen.</string>
     <string name="error_chartable_streaming">Strømming mislyktes. Produsenten bruker Chartable-analyse, som er blokkert. Hvis du kjører en filtreringsapp, for eksempel AdGuard, må du hviteliste chtbl.com for å spille av episoden.</string>
     <string name="error_chartable">Produsenten bruker Chartable-analyse, som er blokkert. Hvis du kjører en filtreringsapp, for eksempel AdGuard, må du hviteliste chtbl.com for å spille av episoden.</string>
@@ -750,7 +749,6 @@ Language: nb_NO
     <string name="settings_auto_play_summary">Velg en episode for meg automatisk når det ikke er noe igjen for avspilling</string>
     <string name="settings_auto_play">Automatisk avspilling</string>
     <string name="settings_auto_download_up_next">Episoder lagt til i Neste</string>
-    <string name="settings_auto_download_unmetered_summary">Hvis du slår av dette, tillates nedlastinger både på mobilnettverk og andre forbruksmålte nettverk. Kontroller nettverksinnstillingene for å få mer informasjon.</string>
     <string name="settings_auto_download_unmetered">Bare på ikke-forbruksmålt WiFi</string>
     <string name="settings_auto_download_podcasts">Last ned podcaster automatisk</string>
     <string name="settings_auto_download_new_episodes">Nye episoder</string>

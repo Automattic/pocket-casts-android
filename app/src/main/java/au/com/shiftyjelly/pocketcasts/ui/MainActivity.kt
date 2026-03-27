@@ -25,6 +25,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -210,6 +211,9 @@ import com.automattic.eventhorizon.EndOfYearModalShownEvent
 import com.automattic.eventhorizon.EndOfYearModalTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FiltersTabOpenedEvent
+import com.automattic.eventhorizon.PlaybackErrorShownEvent
+import com.automattic.eventhorizon.PlaybackErrorTappedEvent
+import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.PodcastsTabOpenedEvent
 import com.automattic.eventhorizon.ProfileTabOpenedEvent
 import com.automattic.eventhorizon.UpNextDismissedEvent
@@ -501,11 +505,21 @@ class MainActivity :
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) { issue ->
                         val context = LocalContext.current
+                        LaunchedEffect(issue) {
+                            if (!viewModel.isPlayerOpen) {
+                                eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            }
+                        }
                         PlaybackErrorInfoBar(
                             message = issue.message,
                             onClick = when (issue.type) {
                                 PlaybackIssueType.PLAYBACK -> {
-                                    { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                                    {
+                                        if (!viewModel.isPlayerOpen) {
+                                            eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        }
+                                        context.startActivityViewUrl(Settings.INFO_FAQ_URL)
+                                    }
                                 }
 
                                 PlaybackIssueType.CONNECTION -> null

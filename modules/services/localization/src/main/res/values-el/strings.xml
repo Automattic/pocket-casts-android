@@ -1241,7 +1241,6 @@ Language: el_GR
     <string name="settings_up_next_tap_summary">Αν είναι ενεργό, το πάτημα σε ένα στοιχείο στην Επόμενο ουρά σου θα το αναπαράγει. Η παρατεταμένη πίεση θα δείξει τις επιλογές επεισοδίων.</string>
     <string name="settings_auto_play">Αυτόματη αναπαραγωγή</string>
     <string name="settings_auto_download_up_next">Επεισόδια προστέθηκαν στο Επόμενο</string>
-    <string name="settings_auto_download_unmetered_summary">Απενεργοποιώντας το θα επιτρέψει τις λήψεις με δεδομένα καθώς και σε άλλα δίκτυα με ογκοχρέωση. Έλεγξε τις ρυθμίσεις του δικτύου σου για περισσότερες πληροφορίες.</string>
     <string name="settings_auto_download_unmetered">Μόνο σε WiFi χωρίς ογκοχρέωση</string>
     <string name="settings_auto_download_podcasts">Αυτόματη λήψη podcasts</string>
     <string name="settings_auto_download_new_episodes">Νέα επεισόδια</string>
@@ -1295,7 +1294,6 @@ Language: el_GR
     <string name="error_playing_format">Το αρχείο δεν μπορεί να αναπαραχθεί. Δοκίμασε να το μετατρέψεις σε άλλη μορφή.</string>
     <string name="error_unable_to_cast">Δεν είναι δυνατή η αναπαραγωγή αυτού του επεισοδίου. Μπορεί να μην είναι διαθέσιμο από τον δημιουργό του podcast.</string>
     <string name="error_unable_to_cast_local">Αδυναμία μετάδοσης τοπικού αρχείου</string>
-    <string name="error_streaming_try_downloading">Η ροή απέτυχε, δοκίμασε να κατεβάσεις το podcast.</string>
     <string name="error_streaming_internet">Η ροή απέτυχε, έλεγξε τη σύνδεση στο διαδίκτυο.</string>
     <string name="error_chartable_streaming">Η ροή απέτυχε. Ο παραγωγός χρησιμοποιεί αναλύσεις Chartable που μπλοκάρονται, αν τρέχεις κάποια εφαρμογή φιλτραρίσματος όπως το AdGuard, θα χρειαστεί να προσθέσεις το chtbl.com στη λίστα επιτρεπόμενων για να παίξεις το επεισόδιο.</string>
     <string name="settings_status_service_support_summary">Μπες στις Συχνές ερωτήσεις υποστήριξης και επικοινώνησε μαζί μας.</string>

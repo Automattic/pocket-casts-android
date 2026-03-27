@@ -171,6 +171,7 @@ media3-datasource-okhttp = { module = "androidx.media3:media3-datasource-okhttp"
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 media3-extractor = { module = "androidx.media3:media3-extractor", version.ref = "media3" }
+media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 
@@ -281,7 +282,7 @@ compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"
 device-names = "com.jaredrummler:android-device-names:2.1.1"
 encryptedlogging = "com.automattic:encryptedlogging:1.1.1"
-eventhorizon = "com.automattic:eventhorizon:pocket-casts-2026-03-24_09-18-45"
+eventhorizon = "com.automattic:eventhorizon:pocket-casts-2026-03-27_16-07-00"
 engage = "com.google.android.engage:engage-core:1.5.11"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 guava = "com.google.guava:guava:33.5.0-android" # Required to fix conflict between versions in exoplayer and workmanager

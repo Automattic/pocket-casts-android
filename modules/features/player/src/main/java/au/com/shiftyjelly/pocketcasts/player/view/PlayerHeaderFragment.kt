@@ -137,6 +137,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackErrorShownEvent
+import com.automattic.eventhorizon.PlaybackErrorTappedEvent
+import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.TranscriptDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
@@ -174,6 +178,9 @@ class PlayerHeaderFragment :
 
     @Inject
     lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
@@ -680,11 +687,23 @@ class PlayerHeaderFragment :
                         .navigationBarsPadding(),
                 ) {
                     val context = LocalContext.current
+
+                    LaunchedEffect(issue, isPlayerOpen) {
+                        if (isPlayerOpen) {
+                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        }
+                    }
+
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
                         onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
-                            { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                            {
+                                if (isPlayerOpen) {
+                                    eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                }
+                                context.startActivityViewUrl(Settings.INFO_FAQ_URL)
+                            }
                         } else {
                             null
                         },
