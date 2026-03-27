@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,7 +66,6 @@ class BrowseTreeProvider @Inject constructor(
     private val upNextQueue: UpNextQueue,
     private val settings: Settings,
     private val serviceManager: ServiceManager,
-    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val listRepository: ListRepository,
 ) {
 
