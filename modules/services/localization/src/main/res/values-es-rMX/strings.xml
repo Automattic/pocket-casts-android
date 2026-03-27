@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-27 14:56:34+0000
+Translation-Revision-Date: 2026-03-24 11:58:32+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">Cuando A continuación llegue a %d, los episodios nuevos que se añadan automáticamente al principio eliminarán el último episodio de la cola. Los episodios configurados para que se añadan automáticamente al final no se añadirán hasta que A continuación esté por debajo del límite.</string>
+    <string name="offline_icon_content_description">Icono sin conexión</string>
+    <string name="profile_last_refresh_at">Última actualización: %s</string>
+    <string name="profile_just_now">Justo ahora</string>
     <string name="referrals_claim_guest_pass_description_installment">Gratis durante %1$s y después %2$s al mes durante %3$d meses. Compromiso total: %4$s más de 1 año.</string>
     <string name="winback_claimed_offer_message_6">Gracias por elegir Pocket Casts. Tu plan de 12 plazos con descuento empezará después de tu periodo de facturación actual.</string>
     <string name="winback_claimed_offer_message_5">¡50 % de descuento en tu próximo año con pagos mensuales!</string>
@@ -15,7 +19,6 @@ Language: es
     <string name="error_download_socket_timeout">Se ha agotado el tiempo de espera de la conexión con el servidor del autor del podcast. Comprueba tu conexión a Internet.</string>
     <string name="error_download_too_many_attempts">Descarga cancelada después de varios intentos. Revisa tu conexión a Internet y el almacenaje e inténtalo de nuevo.</string>
     <string name="error_download_io_failure">Error al descargar el episodio. Por favor, revisa tu conexión a Internet y el almacenaje.</string>
-    <string name="error_download_suspicious_content_size">Error al descargar el episodio. El archivo descargado es demasiado pequeño. Ponte en contacto con el autor del podcast.</string>
     <string name="error_download_invalid_content_type">Error al descargar el episodio. Tipo de contenido recibido %1$s. Ponte en contacto con el autor del podcast.</string>
     <string name="error_download_http_failure">Error al descargar el episodio. Se ha recibido el código de estado HTTP %1$s. Ponte en contacto con el autor del podcast.</string>
     <string name="episode_row_waiting_for_storage">Esperando espacio de almacenamiento</string>
@@ -1383,7 +1386,6 @@ Language: es
     <string name="error_playing_format">No se puede reproducir el archivo. Prueba a convertirlo a otro formato.</string>
     <string name="error_unable_to_play">No se puede reproducir el archivo</string>
     <string name="error_unable_to_cast">No se puede emitir este episodio. Es posible que el autor del podcast no lo haya puesto a disposición de la gente.</string>
-    <string name="error_streaming_try_downloading">Se ha producido un error con la emisión en directo; prueba a descargar el podcast.</string>
     <string name="error_streaming_internet">Se ha producido un error con la emisión en directo, comprueba tu conexión a Internet.</string>
     <string name="error_chartable_streaming">Se ha producido un error con la emisión en directo. El productor usa las estadísticas de Chartable, que están bloqueadas. Si utilizas alguna aplicación de filtrado, como AdGuard, tendrás que añadir chtbl.com a la lista blanca para reproducir el episodio.</string>
     <string name="error_chartable">El productor usa las estadísticas de Chartable, que están bloqueadas. Si utilizas alguna aplicación de filtrado, como AdGuard, tendrás que añadir chtbl.com a la lista blanca para reproducir el episodio.</string>
@@ -1539,7 +1541,6 @@ Language: es
     <string name="settings_auto_play_summary">Cuando no quede nada para reproducir, elige por mí un episodio automáticamente</string>
     <string name="settings_auto_play">Reproducir automáticamente</string>
     <string name="settings_auto_download_up_next">Episodios añadidos a A continuación</string>
-    <string name="settings_auto_download_unmetered_summary">Si desactivas esta opción, se podrán descargar archivos con redes móviles y con otro tipo de redes de uso medido. Comprueba la configuración de red para obtener más información.</string>
     <string name="settings_auto_download_unmetered">Solo con wifi no medida</string>
     <string name="settings_auto_download_podcasts">Descargar podcasts automáticamente</string>
     <string name="settings_auto_download_new_episodes">Nuevos episodios</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 11:55:10+0000
+Translation-Revision-Date: 2026-03-24 11:58:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">Quando Successivo raggiunge %d, i nuovi episodi aggiunti automaticamente tra i primi rimuoveranno l\'ultimo episodio in coda. Gli episodi impostati come aggiunta automatica alla fine non verranno aggiunti finché Successivo non sarà sotto il limite.</string>
+    <string name="offline_icon_content_description">Icona offline</string>
+    <string name="profile_last_refresh_at">Ultimo aggiornamento: %s</string>
+    <string name="profile_just_now">In questo momento</string>
     <string name="referrals_claim_guest_pass_description_installment">Gratuito per %1$s, poi %2$s al mese per %3$d mesi. Impegno totale: %4$s per 1 anno.</string>
     <string name="winback_claimed_offer_message_6">Grazie per aver scelto Pocket Casts. Il tuo piano rateale di 12 mesi a un prezzo scontato inizierà al termine del periodo di fatturazione attuale.</string>
     <string name="winback_claimed_offer_message_5">50% di sconto per il prossimo anno con pagamenti mensili!</string>
@@ -15,7 +19,6 @@ Language: it
     <string name="error_download_too_many_attempts">Download annullato dopo più tentativi. Controlla la connessione a Internet e lo spazio di archiviazione, quindi riprova.</string>
     <string name="error_download_io_failure">Impossibile scaricare l\'episodio. Controlla la connessione a Internet e lo spazio di archiviazione.</string>
     <string name="error_download_socket_timeout">Timeout della connessione al server dell\'autore del podcast. Controlla la connessione a Internet.</string>
-    <string name="error_download_suspicious_content_size">Impossibile scaricare l\'episodio. Il file scaricato è troppo piccolo. Contatta l\'autore del podcast.</string>
     <string name="error_download_invalid_content_type">Impossibile scaricare l\'episodio. Tipo di contenuto ricevuto %1$s. Contatta l\'autore del podcast.</string>
     <string name="error_download_http_failure">Impossibile scaricare l\'episodio. Codice dello stato HTTP ricevuto %1$s. Contatta l\'autore del podcast.</string>
     <string name="episode_row_waiting_for_storage">In attesa dello spazio di archiviazione</string>
@@ -1380,7 +1383,6 @@ Language: it
     <string name="error_playing_format">Il file non può essere riprodotto. Prova a eseguire la conversione in un altro formato.</string>
     <string name="error_unable_to_play">Impossibile riprodurre il file</string>
     <string name="error_unable_to_cast">Impossibile trasmettere questo episodio. Potrebbe non essere disponibile dall\'autore del podcast.</string>
-    <string name="error_streaming_try_downloading">Streaming non riuscito, prova a scaricare il podcast.</string>
     <string name="error_streaming_internet">Streaming non riuscito, controlla la tua connessione Internet.</string>
     <string name="error_chartable_streaming">Streaming non riuscito. Il produttore sta usando l\'analisi di Chartable che viene bloccata, se esegui un\'app di filtraggio come AdGuard dovrai inserire nella lista bianca chtbl.com per riprodurre l\'episodio.</string>
     <string name="error_chartable">Il produttore sta usando l\'analisi di Chartable che viene bloccata, se esegui un\'app di filtraggio come AdGuard dovrai inserire nella lista bianca chtbl.com per riprodurre l\'episodio.</string>
@@ -1565,7 +1567,6 @@ Language: it
     <string name="settings_storage_store_on">Archivia podcast su</string>
     <string name="settings_auto_archive_inactive">Archivia gli episodi inattivi</string>
     <string name="settings_auto_archive_time_limits">Archivia gli episodi oltre i limiti di tempo impostati. I file scaricati vengono rimossi quando l\'episodio viene archiviato.</string>
-    <string name="settings_auto_download_unmetered_summary">Se disattivi questa opzione, la app scaricherà anche su reti cellulari e altre reti a consumo. Dai un\'occhiata alle tue impostazioni di rete per maggiori informazioni.</string>
     <string name="settings_auto_download_charging">Solo quando in carica</string>
     <string name="settings_auto_up_next_limit">Limite di aggiunte automatiche</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">Quando il numero di episodi aggiunti a Succcessivo raggiunge %d, non verranno aggiunti altri episodi.</string>
@@ -1730,10 +1731,10 @@ Language: it
     <string name="profile_file">File</string>
     <string name="profile_feature_requires">La funzionalità richiede\nPocket Casts Plus</string>
     <string name="profile_ends">Termina %s</string>
-    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_ended">Terminato il %s</string>
     <string name="profile_end_tour">FINE TOUR</string>
     <string name="profile_email">E-mail</string>
+    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_deleting_account">Eliminazione dell\'account in corso…</string>
     <string name="profile_delete_from_device_title">Elimina dal dispositivo</string>
     <string name="profile_delete_from_device_only">Elimina solo dal dispositivo</string>

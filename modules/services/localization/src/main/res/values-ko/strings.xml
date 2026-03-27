@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 09:56:26+0000
+Translation-Revision-Date: 2026-03-24 09:54:55+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">다음 차례가 %d에 도달하면 상단에 자동으로 추가된 새 에피소드 때문에 대기열의 마지막 에피소드가 제거됩니다. 하단에 자동 추가하도록 설정된 에피소드는 다음 차례가 한도 미만일 때까지 추가되지 않습니다.</string>
+    <string name="offline_icon_content_description">오프라인 아이콘</string>
+    <string name="profile_last_refresh_at">마지막 새로 고침: %s</string>
+    <string name="profile_just_now">지금</string>
     <string name="referrals_claim_guest_pass_description_installment">%1$s 무료, 이후 %3$d개월 동안 월 %2$s의 금액으로 이용 가능. 총 약정: 1년 간 %4$s.</string>
     <string name="winback_claimed_offer_message_6">Pocket Casts를 선택해 주셔서 감사합니다. 할인된 12개월 할부 요금제는 현재 청구 기간 후에 시작됩니다.</string>
     <string name="winback_claimed_offer_message_5">월간 결제로 내년에 50% 할인을 받으세요!</string>
@@ -15,7 +19,6 @@ Language: ko_KR
     <string name="error_download_too_many_attempts">여러 번 시도한 후 다운로드가 취소되었습니다. 인터넷 연결과 저장 공간을 확인하고 다시 시도하세요.</string>
     <string name="error_download_io_failure">에피소드를 다운로드하지 못했습니다. 인터넷 연결과 저장 공간을 확인하세요.</string>
     <string name="error_download_socket_timeout">팟캐스트 제작자의 서버 연결 시간이 초과되었습니다. 인터넷 연결을 확인하세요.</string>
-    <string name="error_download_suspicious_content_size">에피소드를 다운로드하지 못했습니다. 다운로드한 파일이 너무 작습니다. 팟캐스트 제작자에게 문의하세요.</string>
     <string name="error_download_invalid_content_type">에피소드를 다운로드하지 못했습니다. %1$s 콘텐츠 유형을 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
     <string name="error_download_http_failure">에피소드를 다운로드하지 못했습니다. %1$s HTTP 상태 코드를 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
     <string name="episode_row_waiting_for_storage">저장 공간 대기 중</string>
@@ -1333,7 +1336,6 @@ Language: ko_KR
     <string name="error_unable_to_play">파일을 재생할 수 없음</string>
     <string name="error_unable_to_cast">이 에피소드를 방송할 수 없습니다. 팟캐스트 제작자가 제공하지 않을 수 있습니다.</string>
     <string name="error_unable_to_cast_local">로컬 파일을 방송할 수 없음</string>
-    <string name="error_streaming_try_downloading">스트리밍에 실패했습니다. 팟캐스트를 다운로드해 보세요.</string>
     <string name="error_streaming_internet">스트리밍에 실패했습니다. 인터넷 연결을 확인하세요.</string>
     <string name="error_chartable_streaming">스트리밍에 실패했습니다. 차단 중인 Chartable 분석을 프로듀서가 사용하고 있습니다. AdGuard와 같은 필터링 앱을 사용하는 경우 에피소드를 재생하려면 chtbl.com을 화이트리스트에 추가해야 합니다.</string>
     <string name="error_chartable">차단 중인 Chartable 분석을 프로듀서가 사용하고 있습니다. AdGuard와 같은 필터링 앱을 사용하는 경우 에피소드를 재생하려면 chtbl.com을 화이트리스트에 추가해야 합니다.</string>
@@ -1535,7 +1537,6 @@ Language: ko_KR
     <string name="settings_auto_play_summary">재생할 에피소드가 남아 있지 않으면 자동으로 에피소드를 선별합니다.</string>
     <string name="settings_auto_play">자동 재생</string>
     <string name="settings_auto_download_up_next">다음 차례에 추가된 에피소드</string>
-    <string name="settings_auto_download_unmetered_summary">끄기로 전환하면 다른 데이터 요금제 네트워크는 물론 스마트폰에서도 다운로드할 수 있습니다. 자세한 내용은 네트워크 설정에서 확인하세요.</string>
     <string name="settings_auto_download_unmetered">무제한 데이터 WiFi에서만</string>
     <string name="settings_auto_download_podcasts">팟캐스트 자동 다운로드</string>
     <string name="settings_auto_download_new_episodes">새 에피소드</string>
@@ -1718,9 +1719,9 @@ Language: ko_KR
     <string name="profile_files_empty_summary">자신의 파일을 청취하시겠나요?\n+ 버튼을 눌러 Pocket Casts에서 열면 여기에 표시됩니다.</string>
     <string name="profile_files_addfile_save">저장</string>
     <string name="profile_files_add_filename">이름</string>
-    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_files_add_custom_image">사용자 정의 이미지 추가</string>
     <string name="profile_file_locked">잠김</string>
+    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_file">파일</string>
     <string name="profile_feature_requires">이 기능에 Pocket Casts Plus 필요</string>
     <string name="profile_ends">%s 종료</string>

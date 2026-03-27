@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 09:57:55+0000
+Translation-Revision-Date: 2026-03-24 09:55:15+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">「次のエピソード」の数が%d件に達すると、待機リストの一番上に新しいエピソードが自動的に追加されたときに最後のエピソードが削除されます。 一番下に自動的に追加されるよう設定されたエピソードは、「次のエピソード」が上限を下回るまで追加されません。</string>
+    <string name="offline_icon_content_description">オフラインアイコン</string>
+    <string name="profile_last_refresh_at">最終再読み込み: %s</string>
+    <string name="profile_just_now">たった今</string>
     <string name="referrals_claim_guest_pass_description_installment">%1$sは無料、その後%3$dか月間月額%2$sでご利用いただけます。 コミットメント合計: 年間 %4$s。</string>
     <string name="winback_claimed_offer_message_6">Pocket Casts をお選びいただきありがとうございます。 割引の12か月間分割払いプランは現在の請求期間の後に開始します。</string>
     <string name="winback_claimed_offer_message_5">月額支払いで来年50% オフ !</string>
@@ -15,7 +19,6 @@ Language: ja_JP
     <string name="error_download_too_many_attempts">複数回試行した後、ダウンロードはキャンセルされました。 ネットワーク接続とストレージを確認して、もう一度お試しください。</string>
     <string name="error_download_io_failure">エピソードをダウンロードできませんでした。 ネットワーク接続とストレージを確認してください。</string>
     <string name="error_download_socket_timeout">ポッドキャスト投稿者のサーバーへの接続がタイムアウトしました。 インターネット接続を確認してください。</string>
-    <string name="error_download_suspicious_content_size">エピソードをダウンロードできませんでした。 ダウンロードしたファイルが小さすぎます。 ポッドキャスト投稿者に連絡してください。</string>
     <string name="error_download_invalid_content_type">エピソードをダウンロードできませんでした。 受信したコンテンツタイプは %1$s です。 ポッドキャスト投稿者に連絡してください。</string>
     <string name="error_download_http_failure">エピソードをダウンロードできませんでした。 HTTP ステータスコード %1$s を受信しました。 ポッドキャスト投稿者に連絡してください。</string>
     <string name="episode_row_waiting_for_storage">保存スペース待ち</string>
@@ -1390,7 +1393,6 @@ Language: ja_JP
     <string name="error_playing_format">ファイルを再生できません。 別の形式に変換してみてください。</string>
     <string name="error_unable_to_play">ファイルを再生できません</string>
     <string name="error_unable_to_cast">このエピソードをキャストできません。 ポッドキャストの作成者から提供されていない可能性があります。</string>
-    <string name="error_streaming_try_downloading">ストリーミングに失敗しました。ポッドキャストをダウンロードしてみてください。</string>
     <string name="error_streaming_internet">ストリーミングに失敗しました。インターネット接続を確認してください。</string>
     <string name="error_chartable_streaming">ストリーミングに失敗しました。 プロデューサーが、ブロックされている Chartable アナリティクスを使用しています。AdGuard などのフィルタリングアプリを実行する場合、エピソードを再生するには chtbl.com をホワイトリストに登録する必要があります。</string>
     <string name="error_chartable">プロデューサーが、ブロックされている Chartable アナリティクスを使用しています。AdGuard などのフィルタリングアプリを実行する場合、エピソードを再生するには chtbl.com をホワイトリストに登録する必要があります。</string>
@@ -1549,7 +1551,6 @@ Language: ja_JP
     <string name="settings_auto_play_summary">再生するものが残っていない場合はエピソードを自動的に取得</string>
     <string name="settings_auto_play">自動再生</string>
     <string name="settings_auto_download_up_next">次のエピソードに追加されたエピソード</string>
-    <string name="settings_auto_download_unmetered_summary">こちらをオフにすることで、携帯ネットワークやその他の従量制課金接続でダウンロードできるようになります。 詳細についてはネットワーク設定を確認してください。</string>
     <string name="settings_auto_download_unmetered">従量制課金が行われない Wi-Fi のみ</string>
     <string name="settings_auto_download_podcasts">ポッドキャストを自動ダウンロード</string>
     <string name="settings_auto_download_new_episodes">新規エピソード</string>

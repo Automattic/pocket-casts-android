@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-26 13:56:06+0000
+Translation-Revision-Date: 2026-03-24 13:58:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">Wenn unter „Als Nächstes“ %d Folgen erreicht sind, wird die letzte Folge in der Warteschlange entfernt, sobald neue Folgen automatisch oben hinzugefügt wurden. Folgen, die automatisch unten hinzugefügt werden, werden erst hinzugefügt, wenn „Als Nächstes“ unter dem Limit ist.</string>
+    <string name="offline_icon_content_description">Offline-Icon</string>
+    <string name="profile_last_refresh_at">Letzte Aktualisierung: %s</string>
+    <string name="profile_just_now">Gerade eben</string>
     <string name="referrals_claim_guest_pass_description_installment">Kostenlos für %1$s, danach %2$s pro Monat für %3$d Monate. Gesamtverpflichtung: %4$s über 1 Jahr.</string>
     <string name="winback_claimed_offer_message_6">Vielen Dank, dass du dich für Pocket Casts entschieden hast. Dein vergünstigter 12-monatiger Ratenplan beginnt nach Ablauf deines aktuellen Abrechnungszeitraums.</string>
     <string name="winback_claimed_offer_message_5">50 % Rabatt auf dein nächstes Jahr mit monatlichen Zahlungen!</string>
@@ -15,7 +19,6 @@ Language: de
     <string name="error_download_too_many_attempts">Der Download wurde nach mehreren Versuchen abgebrochen. Bitte überprüfe deine Internetverbindung und deinen Speicherplatz und versuche es erneut.</string>
     <string name="error_download_io_failure">Die Folge konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbindung und deinen Speicherplatz.</string>
     <string name="error_download_socket_timeout">Zeitüberschreitung bei der Verbindung zum Server des Podcast-Autors. Bitte prüfe deine Internetverbindung.</string>
-    <string name="error_download_suspicious_content_size">Die Folge konnte nicht heruntergeladen werden. Die heruntergeladene Datei ist zu klein. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="error_download_invalid_content_type">Die Folge konnte nicht heruntergeladen werden. Inhaltstyp %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="error_download_http_failure">Die Folge konnte nicht heruntergeladen werden. HTTP-Statuscode %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="episode_row_waiting_for_storage">Auf Speicherplatz warten</string>
@@ -1367,7 +1370,6 @@ Language: de
     <string name="error_playing_format">Datei kann nicht abgespielt werden. Versuche, sie in ein anderes Format umzuwandeln.</string>
     <string name="error_unable_to_play">Datei kann nicht abgespielt werden</string>
     <string name="error_unable_to_cast">Diese Folge kann nicht gesendet werden. Es kann sein, dass sie vom Autor des Podcasts nicht verfügbar ist.</string>
-    <string name="error_streaming_try_downloading">Fehler beim Streaming. Versuche, den Podcast herunterzuladen.</string>
     <string name="error_streaming_internet">Fehler beim Streaming. Überprüfe deine Internetverbindung.</string>
     <string name="error_chartable_streaming">Fehler beim Streaming. Der Produzent verwendet das Tool Chartable Analytics, das blockiert wird. Wenn du eine Filter-App wie AdGuard verwendest, musst du chtbl.com auf die Positivliste setzen, um die Folge abspielen zu können.</string>
     <string name="error_chartable">Der Produzent verwendet das Tool Chartable Analytics, das blockiert wird. Wenn du eine Filter-App wie AdGuard verwendest, musst du chtbl.com auf die Positivliste setzen, um die Folge abspielen zu können.</string>
@@ -1565,7 +1567,6 @@ Language: de
     <string name="settings_auto_archive_time_limits">Archiviere Folgen nach Ablauf einer bestimmten Zeit. Downloads werden entfernt, wenn die Folge archiviert wird.</string>
     <string name="settings_manage_downloads_include_starred">Mit Stern markierte Folgen einschließen</string>
     <string name="settings_auto_download_up_next">Zur Warteschlange hinzugefügte Folgen</string>
-    <string name="settings_auto_download_unmetered_summary">Wenn du diese Funktion deaktivierst, kannst du Folgen sowohl über das Mobilfunknetz als auch über andere gebührenpflichtige Netzwerke herunterladen. Weitere Informationen findest du in deinen Netzwerkeinstellungen.</string>
     <string name="settings_auto_up_next_add_to">Automatisch hinzufügen</string>
     <string name="settings_auto_up_next_limit_reached_stop">Keine weiteren hinzufügen</string>
     <string name="settings_title_import_export">OPML-Import/Export</string>
