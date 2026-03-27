@@ -95,13 +95,13 @@ internal class EpisodeDownloader(
             }
 
             response.downloadProgressSource(episode).readTo(tempFile)
-            val fileSize = tempFile.length()
+            val bytesDownloaded = progressCache.progressFlow(episode.uuid).value?.downloadedByteCount ?: 0
             val isValidFileSize = when (episode) {
-                is PodcastEpisode -> fileSize >= minContentLength
+                is PodcastEpisode -> bytesDownloaded >= minContentLength
                 is UserEpisode -> true
             }
             if (!isValidFileSize) {
-                return Result.SuspiciousFileSize(fileSize)
+                return Result.SuspiciousFileSize(bytesDownloaded)
             }
 
             tempFile.copyTo(downloadFile, overwrite = true)
