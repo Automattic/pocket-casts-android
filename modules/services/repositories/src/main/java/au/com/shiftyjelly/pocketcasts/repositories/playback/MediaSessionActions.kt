@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -20,8 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-
 /**
  * Shared action methods used by both the legacy [MediaSessionManager.MediaSessionCallback]
  * and the new [Media3SessionCallback]. Reduces duplication across the two callback
@@ -131,7 +127,7 @@ internal class MediaSessionActions(
     }
 
     fun performPlayFromSearch(searchTerm: String?) {
-        val query: String = searchTerm?.trim { it <= ' ' }?.lowercase() ?: return
+        val query: String = searchTerm?.trim()?.lowercase() ?: return
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "performPlayFromSearch query: %s", query)
 
@@ -145,7 +141,7 @@ internal class MediaSessionActions(
             if (query.startsWith("next episode") || query.startsWith("next podcast")) {
                 val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
                 queueEpisodes.firstOrNull()?.let { episode ->
-                    launch { playbackManager.playNext(episode = episode, source = source) }
+                    launch { playbackManager.playNext(episode = episode, source = sourceView) }
                     return@launch
                 }
             }
@@ -167,8 +163,8 @@ internal class MediaSessionActions(
                 return@launch
             }
 
+            val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
             for (option in options) {
-                val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
                 val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) }
                     ?: continue
                 val playlist = playlistManager.smartPlaylistFlow(playlistPreview.uuid).first()
