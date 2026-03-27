@@ -33,6 +33,7 @@ internal class CastStatePlayer(
     private var castPlaying = false
     private var castBuffering = false
     private var castPositionMs = 0L
+    private var hasReceivedUpdate = false
 
     /**
      * A single placeholder item so that [SimpleBasePlayer] accepts non-idle states.
@@ -52,10 +53,17 @@ internal class CastStatePlayer(
         castPlaying = isPlaying
         castBuffering = isBuffering
         castPositionMs = positionMs
+        hasReceivedUpdate = true
         invalidateState()
     }
 
     override fun getState(): State {
+        if (!hasReceivedUpdate) {
+            return State.Builder()
+                .setAvailableCommands(Player.Commands.EMPTY)
+                .setPlaybackState(STATE_IDLE)
+                .build()
+        }
         return State.Builder()
             .setAvailableCommands(
                 Player.Commands.Builder()
@@ -73,7 +81,6 @@ internal class CastStatePlayer(
             .setPlaybackState(
                 when {
                     castBuffering -> STATE_BUFFERING
-                    castPlaying -> STATE_READY
                     else -> STATE_READY
                 },
             )
