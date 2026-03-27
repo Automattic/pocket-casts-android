@@ -670,20 +670,26 @@ class PlayerHeaderFragment :
             }
             AnimatedNonNullVisibility(
                 item = if (transitionData.isTranscriptOpen) null else playbackIssue,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 16.dp),
                 enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                 exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
             ) { issue ->
-                val context = LocalContext.current
-                PlaybackErrorInfoBar(
-                    message = issue.message,
-                    playerColors = playerColors,
-                    onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
-                        { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
-                    } else {
-                        null
-                    },
-                )
+                Column(
+                    modifier = Modifier
+                        .background(playerColors.contrast06)
+                        .navigationBarsPadding(),
+                ) {
+                    val context = LocalContext.current
+                    PlaybackErrorInfoBar(
+                        message = issue.message,
+                        playerColors = playerColors,
+                        onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
+                            { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
         }
     }
