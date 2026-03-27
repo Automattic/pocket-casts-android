@@ -66,6 +66,8 @@ fun DeveloperPage(
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
+    onTriggerPlaybackError: () -> Unit,
+    onTriggerConnectionError: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -122,6 +124,12 @@ fun DeveloperPage(
         }
         item {
             ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
+        }
+        item {
+            TriggerPlaybackError(onClick = onTriggerPlaybackError)
+        }
+        item {
+            TriggerConnectionError(onClick = onTriggerConnectionError)
         }
         item {
             CrashApp()
@@ -357,6 +365,32 @@ private fun ResetPlaylistsOnboarding(
 }
 
 @Composable
+private fun TriggerPlaybackError(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger playback error",
+        secondaryText = "Set playback state to a playback error with chevron",
+        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun TriggerConnectionError(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger connection error",
+        secondaryText = "Set playback state to a connection error without chevron",
+        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun CrashApp(
     modifier: Modifier = Modifier,
 ) {
@@ -417,6 +451,8 @@ private fun DeveloperPagePreview() {
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
+        onTriggerPlaybackError = {},
+        onTriggerConnectionError = {},
     )
 }
 
