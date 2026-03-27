@@ -137,6 +137,7 @@ class MediaSessionManager(
     private var scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val commandMutex = Mutex()
 
+    @OptIn(UnstableApi::class)
     internal val actions = MediaSessionActions(
         playbackManager = playbackManager,
         podcastManager = podcastManager,
@@ -474,6 +475,13 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
         playbackManager.playbackStateRelay
+            .distinctUntilChanged { old, new ->
+                old.episodeUuid == new.episodeUuid &&
+                    old.state == new.state &&
+                    old.isPlaying == new.isPlaying &&
+                    old.transientLoss == new.transientLoss &&
+                    old.isBuffering == new.isBuffering
+            }
             .observeOn(Schedulers.io())
             .switchMap { state ->
                 if (state.isEmpty) {

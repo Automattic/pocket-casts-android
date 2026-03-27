@@ -100,6 +100,7 @@ open class PlaybackService :
         super.onUpdateNotification(session, startInForegroundRequired)
     }
 
+    @OptIn(UnstableApi::class)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // MediaLibraryService doesn't automatically route ACTION_MEDIA_BUTTON intents
         // sent via PendingIntent.getService (e.g., from PiP controls) to the session callback.
@@ -125,6 +126,7 @@ open class PlaybackService :
         return super.onStartCommand(intent, flags, startId)
     }
 
+    @OptIn(UnstableApi::class)
     override fun onTaskRemoved(rootIntent: Intent?) {
         if (Util.isAutomotive(this)) return
         val player = playbackManager.mediaSessionManager.getMedia3Session()?.player
