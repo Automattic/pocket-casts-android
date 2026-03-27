@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import java.util.Date
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
@@ -46,7 +45,6 @@ class BrowseTreeProviderTest {
     private lateinit var upNextQueue: UpNextQueue
     private lateinit var settings: Settings
     private lateinit var serviceManager: ServiceManager
-    private lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
     private lateinit var provider: BrowseTreeProvider
 
     @Before
@@ -59,8 +57,6 @@ class BrowseTreeProviderTest {
         upNextQueue = mock()
         settings = mock()
         serviceManager = mock()
-        podcastCacheServiceManager = mock()
-
         provider = BrowseTreeProvider(
             podcastManager = podcastManager,
             episodeManager = episodeManager,
@@ -70,7 +66,6 @@ class BrowseTreeProviderTest {
             upNextQueue = upNextQueue,
             settings = settings,
             serviceManager = serviceManager,
-            podcastCacheServiceManager = podcastCacheServiceManager,
             listRepository = mock(),
         )
     }

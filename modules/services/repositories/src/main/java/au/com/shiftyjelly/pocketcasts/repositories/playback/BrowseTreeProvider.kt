@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
 import androidx.media3.common.MediaItem
@@ -35,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,7 +65,6 @@ class BrowseTreeProvider @Inject constructor(
     private val upNextQueue: UpNextQueue,
     private val settings: Settings,
     private val serviceManager: ServiceManager,
-    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val listRepository: ListRepository,
 ) {
 
@@ -397,7 +394,9 @@ class BrowseTreeProvider @Inject constructor(
     }
 
     private suspend fun loadAutomotiveRootChildren(context: Context): List<MediaItem> {
-        val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+        val extrasContentAsList = Bundle().apply {
+            putInt(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE, DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+        }
 
         val upNextItem = buildListMediaItem(context, id = UP_NEXT_ROOT, title = LR.string.up_next, drawable = IR.drawable.ic_upnext)
         val podcastsItem = buildListMediaItem(context, id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
