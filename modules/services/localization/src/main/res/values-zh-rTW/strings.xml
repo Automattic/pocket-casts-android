@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-27 09:56:00+0000
+Translation-Revision-Date: 2026-03-24 11:55:36+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">「接下來播放」達到 %d 集後，自動新增至最上方的新單集會移除佇列中最後的單集。 設定為自動新增至底部的單集，必須在「接下來播放」低於上限後才會新增。</string>
+    <string name="offline_icon_content_description">離線圖示</string>
+    <string name="profile_last_refresh_at">上次重新整理時間：%s</string>
+    <string name="profile_just_now">剛剛</string>
     <string name="referrals_claim_guest_pass_description_installment">%1$s 免費，之後每月 %2$s，持續 %3$d 個月。 合約期：1 年 %4$s。</string>
     <string name="winback_claimed_offer_message_6">感謝選用 Pocket Casts。 折扣的 12 個月分期付款方案會在目前的帳單週期結束後開始。</string>
     <string name="winback_claimed_offer_message_5">每月付款可享次年 5 折優惠！</string>
@@ -15,7 +19,6 @@ Language: zh_TW
     <string name="error_download_too_many_attempts">多次嘗試下載後已取消。 請檢查你的網際網路連線和儲存空間，然後再試一次。</string>
     <string name="error_download_io_failure">無法下載本集。 請檢查你的網際網路連線和儲存空間。</string>
     <string name="error_download_socket_timeout">與 Podcast 作者伺服器的連線逾時。 請檢查你的網際網路連線。</string>
-    <string name="error_download_suspicious_content_size">無法下載本集。 下載的檔案太小。 請聯絡 Podcast 作者。</string>
     <string name="error_download_invalid_content_type">無法下載本集。 已收到內容類型 %1$s。 請聯絡 Podcast 作者。</string>
     <string name="error_download_http_failure">無法下載本集。 已收到 HTTP 狀態碼 %1$s。 請聯絡 Podcast 作者。</string>
     <string name="episode_row_waiting_for_storage">等待儲存空間</string>
@@ -1375,7 +1378,6 @@ Language: zh_TW
     <string name="error_file_not_found">找不到單集檔案，請重新嘗試下載。</string>
     <string name="error_playing_format_external">本集格式似乎無法播放，不妨試試其他應用程式？</string>
     <string name="error_unable_to_play">無法播放檔案</string>
-    <string name="error_streaming_try_downloading">串流失敗，請重新下載 Podcast。</string>
     <string name="error_streaming_internet">串流失敗，請檢查你的網路連線。</string>
     <string name="error_chartable">製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
     <string name="error_webview_not_installed">未安裝系統 WebView，無法載入節目備註。</string>
@@ -1589,7 +1591,6 @@ Language: zh_TW
     <string name="error_storage_permission">已拒絕！Pocket Casts 無法播放此檔案，請檢查你的儲存空間權限。</string>
     <string name="error_playing_format">無法播放檔案。請嘗試轉換為其他格式。</string>
     <string name="error_unable_to_cast">無法轉換本集。Podcast 作者可能未提供本集。</string>
-    <string name="settings_auto_download_unmetered_summary">關閉此功能，將允許從行動數據和其他計量付費網路下載。請檢查網路設定，以進一步了解詳細資訊。</string>
     <string name="error_login_failed">抱歉，無法登入你的同步帳號。稍後請再試一次。</string>
     <string name="settings_learn_more">進一步了解</string>
     <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微退回一點，讓你能更輕鬆跟上進度。</string>
@@ -1742,6 +1743,7 @@ Language: zh_TW
     <string name="profile_newsletter_detail">接收最新消息、應用程式更新、佈景主題播放清單、訪談等內容。</string>
     <string name="profile_new_password">新密碼</string>
     <string name="profile_new_email_address">新電子郵件地址</string>
+    <string name="profile_license_agreement">Pocket Casts 重視你的隱私權。 本隱私權政策說明我們收集的資訊與原因、資訊用途以及處理方式。 本政策適用於 iOS 和 Android Pocket Casts 應用程式，以及與 macOS 和 Windows 應用程式關聯的 Pocket Casts 網頁服務 (共同或個別皆稱為「本服務」)。 使用本服務，即表示你同意本隱私權政策。 如果你開啟應用程式的推播通知，我們會儲存 Apple 提供的推播權杖，藉此將推播通知傳送到你的裝置。 若你購買 Web 應用程式，我們會儲存購買項目的交易 ID。 如果你選擇不建立帳號，並且不使用推播通知，我們的伺服器不會儲存你的任何資料。 Pocket Casts Web 服務也會使用 Cookie 和類似技術，讓你保持登入狀態。 如果你選擇從服務內部產生支援要求，我們可能會產生包含其他資料的附件以協助解決支援要求，你可以在提交要求前檢視這些資料。</string>
     <string name="profile_last_refresh">上次重新整理：%s前</string>
     <string name="profile_joined">已加入：</string>
     <string name="profile_get_plus">取得 Pocket Casts Plus 即可解鎖此功能和其他功能！</string>
@@ -1755,7 +1757,6 @@ Language: zh_TW
     <string name="profile_ends">預計結束時間：%s</string>
     <string name="profile_ended">結束時間：%s</string>
     <string name="profile_end_tour">結束導覽</string>
-    <string name="profile_license_agreement">Pocket Casts 重視你的隱私權。 本隱私權政策說明我們收集的資訊與原因、資訊用途以及處理方式。 本政策適用於 iOS 和 Android Pocket Casts 應用程式，以及與 macOS 和 Windows 應用程式關聯的 Pocket Casts 網頁服務 (共同或個別皆稱為「本服務」)。 使用本服務，即表示你同意本隱私權政策。 如果你開啟應用程式的推播通知，我們會儲存 Apple 提供的推播權杖，藉此將推播通知傳送到你的裝置。 若你購買 Web 應用程式，我們會儲存購買項目的交易 ID。 如果你選擇不建立帳號，並且不使用推播通知，我們的伺服器不會儲存你的任何資料。 Pocket Casts Web 服務也會使用 Cookie 和類似技術，讓你保持登入狀態。 如果你選擇從服務內部產生支援要求，我們可能會產生包含其他資料的附件以協助解決支援要求，你可以在提交要求前檢視這些資料。</string>
     <string name="profile_email">電子郵件</string>
     <string name="profile_deleting_account">正在刪除帳號…</string>
     <string name="profile_delete_from_device_title">從裝置刪除</string>

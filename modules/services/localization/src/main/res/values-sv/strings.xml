@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-27 14:56:38+0000
+Translation-Revision-Date: 2026-03-24 09:57:56+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">När Nästa når %d läggs nya avsnitt automatiskt till högst upp, varpå det sista avsnittet i kön tas bort. Avsnitt som är inställda på att läggas till automatiskt längst ner läggs inte till förrän Nästa är under gränsen.</string>
+    <string name="offline_icon_content_description">Offline-ikon</string>
+    <string name="profile_last_refresh_at">Senaste uppdatering: %s</string>
+    <string name="profile_just_now">Just nu</string>
     <string name="referrals_claim_guest_pass_description_installment">Gratis i %1$s, därefter %2$s/månad i %3$d månader. Totalt åtagande: %4$s under 1 år.</string>
     <string name="winback_claimed_offer_message_6">Tack för att du väljer Pocket Casts. Din rabatterade 12 månader långa betalningsplan börjar efter din nuvarande faktureringsperiod.</string>
     <string name="plus_yearly_installments">Årligt paket – betala månadsvis</string>
@@ -15,7 +19,6 @@ Language: sv_SE
     <string name="error_download_socket_timeout">Tidsgränsen för anslutning till podcastförfattarens server uppnåddes. Kontrollera din internetanslutning.</string>
     <string name="error_download_too_many_attempts">Nedladdningen avbröts efter flera försök. Kontrollera din internetanslutning och ditt lagringsutrymme. Försök sedan igen.</string>
     <string name="error_download_io_failure">Det gick inte att ladda ner avsnittet. Kontrollera din internet-anslutning och ditt lagringsutrymme.</string>
-    <string name="error_download_suspicious_content_size">Det gick inte att ladda ner avsnittet. Den nedladdade filen är för liten. Kontakta podcastförfattaren.</string>
     <string name="error_download_invalid_content_type">Det gick inte att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastförfattaren.</string>
     <string name="error_download_http_failure">Det gick inte att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastförfattaren.</string>
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
@@ -1387,7 +1390,6 @@ Language: sv_SE
     <string name="error_playing_format">Det går inte att spela upp filen. Prova att konvertera den till ett annat format.</string>
     <string name="error_unable_to_play">Det gick inte att spela upp filen</string>
     <string name="error_unable_to_cast">Det gick inte att casta det här avsnittet. Podcastens skapare kanske inte har gjort det tillgängligt.</string>
-    <string name="error_streaming_try_downloading">Streamingen misslyckades. Prova att ladda ner podcasten.</string>
     <string name="error_streaming_internet">Streamingen misslyckades. Kontrollera din internetanslutning.</string>
     <string name="error_chartable_streaming">Streamingen misslyckades. Producenten använder Chartable för analyser och applikationen blockeras för tillfället. Om du kör filtreringsappar som AdGuard måste du vitlista chtbl.com för att spela upp avsnittet.</string>
     <string name="error_chartable">Producenten använder Chartable för analyser och applikationen blockeras för tillfället. Om du kör filtreringsappar som AdGuard måste du vitlista chtbl.com för att spela upp avsnittet.</string>
@@ -1540,7 +1542,6 @@ Language: sv_SE
     <string name="settings_auto_play_summary">När det inte finns något mer att spela upp, välj ett avsnitt åt mig automatiskt</string>
     <string name="settings_auto_play">Spela upp automatiskt</string>
     <string name="settings_auto_download_up_next">Avsnitt tillagda i Nästa</string>
-    <string name="settings_auto_download_unmetered_summary">Om du inaktiverar det här alternativet tillåts nedladdningar på mobila nätverk såväl som andra nätverk med datapriser. Kontrollera dina nätverksinställningar för mer information.</string>
     <string name="settings_auto_download_unmetered">Endast på WiFi utan datapriser</string>
     <string name="settings_auto_download_podcasts">Ladda ner podcasts automatiskt</string>
     <string name="settings_auto_download_new_episodes">Nya avsnitt</string>
@@ -1744,10 +1745,10 @@ Language: sv_SE
     <string name="profile_last_refresh">Senaste uppdatering: %s sedan</string>
     <string name="profile_joined">Gick med:</string>
     <string name="profile_get_plus">Skaffa Pocket Casts Plus för att låsa upp den här funktionen, samt mycket mer!</string>
-    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_files_remove_image">Byt bild</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
+    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_files_add_filename">Namn</string>
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-02-25 12:55:04+0000
+Translation-Revision-Date: 2026-03-24 09:57:34+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="settings_auto_up_next_limit_reached_top_summary">عند وصول \"التالي\" إلى%d ، ستقوم الحلقات الجديدة التي تمت إضافتها‑ تلقائيًا إلى الجزء العلوي بإزالة الحلقة الأخيرة في قائمة الانتظار. لن تتم إضافة الحلقات التي تم تعيينها إلى الإضافة ‑ التلقائية في الجزء السفلي حتى يكون قسم \"التالي\" أعلى من الحد المسموح به.</string>
+    <string name="offline_icon_content_description">أيقونة عدم الاتصال بالإنترنت</string>
+    <string name="profile_last_refresh_at">آخر تحديث: %s</string>
+    <string name="profile_just_now">الآن</string>
     <string name="referrals_claim_guest_pass_description_installment">مجاني لمدة ⁦%1$s⁩، ثم ⁦%2$s⁩شهريًا لمدة ⁦%3$d⁩ من الأشهر. إجمالي الالتزام: ⁦%4$s⁩ خلال عام واحد.</string>
     <string name="winback_claimed_offer_message_6">شكرًا لاختيارك Pocket Casts. تبدأ خطة التقسيط المخفَّضة لمدة 12 شهرًا بعد فترة الفوترة الحالية الخاصة بك.</string>
     <string name="winback_claimed_offer_message_5">خصم 50% على اشتراكك السنوي القادم باستخدام المدفوعات الشهرية!</string>
@@ -15,7 +19,6 @@ Language: ar
     <string name="error_download_too_many_attempts">تم إلغاء التنزيل بعد عدة محاولات. يُرجى التحقق من اتصالك بالإنترنت ومساحة التخزين، ثم إعادة المحاولة مرة أخرى.</string>
     <string name="error_download_io_failure">فشل تنزيل الحلقة. يُرجى التحقق من اتصالك بالإنترنت ومساحة التخزين.</string>
     <string name="error_download_socket_timeout">انتهت مهلة الاتصال بخادم مؤلف البث الصوتي. يُرجى التحقق من اتصالك بالإنترنت.</string>
-    <string name="error_download_suspicious_content_size">فشل تنزيل الحلقة. الملف الذي تم تنزيله صغير للغاية. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="error_download_invalid_content_type">فشل تنزيل الحلقة. تم استلام نوع المحتوى ⁦%1$s⁩. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="error_download_http_failure">فشل تنزيل الحلقة. تم تلقي كود حالة HTTP %1$s. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="episode_row_waiting_for_storage">بانتظار توفر مساحة تخزين</string>
@@ -1333,7 +1336,6 @@ Language: ar
     <string name="error_unable_to_play">يتعذر تشغيل الملف</string>
     <string name="error_unable_to_cast">يتعذر بث هذه الحلقة. قد لا تكون متاحة من مؤلف البث الصوتي.</string>
     <string name="error_unable_to_cast_local">يتعذر بث الملف المحلي</string>
-    <string name="error_streaming_try_downloading">فشل البث، حاول تنزيل البث الصوتي.</string>
     <string name="error_streaming_internet">فشل البث، تحقَّق من اتصالك بالإنترنت.</string>
     <string name="error_chartable_streaming">فشل البث. يستخدم المنتِج تحليلات Chartable التي يتم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
     <string name="error_chartable">يستخدم المنتِج تحليلات Chartable التي تم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
@@ -1535,7 +1537,6 @@ Language: ar
     <string name="settings_auto_play_summary">عندما لا يكون هناك أي شيء متبقٍ لتشغيله، اختر حلقة لي تلقائيًا</string>
     <string name="settings_auto_play">التشغيل التلقائي</string>
     <string name="settings_auto_download_up_next">الحلقات التي تمت إضافتها إلى التالي</string>
-    <string name="settings_auto_download_unmetered_summary">سيؤدي إيقاف هذا إلى السماح بالتنزيلات على الهواتف الخلوية بالإضافة إلى الشبكات المحدودة الأخرى. تحقَّق من إعدادات شبكتك للحصول على مزيد من المعلومات.</string>
     <string name="settings_auto_download_unmetered">فقط على شبكة واي فاي غير محدودة</string>
     <string name="settings_auto_download_podcasts">تنزيل البث الصوتي تلقائيًا</string>
     <string name="settings_auto_download_new_episodes">حلقات جديدة</string>
@@ -1710,6 +1711,7 @@ Language: ar
     <string name="profile_navigation_listening_history">تاريخ الاستماع</string>
     <string name="profile_navigation_files">الملفات</string>
     <string name="profile_monthly">شهريًا</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
@@ -1719,7 +1721,6 @@ Language: ar
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_add_custom_image">إضافة صورة مخصصة</string>
     <string name="profile_file_locked">مقفل</string>
     <string name="profile_file">الملف</string>
