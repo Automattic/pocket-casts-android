@@ -65,10 +65,14 @@ class PlaybackNoticeManagerTest {
     @Test
     fun `connection lost shown when offline without playback`() = runTest {
         FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
         val manager = createManager(backgroundScope)
         runCurrent()
 
         manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            networkCapabilities.value = null
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
             assertEquals(offlineMessage, notice?.message)
@@ -163,16 +167,19 @@ class PlaybackNoticeManagerTest {
     }
 
     @Test
-    fun `no recovery on initial app start`() = runTest {
+    fun `no notice on initial app start with unknown network`() = runTest {
         FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
         val manager = createManager(backgroundScope)
         runCurrent()
 
         manager.playbackNotice.test {
-            assertEquals(PlaybackNoticeType.CONNECTION_LOST, awaitItem()?.type)
-
-            networkCapabilities.value = onlineCapabilities()
+            // Initial null capabilities treated as unknown — no CONNECTION_LOST shown
             assertNull(awaitItem())
+
+            // Going online from unknown state should not show RECOVERY
+            networkCapabilities.value = onlineCapabilities()
+            runCurrent()
+            expectNoEvents()
         }
     }
 
@@ -200,6 +207,30 @@ class PlaybackNoticeManagerTest {
 
             networkCapabilities.value = onlineCapabilities()
             assertEquals(PlaybackNoticeType.RECOVERY, awaitItem()?.type)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
+        }
+    }
+
+    @Test
+    fun `connection playback error shown as connection lost`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                isConnectionError = true,
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
+            assertEquals(offlineMessage, notice?.message)
 
             advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
             runCurrent()

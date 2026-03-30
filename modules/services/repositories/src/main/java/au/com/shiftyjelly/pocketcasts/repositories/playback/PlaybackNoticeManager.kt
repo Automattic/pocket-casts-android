@@ -56,7 +56,7 @@ class PlaybackNoticeManager @Inject constructor(
 
     private fun monitorConnectionIssues() {
         var wasOffline = false
-        var isFirstEmission = true
+        var hasReceivedCapabilities = false
         var recoveryDismissJob: Job? = null
         var connectionLostDismissJob: Job? = null
 
@@ -64,6 +64,12 @@ class PlaybackNoticeManager @Inject constructor(
             networkConnectionWatcher.networkCapabilities.collect { capabilities ->
                 val isOffline = capabilities == null ||
                     !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+
+                if (isOffline && capabilities == null && !hasReceivedCapabilities) {
+                    hasReceivedCapabilities = true
+                    return@collect
+                }
+                hasReceivedCapabilities = true
 
                 if (isOffline) {
                     recoveryDismissJob?.cancel()
@@ -76,7 +82,7 @@ class PlaybackNoticeManager @Inject constructor(
                         delay(AUTO_DISMISS_DURATION)
                         connectionNotice.value = null
                     }
-                    if (!isFirstEmission) wasOffline = true
+                    wasOffline = true
                 } else if (wasOffline) {
                     wasOffline = false
                     connectionLostDismissJob?.cancel()
@@ -91,7 +97,6 @@ class PlaybackNoticeManager @Inject constructor(
                 } else if (recoveryDismissJob?.isActive != true) {
                     connectionNotice.value = null
                 }
-                isFirstEmission = false
             }
         }
     }
@@ -107,12 +112,17 @@ class PlaybackNoticeManager @Inject constructor(
                 when {
                     !playbackState.isError -> null
 
-                    isForeground -> PlaybackNoticeInfo(
+                    !isForeground -> null
+
+                    playbackState.isConnectionError -> PlaybackNoticeInfo(
+                        message = context.getString(LR.string.error_playback_offline),
+                        type = PlaybackNoticeType.CONNECTION_LOST,
+                    )
+
+                    else -> PlaybackNoticeInfo(
                         message = context.getString(LR.string.error_episode_not_available),
                         type = PlaybackNoticeType.PLAYBACK,
                     )
-
-                    else -> null
                 }
             }.collect { notice ->
                 autoDismissJob?.cancel()
