@@ -547,6 +547,52 @@ class SharingClientTest {
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("audio/mp3", intent.type)
         assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    @Test
+    fun shareEpisodeFileWithNullFileType() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        val request = SharingRequest
+            .episodeFile(
+                podcast = podcast,
+                episode = episode.copy(downloadedFilePath = file.path, fileType = null),
+                source = SourceView.PLAYER,
+            ).build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccessful)
+
+        val intent = shareStarter.requireChooserIntent
+        assertEquals("application/octet-stream", intent.type)
+    }
+
+    @Test
+    fun shareEpisodeFileFromUncoveredPath() = runTest {
+        val uncoveredDir = File(context.filesDir, "test_uncovered_dir").also { it.mkdirs() }
+        val file = File(uncoveredDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        try {
+            val request = SharingRequest
+                .episodeFile(
+                    podcast = podcast,
+                    episode = episode.copy(downloadedFilePath = file.path, fileType = "audio/mp3"),
+                    source = SourceView.PLAYER,
+                ).build()
+
+            val response = client.share(request)
+            assertTrue(response.isSuccessful)
+            assertNull(response.feedbackMessage)
+
+            val intent = shareStarter.requireChooserIntent
+            assertEquals(ACTION_SEND, intent.action)
+            assertEquals("audio/mp3", intent.type)
+
+            val cachedFile = File(context.cacheDir, "file.mp3")
+            assertEquals(FileUtil.getUriForFile(context, cachedFile), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+        } finally {
+            file.delete()
+            uncoveredDir.delete()
+        }
     }
 
     @Test
