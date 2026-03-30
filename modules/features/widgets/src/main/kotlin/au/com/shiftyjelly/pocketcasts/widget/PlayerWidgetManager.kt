@@ -14,7 +14,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Singleton
 
+@Singleton
 class PlayerWidgetManager @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
