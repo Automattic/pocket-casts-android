@@ -149,7 +149,7 @@ platform :android do
       extracted_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH
     )
     android_update_release_notes(
-      new_version: new_version,
+      next_version: release_version_next,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
     push_to_git_remote(set_upstream: true, tags: false)
