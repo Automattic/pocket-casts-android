@@ -72,6 +72,10 @@ class PlaybackNoticeManagerTest {
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
             assertEquals(offlineMessage, notice?.message)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
         }
     }
 
@@ -90,6 +94,10 @@ class PlaybackNoticeManagerTest {
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
             assertEquals(offlineMessage, notice?.message)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
         }
     }
 
@@ -110,6 +118,25 @@ class PlaybackNoticeManagerTest {
             val recovery = awaitItem()
             assertEquals(PlaybackNoticeType.RECOVERY, recovery?.type)
             assertEquals(connectedMessage, recovery?.message)
+        }
+    }
+
+    @Test
+    fun `connection lost auto-dismisses after 5 seconds`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            networkCapabilities.value = null
+            assertEquals(PlaybackNoticeType.CONNECTION_LOST, awaitItem()?.type)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
         }
     }
 
@@ -341,8 +368,10 @@ class PlaybackNoticeManagerTest {
             assertEquals(PlaybackNoticeType.CONNECTION_LOST, awaitItem()?.type)
 
             // Wait longer than auto-dismiss duration while masked
+            // Both CONNECTION_LOST and PLAYBACK auto-dismiss timers fire
             advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION + 1.seconds)
             runCurrent()
+            assertNull(awaitItem())
 
             // Connection recovers — playback error was already auto-dismissed while masked
             networkCapabilities.value = onlineCapabilities()
