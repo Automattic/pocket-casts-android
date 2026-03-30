@@ -12,9 +12,9 @@ import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import au.com.shiftyjelly.pocketcasts.widget.data.SmallPlayerWidgetState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import javax.inject.Singleton
 
 @Singleton
 class PlayerWidgetManager @Inject constructor(
