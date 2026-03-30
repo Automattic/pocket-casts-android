@@ -108,7 +108,8 @@ platform :android do
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
 
-    # If a new version is passed, use it as source of truth from now on
+    # new_version: the release version being frozen (e.g. "8.9")
+    # new_beta_version: the first beta of that release (e.g. "8.9-rc-1"), written to version.properties
     new_version = version || release_version_next
     release_branch_name = "release/#{new_version}"
     new_beta_version = beta_version_next(version_name: new_version)
@@ -148,6 +149,8 @@ platform :android do
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH,
       extracted_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH
     )
+    # After the version file is bumped to new_beta_version (e.g. "8.9-rc-1"),
+    # release_version_next reads it and computes the next release (e.g. "8.10").
     android_update_release_notes(
       next_version: release_version_next,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
