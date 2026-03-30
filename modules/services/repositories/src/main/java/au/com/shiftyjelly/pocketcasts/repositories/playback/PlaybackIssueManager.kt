@@ -9,52 +9,49 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+enum class PlaybackIssueType {
+    CONNECTION,
+    PLAYBACK,
+}
 
 data class PlaybackIssueInfo(
     val message: String,
-    val onClick: (() -> Unit)? = null,
+    val type: PlaybackIssueType,
 )
 
 @Singleton
 class PlaybackIssueManager @Inject constructor(
-    private val playbackManager: PlaybackManager,
-    private val networkConnectionWatcher: NetworkConnectionWatcher,
+    playbackManager: PlaybackManager,
+    networkConnectionWatcher: NetworkConnectionWatcher,
     @ApplicationContext private val context: Context,
 ) {
     val playbackIssue: Flow<PlaybackIssueInfo?> = combine(
-        playbackManager.playbackStateFlow
-            .map { it.state to it.lastErrorMessage }
-            .distinctUntilChanged(),
+        playbackManager.playbackStateFlow,
         networkConnectionWatcher.networkCapabilities,
         FeatureFlag.isEnabledFlow(Feature.PLAYBACK_ERROR_INFO_BAR),
-    ) { (state, lastErrorMessage), networkCapabilities, isEnabled ->
+    ) { playbackState, networkCapabilities, isEnabled ->
         if (!isEnabled) return@combine null
-        resolveIssue(state, lastErrorMessage, networkCapabilities)
+        resolveIssue(playbackState, networkCapabilities)
     }
 
     private fun resolveIssue(
-        state: PlaybackState.State,
-        lastErrorMessage: String?,
+        playbackState: PlaybackState,
         networkCapabilities: NetworkCapabilities?,
     ): PlaybackIssueInfo? {
-        val isError = state == PlaybackState.State.ERROR
         val isOffline = networkCapabilities == null ||
             !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
         return when {
-            isError && isOffline -> PlaybackIssueInfo(
+            playbackState.isError && (isOffline || playbackState.isConnectionError) -> PlaybackIssueInfo(
                 message = context.getString(LR.string.error_playback_offline),
+                type = PlaybackIssueType.CONNECTION,
             )
 
-            isError && lastErrorMessage != null -> PlaybackIssueInfo(
-                message = lastErrorMessage,
-            )
-
-            isError -> PlaybackIssueInfo(
-                message = context.getString(LR.string.error_check_your_internet_connection),
+            playbackState.isError -> PlaybackIssueInfo(
+                message = context.getString(LR.string.error_episode_not_available),
+                type = PlaybackIssueType.PLAYBACK,
             )
 
             else -> null

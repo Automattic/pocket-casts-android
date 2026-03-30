@@ -35,7 +35,7 @@ class PlaybackIssueManagerTest {
     }
     private val context = mock<Context> {
         on { getString(LR.string.error_playback_offline) } doReturn "You're offline"
-        on { getString(LR.string.error_check_your_internet_connection) } doReturn "Check your internet connection."
+        on { getString(LR.string.error_episode_not_available) } doReturn "Episode not available"
     }
 
     private val manager = PlaybackIssueManager(
@@ -57,7 +57,7 @@ class PlaybackIssueManagerTest {
     }
 
     @Test
-    fun `error state while online with lastErrorMessage shows that message`() = runTest {
+    fun `error state while online with connection error shows offline message`() = runTest {
         FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
         networkCapabilitiesFlow.value = onlineCapabilities()
 
@@ -65,23 +65,27 @@ class PlaybackIssueManagerTest {
             playbackStateFlow.emit(
                 PlaybackState(
                     state = PlaybackState.State.ERROR,
-                    lastErrorMessage = "Custom error",
+                    isConnectionError = true,
                 ),
             )
 
-            assertEquals("Custom error", awaitItem()?.message)
+            val issue = awaitItem()
+            assertEquals("You're offline", issue?.message)
+            assertEquals(PlaybackIssueType.CONNECTION, issue?.type)
         }
     }
 
     @Test
-    fun `error state while online without lastErrorMessage shows generic internet message`() = runTest {
+    fun `error state while online without connection error shows episode not available`() = runTest {
         FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
         networkCapabilitiesFlow.value = onlineCapabilities()
 
         manager.playbackIssue.test {
             playbackStateFlow.emit(PlaybackState(state = PlaybackState.State.ERROR))
 
-            assertEquals("Check your internet connection.", awaitItem()?.message)
+            val issue = awaitItem()
+            assertEquals("Episode not available", issue?.message)
+            assertEquals(PlaybackIssueType.PLAYBACK, issue?.type)
         }
     }
 

@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -158,6 +159,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -179,6 +181,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -342,7 +345,7 @@ class MainActivity :
     private val miniPlayerHeight: Int
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
 
-    private val bottomContainerHeight: Int
+    private val bottomNavigationHeight: Int
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
@@ -497,9 +500,16 @@ class MainActivity :
                         enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) { issue ->
+                        val context = LocalContext.current
                         PlaybackErrorInfoBar(
                             message = issue.message,
-                            onClick = issue.onClick,
+                            onClick = when (issue.type) {
+                                PlaybackIssueType.PLAYBACK -> {
+                                    { context.startActivityViewUrl(Settings.INFO_FAQ_URL) }
+                                }
+
+                                PlaybackIssueType.CONNECTION -> null
+                            },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -1260,7 +1270,7 @@ class MainActivity :
 
     private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomContainerHeight
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
         }
     }
 

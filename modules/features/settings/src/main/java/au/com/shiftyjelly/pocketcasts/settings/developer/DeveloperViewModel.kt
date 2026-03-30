@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
@@ -189,6 +190,28 @@ class DeveloperViewModel
             val reviewInfo = reviewManager.requestReview()
             appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger, reviewInfo)
         }
+    }
+
+    fun triggerPlaybackError() {
+        val currentState = playbackManager.playbackStateRelay.blockingFirst()
+        playbackManager.playbackStateRelay.accept(
+            currentState.copy(
+                state = PlaybackState.State.ERROR,
+                isConnectionError = false,
+                lastErrorMessage = "Simulated playback error",
+            ),
+        )
+    }
+
+    fun triggerConnectionError() {
+        val currentState = playbackManager.playbackStateRelay.blockingFirst()
+        playbackManager.playbackStateRelay.accept(
+            currentState.copy(
+                state = PlaybackState.State.ERROR,
+                isConnectionError = true,
+                lastErrorMessage = null,
+            ),
+        )
     }
 
     fun clearAppReviewSettings() {
