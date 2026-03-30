@@ -45,7 +45,9 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                         .filter { episode -> episode.uuid in newEpisodeUuidSet }
                         .filter { episode ->
                             val canQueue = episode.canQueueForAutoDownload
-                            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Can't auto download new episode '${episode.uuid}'. Archived: ${episode.isArchived}, Finished: ${episode.isFinished}, Disabled: ${episode.isAutoDownloadDisabled}")
+                            if (!canQueue) {
+                                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Can't auto download new episode '${episode.uuid}'. Archived: ${episode.isArchived}, Finished: ${episode.isFinished}, Disabled: ${episode.isAutoDownloadDisabled}")
+                            }
                             canQueue
                         }
                         .map(BaseEpisode::uuid)
