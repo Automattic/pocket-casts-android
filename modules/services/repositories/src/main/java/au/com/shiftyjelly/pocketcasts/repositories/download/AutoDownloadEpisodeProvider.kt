@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +31,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
 
     private suspend fun getPodcastEpisodes(newEpisodeUuids: Collection<String>): Set<String> {
         val globalEnabled = settings.autoDownloadNewEpisodes.value == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
-        return if (globalEnabled) {
+        return if (globalEnabled && newEpisodeUuids.isNotEmpty()) {
             val perPodcastLimit = settings.autoDownloadLimit.value.episodeCount
             val newEpisodeUuidSet = newEpisodeUuids.toSet()
             podcastManager
@@ -41,9 +42,15 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                     episodeManager
                         .findEpisodesByPodcastOrderedSuspend(podcast)
                         .asSequence()
-                        .filter(BaseEpisode::canQueueForAutoDownload)
+                        .filter { episode -> episode.uuid in newEpisodeUuidSet }
+                        .filter { episode ->
+                            val canQueue = episode.canQueueForAutoDownload
+                            if (!canQueue) {
+                                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Can't auto download new episode '${episode.uuid}'. Archived: ${episode.isArchived}, Finished: ${episode.isFinished}, Disabled: ${episode.isAutoDownloadDisabled}")
+                            }
+                            canQueue
+                        }
                         .map(BaseEpisode::uuid)
-                        .filter(newEpisodeUuidSet::contains)
                         .take(perPodcastLimit)
                 }
         } else {

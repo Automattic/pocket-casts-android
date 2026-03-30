@@ -249,6 +249,13 @@ class VersionMigrationsWorker @AssistedInject constructor(
         if (previousVersionCode < 9382) {
             EpisodeTitlesNormalizationWorker.enqueue(applicationContext)
         }
+
+        if (previousVersionCode < 9418) {
+            val isAnyPodcastAutoDownload = podcastManager.findSubscribedNoOrder().any { it.isAutoDownloadNewEpisodes }
+            if (isAnyPodcastAutoDownload) {
+                settings.autoDownloadNewEpisodes.set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
+            }
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
