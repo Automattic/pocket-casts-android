@@ -517,7 +517,7 @@ class MainActivity :
                                         if (!viewModel.isPlayerOpen) {
                                             eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
                                         }
-                                        PlaybackIssuesBottomSheetFragment.show(supportFragmentManager)
+                                        PlaybackIssuesBottomSheetFragment.show(supportFragmentManager, notice.supportUrl)
                                     }
                                 }
 

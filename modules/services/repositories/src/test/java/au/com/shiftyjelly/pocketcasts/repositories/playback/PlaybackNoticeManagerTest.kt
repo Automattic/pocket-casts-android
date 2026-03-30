@@ -5,6 +5,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.Context
 import android.net.NetworkCapabilities
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -54,10 +55,13 @@ class PlaybackNoticeManagerTest {
         override val isInForeground: StateFlow<Boolean> = this@PlaybackNoticeManagerTest.isInForeground
     }
 
+    private val errorClassifier = PlaybackErrorClassifier()
+
     private fun createManager(scope: kotlinx.coroutines.CoroutineScope) = PlaybackNoticeManager(
         playbackManager = playbackManager,
         networkConnectionWatcher = networkConnectionWatcher,
         appLifecycleProvider = appLifecycleProvider,
+        errorClassifier = errorClassifier,
         applicationScope = scope,
         context = context,
     )
@@ -226,7 +230,7 @@ class PlaybackNoticeManagerTest {
 
             playbackStateFlow.value = PlaybackState(
                 state = PlaybackState.State.ERROR,
-                isConnectionError = true,
+                playbackIssue = PlaybackIssue.ConnectionError,
             )
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
@@ -431,6 +435,140 @@ class PlaybackNoticeManagerTest {
             runCurrent()
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `playback error with http 401 has access issues support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(401),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(Settings.INFO_EPISODE_ACCESS_ISSUES_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `playback error with http 404 has not found support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(404),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(Settings.INFO_EPISODE_NOT_FOUND_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `playback error with http 500 has server problem support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(500),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `playback error without http code has default support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `connection error notice has no support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.ConnectionError,
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
+            assertNull(notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `connection lost network notice has no support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            networkCapabilities.value = null
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.CONNECTION_LOST, notice?.type)
+            assertNull(notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `recovery notice has no support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            networkCapabilities.value = null
+            awaitItem()
+
+            networkCapabilities.value = onlineCapabilities()
+            val recovery = awaitItem()
+            assertEquals(PlaybackNoticeType.RECOVERY, recovery?.type)
+            assertNull(recovery?.supportUrl)
         }
     }
 

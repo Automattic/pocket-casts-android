@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -197,7 +198,7 @@ class DeveloperViewModel
         playbackManager.playbackStateRelay.accept(
             currentState.copy(
                 state = PlaybackState.State.ERROR,
-                isConnectionError = false,
+                playbackIssue = null,
                 lastErrorMessage = "Simulated playback error",
             ),
         )
@@ -208,7 +209,7 @@ class DeveloperViewModel
         playbackManager.playbackStateRelay.accept(
             currentState.copy(
                 state = PlaybackState.State.ERROR,
-                isConnectionError = true,
+                playbackIssue = PlaybackIssue.ConnectionError,
                 lastErrorMessage = null,
             ),
         )

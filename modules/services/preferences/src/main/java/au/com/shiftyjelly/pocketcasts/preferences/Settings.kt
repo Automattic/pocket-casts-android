@@ -64,6 +64,9 @@ interface Settings {
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/knowledge-base/how-to-cancel-a-subscription/"
         const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
         const val INFO_DOWNLOAD_AND_PLAYBACK_URL = "https://support.pocketcasts.com/knowledge-base/download-errors/"
+        const val INFO_EPISODE_ACCESS_ISSUES_URL = "https://support.pocketcasts.com/knowledge-base/episode-access-issues/"
+        const val INFO_EPISODE_NOT_FOUND_URL = "https://support.pocketcasts.com/knowledge-base/episode-not-found/"
+        const val INFO_EPISODE_SERVER_PROBLEM_URL = "https://support.pocketcasts.com/knowledge-base/episode-server-problem/"
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 

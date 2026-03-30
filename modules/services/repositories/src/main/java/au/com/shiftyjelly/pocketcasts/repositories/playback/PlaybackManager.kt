@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -1293,8 +1294,13 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val isConnectionError = errorClassifier.isConnectionError(event)
-                val errorMessage = if (isConnectionError) {
+                val cause = event.error?.cause
+                val playbackIssue = when {
+                    cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
+                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
+                    else -> null
+                }
+                val errorMessage = if (playbackIssue is PlaybackIssue.ConnectionError) {
                     application.getString(LR.string.player_play_failed_check_internet)
                 } else {
                     event.message
@@ -1315,7 +1321,14 @@ open class PlaybackManager @Inject constructor(
                         "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
                     ),
                 )
-                playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, isConnectionError = isConnectionError, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        state = PlaybackState.State.ERROR,
+                        playbackIssue = playbackIssue,
+                        lastErrorMessage = errorMessage,
+                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                    ),
+                )
             }
         }
     }

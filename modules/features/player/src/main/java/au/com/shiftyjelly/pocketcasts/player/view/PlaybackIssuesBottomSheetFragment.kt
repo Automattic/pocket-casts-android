@@ -52,22 +52,26 @@ class PlaybackIssuesBottomSheetFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
+        val supportUrl = arguments?.getString(ARG_SUPPORT_URL) ?: Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL
         DialogBox(themeType = Theme.ThemeType.LIGHT) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Pill()
                 Spacer(modifier = Modifier.height(6.dp))
-                WebViewContainer(modifier = Modifier.weight(1f))
+                WebViewContainer(url = supportUrl, modifier = Modifier.weight(1f))
             }
         }
     }
 
     companion object {
         private const val TAG = "PlaybackIssuesBottomSheetFragment"
+        private const val ARG_SUPPORT_URL = "arg_support_url"
 
-        fun show(fragmentManager: FragmentManager) {
+        fun show(fragmentManager: FragmentManager, supportUrl: String? = null) {
             if (!fragmentManager.isStateSaved && fragmentManager.findFragmentByTag(TAG) == null) {
-                PlaybackIssuesBottomSheetFragment().show(fragmentManager, TAG)
+                PlaybackIssuesBottomSheetFragment().apply {
+                    arguments = Bundle().apply { putString(ARG_SUPPORT_URL, supportUrl) }
+                }.show(fragmentManager, TAG)
             }
         }
     }
@@ -81,9 +85,9 @@ private enum class ContainerState {
 }
 
 @Composable
-private fun WebViewContainer(modifier: Modifier = Modifier) {
+private fun WebViewContainer(url: String, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
-        val webViewState = rememberWebViewState(url = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL)
+        val webViewState = rememberWebViewState(url = url)
         var containerState by remember { mutableStateOf(ContainerState.Initializing) }
 
         LaunchedEffect(webViewState) {

@@ -695,15 +695,19 @@ class PlayerHeaderFragment :
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
-                        onClick = if (issue.type == PlaybackNoticeType.PLAYBACK) {
-                            {
-                                if (isPlayerOpen) {
-                                    eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        onClick = when (issue.type) {
+                            PlaybackNoticeType.PLAYBACK -> {
+                                {
+                                    if (isPlayerOpen) {
+                                        eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                    }
+                                    PlaybackIssuesBottomSheetFragment.show(parentFragmentManager, issue.supportUrl)
                                 }
-                                PlaybackIssuesBottomSheetFragment.show(parentFragmentManager)
                             }
-                        } else {
-                            null
+
+                            PlaybackNoticeType.CONNECTION_LOST -> null
+
+                            PlaybackNoticeType.RECOVERY -> null
                         },
                     )
                 }
