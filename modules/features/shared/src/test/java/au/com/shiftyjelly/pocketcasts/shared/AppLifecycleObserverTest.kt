@@ -84,6 +84,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var blazeAdsManager: BlazeAdsManager
 
+    @Mock private lateinit var appLifecycleProviderImpl: AppLifecycleProviderImpl
+
     private var coroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     lateinit var appLifecycleObserver: AppLifecycleObserver
@@ -107,6 +109,7 @@ class AppLifecycleObserverTest {
             appContext = context,
             appLifecycleAnalytics = appLifecycleAnalytics,
             appLifecycleOwner = appLifecycleOwner,
+            appLifecycleProviderImpl = appLifecycleProviderImpl,
             blazeAdsManager = blazeAdsManager,
             preferencesFeatureProvider = preferencesFeatureProvider,
             defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,

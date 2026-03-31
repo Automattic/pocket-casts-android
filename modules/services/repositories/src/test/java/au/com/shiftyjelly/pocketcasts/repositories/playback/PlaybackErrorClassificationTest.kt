@@ -7,6 +7,7 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -187,6 +188,71 @@ class PlaybackErrorClassificationTest {
         val event = PlayerEvent.PlayerError("Cast playback error", error)
         val stringId = errorClassifier.classifyErrorStringId(event)
         assertEquals(LR.string.error_unable_to_cast, stringId)
+    }
+
+    @Test
+    fun `classifyHelpUrl 401 maps to access issues`() {
+        assertEquals(Settings.INFO_EPISODE_ACCESS_ISSUES_URL, errorClassifier.classifyHelpUrl(401))
+    }
+
+    @Test
+    fun `classifyHelpUrl 403 maps to access issues`() {
+        assertEquals(Settings.INFO_EPISODE_ACCESS_ISSUES_URL, errorClassifier.classifyHelpUrl(403))
+    }
+
+    @Test
+    fun `classifyHelpUrl 404 maps to not found`() {
+        assertEquals(Settings.INFO_EPISODE_NOT_FOUND_URL, errorClassifier.classifyHelpUrl(404))
+    }
+
+    @Test
+    fun `classifyHelpUrl 410 maps to not found`() {
+        assertEquals(Settings.INFO_EPISODE_NOT_FOUND_URL, errorClassifier.classifyHelpUrl(410))
+    }
+
+    @Test
+    fun `classifyHelpUrl 500 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(500))
+    }
+
+    @Test
+    fun `classifyHelpUrl 503 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(503))
+    }
+
+    @Test
+    fun `classifyHelpUrl 400 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(400))
+    }
+
+    @Test
+    fun `classifyHelpUrl 405 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(405))
+    }
+
+    @Test
+    fun `classifyHelpUrl 408 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(408))
+    }
+
+    @Test
+    fun `classifyHelpUrl 409 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(409))
+    }
+
+    @Test
+    fun `classifyHelpUrl 429 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(429))
+    }
+
+    @Test
+    fun `classifyHelpUrl null maps to default download errors`() {
+        assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, errorClassifier.classifyHelpUrl(null))
+    }
+
+    @Test
+    fun `classifyHelpUrl unknown code maps to default download errors`() {
+        assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, errorClassifier.classifyHelpUrl(418))
     }
 
     private fun createHttpErrorEvent(responseCode: Int): PlayerEvent.PlayerError {

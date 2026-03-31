@@ -21,7 +21,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,6 +96,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.view.PlaybackIssuesBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImage
@@ -110,8 +114,9 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueInfo
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeInfo
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -133,6 +138,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackErrorShownEvent
+import com.automattic.eventhorizon.PlaybackErrorTappedEvent
+import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.TranscriptDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
@@ -170,6 +179,9 @@ class PlayerHeaderFragment :
 
     @Inject
     lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
@@ -220,7 +232,7 @@ class PlayerHeaderFragment :
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
         val activeAd by viewModel.activeAd.collectAsState()
-        val playbackIssue by viewModel.playbackIssue.collectAsState()
+        val playbackNotice by viewModel.playbackNotice.collectAsState()
 
         val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
@@ -257,7 +269,8 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         transitionData = transitionData,
                         isPortraitPlayer = isPortraitPlayer,
-                        playbackIssue = playbackIssue,
+                        isPlayerOpen = isPlayerOpen,
+                        playbackNotice = playbackNotice,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
@@ -634,7 +647,8 @@ class PlayerHeaderFragment :
         playerColors: PlayerColors,
         transitionData: TranscriptTransitionData,
         isPortraitPlayer: Boolean,
-        playbackIssue: PlaybackIssueInfo?,
+        isPlayerOpen: Boolean,
+        playbackNotice: PlaybackNoticeInfo?,
         modifier: Modifier = Modifier,
     ) {
         Column(modifier = modifier) {
@@ -647,7 +661,7 @@ class PlayerHeaderFragment :
                     transitionData = transitionData,
                     modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
                         .then(
-                            if (playbackIssue == null || transitionData.isTranscriptOpen) {
+                            if (playbackNotice == null || transitionData.isTranscriptOpen) {
                                 Modifier.navigationBarsPadding()
                             } else {
                                 Modifier
@@ -661,18 +675,52 @@ class PlayerHeaderFragment :
                     headerData = headerData,
                     playerColors = playerColors,
                     transitionData = transitionData,
-                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                        .then(
+                            if (playbackNotice == null || transitionData.isTranscriptOpen) {
+                                Modifier.navigationBarsPadding()
+                            } else {
+                                Modifier
+                            },
+                        ),
                 )
             }
             AnimatedNonNullVisibility(
-                item = if (transitionData.isTranscriptOpen) null else playbackIssue,
+                item = if (transitionData.isTranscriptOpen) null else playbackNotice,
+                modifier = Modifier.padding(top = 16.dp),
                 enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                 exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
             ) { issue ->
-                PlaybackErrorInfoBar(
-                    message = issue.message,
-                    playerColors = playerColors,
-                )
+                Column(
+                    modifier = Modifier
+                        .background(playerColors.contrast06)
+                        .navigationBarsPadding(),
+                ) {
+                    LaunchedEffect(issue, isPlayerOpen) {
+                        if (isPlayerOpen) {
+                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        }
+                    }
+
+                    PlaybackErrorInfoBar(
+                        message = issue.message,
+                        playerColors = playerColors,
+                        onClick = when (issue.type) {
+                            PlaybackNoticeType.PLAYBACK -> {
+                                {
+                                    if (isPlayerOpen) {
+                                        eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                    }
+                                    PlaybackIssuesBottomSheetFragment.show(parentFragmentManager, issue.supportUrl)
+                                }
+                            }
+
+                            PlaybackNoticeType.CONNECTION_LOST -> null
+
+                            PlaybackNoticeType.RECOVERY -> null
+                        },
+                    )
+                }
             }
         }
     }
@@ -816,12 +864,16 @@ class PlayerHeaderFragment :
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                    .scrollable(
+                        state = rememberScrollableState { it },
+                        orientation = Orientation.Vertical,
+                        flingBehavior = showUpNextFlingBehavior,
+                    ),
             ) {
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
                     playerColors = playerColors,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().weight(1f),
                 )
                 Spacer(
                     modifier = Modifier.height(16.dp),
@@ -855,7 +907,11 @@ class PlayerHeaderFragment :
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                    .scrollable(
+                        state = rememberScrollableState { it },
+                        orientation = Orientation.Vertical,
+                        flingBehavior = showUpNextFlingBehavior,
+                    ),
             ) {
                 Spacer(
                     modifier = Modifier.weight(1f),
@@ -883,9 +939,13 @@ class PlayerHeaderFragment :
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                .scrollable(
+                    state = rememberScrollableState { it },
+                    orientation = Orientation.Vertical,
+                    flingBehavior = showUpNextFlingBehavior,
+                ),
         ) {
-            Row {
+            Row(modifier = Modifier.weight(1f)) {
                 val windowWithPx = LocalWindowInfo.current.containerSize.width
                 val windowWidthDp = LocalDensity.current.run { windowWithPx.toDp() }
                 val maxSize = when (artworkOrVideoState) {

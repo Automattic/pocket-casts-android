@@ -25,6 +25,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -127,6 +128,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.player.view.PlaybackIssuesBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
@@ -159,6 +161,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -207,6 +210,9 @@ import com.automattic.eventhorizon.EndOfYearModalShownEvent
 import com.automattic.eventhorizon.EndOfYearModalTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FiltersTabOpenedEvent
+import com.automattic.eventhorizon.PlaybackErrorShownEvent
+import com.automattic.eventhorizon.PlaybackErrorTappedEvent
+import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.PodcastsTabOpenedEvent
 import com.automattic.eventhorizon.ProfileTabOpenedEvent
 import com.automattic.eventhorizon.UpNextDismissedEvent
@@ -342,7 +348,7 @@ class MainActivity :
     private val miniPlayerHeight: Int
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
 
-    private val bottomContainerHeight: Int
+    private val bottomNavigationHeight: Int
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
@@ -489,17 +495,36 @@ class MainActivity :
         binding.playbackIssueBar.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val playbackIssue by viewModel.playbackIssueFlow.collectAsStateWithLifecycle()
+                val playbackNotice by viewModel.playbackNoticeFlow.collectAsStateWithLifecycle()
+                val playerOpen by viewModel.isPlayerOpenFlow.collectAsStateWithLifecycle()
 
                 AppTheme(theme.activeTheme) {
                     AnimatedNonNullVisibility(
-                        item = playbackIssue,
+                        item = if (playerOpen) null else playbackNotice,
                         enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Top),
                         exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Top),
-                    ) { issue ->
+                    ) { notice ->
+                        LaunchedEffect(notice) {
+                            if (!viewModel.isPlayerOpen) {
+                                eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                            }
+                        }
                         PlaybackErrorInfoBar(
-                            message = issue.message,
-                            onClick = issue.onClick,
+                            message = notice.message,
+                            onClick = when (notice.type) {
+                                PlaybackNoticeType.PLAYBACK -> {
+                                    {
+                                        if (!viewModel.isPlayerOpen) {
+                                            eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.MiniPlayer))
+                                        }
+                                        PlaybackIssuesBottomSheetFragment.show(supportFragmentManager, notice.supportUrl)
+                                    }
+                                }
+
+                                PlaybackNoticeType.CONNECTION_LOST -> null
+
+                                PlaybackNoticeType.RECOVERY -> null
+                            },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -1260,7 +1285,7 @@ class MainActivity :
 
     private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomContainerHeight
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
         }
     }
 

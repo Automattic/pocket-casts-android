@@ -30,8 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
@@ -90,7 +90,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
-    private val playbackIssueManager: PlaybackIssueManager,
+    private val playbackNoticeManager: PlaybackNoticeManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
@@ -318,7 +318,7 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
-    val playbackIssue = playbackIssueManager.playbackIssue
+    val playbackNotice = playbackNoticeManager.playbackNotice
         .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)
 
     val playerFlow = playbackManager.playerFlow

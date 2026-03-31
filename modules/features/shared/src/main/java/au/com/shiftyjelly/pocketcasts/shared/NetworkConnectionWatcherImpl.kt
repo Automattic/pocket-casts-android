@@ -30,6 +30,11 @@ class NetworkConnectionWatcherImpl @Inject constructor(
             this@NetworkConnectionWatcherImpl.onCapabilitiesChanged(networkCapabilities)
             super.onCapabilitiesChanged(network, networkCapabilities)
         }
+
+        override fun onLost(network: Network) {
+            this@NetworkConnectionWatcherImpl.onNetworkLost(network)
+            super.onLost(network)
+        }
     }
 
     fun startWatching() {
@@ -51,5 +56,17 @@ class NetworkConnectionWatcherImpl @Inject constructor(
     @VisibleForTesting
     internal fun onCapabilitiesChanged(networkCapabilities: NetworkCapabilities) {
         _networkCapabilities.value = networkCapabilities
+    }
+
+    @VisibleForTesting
+    internal fun onNetworkLost(lostNetwork: Network) {
+        val connectivityManager = PCNetworkUtils.getConnectivityManager(context)
+        val activeNetwork = connectivityManager.activeNetwork
+        val activeCapabilities = if (activeNetwork != null && activeNetwork != lostNetwork) {
+            connectivityManager.getNetworkCapabilities(activeNetwork)
+        } else {
+            null
+        }
+        _networkCapabilities.value = activeCapabilities
     }
 }

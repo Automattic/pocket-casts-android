@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -1244,6 +1245,7 @@ open class PlaybackManager @Inject constructor(
 
     /** LISTENERS  */
 
+    @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
         settings.recordErrorSession()
         val episode = getCurrentEpisode()
@@ -1292,7 +1294,17 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val errorMessage = mapPlaybackErrorToUserMessage(event)
+                val cause = event.error?.cause
+                val playbackIssue = when {
+                    cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
+                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
+                    else -> null
+                }
+                val errorMessage = if (playbackIssue is PlaybackIssue.ConnectionError) {
+                    application.getString(LR.string.player_play_failed_check_internet)
+                } else {
+                    event.message
+                }
 
                 eventHorizon.track(
                     PlaybackFailedEvent(
@@ -1309,12 +1321,10 @@ open class PlaybackManager @Inject constructor(
                         "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
                     ),
                 )
-
-                Toast.makeText(application, errorMessage, Toast.LENGTH_LONG).show()
-
                 playbackStateRelay.accept(
                     playbackState.copy(
                         state = PlaybackState.State.ERROR,
+                        playbackIssue = playbackIssue,
                         lastErrorMessage = errorMessage,
                         lastChangeFrom = LastChangeFrom.OnPlayerError.value,
                     ),
