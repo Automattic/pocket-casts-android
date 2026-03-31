@@ -15,7 +15,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.HttpDataSource
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
@@ -1294,7 +1293,7 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                val isConnectionError = event.error?.cause is HttpDataSource.HttpDataSourceException
+                val isConnectionError = errorClassifier.isConnectionError(event)
                 val errorMessage = if (isConnectionError) {
                     application.getString(LR.string.player_play_failed_check_internet)
                 } else {

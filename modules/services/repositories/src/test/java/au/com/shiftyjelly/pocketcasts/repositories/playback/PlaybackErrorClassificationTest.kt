@@ -8,6 +8,8 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -187,6 +189,52 @@ class PlaybackErrorClassificationTest {
         val event = PlayerEvent.PlayerError("Cast playback error", error)
         val stringId = errorClassifier.classifyErrorStringId(event)
         assertEquals(LR.string.error_unable_to_cast, stringId)
+    }
+
+    @Test
+    fun `HttpDataSourceException is classified as connection error`() {
+        val cause = HttpDataSource.HttpDataSourceException(
+            "Connection failed",
+            DataSpec(Uri.parse("https://example.com/audio.mp3")),
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+            HttpDataSource.HttpDataSourceException.TYPE_OPEN,
+        )
+        val error = PlaybackException(
+            "Source error",
+            cause,
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+        )
+        val event = PlayerEvent.PlayerError("Connection failed", error)
+        assertTrue(errorClassifier.isConnectionError(event))
+    }
+
+    @Test
+    fun `InvalidResponseCodeException is not classified as connection error`() {
+        val event = createHttpErrorEvent(404)
+        assertFalse(errorClassifier.isConnectionError(event))
+    }
+
+    @Test
+    fun `HTTP 401 is not classified as connection error`() {
+        val event = createHttpErrorEvent(401)
+        assertFalse(errorClassifier.isConnectionError(event))
+    }
+
+    @Test
+    fun `null error is not classified as connection error`() {
+        val event = PlayerEvent.PlayerError("Unknown error", null)
+        assertFalse(errorClassifier.isConnectionError(event))
+    }
+
+    @Test
+    fun `non-network error is not classified as connection error`() {
+        val error = PlaybackException(
+            "Decoder init failed",
+            null,
+            PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
+        )
+        val event = PlayerEvent.PlayerError("Decoder init failed", error)
+        assertFalse(errorClassifier.isConnectionError(event))
     }
 
     private fun createHttpErrorEvent(responseCode: Int): PlayerEvent.PlayerError {
