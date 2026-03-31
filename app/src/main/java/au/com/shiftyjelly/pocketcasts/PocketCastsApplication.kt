@@ -56,6 +56,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flow
@@ -313,6 +314,7 @@ class PocketCastsApplication :
         playbackManager.playbackStateRelay.asFlow()
             .map { state -> state.isPlaying }
             .distinctUntilChanged()
+            .conflate()
             .onEach(playerWidgetManager::updateIsPlaying)
             .launchIn(applicationScope)
         val queueFlow = flow {
@@ -324,6 +326,7 @@ class PocketCastsApplication :
         }
         queueFlow
             .distinctUntilChangedBy { queue -> queue.map { it.uuid to it.playedUpToMs } }
+            .conflate()
             .onEach(playerWidgetManager::updateQueue)
             .launchIn(applicationScope)
     }
