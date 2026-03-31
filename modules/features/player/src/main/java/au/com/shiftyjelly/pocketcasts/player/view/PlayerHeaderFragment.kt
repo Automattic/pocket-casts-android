@@ -135,6 +135,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackErrorShownEvent
+import com.automattic.eventhorizon.PlaybackErrorTappedEvent
+import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.TranscriptDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
@@ -172,6 +176,9 @@ class PlayerHeaderFragment :
 
     @Inject
     lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
@@ -259,6 +266,7 @@ class PlayerHeaderFragment :
                         playerColors = playerColors,
                         transitionData = transitionData,
                         isPortraitPlayer = isPortraitPlayer,
+                        isPlayerOpen = isPlayerOpen,
                         playbackIssue = playbackIssue,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
@@ -636,6 +644,7 @@ class PlayerHeaderFragment :
         playerColors: PlayerColors,
         transitionData: TranscriptTransitionData,
         isPortraitPlayer: Boolean,
+        isPlayerOpen: Boolean,
         playbackIssue: PlaybackIssueInfo?,
         modifier: Modifier = Modifier,
     ) {
@@ -677,11 +686,22 @@ class PlayerHeaderFragment :
                         .background(playerColors.contrast06)
                         .navigationBarsPadding(),
                 ) {
+                    LaunchedEffect(issue, isPlayerOpen) {
+                        if (isPlayerOpen) {
+                            eventHorizon.track(PlaybackErrorShownEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                        }
+                    }
+
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
                         onClick = if (issue.type == PlaybackIssueType.PLAYBACK) {
-                            { PlaybackIssuesBottomSheetFragment.show(parentFragmentManager) }
+                            {
+                                if (isPlayerOpen) {
+                                    eventHorizon.track(PlaybackErrorTappedEvent(playerSource = PlayerErrorBannerSource.FullPlayer))
+                                }
+                                PlaybackIssuesBottomSheetFragment.show(parentFragmentManager)
+                            }
                         } else {
                             null
                         },
