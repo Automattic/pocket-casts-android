@@ -14,6 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionCommands
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -129,7 +130,7 @@ internal class Media3SessionCallback(
 
                         else -> {
                             Timber.w("Unknown custom command: ${customCommand.customAction}")
-                            future.set(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
+                            future.set(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
                             return@launch
                         }
                     }
@@ -137,7 +138,7 @@ internal class Media3SessionCallback(
                 future.set(SessionResult(SessionResult.RESULT_SUCCESS))
             } catch (e: Exception) {
                 Timber.e(e, "Custom command failed: ${customCommand.customAction}")
-                future.set(SessionResult(SessionResult.RESULT_ERROR_UNKNOWN))
+                future.set(SessionResult(SessionError.ERROR_UNKNOWN))
             }
         }
         return future
@@ -197,7 +198,7 @@ internal class Media3SessionCallback(
                 future.set(SessionResult(SessionResult.RESULT_SUCCESS))
             } catch (e: Exception) {
                 Timber.e(e, "Set rating failed")
-                future.set(SessionResult(SessionResult.RESULT_ERROR_UNKNOWN))
+                future.set(SessionResult(SessionError.ERROR_UNKNOWN))
             }
         }
         return future

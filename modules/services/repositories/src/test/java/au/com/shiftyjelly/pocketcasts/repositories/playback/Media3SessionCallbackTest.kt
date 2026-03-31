@@ -8,8 +8,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
@@ -174,7 +174,7 @@ class Media3SessionCallbackTest {
             Bundle.EMPTY,
         )
 
-        assertEquals(SessionResult.RESULT_ERROR_NOT_SUPPORTED, result.get().resultCode)
+        assertEquals(SessionError.ERROR_NOT_SUPPORTED, result.get().resultCode)
     }
 
     @Test
