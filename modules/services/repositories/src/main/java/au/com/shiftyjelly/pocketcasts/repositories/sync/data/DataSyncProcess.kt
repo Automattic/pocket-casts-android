@@ -61,7 +61,7 @@ class DataSyncProcess(
     private val context: Context,
 ) {
     private val logger = DataSyncLogger()
-    private val podcastSync = PodcastSync(podcastManager, playbackManager, missingPodcastsSemaphore = Semaphore(permits = 10))
+    private val podcastSync = PodcastSync(podcastManager, missingPodcastsSemaphore = Semaphore(permits = 10))
     private val folderSync = FoldersSync(folderManager)
     private val episodeSync = EpisodeSync(episodeManager, podcastManager, playbackManager, settings)
     private val playlistSync = PlaylistSync(syncManager, appDatabase)

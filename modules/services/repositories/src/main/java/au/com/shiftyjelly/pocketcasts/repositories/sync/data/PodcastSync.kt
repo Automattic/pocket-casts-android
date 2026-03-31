@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
@@ -24,17 +23,16 @@ import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.subscribedOrNull
 import com.pocketcasts.service.api.syncUserPodcast
-import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
-    private val playbackManager: PlaybackManager,
     private val missingPodcastsSemaphore: Semaphore,
 ) {
     suspend fun fullSync(serverPodcasts: List<UserPodcastResponse>) {
