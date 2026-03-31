@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
