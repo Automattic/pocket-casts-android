@@ -21,7 +21,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -672,7 +675,14 @@ class PlayerHeaderFragment :
                     headerData = headerData,
                     playerColors = playerColors,
                     transitionData = transitionData,
-                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+                    modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                        .then(
+                            if (playbackNotice == null || transitionData.isTranscriptOpen) {
+                                Modifier.navigationBarsPadding()
+                            } else {
+                                Modifier
+                            },
+                        ),
                 )
             }
             AnimatedNonNullVisibility(
@@ -854,12 +864,16 @@ class PlayerHeaderFragment :
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                    .scrollable(
+                        state = rememberScrollableState { it },
+                        orientation = Orientation.Vertical,
+                        flingBehavior = showUpNextFlingBehavior,
+                    ),
             ) {
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
                     playerColors = playerColors,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().weight(1f),
                 )
                 Spacer(
                     modifier = Modifier.height(16.dp),
@@ -893,7 +907,11 @@ class PlayerHeaderFragment :
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                    .scrollable(
+                        state = rememberScrollableState { it },
+                        orientation = Orientation.Vertical,
+                        flingBehavior = showUpNextFlingBehavior,
+                    ),
             ) {
                 Spacer(
                     modifier = Modifier.weight(1f),
@@ -921,9 +939,13 @@ class PlayerHeaderFragment :
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior),
+                .scrollable(
+                    state = rememberScrollableState { it },
+                    orientation = Orientation.Vertical,
+                    flingBehavior = showUpNextFlingBehavior,
+                ),
         ) {
-            Row {
+            Row(modifier = Modifier.weight(1f)) {
                 val windowWithPx = LocalWindowInfo.current.containerSize.width
                 val windowWidthDp = LocalDensity.current.run { windowWithPx.toDp() }
                 val maxSize = when (artworkOrVideoState) {
