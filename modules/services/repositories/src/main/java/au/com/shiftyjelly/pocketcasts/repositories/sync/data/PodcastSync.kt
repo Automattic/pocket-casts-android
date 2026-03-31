@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
@@ -133,12 +134,13 @@ internal class PodcastSync(
     }
 
     private suspend fun syncPodcast(localPodcast: Podcast, serverPodcast: SyncUserPodcast) {
-        if (serverPodcast.subscribedOrNull?.value == true) {
+        val serverSubscribed = serverPodcast.subscribedOrNull?.value == true
+        if (serverSubscribed || !localPodcast.isSubscribed) {
             localPodcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
-            localPodcast.isSubscribed = true
+            localPodcast.isSubscribed = serverSubscribed
             localPodcast.applyServerPodcast(serverPodcast)
             podcastManager.updatePodcast(localPodcast)
-        } else if (localPodcast.isSubscribed) {
+        } else {
             podcastManager.unsubscribe(localPodcast.uuid, SourceView.UNKNOWN)
         }
     }
