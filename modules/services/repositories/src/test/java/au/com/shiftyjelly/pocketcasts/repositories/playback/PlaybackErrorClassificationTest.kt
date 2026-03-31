@@ -7,9 +7,8 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -192,49 +191,68 @@ class PlaybackErrorClassificationTest {
     }
 
     @Test
-    fun `HttpDataSourceException is classified as connection error`() {
-        val cause = HttpDataSource.HttpDataSourceException(
-            "Connection failed",
-            DataSpec(Uri.parse("https://example.com/audio.mp3")),
-            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
-            HttpDataSource.HttpDataSourceException.TYPE_OPEN,
-        )
-        val error = PlaybackException(
-            "Source error",
-            cause,
-            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
-        )
-        val event = PlayerEvent.PlayerError("Connection failed", error)
-        assertTrue(errorClassifier.isConnectionError(event))
+    fun `classifyHelpUrl 401 maps to access issues`() {
+        assertEquals(Settings.INFO_EPISODE_ACCESS_ISSUES_URL, errorClassifier.classifyHelpUrl(401))
     }
 
     @Test
-    fun `InvalidResponseCodeException is not classified as connection error`() {
-        val event = createHttpErrorEvent(404)
-        assertFalse(errorClassifier.isConnectionError(event))
+    fun `classifyHelpUrl 403 maps to access issues`() {
+        assertEquals(Settings.INFO_EPISODE_ACCESS_ISSUES_URL, errorClassifier.classifyHelpUrl(403))
     }
 
     @Test
-    fun `HTTP 401 is not classified as connection error`() {
-        val event = createHttpErrorEvent(401)
-        assertFalse(errorClassifier.isConnectionError(event))
+    fun `classifyHelpUrl 404 maps to not found`() {
+        assertEquals(Settings.INFO_EPISODE_NOT_FOUND_URL, errorClassifier.classifyHelpUrl(404))
     }
 
     @Test
-    fun `null error is not classified as connection error`() {
-        val event = PlayerEvent.PlayerError("Unknown error", null)
-        assertFalse(errorClassifier.isConnectionError(event))
+    fun `classifyHelpUrl 410 maps to not found`() {
+        assertEquals(Settings.INFO_EPISODE_NOT_FOUND_URL, errorClassifier.classifyHelpUrl(410))
     }
 
     @Test
-    fun `non-network error is not classified as connection error`() {
-        val error = PlaybackException(
-            "Decoder init failed",
-            null,
-            PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
-        )
-        val event = PlayerEvent.PlayerError("Decoder init failed", error)
-        assertFalse(errorClassifier.isConnectionError(event))
+    fun `classifyHelpUrl 500 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(500))
+    }
+
+    @Test
+    fun `classifyHelpUrl 503 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(503))
+    }
+
+    @Test
+    fun `classifyHelpUrl 400 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(400))
+    }
+
+    @Test
+    fun `classifyHelpUrl 405 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(405))
+    }
+
+    @Test
+    fun `classifyHelpUrl 408 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(408))
+    }
+
+    @Test
+    fun `classifyHelpUrl 409 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(409))
+    }
+
+    @Test
+    fun `classifyHelpUrl 429 maps to server problem`() {
+        assertEquals(Settings.INFO_EPISODE_SERVER_PROBLEM_URL, errorClassifier.classifyHelpUrl(429))
+    }
+
+    @Test
+    fun `classifyHelpUrl null maps to default download errors`() {
+        assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, errorClassifier.classifyHelpUrl(null))
+    }
+
+    @Test
+    fun `classifyHelpUrl unknown code maps to default download errors`() {
+        assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, errorClassifier.classifyHelpUrl(418))
     }
 
     private fun createHttpErrorEvent(responseCode: Int): PlayerEvent.PlayerError {

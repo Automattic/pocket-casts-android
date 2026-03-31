@@ -28,6 +28,7 @@ enum class PlaybackNoticeType {
 data class PlaybackNoticeInfo(
     val message: String,
     val type: PlaybackNoticeType,
+    val supportUrl: String? = null,
 )
 
 @Singleton
@@ -35,6 +36,7 @@ class PlaybackNoticeManager @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val networkConnectionWatcher: NetworkConnectionWatcher,
     private val appLifecycleProvider: AppLifecycleProvider,
+    private val errorClassifier: PlaybackErrorClassifier,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) {
@@ -114,15 +116,19 @@ class PlaybackNoticeManager @Inject constructor(
 
                     !isForeground -> null
 
-                    playbackState.isConnectionError -> PlaybackNoticeInfo(
+                    playbackState.playbackIssue is PlaybackIssue.ConnectionError -> PlaybackNoticeInfo(
                         message = context.getString(LR.string.error_playback_offline),
                         type = PlaybackNoticeType.CONNECTION_LOST,
                     )
 
-                    else -> PlaybackNoticeInfo(
-                        message = context.getString(LR.string.error_episode_not_available),
-                        type = PlaybackNoticeType.PLAYBACK,
-                    )
+                    else -> {
+                        val httpCode = (playbackState.playbackIssue as? PlaybackIssue.HttpError)?.statusCode
+                        PlaybackNoticeInfo(
+                            message = context.getString(LR.string.error_episode_not_available),
+                            type = PlaybackNoticeType.PLAYBACK,
+                            supportUrl = errorClassifier.classifyHelpUrl(httpCode),
+                        )
+                    }
                 }
             }.collect { notice ->
                 autoDismissJob?.cancel()

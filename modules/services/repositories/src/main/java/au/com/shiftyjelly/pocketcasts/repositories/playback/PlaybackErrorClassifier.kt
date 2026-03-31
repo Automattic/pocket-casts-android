@@ -7,9 +7,20 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class PlaybackErrorClassifier {
+class PlaybackErrorClassifier @Inject constructor() {
+
+    fun classifyHelpUrl(responseCode: Int?): String {
+        return when (responseCode) {
+            401, 403 -> Settings.INFO_EPISODE_ACCESS_ISSUES_URL
+            404, 410 -> Settings.INFO_EPISODE_NOT_FOUND_URL
+            in 500..599, 400, 405, 408, 409, 429 -> Settings.INFO_EPISODE_SERVER_PROBLEM_URL
+            else -> Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL
+        }
+    }
 
     @OptIn(UnstableApi::class)
     fun isConnectionError(event: PlayerEvent.PlayerError): Boolean {
