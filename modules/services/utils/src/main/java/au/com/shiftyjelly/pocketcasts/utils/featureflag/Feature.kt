@@ -224,11 +224,11 @@ enum class Feature(
         hasDevToggle = true,
     ),
     PLAYBACK_ERROR_INFO_BAR(
-        key = "playback_error_info_bar",
+        key = "display_errors_on_player",
         title = "Playback error info bar",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 }
