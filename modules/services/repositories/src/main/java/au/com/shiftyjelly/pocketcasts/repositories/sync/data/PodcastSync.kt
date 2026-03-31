@@ -23,13 +23,13 @@ import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.subscribedOrNull
 import com.pocketcasts.service.api.syncUserPodcast
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import java.util.Date
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
