@@ -10,8 +10,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackIssueManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -56,7 +56,7 @@ class MainActivityViewModelTest {
     lateinit var playbackManager: PlaybackManager
 
     @Mock
-    lateinit var playbackIssueManager: PlaybackIssueManager
+    lateinit var playbackNoticeManager: PlaybackNoticeManager
 
     @Mock
     lateinit var userManager: UserManager
@@ -89,7 +89,7 @@ class MainActivityViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
-        whenever(playbackIssueManager.playbackIssue).thenReturn(emptyFlow())
+        whenever(playbackNoticeManager.playbackNotice).thenReturn(emptyFlow())
     }
 
     /* What's new tests */
@@ -234,7 +234,7 @@ class MainActivityViewModelTest {
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,
             playbackManager = playbackManager,
-            playbackIssueManager = playbackIssueManager,
+            playbackNoticeManager = playbackNoticeManager,
             userManager = userManager,
             settings = settings,
             endOfYearManager = endOfYearManager,
