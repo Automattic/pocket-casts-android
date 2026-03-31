@@ -12,6 +12,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
@@ -141,7 +142,7 @@ internal class Media3LibrarySessionCallback(
             isSuggested = isSuggested,
             hasCurrentEpisode = playbackManager.getCurrentEpisode() != null,
         ) ?: return Futures.immediateFuture(
-            LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE),
+            LibraryResult.ofError(SessionError.ERROR_BAD_VALUE),
         )
 
         val rootItem = MediaItem.Builder()
@@ -183,7 +184,7 @@ internal class Media3LibrarySessionCallback(
                 future.set(LibraryResult.ofItemList(paginated, params))
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load children for: $parentId")
-                future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
+                future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
             }
         }
         return future
@@ -202,14 +203,14 @@ internal class Media3LibrarySessionCallback(
             try {
                 val items = browseTreeProvider.search(query, contextProvider())
                 if (items == null) {
-                    future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
+                    future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
                 } else {
                     val paginated = paginate(items, page, pageSize)
                     future.set(LibraryResult.ofItemList(paginated, params))
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to get search results for: $query")
-                future.set(LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN))
+                future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
             }
         }
         return future

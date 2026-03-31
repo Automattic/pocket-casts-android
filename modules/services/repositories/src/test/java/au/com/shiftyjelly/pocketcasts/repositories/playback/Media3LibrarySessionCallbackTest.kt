@@ -78,7 +78,7 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns root media item for default params`() {
-        val episode: PodcastEpisode = mock()
+        val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = true))
             .thenReturn(MEDIA_ID_ROOT)
@@ -91,7 +91,7 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns suggested root when params isSuggested`() {
-        val episode: PodcastEpisode = mock()
+        val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = true, hasCurrentEpisode = true))
             .thenReturn(SUGGESTED_ROOT)
@@ -108,7 +108,7 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onGetLibraryRoot returns recent root when params isRecent`() {
-        val episode: PodcastEpisode = mock()
+        val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(browseTreeProvider.getRootId(isRecent = true, isSuggested = false, hasCurrentEpisode = true))
             .thenReturn(RECENT_ROOT)
@@ -192,7 +192,7 @@ class Media3LibrarySessionCallbackTest {
         val result = callback.onGetSearchResult(mockSession, mockController, "fail", 0, Int.MAX_VALUE, null)
         val libraryResult = result.get()
 
-        assertEquals(androidx.media3.session.LibraryResult.RESULT_ERROR_UNKNOWN, libraryResult.resultCode)
+        assertEquals(androidx.media3.session.SessionError.ERROR_UNKNOWN, libraryResult.resultCode)
     }
 
     @Test
