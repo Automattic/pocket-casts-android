@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import android.net.Uri
-import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
 import androidx.annotation.OptIn
 import androidx.media3.common.PlaybackException
@@ -31,9 +30,11 @@ import timber.log.Timber
 
 class CastPlayer(val context: Context, override val onPlayerEvent: (Player, PlayerEvent) -> Unit) : Player {
 
+    private enum class CastPlaybackState { NONE, STOPPED, BUFFERING, PLAYING, PAUSED }
+
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null
-    private var state: Int = 0
+    private var state: CastPlaybackState = CastPlaybackState.NONE
     private var remoteListenerAdded: Boolean = false
     private var localEpisodeUuid: String? = null
     private var remoteEpisodeUuid: String? = null
@@ -55,8 +56,8 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         get() = isConnected &&
             (remoteMediaClient?.hasMediaSession() ?: false) &&
             TextUtils.equals(localEpisodeUuid, remoteEpisodeUuid) &&
-            state != PlaybackStateCompat.STATE_NONE &&
-            state != PlaybackStateCompat.STATE_STOPPED
+            state != CastPlaybackState.NONE &&
+            state != CastPlaybackState.STOPPED
 
     private var episodeLocation: EpisodeLocation? = null
 
@@ -119,7 +120,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     }
 
     override suspend fun isBuffering(): Boolean {
-        return state == PlaybackStateCompat.STATE_BUFFERING
+        return state == CastPlaybackState.BUFFERING
     }
 
     override suspend fun getCurrentPositionMs(): Int {
@@ -144,7 +145,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     override suspend fun play(currentPositionMs: Int) {
         withContext(Dispatchers.Main) {
             episode?.let {
-                state = PlaybackStateCompat.STATE_BUFFERING
+                state = CastPlaybackState.BUFFERING
                 loadEpisode(it.uuid, currentPositionMs, true)
             }
         }
@@ -160,7 +161,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     override suspend fun stop() {
         withContext(Dispatchers.Main) {
-            state = PlaybackStateCompat.STATE_STOPPED
+            state = CastPlaybackState.STOPPED
             remoteListenerAdded = false
             remoteMediaClient?.unregisterCallback(remoteMediaClientListener)
         }
@@ -357,18 +358,18 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
             }
 
             MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {
-                state = PlaybackStateCompat.STATE_BUFFERING
+                state = CastPlaybackState.BUFFERING
                 onPlayerEvent(this, PlayerEvent.BufferingStateChanged)
             }
 
             MediaStatus.PLAYER_STATE_PLAYING -> {
-                state = PlaybackStateCompat.STATE_PLAYING
+                state = CastPlaybackState.PLAYING
                 setMetadataFromRemote()
                 onPlayerEvent(this, PlayerEvent.PlayerPlaying)
             }
 
             MediaStatus.PLAYER_STATE_PAUSED -> {
-                state = PlaybackStateCompat.STATE_PAUSED
+                state = CastPlaybackState.PAUSED
                 setMetadataFromRemote()
                 onPlayerEvent(this, PlayerEvent.PlayerPaused)
             }
