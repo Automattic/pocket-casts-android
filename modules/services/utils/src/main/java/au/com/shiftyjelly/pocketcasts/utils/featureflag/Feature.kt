@@ -224,7 +224,7 @@ enum class Feature(
         hasDevToggle = true,
     ),
     PLAYBACK_ERROR_INFO_BAR(
-        key = "displayErrorsOnPlayer",
+        key = "display_errors_on_player",
         title = "Playback error info bar",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
