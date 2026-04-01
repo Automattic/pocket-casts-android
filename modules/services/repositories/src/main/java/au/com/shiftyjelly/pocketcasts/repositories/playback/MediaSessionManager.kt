@@ -333,7 +333,13 @@ class MediaSessionManager(
         Timber.i("Media3 session created")
 
         updateMedia3CustomLayout()
-        pendingPlayer?.let { installPlayer(it) }
+        pendingPlayer?.let { player ->
+            if (player is CastStatePlayer) {
+                installCastPlayerInternal(player)
+            } else {
+                installPlayer(player)
+            }
+        }
 
         // Synchronously seed the SeedStatePlayer so the timeline is non-empty and AAOS
         // shows a Now Playing screen immediately on cold start.
@@ -566,7 +572,7 @@ class MediaSessionManager(
             .observeOn(Schedulers.io())
             .subscribeBy(
                 onNext = {
-                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, 0, null)
+                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
