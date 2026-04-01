@@ -136,7 +136,6 @@ open class LegacyPlaybackService :
         return isForeground
     }
 
-
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
         val validator = packageValidator
         if (validator != null && !validator.isKnownCaller(clientPackageName, clientUid)) {
