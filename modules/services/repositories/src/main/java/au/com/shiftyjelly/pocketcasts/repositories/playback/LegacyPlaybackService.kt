@@ -135,7 +135,6 @@ open class LegacyPlaybackService :
         return isForeground
     }
 
-
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
         val validator = packageValidator
         if (validator != null && !validator.isKnownCaller(clientPackageName, clientUid)) {
@@ -194,8 +193,6 @@ open class LegacyPlaybackService :
             }
         }
     }
-
-
 
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
         private val playbackStatusRelay = BehaviorRelay.create<PlaybackStateCompat>()
@@ -324,5 +321,4 @@ open class LegacyPlaybackService :
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
     }
-
 }
