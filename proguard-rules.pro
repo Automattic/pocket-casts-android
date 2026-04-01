@@ -30,7 +30,7 @@
   @retrofit2.http.* <methods>;
 }
 
-# Keep PlaybackService classes (allow obfuscation and shrinking but prevent removal).
+# Keep PlaybackService and LegacyPlaybackService (allow obfuscation and shrinking but prevent removal).
 # Without this rule the media notification is not displayed in some cases.
 # https://github.com/shiftyjelly/pocketcasts-android/issues/1656
 # https://github.com/shiftyjelly/pocketcasts-android/pulls/2921
