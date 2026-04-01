@@ -193,9 +193,11 @@ internal class Media3SessionCallback(
                         } else {
                             actions.unstarEpisode()
                         }
+                        future.set(SessionResult(SessionResult.RESULT_SUCCESS))
+                    } else {
+                        future.set(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
                     }
                 }
-                future.set(SessionResult(SessionResult.RESULT_SUCCESS))
             } catch (e: Exception) {
                 Timber.e(e, "Set rating failed")
                 future.set(SessionResult(SessionError.ERROR_UNKNOWN))
