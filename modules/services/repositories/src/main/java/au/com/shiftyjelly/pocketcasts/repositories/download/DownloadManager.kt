@@ -62,6 +62,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -790,7 +791,7 @@ private class DownloadPrerequisitesProvider(
 
         val trackers = workManager.trackers
         val powerFlow = trackers.batteryChargingTracker.asFlow()
-        val networkFlow = trackers.networkStateTracker.asFlow().map { it.isConnected to it.isMetered }
+        val networkFlow = trackers.networkStateTracker?.asFlow()?.map { it.isConnected to it.isMetered } ?: inAppNetworkFlow()
         val storageTracker = trackers.storageNotLowTracker.asFlow()
         return combine(powerFlow, networkFlow, storageTracker) { isCharging, (isConnected, isMetered), isStorageNotLow ->
             DownloadPrerequisites(
@@ -799,6 +800,15 @@ private class DownloadPrerequisitesProvider(
                 isUnmeteredAvailable = !isMetered,
                 isStorageAvailable = isStorageNotLow,
             )
+        }
+    }
+
+    private fun inAppNetworkFlow(): Flow<Pair<Boolean, Boolean>> {
+        return flow {
+            while (true) {
+                emit(Network.isConnected(context) to Network.isUnmeteredConnection(context))
+                delay(10.seconds)
+            }
         }
     }
 
