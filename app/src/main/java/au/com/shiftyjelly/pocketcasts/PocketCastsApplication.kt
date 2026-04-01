@@ -163,8 +163,6 @@ class PocketCastsApplication :
         setupLogging()
         setupAnalytics()
 
-        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
-
         setupApp()
         cleanupDatabaseExportFileIfExists()
     }
@@ -212,6 +210,7 @@ class PocketCastsApplication :
             notificationManager.setupNewFeaturesNotifications()
             notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
+            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsApplication)
 
             SingletonImageLoader.setSafe { coilImageLoader }
 
