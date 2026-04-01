@@ -322,5 +322,4 @@ open class LegacyPlaybackService :
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
     }
-
 }
