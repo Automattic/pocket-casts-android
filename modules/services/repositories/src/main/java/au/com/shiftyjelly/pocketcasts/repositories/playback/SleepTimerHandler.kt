@@ -37,6 +37,7 @@ internal class SleepTimerHandler(
     private var currentTimeLeft: Duration = ZERO
 
     fun observe() {
+        observeJob?.cancel()
         observeJob = sleepTimer.stateFlow
             .onEach { state -> onSleepTimerStateChange(state) }
             .catch { throwable -> Timber.e(throwable, "Error observing SleepTimer state") }
@@ -46,6 +47,10 @@ internal class SleepTimerHandler(
     fun dispose() {
         observeJob?.cancel()
         observeJob = null
+        cancelTimer()
+    }
+
+    private fun cancelTimer() {
         sleepTimerDisposable?.dispose()
         sleepTimerDisposable = null
         currentTimeLeft = ZERO
@@ -55,7 +60,7 @@ internal class SleepTimerHandler(
         if (state.isSleepTimerRunning && state.timeLeft != ZERO) {
             startOrUpdateSleepTimer(state.timeLeft)
         } else {
-            dispose()
+            cancelTimer()
         }
     }
 
@@ -86,7 +91,7 @@ internal class SleepTimerHandler(
                         }
                         playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
                         sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
-                        dispose()
+                        cancelTimer()
                     }
                 }
                 .subscribe({}, { e -> Timber.e(e, "Sleep timer interval error") })
