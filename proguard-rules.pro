@@ -30,8 +30,8 @@
   @retrofit2.http.* <methods>;
 }
 
-# Do not optimize PlaybackService class.
-# It causes an issue where the media notification is not displayed in some cases.
+# Keep PlaybackService classes (allow obfuscation and shrinking but prevent removal).
+# Without this rule the media notification is not displayed in some cases.
 # https://github.com/shiftyjelly/pocketcasts-android/issues/1656
 # https://github.com/shiftyjelly/pocketcasts-android/pulls/2921
 -keep,allowobfuscation,allowshrinking class au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService { *; }
