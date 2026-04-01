@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -89,8 +90,10 @@ open class LegacyPlaybackService :
 
     private var packageValidator: PackageValidator? = null
 
+    private val job = SupervisorJob()
+
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
+        get() = job + Dispatchers.Default
 
     override fun onCreate() {
         super.onCreate()
@@ -122,6 +125,7 @@ open class LegacyPlaybackService :
 
         disposables.clear()
         sleepTimerDisposable?.dispose()
+        job.cancel()
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Legacy playback service destroyed")
     }
