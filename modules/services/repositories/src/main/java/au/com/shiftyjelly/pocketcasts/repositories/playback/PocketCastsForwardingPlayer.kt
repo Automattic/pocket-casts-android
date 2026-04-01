@@ -100,7 +100,7 @@ class PocketCastsForwardingPlayer(
             .setIsBrowsable(false)
             .setIsPlayable(true)
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
-            .setUserRating(buildRating(episode))
+            .setUserRating(if (episode is PodcastEpisode) buildRating(episode) else null)
 
         if (showArtwork && artworkData != null) {
             metadataBuilder.setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_FRONT_COVER)

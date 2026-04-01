@@ -69,7 +69,7 @@ internal class CastStatePlayer(
                     .build(),
             )
             .setPlaylist(listOf(placeholderItem))
-            .setPlayWhenReady(castPlaying || castBuffering, PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST)
+            .setPlayWhenReady(castPlaying || castBuffering, PLAY_WHEN_READY_CHANGE_REASON_REMOTE)
             .setPlaybackState(
                 when {
                     castBuffering -> STATE_BUFFERING
