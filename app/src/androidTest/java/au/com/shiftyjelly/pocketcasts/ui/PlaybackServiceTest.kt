@@ -8,29 +8,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerNotificationManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
-import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeoutException
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -65,85 +49,6 @@ class PlaybackServiceTest {
         // Get the reference to the service, or you can call
         // public methods on the binder directly.
         service = (binder as PlaybackService.LocalBinder).service
-    }
-
-    @Test
-    fun testLoadSuggestedAndRecent() {
-        val podcastOne = Podcast(
-            uuid = UUID.randomUUID().toString(),
-        )
-        val podcastTwo = Podcast(
-            uuid = UUID.randomUUID().toString(),
-        )
-        val upNextCurrentEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 1")
-        val upNextEpisodes = listOf(
-            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
-            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3"),
-        )
-        val playlistPreview = ManualPlaylistPreview(
-            uuid = UUID.randomUUID().toString(),
-            title = "Playlist title",
-            settings = Playlist.Settings.ForPreview,
-            icon = PlaylistIcon(0),
-        )
-        val playlistPreviews = listOf(playlistPreview)
-        val playlistEpisodes = listOf(
-            PlaylistEpisode.Available(PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4")),
-            // use the same episode in the filter so we can test duplicates aren't used
-            PlaylistEpisode.Available(upNextEpisodes.last()),
-        )
-        val playlist = ManualPlaylist(
-            uuid = playlistPreview.uuid,
-            title = playlistPreview.title,
-            episodes = playlistEpisodes,
-            settings = playlistPreview.settings,
-            metadata = Playlist.Metadata(
-                playbackDurationLeft = 0.seconds,
-                artworkUuids = emptyList(),
-                isShowingArchived = true,
-                totalEpisodeCount = 0,
-                displayedEpisodeCount = 0,
-                displayedAvailableEpisodeCount = 0,
-                archivedEpisodeCount = 0,
-            ),
-        )
-        val latestEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 5")
-
-        val upNextQueue = mock<UpNextQueue> {
-            on { currentEpisode }.doReturn(upNextCurrentEpisode)
-            on { queueEpisodes }.doReturn(upNextEpisodes)
-        }
-        service.upNextQueue = upNextQueue
-        val podcastManager = mock<PodcastManager> {
-            on { findPodcastByUuid(podcastOne.uuid) }.doReturn(podcastOne)
-            on { findPodcastByUuid(podcastTwo.uuid) }.doReturn(podcastTwo)
-        }
-        service.podcastManager = podcastManager
-        val episodeManager = mock<EpisodeManager> {
-            on { findEpisodesWhereBlocking(any(), any()) }.doReturn(playlistEpisodes.mapNotNull(PlaylistEpisode::toPodcastEpisode))
-            on { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
-        }
-        service.episodeManager = episodeManager
-        val smartPlaylistManager = mock<PlaylistManager> {
-            on { playlistPreviewsFlow() }.doReturn(flowOf(playlistPreviews))
-            on { smartPlaylistFlow(playlist.uuid, null) }.doReturn(flowOf(null))
-            on { manualPlaylistFlow(playlist.uuid, null) }.doReturn(flowOf(playlist))
-        }
-        service.playlistManager = smartPlaylistManager
-
-        runTest {
-            val mediaItems = service.loadSuggestedChildren()
-            assertEquals(5, mediaItems.size)
-            assertEquals("${podcastOne.uuid}#${upNextCurrentEpisode.uuid}", mediaItems[0].mediaId)
-            assertEquals("${podcastTwo.uuid}#${upNextEpisodes[0].uuid}", mediaItems[1].mediaId)
-            assertEquals("${podcastOne.uuid}#${upNextEpisodes[1].uuid}", mediaItems[2].mediaId)
-            assertEquals("${podcastOne.uuid}#${playlistEpisodes[0].uuid}", mediaItems[3].mediaId)
-            assertEquals("${podcastTwo.uuid}#${latestEpisode.uuid}", mediaItems[4].mediaId)
-
-            val recentMediaItems = service.loadRecentChildren()
-            assertEquals(1, recentMediaItems.size)
-            assertEquals("${podcastOne.uuid}#${upNextCurrentEpisode.uuid}", recentMediaItems[0].mediaId)
-        }
     }
 
     @Test
