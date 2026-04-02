@@ -147,10 +147,13 @@ class MediaSessionManager(
         eventHorizon = eventHorizon,
         scopeProvider = { scope },
         source = source,
-        onSearchFailed = { message ->
-            media3Session?.sendError(SessionError(SessionError.ERROR_UNKNOWN, message))
-        },
+        onSearchFailed = { message -> sendSearchError(message) },
     )
+
+    @OptIn(UnstableApi::class)
+    private fun sendSearchError(message: String) {
+        media3Session?.sendError(SessionError(SessionError.ERROR_UNKNOWN, message))
+    }
 
     private var bookmarkHelper: BookmarkHelper
 
