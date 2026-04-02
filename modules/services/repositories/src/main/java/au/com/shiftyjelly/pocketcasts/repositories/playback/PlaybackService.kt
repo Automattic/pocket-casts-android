@@ -92,8 +92,10 @@ open class PlaybackService :
 
     @OptIn(UnstableApi::class)
     override fun onUpdateNotification(session: MediaSession, startInForegroundRequired: Boolean) {
+        // AAOS handles media UI entirely — skip app-managed notification removal
+        // to avoid killing the foreground service.
         val isTransientLoss = (session.player as? PocketCastsForwardingPlayer)?.isTransientLoss == true
-        if (!startInForegroundRequired && settings.hideNotificationOnPause.value && !isTransientLoss) {
+        if (!Util.isAutomotive(this) && !startInForegroundRequired && settings.hideNotificationOnPause.value && !isTransientLoss) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             return
         }

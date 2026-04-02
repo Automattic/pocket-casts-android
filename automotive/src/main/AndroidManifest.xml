@@ -43,11 +43,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            At least one service must be enabled in the manifest so the AAOS media
-            centre discovers the app before Application.onCreate() runs.
-            PlaybackServiceToggle will disable the wrong one at startup.
-        -->
         <service
             android:name=".AutoPlaybackService"
             android:exported="true"
@@ -57,17 +52,6 @@
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="androidx.media3.session.MediaLibraryService" />
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".LegacyAutoPlaybackService"
-            android:exported="true"
-            android:enabled="false"
-            android:label="@string/app_name"
-            android:foregroundServiceType="mediaPlayback">
-            <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
