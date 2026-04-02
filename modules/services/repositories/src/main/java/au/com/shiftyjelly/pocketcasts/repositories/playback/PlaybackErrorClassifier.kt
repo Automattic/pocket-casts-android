@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
@@ -36,6 +37,8 @@ class PlaybackErrorClassifier @Inject constructor() {
         val cause = error.cause
 
         return when {
+            cause is StuckPlayerException -> classifyStuckError(cause.stuckType)
+
             cause is HttpDataSource.InvalidResponseCodeException -> classifyHttpError(cause.responseCode)
 
             cause is HttpDataSource.HttpDataSourceException -> LR.string.player_play_failed_check_internet
@@ -51,6 +54,17 @@ class PlaybackErrorClassifier @Inject constructor() {
 
             error.errorCode == PlaybackException.ERROR_CODE_REMOTE_ERROR -> LR.string.error_unable_to_cast
 
+            else -> LR.string.error_unable_to_play
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    @StringRes
+    fun classifyStuckError(stuckType: Int): Int {
+        return when (stuckType) {
+            StuckPlayerException.STUCK_BUFFERING_NOT_LOADING,
+            StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS,
+            -> LR.string.player_play_failed_check_internet
             else -> LR.string.error_unable_to_play
         }
     }

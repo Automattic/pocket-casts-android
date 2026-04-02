@@ -90,4 +90,5 @@ data class PlaybackState(
 sealed class PlaybackIssue {
     data object ConnectionError : PlaybackIssue()
     data class HttpError(val statusCode: Int) : PlaybackIssue()
+    data object StuckPlayer : PlaybackIssue()
 }
