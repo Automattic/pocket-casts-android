@@ -65,6 +65,7 @@ class PlaybackErrorClassifier @Inject constructor() {
             StuckPlayerException.STUCK_BUFFERING_NOT_LOADING,
             StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS,
             -> LR.string.player_play_failed_check_internet
+
             else -> LR.string.error_unable_to_play
         }
     }

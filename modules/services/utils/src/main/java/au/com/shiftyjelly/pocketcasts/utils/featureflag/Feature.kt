@@ -240,6 +240,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    STUCK_PLAYER_RETRY(
+        key = "stuck_player_retry",
+        title = "Retry playback on stuck player",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
