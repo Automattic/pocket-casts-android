@@ -220,7 +220,7 @@ enum class Feature(
         title = "Live analytics debugging",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PLAYBACK_ERROR_INFO_BAR(
