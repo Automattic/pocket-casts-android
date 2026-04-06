@@ -514,6 +514,7 @@ class MainActivity :
                         }
                         PlaybackErrorInfoBar(
                             message = notice.message,
+                            linkText = notice.linkText,
                             onClick = when (notice.type) {
                                 PlaybackNoticeType.PLAYBACK -> {
                                     {

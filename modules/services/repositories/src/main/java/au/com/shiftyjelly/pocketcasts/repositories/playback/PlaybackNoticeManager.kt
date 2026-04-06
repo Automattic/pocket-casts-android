@@ -30,6 +30,7 @@ data class PlaybackNoticeInfo(
     val message: String,
     val type: PlaybackNoticeType,
     val supportUrl: String? = null,
+    val linkText: String? = null,
 )
 
 @Singleton
@@ -130,10 +131,14 @@ class PlaybackNoticeManager @Inject constructor(
 
                     else -> {
                         val httpCode = (playbackState.playbackIssue as? PlaybackIssue.HttpError)?.statusCode
+                        val isAccessDenied = httpCode == 401 || httpCode == 403
                         PlaybackNoticeInfo(
-                            message = context.getString(LR.string.error_episode_not_available),
+                            message = context.getString(
+                                if (isAccessDenied) LR.string.error_streaming_access_denied else LR.string.error_episode_not_available,
+                            ),
                             type = PlaybackNoticeType.PLAYBACK,
                             supportUrl = errorClassifier.classifyHelpUrl(httpCode),
+                            linkText = if (isAccessDenied) context.getString(LR.string.error_streaming_access_denied_action) else null,
                         )
                     }
                 }

@@ -71,6 +71,14 @@ class PlaybackErrorClassifier @Inject constructor() {
     }
 
     @StringRes
+    fun classifyLinkTextResId(responseCode: Int): Int? {
+        return when (responseCode) {
+            401, 403 -> LR.string.error_streaming_access_denied_action
+            else -> null
+        }
+    }
+
+    @StringRes
     fun classifyHttpError(responseCode: Int): Int {
         return when (responseCode) {
             401, 403 -> LR.string.error_streaming_access_denied

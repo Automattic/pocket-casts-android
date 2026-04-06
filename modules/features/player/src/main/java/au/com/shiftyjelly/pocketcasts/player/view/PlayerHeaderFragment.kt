@@ -705,6 +705,7 @@ class PlayerHeaderFragment :
                     PlaybackErrorInfoBar(
                         message = issue.message,
                         playerColors = playerColors,
+                        linkText = issue.linkText,
                         onClick = when (issue.type) {
                             PlaybackNoticeType.PLAYBACK -> {
                                 {

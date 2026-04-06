@@ -12,14 +12,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -33,6 +42,7 @@ fun PlaybackErrorInfoBar(
     playerColors: PlayerColors,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    linkText: String? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -43,11 +53,11 @@ fun PlaybackErrorInfoBar(
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .padding(horizontal = 16.dp),
     ) {
-        TextH50(
-            text = message,
+        InfoBarText(
+            message = message,
+            linkText = linkText,
             color = playerColors.contrast01,
-            disableAutoScale = true,
-            textAlign = TextAlign.Center,
+            linkColor = MaterialTheme.theme.colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
         if (onClick != null) {
@@ -70,6 +80,7 @@ fun PlaybackErrorInfoBar(
     message: String,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    linkText: String? = null,
 ) {
     val colors = MaterialTheme.theme.colors
     Row(
@@ -82,11 +93,11 @@ fun PlaybackErrorInfoBar(
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .padding(horizontal = 28.dp),
     ) {
-        TextH50(
-            text = message,
+        InfoBarText(
+            message = message,
+            linkText = linkText,
             color = colors.primaryText01,
-            disableAutoScale = true,
-            textAlign = TextAlign.Center,
+            linkColor = colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
         if (onClick != null) {
@@ -98,5 +109,42 @@ fun PlaybackErrorInfoBar(
                 modifier = Modifier.size(16.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun InfoBarText(
+    message: String,
+    linkText: String?,
+    color: Color,
+    linkColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    if (linkText != null) {
+        val annotatedString = buildAnnotatedString {
+            append("$message ")
+            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
+                append(linkText)
+            }
+        }
+        Text(
+            text = annotatedString,
+            color = color,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            fontWeight = FontWeight.W500,
+            textAlign = TextAlign.Center,
+            maxLines = Int.MAX_VALUE,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier,
+        )
+    } else {
+        TextH50(
+            text = message,
+            color = color,
+            disableAutoScale = true,
+            textAlign = TextAlign.Center,
+            modifier = modifier,
+        )
     }
 }
