@@ -106,8 +106,12 @@ abstract class AnalyticsModule {
                 coroutineScope = CoroutineScope(
                     Dispatchers.IO + SupervisorJob() + CoroutineExceptionHandler { _, throwable ->
                         LogBuffer.e(ExperimentProvider.TAG, throwable, "Uncaught exception in ExPlat coroutine scope")
-                        directory.deleteRecursively()
-                        LogBuffer.i(ExperimentProvider.TAG, "Cleared corrupted experiment cache")
+                        val deleted = runCatching { directory.deleteRecursively() }.getOrDefault(false)
+                        if (deleted) {
+                            LogBuffer.i(ExperimentProvider.TAG, "Cleared corrupted experiment cache")
+                        } else {
+                            LogBuffer.e(ExperimentProvider.TAG, "Failed to clear corrupted experiment cache")
+                        }
                     },
                 ),
                 callFactory = { request -> httpClient.get().newCall(request) },

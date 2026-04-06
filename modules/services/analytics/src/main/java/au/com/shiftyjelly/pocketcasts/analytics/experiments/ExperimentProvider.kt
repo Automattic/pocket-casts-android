@@ -33,6 +33,7 @@ class ExperimentProvider @Inject constructor(
             repository.initialize(anonymousId = uuid, oAuthToken = null)
         }.onFailure { throwable ->
             LogBuffer.e(TAG, throwable, "Failed to initialize experiments")
+            runCatching { repository.clear() }
         }
     }
 
