@@ -377,6 +377,9 @@ class MainActivity :
             }
 
             is OnboardingFinish.DoneShowPlusPromotion -> {
+                val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
+                val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
+                openTab(landingTab)
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
             }
