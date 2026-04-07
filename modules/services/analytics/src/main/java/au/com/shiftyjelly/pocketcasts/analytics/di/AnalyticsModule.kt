@@ -28,9 +28,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 
