@@ -37,12 +37,16 @@ class PlaybackNoticeManagerTest {
     private val connectedMessage = "You're connected"
     private val episodeNotAvailableMessage = "Episode not available"
     private val unableToPlayMessage = "Unable to play"
+    private val accessDeniedMessage = "This episode can't be played."
+    private val accessDeniedAction = "Learn about possible causes"
 
     private val context: Context = mock {
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_offline) } doReturn offlineMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_connected) } doReturn connectedMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_episode_not_available) } doReturn episodeNotAvailableMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play) } doReturn unableToPlayMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_streaming_access_denied) } doReturn accessDeniedMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_streaming_access_denied_action) } doReturn accessDeniedAction
     }
 
     private val networkConnectionWatcher = object : NetworkConnectionWatcher {
