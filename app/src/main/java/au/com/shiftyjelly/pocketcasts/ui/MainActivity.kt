@@ -469,10 +469,18 @@ class MainActivity :
 
         playbackManager.setNotificationPermissionChecker(this)
 
-        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
+        val hasCompletedOnboarding = settings.hasCompletedOnboarding()
+        val isLoggedIn = syncManager.isLoggedIn()
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
+        }
+
+        // After restore from backup, prompt user to log in if they're not
+        if (!showOnboarding && settings.getNeedsLoginPromptAfterRestore() && !isLoggedIn && savedInstanceState == null) {
+            settings.setNeedsLoginPromptAfterRestore(false)
+            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
