@@ -24,7 +24,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -60,7 +59,7 @@ fun PlaybackErrorInfoBar(
             linkColor = MaterialTheme.theme.colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
-        if (onClick != null) {
+        if (onClick != null && linkText == null) {
             Spacer(modifier = Modifier.width(4.dp))
             Image(
                 painter = painterResource(IR.drawable.ic_chevron_right),
@@ -100,7 +99,7 @@ fun PlaybackErrorInfoBar(
             linkColor = colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
-        if (onClick != null) {
+        if (onClick != null && linkText == null) {
             Spacer(modifier = Modifier.width(4.dp))
             Image(
                 painter = painterResource(IR.drawable.ic_chevron_right),
@@ -122,8 +121,8 @@ private fun InfoBarText(
 ) {
     if (linkText != null) {
         val annotatedString = buildAnnotatedString {
-            append("$message ")
-            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
+            append("$message\n")
+            withStyle(SpanStyle(color = linkColor)) {
                 append(linkText)
             }
         }
