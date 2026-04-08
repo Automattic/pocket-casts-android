@@ -195,7 +195,6 @@ open class LegacyPlaybackService :
         }
     }
 
-
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
         private val playbackStatusRelay = BehaviorRelay.create<PlaybackStateCompat>()
         private val mediaMetadataRelay = BehaviorRelay.create<MediaMetadataCompat>().apply {
@@ -319,7 +318,7 @@ open class LegacyPlaybackService :
 
         private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
             if (Util.isAutomotive(this@LegacyPlaybackService)) return null
-            val mediaSession = playbackManager.mediaSessionManager.mediaSession
+            val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return null
             return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
         }
     }
