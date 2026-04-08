@@ -123,7 +123,7 @@ class PlaybackNoticeManager @Inject constructor(
                     )
 
                     playbackState.playbackIssue is PlaybackIssue.StuckPlayer -> PlaybackNoticeInfo(
-                        message = context.getString(LR.string.error_unable_to_play),
+                        message = context.getString(playbackState.playbackIssue.messageResId),
                         type = PlaybackNoticeType.PLAYBACK,
                         supportUrl = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL,
                     )

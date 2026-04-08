@@ -586,7 +586,7 @@ class PlaybackNoticeManagerTest {
 
             playbackStateFlow.value = PlaybackState(
                 state = PlaybackState.State.ERROR,
-                playbackIssue = PlaybackIssue.StuckPlayer,
+                playbackIssue = PlaybackIssue.StuckPlayer(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play),
             )
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)

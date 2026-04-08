@@ -1299,15 +1299,15 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val cause = event.error?.cause
                 val playbackIssue = when {
-                    stuckException != null -> PlaybackIssue.StuckPlayer
+                    stuckException != null -> PlaybackIssue.StuckPlayer(errorClassifier.classifyErrorStringId(event))
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
                     cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
                     else -> null
                 }
-                val errorMessage = if (playbackIssue is PlaybackIssue.ConnectionError) {
-                    application.getString(LR.string.player_play_failed_check_internet)
-                } else {
-                    event.message
+                val errorMessage = when (playbackIssue) {
+                    is PlaybackIssue.ConnectionError -> application.getString(LR.string.player_play_failed_check_internet)
+                    is PlaybackIssue.StuckPlayer -> application.getString(playbackIssue.messageResId)
+                    else -> event.message
                 }
 
                 eventHorizon.track(
