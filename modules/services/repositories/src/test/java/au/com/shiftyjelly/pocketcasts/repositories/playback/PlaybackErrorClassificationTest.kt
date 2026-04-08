@@ -3,11 +3,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.net.Uri
 import androidx.media3.common.Format
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
-import androidx.media3.common.util.StuckPlayerException
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import org.junit.Assert.assertEquals
 import org.junit.Test
