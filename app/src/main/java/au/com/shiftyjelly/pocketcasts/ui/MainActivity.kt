@@ -364,9 +364,7 @@ class MainActivity :
         when (result) {
             is OnboardingFinish.Done -> {
                 if (!settings.hasCompletedOnboarding()) {
-                    val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
-                    val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
-                    openTab(landingTab)
+                    lifecycleScope.launch { openLandingTabAfterOnboarding() }
                 }
                 settings.setHasDoneInitialOnboarding()
             }
@@ -377,11 +375,13 @@ class MainActivity :
             }
 
             is OnboardingFinish.DoneShowPlusPromotion -> {
-                val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
-                val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
-                openTab(landingTab)
-                settings.setHasDoneInitialOnboarding()
-                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
+                lifecycleScope.launch {
+                    if (!settings.hasCompletedOnboarding()) {
+                        openLandingTabAfterOnboarding()
+                    }
+                    settings.setHasDoneInitialOnboarding()
+                    OnboardingLauncher.openOnboardingFlow(this@MainActivity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
+                }
             }
 
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
@@ -1350,6 +1350,12 @@ class MainActivity :
 
     override fun openTab(tabId: Int) {
         navigator.switchTab(tabId)
+    }
+
+    private suspend fun openLandingTabAfterOnboarding() {
+        val podcastCount = podcastManager.countSubscribed()
+        val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
+        openTab(landingTab)
     }
 
     override fun showBottomSheet(fragment: Fragment) {
