@@ -121,7 +121,8 @@ private fun InfoBarText(
 ) {
     if (linkText != null) {
         val annotatedString = buildAnnotatedString {
-            append("$message\n")
+            append(message)
+            append(" ")
             withStyle(SpanStyle(color = linkColor)) {
                 append(linkText)
             }

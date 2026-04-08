@@ -138,7 +138,7 @@ class PlaybackNoticeManager @Inject constructor(
                             ),
                             type = PlaybackNoticeType.PLAYBACK,
                             supportUrl = errorClassifier.classifyHelpUrl(httpCode),
-                            linkText = if (isAccessDenied) context.getString(LR.string.error_streaming_access_denied_action) else null,
+                            linkText = if (isAccessDenied) context.getString(LR.string.settings_battery_learn_more) else null,
                         )
                     }
                 }

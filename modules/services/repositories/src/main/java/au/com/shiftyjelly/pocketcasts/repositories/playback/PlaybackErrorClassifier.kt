@@ -24,13 +24,6 @@ class PlaybackErrorClassifier @Inject constructor() {
     }
 
     @OptIn(UnstableApi::class)
-    fun isConnectionError(event: PlayerEvent.PlayerError): Boolean {
-        val cause = event.error?.cause
-        return cause is HttpDataSource.HttpDataSourceException &&
-            cause !is HttpDataSource.InvalidResponseCodeException
-    }
-
-    @OptIn(UnstableApi::class)
     @StringRes
     fun classifyErrorStringId(event: PlayerEvent.PlayerError): Int {
         val error = event.error ?: return LR.string.error_unable_to_play
@@ -67,14 +60,6 @@ class PlaybackErrorClassifier @Inject constructor() {
             -> LR.string.player_play_failed_check_internet
 
             else -> LR.string.error_unable_to_play
-        }
-    }
-
-    @StringRes
-    fun classifyLinkTextResId(responseCode: Int): Int? {
-        return when (responseCode) {
-            401, 403 -> LR.string.error_streaming_access_denied_action
-            else -> null
         }
     }
 
