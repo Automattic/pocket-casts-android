@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -161,6 +162,7 @@ class PocketCastsApplication :
         setupCrashLogging()
         setupLogging()
         setupAnalytics()
+
         setupApp()
         cleanupDatabaseExportFileIfExists()
     }
@@ -208,6 +210,7 @@ class PocketCastsApplication :
             notificationManager.setupNewFeaturesNotifications()
             notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
+            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsApplication)
 
             SingletonImageLoader.setSafe { coilImageLoader }
 
