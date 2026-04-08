@@ -7,6 +7,7 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
+import androidx.media3.common.util.StuckPlayerException
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -253,6 +254,51 @@ class PlaybackErrorClassificationTest {
     @Test
     fun `classifyHelpUrl unknown code maps to default download errors`() {
         assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, errorClassifier.classifyHelpUrl(418))
+    }
+
+    @Test
+    fun `stuck buffering not loading maps to check internet`() {
+        val event = createStuckPlayerEvent(StuckPlayerException.STUCK_BUFFERING_NOT_LOADING)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.player_play_failed_check_internet, stringId)
+    }
+
+    @Test
+    fun `stuck buffering no progress maps to check internet`() {
+        val event = createStuckPlayerEvent(StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.player_play_failed_check_internet, stringId)
+    }
+
+    @Test
+    fun `stuck playing no progress maps to unable to play`() {
+        val event = createStuckPlayerEvent(StuckPlayerException.STUCK_PLAYING_NO_PROGRESS)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_unable_to_play, stringId)
+    }
+
+    @Test
+    fun `stuck playing not ending maps to unable to play`() {
+        val event = createStuckPlayerEvent(StuckPlayerException.STUCK_PLAYING_NOT_ENDING)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_unable_to_play, stringId)
+    }
+
+    @Test
+    fun `stuck suppressed maps to unable to play`() {
+        val event = createStuckPlayerEvent(StuckPlayerException.STUCK_SUPPRESSED)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_unable_to_play, stringId)
+    }
+
+    private fun createStuckPlayerEvent(stuckType: Int): PlayerEvent.PlayerError {
+        val cause = StuckPlayerException(stuckType, 10_000)
+        val error = PlaybackException(
+            "Stuck player",
+            cause,
+            PlaybackException.ERROR_CODE_UNSPECIFIED,
+        )
+        return PlayerEvent.PlayerError("Stuck player", error)
     }
 
     private fun createHttpErrorEvent(responseCode: Int): PlayerEvent.PlayerError {

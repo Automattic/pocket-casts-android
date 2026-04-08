@@ -60,7 +60,7 @@ class PlaybackErrorClassifier @Inject constructor() {
 
     @OptIn(UnstableApi::class)
     @StringRes
-    fun classifyStuckError(stuckType: Int): Int {
+    private fun classifyStuckError(stuckType: Int): Int {
         return when (stuckType) {
             StuckPlayerException.STUCK_BUFFERING_NOT_LOADING,
             StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS,

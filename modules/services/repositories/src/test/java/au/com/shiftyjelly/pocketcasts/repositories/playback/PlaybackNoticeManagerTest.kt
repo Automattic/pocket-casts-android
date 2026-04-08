@@ -36,11 +36,13 @@ class PlaybackNoticeManagerTest {
     private val offlineMessage = "No connection"
     private val connectedMessage = "You're connected"
     private val episodeNotAvailableMessage = "Episode not available"
+    private val unableToPlayMessage = "Unable to play"
 
     private val context: Context = mock {
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_offline) } doReturn offlineMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_connected) } doReturn connectedMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_episode_not_available) } doReturn episodeNotAvailableMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play) } doReturn unableToPlayMessage
     }
 
     private val networkConnectionWatcher = object : NetworkConnectionWatcher {
@@ -569,6 +571,27 @@ class PlaybackNoticeManagerTest {
             val recovery = awaitItem()
             assertEquals(PlaybackNoticeType.RECOVERY, recovery?.type)
             assertNull(recovery?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `stuck player error shown with support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.StuckPlayer,
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(unableToPlayMessage, notice?.message)
+            assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
         }
     }
 
