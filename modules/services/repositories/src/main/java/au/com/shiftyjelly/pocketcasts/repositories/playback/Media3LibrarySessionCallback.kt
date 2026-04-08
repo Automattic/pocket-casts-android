@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
@@ -15,12 +14,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -131,21 +126,7 @@ internal class Media3LibrarySessionCallback(
                     val podcast = (episode as? PodcastEpisode)?.let {
                         podcastManager.findPodcastByUuid(it.podcastUuid)
                     }
-                    val artworkUri = resolveArtworkUri(episode, podcast)
-                    val mediaItem = MediaItem.Builder()
-                        .setMediaId(episode.uuid)
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setTitle(episode.title)
-                                .setArtist(episode.displaySubtitle(podcast))
-                                .setArtworkUri(artworkUri)
-                                .setDurationMs(episode.durationMs.toLong())
-                                .setIsPlayable(true)
-                                .setIsBrowsable(false)
-                                .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
-                                .build(),
-                        )
-                        .build()
+                    val mediaItem = buildEpisodeMediaItem(episode, podcast)
                     future.set(
                         MediaSession.MediaItemsWithStartPosition(
                             listOf(mediaItem),
@@ -161,19 +142,6 @@ internal class Media3LibrarySessionCallback(
             }
         }
         return future
-    }
-
-    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
-        return when (episode) {
-            is PodcastEpisode -> {
-                val url = episode.imageUrl ?: podcast?.getArtworkUrl(480)
-                url?.let(Uri::parse)
-            }
-
-            is UserEpisode -> {
-                episode.artworkUrl?.let(Uri::parse)
-            }
-        }
     }
 
     override fun onGetLibraryRoot(

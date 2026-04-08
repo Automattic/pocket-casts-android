@@ -165,21 +165,7 @@ internal class Media3SessionCallback(
                         podcastManager.findPodcastByUuid(it.podcastUuid)
                     }
 
-                    val artworkUri = resolveArtworkUri(episode, podcast)
-                    val resolvedItem = MediaItem.Builder()
-                        .setMediaId(mediaId)
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setTitle(episode.title)
-                                .setArtist(episode.displaySubtitle(podcast))
-                                .setArtworkUri(artworkUri)
-                                .setDurationMs(episode.durationMs.toLong())
-                                .setIsPlayable(true)
-                                .setIsBrowsable(false)
-                                .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
-                                .build(),
-                        )
-                        .build()
+                    val resolvedItem = buildEpisodeMediaItem(episode, podcast, mediaId)
                     future.set(listOf(resolvedItem))
 
                     playbackManager.playNowSuspend(episode = episode, sourceView = source)
@@ -190,19 +176,6 @@ internal class Media3SessionCallback(
             }
         }
         return future
-    }
-
-    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
-        return when (episode) {
-            is PodcastEpisode -> {
-                val url = episode.imageUrl ?: podcast?.getArtworkUrl(480)
-                url?.let(Uri::parse)
-            }
-
-            is UserEpisode -> {
-                episode.artworkUrl?.let(Uri::parse)
-            }
-        }
     }
 
     override fun onSetRating(
@@ -406,4 +379,40 @@ internal class Media3SessionCallback(
             -> Timber.e(MediaSessionManager.ACTION_NOT_SUPPORTED)
         }
     }
+}
+
+internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
+    return when (episode) {
+        is PodcastEpisode -> {
+            val url = episode.imageUrl?.takeIf { it.isNotBlank() }
+                ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+            url?.let(Uri::parse)
+        }
+
+        is UserEpisode -> {
+            episode.artworkUrl?.takeIf { it.isNotBlank() }?.let(Uri::parse)
+        }
+    }
+}
+
+internal fun buildEpisodeMediaItem(
+    episode: BaseEpisode,
+    podcast: Podcast?,
+    mediaId: String = episode.uuid,
+): MediaItem {
+    val artworkUri = resolveArtworkUri(episode, podcast)
+    return MediaItem.Builder()
+        .setMediaId(mediaId)
+        .setMediaMetadata(
+            MediaMetadata.Builder()
+                .setTitle(episode.title)
+                .setArtist(episode.displaySubtitle(podcast))
+                .setArtworkUri(artworkUri)
+                .setDurationMs(episode.durationMs.toLong())
+                .setIsPlayable(true)
+                .setIsBrowsable(false)
+                .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
+                .build(),
+        )
+        .build()
 }
