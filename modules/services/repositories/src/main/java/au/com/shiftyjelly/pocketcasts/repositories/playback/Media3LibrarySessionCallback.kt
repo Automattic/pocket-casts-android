@@ -14,8 +14,11 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
@@ -38,11 +41,15 @@ internal class Media3LibrarySessionCallback(
     private val sessionCallback: Media3SessionCallback,
     private val browseTreeProvider: BrowseTreeProvider,
     private val playbackManager: PlaybackManager,
+    private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
     private val settings: Settings,
     private val packageValidator: PackageValidator?,
-    private val scope: CoroutineScope,
+    private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
 ) : MediaLibraryService.MediaLibrarySession.Callback {
+
+    private val scope: CoroutineScope get() = scopeProvider()
 
     override fun onConnect(
         session: MediaSession,
@@ -108,11 +115,18 @@ internal class Media3LibrarySessionCallback(
         playbackHasBeenResumed: Boolean,
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
         val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
+        val context = contextProvider()
+        if (Util.isAutomotive(context)) {
+            settings.setAutomotiveConnectedToMediaSession(true)
+        }
         scope.launch {
             try {
                 val episode = playbackManager.getCurrentEpisode()
                 if (episode != null) {
-                    val mediaItem = MediaItem.Builder().setMediaId(episode.uuid).build()
+                    val podcast = (episode as? PodcastEpisode)?.let {
+                        podcastManager.findPodcastByUuid(it.podcastUuid)
+                    }
+                    val mediaItem = buildEpisodeMediaItem(episode, podcast)
                     future.set(
                         MediaSession.MediaItemsWithStartPosition(
                             listOf(mediaItem),
