@@ -19,6 +19,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.android.gms.common.ConnectionResult
@@ -60,11 +64,19 @@ class AutomotiveApplication :
 
     @Inject lateinit var experimentProvider: ExperimentProvider
 
+    @Inject lateinit var defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider
+
+    @Inject lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
+
+    @Inject lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
+
+        setupFeatureFlags()
 
         RxJavaUncaughtExceptionHandling.setUp()
         setupRemoteLogging()
@@ -121,6 +133,18 @@ class AutomotiveApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+    }
+
+    private fun setupFeatureFlags() {
+        val providers = if (BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE) {
+            listOf(preferencesFeatureProvider)
+        } else {
+            listOf(
+                firebaseRemoteFeatureProvider,
+                defaultReleaseFeatureProvider,
+            )
+        }
+        FeatureFlag.initialize(providers)
     }
 
     private fun setupAnalytics() {

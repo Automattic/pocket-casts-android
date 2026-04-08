@@ -112,7 +112,10 @@ class MediaSessionManager(
 
     // Evaluated once at construction — toggling requires a process restart.
     // Swapping between Media3 and legacy session at runtime is not supported.
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
+    // On automotive, always use Media3: AAOS never uses app-managed notifications,
+    // so the legacy compat session is unnecessary and having a single service avoids
+    // the race condition where AAOS discovers the wrong service before the toggle runs.
+    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) || Util.isAutomotive(context)
 
     val mediaSession: MediaSessionCompat? = if (!useMedia3Session) {
         MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
@@ -780,7 +783,7 @@ class MediaSessionManager(
      * Resolves the currently-enabled media browser service from the manifest.
      * This avoids hardcoding service class names, which differ between app variants
      * (e.g., phone uses [PlaybackService]/[LegacyPlaybackService],
-     * automotive uses AutoPlaybackService/LegacyAutoPlaybackService).
+     * automotive uses AutoPlaybackService).
      */
     private fun resolveMediaBrowserServiceComponent(context: Context): ComponentName? {
         val intent = Intent("android.media.browse.MediaBrowserService").apply {
