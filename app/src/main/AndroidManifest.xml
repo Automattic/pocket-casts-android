@@ -599,9 +599,25 @@
             android:exported="true">
         </receiver>
 
+        <!-- Both services start disabled; PlaybackServiceToggle.ensureCorrectServiceEnabled()
+             enables the correct one in Application.onCreate() based on the MEDIA3_SESSION feature flag.
+             This avoids the system resolving the wrong service before the toggle runs. -->
         <service
                 android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService"
                 android:exported="true"
+                android:enabled="false"
+                android:label="@string/app_name"
+                android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService"/>
+                <action android:name="androidx.media3.session.MediaLibraryService"/>
+            </intent-filter>
+        </service>
+
+        <service
+                android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.LegacyPlaybackService"
+                android:exported="true"
+                android:enabled="false"
                 android:label="@string/app_name"
                 android:foregroundServiceType="mediaPlayback">
             <intent-filter>
@@ -621,17 +637,6 @@
                     />
             </intent-filter>
         </service>
-
-        <!-- A receiver that will receive media buttons and send as
-            intents to your MediaBrowserServiceCompat implementation.
-            Required on pre-Lollipop. More information at
-            http://developer.android.com/reference/android/support/v4/media/session/MediaButtonReceiver.html -->
-        <receiver android:name="androidx.media.session.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-            </intent-filter>
-        </receiver>
 
         <!-- Google play services -->
         <meta-data
