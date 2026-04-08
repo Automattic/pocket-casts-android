@@ -149,21 +149,13 @@ class PocketCastsForwardingPlayer(
     }
 
     override fun seekTo(positionMs: Long) {
-        if (onSeekTo != null) {
-            onSeekTo.invoke(positionMs)
-            super.seekTo(positionMs)
-        } else {
-            super.seekTo(positionMs)
-        }
+        onSeekTo?.invoke(positionMs)
+        super.seekTo(positionMs)
     }
 
     override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
-        if (onSeekTo != null) {
-            onSeekTo.invoke(positionMs)
-            super.seekTo(mediaItemIndex, positionMs)
-        } else {
-            super.seekTo(mediaItemIndex, positionMs)
-        }
+        onSeekTo?.invoke(positionMs)
+        super.seekTo(mediaItemIndex, positionMs)
     }
 
     override fun seekToNext() {
@@ -202,7 +194,9 @@ class PocketCastsForwardingPlayer(
 
     override fun addListener(listener: Player.Listener) {
         super.addListener(listener)
-        listeners.add(listener)
+        if (!listeners.contains(listener)) {
+            listeners.add(listener)
+        }
     }
 
     override fun removeListener(listener: Player.Listener) {
@@ -213,12 +207,13 @@ class PocketCastsForwardingPlayer(
     private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
         return when (episode) {
             is PodcastEpisode -> {
-                val url = episode.imageUrl ?: podcast?.getArtworkUrl(480)
+                val url = episode.imageUrl?.takeIf { it.isNotBlank() }
+                    ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
                 url?.let(Uri::parse)
             }
 
             is UserEpisode -> {
-                episode.artworkUrl?.let(Uri::parse)
+                episode.artworkUrl?.takeIf { it.isNotBlank() }?.let(Uri::parse)
             }
         }
     }
