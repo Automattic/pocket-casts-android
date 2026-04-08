@@ -527,7 +527,7 @@ class MediaSessionManager(
     ) : MediaSessionCompat.Callback() {
 
         private var playFromSearchDisposable: Disposable? = null
-        private val mediaEventQueue = MediaEventQueue(scope = this@MediaSessionManager)
+        private val mediaEventQueue = MediaEventQueue(scopeProvider = { this@MediaSessionManager })
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
