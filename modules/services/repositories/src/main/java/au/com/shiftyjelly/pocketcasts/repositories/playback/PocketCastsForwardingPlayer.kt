@@ -78,6 +78,8 @@ class PocketCastsForwardingPlayer(
      * Updates the metadata exposed via [getCurrentMediaItem]. Call this when the
      * current episode changes or when metadata is refreshed (e.g., artwork loaded).
      *
+     * @param showArtwork When false, artwork URI and data are omitted from the metadata.
+     * @param useEpisodeArtwork When true, prefer episode-specific artwork; when false, use podcast artwork.
      * @param artworkData Pre-compressed artwork bytes (e.g. WebP). Compression should
      *   happen off the main thread before calling this method.
      */
@@ -86,11 +88,12 @@ class PocketCastsForwardingPlayer(
         episode: BaseEpisode,
         podcast: Podcast?,
         showArtwork: Boolean = true,
+        useEpisodeArtwork: Boolean = true,
         artworkData: ByteArray? = null,
     ) {
         checkMainThread()
 
-        val artworkUri = if (showArtwork) resolveArtworkUri(episode, podcast) else null
+        val artworkUri = if (showArtwork) resolveArtworkUri(episode, podcast, useEpisodeArtwork) else null
         val podcastTitle = episode.displaySubtitle(podcast)
 
         val metadataBuilder = MediaMetadata.Builder()
@@ -299,11 +302,15 @@ class PocketCastsForwardingPlayer(
         listeners.remove(listener)
     }
 
-    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
+    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?, useEpisodeArtwork: Boolean): Uri? {
         return when (episode) {
             is PodcastEpisode -> {
-                val url = episode.imageUrl?.takeIf { it.isNotBlank() }
-                    ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                val url = if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf { it.isNotBlank() }
+                        ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                } else {
+                    podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                }
                 url?.let(Uri::parse)
             }
 

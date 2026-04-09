@@ -69,6 +69,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -363,8 +364,9 @@ class MediaSessionManager(
                     else -> null
                 }
                 val showArtwork = settings.showArtworkOnLockScreen.value
+                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
                 withContext(Dispatchers.Main) {
-                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork)
+                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to seed initial Media3 metadata")
@@ -486,7 +488,7 @@ class MediaSessionManager(
 
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
-        playbackManager.playbackStateRelay
+        val episodeAndState = playbackManager.playbackStateRelay
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
                     old.state == new.state &&
@@ -506,8 +508,16 @@ class MediaSessionManager(
                         .toObservable()
                 }
             }
+
+        val artworkConfig = settings.artworkConfiguration.flow.asObservable()
+        val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow.asObservable()
+
+        Observables.combineLatest(episodeAndState, artworkConfig, showArtworkOnLockScreen) { episodeState, config, showArtwork ->
+            Triple(episodeState, config.useEpisodeArtwork, showArtwork)
+        }
             .observeOn(Schedulers.io())
-            .map<Optional<MediaUpdateData>> { (episodeOpt, state) ->
+            .map<Optional<MediaUpdateData>> { (episodeState, useEpisodeArtwork, showArtwork) ->
+                val (episodeOpt, state) = episodeState
                 if (!episodeOpt.isPresent()) {
                     return@map Optional.empty()
                 }
@@ -516,12 +526,11 @@ class MediaSessionManager(
                     is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
                     else -> null
                 }
-                val showArtwork = settings.showArtworkOnLockScreen.value
                 val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
                     AutoConverter.getPodcastArtworkBitmap(
                         episode,
                         context,
-                        settings.artworkConfiguration.value.useEpisodeArtwork,
+                        useEpisodeArtwork,
                     )?.let { bitmap ->
                         java.io.ByteArrayOutputStream().use { stream ->
                             val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -537,7 +546,7 @@ class MediaSessionManager(
                 } else {
                     null
                 }
-                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, artworkData))
+                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, useEpisodeArtwork, artworkData))
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -548,7 +557,7 @@ class MediaSessionManager(
                         player.clearMetadata()
                         return@subscribeBy
                     }
-                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.artworkData)
+                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData)
                     player.isTransientLoss = data.state.transientLoss
                     updateMedia3CustomLayout()
                 },
@@ -1365,13 +1374,15 @@ private data class MediaUpdateData(
     val podcast: Podcast?,
     val state: PlaybackState,
     val showArtwork: Boolean,
+    val useEpisodeArtwork: Boolean,
     val artworkData: ByteArray?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MediaUpdateData) return false
         return episode == other.episode && podcast == other.podcast && state == other.state &&
-            showArtwork == other.showArtwork && artworkData.contentEquals(other.artworkData)
+            showArtwork == other.showArtwork && useEpisodeArtwork == other.useEpisodeArtwork &&
+            artworkData.contentEquals(other.artworkData)
     }
 
     override fun hashCode(): Int {
@@ -1379,6 +1390,7 @@ private data class MediaUpdateData(
         result = 31 * result + (podcast?.hashCode() ?: 0)
         result = 31 * result + state.hashCode()
         result = 31 * result + showArtwork.hashCode()
+        result = 31 * result + useEpisodeArtwork.hashCode()
         result = 31 * result + (artworkData?.contentHashCode() ?: 0)
         return result
     }
