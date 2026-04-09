@@ -151,12 +151,26 @@ class MediaSessionManager(
         eventHorizon = eventHorizon,
         scopeProvider = { scope },
         source = source,
-        onSearchFailed = { message -> sendSearchError(message) },
+        onSearchFailed = { message ->
+            if (useMedia3Session) {
+                sendSearchError(message)
+            } else {
+                errorPlaybackState(message)
+            }
+        },
     )
 
     @OptIn(UnstableApi::class)
     private fun sendSearchError(message: String) {
         media3Session?.sendError(SessionError(SessionError.ERROR_UNKNOWN, message))
+    }
+
+    private fun errorPlaybackState(message: String) {
+        val stateBuilder = PlaybackStateCompat.Builder()
+            .setState(PlaybackStateCompat.STATE_ERROR, 0, 0f)
+            .setErrorMessage(PlaybackStateCompat.ERROR_CODE_UNKNOWN_ERROR, message)
+            .setActions(getSupportedActions(PlaybackState()))
+        mediaSession?.setPlaybackState(stateBuilder.build())
     }
 
     private var bookmarkHelper: BookmarkHelper
