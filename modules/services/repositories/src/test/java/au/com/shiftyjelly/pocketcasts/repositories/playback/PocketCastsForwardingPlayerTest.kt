@@ -162,7 +162,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `available commands include expected controls`() {
+    fun `available commands include skip buttons by default`() {
         val commands = forwardingPlayer.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
@@ -173,6 +173,18 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
+    }
+
+    @Test
+    fun `available commands exclude standard skip when showStandardSkipButtons is false`() {
+        val player = PocketCastsForwardingPlayer(mockPlayer, showStandardSkipButtons = false)
+        val commands = player.availableCommands
+
+        assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_BACK))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     @Test
@@ -581,6 +593,19 @@ class PocketCastsForwardingPlayerTest {
 
         assertTrue(skipForwardCalled)
         assertTrue(skipBackCalled)
+    }
+
+    @Test
+    fun `swapPlayer preserves showStandardSkipButtons`() {
+        val player = PocketCastsForwardingPlayer(mockPlayer, showStandardSkipButtons = false)
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = player.swapPlayer(newWrappedPlayer)
+
+        assertFalse(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     // --- setMediaItems / addMediaItems / prepare interception tests ---

@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  */
 @UnstableApi
 internal class Media3AutomotiveStrategy(
+    private val useCustomSkipButtons: () -> Boolean,
     private val speedToDrawable: (Double) -> Int,
     private val skipBackIconForDuration: (Int) -> Int,
     private val skipForwardIconForDuration: (Int) -> Int,
@@ -43,20 +44,22 @@ internal class Media3AutomotiveStrategy(
                     .build(),
             )
         }
-        buttons.add(
-            CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
-                .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
-                .setDisplayName(context.getString(LR.string.skip_back))
-                .setCustomIconResId(IR.drawable.media_skipback)
-                .build(),
-        )
-        buttons.add(
-            CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
-                .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
-                .setDisplayName(context.getString(LR.string.skip_forward))
-                .setCustomIconResId(IR.drawable.media_skipforward)
-                .build(),
-        )
+        if (useCustomSkipButtons()) {
+            buttons.add(
+                CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
+                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
+                    .setDisplayName(context.getString(LR.string.skip_back))
+                    .setCustomIconResId(IR.drawable.media_skipback)
+                    .build(),
+            )
+            buttons.add(
+                CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
+                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
+                    .setDisplayName(context.getString(LR.string.skip_forward))
+                    .setCustomIconResId(IR.drawable.media_skipforward)
+                    .build(),
+            )
+        }
         val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
         settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             if (mediaControl != MediaNotificationControls.PlaybackSpeed) {

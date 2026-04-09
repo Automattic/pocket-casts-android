@@ -181,7 +181,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
         if (useMedia3Session) {
-            Media3AutomotiveStrategy(::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
+            Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
         } else {
             LegacyAutomotiveStrategy(::useCustomSkipButtons)
         }
@@ -323,6 +323,7 @@ class MediaSessionManager(
                     true
                 }
             },
+            showStandardSkipButtons = !useCustomSkipButtons(),
         )
 
         media3Callback = Media3SessionCallback(
@@ -476,6 +477,7 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
+            showStandardSkipButtons = !useCustomSkipButtons(),
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId

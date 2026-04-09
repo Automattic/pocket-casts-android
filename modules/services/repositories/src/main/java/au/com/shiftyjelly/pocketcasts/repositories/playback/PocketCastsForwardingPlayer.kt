@@ -42,6 +42,7 @@ class PocketCastsForwardingPlayer(
     private val onPause: (() -> Unit)? = null,
     private val onSeekTo: ((Long) -> Unit)? = null,
     internal val playGuard: (() -> Boolean) = { true },
+    private val showStandardSkipButtons: Boolean = true,
 ) : ForwardingPlayer(wrappedPlayer) {
 
     internal var currentMediaItem: MediaItem = MediaItem.EMPTY
@@ -67,7 +68,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard, showStandardSkipButtons).also {
             it.currentMediaItem = this.currentMediaItem
             it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
@@ -152,19 +153,20 @@ class PocketCastsForwardingPlayer(
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
     override fun getAvailableCommands(): Player.Commands {
-        return Player.Commands.Builder()
+        val builder = Player.Commands.Builder()
             .addAll(
                 Player.COMMAND_PLAY_PAUSE,
                 Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_SEEK_FORWARD,
                 Player.COMMAND_SEEK_BACK,
-                Player.COMMAND_SEEK_TO_NEXT,
-                Player.COMMAND_SEEK_TO_PREVIOUS,
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
             )
-            .build()
+        if (showStandardSkipButtons) {
+            builder.addAll(Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_PREVIOUS)
+        }
+        return builder.build()
     }
 
     override fun seekTo(positionMs: Long) {
