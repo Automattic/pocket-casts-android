@@ -588,12 +588,26 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     private fun updateMedia3CustomLayout() {
         val session = media3Session ?: return
-        if (Util.isWearOs(context)) return
-
         val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
-        if (Util.isAutomotive(context)) {
+        if (Util.isWearOs(context)) {
+            // WearOS: only skip back and skip forward, no custom actions.
+            buttons.add(
+                CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
+                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
+                    .setDisplayName(context.getString(LR.string.skip_back))
+                    .setCustomIconResId(IR.drawable.media_skipback)
+                    .build(),
+            )
+            buttons.add(
+                CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
+                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
+                    .setDisplayName(context.getString(LR.string.skip_forward))
+                    .setCustomIconResId(IR.drawable.media_skipforward)
+                    .build(),
+            )
+        } else if (Util.isAutomotive(context)) {
             // Automotive: use circular seek icons matching the configured skip duration.
             // Playback speed first (gets the extra slot), then skip buttons, then custom actions.
             if (playbackManager.isAudioEffectsAvailable()) {
