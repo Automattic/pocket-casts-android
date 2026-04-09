@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -509,6 +510,36 @@ class PocketCastsForwardingPlayerTest {
         val podcast = createPodcast(title = "Podcast")
 
         forwardingPlayer.updateMetadata(episode, podcast, showArtwork = true)
+
+        assertEquals(Uri.parse("https://example.com/art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
+    }
+
+    @Test
+    fun `updateMetadata uses podcast artwork when useEpisodeArtwork is false`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/episode-art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, useEpisodeArtwork = false)
+
+        val artworkUri = forwardingPlayer.mediaMetadata.artworkUri
+        assertNotNull(artworkUri)
+        assertFalse(artworkUri.toString().contains("episode-art"))
+    }
+
+    @Test
+    fun `updateMetadata uses episode artwork when useEpisodeArtwork is true`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, useEpisodeArtwork = true)
 
         assertEquals(Uri.parse("https://example.com/art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
     }
