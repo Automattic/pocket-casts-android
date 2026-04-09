@@ -113,16 +113,19 @@ class MediaSessionManager(
 
     // Evaluated once at construction — toggling requires a process restart.
     // Swapping between Media3 and legacy session at runtime is not supported.
-    // On automotive, always use Media3: AAOS never uses app-managed notifications,
-    // so the legacy compat session is unnecessary and having a single service avoids
-    // the race condition where AAOS discovers the wrong service before the toggle runs.
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) || Util.isAutomotive(context)
+    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
+    private val isAutomotive = Util.isAutomotive(context)
 
-    val mediaSession: MediaSessionCompat? = if (!useMedia3Session) {
+    // Automotive always needs a MediaLibrarySession for the service contract (it's the
+    // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
+    // is delegated to an AutomotiveSessionStrategy.
+    private val needsMedia3Session = useMedia3Session || isAutomotive
+
+    // On non-automotive platforms with flag OFF, create a MediaSessionCompat.
+    // On automotive (regardless of flag), the MediaLibrarySession handles everything.
+    val mediaSession: MediaSessionCompat? = if (!useMedia3Session && !isAutomotive) {
         MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-            if (!Util.isAutomotive(context)) {
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
-            }
+            session.setSessionActivity(context.getLaunchActivityPendingIntent())
             session.setRatingType(RatingCompat.RATING_HEART)
             session.setExtras(
                 Bundle().apply {
@@ -152,7 +155,7 @@ class MediaSessionManager(
         scopeProvider = { scope },
         source = source,
         onSearchFailed = { message ->
-            if (useMedia3Session) {
+            if (needsMedia3Session) {
                 sendSearchError(message)
             } else {
                 errorPlaybackState(message)
@@ -174,6 +177,17 @@ class MediaSessionManager(
     }
 
     private var bookmarkHelper: BookmarkHelper
+
+    @OptIn(UnstableApi::class)
+    private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
+        if (useMedia3Session) {
+            Media3AutomotiveStrategy(::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
+        } else {
+            LegacyAutomotiveStrategy(::useCustomSkipButtons)
+        }
+    } else {
+        null
+    }
 
     @Volatile
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
@@ -210,8 +224,8 @@ class MediaSessionManager(
             settings,
         )
 
-        if (!useMedia3Session) {
-            mediaSession!!.setCallback(
+        if (mediaSession != null) {
+            mediaSession.setCallback(
                 MediaSessionCallback(
                     playbackManager,
                     episodeManager,
@@ -236,7 +250,7 @@ class MediaSessionManager(
     }
 
     fun startObserving() {
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             observeForMedia3Updates()
         } else {
             connect()
@@ -268,7 +282,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun createSession(service: MediaLibraryService) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         // Recreate scope in case release() was called previously (service restart).
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -395,7 +409,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun installPlayer(exoPlayer: androidx.media3.common.Player) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         val currentPlayer = forwardingPlayer
         if (currentPlayer == null) {
             Timber.i("installPlayer: session not ready, deferring")
@@ -421,7 +435,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun installCastPlayer() {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         val player = CastStatePlayer(
             applicationLooper = android.os.Looper.getMainLooper(),
             onPlay = { scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = source) } } },
@@ -480,12 +494,12 @@ class MediaSessionManager(
      */
     @MainThread
     fun updateCastState(isPlaying: Boolean, isBuffering: Boolean, positionMs: Long) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         castStatePlayer?.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
     fun startServiceIfNeeded(context: Context) {
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             if (media3Session != null) return
         }
         val component = resolveMediaBrowserServiceComponent(context)
@@ -616,38 +630,8 @@ class MediaSessionManager(
         val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
-        if (Util.isAutomotive(context)) {
-            // Automotive: use circular seek icons matching the configured skip duration.
-            // Playback speed first (gets the extra slot), then skip buttons, then custom actions.
-            if (playbackManager.isAudioEffectsAvailable()) {
-                buttons.add(
-                    CommandButton.Builder(CommandButton.ICON_UNDEFINED)
-                        .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
-                        .setDisplayName(context.getString(LR.string.playback_speed))
-                        .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
-                        .build(),
-                )
-            }
-            buttons.add(
-                CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
-                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
-                    .setDisplayName(context.getString(LR.string.skip_back))
-                    .setCustomIconResId(IR.drawable.media_skipback)
-                    .build(),
-            )
-            buttons.add(
-                CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
-                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
-                    .setDisplayName(context.getString(LR.string.skip_forward))
-                    .setCustomIconResId(IR.drawable.media_skipforward)
-                    .build(),
-            )
-            val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
-            settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
-                if (mediaControl != MediaNotificationControls.PlaybackSpeed) {
-                    buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
-                }
-            }
+        if (isAutomotive) {
+            buttons.addAll(automotiveStrategy!!.buildCustomLayout(playbackManager, settings, context, ::buildCustomActionButton))
         } else {
             // Mobile/other: existing behavior unchanged
             if (useCustomSkipButtons()) {
@@ -751,7 +735,7 @@ class MediaSessionManager(
     fun release() {
         disposables.clear()
         scope.cancel()
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             media3Session?.release()
             media3Session = null
             forwardingPlayer = null
