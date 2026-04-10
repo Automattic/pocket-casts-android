@@ -261,7 +261,8 @@ class PlaybackNoticeManagerTest {
             playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
-            assertEquals(episodeNotAvailableMessage, notice?.message)
+            assertEquals(accessDeniedMessage, notice?.message)
+            assertEquals(accessDeniedAction, notice?.linkText)
 
             advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
             runCurrent()
@@ -594,7 +595,8 @@ class PlaybackNoticeManagerTest {
             )
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
-            assertEquals(unableToPlayMessage, notice?.message)
+            assertEquals(accessDeniedMessage, notice?.message)
+            assertEquals(accessDeniedAction, notice?.linkText)
             assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
         }
     }

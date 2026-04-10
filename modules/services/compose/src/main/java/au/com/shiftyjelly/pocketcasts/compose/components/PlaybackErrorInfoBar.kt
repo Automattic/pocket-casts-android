@@ -1,24 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 /**
  * Fullscreen player variant uses player colors.
@@ -59,15 +52,6 @@ fun PlaybackErrorInfoBar(
             linkColor = MaterialTheme.theme.colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
-        if (onClick != null && linkText == null) {
-            Spacer(modifier = Modifier.width(4.dp))
-            Image(
-                painter = painterResource(IR.drawable.ic_chevron_right),
-                colorFilter = ColorFilter.tint(playerColors.contrast03),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-        }
     }
 }
 
@@ -99,15 +83,6 @@ fun PlaybackErrorInfoBar(
             linkColor = colors.primaryInteractive01,
             modifier = Modifier.weight(1f, fill = false),
         )
-        if (onClick != null && linkText == null) {
-            Spacer(modifier = Modifier.width(4.dp))
-            Image(
-                painter = painterResource(IR.drawable.ic_chevron_right),
-                colorFilter = ColorFilter.tint(colors.primaryIcon02),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-        }
     }
 }
 
