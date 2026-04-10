@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 13:56:01+0000
+Translation-Revision-Date: 2026-04-09 18:55:50+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="error_episode_not_available">Выпуск недоступен</string>
+    <string name="error_playback_connected">Вы подключены</string>
+    <string name="error_playback_offline">Отсутствует подключение к Интернету</string>
+    <string name="error_cast_connection_failed">Не удалось подключиться к устройству Chromecast. Проверьте устройство и повторите попытку.</string>
+    <string name="error_audio_output">Не удалось воспроизвести аудио. Проверьте аудиоустройство и повторите попытку.</string>
+    <string name="error_decoder_initialization">Не удалось воспроизвести этот аудиоформат на вашем устройстве.</string>
+    <string name="error_streaming_server_error">На сервере подкастов возникли проблемы. Повторите попытку позже.</string>
+    <string name="error_streaming_no_longer_available">Этот выпуск больше не доступен у издателя.</string>
+    <string name="error_streaming_not_found">Этот выпуск не найден на сервере. Возможно, он был удалён издателем.</string>
+    <string name="error_streaming_access_denied">У вас больше нет доступа для воспроизведения этого выпуска.</string>
+    <string name="settings_auto_download_storage_summary">Если эта опция отключена, загрузка может происходить, когда устройству не хватает внутренней памяти.</string>
+    <string name="settings_auto_download_storage">Только при достаточном объёме памяти</string>
+    <string name="settings_auto_download_charging_summary">Если эта опция отключена, загрузка может происходить без подключения устройства к зарядке.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Когда размер очереди «Следующие» достигает %d вып., каждый новый выпуск, автоматически добавляемый в начало, будет удалять из очереди самый старый выпуск. Автоматически добавляемые в конец выпуски не будут добавляться, пока размер очереди «Следующие» не снизится до лимита.</string>
     <string name="offline_icon_content_description">Значок офлайна</string>
     <string name="profile_last_refresh_at">Последнее обновление: %s</string>
@@ -21,6 +34,7 @@ Language: ru
     <string name="error_download_socket_timeout">Время подключения к серверу автора подкаста истекло. Проверьте подключение к Интернету.</string>
     <string name="error_download_invalid_content_type">Не удалось загрузить выпуск. Полученный тип контента %1$s. Обратитесь к автору подкаста.</string>
     <string name="error_download_http_failure">Не удалось загрузить выпуск. Получен код статуса HTTP %1$s. Обратитесь к автору подкаста.</string>
+    <string name="error_download_suspicious_content_size">Не удалось загрузить выпуск. Загруженный файл слишком мал. Повторите попытку.</string>
     <string name="episode_row_waiting_for_storage">Ожидание места для загрузки</string>
     <string name="podcasts_download_storage">Для начала загрузки требуется свободное место</string>
     <string name="watch_sync_failed">Не удалось синхронизировать с часами</string>
@@ -1608,6 +1622,8 @@ Language: ru
     <string name="settings_podcast_episode_grouping_summary">В новых подкастах, на которые вы подписаны, выпуски будут сгруппированы по %s.</string>
     <string name="settings_import_file_summary">Если у вас есть подкасты в другом приложении или сервисе, Pocket Casts может импортировать их из файла OPML.</string>
     <string name="settings_export_send_email_summary">Экспортируйте свои подкасты в супернавороченном (но весьма популярном) формате OPML.</string>
+    <string name="error_streaming_try_downloading">Сбой трансляции. Попробуйте загрузить выпуск.</string>
+    <string name="settings_auto_download_unmetered_summary">Если эта опция отключена, скачивание может происходить как в сотовых, так и в других сетях с тарификацией. Проверьте настройки сети, чтобы узнать дополнительные сведения.</string>
     <string name="profile">Профиль</string>
     <string name="profile_reset_password">Задать пароль</string>
     <string name="profile_web_player">Веб-плеер</string>

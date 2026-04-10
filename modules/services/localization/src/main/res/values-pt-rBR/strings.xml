@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-25 09:54:15+0000
+Translation-Revision-Date: 2026-04-08 22:58:15+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="error_episode_not_available">Episódio não disponível</string>
+    <string name="error_playback_connected">Conexão estabelecida</string>
+    <string name="error_playback_offline">Você está offline</string>
+    <string name="error_cast_connection_failed">Não foi possível estabelecer conexão com o dispositivo Chromecast. Verifique o dispositivo e tente novamente.</string>
+    <string name="error_audio_output">Não foi possível reproduzir o áudio. Verifique seu dispositivo de saída de áudio e tente novamente.</string>
+    <string name="error_decoder_initialization">Não é possível reproduzir este formato de áudio em seu dispositivo.</string>
+    <string name="error_streaming_server_error">O servidor de podcast está com problemas. Tente novamente mais tarde.</string>
+    <string name="error_streaming_no_longer_available">Este episódio não é mais oferecido por quem o publicou.</string>
+    <string name="error_streaming_not_found">Não foi possível encontrar este episódio no servidor. Ele pode ter sido removido pelo distribuidor.</string>
+    <string name="error_streaming_access_denied">Você não tem mais acesso para reproduzir este episódio.</string>
+    <string name="settings_auto_download_storage_summary">Se esta opção estiver desativada, os downloads poderão ocorrer quando o dispositivo estiver com pouco armazenamento interno.</string>
+    <string name="settings_auto_download_storage">Somente quando houver armazenamento suficiente</string>
+    <string name="settings_auto_download_charging_summary">Quando esta opção estiver desativada, os downloads poderão ocorrer sem que o dispositivo esteja conectado a um carregador.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Quando os Próximos chegam a %d, os novos episódios adicionados automaticamente ao início da fila removem os últimos. Os episódios configurados com adição automática ao fim da fila não serão adicionados até que Próximos esteja abaixo do limite.</string>
     <string name="offline_icon_content_description">Ícone de offline</string>
     <string name="profile_just_now">Agora mesmo</string>
@@ -21,6 +34,7 @@ Language: pt_BR
     <string name="error_download_socket_timeout">A conexão com o servidor do autor do podcast expirou. Verifique sua conexão com a Internet.</string>
     <string name="error_download_invalid_content_type">Falha ao baixar o episódio. Tipo de conteúdo recebido %1$s. Entre em contato com o autor do podcast.</string>
     <string name="error_download_http_failure">Falha ao baixar o episódio. Código de status HTTP recebido %1$s. Entre em contato com o autor do podcast.</string>
+    <string name="error_download_suspicious_content_size">Falha ao baixar o episódio. O arquivo baixado é muito pequeno. Tente novamente.</string>
     <string name="episode_row_waiting_for_storage">Aguardando espaço de armazenamento</string>
     <string name="podcasts_download_storage">Download aguardando espaço de armazenamento</string>
     <string name="watch_sync_failed">Não foi possível sincronizar com o relógio</string>
@@ -1608,6 +1622,8 @@ Language: pt_BR
     <string name="settings_podcast_episode_grouping_summary">Os episódios dos novos podcasts que você seguir serão agrupados por %s.</string>
     <string name="settings_import_file_summary">Se você tiver podcasts em outro aplicativo ou serviço, o Pocket Casts poderá importá-los com um arquivo OPML.</string>
     <string name="settings_export_send_email_summary">Exporte seus podcasts no formato supernerd (mas amplamente compatível) OPML.</string>
+    <string name="error_streaming_try_downloading">Falha na reprodução. Tente baixar o episódio.</string>
+    <string name="settings_auto_download_unmetered_summary">Quando esta opção estiver desativada, os downloads poderão ocorrer em redes de celulares e outras redes limitadas. Verifique suas configurações de rede para obter mais informações.</string>
     <string name="profile">Perfil</string>
     <string name="profile_reset_password">Redefinir senha</string>
     <string name="profile_web_player">Reprodutor da Web</string>

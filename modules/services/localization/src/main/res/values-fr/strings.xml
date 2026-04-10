@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 16:56:05+0000
+Translation-Revision-Date: 2026-04-08 22:54:58+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="error_episode_not_available">Épisode non disponible</string>
+    <string name="error_playback_connected">Vous êtes connecté</string>
+    <string name="error_playback_offline">Vous êtes hors ligne</string>
+    <string name="error_cast_connection_failed">Impossible de se connecter au périphérique Chromecast. Veuillez vérifier votre périphérique et réessayer.</string>
+    <string name="error_audio_output">Impossible de lire l’audio. Veuillez vérifier votre périphérique de sortie audio et réessayer.</string>
+    <string name="error_decoder_initialization">Impossible de lire ce format audio sur votre périphérique.</string>
+    <string name="error_streaming_server_error">Le serveur de podcast rencontre des problèmes. Veuillez réessayer plus tard.</string>
+    <string name="error_streaming_no_longer_available">Cet épisode n’est plus disponible auprès de l’éditeur.</string>
+    <string name="error_streaming_not_found">Cet épisode est introuvable sur le serveur. Il a peut-être été supprimé par l’éditeur.</string>
+    <string name="error_streaming_access_denied">Vous n’avez plus accès à cet épisode.</string>
+    <string name="settings_auto_download_storage_summary">Si cette option est désactivée, des téléchargements peuvent être effectués lorsque le périphérique manque d’espace de stockage interne.</string>
+    <string name="settings_auto_download_storage">Uniquement lorsque l’espace de stockage est suffisant</string>
+    <string name="settings_auto_download_charging_summary">Si cette option est désactivée, des téléchargements peuvent être effectués même si le périphérique n’est pas branché.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Lorsque la file d’attente atteint %d éléments, les nouveaux épisodes ajoutés automatiquement au début suppriment ceux qui sont à la fin. Les épisodes qui doivent s’ajouter automatiquement à la fin ne sont pas ajoutés tant que la file d’attente n’est pas en dessous de la limite.</string>
     <string name="offline_icon_content_description">Icône du mode hors ligne</string>
     <string name="profile_last_refresh_at">Dernière actualisation : %s</string>
@@ -21,6 +34,7 @@ Language: fr
     <string name="error_download_socket_timeout">La connexion au serveur de l’auteur du podcast a été interrompue. Veuillez vérifier votre connexion Internet.</string>
     <string name="error_download_invalid_content_type">Échec du téléchargement de l’épisode. Type de contenu reçu : %1$s. Veuillez contacter l’auteur du podcast.</string>
     <string name="error_download_http_failure">Échec du téléchargement de l’épisode. Code d’état HTTP reçu : %1$s. Veuillez contacter l’auteur du podcast.</string>
+    <string name="error_download_suspicious_content_size">Échec du téléchargement de l’épisode. Le fichier téléchargé est trop petit. Veuillez réessayer.</string>
     <string name="episode_row_waiting_for_storage">En attente d’espace de stockage</string>
     <string name="podcasts_download_storage">Téléchargement en attente d’espace de stockage</string>
     <string name="watch_sync_failed">Échec de la synchronisation avec la montre</string>
@@ -1608,6 +1622,8 @@ Language: fr
     <string name="settings_podcast_episode_grouping_summary">Les épisodes des nouveaux podcasts auxquels vous vous abonnez seront groupés par %s.</string>
     <string name="settings_show_archived_summary_show">Les nouveaux podcasts auxquels vous vous abonnez afficheront les épisodes archivés.</string>
     <string name="settings_import_file_summary">Si vous avez des podcasts dans une autre application ou un autre service, Pocket Casts peut les importer à partir d’un fichier OPML.</string>
+    <string name="error_streaming_try_downloading">Échec de la diffusion. Essayez de télécharger l’épisode.</string>
+    <string name="settings_auto_download_unmetered_summary">Si cette option est désactivée, des téléchargements peuvent être effectués sur les réseaux mobiles ainsi que sur d’autres réseaux avec facturation à l’usage. Vérifiez les réglages de votre réseau pour plus d’informations.</string>
     <string name="profile">Profil</string>
     <string name="profile_reset_password">Réinitialiser le mot de passe</string>
     <string name="profile_web_player">Lecteur Web</string>
