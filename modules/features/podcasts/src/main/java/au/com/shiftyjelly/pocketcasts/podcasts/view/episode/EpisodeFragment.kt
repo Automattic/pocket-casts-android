@@ -555,7 +555,7 @@ class EpisodeFragment : BaseFragment() {
                         warningsHelper
                             .downloadWarning(episodeUUID, SourceView.EPISODE_DETAILS)
                             .show(parentFragmentManager, "download warning")
-                    }else {
+                    } else {
                         viewModel.downloadEpisode()
                     }
                 }
