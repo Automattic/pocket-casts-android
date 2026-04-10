@@ -116,6 +116,8 @@ class PlaybackNoticeManager @Inject constructor(
                 when {
                     !playbackState.isError -> null
 
+                    playbackState.transientLoss -> null
+
                     !isForeground -> null
 
                     playbackState.playbackIssue is PlaybackIssue.ConnectionError -> PlaybackNoticeInfo(

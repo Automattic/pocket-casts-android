@@ -601,6 +601,40 @@ class PlaybackNoticeManagerTest {
         }
     }
 
+    @Test
+    fun `transient error state during player switch does not trigger notice`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            // Simulate pause(transientLoss=true) re-emitting an ERROR state during player switch
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(401),
+                transientLoss = true,
+            )
+            runCurrent()
+            expectNoEvents()
+
+            // loadCurrentEpisode emits PLAYING state
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.PLAYING)
+            runCurrent()
+            expectNoEvents()
+
+            // Real error arrives with transientLoss=false
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(401),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+        }
+    }
+
     private fun onlineCapabilities() = mock<NetworkCapabilities> {
         on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
     }
