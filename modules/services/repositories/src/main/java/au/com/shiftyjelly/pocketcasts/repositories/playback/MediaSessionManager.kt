@@ -318,6 +318,16 @@ class MediaSessionManager(
                     }
                 }
             },
+            onSeekToQueueItem = { mediaId ->
+                scope.launch {
+                    commandMutex.withLock {
+                        val episode = episodeManager.findEpisodeByUuid(mediaId)
+                        if (episode != null) {
+                            playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        }
+                    }
+                }
+            },
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
@@ -626,8 +636,24 @@ class MediaSessionManager(
 
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
+            .switchMap { state ->
+                if (state is UpNextQueue.State.Loaded) {
+                    Observable.fromCallable {
+                        state.queue.map { episode ->
+                            val podcast = (episode as? PodcastEpisode)?.let {
+                                podcastManager.findPodcastByUuidBlocking(it.podcastUuid)
+                            }
+                            buildEpisodeMediaItem(episode, podcast)
+                        }
+                    }
+                } else {
+                    Observable.just(emptyList())
+                }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
+                onNext = { items ->
+                    forwardingPlayer?.updateQueue(items)
                     media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },

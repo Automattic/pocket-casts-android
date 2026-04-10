@@ -94,7 +94,19 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        val playerCommands = Player.Commands.Builder()
+            .addAll(
+                Player.COMMAND_PLAY_PAUSE,
+                Player.COMMAND_SET_MEDIA_ITEM,
+                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_STOP,
+                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_GET_METADATA,
+                Player.COMMAND_GET_TIMELINE,
+            )
+            .build()
+
+        return MediaSession.ConnectionResult.accept(sessionCommands, playerCommands)
     }
 
     override fun onCustomCommand(
