@@ -436,7 +436,7 @@ class SettingsImpl @Inject constructor(
 
     override val warnOnMeteredNetwork = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI,
-        defaultValue = false,
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 

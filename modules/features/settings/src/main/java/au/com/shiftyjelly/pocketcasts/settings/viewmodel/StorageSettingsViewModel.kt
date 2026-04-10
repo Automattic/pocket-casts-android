@@ -467,7 +467,7 @@ class StorageSettingsViewModel @Inject constructor(
         )
 
         data class StorageDataWarningState(
-            val isChecked: Boolean = false,
+            val isChecked: Boolean = true,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }
