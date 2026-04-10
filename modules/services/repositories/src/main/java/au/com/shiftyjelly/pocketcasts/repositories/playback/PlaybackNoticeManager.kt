@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.Context
 import android.net.NetworkCapabilities
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -119,6 +120,12 @@ class PlaybackNoticeManager @Inject constructor(
                     playbackState.playbackIssue is PlaybackIssue.ConnectionError -> PlaybackNoticeInfo(
                         message = context.getString(LR.string.error_playback_offline),
                         type = PlaybackNoticeType.CONNECTION_LOST,
+                    )
+
+                    playbackState.playbackIssue is PlaybackIssue.StuckPlayer -> PlaybackNoticeInfo(
+                        message = context.getString(playbackState.playbackIssue.messageResId),
+                        type = PlaybackNoticeType.PLAYBACK,
+                        supportUrl = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL,
                     )
 
                     else -> {

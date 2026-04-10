@@ -1,6 +1,8 @@
 8.10
-
-
+-----
+*   Updates
+    *   Make sure users with new accounts land on the Podcasts tab when they followed some recommended podcasts
+        ([#5197](https://github.com/Automattic/pocket-casts-android/pull/5197))
 8.9
 -----
 *   New Features
