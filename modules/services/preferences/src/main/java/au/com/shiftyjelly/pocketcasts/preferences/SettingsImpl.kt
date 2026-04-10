@@ -593,6 +593,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val disableSeekSliderInNotification = UserSetting.BoolPref(
+        sharedPrefKey = "disableSeekSliderInNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val dailyRemindersNotification = UserSetting.BoolPref(
         sharedPrefKey = "dailyRemindersNotification",
         defaultValue = false,

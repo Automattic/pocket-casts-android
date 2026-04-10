@@ -370,6 +370,7 @@ interface Settings {
     fun shouldShowLowStorageBannerAfterSnooze(): Boolean
 
     val hideNotificationOnPause: UserSetting<Boolean>
+    val disableSeekSliderInNotification: UserSetting<Boolean>
     val dailyRemindersNotification: UserSetting<Boolean>
     val recommendationsNotification: UserSetting<Boolean>
     val newFeaturesNotification: UserSetting<Boolean>

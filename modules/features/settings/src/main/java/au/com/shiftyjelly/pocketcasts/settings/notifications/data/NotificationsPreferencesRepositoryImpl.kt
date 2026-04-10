@@ -193,6 +193,10 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             title = TextResource.fromStringId(LR.string.settings_notification_hide_on_pause),
                             isEnabled = settings.hideNotificationOnPause.value,
                         ),
+                        NotificationPreferenceType.DisableSeekSliderInNotification(
+                            title = TextResource.fromStringId(LR.string.settings_notification_disable_seek_slider),
+                            isEnabled = settings.disableSeekSliderInNotification.value,
+                        ),
                     ),
                 ),
             )
@@ -256,6 +260,10 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
             is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                 settings.hideNotificationOnPause.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.DisableSeekSliderInNotification -> {
+                settings.disableSeekSliderInNotification.set(value = preference.isEnabled, updateModifiedAt = true)
             }
 
             is NotificationPreferenceType.PlayOverNotifications -> {

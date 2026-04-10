@@ -83,6 +83,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     )
                 }
 
+                is NotificationPreferenceType.DisableSeekSliderInNotification -> {
+                    preferenceRepository.setPreference(preference)
+                }
+
                 is NotificationPreferenceType.PlayOverNotifications -> {
                     preferenceRepository.setPreference(preference)
                     eventHorizon.track(

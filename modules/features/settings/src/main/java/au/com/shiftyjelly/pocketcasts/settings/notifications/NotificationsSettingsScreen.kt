@@ -141,6 +141,10 @@ private fun PreviewNotificationSettingsScreen(
                             title = TextResource.fromText("Hide playback notification on pause"),
                             isEnabled = true,
                         ),
+                        NotificationPreferenceType.DisableSeekSliderInNotification(
+                            title = TextResource.fromText("Disable seek slider in notification"),
+                            isEnabled = true,
+                        ),
                     ),
                 ),
             ),
@@ -182,6 +186,10 @@ private fun PreviewDisabledNotificationsSettingsScreen() = AppTheme(Theme.ThemeT
                         ),
                         NotificationPreferenceType.HidePlaybackNotificationOnPause(
                             title = TextResource.fromText("Hide playback notification on pause"),
+                            isEnabled = true,
+                        ),
+                        NotificationPreferenceType.DisableSeekSliderInNotification(
+                            title = TextResource.fromText("Disable seek slider in notification"),
                             isEnabled = true,
                         ),
                     ),

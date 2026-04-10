@@ -275,7 +275,6 @@ class MediaSessionManager(
         } else {
             val actions = PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE or
-                PlaybackStateCompat.ACTION_SEEK_TO or
                 PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
                 PlaybackStateCompat.ACTION_PLAY_PAUSE or
@@ -283,7 +282,8 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM or
                 PlaybackStateCompat.ACTION_FAST_FORWARD or
                 PlaybackStateCompat.ACTION_REWIND or
-                prepareActions
+                    prepareActions or
+                    (if (settings.disableSeekSliderInNotification.value) 0L else PlaybackStateCompat.ACTION_SEEK_TO)
 
             return if (useCustomSkipButtons()) {
                 actions
