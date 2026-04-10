@@ -29,7 +29,12 @@ class ExperimentProvider @Inject constructor(
 
     fun initialize(uuid: String) {
         LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
-        repository.initialize(anonymousId = uuid, oAuthToken = null)
+        runCatching {
+            repository.initialize(anonymousId = uuid, oAuthToken = null)
+        }.onFailure { throwable ->
+            LogBuffer.e(TAG, throwable, "Failed to initialize experiments")
+            runCatching { repository.clear() }
+        }
     }
 
     suspend fun refreshExperiments(uuid: String? = null) = withContext(ioDispatcher) {

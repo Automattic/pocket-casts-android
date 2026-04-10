@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 09:54:55+0000
+Translation-Revision-Date: 2026-04-09 09:57:43+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="error_episode_not_available">에피소드가 제공되지 않았습니다</string>
+    <string name="error_playback_connected">연결되었습니다</string>
+    <string name="error_playback_offline">오프라인 상태입니다</string>
+    <string name="error_cast_connection_failed">Chromecast 기기에 연결할 수 없습니다. 기기를 확인하고 다시 시도하세요.</string>
+    <string name="error_audio_output">오디오를 재생할 수 없습니다. 오디오 출력 기기를 확인하고 다시 시도하세요.</string>
+    <string name="error_decoder_initialization">기기에서 이 오디오 형식을 재생할 수 없습니다.</string>
+    <string name="error_streaming_server_error">팟캐스트 서버에 문제가 있습니다. 나중에 다시 시도해 보세요.</string>
+    <string name="error_streaming_no_longer_available">이 에피소드는 더 이상 게시자가 제공하지 않습니다.</string>
+    <string name="error_streaming_not_found">서버에서 이 에피소드를 찾을 수 없습니다. 게시자가 제거했을 수 있습니다.</string>
+    <string name="error_streaming_access_denied">더 이상 이 에피소드를 재생할 권한이 없습니다.</string>
+    <string name="settings_auto_download_storage_summary">비활성화되면 기기의 내부 저장 공간이 부족할 때 다운로드가 시작될 수 있습니다.</string>
+    <string name="settings_auto_download_storage">저장 공간이 충분할 때만</string>
+    <string name="settings_auto_download_charging_summary">비활성화되면 기기가 충전기에 연결되지 않은 상태에서도 다운로드가 시작될 수 있습니다.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">다음 차례가 %d에 도달하면 상단에 자동으로 추가된 새 에피소드 때문에 대기열의 마지막 에피소드가 제거됩니다. 하단에 자동 추가하도록 설정된 에피소드는 다음 차례가 한도 미만일 때까지 추가되지 않습니다.</string>
     <string name="offline_icon_content_description">오프라인 아이콘</string>
     <string name="profile_last_refresh_at">마지막 새로 고침: %s</string>
@@ -21,6 +34,7 @@ Language: ko_KR
     <string name="error_download_socket_timeout">팟캐스트 제작자의 서버 연결 시간이 초과되었습니다. 인터넷 연결을 확인하세요.</string>
     <string name="error_download_invalid_content_type">에피소드를 다운로드하지 못했습니다. %1$s 콘텐츠 유형을 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
     <string name="error_download_http_failure">에피소드를 다운로드하지 못했습니다. %1$s HTTP 상태 코드를 받았습니다. 팟캐스트 제작자에게 문의하세요.</string>
+    <string name="error_download_suspicious_content_size">에피소드를 다운로드하지 못했습니다. 다운로드한 파일이 너무 작습니다. 다시 시도해 보세요.</string>
     <string name="episode_row_waiting_for_storage">저장 공간 대기 중</string>
     <string name="podcasts_download_storage">저장 공간 다운로드 대기 중</string>
     <string name="watch_sync_failed">시계와 동기화할 수 없음</string>
@@ -1608,6 +1622,8 @@ Language: ko_KR
     <string name="settings_podcast_episode_grouping_summary">팔로우하는 새 팟캐스트의 에피소드가 %s별로 그룹화됩니다.</string>
     <string name="settings_import_file_summary">다른 앱 또는 서비스에 팟캐스트가 있으면 Pocket Casts에서는 OPML 파일에서 해당 구독을 가져올 수 있습니다.</string>
     <string name="settings_export_send_email_summary">특이하지만 널리 지원되는 OPML 형식으로 팟캐스트를 내보냅니다.</string>
+    <string name="error_streaming_try_downloading">스트리밍에 실패했습니다. 에피소드를 다운로드해 보세요.</string>
+    <string name="settings_auto_download_unmetered_summary">비활성화되면 다른 데이터 요금제 네트워크는 물론 셀룰러 요금제를 사용하는 도중에도 다운로드가 시작될 수 있습니다. 자세한 내용은 네트워크 설정에서 확인하세요.</string>
     <string name="plus_cloud_storage">클라우드 저장 공간</string>
     <string name="profile_expiry_date_unknown">알 수 없음</string>
     <string name="profile_yearly">매년</string>

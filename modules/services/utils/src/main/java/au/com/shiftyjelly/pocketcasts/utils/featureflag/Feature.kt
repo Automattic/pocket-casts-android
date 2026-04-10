@@ -227,9 +227,9 @@ enum class Feature(
     LIVE_ANALYTICS(
         key = "live_analytics",
         title = "Live analytics debugging",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PLAYBACK_ERROR_INFO_BAR(
