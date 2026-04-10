@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -56,6 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flow
@@ -156,10 +158,13 @@ class PocketCastsApplication :
 
         super.onCreate()
 
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
+
         RxJavaUncaughtExceptionHandling.setUp()
         setupCrashLogging()
         setupLogging()
         setupAnalytics()
+
         setupApp()
         cleanupDatabaseExportFileIfExists()
     }
@@ -207,6 +212,7 @@ class PocketCastsApplication :
             notificationManager.setupNewFeaturesNotifications()
             notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
+            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsApplication)
 
             SingletonImageLoader.setSafe { coilImageLoader }
 
@@ -313,6 +319,7 @@ class PocketCastsApplication :
         playbackManager.playbackStateRelay.asFlow()
             .map { state -> state.isPlaying }
             .distinctUntilChanged()
+            .conflate()
             .onEach(playerWidgetManager::updateIsPlaying)
             .launchIn(applicationScope)
         val queueFlow = flow {
@@ -324,6 +331,7 @@ class PocketCastsApplication :
         }
         queueFlow
             .distinctUntilChangedBy { queue -> queue.map { it.uuid to it.playedUpToMs } }
+            .conflate()
             .onEach(playerWidgetManager::updateQueue)
             .launchIn(applicationScope)
     }

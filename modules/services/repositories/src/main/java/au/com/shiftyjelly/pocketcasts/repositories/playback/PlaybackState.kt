@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -90,4 +91,5 @@ data class PlaybackState(
 sealed class PlaybackIssue {
     data object ConnectionError : PlaybackIssue()
     data class HttpError(val statusCode: Int) : PlaybackIssue()
+    data class StuckPlayer(@StringRes val messageResId: Int) : PlaybackIssue()
 }

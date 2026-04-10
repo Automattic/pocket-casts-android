@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
@@ -34,7 +33,6 @@ import kotlinx.coroutines.withContext
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
-    private val playbackManager: PlaybackManager,
     private val missingPodcastsSemaphore: Semaphore,
 ) {
     suspend fun fullSync(serverPodcasts: List<UserPodcastResponse>) {
@@ -133,12 +131,13 @@ internal class PodcastSync(
     }
 
     private suspend fun syncPodcast(localPodcast: Podcast, serverPodcast: SyncUserPodcast) {
-        if (serverPodcast.subscribedOrNull?.value == true) {
+        val serverSubscribed = serverPodcast.subscribedOrNull?.value == true
+        if (serverSubscribed || !localPodcast.isSubscribed) {
             localPodcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
-            localPodcast.isSubscribed = true
+            localPodcast.isSubscribed = serverSubscribed
             localPodcast.applyServerPodcast(serverPodcast)
             podcastManager.updatePodcast(localPodcast)
-        } else if (localPodcast.isSubscribed) {
+        } else {
             podcastManager.unsubscribe(localPodcast.uuid, SourceView.UNKNOWN)
         }
     }
