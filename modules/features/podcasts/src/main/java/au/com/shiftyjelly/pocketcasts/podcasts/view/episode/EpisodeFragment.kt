@@ -551,13 +551,11 @@ class EpisodeFragment : BaseFragment() {
                 }
             } else {
                 context?.let { context ->
-                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context)) {
+                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && !episode.isDownloadCancellable) {
                         warningsHelper
                             .downloadWarning(episodeUUID, SourceView.EPISODE_DETAILS)
                             .show(parentFragmentManager, "download warning")
-                    } else if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && episode.isDownloading) {
-                        viewModel.downloadEpisode()
-                    } else {
+                    }else {
                         viewModel.downloadEpisode()
                     }
                 }
