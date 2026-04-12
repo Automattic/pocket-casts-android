@@ -148,6 +148,7 @@ internal class EpisodeSync(
             ?.takeIf { !isEpisodePlaying && it >= 0 && it !in (playedUpTo - seekThresholdSecs)..(playedUpTo + 2) }
             ?.let { value ->
                 playedUpTo = value
+                playbackManager.seekIfPlayingToTimeMs(uuid, (playedUpTo * 1000).toInt())
             }
     }
 }
