@@ -484,7 +484,7 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                settings.showFreeAccountEncouragement = false
+                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
         }
