@@ -87,7 +87,7 @@ class MediaSessionManager(
     val eventHorizon: EventHorizon,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
-    applicationScope: CoroutineScope,
+    private val applicationScope: CoroutineScope,
 ) {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -111,27 +111,32 @@ class MediaSessionManager(
         }
     }
 
-    // Evaluated once at construction — toggling requires a process restart.
-    // Swapping between Media3 and legacy session at runtime is not supported.
+    // Evaluated lazily on first access — must not be read before FeatureFlag.initialize().
+    // In practice the first access is in startObserving(), which runs after FeatureFlag init.
+    // Toggling requires a process restart; swapping at runtime is not supported.
     // On automotive, always use Media3: AAOS never uses app-managed notifications,
     // so the legacy compat session is unnecessary and having a single service avoids
     // the race condition where AAOS discovers the wrong service before the toggle runs.
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) || Util.isAutomotive(context)
+    private val useMedia3Session by lazy {
+        FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) || Util.isAutomotive(context)
+    }
 
-    val mediaSession: MediaSessionCompat? = if (!useMedia3Session) {
-        MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-            if (!Util.isAutomotive(context)) {
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+    val mediaSession: MediaSessionCompat? by lazy {
+        if (!useMedia3Session) {
+            MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
+                if (!Util.isAutomotive(context)) {
+                    session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                }
+                session.setRatingType(RatingCompat.RATING_HEART)
+                session.setExtras(
+                    Bundle().apply {
+                        putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
+                    },
+                )
             }
-            session.setRatingType(RatingCompat.RATING_HEART)
-            session.setExtras(
-                Bundle().apply {
-                    putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
-                },
-            )
+        } else {
+            null
         }
-    } else {
-        null
     }
 
     val disposables = CompositeDisposable()
@@ -165,6 +170,9 @@ class MediaSessionManager(
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
 
     @Volatile
+    private var media3Service: MediaLibraryService? = null
+
+    @Volatile
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
 
     @Volatile
@@ -195,7 +203,9 @@ class MediaSessionManager(
             bookmarkManager,
             settings,
         )
+    }
 
+    fun startObserving() {
         if (!useMedia3Session) {
             mediaSession!!.setCallback(
                 MediaSessionCallback(
@@ -219,9 +229,7 @@ class MediaSessionManager(
                 }
             }
         }
-    }
 
-    fun startObserving() {
         if (useMedia3Session) {
             observeForMedia3Updates()
         } else {
@@ -255,6 +263,7 @@ class MediaSessionManager(
     @MainThread
     fun createSession(service: MediaLibraryService) {
         if (!useMedia3Session) return
+        media3Service = service
         // Recreate scope in case release() was called previously (service restart).
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -356,22 +365,7 @@ class MediaSessionManager(
         }
 
         // Asynchronously enrich metadata with podcast name + artwork.
-        scope.launch(Dispatchers.IO) {
-            try {
-                val ep = playbackManager.getCurrentEpisode() ?: return@launch
-                val podcast = when (ep) {
-                    is PodcastEpisode -> podcastManager.findPodcastByUuid(ep.podcastUuid)
-                    else -> null
-                }
-                val showArtwork = settings.showArtworkOnLockScreen.value
-                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
-                withContext(Dispatchers.Main) {
-                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork)
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to seed initial Media3 metadata")
-            }
-        }
+        forwardingPlayer?.let { replayMetadataToPlayer(it) }
     }
 
     /**
@@ -397,6 +391,7 @@ class MediaSessionManager(
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = null
+        replayMetadataToPlayer(swapped)
         Timber.i("Media3 session player swapped")
     }
 
@@ -457,7 +452,61 @@ class MediaSessionManager(
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = null
+        replayMetadataToPlayer(swapped)
         Timber.i("Media3 session cast player installed (no transport callbacks)")
+    }
+
+    /**
+     * Asynchronously fetches the current episode metadata and artwork, then applies
+     * it to the given [player]. Guarded by an identity check so that a stale replay
+     * (e.g., if another player swap happened during the async work) is discarded.
+     *
+     * Called after every player swap ([installPlayer], [installCastPlayerInternal],
+     * [createSession]) to ensure the Media3 notification has content. This is
+     * necessary because [observeForMedia3Updates] may have dropped the playback
+     * state event while [forwardingPlayer] was still null.
+     */
+    @OptIn(UnstableApi::class)
+    private fun replayMetadataToPlayer(player: PocketCastsForwardingPlayer) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                val state = playbackManager.playbackStateRelay.blockingFirst()
+                if (state.isEmpty) return@launch
+                val episode = episodeManager.findEpisodeByUuid(state.episodeUuid) ?: return@launch
+                val podcast = when (episode) {
+                    is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
+                    else -> null
+                }
+                val showArtwork = settings.showArtworkOnLockScreen.value
+                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
+                val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
+                    AutoConverter.getPodcastArtworkBitmap(episode, context, useEpisodeArtwork)?.let { bitmap ->
+                        java.io.ByteArrayOutputStream().use { stream ->
+                            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+                            } else {
+                                @Suppress("DEPRECATION")
+                                android.graphics.Bitmap.CompressFormat.WEBP
+                            }
+                            bitmap.compress(format, 80, stream)
+                            stream.toByteArray()
+                        }
+                    }
+                } else {
+                    null
+                }
+                withContext(Dispatchers.Main) {
+                    if (forwardingPlayer === player) {
+                        player.updateMetadata(episode, podcast, showArtwork, useEpisodeArtwork, artworkData)
+                        player.isTransientLoss = state.transientLoss
+                        updateMedia3CustomLayout()
+                        media3Service?.triggerNotificationUpdate()
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to replay metadata after player install")
+            }
+        }
     }
 
     /**
@@ -740,6 +789,7 @@ class MediaSessionManager(
         if (useMedia3Session) {
             media3Session?.release()
             media3Session = null
+            media3Service = null
             forwardingPlayer = null
             placeholderPlayer?.release()
             placeholderPlayer = null
