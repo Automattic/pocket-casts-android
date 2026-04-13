@@ -472,15 +472,21 @@ class MainActivity :
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
         val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
-        // After restore from backup, prompt user to log in if they're not
-        if (!showOnboarding && settings.getNeedsLoginPromptAfterRestore() && !isLoggedIn && savedInstanceState == null) {
+        // After restore from backup, consume the restore flag on fresh launch so it can't
+        // trigger later unexpectedly, and suppress the generic encouragement flag when this
+        // path launches the same account encouragement flow.
+        if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
-            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+            if (!showOnboarding && !isLoggedIn) {
+                settings.showFreeAccountEncouragement = false
+                openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+            }
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
