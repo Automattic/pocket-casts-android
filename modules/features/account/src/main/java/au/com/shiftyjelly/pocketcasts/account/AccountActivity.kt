@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.AccountUpdatedDismissedEvent
 import com.automattic.eventhorizon.AccountUpdatedShownEvent
 import com.automattic.eventhorizon.CreateAccountDismissedLegacyEvent
@@ -150,6 +151,7 @@ class AccountActivity : AppCompatActivity() {
         val currentFragment = navController.currentDestination
         currentFragment?.trackDismissed()
 
+        UiUtil.hideKeyboard(binding.root)
         if (currentFragment?.id == R.id.createDoneFragment || !navController.popBackStack()) {
             finish()
         }
