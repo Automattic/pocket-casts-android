@@ -1522,10 +1522,10 @@ class MainActivity :
     }
 
     override fun showAccountUpgradeNow(autoSelectPlus: Boolean) {
-        showAccountUpgradeNowDialog(shouldClose = false, autoSelectPlus = autoSelectPlus)
+        showAccountUpgradeNowDialog(autoSelectPlus = autoSelectPlus)
     }
 
-    private fun showAccountUpgradeNowDialog(shouldClose: Boolean, autoSelectPlus: Boolean = false) {
+    private fun showAccountUpgradeNowDialog(autoSelectPlus: Boolean = false) {
         val observer: Observer<SignInState> = Observer { value ->
             val intent = if (value.isSignedInAsFree) {
                 AccountActivity.newUpgradeInstance(this)
@@ -1537,10 +1537,6 @@ class MainActivity :
                 Intent(this, AccountActivity::class.java)
             }
             startActivity(intent)
-
-            if (shouldClose) {
-                finish()
-            }
         }
 
         viewModel.signInState.observeOnce(this, observer)
@@ -1693,7 +1689,7 @@ class MainActivity :
                 }
 
                 is UpgradeAccountDeepLink -> {
-                    showAccountUpgradeNowDialog(shouldClose = true)
+                    showAccountUpgradeNowDialog()
                 }
 
                 is PromoCodeDeepLink -> {

@@ -7,10 +7,15 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -52,19 +57,21 @@ class AccountActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+        enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
 
         binding = AccountActivityBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
-            },
-        )
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            binding.root.updatePadding(
+                left = insets.left,
+                right = insets.right,
+                bottom = insets.bottom,
+                top = insets.top,
+            )
+            windowInsets
+        }
 
         val navController = findNavController(R.id.nav_host_fragment)
         binding.carHeader?.btnClose?.setOnClickListener {
@@ -72,6 +79,15 @@ class AccountActivity : AppCompatActivity() {
                 finish()
             }
         }
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackNavigation(navController)
+                }
+            },
+        )
 
         if (savedInstanceState == null) {
             val navInflater = navController.navInflater
@@ -99,7 +115,9 @@ class AccountActivity : AppCompatActivity() {
 
             val navConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar?.setupWithNavController(navController, navConfiguration)
-            binding.toolbar?.setNavigationOnClickListener { _ -> handleBackPressed() }
+            binding.toolbar?.setNavigationOnClickListener { _ ->
+                handleBackNavigation(navController)
+            }
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 destination.trackShown()
@@ -129,17 +147,14 @@ class AccountActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleBackPressed() {
-        val currentFragment = findNavController(R.id.nav_host_fragment).currentDestination
+    private fun handleBackNavigation(navController: NavController) {
+        val currentFragment = navController.currentDestination
         currentFragment?.trackDismissed()
 
-        if (currentFragment?.id == R.id.createDoneFragment) {
-            finish()
-            return
-        }
-
         UiUtil.hideKeyboard(binding.root)
-        onBackPressedDispatcher.onBackPressed()
+        if (currentFragment?.id == R.id.createDoneFragment || !navController.popBackStack()) {
+            finish()
+        }
     }
 
     private fun NavDestination.trackShown() {
