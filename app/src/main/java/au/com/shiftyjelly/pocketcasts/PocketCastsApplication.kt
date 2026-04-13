@@ -256,6 +256,8 @@ class PocketCastsApplication :
                         fileStorage.fixBrokenFiles(episodeManager)
                         // reset stats
                         statsManager.reset()
+                        // Flag for login prompt in MainActivity
+                        settings.setNeedsLoginPromptAfterRestore(true)
                     }
                     settings.setRestoreFromBackupEnded()
                 }
