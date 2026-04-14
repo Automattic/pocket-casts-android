@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 09:57:34+0000
+Translation-Revision-Date: 2026-04-09 09:55:38+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="error_episode_not_available">الحلقة غير متوفرة</string>
+    <string name="error_playback_connected">أنت متصل</string>
+    <string name="error_playback_offline">أنت غير متصل بالإنترنت</string>
+    <string name="error_cast_connection_failed">تعذر الاتصال بجهاز Chromecast. يُرجى التحقق من الجهاز ثم إعادة المحاولة.</string>
+    <string name="error_audio_output">تعذّر تشغيل الصوت. يُرجى التحقق من جهاز إخراج الصوت ثم إعادة المحاولة.</string>
+    <string name="error_decoder_initialization">يتعذّر تشغيل ملف صوتي بهذا التنسيق على جهازك.</string>
+    <string name="error_streaming_server_error">توجد بعض المشكلات في خادم البث الصوتي. يُرجى إعادة المحاولة لاحقًا.</string>
+    <string name="error_streaming_no_longer_available">لم تعد هذه الحلقة متوفرة بعد الآن من قِبَل الناشر.</string>
+    <string name="error_streaming_not_found">تعذّر العثور على هذه الحلقة على الخادم. ربما تمت إزالتها من قِبَل الناشر.</string>
+    <string name="error_streaming_access_denied">لم يعُد لديك حق الوصول لتشغيل هذه الحلقة.</string>
+    <string name="settings_auto_download_storage_summary">عند التعطيل، يمكن أن تتم عمليات التنزيل حتى عندما تكون مساحة التخزين الداخلية للجهاز منخفضة.</string>
+    <string name="settings_auto_download_storage">فقط عند توفر مساحة تخزين كافية</string>
+    <string name="settings_auto_download_charging_summary">عند التعطيل، يمكن أن تتم عمليات التنزيل حتى دون توصيل الجهاز بالشاحن.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">عند وصول \"التالي\" إلى%d ، ستقوم الحلقات الجديدة التي تمت إضافتها‑ تلقائيًا إلى الجزء العلوي بإزالة الحلقة الأخيرة في قائمة الانتظار. لن تتم إضافة الحلقات التي تم تعيينها إلى الإضافة ‑ التلقائية في الجزء السفلي حتى يكون قسم \"التالي\" أعلى من الحد المسموح به.</string>
     <string name="offline_icon_content_description">أيقونة عدم الاتصال بالإنترنت</string>
     <string name="profile_last_refresh_at">آخر تحديث: %s</string>
@@ -21,6 +34,7 @@ Language: ar
     <string name="error_download_socket_timeout">انتهت مهلة الاتصال بخادم مؤلف البث الصوتي. يُرجى التحقق من اتصالك بالإنترنت.</string>
     <string name="error_download_invalid_content_type">فشل تنزيل الحلقة. تم استلام نوع المحتوى ⁦%1$s⁩. يُرجى الاتصال بمؤلف البث الصوتي.</string>
     <string name="error_download_http_failure">فشل تنزيل الحلقة. تم تلقي كود حالة HTTP %1$s. يُرجى الاتصال بمؤلف البث الصوتي.</string>
+    <string name="error_download_suspicious_content_size">فشل تنزيل الحلقة. حجم الملف الذي تم تنزيله صغير جدًا. يُرجى إعادة المحاولة.</string>
     <string name="episode_row_waiting_for_storage">بانتظار توفر مساحة تخزين</string>
     <string name="podcasts_download_storage">التنزيل متوقف بانتظار توفر مساحة تخزين</string>
     <string name="watch_sync_failed">تعذّرت المزامنة مع الساعة</string>
@@ -1608,6 +1622,8 @@ Language: ar
     <string name="settings_import_file_summary">إذا كانت لديك حلقات بث صوتي في تطبيق أو خدمة أخرى، فيمكن لـ Pocket Casts استيرادها من ملف OPML.</string>
     <string name="settings_export_send_email_summary">قم بتصدير حلقات البث الصوتي على هيئة تنسيق OPML الغريب للغاية (لكنه مدعوم على مستوى واسع).</string>
     <string name="plus_slash_month">%s في الشهر</string>
+    <string name="error_streaming_try_downloading">فشل البث. حاول تنزيل الحلقة.</string>
+    <string name="settings_auto_download_unmetered_summary">عند التعطيل، يمكن أن تتم عمليات التنزيل على الشبكات الخلوية وكذلك على الشبكات الأخرى ذات القيود على البيانات. راجع إعدادات الشبكة لديك للحصول على مزيد من المعلومات.</string>
     <string name="plus_cloud_storage">التخزين السحابي</string>
     <string name="profile_expiry_date_unknown">غير معروف</string>
     <string name="profile_yearly">سنوي</string>

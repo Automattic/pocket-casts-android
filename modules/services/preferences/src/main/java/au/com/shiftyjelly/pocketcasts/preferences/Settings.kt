@@ -361,6 +361,9 @@ interface Settings {
     fun isRestoreFromBackup(): Boolean
     fun setRestoreFromBackupEnded()
 
+    fun setNeedsLoginPromptAfterRestore(value: Boolean)
+    fun getNeedsLoginPromptAfterRestore(): Boolean
+
     fun clearPlusPreferences()
 
     fun setDismissLowStorageModalTime(lastUpdateTime: Long)

@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 09:57:56+0000
+Translation-Revision-Date: 2026-04-09 11:56:35+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="error_playback_connected">Du är ansluten</string>
+    <string name="error_episode_not_available">Avsnitt inte tillgängligt</string>
+    <string name="error_playback_offline">Du är offline</string>
+    <string name="error_decoder_initialization">Kan inte spela detta ljudformat på din enhet.</string>
+    <string name="error_cast_connection_failed">Det gick inte att ansluta till Chromecast-enheten. Kontrollera enheten och försök igen.</string>
+    <string name="error_audio_output">Det gick inte att spela upp ljud. Kontrollera din enhets ljudutgång och försök igen.</string>
+    <string name="error_streaming_server_error">Podcastservern har problem. Försök igen senare.</string>
+    <string name="error_streaming_no_longer_available">Det här avsnittet är inte längre tillgängligt från utgivaren.</string>
+    <string name="error_streaming_not_found">Det här avsnittet gick inte att hitta på servern. Det kan ha tagits bort av utgivaren.</string>
+    <string name="error_streaming_access_denied">Du har inte längre åtkomst att spela upp detta avsnitt.</string>
+    <string name="settings_auto_download_storage_summary">När detta är inaktiverat kan nedladdningar ske när enhetens interna lagringsutrymme håller på att ta slut.</string>
+    <string name="settings_auto_download_storage">Endast när det finns tillräckligt med lagringsutrymme</string>
+    <string name="settings_auto_download_charging_summary">När detta är inaktiverat kan nedladdningar ske utan att enheten är ansluten till en laddare.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">När Nästa når %d läggs nya avsnitt automatiskt till högst upp, varpå det sista avsnittet i kön tas bort. Avsnitt som är inställda på att läggas till automatiskt längst ner läggs inte till förrän Nästa är under gränsen.</string>
     <string name="offline_icon_content_description">Offline-ikon</string>
     <string name="profile_last_refresh_at">Senaste uppdatering: %s</string>
@@ -21,6 +34,7 @@ Language: sv_SE
     <string name="error_download_io_failure">Det gick inte att ladda ner avsnittet. Kontrollera din internet-anslutning och ditt lagringsutrymme.</string>
     <string name="error_download_invalid_content_type">Det gick inte att ladda ner avsnittet. Mottagen innehållstyp %1$s. Kontakta podcastförfattaren.</string>
     <string name="error_download_http_failure">Det gick inte att ladda ner avsnittet. Mottagen HTTP-statuskod %1$s. Kontakta podcastförfattaren.</string>
+    <string name="error_download_suspicious_content_size">Misslyckades att ladda ner avsnittet. Den nedladdade filen är för liten. Försök igen.</string>
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
     <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
     <string name="watch_sync_retry">Försök igen</string>
@@ -51,7 +65,6 @@ Language: sv_SE
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
     <string name="podcasts_add_episode">Lägg till</string>
     <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
-    <string name="add_to_up_next_top">Spela upp nästa i Up Next</string>
     <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
     <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
     <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>
@@ -1608,6 +1621,8 @@ Language: sv_SE
     <string name="settings_podcast_episode_grouping_summary">Nya podcasts som du kommer inte att gruppera sina avsnitt efter %s.</string>
     <string name="settings_import_file_summary">Om du har podcasts i någon annan app eller tjänst kan Pocket Casts importera dem från en OPML-fil.</string>
     <string name="settings_export_send_email_summary">Exportera dina podcasts i det supernördiga OPML-formatet (som stöds i stor utsträckning).</string>
+    <string name="error_streaming_try_downloading">Streamingen misslyckades. Prova att ladda ner avsnittet.</string>
+    <string name="settings_auto_download_unmetered_summary">När detta är inaktiverat kan nedladdningar ske på mobila nätverk såväl som andra nätverk med datapriser. Kontrollera dina nätverksinställningar för mer information.</string>
     <string name="profile">Profil</string>
     <string name="profile_reset_password">Återställ lösenord</string>
     <string name="profile_web_player">Webbspelare</string>

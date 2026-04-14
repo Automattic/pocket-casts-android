@@ -3,6 +3,10 @@
 *   Updates
     *   Make sure users with new accounts land on the Podcasts tab when they followed some recommended podcasts
         ([#5197](https://github.com/Automattic/pocket-casts-android/pull/5197))
+*   Bug Fixes
+    *   Fix active episode not syncing its playback position
+        ([#5213](https://github.com/Automattic/pocket-casts-android/pull/5213))
+
 8.9
 -----
 *   New Features
@@ -13,6 +17,9 @@
         ([#5165](https://github.com/Automattic/pocket-casts-android/pull/5165))
     *   Enhance error handling around sharing a downloaded episode
         ([#5168](https://github.com/Automattic/pocket-casts-android/pull/5168))
+*   Bug Fixes
+    *   Fix crash with stale experiment cache
+        ([#5196](https://github.com/Automattic/pocket-casts-android/pull/5196))
 
 8.8
 -----

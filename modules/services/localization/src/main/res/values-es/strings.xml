@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 11:58:32+0000
+Translation-Revision-Date: 2026-04-09 09:55:18+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="error_episode_not_available">Episode not available</string>
+    <string name="error_playback_connected">No te has conectado.</string>
+    <string name="error_playback_offline">No tienes conexión a Internet.</string>
+    <string name="error_cast_connection_failed">No se ha podido conectar al dispositivo Chromecast. Comprueba el dispositivo e inténtalo de nuevo.</string>
+    <string name="error_audio_output">No se ha podido reproducir el audio. Comprueba tu dispositivo de salida de audio e inténtalo de nuevo.</string>
+    <string name="error_decoder_initialization">No se puede reproducir este formato de audio en tu dispositivo.</string>
+    <string name="error_streaming_server_error">El servidor de podcasts está experimentando problemas. Inténtalo de nuevo más tarde.</string>
+    <string name="error_streaming_no_longer_available">Este episodio ya no está disponible en el editor.</string>
+    <string name="error_streaming_not_found">No se ha podido encontrar este episodio en el servidor. Puede que el editor lo haya eliminado.</string>
+    <string name="error_streaming_access_denied">Ya no tienes acceso para reproducir este episodio.</string>
+    <string name="settings_auto_download_storage_summary">Cuando se desactiva, las descargas pueden ocurrir cuando el dispositivo tiene poco almacenamiento interno.</string>
+    <string name="settings_auto_download_storage">Solo cuando haya suficiente almacenamiento</string>
+    <string name="settings_auto_download_charging_summary">Cuando se desactiva, las descargas pueden ocurrir sin que el dispositivo esté conectado a un cargador.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Cuando A continuación llegue a %d, los episodios nuevos que se añadan automáticamente al principio eliminarán el último episodio de la cola. Los episodios configurados para que se añadan automáticamente al final no se añadirán hasta que A continuación esté por debajo del límite.</string>
     <string name="offline_icon_content_description">Icono sin conexión</string>
     <string name="profile_last_refresh_at">Última actualización: %s</string>
@@ -21,6 +34,7 @@ Language: es
     <string name="error_download_io_failure">Error al descargar el episodio. Por favor, revisa tu conexión a Internet y el almacenaje.</string>
     <string name="error_download_invalid_content_type">Error al descargar el episodio. Tipo de contenido recibido %1$s. Ponte en contacto con el autor del podcast.</string>
     <string name="error_download_http_failure">Error al descargar el episodio. Se ha recibido el código de estado HTTP %1$s. Ponte en contacto con el autor del podcast.</string>
+    <string name="error_download_suspicious_content_size">Error al descargar el episodio. El archivo descargado es demasiado pequeño. Inténtalo de nuevo.</string>
     <string name="episode_row_waiting_for_storage">Esperando espacio de almacenamiento</string>
     <string name="podcasts_download_storage">Descarga esperando espacio de almacenamiento</string>
     <string name="watch_sync_failed">No se ha podido sincronizar con el reloj</string>
@@ -1608,6 +1622,8 @@ Language: es
     <string name="settings_podcast_episode_grouping_summary">Los pódcasts nuevos a los que te suscribas agruparán sus episodios por %s.</string>
     <string name="settings_import_file_summary">Si tienes pódcasts en otra aplicación o servicio, Pocket Casts puede importarlas desde un archivo OPML.</string>
     <string name="settings_export_send_email_summary">Exporta tus pódcasts con el formato superraro (pero admitido casi siempre) OPML.</string>
+    <string name="error_streaming_try_downloading">Se ha producido un error con la emisión en directo. Prueba a descargar el episodio.</string>
+    <string name="settings_auto_download_unmetered_summary">Cuando se desactiva, las descargas pueden ocurrir tanto en redes móviles como en otras redes de uso medido. Comprueba tu configuración de red para obtener más información.</string>
     <string name="profile">Perfil</string>
     <string name="profile_reset_password">Restablecer contraseña</string>
     <string name="profile_web_player">Reproductor web</string>
