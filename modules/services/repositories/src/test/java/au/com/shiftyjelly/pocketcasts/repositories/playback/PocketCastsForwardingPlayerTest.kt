@@ -167,22 +167,22 @@ class PocketCastsForwardingPlayerTest {
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_BACK))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
     }
 
     @Test
-    fun `available commands exclude standard skip when showStandardSkipButtons is false`() {
-        val player = PocketCastsForwardingPlayer(mockPlayer, showStandardSkipButtons = false)
+    fun `available commands exclude seek to next and previous`() {
+        val player = PocketCastsForwardingPlayer(mockPlayer)
         val commands = player.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertTrue(commands.contains(Player.COMMAND_SEEK_BACK))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
@@ -596,8 +596,8 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `swapPlayer preserves showStandardSkipButtons`() {
-        val player = PocketCastsForwardingPlayer(mockPlayer, showStandardSkipButtons = false)
+    fun `swapPlayer excludes seek to next and previous`() {
+        val player = PocketCastsForwardingPlayer(mockPlayer)
 
         val newWrappedPlayer = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()

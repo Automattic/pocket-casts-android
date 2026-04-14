@@ -29,14 +29,17 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.asAlbumArtContentUri
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -180,11 +183,7 @@ class MediaSessionManager(
 
     @OptIn(UnstableApi::class)
     private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
-        if (useMedia3Session) {
-            Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
-        } else {
-            LegacyAutomotiveStrategy(::useCustomSkipButtons)
-        }
+        Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
     } else {
         null
     }
@@ -323,7 +322,6 @@ class MediaSessionManager(
                     true
                 }
             },
-            showStandardSkipButtons = !useCustomSkipButtons(),
         )
 
         media3Callback = Media3SessionCallback(
@@ -394,8 +392,13 @@ class MediaSessionManager(
                 }
                 val showArtwork = settings.showArtworkOnLockScreen.value
                 val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
+                val wrappedArtworkUri = if (showArtwork) {
+                    resolveAndWrapArtworkUri(ep, podcast, useEpisodeArtwork)
+                } else {
+                    null
+                }
                 withContext(Dispatchers.Main) {
-                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork)
+                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork, artworkUri = wrappedArtworkUri, showRating = !isAutomotive)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to seed initial Media3 metadata")
@@ -477,7 +480,6 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
-            showStandardSkipButtons = !useCustomSkipButtons(),
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
@@ -587,7 +589,12 @@ class MediaSessionManager(
                         player.clearMetadata()
                         return@subscribeBy
                     }
-                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData)
+                    val wrappedUri = if (data.showArtwork) {
+                        resolveAndWrapArtworkUri(data.episode, data.podcast, data.useEpisodeArtwork)
+                    } else {
+                        null
+                    }
+                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData, artworkUri = wrappedUri, showRating = !isAutomotive)
                     player.isTransientLoss = data.state.transientLoss
                     updateMedia3CustomLayout()
                 },
@@ -633,7 +640,9 @@ class MediaSessionManager(
         val currentEpisode = playbackManager.getCurrentEpisode()
 
         if (isAutomotive) {
-            buttons.addAll(automotiveStrategy!!.buildCustomLayout(playbackManager, settings, context, ::buildCustomActionButton))
+            val layout = automotiveStrategy!!.buildLayout(playbackManager, settings, context, ::buildCustomActionButton)
+            session.setCustomLayout(layout.primaryButtons + layout.overflowButtons)
+            return
         } else {
             // Mobile/other: existing behavior unchanged
             if (useCustomSkipButtons()) {
@@ -732,6 +741,34 @@ class MediaSessionManager(
         in 8..12 -> CommandButton.ICON_SKIP_FORWARD_10
         in 13..22 -> CommandButton.ICON_SKIP_FORWARD_15
         else -> CommandButton.ICON_SKIP_FORWARD_30
+    }
+
+    /**
+     * Resolves an artwork URI for the given episode, wrapping it through
+     * [AlbumArtContentProvider][au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider]
+     * on automotive so that AAOS can load it via a content:// scheme.
+     */
+    private fun resolveAndWrapArtworkUri(
+        episode: BaseEpisode,
+        podcast: Podcast?,
+        useEpisodeArtwork: Boolean = true,
+    ): android.net.Uri? {
+        val url = when (episode) {
+            is PodcastEpisode -> {
+                if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf { it.isNotBlank() }
+                        ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                } else {
+                    podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                }
+            }
+
+            is UserEpisode -> {
+                episode.artworkUrl?.takeIf { it.isNotBlank() }
+            }
+        } ?: return null
+        val uri = android.net.Uri.parse(url)
+        return if (isAutomotive) uri.asAlbumArtContentUri(context) else uri
     }
 
     fun release() {

@@ -8,20 +8,24 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 
 /**
- * Strategy interface for automotive-specific custom action layout and metadata formatting.
+ * Strategy interface for automotive-specific custom action layout.
  *
- * Automotive always uses a [MediaLibraryService][androidx.media3.session.MediaLibraryService]
- * shell, but the internal behavior differs based on the `media3_session` feature flag:
- * - Flag ON: [Media3AutomotiveStrategy] — new layout with promoted speed button and circular skip icons.
- * - Flag OFF: [LegacyAutomotiveStrategy] — matches the old `MediaBrowserServiceCompat` behavior.
+ * Returns two lists:
+ * - **primaryButtons**: shown in the main transport bar via `setMediaButtonPreferences`
+ * - **overflowButtons**: additional actions available in the overflow menu via `setCustomLayout`
  */
 @UnstableApi
 internal interface AutomotiveSessionStrategy {
 
-    fun buildCustomLayout(
+    data class ButtonLayout(
+        val primaryButtons: List<CommandButton>,
+        val overflowButtons: List<CommandButton>,
+    )
+
+    fun buildLayout(
         playbackManager: PlaybackManager,
         settings: Settings,
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
-    ): List<CommandButton>
+    ): ButtonLayout
 }

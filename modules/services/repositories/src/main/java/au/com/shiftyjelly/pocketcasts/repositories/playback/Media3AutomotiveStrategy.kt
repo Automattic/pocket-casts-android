@@ -11,61 +11,56 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-/**
- * Automotive strategy for the Media3 session path (flag ON).
- *
- * Layout: playback speed first (promoted slot), then circular skip icons
- * matching the configured duration, then remaining custom actions
- * (excluding speed since it is already shown).
- */
 @UnstableApi
 internal class Media3AutomotiveStrategy(
     private val useCustomSkipButtons: () -> Boolean,
     private val speedToDrawable: (Double) -> Int,
-    private val skipBackIconForDuration: (Int) -> Int,
-    private val skipForwardIconForDuration: (Int) -> Int,
+    @Suppress("unused") private val skipBackIconForDuration: (Int) -> Int,
+    @Suppress("unused") private val skipForwardIconForDuration: (Int) -> Int,
 ) : AutomotiveSessionStrategy {
 
-    override fun buildCustomLayout(
+    override fun buildLayout(
         playbackManager: PlaybackManager,
         settings: Settings,
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
-    ): List<CommandButton> {
-        val buttons = mutableListOf<CommandButton>()
+    ): AutomotiveSessionStrategy.ButtonLayout {
+        val primaryButtons = mutableListOf<CommandButton>()
+        val overflowButtons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
-        if (playbackManager.isAudioEffectsAvailable()) {
-            buttons.add(
-                CommandButton.Builder(CommandButton.ICON_UNDEFINED)
-                    .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
-                    .setDisplayName(context.getString(LR.string.playback_speed))
-                    .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
-                    .build(),
-            )
-        }
         if (useCustomSkipButtons()) {
-            buttons.add(
-                CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
+            primaryButtons.add(
+                CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_back))
                     .setCustomIconResId(IR.drawable.media_skipback)
                     .build(),
             )
-            buttons.add(
-                CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
+            primaryButtons.add(
+                CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_forward))
                     .setCustomIconResId(IR.drawable.media_skipforward)
                     .build(),
             )
         }
+
+        primaryButtons.add(
+            CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+                .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
+                .setDisplayName(context.getString(LR.string.playback_speed))
+                .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
+                .build(),
+        )
+
         val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
         settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             if (mediaControl != MediaNotificationControls.PlaybackSpeed) {
-                buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
+                buildCustomActionButton(mediaControl, currentEpisode)?.let(overflowButtons::add)
             }
         }
-        return buttons
+
+        return AutomotiveSessionStrategy.ButtonLayout(primaryButtons, overflowButtons)
     }
 }

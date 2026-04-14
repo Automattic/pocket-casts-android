@@ -42,7 +42,6 @@ class PocketCastsForwardingPlayer(
     private val onPause: (() -> Unit)? = null,
     private val onSeekTo: ((Long) -> Unit)? = null,
     internal val playGuard: (() -> Boolean) = { true },
-    private val showStandardSkipButtons: Boolean = true,
 ) : ForwardingPlayer(wrappedPlayer) {
 
     internal var currentMediaItem: MediaItem = MediaItem.EMPTY
@@ -68,7 +67,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard, showStandardSkipButtons).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard).also {
             it.currentMediaItem = this.currentMediaItem
             it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
@@ -91,10 +90,10 @@ class PocketCastsForwardingPlayer(
         showArtwork: Boolean = true,
         useEpisodeArtwork: Boolean = true,
         artworkData: ByteArray? = null,
+        artworkUri: Uri? = if (showArtwork) resolveArtworkUri(episode, podcast, useEpisodeArtwork) else null,
+        showRating: Boolean = true,
     ) {
         checkMainThread()
-
-        val artworkUri = if (showArtwork) resolveArtworkUri(episode, podcast, useEpisodeArtwork) else null
         val podcastTitle = episode.displaySubtitle(podcast)
 
         val metadataBuilder = MediaMetadata.Builder()
@@ -107,7 +106,7 @@ class PocketCastsForwardingPlayer(
             .setIsBrowsable(false)
             .setIsPlayable(true)
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
-            .setUserRating(if (episode is PodcastEpisode) buildRating(episode) else null)
+            .setUserRating(if (showRating && episode is PodcastEpisode) buildRating(episode) else null)
 
         if (showArtwork && artworkData != null) {
             metadataBuilder.setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
@@ -153,20 +152,16 @@ class PocketCastsForwardingPlayer(
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
     override fun getAvailableCommands(): Player.Commands {
-        val builder = Player.Commands.Builder()
+        return Player.Commands.Builder()
             .addAll(
                 Player.COMMAND_PLAY_PAUSE,
+                Player.COMMAND_SET_MEDIA_ITEM,
                 Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_SEEK_FORWARD,
-                Player.COMMAND_SEEK_BACK,
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
             )
-        if (showStandardSkipButtons) {
-            builder.addAll(Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_PREVIOUS)
-        }
-        return builder.build()
+            .build()
     }
 
     override fun seekTo(positionMs: Long) {

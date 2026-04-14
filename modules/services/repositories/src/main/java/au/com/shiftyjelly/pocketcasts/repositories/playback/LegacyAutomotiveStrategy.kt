@@ -26,12 +26,12 @@ internal class LegacyAutomotiveStrategy(
     private val useCustomSkipButtons: () -> Boolean,
 ) : AutomotiveSessionStrategy {
 
-    override fun buildCustomLayout(
+    override fun buildLayout(
         playbackManager: PlaybackManager,
         settings: Settings,
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
-    ): List<CommandButton> {
+    ): AutomotiveSessionStrategy.ButtonLayout {
         val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
@@ -57,6 +57,8 @@ internal class LegacyAutomotiveStrategy(
         settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
         }
-        return buttons
+
+        // Legacy strategy puts everything in one flat list (no primary/overflow split)
+        return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = buttons, overflowButtons = emptyList())
     }
 }
