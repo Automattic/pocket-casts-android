@@ -263,7 +263,7 @@ credentials-google-play = { module = "androidx.credentials:credentials-play-serv
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "google-id"}
 
 # Other dependencies
-androidx-annotation = "androidx.annotation:annotation:1.9.1"
+androidx-annotation = "androidx.annotation:annotation:1.10.0"
 androidx-appcompat = "androidx.appcompat:appcompat:1.7.1"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-car = "androidx.car.app:app:1.7.0"
