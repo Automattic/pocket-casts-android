@@ -10,6 +10,7 @@ import androidx.media3.common.Player
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -511,6 +512,48 @@ class PocketCastsForwardingPlayerTest {
         forwardingPlayer.updateMetadata(episode, podcast, showArtwork = true)
 
         assertEquals(Uri.parse("https://example.com/art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
+    }
+
+    @Test
+    fun `updateMetadata uses podcast artwork when useEpisodeArtwork is false`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/episode-art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, useEpisodeArtwork = false)
+
+        val artworkUri = forwardingPlayer.mediaMetadata.artworkUri
+        assertEquals(Uri.parse(podcast.getArtworkUrl(480)), artworkUri)
+    }
+
+    @Test
+    fun `updateMetadata uses episode artwork when useEpisodeArtwork is true`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/art.jpg",
+        )
+        val podcast = createPodcast(title = "Podcast")
+
+        forwardingPlayer.updateMetadata(episode, podcast, useEpisodeArtwork = true)
+
+        assertEquals(Uri.parse("https://example.com/art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
+    }
+
+    @Test
+    fun `updateMetadata falls back to episode artwork when useEpisodeArtwork is false and podcast is null`() {
+        val episode = createPodcastEpisode(
+            uuid = "ep-1",
+            title = "Test",
+            imageUrl = "https://example.com/episode-art.jpg",
+        )
+
+        forwardingPlayer.updateMetadata(episode, podcast = null, useEpisodeArtwork = false)
+
+        assertEquals(Uri.parse("https://example.com/episode-art.jpg"), forwardingPlayer.mediaMetadata.artworkUri)
     }
 
     @Test
