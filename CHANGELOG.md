@@ -1,9 +1,5 @@
 8.9
 -----
-
-
-8.9
------
 *   New Features
     *   Display playback errors on bottom bar
         ([#5188](https://github.com/Automattic/pocket-casts-android/pull/5188))

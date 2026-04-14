@@ -36,11 +36,17 @@ class PlaybackNoticeManagerTest {
     private val offlineMessage = "No connection"
     private val connectedMessage = "You're connected"
     private val episodeNotAvailableMessage = "Episode not available"
+    private val unableToPlayMessage = "Unable to play"
+    private val accessDeniedMessage = "This episode can't be played."
+    private val accessDeniedAction = "Learn more"
 
     private val context: Context = mock {
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_offline) } doReturn offlineMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_connected) } doReturn connectedMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_episode_not_available) } doReturn episodeNotAvailableMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play) } doReturn unableToPlayMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_streaming_access_denied) } doReturn accessDeniedMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.settings_battery_learn_more) } doReturn accessDeniedAction
     }
 
     private val networkConnectionWatcher = object : NetworkConnectionWatcher {
@@ -255,7 +261,8 @@ class PlaybackNoticeManagerTest {
             playbackStateFlow.value = PlaybackState(state = PlaybackState.State.ERROR)
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
-            assertEquals(episodeNotAvailableMessage, notice?.message)
+            assertEquals(accessDeniedMessage, notice?.message)
+            assertEquals(accessDeniedAction, notice?.linkText)
 
             advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
             runCurrent()
@@ -569,6 +576,62 @@ class PlaybackNoticeManagerTest {
             val recovery = awaitItem()
             assertEquals(PlaybackNoticeType.RECOVERY, recovery?.type)
             assertNull(recovery?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `stuck player error shown with support url`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.StuckPlayer(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(accessDeniedMessage, notice?.message)
+            assertEquals(accessDeniedAction, notice?.linkText)
+            assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `transient error state during player switch does not trigger notice`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            // Simulate pause(transientLoss=true) re-emitting an ERROR state during player switch
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(401),
+                transientLoss = true,
+            )
+            runCurrent()
+            expectNoEvents()
+
+            // loadCurrentEpisode emits PLAYING state
+            playbackStateFlow.value = PlaybackState(state = PlaybackState.State.PLAYING)
+            runCurrent()
+            expectNoEvents()
+
+            // Real error arrives with transientLoss=false
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.HttpError(401),
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
         }
     }
 

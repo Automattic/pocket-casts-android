@@ -551,7 +551,7 @@ class EpisodeFragment : BaseFragment() {
                 }
             } else {
                 context?.let { context ->
-                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context)) {
+                    if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && !episode.isDownloadCancellable) {
                         warningsHelper
                             .downloadWarning(episodeUUID, SourceView.EPISODE_DETAILS)
                             .show(parentFragmentManager, "download warning")

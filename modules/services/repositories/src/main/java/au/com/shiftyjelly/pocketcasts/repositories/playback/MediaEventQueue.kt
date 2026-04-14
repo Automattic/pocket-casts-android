@@ -6,10 +6,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 internal class MediaEventQueue(
-    private val scope: CoroutineScope,
+    private val scopeProvider: () -> CoroutineScope,
 ) {
     private var singleTapJob: SingleTapJob? = null
     private var multiTapJob: Job? = null
+
+    private val scope: CoroutineScope get() = scopeProvider()
 
     suspend fun consumeEvent(event: MediaEvent) = when (event) {
         MediaEvent.SingleTap -> handleSingleTapEvent()
@@ -48,7 +50,7 @@ internal class MediaEventQueue(
     }
 
     private class SingleTapJob(
-        private val scope: CoroutineScope,
+        scope: CoroutineScope,
     ) {
         private var counter: Int = 1
 

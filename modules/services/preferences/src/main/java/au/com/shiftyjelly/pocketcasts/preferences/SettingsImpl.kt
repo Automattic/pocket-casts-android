@@ -89,6 +89,7 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
+        private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
     }
 
     private var languageCode: String? = null
@@ -505,6 +506,14 @@ class SettingsImpl @Inject constructor(
 
     override fun setRestoreFromBackupEnded() {
         setString("deviceUuid", getUniqueDeviceId())
+    }
+
+    override fun setNeedsLoginPromptAfterRestore(value: Boolean) {
+        sharedPreferences.edit().putBoolean(NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY, value).apply()
+    }
+
+    override fun getNeedsLoginPromptAfterRestore(): Boolean {
+        return sharedPreferences.getBoolean(NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY, false)
     }
 
     @SuppressLint("HardwareIds")
