@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 16:54:30+0000
+Translation-Revision-Date: 2026-04-08 14:56:13+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="error_episode_not_available">Episode not available</string>
+    <string name="error_playback_connected">Je bent niet verbonden.</string>
+    <string name="error_playback_offline">Je bent offline.</string>
+    <string name="error_cast_connection_failed">Kan geen verbinding maken met het Chromecast-apparaat. Controleer het apparaat en probeer het opnieuw.</string>
+    <string name="error_audio_output">Kon audio niet afspelen. Controleer je audio-uitvoerapparaat en probeer het opnieuw.</string>
+    <string name="error_decoder_initialization">Kan dit audioformaat niet afspelen op je apparaat.</string>
+    <string name="error_streaming_server_error">De podcastserver ondervindt problemen. Probeer het later opnieuw.</string>
+    <string name="error_streaming_no_longer_available">Deze aflevering is niet meer beschikbaar bij de uitgever.</string>
+    <string name="error_streaming_not_found">Deze aflevering kon niet worden gevonden op de server. Mogelijk is het verwijderd door de uitgever.</string>
+    <string name="error_streaming_access_denied">Je hebt niet langer toegang om deze aflevering af te spelen.</string>
+    <string name="settings_auto_download_storage_summary">Wanneer uitgeschakeld, kunnen downloads plaatsvinden wanneer het apparaat weinig interne opslag heeft.</string>
+    <string name="settings_auto_download_storage">Alleen als er voldoende opslagruimte is</string>
+    <string name="settings_auto_download_charging_summary">Wanneer uitgeschakeld, kunnen downloads plaatsvinden zonder dat het apparaat is verbonden met een oplader.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Wanneer Hierna de %d bereikt, wordt de laatste aflevering in de wachtrij automatisch verwijderd wanneer nieuwe afleveringen automatisch bovenaan worden toegevoegd. Afleveringen die zijn ingesteld op automatisch onderaan toevoegen worden pas toegevoegd als Hierna onder de limiet ligt.</string>
     <string name="offline_icon_content_description">Offline-pictogram</string>
     <string name="profile_last_refresh_at">Laatst vernieuwd: %s</string>
@@ -21,6 +34,7 @@ Language: nl
     <string name="error_download_io_failure">Downloaden van aflevering mislukt. Controleer je internet verbinding en opslag.</string>
     <string name="error_download_invalid_content_type">Downloaden van aflevering mislukt. Ontvangen contenttype %1$s. Neem contact op met de auteur van de podcast.</string>
     <string name="error_download_http_failure">Downloaden van aflevering mislukt. HTTP-statuscode %1$s ontvangen. Neem contact op met de auteur van de podcast.</string>
+    <string name="error_download_suspicious_content_size">Downloaden van aflevering mislukt. Het gedownloade bestand is te klein. Probeer het nog eens.</string>
     <string name="episode_row_waiting_for_storage">Wachten op opslagruimte</string>
     <string name="podcasts_download_storage">Download wacht op opslagruimte</string>
     <string name="watch_sync_failed">Kon niet gesynchroniseerd worden om te bekijken</string>
@@ -1607,6 +1621,8 @@ Language: nl
     <string name="settings_import_file_summary">Als je podcast-abonnementen hebt in een andere app of dienst, kan Pocket Casts ze importeren vanuit een OPML-bestand.</string>
     <string name="settings_export_send_email_summary">Exporteer je podcasts in de nerdy (maar breed ondersteunde) OPML-indeling.</string>
     <string name="settings_podcast_episode_grouping_summary_none">De afleveringen van nieuwe podcasts waarop je je abonneert worden niet gegroepeerd.</string>
+    <string name="error_streaming_try_downloading">Streaming is mislukt. Download de aflevering.</string>
+    <string name="settings_auto_download_unmetered_summary">Wanneer uitgeschakeld, kunnen downloads plaatsvinden op mobiele en andere netwerken met een limiet. Controleer je netwerkinstellingen voor meer informatie.</string>
     <string name="profile">Profiel</string>
     <string name="profile_reset_password">Wachtwoord opnieuw instellen</string>
     <string name="profile_web_player">Online speler</string>

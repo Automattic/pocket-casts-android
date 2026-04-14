@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-26 23:48:53+0000
+Translation-Revision-Date: 2026-04-06 23:05:30+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="error_episode_not_available">Episodi no disponible</string>
+    <string name="error_playback_connected">Estàs connectat</string>
     <string name="error_playback_offline">Estàs fora de línia</string>
     <string name="error_cast_connection_failed">No s\'ha pogut connectar al dispositiu Chromecast. Comprova el dispositiu i torna-ho a provar.</string>
     <string name="error_audio_output">No s\'ha pogut reproduir l\'àudio. Comprova el dispositiu de sortida d\'àudio i torna-ho a provar.</string>
     <string name="error_decoder_initialization">No es pot reproduir aquest format d\'àudio al teu dispositiu.</string>
-    <string name="error_streaming_server_error">El servidor del pòdcast està tenint problemes. Torna-ho a provar més tard.</string>
     <string name="error_streaming_no_longer_available">Aquest episodi ja no està disponible a través de l\'autor.</string>
     <string name="error_streaming_not_found">No s\'ha pogut trobar aquest episodi al servidor. Pot ser que l\'autor l\'hagi eliminat.</string>
     <string name="error_streaming_access_denied">Ja no tens accés per reproduir aquest episodi.</string>
+    <string name="error_streaming_server_error">El servidor del pòdcast té problemes. Torna-ho a provar més tard.</string>
     <string name="settings_auto_download_storage_summary">Quan està desactivat, les descàrregues poden produir-se encara que el dispositiu tingui poc espai d\'emmagatzematge intern.</string>
     <string name="settings_auto_download_storage">Només quan hi ha prou espai</string>
     <string name="settings_auto_download_charging_summary">Quan està desactivat, les descàrregues poden produir-se sense que el dispositiu estigui connectat a un carregador.</string>
@@ -1437,7 +1439,6 @@ Language: ca
     <string name="settings_refresh_artwork_title">Tot d\'una!</string>
     <string name="error_login_failed">No s\'ha pogut iniciar sessió al compte on sincronitzes les dades. Torneu-ho a provar més tard.</string>
     <string name="error_field_required">Aquest camp és obligatori</string>
-    <string name="error_incorrect_password">Aquest contrasenya és incorrecta</string>
     <string name="error_invalid_password">Aquesta contrasenya és massa curta</string>
     <string name="error_invalid_email">Aquesta adreça de correu electrònic no és vàlida</string>
     <string name="error_file_not_found">No s\'ha trobat el fitxer de l\'episodi. Proveu-lo a descarregar de nou.</string>
@@ -1622,6 +1623,7 @@ Language: ca
     <string name="settings_status_service_discover_summary">La secció Descobreix: l\'aplicació i la cerca de pòdcast.</string>
     <string name="settings_auto_download_unmetered_summary">Si desactives aquesta opció, es podran descarregar arxius amb xarxes mòbils i amb un altre tipus de xarxes d\'ús mesurat. Comprova la configuració de xarxa per a més informació.</string>
     <string name="error_streaming_try_downloading">S\'ha produït un error en la reproducció en directe. Prova de descarregar l\'episodi.</string>
+    <string name="error_incorrect_password">Aquesta contrasenya és incorrecta</string>
     <string name="profile">Perfil</string>
     <string name="filters_chip_download_status">Estat de la descàrrega</string>
     <string name="filters_chip_media_type">Tipus d\'arxiu multimèdia</string>
@@ -1640,7 +1642,6 @@ Language: ca
     <string name="profile_clear_cannot_be_undone">Aquesta acció no es pot desfer.</string>
     <string name="profile_cloud_delete_files_singular">Estàs segur que vols esborrar aquest fitxer?</string>
     <string name="profile_cloud_download_failed">Error a la descàrrega</string>
-    <string name="profile_cloud_files_added_uploaded">Els arxius afegits a aquests dispositiu es pujaran automàticament al núvol.</string>
     <string name="profile_cloud_only_on_wifi">Només amb Wi-Fi</string>
     <string name="profile_cloud_playback_failed">Error en reproduir</string>
     <string name="profile_create_terms_of_use">Condicions d\'ús</string>
@@ -1670,7 +1671,6 @@ Language: ca
     <string name="profile_payment_try_again">Tornar-ho a provar</string>
     <string name="profile_refresh_failed">S\'ha produït un error en actualitzar</string>
     <string name="profile_reset_password_sent">S\'ha enviat l\'enllaç per recuperar la contrasenya</string>
-    <string name="profile_sonos_linking_failed">S\'ha produit un error a la vinculació</string>
     <string name="profile_sonos_linking_failed_summary">Ara mateix no es pot vincular el compte de Pocket Casts. Torna-ho a provar més tard.</string>
     <string name="profile_sonos_need_account">Per poder connectar-ne amb Sonos, necessites un compte de Pocket Casts.</string>
     <string name="profile_stat_days_listened">Dies escoltats</string>
@@ -1840,6 +1840,8 @@ Language: ca
     <string name="profile_cloud_all_files_added">Tots els arxius afegits als teus arxius s\'afegiran a «Tot seguit».</string>
     <string name="profile_clean_up">Buida</string>
     <string name="filters_choose_podcasts">Tria pòdcasts</string>
+    <string name="profile_cloud_files_added_uploaded">Els arxius afegits a aquests dispositius es pujaran automàticament al núvol.</string>
+    <string name="profile_sonos_linking_failed">S\'ha produït un error a la vinculació</string>
     <string name="podcasts">Pòdcasts</string>
     <string name="download_warning_title">Descarrega-ho tot</string>
     <string name="episode_row_download_failed">Error a la descàrrega</string>

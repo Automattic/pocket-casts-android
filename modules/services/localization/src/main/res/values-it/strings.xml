@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 11:58:48+0000
+Translation-Revision-Date: 2026-04-09 11:54:47+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="error_episode_not_available">Episodio non disponibile</string>
+    <string name="error_playback_connected">Sei connesso</string>
+    <string name="error_playback_offline">Sei offline</string>
+    <string name="error_cast_connection_failed">Impossibile connettersi al dispositivo Chromecast. Controlla il dispositivo e riprova.</string>
+    <string name="error_audio_output">Impossibile riprodurre l\'audio. Controlla il dispositivo di uscita audio e riprova.</string>
+    <string name="error_decoder_initialization">Impossibile riprodurre questo formato audio sul dispositivo.</string>
+    <string name="error_streaming_server_error">Il server del podcast sta riscontrando problemi. Riprova più tardi.</string>
+    <string name="error_streaming_no_longer_available">Questo episodio non è più disponibile dall\'editore.</string>
+    <string name="error_streaming_not_found">Impossibile trovare questo episodio sul server. Potrebbe essere stato rimosso dall\'editore.</string>
+    <string name="error_streaming_access_denied">Non hai più accesso a questo episodio.</string>
+    <string name="settings_auto_download_storage_summary">Quando questa opzione è disattivata, i download possono essere eseguiti anche quando lo spazio di archiviazione interno del dispositivo è insufficiente.</string>
+    <string name="settings_auto_download_storage">Solo quando lo spazio di archiviazione è sufficiente</string>
+    <string name="settings_auto_download_charging_summary">Quando questa opzione è disattivata, i download possono essere eseguiti senza che il dispositivo sia in carica.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Quando Successivo raggiunge %d, i nuovi episodi aggiunti automaticamente tra i primi rimuoveranno l\'ultimo episodio in coda. Gli episodi impostati come aggiunta automatica alla fine non verranno aggiunti finché Successivo non sarà sotto il limite.</string>
     <string name="offline_icon_content_description">Icona offline</string>
     <string name="profile_last_refresh_at">Ultimo aggiornamento: %s</string>
@@ -21,6 +34,7 @@ Language: it
     <string name="error_download_socket_timeout">Timeout della connessione al server dell\'autore del podcast. Controlla la connessione a Internet.</string>
     <string name="error_download_invalid_content_type">Impossibile scaricare l\'episodio. Tipo di contenuto ricevuto %1$s. Contatta l\'autore del podcast.</string>
     <string name="error_download_http_failure">Impossibile scaricare l\'episodio. Codice dello stato HTTP ricevuto %1$s. Contatta l\'autore del podcast.</string>
+    <string name="error_download_suspicious_content_size">Impossibile scaricare l\'episodio. Il file scaricato è troppo piccolo. Riprova.</string>
     <string name="episode_row_waiting_for_storage">In attesa dello spazio di archiviazione</string>
     <string name="podcasts_download_storage">Download in attesa dello spazio di archiviazione</string>
     <string name="watch_sync_failed">Impossibile sincronizzare l\'orologio</string>
@@ -1607,6 +1621,8 @@ Language: it
     <string name="settings_podcast_episode_grouping_summary">Per i nuovi podcast che segui gli episodi saranno raggruppati per %s.</string>
     <string name="settings_export_send_email_summary">Esporta i tuoi podcast in OPML, un formato super nerd (ma ampiamente supportato).</string>
     <string name="settings_import_file_summary">Se segui podcast su un\'app o un servizio diversi, Pocket Casts può importarli da un file OPML.</string>
+    <string name="error_streaming_try_downloading">Streaming non riuscito. Prova a scaricare l\'episodio.</string>
+    <string name="settings_auto_download_unmetered_summary">Quando questa opzione è disattivata, i download possono essere eseguiti sia su reti cellulari che su altre reti a consumo. Controlla le impostazioni di rete per maggiori informazioni.</string>
     <string name="profile">Profilo</string>
     <string name="profile_reset_password">Reimposta password</string>
     <string name="profile_web_player">Lettore web</string>

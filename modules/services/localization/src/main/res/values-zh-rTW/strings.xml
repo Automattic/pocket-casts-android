@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 11:55:36+0000
+Translation-Revision-Date: 2026-04-09 09:56:13+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="error_episode_not_available">本集無法收聽</string>
+    <string name="error_playback_connected">你並未連線</string>
+    <string name="error_playback_offline">你目前為離線狀態</string>
+    <string name="error_cast_connection_failed">無法連結至 Chromecast 裝置。 請檢查裝置，然後再試一次。</string>
+    <string name="error_audio_output">無法播放音訊。 請檢查音訊輸出裝置，然後再試一次。</string>
+    <string name="error_decoder_initialization">無法在裝置上播放此音訊格式。</string>
+    <string name="error_streaming_server_error">Podcast 伺服器發生問題。 請稍後再試。</string>
+    <string name="error_streaming_no_longer_available">本集無法再透過發表者收聽。</string>
+    <string name="error_streaming_not_found">伺服器上找不到此集。 發行者可能已移除。</string>
+    <string name="error_streaming_access_denied">你無法再播放此集。</string>
+    <string name="settings_auto_download_storage_summary">停用後，當裝置內部儲存空間不足時，就會進行下載。</string>
+    <string name="settings_auto_download_storage">僅限儲存空間足夠時</string>
+    <string name="settings_auto_download_charging_summary">停用後，你無須將裝置連結至充電器，即可進行下載。</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">「接下來播放」達到 %d 集後，自動新增至最上方的新單集會移除佇列中最後的單集。 設定為自動新增至底部的單集，必須在「接下來播放」低於上限後才會新增。</string>
     <string name="offline_icon_content_description">離線圖示</string>
     <string name="profile_last_refresh_at">上次重新整理時間：%s</string>
@@ -21,6 +34,7 @@ Language: zh_TW
     <string name="error_download_socket_timeout">與 Podcast 作者伺服器的連線逾時。 請檢查你的網際網路連線。</string>
     <string name="error_download_invalid_content_type">無法下載本集。 已收到內容類型 %1$s。 請聯絡 Podcast 作者。</string>
     <string name="error_download_http_failure">無法下載本集。 已收到 HTTP 狀態碼 %1$s。 請聯絡 Podcast 作者。</string>
+    <string name="error_download_suspicious_content_size">無法下載此集。 下載的檔案太小。 請再試一次。</string>
     <string name="episode_row_waiting_for_storage">等待儲存空間</string>
     <string name="podcasts_download_storage">等待儲存空間的下載</string>
     <string name="watch_sync_failed">無法同步處理以觀看</string>
@@ -1608,6 +1622,8 @@ Language: zh_TW
     <string name="settings_import_file_summary">如果你在其他應用程式或服務訂閱 Podcast 節目，可以運用 OPML 檔案匯入Podcast。</string>
     <string name="settings_export_send_email_summary">以宅味十足 (但也廣受支援) 的 OPML 格式匯出你的 Podcast。</string>
     <string name="settings_podcast_episode_grouping_summary">你追蹤的新訂閱 Podcast 會依「%s」為單集分組。</string>
+    <string name="error_streaming_try_downloading">串流失敗。 嘗試下載此集。</string>
+    <string name="settings_auto_download_unmetered_summary">停用後，系統可透過行動數據和其他計量付費網路下載。 請檢查網路設定，進一步了解詳細資訊。</string>
     <string name="profile">個人檔案</string>
     <string name="profile_reset_password">重設密碼</string>
     <string name="profile_web_player">網頁播放器</string>

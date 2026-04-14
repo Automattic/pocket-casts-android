@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-03-24 13:58:07+0000
+Translation-Revision-Date: 2026-04-08 14:56:25+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="error_episode_not_available">Folge nicht verfügbar</string>
+    <string name="error_playback_connected">Du bist verbunden</string>
+    <string name="error_playback_offline">Du bist offline</string>
+    <string name="error_cast_connection_failed">Es konnte keine Verbindung zum Chromecast-Gerät hergestellt werden. Bitte überprüfe das Gerät und versuche es erneut.</string>
+    <string name="error_audio_output">Audio konnte nicht abgespielt werden. Bitte überprüfe dein Audioausgabegerät und versuche es erneut.</string>
+    <string name="error_decoder_initialization">Dieses Audioformat kann auf deinem Gerät nicht abgespielt werden.</string>
+    <string name="error_streaming_server_error">Auf dem Podcast-Server sind Probleme aufgetreten. Bitte versuche es später erneut.</string>
+    <string name="error_streaming_no_longer_available">Diese Folge ist beim Herausgeber nicht mehr verfügbar.</string>
+    <string name="error_streaming_not_found">Diese Folge konnte auf dem Server nicht gefunden werden. Möglicherweise wurde sie vom Herausgeber entfernt.</string>
+    <string name="error_streaming_access_denied">Du hast keinen Zugriff mehr, um diese Folge wiederzugeben.</string>
+    <string name="settings_auto_download_storage_summary">Wenn diese Option deaktiviert ist, können Downloads erfolgen, wenn das Gerät nicht mehr viel internen Speicherplatz hat.</string>
+    <string name="settings_auto_download_storage">Nur bei ausreichendem Speicherplatz</string>
+    <string name="settings_auto_download_charging_summary">Wenn diese Option deaktiviert ist, können Downloads erfolgen, ohne dass das Gerät an ein Ladegerät angeschlossen ist.</string>
     <string name="settings_auto_up_next_limit_reached_top_summary">Wenn unter „Als Nächstes“ %d Folgen erreicht sind, wird die letzte Folge in der Warteschlange entfernt, sobald neue Folgen automatisch oben hinzugefügt wurden. Folgen, die automatisch unten hinzugefügt werden, werden erst hinzugefügt, wenn „Als Nächstes“ unter dem Limit ist.</string>
     <string name="offline_icon_content_description">Offline-Icon</string>
     <string name="profile_last_refresh_at">Letzte Aktualisierung: %s</string>
@@ -21,6 +34,7 @@ Language: de
     <string name="error_download_socket_timeout">Zeitüberschreitung bei der Verbindung zum Server des Podcast-Autors. Bitte prüfe deine Internetverbindung.</string>
     <string name="error_download_invalid_content_type">Die Folge konnte nicht heruntergeladen werden. Inhaltstyp %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
     <string name="error_download_http_failure">Die Folge konnte nicht heruntergeladen werden. HTTP-Statuscode %1$s erhalten. Bitte wende dich an den Autor des Podcasts.</string>
+    <string name="error_download_suspicious_content_size">Die Folge konnte nicht heruntergeladen werden. Die heruntergeladene Datei ist zu klein. Bitte versuche es erneut.</string>
     <string name="episode_row_waiting_for_storage">Auf Speicherplatz warten</string>
     <string name="podcasts_download_storage">Download wartet auf Speicherplatz</string>
     <string name="watch_sync_failed">Synchronisierung mit Watch fehlgeschlagen</string>
@@ -1608,6 +1622,8 @@ Language: de
     <string name="settings_show_archived_summary_hide">Bei neuen Podcasts, die du abonnierst, werden keine archivierten Folgen angezeigt.</string>
     <string name="settings_import_file_summary">Wenn du Podcasts in einer anderen App oder bei einem anderen Dienst hast, kann Pocket Casts sie aus einer OPML-Datei importieren.</string>
     <string name="settings_export_send_email_summary">Exportiere deine Podcasts in das technisch anspruchsvolle (aber von vielen Apps unterstützte) OPML-Format.</string>
+    <string name="error_streaming_try_downloading">Fehler beim Streaming. Versuche, die Folge herunterzuladen.</string>
+    <string name="settings_auto_download_unmetered_summary">Wenn diese Option deaktiviert ist, können Downloads sowohl in Mobilfunknetzen als auch in anderen getakteten Netzwerken erfolgen. Weitere Informationen findest du in deinen Netzwerkeinstellungen.</string>
     <string name="profile">Profil</string>
     <string name="profile_reset_password">Passwort zurücksetzen</string>
     <string name="profile_web_player">Webplayer</string>

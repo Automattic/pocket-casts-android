@@ -28,9 +28,10 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 
 @Module
@@ -102,7 +103,17 @@ abstract class AnalyticsModule {
                 logger = logger,
                 failFast = BuildConfig.DEBUG,
                 cacheDir = directory,
-                coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
+                coroutineScope = CoroutineScope(
+                    Dispatchers.IO + SupervisorJob() + CoroutineExceptionHandler { _, throwable ->
+                        LogBuffer.e(ExperimentProvider.TAG, throwable, "Uncaught exception in ExPlat coroutine scope")
+                        val deleted = runCatching { directory.deleteRecursively() }.getOrDefault(false)
+                        if (deleted) {
+                            LogBuffer.i(ExperimentProvider.TAG, "Cleared corrupted experiment cache")
+                        } else {
+                            LogBuffer.e(ExperimentProvider.TAG, "Failed to clear corrupted experiment cache")
+                        }
+                    },
+                ),
                 callFactory = { request -> httpClient.get().newCall(request) },
             )
         }
