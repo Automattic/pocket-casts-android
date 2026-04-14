@@ -30,6 +30,7 @@ data class PlaybackNoticeInfo(
     val message: String,
     val type: PlaybackNoticeType,
     val supportUrl: String? = null,
+    val linkText: String? = null,
 )
 
 @Singleton
@@ -115,6 +116,8 @@ class PlaybackNoticeManager @Inject constructor(
                 when {
                     !playbackState.isError -> null
 
+                    playbackState.transientLoss -> null
+
                     !isForeground -> null
 
                     playbackState.playbackIssue is PlaybackIssue.ConnectionError -> PlaybackNoticeInfo(
@@ -123,17 +126,19 @@ class PlaybackNoticeManager @Inject constructor(
                     )
 
                     playbackState.playbackIssue is PlaybackIssue.StuckPlayer -> PlaybackNoticeInfo(
-                        message = context.getString(playbackState.playbackIssue.messageResId),
+                        message = context.getString(LR.string.error_streaming_access_denied),
                         type = PlaybackNoticeType.PLAYBACK,
                         supportUrl = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL,
+                        linkText = context.getString(LR.string.settings_battery_learn_more),
                     )
 
                     else -> {
                         val httpCode = (playbackState.playbackIssue as? PlaybackIssue.HttpError)?.statusCode
                         PlaybackNoticeInfo(
-                            message = context.getString(LR.string.error_episode_not_available),
+                            message = context.getString(LR.string.error_streaming_access_denied),
                             type = PlaybackNoticeType.PLAYBACK,
                             supportUrl = errorClassifier.classifyHelpUrl(httpCode),
+                            linkText = context.getString(LR.string.settings_battery_learn_more),
                         )
                     }
                 }

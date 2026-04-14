@@ -24,13 +24,6 @@ class PlaybackErrorClassifier @Inject constructor() {
     }
 
     @OptIn(UnstableApi::class)
-    fun isConnectionError(event: PlayerEvent.PlayerError): Boolean {
-        val cause = event.error?.cause
-        return cause is HttpDataSource.HttpDataSourceException &&
-            cause !is HttpDataSource.InvalidResponseCodeException
-    }
-
-    @OptIn(UnstableApi::class)
     @StringRes
     fun classifyErrorStringId(event: PlayerEvent.PlayerError): Int {
         val error = event.error ?: return LR.string.error_unable_to_play
