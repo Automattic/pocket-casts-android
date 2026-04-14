@@ -3,6 +3,8 @@
 *   Updates
     *   Make sure users with new accounts land on the Podcasts tab when they followed some recommended podcasts
         ([#5197](https://github.com/Automattic/pocket-casts-android/pull/5197))
+    * Disable seek slider in notification when playing any podcast.
+      ([#5209](https://github.com/Automattic/pocket-casts-android/pull/5209))
 *   Bug Fixes
     *   Fix active episode not syncing its playback position
         ([#5213](https://github.com/Automattic/pocket-casts-android/pull/5213))
