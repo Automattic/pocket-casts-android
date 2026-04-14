@@ -207,20 +207,22 @@ class MediaSessionManager(
 
     fun startObserving() {
         if (!useMedia3Session) {
-            mediaSession!!.setCallback(
-                MediaSessionCallback(
-                    playbackManager,
-                    episodeManager,
-                    enqueueCommand = { tag, command ->
-                        val added = commandQueue.tryEmit(Pair(tag, command))
-                        if (added) {
-                            Timber.i("Added command to queue: $tag")
-                        } else {
-                            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
-                        }
-                    },
-                ),
-            )
+            applicationScope.launch(Dispatchers.Main) {
+                mediaSession!!.setCallback(
+                    MediaSessionCallback(
+                        playbackManager,
+                        episodeManager,
+                        enqueueCommand = { tag, command ->
+                            val added = commandQueue.tryEmit(Pair(tag, command))
+                            if (added) {
+                                Timber.i("Added command to queue: $tag")
+                            } else {
+                                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
+                            }
+                        },
+                    ),
+                )
+            }
 
             applicationScope.launch {
                 commandQueue.collect { (tag, command) ->
