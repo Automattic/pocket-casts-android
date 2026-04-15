@@ -212,7 +212,7 @@ open class LegacyPlaybackService :
                     (state1.state == state2.state && metadata1.getString(METADATA_KEY_MEDIA_ID) == metadata2.getString(METADATA_KEY_MEDIA_ID) && artworkConfiguration1 == artworkConfiguration2) &&
                         (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
                 }
-                .map { (playbackState, _, artworkConfiguration) -> playbackState to buildNotification(artworkConfiguration.useEpisodeArtwork) }
+                .map { (playbackState, metadata, artworkConfiguration) -> playbackState to buildNotification(playbackState.state, metadata, artworkConfiguration.useEpisodeArtwork) }
                 .observeOn(SchedulerProvider.mainThread)
                 .subscribeBy(
                     onNext = { (state: PlaybackStateCompat, notification: Notification?) ->
@@ -316,10 +316,15 @@ open class LegacyPlaybackService :
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        private fun buildNotification(useEpisodeArtwork: Boolean): Notification? {
+        private fun buildNotification(state: Int, metadata: MediaMetadataCompat?, useEpisodeArtwork: Boolean): Notification? {
             if (Util.isAutomotive(this@LegacyPlaybackService)) return null
             val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return null
-            return notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
+            if (metadata == null || metadata.getString(METADATA_KEY_MEDIA_ID).isNullOrEmpty()) return null
+            return if (state != PlaybackStateCompat.STATE_NONE) {
+                notificationDrawer.buildPlayingNotification(mediaSession.sessionToken, useEpisodeArtwork)
+            } else {
+                null
+            }
         }
     }
 }

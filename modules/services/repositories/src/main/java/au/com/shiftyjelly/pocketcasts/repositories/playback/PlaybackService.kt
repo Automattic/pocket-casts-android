@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
@@ -12,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackForegroundServiceErrorEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -56,6 +60,8 @@ open class PlaybackService :
 
     @Inject lateinit var sleepTimer: SleepTimer
 
+    @Inject lateinit var eventHorizon: EventHorizon
+
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Default
@@ -99,7 +105,16 @@ open class PlaybackService :
             stopForeground(STOP_FOREGROUND_REMOVE)
             return
         }
-        super.onUpdateNotification(session, startInForegroundRequired)
+        try {
+            super.onUpdateNotification(session, startInForegroundRequired)
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "onUpdateNotification failed: $e")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                val currentValue = settings.getTimesToShowBatteryWarning()
+                settings.setTimesToShowBatteryWarning(2 + currentValue)
+                eventHorizon.track(PlaybackForegroundServiceErrorEvent)
+            }
+        }
     }
 
     @OptIn(UnstableApi::class)
