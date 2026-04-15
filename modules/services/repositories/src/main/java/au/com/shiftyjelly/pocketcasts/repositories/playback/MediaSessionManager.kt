@@ -712,13 +712,13 @@ class MediaSessionManager(
             MediaNotificationControls.Star -> {
                 if (currentEpisode is PodcastEpisode) {
                     if (currentEpisode.isStarred) {
-                        CommandButton.Builder(CommandButton.ICON_HEART_FILLED)
+                        CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                             .setSessionCommand(SessionCommand(APP_ACTION_UNSTAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.unstar))
                             .setCustomIconResId(IR.drawable.auto_starred)
                             .build()
                     } else {
-                        CommandButton.Builder(CommandButton.ICON_HEART_UNFILLED)
+                        CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                             .setSessionCommand(SessionCommand(APP_ACTION_STAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.star))
                             .setCustomIconResId(IR.drawable.auto_star)
