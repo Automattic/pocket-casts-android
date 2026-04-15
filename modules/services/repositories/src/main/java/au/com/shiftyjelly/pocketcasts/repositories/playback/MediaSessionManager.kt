@@ -18,6 +18,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.core.content.IntentCompat
+import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
@@ -29,14 +30,17 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.asAlbumArtContentUri
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -69,6 +73,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -112,16 +117,19 @@ class MediaSessionManager(
 
     // Evaluated once at construction — toggling requires a process restart.
     // Swapping between Media3 and legacy session at runtime is not supported.
-    // On automotive, always use Media3: AAOS never uses app-managed notifications,
-    // so the legacy compat session is unnecessary and having a single service avoids
-    // the race condition where AAOS discovers the wrong service before the toggle runs.
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) || Util.isAutomotive(context)
+    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
+    private val isAutomotive = Util.isAutomotive(context)
 
-    val mediaSession: MediaSessionCompat? = if (!useMedia3Session) {
+    // Automotive always needs a MediaLibrarySession for the service contract (it's the
+    // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
+    // is delegated to an AutomotiveSessionStrategy.
+    private val needsMedia3Session = useMedia3Session || isAutomotive
+
+    // On non-automotive platforms with flag OFF, create a MediaSessionCompat.
+    // On automotive (regardless of flag), the MediaLibrarySession handles everything.
+    val mediaSession: MediaSessionCompat? = if (!useMedia3Session && !isAutomotive) {
         MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-            if (!Util.isAutomotive(context)) {
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
-            }
+            session.setSessionActivity(context.getLaunchActivityPendingIntent())
             session.setRatingType(RatingCompat.RATING_HEART)
             session.setExtras(
                 Bundle().apply {
@@ -150,7 +158,13 @@ class MediaSessionManager(
         eventHorizon = eventHorizon,
         scopeProvider = { scope },
         source = source,
-        onSearchFailed = { message -> sendSearchError(message) },
+        onSearchFailed = { message ->
+            if (needsMedia3Session) {
+                sendSearchError(message)
+            } else {
+                errorPlaybackState(message)
+            }
+        },
     )
 
     @OptIn(UnstableApi::class)
@@ -158,7 +172,23 @@ class MediaSessionManager(
         media3Session?.sendError(SessionError(SessionError.ERROR_UNKNOWN, message))
     }
 
+    private fun errorPlaybackState(message: String) {
+        val stateBuilder = PlaybackStateCompat.Builder()
+            .setState(PlaybackStateCompat.STATE_ERROR, 0, 0f)
+            .setErrorMessage(PlaybackStateCompat.ERROR_CODE_UNKNOWN_ERROR, message)
+            .setActions(getSupportedActions(PlaybackState()))
+        mediaSession?.setPlaybackState(stateBuilder.build())
+    }
+
     private var bookmarkHelper: BookmarkHelper
+
+    @OptIn(UnstableApi::class)
+    @Suppress("UnsafeOptInUsageError")
+    private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
+        Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
+    } else {
+        null
+    }
 
     @Volatile
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
@@ -195,8 +225,8 @@ class MediaSessionManager(
             settings,
         )
 
-        if (!useMedia3Session) {
-            mediaSession!!.setCallback(
+        if (mediaSession != null) {
+            mediaSession.setCallback(
                 MediaSessionCallback(
                     playbackManager,
                     episodeManager,
@@ -221,7 +251,7 @@ class MediaSessionManager(
     }
 
     fun startObserving() {
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             observeForMedia3Updates()
         } else {
             connect()
@@ -253,7 +283,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun createSession(service: MediaLibraryService) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         // Recreate scope in case release() was called previously (service restart).
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -363,8 +393,14 @@ class MediaSessionManager(
                     else -> null
                 }
                 val showArtwork = settings.showArtworkOnLockScreen.value
+                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
+                val wrappedArtworkUri = if (showArtwork) {
+                    resolveAndWrapArtworkUri(ep, podcast, useEpisodeArtwork)
+                } else {
+                    null
+                }
                 withContext(Dispatchers.Main) {
-                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork)
+                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork, artworkUri = wrappedArtworkUri, showRating = !isAutomotive)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to seed initial Media3 metadata")
@@ -379,7 +415,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun installPlayer(exoPlayer: androidx.media3.common.Player) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         val currentPlayer = forwardingPlayer
         if (currentPlayer == null) {
             Timber.i("installPlayer: session not ready, deferring")
@@ -405,7 +441,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @MainThread
     fun installCastPlayer() {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         val player = CastStatePlayer(
             applicationLooper = android.os.Looper.getMainLooper(),
             onPlay = { scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = source) } } },
@@ -464,12 +500,12 @@ class MediaSessionManager(
      */
     @MainThread
     fun updateCastState(isPlaying: Boolean, isBuffering: Boolean, positionMs: Long) {
-        if (!useMedia3Session) return
+        if (!needsMedia3Session) return
         castStatePlayer?.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
     fun startServiceIfNeeded(context: Context) {
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             if (media3Session != null) return
         }
         val component = resolveMediaBrowserServiceComponent(context)
@@ -486,7 +522,7 @@ class MediaSessionManager(
 
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
-        playbackManager.playbackStateRelay
+        val episodeAndState = playbackManager.playbackStateRelay
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
                     old.state == new.state &&
@@ -506,8 +542,16 @@ class MediaSessionManager(
                         .toObservable()
                 }
             }
+
+        val artworkConfig = settings.artworkConfiguration.flow.asObservable()
+        val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow.asObservable()
+
+        Observables.combineLatest(episodeAndState, artworkConfig, showArtworkOnLockScreen) { episodeState, config, showArtwork ->
+            Triple(episodeState, config.useEpisodeArtwork, showArtwork)
+        }
             .observeOn(Schedulers.io())
-            .map<Optional<MediaUpdateData>> { (episodeOpt, state) ->
+            .map<Optional<MediaUpdateData>> { (episodeState, useEpisodeArtwork, showArtwork) ->
+                val (episodeOpt, state) = episodeState
                 if (!episodeOpt.isPresent()) {
                     return@map Optional.empty()
                 }
@@ -516,12 +560,11 @@ class MediaSessionManager(
                     is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
                     else -> null
                 }
-                val showArtwork = settings.showArtworkOnLockScreen.value
                 val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
                     AutoConverter.getPodcastArtworkBitmap(
                         episode,
                         context,
-                        settings.artworkConfiguration.value.useEpisodeArtwork,
+                        useEpisodeArtwork,
                     )?.let { bitmap ->
                         java.io.ByteArrayOutputStream().use { stream ->
                             val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -537,7 +580,7 @@ class MediaSessionManager(
                 } else {
                     null
                 }
-                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, artworkData))
+                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, useEpisodeArtwork, artworkData))
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -548,7 +591,12 @@ class MediaSessionManager(
                         player.clearMetadata()
                         return@subscribeBy
                     }
-                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.artworkData)
+                    val wrappedUri = if (data.showArtwork) {
+                        resolveAndWrapArtworkUri(data.episode, data.podcast, data.useEpisodeArtwork)
+                    } else {
+                        null
+                    }
+                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData, artworkUri = wrappedUri, showRating = !isAutomotive)
                     player.isTransientLoss = data.state.transientLoss
                     updateMedia3CustomLayout()
                 },
@@ -593,38 +641,10 @@ class MediaSessionManager(
         val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
-        if (Util.isAutomotive(context)) {
-            // Automotive: use circular seek icons matching the configured skip duration.
-            // Playback speed first (gets the extra slot), then skip buttons, then custom actions.
-            if (playbackManager.isAudioEffectsAvailable()) {
-                buttons.add(
-                    CommandButton.Builder(CommandButton.ICON_UNDEFINED)
-                        .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
-                        .setDisplayName(context.getString(LR.string.playback_speed))
-                        .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
-                        .build(),
-                )
-            }
-            buttons.add(
-                CommandButton.Builder(skipBackIconForDuration(settings.skipBackInSecs.value))
-                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
-                    .setDisplayName(context.getString(LR.string.skip_back))
-                    .setCustomIconResId(IR.drawable.media_skipback)
-                    .build(),
-            )
-            buttons.add(
-                CommandButton.Builder(skipForwardIconForDuration(settings.skipForwardInSecs.value))
-                    .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
-                    .setDisplayName(context.getString(LR.string.skip_forward))
-                    .setCustomIconResId(IR.drawable.media_skipforward)
-                    .build(),
-            )
-            val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
-            settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
-                if (mediaControl != MediaNotificationControls.PlaybackSpeed) {
-                    buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
-                }
-            }
+        if (isAutomotive) {
+            val layout = automotiveStrategy!!.buildLayout(playbackManager, settings, context, ::buildCustomActionButton)
+            session.setCustomLayout(layout.primaryButtons + layout.overflowButtons)
+            return
         } else {
             // Mobile/other: existing behavior unchanged
             if (useCustomSkipButtons()) {
@@ -692,13 +712,13 @@ class MediaSessionManager(
             MediaNotificationControls.Star -> {
                 if (currentEpisode is PodcastEpisode) {
                     if (currentEpisode.isStarred) {
-                        CommandButton.Builder(CommandButton.ICON_HEART_FILLED)
+                        CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                             .setSessionCommand(SessionCommand(APP_ACTION_UNSTAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.unstar))
                             .setCustomIconResId(IR.drawable.auto_starred)
                             .build()
                     } else {
-                        CommandButton.Builder(CommandButton.ICON_HEART_UNFILLED)
+                        CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                             .setSessionCommand(SessionCommand(APP_ACTION_STAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.star))
                             .setCustomIconResId(IR.drawable.auto_star)
@@ -725,10 +745,38 @@ class MediaSessionManager(
         else -> CommandButton.ICON_SKIP_FORWARD_30
     }
 
+    /**
+     * Resolves an artwork URI for the given episode, wrapping it through
+     * [AlbumArtContentProvider][au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider]
+     * on automotive so that AAOS can load it via a content:// scheme.
+     */
+    private fun resolveAndWrapArtworkUri(
+        episode: BaseEpisode,
+        podcast: Podcast?,
+        useEpisodeArtwork: Boolean = true,
+    ): android.net.Uri? {
+        val url = when (episode) {
+            is PodcastEpisode -> {
+                if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf { it.isNotBlank() }
+                        ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                } else {
+                    podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                }
+            }
+
+            is UserEpisode -> {
+                episode.artworkUrl?.takeIf { it.isNotBlank() }
+            }
+        } ?: return null
+        val uri = url.toUri()
+        return if (isAutomotive) uri.asAlbumArtContentUri(context) else uri
+    }
+
     fun release() {
         disposables.clear()
         scope.cancel()
-        if (useMedia3Session) {
+        if (needsMedia3Session) {
             media3Session?.release()
             media3Session = null
             forwardingPlayer = null
@@ -1365,13 +1413,15 @@ private data class MediaUpdateData(
     val podcast: Podcast?,
     val state: PlaybackState,
     val showArtwork: Boolean,
+    val useEpisodeArtwork: Boolean,
     val artworkData: ByteArray?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MediaUpdateData) return false
         return episode == other.episode && podcast == other.podcast && state == other.state &&
-            showArtwork == other.showArtwork && artworkData.contentEquals(other.artworkData)
+            showArtwork == other.showArtwork && useEpisodeArtwork == other.useEpisodeArtwork &&
+            artworkData.contentEquals(other.artworkData)
     }
 
     override fun hashCode(): Int {
@@ -1379,6 +1429,7 @@ private data class MediaUpdateData(
         result = 31 * result + (podcast?.hashCode() ?: 0)
         result = 31 * result + state.hashCode()
         result = 31 * result + showArtwork.hashCode()
+        result = 31 * result + useEpisodeArtwork.hashCode()
         result = 31 * result + (artworkData?.contentHashCode() ?: 0)
         return result
     }

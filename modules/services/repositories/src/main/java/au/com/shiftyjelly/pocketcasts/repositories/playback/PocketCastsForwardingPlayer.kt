@@ -78,6 +78,8 @@ class PocketCastsForwardingPlayer(
      * Updates the metadata exposed via [getCurrentMediaItem]. Call this when the
      * current episode changes or when metadata is refreshed (e.g., artwork loaded).
      *
+     * @param showArtwork When false, artwork URI and data are omitted from the metadata.
+     * @param useEpisodeArtwork When true, prefer episode-specific artwork; when false, use podcast artwork.
      * @param artworkData Pre-compressed artwork bytes (e.g. WebP). Compression should
      *   happen off the main thread before calling this method.
      */
@@ -86,11 +88,12 @@ class PocketCastsForwardingPlayer(
         episode: BaseEpisode,
         podcast: Podcast?,
         showArtwork: Boolean = true,
+        useEpisodeArtwork: Boolean = true,
         artworkData: ByteArray? = null,
+        artworkUri: Uri? = if (showArtwork) resolveArtworkUri(episode, podcast, useEpisodeArtwork) else null,
+        showRating: Boolean = true,
     ) {
         checkMainThread()
-
-        val artworkUri = if (showArtwork) resolveArtworkUri(episode, podcast) else null
         val podcastTitle = episode.displaySubtitle(podcast)
 
         val metadataBuilder = MediaMetadata.Builder()
@@ -103,7 +106,7 @@ class PocketCastsForwardingPlayer(
             .setIsBrowsable(false)
             .setIsPlayable(true)
             .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
-            .setUserRating(if (episode is PodcastEpisode) buildRating(episode) else null)
+            .setUserRating(if (showRating && episode is PodcastEpisode) buildRating(episode) else null)
 
         if (showArtwork && artworkData != null) {
             metadataBuilder.setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
@@ -152,11 +155,8 @@ class PocketCastsForwardingPlayer(
         return Player.Commands.Builder()
             .addAll(
                 Player.COMMAND_PLAY_PAUSE,
+                Player.COMMAND_SET_MEDIA_ITEM,
                 Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_SEEK_FORWARD,
-                Player.COMMAND_SEEK_BACK,
-                Player.COMMAND_SEEK_TO_NEXT,
-                Player.COMMAND_SEEK_TO_PREVIOUS,
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
@@ -299,11 +299,15 @@ class PocketCastsForwardingPlayer(
         listeners.remove(listener)
     }
 
-    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
+    private fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?, useEpisodeArtwork: Boolean): Uri? {
         return when (episode) {
             is PodcastEpisode -> {
-                val url = episode.imageUrl?.takeIf { it.isNotBlank() }
-                    ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                val url = if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf { it.isNotBlank() }
+                        ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                } else {
+                    podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
+                }
                 url?.let(Uri::parse)
             }
 
