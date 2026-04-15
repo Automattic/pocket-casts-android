@@ -162,29 +162,27 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `available commands include skip buttons by default`() {
+    fun `available commands expose only core controls`() {
         val commands = forwardingPlayer.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_STOP))
+        assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
         assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
-        assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
-        assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
     }
 
     @Test
-    fun `available commands exclude seek to next and previous`() {
+    fun `available commands include SET_MEDIA_ITEM for playback initiation`() {
         val player = PocketCastsForwardingPlayer(mockPlayer)
         val commands = player.availableCommands
 
-        assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
     }
 
     @Test

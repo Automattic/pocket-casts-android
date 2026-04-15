@@ -18,6 +18,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.core.content.IntentCompat
+import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
@@ -182,6 +183,7 @@ class MediaSessionManager(
     private var bookmarkHelper: BookmarkHelper
 
     @OptIn(UnstableApi::class)
+    @Suppress("UnsafeOptInUsageError")
     private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
         Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
     } else {
@@ -767,7 +769,7 @@ class MediaSessionManager(
                 episode.artworkUrl?.takeIf { it.isNotBlank() }
             }
         } ?: return null
-        val uri = android.net.Uri.parse(url)
+        val uri = url.toUri()
         return if (isAutomotive) uri.asAlbumArtContentUri(context) else uri
     }
 
