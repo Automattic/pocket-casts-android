@@ -1,6 +1,8 @@
 8.11
 -----
-
+*   Updates
+    *   Make sure archived episode status is preserved across sync
+        ([#5227](https://github.com/Automattic/pocket-casts-android/pull/5227))
 
 8.10
 -----
