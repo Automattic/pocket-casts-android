@@ -174,7 +174,7 @@ open class PlaybackManager @Inject constructor(
             val secs = skipLastSecs ?: 0
             return (secs * 1000L * playbackSpeed.coerceAtLeast(1.0)).toLong()
         }
-        
+
         internal fun shouldSkipLast(
             skipLastSecs: Int?,
             playbackSpeed: Double,
