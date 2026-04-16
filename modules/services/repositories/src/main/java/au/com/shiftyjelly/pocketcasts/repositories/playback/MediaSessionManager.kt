@@ -639,9 +639,15 @@ class MediaSessionManager(
             .switchMap { state ->
                 if (state is UpNextQueue.State.Loaded) {
                     Observable.fromCallable {
+                        // De-duplicate podcast lookups by uuid so a queue containing
+                        // several episodes of the same podcast only hits the DB once.
+                        val podcastsByUuid = state.queue
+                            .mapNotNull { (it as? PodcastEpisode)?.podcastUuid }
+                            .toSet()
+                            .associateWith { podcastManager.findPodcastByUuidBlocking(it) }
                         state.queue.map { episode ->
                             val podcast = (episode as? PodcastEpisode)?.let {
-                                podcastManager.findPodcastByUuidBlocking(it.podcastUuid)
+                                podcastsByUuid[it.podcastUuid]
                             }
                             buildEpisodeMediaItem(episode, podcast)
                         }
@@ -654,7 +660,7 @@ class MediaSessionManager(
             .subscribeBy(
                 onNext = { items ->
                     forwardingPlayer?.updateQueue(items)
-                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
+                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, items.size, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )

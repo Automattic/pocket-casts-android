@@ -110,10 +110,18 @@ class PocketCastsForwardingPlayer(
                     currentMediaItem,
                     Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED,
                 )
+                // The first window of the timeline tracks currentMediaItem, so changing the
+                // episode also changes the timeline. The legacy MediaSessionCompat bridge
+                // relies on this event to rebuild setQueue for external controllers (Wear OS).
+                listener.onTimelineChanged(currentTimeline, Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED)
             }
         }
         if (episodeChanged) {
-            dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED, Player.EVENT_MEDIA_ITEM_TRANSITION)
+            dispatchEvents(
+                Player.EVENT_MEDIA_METADATA_CHANGED,
+                Player.EVENT_MEDIA_ITEM_TRANSITION,
+                Player.EVENT_TIMELINE_CHANGED,
+            )
         } else {
             dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED)
         }
@@ -127,6 +135,7 @@ class PocketCastsForwardingPlayer(
         listeners.forEach { listener ->
             listener.onTimelineChanged(currentTimeline, Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED)
         }
+        dispatchEvents(Player.EVENT_TIMELINE_CHANGED)
     }
 
     @MainThread
@@ -140,7 +149,7 @@ class PocketCastsForwardingPlayer(
             listener.onMediaMetadataChanged(MediaMetadata.EMPTY)
             listener.onTimelineChanged(currentTimeline, Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED)
         }
-        dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED)
+        dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED, Player.EVENT_TIMELINE_CHANGED)
     }
 
     override fun getCurrentMediaItem(): MediaItem = currentMediaItem
@@ -155,7 +164,13 @@ class PocketCastsForwardingPlayer(
         return if (allItems.isEmpty()) Timeline.EMPTY else QueueTimeline(allItems)
     }
 
-    override fun getCurrentMediaItemIndex(): Int = 0
+    override fun getCurrentMediaItemIndex(): Int {
+        // Per Player contract, return C.INDEX_UNSET when there's no current window.
+        // Returning 0 would make controllers think the first queue item is currently
+        // playing when playback is idle, and prevents the legacy bridge from setting
+        // a valid active queue item id (breaks Wear OS Up Next affordance).
+        return if (currentMediaItem == MediaItem.EMPTY) C.INDEX_UNSET else 0
+    }
 
     override fun getMediaItemCount(): Int = currentTimeline.windowCount
 
@@ -186,10 +201,13 @@ class PocketCastsForwardingPlayer(
     }
 
     override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
-        if (mediaItemIndex > 0 && mediaItemIndex < 1 + queueItems.size) {
+        val queueCallback = onSeekToQueueItem
+        if (queueCallback != null && mediaItemIndex > 0 && mediaItemIndex < 1 + queueItems.size) {
             val mediaId = queueItems[mediaItemIndex - 1].mediaId
-            onSeekToQueueItem?.invoke(mediaId)
+            queueCallback.invoke(mediaId)
         } else {
+            // No queue callback wired (e.g. cast install path) or index outside the
+            // queue range — delegate to the wrapped player, matching seekTo(positionMs).
             onSeekTo?.invoke(positionMs)
             super.seekTo(mediaItemIndex, positionMs)
         }
