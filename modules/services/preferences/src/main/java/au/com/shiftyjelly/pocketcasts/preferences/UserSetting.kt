@@ -271,6 +271,7 @@ abstract class UserSetting<T>(
         private val defaultValue: List<T>,
         private val fromString: (String) -> T?,
         private val toString: (T) -> String,
+        private val addMissingDefaultValues: Boolean = false,
     ) : UserSetting<List<T>>(
         sharedPrefKey = sharedPrefKey,
         sharedPrefs = sharedPrefs,
@@ -281,8 +282,13 @@ abstract class UserSetting<T>(
             return if (strValue.isNullOrEmpty()) {
                 defaultValue
             } else {
-                val commaSeparatedString = strValue.split(",")
-                commaSeparatedString.mapNotNull(fromString)
+                val stored = strValue.split(",").mapNotNull(fromString)
+                if (addMissingDefaultValues) {
+                    val missing = defaultValue.filterNot { it in stored }
+                    if (missing.isEmpty()) stored else stored + missing
+                } else {
+                    stored
+                }
             }
         }
 
