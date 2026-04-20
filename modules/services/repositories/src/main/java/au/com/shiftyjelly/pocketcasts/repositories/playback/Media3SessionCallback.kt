@@ -102,6 +102,7 @@ internal class Media3SessionCallback(
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
+                Player.COMMAND_GET_TIMELINE,
             )
             .build()
 

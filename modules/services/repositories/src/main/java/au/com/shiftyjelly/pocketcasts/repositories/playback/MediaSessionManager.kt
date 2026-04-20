@@ -329,6 +329,16 @@ class MediaSessionManager(
                     }
                 }
             },
+            onSeekToQueueItem = { mediaId ->
+                scope.launch {
+                    commandMutex.withLock {
+                        val episode = episodeManager.findEpisodeByUuid(mediaId)
+                        if (episode != null) {
+                            playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        }
+                    }
+                }
+            },
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
@@ -677,9 +687,31 @@ class MediaSessionManager(
 
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
+            .switchMap { state ->
+                if (state is UpNextQueue.State.Loaded) {
+                    Observable.fromCallable {
+                        // De-duplicate podcast lookups by uuid so a queue containing
+                        // several episodes of the same podcast only hits the DB once.
+                        val podcastsByUuid = state.queue
+                            .mapNotNull { (it as? PodcastEpisode)?.podcastUuid }
+                            .toSet()
+                            .associateWith { podcastManager.findPodcastByUuidBlocking(it) }
+                        state.queue.map { episode ->
+                            val podcast = (episode as? PodcastEpisode)?.let {
+                                podcastsByUuid[it.podcastUuid]
+                            }
+                            buildEpisodeMediaItem(episode, podcast)
+                        }
+                    }
+                } else {
+                    Observable.just(emptyList())
+                }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
-                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
+                onNext = { items ->
+                    forwardingPlayer?.updateQueue(items)
+                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, items.size, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
