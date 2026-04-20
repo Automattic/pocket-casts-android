@@ -22,7 +22,6 @@ import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -187,6 +186,8 @@ class MediaSessionManager(
         replay = 0,
         extraBufferCapacity = 10,
     )
+
+    private var isAndroidAutoConnected = false
 
     init {
         bookmarkHelper = BookmarkHelper(
@@ -365,6 +366,11 @@ class MediaSessionManager(
                 val showArtwork = settings.showArtworkOnLockScreen.value
                 withContext(Dispatchers.Main) {
                     forwardingPlayer?.updateMetadata(ep, podcast, showArtwork)
+                    Util.isAndroidAutoConnectedFlow(context).collect { autoConnected ->
+                        isAndroidAutoConnected = autoConnected
+                        val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
+                        updatePlaybackState(playbackStateCompat)
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to seed initial Media3 metadata")
@@ -853,6 +859,12 @@ class MediaSessionManager(
             PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID or
             PlaybackStateCompat.ACTION_PREPARE_FROM_SEARCH
 
+        val scrubbingAction = if (isAndroidAutoConnected || settings.enableLockScreenScrubbing.value) {
+            PlaybackStateCompat.ACTION_SEEK_TO
+        } else {
+            0L
+        }
+
         if (playbackState.isEmpty) {
             return PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
@@ -868,7 +880,7 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_FAST_FORWARD or
                 PlaybackStateCompat.ACTION_REWIND or
                     prepareActions or
-                    (if (settings.disableSeekSliderInNotification.value) 0L else PlaybackStateCompat.ACTION_SEEK_TO)
+                    scrubbingAction
 
             return if (useCustomSkipButtons()) {
                 actions

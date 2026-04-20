@@ -389,7 +389,6 @@ class Support @Inject constructor(
                 output.append("Notifications").append(eol)
                 output.append("Play over notifications? ").append(settings.playOverNotification.value.analyticsValue).append(eol)
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.value) "yes" else "no").append(eol)
-                output.append("Disable seek slider in notification? ").append(if (settings.disableSeekSliderInNotification.value) "yes" else "no").append(eol)
                 output.append(eol)
 
                 val effects = settings.globalPlaybackEffects.value

@@ -57,11 +57,6 @@ internal sealed interface NotificationPreferenceType {
         val isEnabled: Boolean,
     ) : NotificationPreferenceType
 
-    data class DisableSeekSliderInNotification(
-        override val title: TextResource,
-        val isEnabled: Boolean,
-    ) : NotificationPreferenceType
-
     data class EnableDailyReminders(
         override val title: TextResource,
         val isEnabled: Boolean,

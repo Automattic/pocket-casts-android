@@ -115,17 +115,6 @@ internal fun NotificationPreferenceCategory(
                     )
                 }
 
-                is NotificationPreferenceType.DisableSeekSliderInNotification -> {
-                    SettingRow(
-                        primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
-                        modifier = Modifier.toggleable(
-                            value = item.isEnabled,
-                            role = Role.Switch,
-                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
-                    )
-                }
-
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> {
                     SettingRow(
                         enabled = isEnabled,

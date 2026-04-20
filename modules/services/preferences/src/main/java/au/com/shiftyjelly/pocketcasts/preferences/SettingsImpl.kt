@@ -602,12 +602,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val disableSeekSliderInNotification = UserSetting.BoolPref(
-        sharedPrefKey = "disableSeekSliderInNotification",
-        defaultValue = false,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val dailyRemindersNotification = UserSetting.BoolPref(
         sharedPrefKey = "dailyRemindersNotification",
         defaultValue = false,
@@ -652,6 +646,12 @@ class SettingsImpl @Inject constructor(
 
     override val openPlayerAutomatically = UserSetting.BoolPref(
         sharedPrefKey = "openPlayerAutomatically",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val enableLockScreenScrubbing = UserSetting.BoolPref(
+        sharedPrefKey = "enableLockScreenScrubbing",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
