@@ -47,6 +47,7 @@ class NotificationsPreferencesRepositoryImplTest {
         whenever(settings.newEpisodeNotificationActions).thenReturn(UserSetting.Mock(NewEpisodeNotificationAction.DefaultValues, mock()))
         whenever(settings.playOverNotification).thenReturn(UserSetting.Mock(PlayOverNotificationSetting.DUCK, mock()))
         whenever(settings.hideNotificationOnPause).thenReturn(UserSetting.Mock(false, mock()))
+        whenever(settings.disableSeekSliderInNotification).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.dailyRemindersNotification).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.recommendationsNotification).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.newFeaturesNotification).thenReturn(UserSetting.Mock(false, mock()))
