@@ -552,6 +552,10 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateAll(episodes)
     }
 
+    override suspend fun updateAllSyncFields(episodes: Collection<PodcastEpisode>) {
+        episodeDao.updateAllSyncFields(episodes)
+    }
+
     override fun clearPlaybackErrorBlocking(episode: BaseEpisode?) {
         if (episode?.playErrorDetails == null) {
             return
