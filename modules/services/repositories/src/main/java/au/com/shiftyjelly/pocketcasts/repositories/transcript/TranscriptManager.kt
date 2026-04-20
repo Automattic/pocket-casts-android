@@ -10,6 +10,10 @@ interface TranscriptManager {
         episodeUuid: String,
     ): Transcript?
 
+    suspend fun loadSummaryText(
+        episodeUuid: String,
+    ): String?
+
     fun resetInvalidTranscripts(
         episodeUuid: String,
     )

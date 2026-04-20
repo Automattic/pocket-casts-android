@@ -566,7 +566,8 @@ abstract class PlaylistDao {
           podcast_episode.deselected_chapters AS p_deselected_chapters,
           podcast_episode.deselected_chapters_modified AS p_deselected_chapters_modified,
           podcast_episode.slug AS p_slug,
-          podcast_episode.has_generated_transcript AS p_has_generated_transcript
+          podcast_episode.has_generated_transcript AS p_has_generated_transcript,
+          podcast_episode.has_generated_summary AS p_has_generated_summary
         FROM manual_playlist_episodes AS manual_episode
         LEFT JOIN podcast_episodes AS podcast_episode ON podcast_episode.uuid IS manual_episode.episode_uuid
         LEFT JOIN podcasts AS podcast ON podcast.uuid IS manual_episode.podcast_uuid

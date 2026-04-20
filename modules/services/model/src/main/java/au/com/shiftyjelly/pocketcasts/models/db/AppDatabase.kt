@@ -107,7 +107,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         ManualPlaylistEpisode::class,
         BlazeAd::class,
     ],
-    version = 125,
+    version = 126,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1413,6 +1413,10 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcast_episodes ADD COLUMN has_generated_transcript INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_125_126 = addMigration(125, 126) { database ->
+            database.execSQL("ALTER TABLE podcast_episodes ADD COLUMN has_generated_summary INTEGER NOT NULL DEFAULT 0")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1828,6 +1832,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_122_123,
                 MIGRATION_123_124,
                 MIGRATION_124_125,
+                MIGRATION_125_126,
             )
         }
 

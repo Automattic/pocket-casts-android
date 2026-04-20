@@ -133,6 +133,35 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
+    override suspend fun loadSummaryText(episodeUuid: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val transcripts = transcriptDao.observeTranscripts(episodeUuid)
+                    .firstOrNull()
+                    .orEmpty()
+                val generatedTranscript = transcripts.firstOrNull { it.isGenerated } ?: return@withContext null
+
+                // Derive summary URL from generated transcript URL:
+                // .../generated_transcripts/{podcastUuid}/{episodeUuid}.vtt
+                // -> .../summaries/{podcastUuid}/{episodeUuid}.md
+                val transcriptUrl = generatedTranscript.url
+                val baseUrl = transcriptUrl.substringBefore("/generated_transcripts/")
+                val podcastUuid = transcriptUrl
+                    .substringAfter("/generated_transcripts/")
+                    .substringBefore("/")
+                val summaryUrl = "$baseUrl/summaries/$podcastUuid/$episodeUuid.md"
+
+                val response = transcriptService.getTranscriptOrThrow(summaryUrl)
+                response.string()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
+                null
+            }
+        }
+    }
+
     override fun resetInvalidTranscripts(
         episodeUuid: String,
     ) {

@@ -566,6 +566,32 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
 
+        binding?.episodeSummary?.setContentWithViewCompositionStrategy {
+            val summaryText = viewModel.summary.collectAsState().value
+
+            AppTheme(activeTheme) {
+                AnimatedNonNullVisibility(item = summaryText) { text ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    ) {
+                        SummaryExcerptBanner(
+                            modifier = Modifier.clickable(
+                                role = Role.Button,
+                                onClickLabel = stringResource(LR.string.view_summary),
+                                onClick = {
+                                    val sheet = SummaryBottomSheet.newInstance(text)
+                                    sheet.show(parentFragmentManager, "episode_summary")
+                                },
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
         binding?.episodeTranscript?.setContentWithViewCompositionStrategy {
             val transcript = viewModel.transcript.collectAsState().value
 

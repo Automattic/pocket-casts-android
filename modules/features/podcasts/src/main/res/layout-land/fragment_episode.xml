@@ -236,12 +236,20 @@
             tools:text="1h 50m left" />
 
         <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/episodeTranscript"
+            android:id="@+id/episodeSummary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/episodeTranscript"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/episodeSummary" />
 
         <FrameLayout
             android:id="@+id/webViewShowNotes"
