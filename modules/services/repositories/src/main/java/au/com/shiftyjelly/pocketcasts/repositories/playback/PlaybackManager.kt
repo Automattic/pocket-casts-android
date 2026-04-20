@@ -169,6 +169,25 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+
+        internal fun effectiveSkipLastMs(skipLastSecs: Int?, playbackSpeed: Double): Long {
+            val secs = skipLastSecs ?: 0
+            return (secs * 1000L * playbackSpeed.coerceAtLeast(1.0)).toLong()
+        }
+
+        internal fun shouldSkipLast(
+            skipLastSecs: Int?,
+            playbackSpeed: Double,
+            positionMs: Int,
+            durationMs: Int?,
+        ): Boolean {
+            if (skipLastSecs == null || skipLastSecs <= 0) return false
+            if (durationMs == null || durationMs <= 0) return false
+            if (positionMs < 0) return false
+            val thresholdMs = effectiveSkipLastMs(skipLastSecs, playbackSpeed)
+            if (durationMs <= thresholdMs) return false
+            return durationMs - positionMs < thresholdMs
+        }
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -2330,7 +2349,9 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
-        val skipLast = playbackStateRelay.blockingFirst().podcast?.skipLastSecs
+        val currentPlaybackState = playbackStateRelay.blockingFirst()
+        val skipLast = currentPlaybackState.podcast?.skipLastSecs
+        val playbackSpeed = currentPlaybackState.playbackSpeed
 
         val positionMs = player?.getCurrentPositionMs() ?: -1
         if (positionMs < 0) {
@@ -2338,27 +2359,25 @@ open class PlaybackManager @Inject constructor(
         }
 
         val durationMs = player?.durationMs()
-        @Suppress("KotlinConstantConditions") // This is a false positive
-        if (skipLast.isPositive() && durationMs.isPositive() && durationMs > skipLast) {
-            val timeRemaining = (durationMs - positionMs) / 1000
-            if (timeRemaining < skipLast) {
-                if (isSleepAfterEpisodeEnabled()) {
-                    sleepEndOfEpisode(episode)
-                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
-                } else {
-                    eventHorizon.track(
-                        PlayerEpisodeCompletedEvent(
-                            podcastUuid = episode.podcastOrSubstituteUuid,
-                            episodeUuid = episode.uuid,
-                        ),
-                    )
-                    statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
-                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skipping remainder of ${episode.title} with skip last $skipLast")
-                    showToast(application.getString(LR.string.player_skipped_last, skipLast))
-                }
-                return
+        if (shouldSkipLast(skipLast, playbackSpeed, positionMs, durationMs)) {
+            // shouldSkipLast guarantees durationMs is non-null and positive when it returns true.
+            val remainingMs = durationMs!! - positionMs
+            if (isSleepAfterEpisodeEnabled()) {
+                sleepEndOfEpisode(episode)
+                episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
+            } else {
+                eventHorizon.track(
+                    PlayerEpisodeCompletedEvent(
+                        podcastUuid = episode.podcastOrSubstituteUuid,
+                        episodeUuid = episode.uuid,
+                    ),
+                )
+                statsManager.addTimeSavedAutoSkipping(remainingMs.toLong())
+                episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skipping remainder of ${episode.title} with skip last $skipLast (speed=$playbackSpeed)")
+                showToast(application.getString(LR.string.player_skipped_last, skipLast))
             }
+            return
         }
 
         episode.playedUpToMs = positionMs

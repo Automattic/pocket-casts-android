@@ -1,6 +1,8 @@
 8.11
 -----
-
+*   Bug Fixes
+    *   Fix Skip Last calculation at increased playback speeds
+        ([#5230](https://github.com/Automattic/pocket-casts-android/pull/5230))
 
 8.10
 -----
