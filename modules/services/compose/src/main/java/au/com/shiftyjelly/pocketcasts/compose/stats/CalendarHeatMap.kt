@@ -386,7 +386,7 @@ private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
 private fun CalendarHeatMapPreview() {
     val previewHeatLevels = remember {
         val random = Random(0)
-        List(366) { HeatLevel.entries.random(random) }
+        List(400) { HeatLevel.entries.random(random) }
     }
 
     CalendarHeatMap(
