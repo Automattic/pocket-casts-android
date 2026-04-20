@@ -340,7 +340,7 @@ private data class HeatMapCell(
 @Composable
 private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
     return remember(start, end) {
-        // Use sunday based index
+        // Use Sunday-based index
         val startOffset = start.dayOfWeek.value % 7
 
         val monthLabels = buildList {
