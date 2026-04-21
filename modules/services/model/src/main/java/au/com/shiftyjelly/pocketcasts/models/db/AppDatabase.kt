@@ -1424,18 +1424,12 @@ abstract class AppDatabase : RoomDatabase() {
                         uuid TEXT PRIMARY KEY NOT NULL,
                         episode_uuid TEXT NOT NULL,
                         podcast_uuid TEXT NOT NULL,
-                        episode_title TEXT NOT NULL,
-                        podcast_title TEXT NOT NULL,
-                        podcast_category TEXT NOT NULL,
                         started_at_ms INTEGER NOT NULL,
-                        duration_ms INTEGER NOT NULL,
-                        is_synced INTEGER NOT NULL
+                        duration_ms INTEGER NOT NULL
                     );
                 """.trimIndent(),
             )
             database.execSQL("CREATE INDEX playback_stats_events_started_at_ms ON playback_stats_events(started_at_ms)")
-            database.execSQL("CREATE INDEX playback_stats_events_podcast_uuid ON playback_stats_events(podcast_uuid)")
-            database.execSQL("CREATE INDEX playback_stats_events_podcast_category ON playback_stats_events(podcast_category)")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {

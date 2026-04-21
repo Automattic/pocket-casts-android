@@ -52,9 +52,6 @@ class PlaybackStatsCollectorTest {
         queue = mock<UpNextQueue> {
             on { currentEpisode } doAnswer { episode }
         },
-        podcastDao = mock<PodcastDao> {
-            on { findPodcastByUuid(any()) } doAnswer { podcast }
-        },
         playbackStatsDao = mock<PlaybackStatsDao> {
             on { insertOrIgnore(any()) } doAnswer { invocation ->
                 @Suppress("UNCHECKED_CAST")
@@ -112,9 +109,6 @@ class PlaybackStatsCollectorTest {
                     durationMs = 10.minutes.inWholeMilliseconds,
                     episodeUuid = "user-episode-id",
                     podcastUuid = Podcast.userPodcast.uuid,
-                    episodeTitle = "User episode title",
-                    podcastTitle = Podcast.userPodcast.title,
-                    podcastCategory = Podcast.userPodcast.getFirstCategoryUnlocalised(),
                 ),
             ),
             storedEvents,
@@ -145,48 +139,6 @@ class PlaybackStatsCollectorTest {
                     uuidIndex = 1,
                     startedAtMs = 24.hours.inWholeMilliseconds,
                     durationMs = 1.seconds.inWholeMilliseconds,
-                ),
-            ),
-            storedEvents,
-        )
-    }
-
-    @Test
-    fun `reuse cached podcast across playback sessions`() = testScope.runTest {
-        episode = createPodcastEpisode()
-        podcast = createPodcast()
-
-        collector.onStart()
-        runCurrent()
-
-        clock += 10.seconds
-        collector.onStop()
-        runCurrent()
-
-        episode = createPodcastEpisode(uuid = "episode-id-2", title = "Episode title 2")
-        podcast = null
-
-        clock += 5.seconds
-        collector.onStart()
-        runCurrent()
-
-        clock += 20.seconds
-        collector.onStop()
-        runCurrent()
-
-        assertEquals(
-            listOf(
-                expectedEvent(
-                    uuidIndex = 0,
-                    startedAtMs = 0,
-                    durationMs = 10.seconds.inWholeMilliseconds,
-                ),
-                expectedEvent(
-                    uuidIndex = 1,
-                    episodeUuid = "episode-id-2",
-                    episodeTitle = "Episode title 2",
-                    startedAtMs = 15.seconds.inWholeMilliseconds,
-                    durationMs = 20.seconds.inWholeMilliseconds,
                 ),
             ),
             storedEvents,
@@ -251,32 +203,24 @@ class PlaybackStatsCollectorTest {
 
     private fun createPodcastEpisode(
         uuid: String = "episode-id",
-        title: String = "Episode title",
         podcastUuid: String = "podcast-id",
     ) = PodcastEpisode(
         uuid = uuid,
-        title = title,
         podcastUuid = podcastUuid,
         publishedDate = Date(),
     )
 
     private fun createUserEpisode(
         uuid: String = "user-episode-id",
-        title: String = "User episode title",
     ) = UserEpisode(
         uuid = uuid,
-        title = title,
         publishedDate = Date(),
     )
 
     private fun createPodcast(
         uuid: String = "podcast-id",
-        title: String = "Podcast title",
-        category: String = "Podcast category",
     ) = Podcast(
         uuid = uuid,
-        title = title,
-        podcastCategory = category,
     )
 
     private fun expectedEvent(
@@ -285,18 +229,11 @@ class PlaybackStatsCollectorTest {
         durationMs: Long,
         episodeUuid: String = "episode-id",
         podcastUuid: String = "podcast-id",
-        episodeTitle: String = "Episode title",
-        podcastTitle: String = "Podcast title",
-        podcastCategory: String = "Podcast category",
     ) = PlaybackStatsEvent(
         uuid = uuidProvider.uuids[uuidIndex].toString(),
         episodeUuid = episodeUuid,
         podcastUuid = podcastUuid,
-        episodeTitle = episodeTitle,
-        podcastTitle = podcastTitle,
-        podcastCategory = podcastCategory,
         startedAtMs = startedAtMs,
         durationMs = durationMs,
-        isSynced = false,
     )
 }

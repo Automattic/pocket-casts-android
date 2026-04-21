@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 126,
-    "identityHash": "b328a095769b3a934bb55b075b20d83a",
+    "identityHash": "a2f2caf6020cf0016e64bd1e718860db",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -2038,7 +2038,7 @@
       },
       {
         "tableName": "playback_stats_events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_title` TEXT NOT NULL, `podcast_title` TEXT NOT NULL, `podcast_category` TEXT NOT NULL, `started_at_ms` INTEGER NOT NULL, `duration_ms` INTEGER NOT NULL, `is_synced` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `started_at_ms` INTEGER NOT NULL, `duration_ms` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -2059,24 +2059,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "episodeTitle",
-            "columnName": "episode_title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "podcastTitle",
-            "columnName": "podcast_title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "podcastCategory",
-            "columnName": "podcast_category",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "startedAtMs",
             "columnName": "started_at_ms",
             "affinity": "INTEGER",
@@ -2085,12 +2067,6 @@
           {
             "fieldPath": "durationMs",
             "columnName": "duration_ms",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isSynced",
-            "columnName": "is_synced",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -2110,31 +2086,13 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `playback_stats_events_started_at_ms` ON `${TABLE_NAME}` (`started_at_ms`)"
-          },
-          {
-            "name": "playback_stats_events_podcast_uuid",
-            "unique": false,
-            "columnNames": [
-              "podcast_uuid"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `playback_stats_events_podcast_uuid` ON `${TABLE_NAME}` (`podcast_uuid`)"
-          },
-          {
-            "name": "playback_stats_events_podcast_category",
-            "unique": false,
-            "columnNames": [
-              "podcast_category"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `playback_stats_events_podcast_category` ON `${TABLE_NAME}` (`podcast_category`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b328a095769b3a934bb55b075b20d83a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2f2caf6020cf0016e64bd1e718860db')"
     ]
   }
 }
