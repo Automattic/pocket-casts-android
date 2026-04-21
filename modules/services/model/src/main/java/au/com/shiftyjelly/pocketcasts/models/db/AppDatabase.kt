@@ -1433,7 +1433,7 @@ abstract class AppDatabase : RoomDatabase() {
                     );
                 """.trimIndent(),
             )
-            database.execSQL("CREATE INDEX playback_stats_events_started_at_ms ON smart_playlists(started_at_ms)")
+            database.execSQL("CREATE INDEX playback_stats_events_started_at_ms ON playback_stats_events(started_at_ms)")
             database.execSQL("CREATE INDEX playback_stats_events_podcast_uuid ON playback_stats_events(podcast_uuid)")
             database.execSQL("CREATE INDEX playback_stats_events_podcast_category ON playback_stats_events(podcast_category)")
         }
