@@ -30,15 +30,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 import java.time.temporal.ChronoUnit
+import kotlin.math.max
 import kotlin.random.Random
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import java.time.format.TextStyle as DateTextStyle
@@ -66,7 +71,7 @@ fun CalendarHeatMap(
         start = start,
         end = end.plusDays(1).coerceAtLeast(start),
     )
-    val dimensions = rememberHeatMapDimensions(
+    val sizing = rememberHeatMapSizing(
         weeks = data.weeks,
         cellSize = cellSize,
         cellSpacing = cellSpacing,
@@ -76,18 +81,14 @@ fun CalendarHeatMap(
     val dayLabelsByRow = remember(locale) {
         Days.associateWith { day -> day.getDisplayName(DateTextStyle.SHORT, locale) }
     }
-    val textStyle = TextStyle(
-        fontSize = 12.nonScaledSp,
-    )
 
     Column(
         modifier = modifier,
     ) {
-        val dayLabelWidth = measureWeekdayLabels(dayLabelsByRow.values, textStyle)
+        val dayLabelWidth = measureWeekdayLabels(dayLabelsByRow.values, sizing.textStyle)
         MonthLabels(
             data = data,
-            dimensions = dimensions,
-            textStyle = textStyle,
+            sizing = sizing,
             modifier = Modifier
                 .padding(start = dayLabelWidth + 4.dp, bottom = 2.dp)
                 .horizontalScroll(scrollState),
@@ -96,13 +97,12 @@ fun CalendarHeatMap(
         Row {
             WeekdayLabels(
                 dayLabelsByRow = dayLabelsByRow,
-                dimensions = dimensions,
-                textStyle = textStyle,
+                sizing = sizing,
                 modifier = Modifier.padding(end = 4.dp),
             )
             Cells(
                 data = data,
-                dimensions = dimensions,
+                sizing = sizing,
                 colors = colors,
                 cellHeatLevel = cellHeatLevel,
                 modifier = Modifier.horizontalScroll(scrollState),
@@ -110,11 +110,10 @@ fun CalendarHeatMap(
         }
 
         Legend(
-            dimensions = dimensions,
+            sizing = sizing,
             colors = colors,
-            textStyle = textStyle,
             modifier = Modifier
-                .padding(top = 6.dp, end = dimensions.cellPitch)
+                .padding(top = 6.dp, end = sizing.cellPitch)
                 .align(Alignment.End),
         )
     }
@@ -123,25 +122,24 @@ fun CalendarHeatMap(
 @Composable
 private fun WeekdayLabels(
     dayLabelsByRow: Map<DayOfWeek, String>,
-    dimensions: HeatMapDimensions,
-    textStyle: TextStyle,
+    sizing: HeatMapSizing,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
 
     Box(
-        modifier = modifier.height(dimensions.mapHeight),
+        modifier = modifier.height(sizing.mapHeight),
     ) {
         dayLabelsByRow.forEach { (dayOfWeek, label) ->
             val labelHeight = with(density) {
-                textMeasurer.measure(label, textStyle).size.height.toDp()
+                textMeasurer.measure(label, sizing.textStyle).size.height.toDp()
             }
             Text(
                 text = label,
-                modifier = Modifier.offset(y = dimensions.cellPitch * dayOfWeek.value + (dimensions.cellSize - labelHeight) / 2),
+                modifier = Modifier.offset(y = sizing.cellPitch * dayOfWeek.value + (sizing.cellSize - labelHeight) / 2),
                 color = MaterialTheme.theme.colors.primaryText02,
-                style = textStyle,
+                style = sizing.textStyle,
             )
         }
     }
@@ -167,20 +165,19 @@ private val Days = listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDA
 @Composable
 private fun MonthLabels(
     data: HeatMapData,
-    dimensions: HeatMapDimensions,
-    textStyle: TextStyle,
+    sizing: HeatMapSizing,
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.width(dimensions.mapWidth),
+        modifier = modifier.width(sizing.mapWidth),
     ) {
         val locale = LocalResources.current.configuration.locales[0]
         data.monthLabels.forEach { monthLabel ->
             Text(
                 text = monthLabel.month.getDisplayName(DateTextStyle.SHORT, locale),
-                modifier = Modifier.offset(x = dimensions.cellPitch * monthLabel.column),
+                modifier = Modifier.offset(x = sizing.cellPitch * monthLabel.column),
                 color = MaterialTheme.theme.colors.primaryText02,
-                style = textStyle,
+                style = sizing.textStyle,
             )
         }
     }
@@ -189,16 +186,16 @@ private fun MonthLabels(
 @Composable
 private fun Cells(
     data: HeatMapData,
-    dimensions: HeatMapDimensions,
+    sizing: HeatMapSizing,
     colors: HeatColors,
     cellHeatLevel: (LocalDate) -> HeatLevel,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
-        modifier = modifier.size(dimensions.mapWidth, dimensions.mapHeight),
+        modifier = modifier.size(sizing.mapWidth, sizing.mapHeight),
     ) {
-        val cellSizePx = dimensions.cellSize.toPx()
-        val cellPitchPx = dimensions.cellPitch.toPx()
+        val cellSizePx = sizing.cellSize.toPx()
+        val cellPitchPx = sizing.cellPitch.toPx()
 
         data.cells.forEach { cell ->
             drawHeatSquare(
@@ -212,9 +209,8 @@ private fun Cells(
 
 @Composable
 private fun Legend(
-    dimensions: HeatMapDimensions,
+    sizing: HeatMapSizing,
     colors: HeatColors,
-    textStyle: TextStyle,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -225,13 +221,13 @@ private fun Legend(
         Text(
             text = stringResource(LR.string.less),
             color = MaterialTheme.theme.colors.primaryText02,
-            style = textStyle,
+            style = sizing.textStyle,
         )
         Canvas(
-            modifier = Modifier.size(dimensions.legendWidth, dimensions.cellSize),
+            modifier = Modifier.size(sizing.legendWidth, sizing.cellSize),
         ) {
-            val cellSizePx = dimensions.cellSize.toPx()
-            val cellPitchPx = dimensions.cellPitch.toPx()
+            val cellSizePx = sizing.cellSize.toPx()
+            val cellPitchPx = sizing.cellPitch.toPx()
 
             HeatLevel.entries.forEachIndexed { cellIndex, heatLevel ->
                 drawHeatSquare(
@@ -244,7 +240,7 @@ private fun Legend(
         Text(
             text = stringResource(LR.string.more),
             color = MaterialTheme.theme.colors.primaryText02,
-            style = textStyle,
+            style = sizing.textStyle,
         )
     }
 }
@@ -262,29 +258,35 @@ private fun DrawScope.drawHeatSquare(
     )
 }
 
-private data class HeatMapDimensions(
+private data class HeatMapSizing(
     val cellSize: Dp,
     val cellPitch: Dp,
     val mapWidth: Dp,
     val mapHeight: Dp,
     val legendWidth: Dp,
+    val textStyle: TextStyle,
 )
 
 @Composable
-private fun rememberHeatMapDimensions(
+private fun rememberHeatMapSizing(
     weeks: Int,
     cellSize: Dp,
     cellSpacing: Dp,
-): HeatMapDimensions {
-    return remember(weeks, cellSize, cellSpacing) {
-        val cellPitch = cellSize + cellSpacing
+): HeatMapSizing {
+    val fontScale = LocalDensity.current.fontScale
 
-        HeatMapDimensions(
-            cellSize = cellSize,
+    return remember(weeks, cellSize, cellSpacing, fontScale) {
+        val resizeScale = max(fontScale, 1f)
+        val resizedCellSize = cellSize * resizeScale
+        val cellPitch = resizedCellSize + cellSpacing
+
+        HeatMapSizing(
+            cellSize = resizedCellSize,
             cellPitch = cellPitch,
-            mapWidth = cellSize * weeks + cellSpacing * (weeks - 1).coerceAtLeast(0),
-            mapHeight = cellSize * 7 + cellSpacing * 6,
-            legendWidth = cellSize * HeatLevel.entries.size + cellSpacing * (HeatLevel.entries.size - 1),
+            mapWidth = resizedCellSize * weeks + cellSpacing * (weeks - 1).coerceAtLeast(0),
+            mapHeight = resizedCellSize * 7 + cellSpacing * 6,
+            legendWidth = resizedCellSize * HeatLevel.entries.size + cellSpacing * (HeatLevel.entries.size - 1),
+            textStyle = TextStyle(fontSize = cellSize.value.sp),
         )
     }
 }
@@ -383,15 +385,53 @@ private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
 
 @Preview
 @Composable
-private fun CalendarHeatMapPreview() {
+private fun CalendarHeatMapPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
     val previewHeatLevels = remember {
         val random = Random(0)
         List(400) { HeatLevel.entries.random(random) }
     }
 
-    CalendarHeatMap(
-        start = LocalDate.of(2025, 3, 6),
-        end = LocalDate.of(2026, 1, 1),
-        cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
-    )
+    AppThemeWithBackground(themeType) {
+        CalendarHeatMap(
+            start = LocalDate.of(2025, 3, 6),
+            end = LocalDate.of(2026, 1, 1),
+            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
+        )
+    }
+}
+
+@Preview(fontScale = 1.5f)
+@Composable
+private fun CalendarHeatMapPreviewFont150Percent() {
+    val previewHeatLevels = remember {
+        val random = Random(0)
+        List(366) { HeatLevel.entries.random(random) }
+    }
+
+    AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
+        CalendarHeatMap(
+            start = LocalDate.of(2025, 3, 6),
+            end = LocalDate.of(2026, 1, 1),
+            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
+        )
+    }
+}
+
+@Preview(fontScale = 2f)
+@Composable
+private fun CalendarHeatMapPreviewFont200Percent() {
+    val previewHeatLevels = remember {
+        val random = Random(0)
+        List(366) { HeatLevel.entries.random(random) }
+    }
+
+    AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
+        CalendarHeatMap(
+            start = LocalDate.of(2025, 3, 6),
+            end = LocalDate.of(2026, 1, 1),
+            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
+        )
+    }
 }
