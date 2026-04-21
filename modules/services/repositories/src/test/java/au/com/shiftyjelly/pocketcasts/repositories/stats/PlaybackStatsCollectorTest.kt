@@ -71,7 +71,6 @@ class PlaybackStatsCollectorTest {
 
         clock += 34.seconds
         collector.onStart()
-        runCurrent()
 
         clock += 10.minutes
         collector.onStop()
@@ -95,7 +94,6 @@ class PlaybackStatsCollectorTest {
 
         clock += 34.seconds
         collector.onStart()
-        runCurrent()
 
         clock += 10.minutes
         collector.onStop()
@@ -122,7 +120,6 @@ class PlaybackStatsCollectorTest {
 
         clock += 23.hours + 59.minutes + 59.seconds
         collector.onStart()
-        runCurrent()
 
         clock += 2.seconds
         collector.onStop()
@@ -155,7 +152,6 @@ class PlaybackStatsCollectorTest {
 
         clock += 10.minutes
         collector.onStart()
-        runCurrent()
 
         clock += 5.minutes
         collector.onStop()
@@ -180,10 +176,10 @@ class PlaybackStatsCollectorTest {
 
         clock += 34.seconds
         collector.onStart()
-        runCurrent()
 
         clock += 10.minutes
         collector.onStop()
+        runCurrent()
 
         clock += 5.minutes
         collector.onStop()
