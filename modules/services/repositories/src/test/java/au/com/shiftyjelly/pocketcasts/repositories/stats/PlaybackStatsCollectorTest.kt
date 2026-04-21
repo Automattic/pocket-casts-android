@@ -30,8 +30,6 @@ import org.mockito.kotlin.mock
 class PlaybackStatsCollectorTest {
     private var episode: BaseEpisode? = null
 
-    private var podcast: Podcast? = null
-
     private val storedEvents = mutableListOf<PlaybackStatsEvent>()
 
     private val clock = MutableClock()
@@ -68,7 +66,6 @@ class PlaybackStatsCollectorTest {
     @Test
     fun `track podcast event`() = testScope.runTest {
         episode = createPodcastEpisode()
-        podcast = createPodcast()
 
         clock += 34.seconds
         collector.onStart()
@@ -117,7 +114,6 @@ class PlaybackStatsCollectorTest {
     @Test
     fun `save startedAtMs as epoch millis when clock zone is not UTC`() = testScope.runTest {
         episode = createPodcastEpisode()
-        podcast = createPodcast()
 
         val startedAt = Instant.parse("2026-01-01T13:14:15Z")
         clock.setInstant(startedAt)
@@ -144,7 +140,6 @@ class PlaybackStatsCollectorTest {
     @Test
     fun `split played event at midnight UTC`() = testScope.runTest {
         episode = createPodcastEpisode()
-        podcast = createPodcast()
 
         clock += 23.hours + 59.minutes + 59.seconds
         collector.onStart()
@@ -173,7 +168,6 @@ class PlaybackStatsCollectorTest {
     @Test
     fun `ignore repeated onStart while already playing`() = testScope.runTest {
         episode = createPodcastEpisode()
-        podcast = createPodcast()
 
         clock += 34.seconds
         collector.onStart()
@@ -200,7 +194,6 @@ class PlaybackStatsCollectorTest {
     @Test
     fun `ignore repeated onStop after playback ends`() = testScope.runTest {
         episode = createPodcastEpisode()
-        podcast = createPodcast()
 
         clock += 34.seconds
         collector.onStart()
@@ -239,12 +232,6 @@ class PlaybackStatsCollectorTest {
     ) = UserEpisode(
         uuid = uuid,
         publishedDate = Date(),
-    )
-
-    private fun createPodcast(
-        uuid: String = "podcast-id",
-    ) = Podcast(
-        uuid = uuid,
     )
 
     private fun expectedEvent(
