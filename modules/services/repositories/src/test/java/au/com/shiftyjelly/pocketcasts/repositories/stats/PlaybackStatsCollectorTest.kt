@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.stats
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaybackStatsDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
