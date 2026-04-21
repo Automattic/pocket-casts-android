@@ -169,6 +169,7 @@ class CastPlayer(
             remoteListenerAdded = false
             remoteMediaClient?.unregisterCallback(remoteMediaClientListener)
             remoteMediaClient?.unregisterCallback(playPauseCallback)
+            playbackStatsCollector.onStop()
         }
     }
 
