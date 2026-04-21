@@ -113,7 +113,7 @@ fun CalendarHeatMap(
             sizing = sizing,
             colors = colors,
             modifier = Modifier
-                .padding(top = 6.dp, end = sizing.cellPitch)
+                .padding(top = 6.dp)
                 .align(Alignment.End),
         )
     }
