@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Date
 import java.util.UUID
 import kotlin.time.Duration.Companion.hours
@@ -107,6 +109,33 @@ class PlaybackStatsCollectorTest {
                     durationMs = 10.minutes.inWholeMilliseconds,
                     episodeUuid = "user-episode-id",
                     podcastUuid = Podcast.userPodcast.uuid,
+                ),
+            ),
+            storedEvents,
+        )
+    }
+
+    @Test
+    fun `save startedAtMs as epoch millis when clock zone is not UTC`() = testScope.runTest {
+        episode = createPodcastEpisode()
+        podcast = createPodcast()
+
+        val startedAt = Instant.parse("2026-01-01T13:14:15Z")
+        clock.setInstant(startedAt)
+        clock.setZone(ZoneId.of("Australia/Sydney"))
+
+        collector.onStart()
+
+        clock += 10.minutes
+        collector.onStop()
+        runCurrent()
+
+        assertEquals(
+            listOf(
+                expectedEvent(
+                    uuidIndex = 0,
+                    startedAtMs = startedAt.toEpochMilli(),
+                    durationMs = 10.minutes.inWholeMilliseconds,
                 ),
             ),
             storedEvents,
