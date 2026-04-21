@@ -1421,7 +1421,7 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL(
                 """
                     CREATE TABLE playback_stats_events (
-                        uuid TEXT PRIMARY_KEY NOT NULL,
+                        uuid TEXT PRIMARY KEY NOT NULL,
                         episode_uuid TEXT NOT NULL,
                         podcast_uuid TEXT NOT NULL,
                         episode_title TEXT NOT NULL,
