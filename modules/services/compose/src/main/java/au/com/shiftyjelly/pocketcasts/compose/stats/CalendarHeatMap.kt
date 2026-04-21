@@ -60,7 +60,7 @@ enum class HeatLevel {
 fun CalendarHeatMap(
     start: LocalDate,
     end: LocalDate,
-    cellHeatLevel: (LocalDate) -> HeatLevel,
+    heatLevels: Map<LocalDate, HeatLevel>,
     modifier: Modifier = Modifier,
     cellSize: Dp = 12.dp,
     cellSpacing: Dp = 4.dp,
@@ -104,7 +104,7 @@ fun CalendarHeatMap(
                 data = data,
                 sizing = sizing,
                 colors = colors,
-                cellHeatLevel = cellHeatLevel,
+                heatLevels = heatLevels,
                 modifier = Modifier.horizontalScroll(scrollState),
             )
         }
@@ -188,7 +188,7 @@ private fun Cells(
     data: HeatMapData,
     sizing: HeatMapSizing,
     colors: HeatColors,
-    cellHeatLevel: (LocalDate) -> HeatLevel,
+    heatLevels: Map<LocalDate, HeatLevel>,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
@@ -196,12 +196,11 @@ private fun Cells(
     ) {
         val cellSizePx = sizing.cellSize.toPx()
         val cellPitchPx = sizing.cellPitch.toPx()
-
         data.cells.forEach { cell ->
             drawHeatSquare(
                 topLeft = Offset(cell.column * cellPitchPx, cell.row * cellPitchPx),
                 cellSizePx = cellSizePx,
-                color = colors[cellHeatLevel(cell.date)],
+                color = colors[heatLevels[cell.date] ?: HeatLevel.None],
             )
         }
     }
@@ -388,50 +387,62 @@ private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
 private fun CalendarHeatMapPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    val previewHeatLevels = remember {
+    val start = LocalDate.of(2025, 3, 6)
+    val end = LocalDate.of(2026, 1, 1)
+    val heatLevels = remember {
         val random = Random(0)
-        List(400) { HeatLevel.entries.random(random) }
+        var date = start
+        buildMap {
+            while (date <= end) {
+                put(date, HeatLevel.entries.random(random))
+                date = date.plusDays(1)
+            }
+        }
     }
 
     AppThemeWithBackground(themeType) {
-        CalendarHeatMap(
-            start = LocalDate.of(2025, 3, 6),
-            end = LocalDate.of(2026, 1, 1),
-            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
-        )
+        CalendarHeatMap(start, end, heatLevels)
     }
 }
 
 @Preview(fontScale = 1.5f)
 @Composable
 private fun CalendarHeatMapPreviewFont150Percent() {
-    val previewHeatLevels = remember {
+    val start = LocalDate.of(2025, 3, 6)
+    val end = LocalDate.of(2026, 1, 1)
+    val heatLevels = remember {
         val random = Random(0)
-        List(366) { HeatLevel.entries.random(random) }
+        var date = start
+        buildMap {
+            while (date <= end) {
+                put(date, HeatLevel.entries.random(random))
+                date = date.plusDays(1)
+            }
+        }
     }
 
     AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
-        CalendarHeatMap(
-            start = LocalDate.of(2025, 3, 6),
-            end = LocalDate.of(2026, 1, 1),
-            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
-        )
+        CalendarHeatMap(start, end, heatLevels)
     }
 }
 
 @Preview(fontScale = 2f)
 @Composable
 private fun CalendarHeatMapPreviewFont200Percent() {
-    val previewHeatLevels = remember {
+    val start = LocalDate.of(2025, 3, 6)
+    val end = LocalDate.of(2026, 1, 1)
+    val heatLevels = remember {
         val random = Random(0)
-        List(366) { HeatLevel.entries.random(random) }
+        var date = start
+        buildMap {
+            while (date <= end) {
+                put(date, HeatLevel.entries.random(random))
+                date = date.plusDays(1)
+            }
+        }
     }
 
     AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
-        CalendarHeatMap(
-            start = LocalDate.of(2025, 3, 6),
-            end = LocalDate.of(2026, 1, 1),
-            cellHeatLevel = { date -> previewHeatLevels[date.dayOfYear] },
-        )
+        CalendarHeatMap(start, end, heatLevels)
     }
 }
