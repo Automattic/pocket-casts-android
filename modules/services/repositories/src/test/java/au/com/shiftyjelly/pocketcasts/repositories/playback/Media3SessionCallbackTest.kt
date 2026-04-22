@@ -102,11 +102,12 @@ class Media3SessionCallbackTest {
 
         val playerCommands = result.availablePlayerCommands
         assertTrue(playerCommands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertTrue(playerCommands.contains(Player.COMMAND_SET_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_BACK))
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_BACK))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_METADATA))
