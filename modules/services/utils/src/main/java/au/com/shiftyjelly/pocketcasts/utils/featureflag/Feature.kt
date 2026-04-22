@@ -240,6 +240,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    EPISODE_CHAT(
+        key = "episode_chat",
+        title = "Episode Chat",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
