@@ -174,6 +174,7 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_STOP))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_MEDIA_ITEM))
         assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
@@ -814,6 +815,54 @@ class PocketCastsForwardingPlayerTest {
 
         assertNull(capturedMediaId)
         verify(mockPlayer).seekTo(5, 0L)
+    }
+
+    @Test
+    fun `seekToDefaultPosition with queue index invokes onSeekToQueueItem`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1"), queueItemOf("q2")))
+
+        player.seekToDefaultPosition(2)
+
+        assertEquals("q2", capturedMediaId)
+        verify(mockPlayer, never()).seekToDefaultPosition(any<Int>())
+    }
+
+    @Test
+    fun `seekToDefaultPosition with index 0 falls back to super`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        player.seekToDefaultPosition(0)
+
+        assertNull(capturedMediaId)
+        verify(mockPlayer).seekToDefaultPosition(0)
+    }
+
+    @Test
+    fun `seekToDefaultPosition with out of range index falls back to super`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        player.seekToDefaultPosition(5)
+
+        assertNull(capturedMediaId)
+        verify(mockPlayer).seekToDefaultPosition(5)
     }
 
     @Test

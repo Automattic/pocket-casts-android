@@ -191,6 +191,7 @@ class PocketCastsForwardingPlayer(
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
                 Player.COMMAND_GET_TIMELINE,
+                Player.COMMAND_SEEK_TO_MEDIA_ITEM,
             )
             .build()
     }
@@ -210,6 +211,16 @@ class PocketCastsForwardingPlayer(
             // queue range — delegate to the wrapped player, matching seekTo(positionMs).
             onSeekTo?.invoke(positionMs)
             super.seekTo(mediaItemIndex, positionMs)
+        }
+    }
+
+    override fun seekToDefaultPosition(mediaItemIndex: Int) {
+        val queueCallback = onSeekToQueueItem
+        if (queueCallback != null && mediaItemIndex > 0 && mediaItemIndex < 1 + queueItems.size) {
+            val mediaId = queueItems[mediaItemIndex - 1].mediaId
+            queueCallback.invoke(mediaId)
+        } else {
+            super.seekToDefaultPosition(mediaItemIndex)
         }
     }
 

@@ -111,6 +111,7 @@ class Media3SessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_METADATA))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_MEDIA_ITEM))
     }
 
     @Test
