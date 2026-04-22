@@ -74,19 +74,27 @@ private class PartialStatsEvent(
         return split(createdAt, endedAt, clock.zone, uuidProvider)
     }
 
-    private tailrec fun split(
+    /**
+     * Splits a session into one event per UTC based calendar day, cutting each
+     * segment at the next midnight until the play session ends
+     */
+    private fun split(
         startedAt: Instant,
         endedAt: Instant,
         zone: ZoneId,
         uuidProvider: UUIDProvider,
-        events: MutableList<PlaybackStatsEvent> = mutableListOf(),
     ): List<PlaybackStatsEvent> {
-        val segmentEnd = minOf(endedAt, startedAt.nextDayStart(zone))
-        events += createEvent(uuidProvider.generateUUID(), startedAt, segmentEnd)
-        return if (segmentEnd >= endedAt) {
-            events
-        } else {
-            split(segmentEnd, endedAt, zone, uuidProvider, events)
+        return buildList {
+            var segmentStart = startedAt
+            while (true) {
+                val segmentEnd = minOf(endedAt, segmentStart.nextDayStart(zone))
+                add(createEvent(uuidProvider.generateUUID(), segmentStart, segmentEnd))
+
+                if (segmentEnd >= endedAt) {
+                    break
+                }
+                segmentStart = segmentEnd
+            }
         }
     }
 
