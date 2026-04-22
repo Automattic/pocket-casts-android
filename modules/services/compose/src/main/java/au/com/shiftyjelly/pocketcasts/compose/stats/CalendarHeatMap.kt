@@ -142,11 +142,12 @@ private fun WeekdayLabels(
     Box(
         modifier = modifier.height(sizing.mapHeight),
     ) {
+        val isSundayBased = locale.isSundayBased()
         dayLabelsByRow.forEach { (dayOfWeek, label) ->
             val labelHeight = with(density) {
                 textMeasurer.measure(label, sizing.textStyle).size.height.toDp()
             }
-            val dayOfWeekOffset = if (locale.isSundayBased()) {
+            val dayOfWeekOffset = if (isSundayBased) {
                 dayOfWeek.value % 7
             } else {
                 dayOfWeek.ordinal
