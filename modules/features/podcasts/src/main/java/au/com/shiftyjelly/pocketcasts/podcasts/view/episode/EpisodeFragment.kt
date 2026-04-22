@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.transcripts.ChatFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
@@ -616,7 +617,10 @@ class EpisodeFragment : BaseFragment() {
                                             role = Role.Button,
                                             onClickLabel = stringResource(LR.string.episode_chat),
                                             onClick = {
-                                                // TODO: Navigate to chat
+                                                if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                                                    val fragment = ChatFragment.newInstance(episodeUuid, podcastUuid)
+                                                    fragment.show(parentFragmentManager, "episode_chat")
+                                                }
                                             },
                                         ),
                                 )

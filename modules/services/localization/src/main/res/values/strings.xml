@@ -2357,6 +2357,9 @@
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
 
+    <!-- Transcripts -->
+    <string name="chat_paywall_title">Chat with this episode</string>
+
     <!--    Tasker Plugin-->
 
     <string name="must_provide_filter_name">Must provide playlist name</string>
