@@ -64,6 +64,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -606,17 +608,19 @@ class EpisodeFragment : BaseFragment() {
                                         },
                                     ),
                             )
-                            ChatBanner(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.episode_chat),
-                                        onClick = {
-                                            // TODO: Navigate to chat
-                                        },
-                                    ),
-                            )
+                            if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
+                                ChatBanner(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(
+                                            role = Role.Button,
+                                            onClickLabel = stringResource(LR.string.episode_chat),
+                                            onClick = {
+                                                // TODO: Navigate to chat
+                                            },
+                                        ),
+                                )
+                            }
                         }
                         LaunchedEffect(podcastUuid, episodeUuid) {
                             eventHorizon.track(
