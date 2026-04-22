@@ -217,6 +217,52 @@ class EpisodeDaoDownloadStatusTest {
     }
 
     @Test
+    fun setReadyForDownloadSetsArchiveFieldsForArchivedEpisode() = runTest {
+        episodeDao.update(
+            episode.copy(
+                isArchived = true,
+                archivedModified = 0L,
+                lastArchiveInteraction = 0L,
+                excludeFromEpisodeLimit = false,
+                downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
+                downloadTaskId = null,
+            ),
+        )
+
+        episodeDao.setReadyForDownload(episode.uuid, workerId, now, forceNewDownload = false)
+
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(false, updatedEpisode.isArchived)
+        assertEquals(now.toEpochMilli(), updatedEpisode.archivedModified)
+        assertEquals(now.toEpochMilli(), updatedEpisode.lastArchiveInteraction)
+        assertEquals(true, updatedEpisode.excludeFromEpisodeLimit)
+    }
+
+    @Test
+    fun setReadyForDownloadDoesNotModifyArchiveFieldsForNonArchivedEpisode() = runTest {
+        val originalArchivedModified = 1000L
+        val originalLastArchiveInteraction = 2000L
+        episodeDao.update(
+            episode.copy(
+                isArchived = false,
+                archivedModified = originalArchivedModified,
+                lastArchiveInteraction = originalLastArchiveInteraction,
+                excludeFromEpisodeLimit = false,
+                downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
+                downloadTaskId = null,
+            ),
+        )
+
+        episodeDao.setReadyForDownload(episode.uuid, workerId, now, forceNewDownload = false)
+
+        val updatedEpisode = episodeDao.findByUuid(episode.uuid)!!
+        assertEquals(false, updatedEpisode.isArchived)
+        assertEquals(originalArchivedModified, updatedEpisode.archivedModified)
+        assertEquals(originalLastArchiveInteraction, updatedEpisode.lastArchiveInteraction)
+        assertEquals(false, updatedEpisode.excludeFromEpisodeLimit)
+    }
+
+    @Test
     fun setReadyForDownloadWithWorkerId() = runTest {
         val episode = episode.copy(
             isArchived = true,
