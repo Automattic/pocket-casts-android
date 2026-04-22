@@ -467,8 +467,8 @@ private fun CalendarHeatMapPreviewFont200Percent() {
 @Preview
 @Composable
 private fun CalendarHeatMapPreviewLocale() {
-    val start = LocalDate.of(2025, 3, 6)
-    val end = LocalDate.of(2026, 1, 1)
+    val start = LocalDate.of(2024, 1, 1)
+    val end = LocalDate.of(2024, 4, 30)
     val heatLevels = remember {
         val random = Random(0)
         var date = start
