@@ -76,18 +76,13 @@ fun CalendarHeatMap(
         locale = locale,
     )
     val sizing = rememberHeatMapSizing(
-        weeks = data.weeks,
+        weeks = data.weekCount,
         cellSize = cellSize,
         cellSpacing = cellSpacing,
     )
 
-    val dayLabelsByRow = remember(locale) {
-        val days = if (locale.isSundayBased()) {
-            listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
-        } else {
-            listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.SATURDAY)
-        }
-        days.associateWith { day -> day.getDisplayName(DateTextStyle.SHORT, locale) }
+    val dayLabelsByRow = remember(locale, data.displayedDays) {
+        data.displayedDays.associateWith { day -> day.getDisplayName(DateTextStyle.SHORT, locale) }
     }
 
     Column(
@@ -107,7 +102,7 @@ fun CalendarHeatMap(
             WeekdayLabels(
                 dayLabelsByRow = dayLabelsByRow,
                 sizing = sizing,
-                locale = locale,
+                dayOfWeekOffset = data.dayOfWeekOffset,
                 modifier = Modifier.padding(end = 4.dp),
             )
             Cells(
@@ -133,7 +128,7 @@ fun CalendarHeatMap(
 private fun WeekdayLabels(
     dayLabelsByRow: Map<DayOfWeek, String>,
     sizing: HeatMapSizing,
-    locale: Locale,
+    dayOfWeekOffset: (DayOfWeek) -> Int,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -142,19 +137,13 @@ private fun WeekdayLabels(
     Box(
         modifier = modifier.height(sizing.mapHeight),
     ) {
-        val isSundayBased = locale.isSundayBased()
         dayLabelsByRow.forEach { (dayOfWeek, label) ->
             val labelHeight = with(density) {
                 textMeasurer.measure(label, sizing.textStyle).size.height.toDp()
             }
-            val dayOfWeekOffset = if (isSundayBased) {
-                dayOfWeek.value % 7
-            } else {
-                dayOfWeek.ordinal
-            }
             Text(
                 text = label,
-                modifier = Modifier.offset(y = sizing.cellPitch * dayOfWeekOffset + (sizing.cellSize - labelHeight) / 2),
+                modifier = Modifier.offset(y = sizing.cellPitch * dayOfWeekOffset(dayOfWeek) + (sizing.cellSize - labelHeight) / 2),
                 color = MaterialTheme.theme.colors.primaryText02,
                 style = sizing.textStyle,
             )
@@ -337,9 +326,11 @@ private fun rememberHeatColors(): HeatColors {
 }
 
 private data class HeatMapData(
-    val weeks: Int,
+    val weekCount: Int,
     val monthLabels: List<HeatMapMonthLabel>,
     val cells: List<HeatMapCell>,
+    val displayedDays: List<DayOfWeek>,
+    val dayOfWeekOffset: (DayOfWeek) -> Int,
 )
 
 private data class HeatMapMonthLabel(
@@ -356,11 +347,9 @@ private data class HeatMapCell(
 @Composable
 private fun rememberHeatMapData(start: LocalDate, end: LocalDate, locale: Locale): HeatMapData {
     return remember(start, end, locale) {
-        val startOffset = if (locale.isSundayBased()) {
-            start.dayOfWeek.value % 7
-        } else {
-            start.dayOfWeek.ordinal
-        }
+        val firstDayIso = calendarToIsoDay(Calendar.getInstance(locale).firstDayOfWeek)
+        val dayOfWeekOffset: (DayOfWeek) -> Int = { day -> (day.value - firstDayIso + 7) % 7 }
+        val startOffset = dayOfWeekOffset(start.dayOfWeek)
 
         val monthLabels = buildList {
             var monthStart = start.withDayOfMonth(1)
@@ -393,14 +382,22 @@ private fun rememberHeatMapData(start: LocalDate, end: LocalDate, locale: Locale
         val cellsCount = startOffset + daysCount
         HeatMapData(
             // Round up partial weeks, then reserve one empty trailing week for labels.
-            weeks = (cellsCount + 6) / 7 + 1,
+            weekCount = (cellsCount + 6) / 7 + 1,
             monthLabels = monthLabels,
             cells = cells,
+            displayedDays = everySecondDays(firstDayIso),
+            dayOfWeekOffset = dayOfWeekOffset,
         )
     }
 }
 
-private fun Locale.isSundayBased() = Calendar.getInstance(this).firstDayOfWeek == Calendar.SUNDAY
+private fun calendarToIsoDay(calendarDay: Int): Int {
+    return ((calendarDay + 5) % 7) + 1
+}
+
+private fun everySecondDays(isoFirstDay: Int): List<DayOfWeek> {
+    return listOf(1, 3, 5).map { offset -> DayOfWeek.of(((isoFirstDay - 1 + offset) % 7) + 1) }
+}
 
 @Preview
 @Composable
@@ -469,7 +466,7 @@ private fun CalendarHeatMapPreviewFont200Percent() {
 
 @Preview
 @Composable
-private fun CalendarHeatMapPreviewMondayBasedLocale() {
+private fun CalendarHeatMapPreviewLocale() {
     val start = LocalDate.of(2025, 3, 6)
     val end = LocalDate.of(2026, 1, 1)
     val heatLevels = remember {
@@ -483,13 +480,35 @@ private fun CalendarHeatMapPreviewMondayBasedLocale() {
         }
     }
 
+    @Suppress("DEPRECATION")
     AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
-        @Suppress("DEPRECATION")
-        CalendarHeatMap(
-            start = start,
-            end = end,
-            heatLevels = heatLevels,
-            locale = Locale("US", "pl"),
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            CalendarHeatMap(
+                start = start,
+                end = end,
+                heatLevels = heatLevels,
+                locale = Locale("en", "US"),
+            )
+            CalendarHeatMap(
+                start = start,
+                end = end,
+                heatLevels = heatLevels,
+                locale = Locale("en", "PL"),
+            )
+            CalendarHeatMap(
+                start = start,
+                end = end,
+                heatLevels = heatLevels,
+                locale = Locale("en", "IR"),
+            )
+            CalendarHeatMap(
+                start = start,
+                end = end,
+                heatLevels = heatLevels,
+                locale = Locale("en", "MV"),
+            )
+        }
     }
 }
