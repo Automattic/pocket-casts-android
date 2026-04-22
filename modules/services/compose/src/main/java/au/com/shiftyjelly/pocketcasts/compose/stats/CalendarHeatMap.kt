@@ -43,6 +43,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.max
 import kotlin.random.Random
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -65,11 +67,13 @@ fun CalendarHeatMap(
     cellSize: Dp = 12.dp,
     cellSpacing: Dp = 4.dp,
     scrollState: ScrollState = rememberScrollState(initial = Int.MAX_VALUE),
+    locale: Locale = LocalResources.current.configuration.locales[0],
 ) {
     val colors = rememberHeatColors()
     val data = rememberHeatMapData(
         start = start,
         end = end.plusDays(1).coerceAtLeast(start),
+        locale = locale,
     )
     val sizing = rememberHeatMapSizing(
         weeks = data.weeks,
@@ -77,9 +81,13 @@ fun CalendarHeatMap(
         cellSpacing = cellSpacing,
     )
 
-    val locale = LocalResources.current.configuration.locales[0]
     val dayLabelsByRow = remember(locale) {
-        Days.associateWith { day -> day.getDisplayName(DateTextStyle.SHORT, locale) }
+        val days = if (locale.isSundayBased()) {
+            listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
+        } else {
+            listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.SATURDAY)
+        }
+        days.associateWith { day -> day.getDisplayName(DateTextStyle.SHORT, locale) }
     }
 
     Column(
@@ -89,6 +97,7 @@ fun CalendarHeatMap(
         MonthLabels(
             data = data,
             sizing = sizing,
+            locale = locale,
             modifier = Modifier
                 .padding(start = dayLabelWidth + 4.dp, bottom = 2.dp)
                 .horizontalScroll(scrollState),
@@ -98,6 +107,7 @@ fun CalendarHeatMap(
             WeekdayLabels(
                 dayLabelsByRow = dayLabelsByRow,
                 sizing = sizing,
+                locale = locale,
                 modifier = Modifier.padding(end = 4.dp),
             )
             Cells(
@@ -123,6 +133,7 @@ fun CalendarHeatMap(
 private fun WeekdayLabels(
     dayLabelsByRow: Map<DayOfWeek, String>,
     sizing: HeatMapSizing,
+    locale: Locale,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -135,9 +146,14 @@ private fun WeekdayLabels(
             val labelHeight = with(density) {
                 textMeasurer.measure(label, sizing.textStyle).size.height.toDp()
             }
+            val dayOfWeekOffset = if (locale.isSundayBased()) {
+                dayOfWeek.value % 7
+            } else {
+                dayOfWeek.ordinal
+            }
             Text(
                 text = label,
-                modifier = Modifier.offset(y = sizing.cellPitch * dayOfWeek.value + (sizing.cellSize - labelHeight) / 2),
+                modifier = Modifier.offset(y = sizing.cellPitch * dayOfWeekOffset + (sizing.cellSize - labelHeight) / 2),
                 color = MaterialTheme.theme.colors.primaryText02,
                 style = sizing.textStyle,
             )
@@ -160,18 +176,16 @@ private fun measureWeekdayLabels(
     return with(density) { maxLabelWidth.toDp() }
 }
 
-private val Days = listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
-
 @Composable
 private fun MonthLabels(
     data: HeatMapData,
     sizing: HeatMapSizing,
+    locale: Locale,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.width(sizing.mapWidth),
     ) {
-        val locale = LocalResources.current.configuration.locales[0]
         data.monthLabels.forEach { monthLabel ->
             Text(
                 text = monthLabel.month.getDisplayName(DateTextStyle.SHORT, locale),
@@ -339,10 +353,13 @@ private data class HeatMapCell(
 )
 
 @Composable
-private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
-    return remember(start, end) {
-        // Use Sunday-based index
-        val startOffset = start.dayOfWeek.value % 7
+private fun rememberHeatMapData(start: LocalDate, end: LocalDate, locale: Locale): HeatMapData {
+    return remember(start, end, locale) {
+        val startOffset = if (locale.isSundayBased()) {
+            start.dayOfWeek.value % 7
+        } else {
+            start.dayOfWeek.ordinal
+        }
 
         val monthLabels = buildList {
             var monthStart = start.withDayOfMonth(1)
@@ -381,6 +398,8 @@ private fun rememberHeatMapData(start: LocalDate, end: LocalDate): HeatMapData {
         )
     }
 }
+
+private fun Locale.isSundayBased() = Calendar.getInstance(this).firstDayOfWeek == Calendar.SUNDAY
 
 @Preview
 @Composable
@@ -444,5 +463,32 @@ private fun CalendarHeatMapPreviewFont200Percent() {
 
     AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
         CalendarHeatMap(start, end, heatLevels)
+    }
+}
+
+@Preview
+@Composable
+private fun CalendarHeatMapPreviewMondayBasedLocale() {
+    val start = LocalDate.of(2025, 3, 6)
+    val end = LocalDate.of(2026, 1, 1)
+    val heatLevels = remember {
+        val random = Random(0)
+        var date = start
+        buildMap {
+            while (date <= end) {
+                put(date, HeatLevel.entries.random(random))
+                date = date.plusDays(1)
+            }
+        }
+    }
+
+    AppThemeWithBackground(Theme.ThemeType.CLASSIC_LIGHT) {
+        @Suppress("DEPRECATION")
+        CalendarHeatMap(
+            start = start,
+            end = end,
+            heatLevels = heatLevels,
+            locale = Locale("US", "pl"),
+        )
     }
 }
