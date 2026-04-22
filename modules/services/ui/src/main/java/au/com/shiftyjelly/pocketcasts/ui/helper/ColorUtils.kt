@@ -54,6 +54,18 @@ object ColorUtils {
     fun calculateContrast(backgroundColor: ComposeColor, foregroundColor: ComposeColor): Double {
         return AndroidColorUtils.calculateContrast(foregroundColor.toArgb(), backgroundColor.toArgb())
     }
+
+    fun blendColors(first: ComposeColor, second: ComposeColor, fraction: Float): ComposeColor {
+        val clampedFraction = fraction.coerceIn(0f, 1f)
+        val inverseFraction = 1f - clampedFraction
+
+        return ComposeColor(
+            red = first.red * inverseFraction + second.red * clampedFraction,
+            green = first.green * inverseFraction + second.green * clampedFraction,
+            blue = first.blue * inverseFraction + second.blue * clampedFraction,
+            alpha = first.alpha * inverseFraction + second.alpha * clampedFraction,
+        )
+    }
 }
 
 fun Int.colorIntWithAlpha(alpha: Int): Int {
