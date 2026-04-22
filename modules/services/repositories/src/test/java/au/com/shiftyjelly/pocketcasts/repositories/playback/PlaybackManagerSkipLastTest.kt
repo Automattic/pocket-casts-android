@@ -94,7 +94,7 @@ class PlaybackManagerSkipLastTest {
     @Test
     fun `shouldSkipLast at 0 point 5x keeps the 1x window (never shrinks)`() {
         // The user set Skip Last=120s. On 0.5x we must not reduce the media window below 120_000ms.
-        // At 60_001ms remaining (position 1_739_999), 1x would NOT fire, so neither should 0.5x.
+        // At 120_001ms remaining (position 1_679_999), 1x would NOT fire, so neither should 0.5x.
         assertFalse(
             shouldSkipLast(
                 skipLastSecs = 120,
