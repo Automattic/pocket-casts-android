@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.transcripts
+package au.com.shiftyjelly.pocketcasts.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

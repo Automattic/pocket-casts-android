@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.transcripts.ChatUiState
+import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -29,7 +29,7 @@ fun ChatPage(
     modifier: Modifier = Modifier,
     paywallPadding: PaddingValues = PaddingValues(16.dp),
 ) {
-    val theme = rememberTranscriptTheme()
+    val theme = rememberChatTheme()
 
     Column(
         modifier = modifier.background(theme.background),
@@ -43,7 +43,7 @@ fun ChatPage(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(LR.string.close),
-                tint = theme.toolbarColors.button,
+                tint = theme.iconButton,
             )
         }
 

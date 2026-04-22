@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,7 +46,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -54,7 +53,7 @@ internal fun ChatPaywall(
     isFreeTrialAvailable: Boolean,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
-    theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    theme: ChatTheme = ChatTheme.default(MaterialTheme.theme.colors),
     contentPadding: PaddingValues = PaddingValues(16.dp),
 ) {
     val startPadding = contentPadding.calculateStartPadding(LocalLayoutDirection.current)

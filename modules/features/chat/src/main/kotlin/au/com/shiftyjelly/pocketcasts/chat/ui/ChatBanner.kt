@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

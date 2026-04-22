@@ -32,6 +32,7 @@ dependencies {
     api(libs.rx2.java)
     api(libs.rx2.relay)
 
+    api(projects.modules.features.chat)
     api(projects.modules.features.player)
     api(projects.modules.features.transcripts)
     api(projects.modules.services.analytics)
