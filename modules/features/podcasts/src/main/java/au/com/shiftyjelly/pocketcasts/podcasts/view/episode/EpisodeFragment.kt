@@ -17,13 +17,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -54,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -579,30 +579,43 @@ class EpisodeFragment : BaseFragment() {
                         val episodeUuid = textTranscript.episodeUuid
                         val podcastUuid = textTranscript.podcastUuid
 
-                        Box(
-                            contentAlignment = Alignment.Center,
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                         ) {
                             TranscriptExcerptBanner(
                                 isGenerated = textTranscript.isGenerated,
-                                modifier = Modifier.clickable(
-                                    role = Role.Button,
-                                    onClickLabel = stringResource(LR.string.transcript_open),
-                                    onClick = {
-                                        if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                            val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
-                                            fragment.show(parentFragmentManager, "episode_transcript")
-                                        }
-                                        eventHorizon.track(
-                                            EpisodeDetailTranscriptCardTappedEvent(
-                                                episodeUuid = episodeUuid,
-                                                podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                                            ),
-                                        )
-                                    },
-                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.transcript_open),
+                                        onClick = {
+                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                                val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
+                                                fragment.show(parentFragmentManager, "episode_transcript")
+                                            }
+                                            eventHorizon.track(
+                                                EpisodeDetailTranscriptCardTappedEvent(
+                                                    episodeUuid = episodeUuid,
+                                                    podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                                                ),
+                                            )
+                                        },
+                                    ),
+                            )
+                            ChatBanner(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.episode_chat),
+                                        onClick = {
+                                            // TODO: Navigate to chat
+                                        },
+                                    ),
                             )
                         }
                         LaunchedEffect(podcastUuid, episodeUuid) {
