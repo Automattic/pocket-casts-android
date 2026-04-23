@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
@@ -621,7 +622,10 @@ class EpisodeFragment : BaseFragment() {
                                             onClickLabel = stringResource(LR.string.episode_chat),
                                             onClick = {
                                                 if (isPlusUser) {
-                                                    // TODO: Open chat fragment
+                                                    if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                                                        val fragment = ChatFragment.newInstance(episodeUuid, podcastUuid)
+                                                        fragment.show(parentFragmentManager, "episode_chat")
+                                                    }
                                                 } else {
                                                     if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
                                                         val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
