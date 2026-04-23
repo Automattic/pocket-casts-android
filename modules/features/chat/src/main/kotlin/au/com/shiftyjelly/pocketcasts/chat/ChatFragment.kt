@@ -46,7 +46,12 @@ class ChatFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setEpisodeInfo(args.episodeTitle, args.episodeSubtitle, args.podcastUuid)
+        viewModel.setEpisodeInfo(
+            args.episodeTitle,
+            args.episodeSubtitle,
+            args.podcastUuid,
+            getString(au.com.shiftyjelly.pocketcasts.localization.R.string.chat_preview_ai_1),
+        )
     }
 
     override fun onCreateView(
@@ -72,8 +77,10 @@ class ChatFragment : BaseDialogFragment() {
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         bottomSheetView()?.let { bottomSheet ->
             val behavior = BottomSheetBehavior.from(bottomSheet)
             behavior.isDraggable = false

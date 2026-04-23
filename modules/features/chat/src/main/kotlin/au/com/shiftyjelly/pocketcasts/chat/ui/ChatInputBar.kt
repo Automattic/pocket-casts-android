@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
@@ -39,6 +40,8 @@ internal fun ChatInputBar(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Column(
         modifier = modifier
             .background(theme.background)
@@ -56,7 +59,10 @@ internal fun ChatInputBar(
                 onValueChange = onTextChange,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(onSend = { onSend() }),
+                keyboardActions = KeyboardActions(onSend = {
+                    onSend()
+                    keyboardController?.hide()
+                }),
                 textStyle = TextStyle(
                     color = theme.inputText,
                     fontSize = 16.sp,
@@ -81,7 +87,10 @@ internal fun ChatInputBar(
                 modifier = Modifier.weight(1f),
             )
             IconButton(
-                onClick = onSend,
+                onClick = {
+                    onSend()
+                    keyboardController?.hide()
+                },
                 enabled = text.isNotBlank(),
                 modifier = Modifier
                     .padding(start = 8.dp)
