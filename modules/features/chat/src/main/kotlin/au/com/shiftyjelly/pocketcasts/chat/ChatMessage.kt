@@ -8,23 +8,23 @@ data class ChatMessage(
     val role: ChatRole,
 )
 
-enum class ChatRole {
-    Ai,
-    User,
+enum class ChatRole(val value: String) {
+    Assistant("assistant"),
+    User("user"),
 }
 
 fun ChatMessage.toEntity(episodeUuid: String) = EpisodeChatMessage(
     uuid = UUID.randomUUID().toString(),
     episodeUuid = episodeUuid,
     text = text,
-    role = role.name.lowercase(),
+    role = role.value,
 )
 
 fun List<EpisodeChatMessage>.toChatMessages() = map { entity ->
     ChatMessage(
         text = entity.text,
         role = when (entity.role) {
-            "ai" -> ChatRole.Ai
+            ChatRole.Assistant.value -> ChatRole.Assistant
             else -> ChatRole.User
         },
     )

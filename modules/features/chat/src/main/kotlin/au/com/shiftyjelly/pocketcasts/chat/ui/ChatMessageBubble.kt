@@ -72,6 +72,29 @@ internal fun UserMessageBubble(
     }
 }
 
+@Composable
+internal fun ThinkingBubble(
+    podcastUuid: String?,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        if (podcastUuid != null) {
+            PodcastImage(
+                uuid = podcastUuid,
+                imageSize = 28.dp,
+                cornerSize = 14.dp,
+                elevation = null,
+            )
+        }
+        ChatTypingIndicator(theme = theme)
+    }
+}
+
 private val AiBubbleShape = RoundedCornerShape(
     topStart = 4.dp,
     topEnd = 16.dp,

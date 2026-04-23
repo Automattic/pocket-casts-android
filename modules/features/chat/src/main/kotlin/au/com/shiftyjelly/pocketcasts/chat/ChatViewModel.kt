@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -20,6 +23,7 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var sendJob: Job? = null
     private lateinit var episodeUuid: String
     private lateinit var welcomeMessageText: String
 
@@ -65,7 +69,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val existing = chatManager.getMessages(episodeUuid)
             if (existing.isEmpty()) {
-                val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Ai)
+                val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Assistant)
                 chatManager.createChat(episodeUuid, podcastUuid, welcomeMsg)
             }
         }
@@ -76,8 +80,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun clearChat() {
+        sendJob?.cancel()
+        _uiState.update { it.copy(isAwaitingReply = false, error = null) }
         viewModelScope.launch {
-            val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Ai)
+            val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Assistant)
             chatManager.clearMessages(episodeUuid, welcomeMsg)
         }
     }
@@ -86,10 +92,25 @@ class ChatViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
         if (text.isEmpty()) return
 
-        _uiState.update { it.copy(inputText = "") }
-        viewModelScope.launch {
-            val userMessage = ChatMessage(text = text, role = ChatRole.User)
-            chatManager.saveMessage(episodeUuid, userMessage)
+        val podcastUuid = _uiState.value.podcastUuid ?: return
+        val currentMessages = _uiState.value.messages
+
+        _uiState.update { it.copy(inputText = "", isAwaitingReply = true, error = null) }
+
+        sendJob = viewModelScope.launch {
+            try {
+                val userMessage = ChatMessage(text = text, role = ChatRole.User)
+                chatManager.sendMessage(episodeUuid, podcastUuid, userMessage, currentMessages)
+            } catch (e: HttpException) {
+                val error = if (e.code() == 404) ChatError.NoTranscript else ChatError.ServerError
+                _uiState.update { it.copy(error = error) }
+            } catch (e: IOException) {
+                _uiState.update { it.copy(error = ChatError.NetworkError) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = ChatError.ServerError) }
+            } finally {
+                _uiState.update { it.copy(isAwaitingReply = false) }
+            }
         }
     }
 }
@@ -101,6 +122,8 @@ data class ChatUiState(
     val podcastUuid: String? = null,
     val messages: List<ChatMessage> = emptyList(),
     val isConnected: Boolean = true,
+    val isAwaitingReply: Boolean = false,
+    val error: ChatError? = null,
 ) {
-    val canSend: Boolean get() = inputText.isNotBlank() && isConnected
+    val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 }

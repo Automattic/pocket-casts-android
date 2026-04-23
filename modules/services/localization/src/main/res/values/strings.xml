@@ -2366,6 +2366,9 @@
     <string name="chat_input_hint">Ask about this episode…</string>
     <string name="chat_send">Send</string>
     <string name="chat_clear">Clear Chat</string>
+    <string name="chat_error_no_transcript">No transcript available for this episode.</string>
+    <string name="chat_error_server">Something went wrong. Please try again.</string>
+    <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
