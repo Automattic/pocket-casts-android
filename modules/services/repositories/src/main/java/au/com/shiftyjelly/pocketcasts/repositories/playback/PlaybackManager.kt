@@ -99,6 +99,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -1307,6 +1308,16 @@ open class PlaybackManager @Inject constructor(
 
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
 
+        // If a downloaded episode's file is missing, clear the stale download status
+        // and retry playback via streaming instead of leaving the user stuck.
+        if (episode != null && episode.isDownloaded && episode.downloadUrl != null && isDownloadedFileMissing(event)) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Downloaded file missing for ${episode.uuid}, clearing download status and retrying via stream")
+            downloadQueue.cancel(episode.uuid, SourceView.UNKNOWN).join()
+            episodeManager.clearPlaybackErrorBlocking(episode)
+            playNow(episode = episode, forceStream = true, sourceView = SourceView.UNKNOWN)
+            return
+        }
+
         val currentEpisode = getCurrentEpisode()
         if (currentEpisode is BaseEpisode) {
             episodeManager.markAsPlaybackErrorBlocking(currentEpisode, event, isPlaybackRemote())
@@ -1363,6 +1374,15 @@ open class PlaybackManager @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun isDownloadedFileMissing(event: PlayerEvent.PlayerError): Boolean {
+        var cause: Throwable? = event.error
+        while (cause != null) {
+            if (cause is FileNotFoundException) return true
+            cause = cause.cause
+        }
+        return false
     }
 
     @OptIn(UnstableApi::class)

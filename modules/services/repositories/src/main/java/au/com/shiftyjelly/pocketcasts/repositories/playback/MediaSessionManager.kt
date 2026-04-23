@@ -192,7 +192,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @Suppress("UnsafeOptInUsageError")
     private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
-        Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
+        Media3AutomotiveStrategy(::useCustomSkipButtons)
     } else {
         null
     }

@@ -14,9 +14,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @UnstableApi
 internal class Media3AutomotiveStrategy(
     private val useCustomSkipButtons: () -> Boolean,
-    private val speedToDrawable: (Double) -> Int,
-    @Suppress("unused") private val skipBackIconForDuration: (Int) -> Int,
-    @Suppress("unused") private val skipForwardIconForDuration: (Int) -> Int,
 ) : AutomotiveSessionStrategy {
 
     override fun buildLayout(
@@ -25,19 +22,18 @@ internal class Media3AutomotiveStrategy(
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
     ): AutomotiveSessionStrategy.ButtonLayout {
-        val primaryButtons = mutableListOf<CommandButton>()
-        val overflowButtons = mutableListOf<CommandButton>()
+        val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
 
         if (useCustomSkipButtons()) {
-            primaryButtons.add(
+            buttons.add(
                 CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_back))
                     .setCustomIconResId(IR.drawable.media_skipback)
                     .build(),
             )
-            primaryButtons.add(
+            buttons.add(
                 CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_forward))
@@ -46,21 +42,11 @@ internal class Media3AutomotiveStrategy(
             )
         }
 
-        primaryButtons.add(
-            CommandButton.Builder(CommandButton.ICON_UNDEFINED)
-                .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
-                .setDisplayName(context.getString(LR.string.playback_speed))
-                .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
-                .build(),
-        )
-
         val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
         settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
-            if (mediaControl != MediaNotificationControls.PlaybackSpeed) {
-                buildCustomActionButton(mediaControl, currentEpisode)?.let(overflowButtons::add)
-            }
+            buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
         }
 
-        return AutomotiveSessionStrategy.ButtonLayout(primaryButtons, overflowButtons)
+        return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = buttons, overflowButtons = emptyList())
     }
 }
