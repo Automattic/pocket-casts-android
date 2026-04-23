@@ -2,28 +2,24 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.images.icons.IconChat
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 
 @Composable
 internal fun AiMessageBubble(
     text: String,
+    podcastUuid: String?,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -32,7 +28,14 @@ internal fun AiMessageBubble(
         verticalAlignment = Alignment.Top,
         modifier = modifier.fillMaxWidth(),
     ) {
-        AiAvatar(theme = theme)
+        if (podcastUuid != null) {
+            PodcastImage(
+                uuid = podcastUuid,
+                imageSize = 28.dp,
+                cornerSize = 14.dp,
+                elevation = null,
+            )
+        }
         Text(
             text = text,
             color = theme.aiBubbleText,
@@ -65,27 +68,6 @@ internal fun UserMessageBubble(
                 .widthIn(max = 300.dp)
                 .background(theme.userBubble, UserBubbleShape)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
-        )
-    }
-}
-
-@Composable
-internal fun AiAvatar(
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .size(28.dp)
-            .clip(CircleShape)
-            .background(theme.aiBubble),
-    ) {
-        Icon(
-            imageVector = IconChat,
-            contentDescription = null,
-            tint = theme.aiBubbleText,
-            modifier = Modifier.size(16.dp),
         )
     }
 }

@@ -47,7 +47,7 @@ fun ChatScreen(
         ) {
             uiState.messages.forEach { message ->
                 when (message.role) {
-                    ChatRole.Ai -> AiMessageBubble(text = message.text, theme = theme)
+                    ChatRole.Ai -> AiMessageBubble(text = message.text, podcastUuid = uiState.podcastUuid, theme = theme)
                     ChatRole.User -> UserMessageBubble(text = message.text, theme = theme)
                 }
             }
