@@ -99,6 +99,7 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.ExpandableText
@@ -328,7 +329,7 @@ private fun PodcastCategoriesLabel(
     explicit: Boolean,
     onClickCategory: () -> Unit,
 ) {
-    val showExplicitIndicator = FeatureFlag.isEnabled(Feature.EXPLICIT_PODCAST_INDICATOR)
+    val showExplicitIndicator by FeatureFlag.isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR).collectAsStateWithLifecycle()
     val text = remember(category, author, explicit, onClickCategory, showExplicitIndicator) {
         val text = listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
         buildAnnotatedString {
@@ -349,7 +350,7 @@ private fun PodcastCategoriesLabel(
             }
             if (showExplicitIndicator && explicit) {
                 if (text.isNotBlank() || category.isNotBlank()) {
-                    append(" · ")
+                    append(" · ")
                 }
                 appendInlineContent("explicit")
             }
@@ -364,11 +365,15 @@ private fun PodcastCategoriesLabel(
         inlineContent = if (showExplicitIndicator && explicit) {
             mapOf(
                 "explicit" to InlineTextContent(Placeholder(13.sp, 13.sp, PlaceholderVerticalAlign.TextCenter)) {
-                    Image(
+                    val explicitDescription = stringResource(LR.string.explicit)
+                    Icon(
                         painter = painterResource(IR.drawable.explicit),
-                        colorFilter = ColorFilter.tint(iconColor),
-                        contentDescription = stringResource(LR.string.explicit),
-                        modifier = Modifier.fillMaxSize(),
+                        tint = iconColor,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            // Use this instead of contentDescription so TalkBack only says "Explicit" and doesn't say "Image"
+                            .clearAndSetSemantics { contentDescription = explicitDescription },
                     )
                 },
             )
