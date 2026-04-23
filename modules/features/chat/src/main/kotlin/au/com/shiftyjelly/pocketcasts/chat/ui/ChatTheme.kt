@@ -13,6 +13,10 @@ internal data class ChatTheme(
     val primaryText: Color,
     val secondaryText: Color,
     val iconButton: Color,
+    val aiBubble: Color,
+    val aiBubbleText: Color,
+    val userBubble: Color,
+    val userBubbleText: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -20,6 +24,10 @@ internal data class ChatTheme(
             primaryText = colors.primaryText01,
             secondaryText = colors.primaryText02,
             iconButton = colors.primaryIcon01,
+            aiBubble = colors.primaryUi05,
+            aiBubbleText = colors.primaryText01,
+            userBubble = colors.primaryInteractive01,
+            userBubbleText = colors.primaryInteractive02,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -27,6 +35,10 @@ internal data class ChatTheme(
             primaryText = colors.contrast02,
             secondaryText = colors.contrast04,
             iconButton = colors.contrast02,
+            aiBubble = colors.contrast05,
+            aiBubbleText = colors.contrast02,
+            userBubble = colors.contrast01,
+            userBubbleText = colors.background01,
         )
     }
 }
