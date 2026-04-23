@@ -15,7 +15,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -30,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ChatToolbar(
     episodeTitle: String,
+    episodeSubtitle: String,
     podcastUuid: String?,
     onClickBack: () -> Unit,
     theme: ChatTheme,
@@ -75,7 +75,13 @@ internal fun ChatToolbar(
                 ),
             )
             Text(
-                text = episodeTitle,
+                text = buildString {
+                    if (episodeSubtitle.isNotEmpty()) {
+                        append(episodeSubtitle)
+                        append(" · ")
+                    }
+                    append(episodeTitle)
+                },
                 color = theme.secondaryText,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

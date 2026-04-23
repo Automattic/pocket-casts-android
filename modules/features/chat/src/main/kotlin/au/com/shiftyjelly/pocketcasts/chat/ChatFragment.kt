@@ -32,9 +32,10 @@ class ChatFragment : BaseDialogFragment() {
             episodeUuid: String,
             podcastUuid: String?,
             episodeTitle: String,
+            episodeSubtitle: String,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid, episodeTitle))
+                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid, episodeTitle, episodeSubtitle))
             }
         }
     }
@@ -45,7 +46,7 @@ class ChatFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setEpisodeInfo(args.episodeTitle, args.podcastUuid)
+        viewModel.setEpisodeInfo(args.episodeTitle, args.episodeSubtitle, args.podcastUuid)
     }
 
     override fun onCreateView(
@@ -85,5 +86,6 @@ class ChatFragment : BaseDialogFragment() {
         val episodeUuid: String,
         val podcastUuid: String?,
         val episodeTitle: String,
+        val episodeSubtitle: String,
     ) : Parcelable
 }

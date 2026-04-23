@@ -13,8 +13,8 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun setEpisodeInfo(episodeTitle: String, podcastUuid: String?) {
-        _uiState.update { it.copy(episodeTitle = episodeTitle, podcastUuid = podcastUuid) }
+    fun setEpisodeInfo(episodeTitle: String, episodeSubtitle: String, podcastUuid: String?) {
+        _uiState.update { it.copy(episodeTitle = episodeTitle, episodeSubtitle = episodeSubtitle, podcastUuid = podcastUuid) }
     }
 
     fun onInputTextChange(text: String) {
@@ -33,5 +33,6 @@ class ChatViewModel @Inject constructor() : ViewModel() {
 data class ChatUiState(
     val inputText: String = "",
     val episodeTitle: String = "",
+    val episodeSubtitle: String = "",
     val podcastUuid: String? = null,
 )

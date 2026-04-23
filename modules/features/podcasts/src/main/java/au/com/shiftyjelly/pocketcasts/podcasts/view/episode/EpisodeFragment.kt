@@ -622,11 +622,13 @@ class EpisodeFragment : BaseFragment() {
                                             onClickLabel = stringResource(LR.string.episode_chat),
                                             onClick = {
 //                                                if (isPlusUser) {
+                                                    val episode = viewModel.episode ?: return@clickable
                                                     if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                                                         val fragment = ChatFragment.newInstance(
                                                             episodeUuid,
                                                             podcastUuid,
-                                                            viewModel.episode?.title.orEmpty(),
+                                                            episode.title,
+                                                            PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
                                                         )
                                                         fragment.show(parentFragmentManager, "episode_chat")
                                                     }

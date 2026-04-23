@@ -31,6 +31,7 @@ fun ChatScreen(
     ) {
         ChatToolbar(
             episodeTitle = uiState.episodeTitle,
+            episodeSubtitle = uiState.episodeSubtitle,
             podcastUuid = uiState.podcastUuid,
             onClickBack = onClickClose,
             theme = theme,
