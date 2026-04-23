@@ -4,11 +4,17 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Singleton
 class ChatManager @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
 ) {
+
+    fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
+        return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages() }
+    }
 
     suspend fun getMessages(episodeUuid: String): List<ChatMessage> {
         return episodeChatDao.getMessages(episodeUuid).toChatMessages()

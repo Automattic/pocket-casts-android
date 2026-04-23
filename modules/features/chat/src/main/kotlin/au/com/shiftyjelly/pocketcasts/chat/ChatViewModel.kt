@@ -49,17 +49,23 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
             )
         }
-        loadChat(podcastUuid)
+        observeMessages()
+        ensureChatExists(podcastUuid)
     }
 
-    private fun loadChat(podcastUuid: String?) {
+    private fun observeMessages() {
         viewModelScope.launch {
-            val existingMessages = chatManager.getMessages(episodeUuid)
-            if (existingMessages.isNotEmpty()) {
-                _uiState.update { it.copy(messages = existingMessages) }
-            } else {
+            chatManager.observeMessages(episodeUuid).collect { messages ->
+                _uiState.update { it.copy(messages = messages) }
+            }
+        }
+    }
+
+    private fun ensureChatExists(podcastUuid: String?) {
+        viewModelScope.launch {
+            val existing = chatManager.getMessages(episodeUuid)
+            if (existing.isEmpty()) {
                 val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Ai)
-                _uiState.update { it.copy(messages = listOf(welcomeMsg)) }
                 chatManager.createChat(episodeUuid, podcastUuid, welcomeMsg)
             }
         }
@@ -70,9 +76,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun clearChat() {
-        val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Ai)
-        _uiState.update { it.copy(messages = listOf(welcomeMsg)) }
         viewModelScope.launch {
+            val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Ai)
             chatManager.clearMessages(episodeUuid, welcomeMsg)
         }
     }
@@ -81,9 +86,9 @@ class ChatViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
         if (text.isEmpty()) return
 
-        val userMessage = ChatMessage(text = text, role = ChatRole.User)
-        _uiState.update { it.copy(inputText = "", messages = it.messages + userMessage) }
+        _uiState.update { it.copy(inputText = "") }
         viewModelScope.launch {
+            val userMessage = ChatMessage(text = text, role = ChatRole.User)
             chatManager.saveMessage(episodeUuid, userMessage)
         }
     }
