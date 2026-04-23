@@ -164,13 +164,7 @@ class PocketCastsForwardingPlayer(
         return if (allItems.isEmpty()) Timeline.EMPTY else QueueTimeline(allItems)
     }
 
-    override fun getCurrentMediaItemIndex(): Int {
-        // Per Player contract, return C.INDEX_UNSET when there's no current window.
-        // Returning 0 would make controllers think the first queue item is currently
-        // playing when playback is idle, and prevents the legacy bridge from setting
-        // a valid active queue item id (breaks Wear OS Up Next affordance).
-        return if (currentMediaItem == MediaItem.EMPTY) C.INDEX_UNSET else 0
-    }
+    override fun getCurrentMediaItemIndex(): Int = 0
 
     override fun getMediaItemCount(): Int = currentTimeline.windowCount
 

@@ -681,8 +681,8 @@ class PocketCastsForwardingPlayerTest {
     // --- Queue / timeline tests ---
 
     @Test
-    fun `getCurrentMediaItemIndex returns INDEX_UNSET when no current item`() {
-        assertEquals(C.INDEX_UNSET, forwardingPlayer.currentMediaItemIndex)
+    fun `getCurrentMediaItemIndex returns zero when no current item`() {
+        assertEquals(0, forwardingPlayer.currentMediaItemIndex)
     }
 
     @Test
