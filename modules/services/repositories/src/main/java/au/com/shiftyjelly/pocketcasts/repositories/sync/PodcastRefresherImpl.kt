@@ -128,7 +128,8 @@ class PodcastRefresherImpl @Inject constructor(
             existingPodcast.estimatedNextEpisode != updatedPodcast.estimatedNextEpisode ||
             existingPodcast.episodeFrequency != updatedPodcast.episodeFrequency ||
             existingPodcast.refreshAvailable != updatedPodcast.refreshAvailable ||
-            existingPodcast.fundingUrl != updatedPodcast.fundingUrl
+            existingPodcast.fundingUrl != updatedPodcast.fundingUrl ||
+            existingPodcast.explicit != updatedPodcast.explicit
         ) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh required update for podcast ${existingPodcast.uuid}")
             appDatabase.podcastDao().updateRefresh(
@@ -141,6 +142,7 @@ class PodcastRefresherImpl @Inject constructor(
                 episodeFrequency = updatedPodcast.episodeFrequency,
                 refreshAvailable = updatedPodcast.refreshAvailable,
                 fundingUrl = updatedPodcast.fundingUrl,
+                explicit = updatedPodcast.explicit,
             )
         }
     }
