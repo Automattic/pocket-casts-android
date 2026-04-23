@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.chat.ChatRole
@@ -23,6 +24,11 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(uiState.messages.size, scrollState.maxValue) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
 
     Column(
         modifier = modifier
@@ -42,7 +48,7 @@ fun ChatScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             uiState.messages.forEach { message ->
