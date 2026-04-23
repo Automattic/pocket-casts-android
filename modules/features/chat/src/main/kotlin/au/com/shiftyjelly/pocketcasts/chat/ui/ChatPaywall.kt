@@ -9,7 +9,6 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,22 +18,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -73,31 +75,39 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun ChatPaywall(
-    isFreeTrialAvailable: Boolean,
+fun ChatPaywallPage(
+    uiState: ChatPaywallUiState,
+    onClickClose: () -> Unit,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
-    theme: ChatTheme = ChatTheme.default(MaterialTheme.theme.colors),
     contentPadding: PaddingValues = PaddingValues(16.dp),
 ) {
+    val theme = rememberChatTheme()
     val startPadding = contentPadding.calculateStartPadding(LocalLayoutDirection.current)
     val endPadding = contentPadding.calculateEndPadding(LocalLayoutDirection.current)
     val bottomPadding = contentPadding.calculateBottomPadding()
     val topPadding = contentPadding.calculateTopPadding()
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable(indication = null, interactionSource = null, onClick = {})
-            .verticalScroll(rememberScrollState())
-            .then(modifier),
+        modifier = modifier.background(theme.background),
     ) {
+        IconButton(
+            onClick = onClickClose,
+            modifier = Modifier
+                .padding(start = 8.dp, top = 8.dp)
+                .offset(x = -4.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(LR.string.close),
+                tint = theme.iconButton,
+            )
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(theme.background)
                 .padding(top = topPadding, start = startPadding, end = endPadding),
         ) {
             SubscriptionBadge(
@@ -130,6 +140,7 @@ internal fun ChatPaywall(
                 textAlign = TextAlign.Center,
             )
         }
+
         val gradientBrush = remember(theme.background) {
             val colorsStops = arrayOf(
                 0.0f to theme.background,
@@ -152,7 +163,7 @@ internal fun ChatPaywall(
             LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
         ) {
             RowButton(
-                text = if (isFreeTrialAvailable) {
+                text = if (uiState.isFreeTrialAvailable) {
                     stringResource(LR.string.profile_start_free_trial)
                 } else {
                     stringResource(LR.string.onboarding_subscribe_to_plus)
@@ -372,8 +383,9 @@ private fun ChatPaywallPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        ChatPaywall(
-            isFreeTrialAvailable = true,
+        ChatPaywallPage(
+            uiState = ChatPaywallUiState(),
+            onClickClose = {},
             onClickSubscribe = {},
         )
     }

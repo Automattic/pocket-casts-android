@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatPage
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatPaywallPage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -22,14 +22,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
-class ChatFragment : BaseDialogFragment() {
+class ChatPaywallFragment : BaseDialogFragment() {
     companion object {
-        private const val ARGS_KEY = "chat_args"
+        private const val ARGS_KEY = "chat_paywall_args"
 
         fun newInstance(
             episodeUuid: String,
             podcastUuid: String?,
-        ) = ChatFragment().apply {
+        ) = ChatPaywallFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid))
             }
@@ -38,7 +38,7 @@ class ChatFragment : BaseDialogFragment() {
 
     private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
 
-    private val viewModel by viewModels<ChatViewModel>()
+    private val viewModel by viewModels<ChatPaywallViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +48,7 @@ class ChatFragment : BaseDialogFragment() {
         DialogBox {
             val uiState by viewModel.uiState.collectAsState()
 
-            ChatPage(
+            ChatPaywallPage(
                 uiState = uiState,
                 onClickClose = { dismiss() },
                 onClickSubscribe = {
@@ -57,13 +57,7 @@ class ChatFragment : BaseDialogFragment() {
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.UNKNOWN),
                     )
                 },
-                onShowChat = {
-                    // TODO: Analytics for chat shown
-                },
-                onShowChatPaywall = {
-                    // TODO: Analytics for chat paywall shown
-                },
-                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 modifier = Modifier.fillMaxWidth(),
             )
         }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -52,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
-import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
+import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
@@ -610,6 +611,8 @@ class EpisodeFragment : BaseFragment() {
                                     ),
                             )
                             if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
+                                val isPlusUser by viewModel.isPlusUser.collectAsState()
+
                                 ChatBanner(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -617,9 +620,13 @@ class EpisodeFragment : BaseFragment() {
                                             role = Role.Button,
                                             onClickLabel = stringResource(LR.string.episode_chat),
                                             onClick = {
-                                                if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
-                                                    val fragment = ChatFragment.newInstance(episodeUuid, podcastUuid)
-                                                    fragment.show(parentFragmentManager, "episode_chat")
+                                                if (isPlusUser) {
+                                                    // TODO: Open chat fragment
+                                                } else {
+                                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
+                                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
+                                                    }
                                                 }
                                             },
                                         ),

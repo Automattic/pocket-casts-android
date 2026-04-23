@@ -7,22 +7,19 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(
-    private val userManager: UserManager,
+class ChatPaywallViewModel @Inject constructor(
     private val paymentClient: PaymentClient,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ChatUiState())
+    private val _uiState = MutableStateFlow(ChatPaywallUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -33,19 +30,9 @@ class ChatViewModel @Inject constructor(
                 state.copy(isFreeTrialAvailable = trialOffer != null)
             }
         }
-        viewModelScope.launch {
-            userManager.getSignInState().asFlow().collect { signInState ->
-                _uiState.update { state ->
-                    state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
-                }
-            }
-        }
     }
 }
 
-data class ChatUiState(
-    val isPlusUser: Boolean = false,
+data class ChatPaywallUiState(
     val isFreeTrialAvailable: Boolean = false,
-) {
-    val isPaywallVisible get() = !isPlusUser
-}
+)
