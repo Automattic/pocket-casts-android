@@ -1,24 +1,25 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 
 @Composable
 fun ChatScreen(
-    episodeUuid: String,
+    uiState: ChatUiState,
     onClickClose: () -> Unit,
+    onInputTextChange: (String) -> Unit,
+    onSend: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
@@ -28,19 +29,29 @@ fun ChatScreen(
             .fillMaxSize()
             .background(theme.background),
     ) {
-        IconButton(
-            onClick = onClickClose,
+        ChatToolbar(
+            episodeTitle = uiState.episodeTitle,
+            podcastUuid = uiState.podcastUuid,
+            onClickBack = onClickClose,
+            theme = theme,
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .padding(start = 8.dp, top = 8.dp)
-                .offset(x = -4.dp),
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(LR.string.close),
-                tint = theme.iconButton,
-            )
+            // TODO: Render actual chat messages
+            Spacer(modifier = Modifier.height(1.dp))
         }
 
-        // TODO: Chat content
+        ChatInputBar(
+            text = uiState.inputText,
+            onTextChange = onInputTextChange,
+            onSend = onSend,
+            theme = theme,
+        )
     }
 }

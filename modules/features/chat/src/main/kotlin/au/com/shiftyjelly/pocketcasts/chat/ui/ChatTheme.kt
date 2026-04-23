@@ -17,6 +17,15 @@ internal data class ChatTheme(
     val aiBubbleText: Color,
     val userBubble: Color,
     val userBubbleText: Color,
+    val inputBackground: Color,
+    val inputText: Color,
+    val inputHint: Color,
+    val sendButton: Color,
+    val sendButtonIcon: Color,
+    val suggestionBackground: Color,
+    val suggestionText: Color,
+    val suggestionBorder: Color,
+    val divider: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -28,6 +37,15 @@ internal data class ChatTheme(
             aiBubbleText = colors.primaryText01,
             userBubble = colors.primaryInteractive01,
             userBubbleText = colors.primaryInteractive02,
+            inputBackground = colors.primaryField01,
+            inputText = colors.primaryText01,
+            inputHint = colors.primaryText02,
+            sendButton = colors.primaryInteractive01,
+            sendButtonIcon = colors.primaryInteractive02,
+            suggestionBackground = colors.primaryUi01,
+            suggestionText = colors.primaryText01,
+            suggestionBorder = colors.primaryUi05,
+            divider = colors.primaryUi05,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -39,6 +57,15 @@ internal data class ChatTheme(
             aiBubbleText = colors.contrast02,
             userBubble = colors.contrast01,
             userBubbleText = colors.background01,
+            inputBackground = colors.contrast05,
+            inputText = colors.contrast02,
+            inputHint = colors.contrast04,
+            sendButton = colors.contrast01,
+            sendButtonIcon = colors.background01,
+            suggestionBackground = colors.background01,
+            suggestionText = colors.contrast02,
+            suggestionBorder = colors.contrast05,
+            divider = colors.contrast05,
         )
     }
 }

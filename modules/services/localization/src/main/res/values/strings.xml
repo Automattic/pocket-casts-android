@@ -2364,8 +2364,10 @@
     <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
     <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
 
-    <!--    Tasker Plugin-->
+    <string name="chat_input_hint">Ask about this episode…</string>
+    <string name="chat_send">Send</string>
 
+    <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
     <string name="filter_x_not_found">Playlist %1$s not found</string>
     <string name="no_episodes_in_filter_x">No episodes in playlist %1$s</string>

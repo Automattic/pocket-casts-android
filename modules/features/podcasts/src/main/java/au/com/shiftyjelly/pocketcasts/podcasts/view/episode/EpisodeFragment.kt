@@ -621,17 +621,21 @@ class EpisodeFragment : BaseFragment() {
                                             role = Role.Button,
                                             onClickLabel = stringResource(LR.string.episode_chat),
                                             onClick = {
-                                                if (isPlusUser) {
+//                                                if (isPlusUser) {
                                                     if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
-                                                        val fragment = ChatFragment.newInstance(episodeUuid, podcastUuid)
+                                                        val fragment = ChatFragment.newInstance(
+                                                            episodeUuid,
+                                                            podcastUuid,
+                                                            viewModel.episode?.title.orEmpty(),
+                                                        )
                                                         fragment.show(parentFragmentManager, "episode_chat")
                                                     }
-                                                } else {
-                                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
-                                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
-                                                    }
-                                                }
+//                                                } else {
+//                                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
+//                                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+//                                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
+//                                                    }
+//                                                }
                                             },
                                         ),
                                 )
