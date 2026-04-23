@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -79,6 +80,9 @@ object ModelModule {
 
     @Provides
     fun userCategoryVisits(database: AppDatabase): UserCategoryVisitsDao = database.userCategoryVisitsDao()
+
+    @Provides
+    fun provideEpisodeChatDao(database: AppDatabase): EpisodeChatDao = database.episodeChatDao()
 }
 
 @Qualifier

@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BlazeAdDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
@@ -58,6 +59,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -106,13 +109,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserCategoryVisits::class,
         ManualPlaylistEpisode::class,
         BlazeAd::class,
+        EpisodeChat::class,
+        EpisodeChatMessage::class,
     ],
-    version = 125,
+    version = 126,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
         AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
+        AutoMigration(from = 125, to = 126),
     ],
 )
 @TypeConverters(
@@ -159,6 +165,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userNotificationsDao(): UserNotificationsDao
     abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
     abstract fun blazeAdDao(): BlazeAdDao
+    abstract fun episodeChatDao(): EpisodeChatDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
         listOf(

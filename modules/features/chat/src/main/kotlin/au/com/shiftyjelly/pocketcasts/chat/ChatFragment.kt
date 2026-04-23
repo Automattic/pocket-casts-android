@@ -50,10 +50,11 @@ class ChatFragment : BaseDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.setEpisodeInfo(
-            args.episodeTitle,
-            args.episodeSubtitle,
-            args.podcastUuid,
-            getString(LR.string.chat_preview_ai_1),
+            episodeUuid = args.episodeUuid,
+            episodeTitle = args.episodeTitle,
+            episodeSubtitle = args.episodeSubtitle,
+            podcastUuid = args.podcastUuid,
+            welcomeMessage = getString(LR.string.chat_preview_ai_1),
         )
     }
 
