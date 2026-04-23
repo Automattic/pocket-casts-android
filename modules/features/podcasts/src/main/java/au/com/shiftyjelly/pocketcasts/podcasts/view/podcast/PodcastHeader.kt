@@ -329,7 +329,7 @@ private fun PodcastCategoriesLabel(
     onClickCategory: () -> Unit,
 ) {
     val showExplicitIndicator = FeatureFlag.isEnabled(Feature.EXPLICIT_PODCAST_INDICATOR)
-    val text = remember(category, author, onClickCategory, showExplicitIndicator) {
+    val text = remember(category, author, explicit, onClickCategory, showExplicitIndicator) {
         val text = listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
         buildAnnotatedString {
             append(text)
@@ -348,7 +348,7 @@ private fun PodcastCategoriesLabel(
                 )
             }
             if (showExplicitIndicator && explicit) {
-                if (text.isNotBlank() && category.isNotBlank()) {
+                if (text.isNotBlank() || category.isNotBlank()) {
                     append(" · ")
                 }
                 appendInlineContent("explicit")
