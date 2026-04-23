@@ -29,19 +29,26 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    private lateinit var welcomeMessage: ChatMessage
+
     fun setEpisodeInfo(episodeTitle: String, episodeSubtitle: String, podcastUuid: String?, welcomeMessage: String) {
+        this.welcomeMessage = ChatMessage(text = welcomeMessage, role = ChatRole.Ai)
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
                 episodeSubtitle = episodeSubtitle,
                 podcastUuid = podcastUuid,
-                messages = listOf(ChatMessage(text = welcomeMessage, role = ChatRole.Ai)),
+                messages = listOf(this.welcomeMessage),
             )
         }
     }
 
     fun onInputTextChange(text: String) {
         _uiState.update { it.copy(inputText = text) }
+    }
+
+    fun clearChat() {
+        _uiState.update { it.copy(messages = listOf(welcomeMessage)) }
     }
 
     fun onSend() {

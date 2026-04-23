@@ -18,7 +18,10 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
@@ -50,7 +53,7 @@ class ChatFragment : BaseDialogFragment() {
             args.episodeTitle,
             args.episodeSubtitle,
             args.podcastUuid,
-            getString(au.com.shiftyjelly.pocketcasts.localization.R.string.chat_preview_ai_1),
+            getString(LR.string.chat_preview_ai_1),
         )
     }
 
@@ -70,11 +73,22 @@ class ChatFragment : BaseDialogFragment() {
             ChatScreen(
                 uiState = uiState,
                 onClickClose = { dismiss() },
+                onClickMore = ::showOptionsDialog,
                 onInputTextChange = viewModel::onInputTextChange,
                 onSend = viewModel::onSend,
                 modifier = Modifier.fillMaxSize(),
             )
         }
+    }
+
+    private fun showOptionsDialog() {
+        OptionsDialog()
+            .addTextOption(
+                titleId = LR.string.chat_clear,
+                imageId = IR.drawable.ic_delete,
+                click = { viewModel.clearChat() },
+            )
+            .show(parentFragmentManager, "chat_options")
     }
 
     @Suppress("DEPRECATION")

@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
+    onClickMore: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     modifier: Modifier = Modifier,
@@ -41,6 +42,7 @@ fun ChatScreen(
             episodeSubtitle = uiState.episodeSubtitle,
             podcastUuid = uiState.podcastUuid,
             onClickBack = onClickClose,
+            onClickMore = onClickMore,
             theme = theme,
         )
 

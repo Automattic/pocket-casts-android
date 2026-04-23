@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -32,6 +34,7 @@ internal fun ChatToolbar(
     episodeSubtitle: String,
     podcastUuid: String?,
     onClickBack: () -> Unit,
+    onClickMore: () -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -94,6 +97,13 @@ internal fun ChatToolbar(
                         trim = LineHeightStyle.Trim.Both,
                     ),
                 ),
+            )
+        }
+        IconButton(onClick = onClickMore, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
+                contentDescription = stringResource(LR.string.more_options),
+                tint = theme.iconButton,
             )
         }
     }

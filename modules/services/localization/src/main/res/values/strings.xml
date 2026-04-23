@@ -2357,15 +2357,15 @@
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
 
-    <!-- Transcripts -->
+    <!-- Chat -->
     <string name="chat_paywall_title">Chat with this episode</string>
     <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
     <string name="chat_preview_user_1">What was the main topic of this episode?</string>
     <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
     <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
-
     <string name="chat_input_hint">Ask about this episode…</string>
     <string name="chat_send">Send</string>
+    <string name="chat_clear">Clear Chat</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
