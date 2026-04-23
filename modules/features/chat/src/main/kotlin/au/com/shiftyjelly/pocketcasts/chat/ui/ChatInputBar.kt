@@ -37,26 +37,41 @@ internal fun ChatInputBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    isConnected: Boolean,
+    canSend: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(theme.background)
             .navigationBarsPadding(),
     ) {
         Divider(color = theme.divider, thickness = 0.5.dp)
+        if (!isConnected) {
+            Text(
+                text = stringResource(LR.string.error_check_your_internet_connection),
+                color = theme.secondaryText,
+                fontSize = 13.sp,
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(
+                    start = 12.dp,
+                    end = 12.dp,
+                    bottom = 8.dp
+                ),
         ) {
             BasicTextField(
                 value = text,
                 onValueChange = onTextChange,
+                enabled = isConnected,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
@@ -91,20 +106,20 @@ internal fun ChatInputBar(
                     onSend()
                     keyboardController?.hide()
                 },
-                enabled = text.isNotBlank(),
+                enabled = canSend,
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(
-                        if (text.isNotBlank()) theme.sendButton else theme.divider,
+                        if (canSend) theme.sendButton else theme.divider,
                         CircleShape,
                     ),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = stringResource(LR.string.chat_send),
-                    tint = if (text.isNotBlank()) theme.sendButtonIcon else theme.inputHint,
+                    tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
                     modifier = Modifier.size(18.dp),
                 )
             }

@@ -63,6 +63,8 @@ fun ChatScreen(
             text = uiState.inputText,
             onTextChange = onInputTextChange,
             onSend = onSend,
+            isConnected = uiState.isConnected,
+            canSend = uiState.canSend,
             theme = theme,
         )
     }

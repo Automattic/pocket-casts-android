@@ -1,17 +1,33 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
+import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
-class ChatViewModel @Inject constructor() : ViewModel() {
+class ChatViewModel @Inject constructor(
+    private val networkConnectionWatcher: NetworkConnectionWatcher,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            networkConnectionWatcher.networkCapabilities.collect { capabilities ->
+                val isConnected = capabilities != null &&
+                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                _uiState.update { it.copy(isConnected = isConnected) }
+            }
+        }
+    }
 
     fun setEpisodeInfo(episodeTitle: String, episodeSubtitle: String, podcastUuid: String?, welcomeMessage: String) {
         _uiState.update {
@@ -44,7 +60,10 @@ data class ChatUiState(
     val episodeSubtitle: String = "",
     val podcastUuid: String? = null,
     val messages: List<ChatMessage> = emptyList(),
-)
+    val isConnected: Boolean = true,
+) {
+    val canSend: Boolean get() = inputText.isNotBlank() && isConnected
+}
 
 data class ChatMessage(
     val text: String,
