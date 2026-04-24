@@ -47,6 +47,7 @@ data class PodcastInfo(
     @Json(name = "is_private") val isPrivate: Boolean?,
     @Json(name = "fundings") val fundings: List<Funding>?,
     @Json(name = "slug") val slug: String?,
+    @Json(name = "explicit") val explicit: Boolean?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -65,6 +66,7 @@ data class PodcastInfo(
         podcast.isPrivate = isPrivate ?: false
         podcast.fundingUrl = fundings?.firstOrNull()?.url
         podcast.slug = slug.orEmpty()
+        podcast.explicit = explicit
         return podcast
     }
 }

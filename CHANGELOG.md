@@ -1,5 +1,8 @@
 8.11
 -----
+*   New Features
+    *   Added explicit indicator to podcast page
+        ([#5243](https://github.com/Automattic/pocket-casts-android/pull/5243))
 *   Updates
     *   Make sure archived episode status is preserved across sync
         ([#5227](https://github.com/Automattic/pocket-casts-android/pull/5227))
