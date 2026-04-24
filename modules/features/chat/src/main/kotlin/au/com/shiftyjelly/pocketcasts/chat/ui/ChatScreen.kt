@@ -29,6 +29,7 @@ fun ChatScreen(
     onClickMore: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
@@ -60,10 +61,15 @@ fun ChatScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            uiState.messages.forEach { message ->
+            uiState.messages.forEachIndexed { index, message ->
                 when (message.role) {
                     ChatRole.Assistant -> AiMessageBubble(text = message.text, podcastUuid = uiState.podcastUuid, theme = theme)
-                    ChatRole.User -> UserMessageBubble(text = message.text, theme = theme)
+                    ChatRole.User -> UserMessageBubble(
+                        text = message.text,
+                        theme = theme,
+                        allowRetry = index == uiState.messages.lastIndex && uiState.error != null,
+                        onRetry = onRetry,
+                    )
                 }
             }
             if (uiState.isAwaitingReply) {
@@ -92,7 +98,6 @@ private fun ChatErrorMessage(
     modifier: Modifier = Modifier,
 ) {
     val messageRes = when (error) {
-        ChatError.NoTranscript -> LR.string.chat_error_no_transcript
         ChatError.ServerError -> LR.string.chat_error_server
         ChatError.NetworkError -> LR.string.chat_error_network
     }

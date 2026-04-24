@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -92,18 +91,24 @@ class ChatViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
         if (text.isEmpty()) return
 
+        _uiState.update { it.copy(inputText = "") }
+        performSend(message = text, isRetry = false)
+    }
+
+    fun retry() {
+        val lastUserMessage = _uiState.value.messages.lastOrNull { it.role == ChatRole.User } ?: return
+        performSend(message = lastUserMessage.text, isRetry = true)
+    }
+
+    private fun performSend(message: String, isRetry: Boolean) {
         val podcastUuid = _uiState.value.podcastUuid ?: return
         val currentMessages = _uiState.value.messages
 
-        _uiState.update { it.copy(inputText = "", isAwaitingReply = true, error = null) }
+        _uiState.update { it.copy(isAwaitingReply = true, error = null) }
 
         sendJob = viewModelScope.launch {
             try {
-                val userMessage = ChatMessage(text = text, role = ChatRole.User)
-                chatManager.sendMessage(episodeUuid, podcastUuid, userMessage, currentMessages)
-            } catch (e: HttpException) {
-                val error = if (e.code() == 404) ChatError.NoTranscript else ChatError.ServerError
-                _uiState.update { it.copy(error = error) }
+                chatManager.sendMessage(episodeUuid, podcastUuid, message, currentMessages, isRetry)
             } catch (e: IOException) {
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: Exception) {

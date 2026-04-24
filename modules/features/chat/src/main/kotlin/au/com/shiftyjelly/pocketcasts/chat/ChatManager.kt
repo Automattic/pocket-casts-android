@@ -32,23 +32,26 @@ class ChatManager @Inject constructor(
     suspend fun sendMessage(
         episodeUuid: String,
         podcastUuid: String,
-        userMessage: ChatMessage,
+        message: String,
         allMessages: List<ChatMessage>,
+        isRetry: Boolean = false,
     ) {
-        episodeChatDao.insertMessage(userMessage.toEntity(episodeUuid))
+        if (!isRetry) {
+            val userMessage = ChatMessage(text = message, role = ChatRole.User)
+            episodeChatDao.insertMessage(userMessage.toEntity(episodeUuid))
+        }
 
-        val history = allMessages
-            .map { msg ->
-                ConversationMessage(
-                    role = msg.role.value,
-                    content = msg.text,
-                )
-            }
+        val history = allMessages.map { msg ->
+            ConversationMessage(
+                role = msg.role.value,
+                content = msg.text,
+            )
+        }
 
         val request = EpisodeChatRequest(
             episodeUuid = episodeUuid,
             podcastUuid = podcastUuid,
-            message = userMessage.text,
+            message = message,
             conversationHistory = history,
         )
 

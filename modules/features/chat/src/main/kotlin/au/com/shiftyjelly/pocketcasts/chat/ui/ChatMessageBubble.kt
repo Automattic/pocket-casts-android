@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +13,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AiMessageBubble(
@@ -54,21 +57,33 @@ internal fun UserMessageBubble(
     text: String,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    allowRetry: Boolean = false,
+    onRetry: () -> Unit = {},
 ) {
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
     ) {
+        val bubbleModifier = Modifier
+            .widthIn(max = 300.dp)
+            .then(if (allowRetry) Modifier.clickable(onClick = onRetry) else Modifier)
+            .background(theme.userBubble, UserBubbleShape)
+            .padding(horizontal = 14.dp, vertical = 10.dp)
         Text(
             text = text,
             color = theme.userBubbleText,
             fontSize = 15.sp,
             lineHeight = 22.sp,
-            modifier = Modifier
-                .widthIn(max = 300.dp)
-                .background(theme.userBubble, UserBubbleShape)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = bubbleModifier,
         )
+        if (allowRetry) {
+            Text(
+                text = stringResource(LR.string.chat_tap_to_retry),
+                color = theme.secondaryText,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
     }
 }
 

@@ -77,6 +77,7 @@ class ChatFragment : BaseDialogFragment() {
                 onClickMore = ::showOptionsDialog,
                 onInputTextChange = viewModel::onInputTextChange,
                 onSend = viewModel::onSend,
+                onRetry = viewModel::retry,
                 modifier = Modifier.fillMaxSize(),
             )
         }
