@@ -33,7 +33,7 @@ class ChatFragment : BaseDialogFragment() {
 
         fun newInstance(
             episodeUuid: String,
-            podcastUuid: String?,
+            podcastUuid: String,
             episodeTitle: String,
             episodeSubtitle: String,
         ) = ChatFragment().apply {
@@ -107,7 +107,7 @@ class ChatFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val episodeUuid: String,
-        val podcastUuid: String?,
+        val podcastUuid: String,
         val episodeTitle: String,
         val episodeSubtitle: String,
     ) : Parcelable

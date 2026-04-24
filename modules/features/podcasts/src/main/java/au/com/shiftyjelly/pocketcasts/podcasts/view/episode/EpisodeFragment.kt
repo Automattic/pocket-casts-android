@@ -623,10 +623,11 @@ class EpisodeFragment : BaseFragment() {
                                             onClick = {
 //                                                if (isPlusUser) {
                                                     val episode = viewModel.episode ?: return@clickable
+                                                    val chatPodcastUuid = podcastUuid ?: return@clickable
                                                     if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                                                         val fragment = ChatFragment.newInstance(
                                                             episodeUuid,
-                                                            podcastUuid,
+                                                            chatPodcastUuid,
                                                             episode.title,
                                                             PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
                                                         )

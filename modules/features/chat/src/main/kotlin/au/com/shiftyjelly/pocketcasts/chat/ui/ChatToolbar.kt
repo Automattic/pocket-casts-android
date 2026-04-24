@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun ChatToolbar(
     episodeTitle: String,
     episodeSubtitle: String,
-    podcastUuid: String?,
+    podcastUuid: String,
     onClickBack: () -> Unit,
     onClickMore: () -> Unit,
     theme: ChatTheme,
@@ -51,15 +51,13 @@ internal fun ChatToolbar(
                 tint = theme.iconButton,
             )
         }
-        if (podcastUuid != null) {
-            PodcastImage(
-                uuid = podcastUuid,
-                imageSize = 36.dp,
-                cornerSize = 6.dp,
-                elevation = null,
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-        }
+        PodcastImage(
+            uuid = podcastUuid,
+            imageSize = 36.dp,
+            cornerSize = 6.dp,
+            elevation = null,
+        )
+        Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(LR.string.episode_chat),

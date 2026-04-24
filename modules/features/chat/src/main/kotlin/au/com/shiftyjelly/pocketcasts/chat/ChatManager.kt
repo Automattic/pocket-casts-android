@@ -28,7 +28,7 @@ class ChatManager @Inject constructor(
         return episodeChatDao.getMessages(episodeUuid).toChatMessages()
     }
 
-    suspend fun createChat(episodeUuid: String, podcastUuid: String?, welcomeMessage: ChatMessage) {
+    suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
         episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
         episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid))
     }
@@ -47,7 +47,7 @@ class ChatManager @Inject constructor(
 
         val history = allMessages.map { msg ->
             ConversationMessage(
-                role = msg.role.value,
+                role = msg.role.apiRole,
                 content = msg.text,
             )
         }
@@ -72,6 +72,16 @@ class ChatManager @Inject constructor(
 
         val aiReply = ChatMessage(text = response.reply, role = ChatRole.Assistant)
         episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid))
+
+        val quoteText = response.quote?.takeIf { it.isNotBlank() }
+        if (quoteText != null) {
+            val quoteMessage = ChatMessage(
+                text = quoteText,
+                role = ChatRole.Quote,
+                metadata = response.quoteTime?.takeIf { it.isNotBlank() },
+            )
+            episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid))
+        }
     }
 
     suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {

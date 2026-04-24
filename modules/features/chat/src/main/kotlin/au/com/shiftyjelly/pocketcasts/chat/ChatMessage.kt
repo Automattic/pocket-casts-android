@@ -6,11 +6,13 @@ import java.util.UUID
 data class ChatMessage(
     val text: String,
     val role: ChatRole,
+    val metadata: String? = null,
 )
 
-enum class ChatRole(val value: String) {
-    Assistant("assistant"),
-    User("user"),
+enum class ChatRole(val value: String, val apiRole: String) {
+    Assistant(value = "assistant", apiRole = "assistant"),
+    User(value = "user", apiRole = "user"),
+    Quote(value = "quote", apiRole = "assistant"),
 }
 
 fun ChatMessage.toEntity(episodeUuid: String) = EpisodeChatMessage(
@@ -18,6 +20,7 @@ fun ChatMessage.toEntity(episodeUuid: String) = EpisodeChatMessage(
     episodeUuid = episodeUuid,
     text = text,
     role = role.value,
+    metadata = metadata,
 )
 
 fun List<EpisodeChatMessage>.toChatMessages() = map { entity ->
@@ -25,7 +28,9 @@ fun List<EpisodeChatMessage>.toChatMessages() = map { entity ->
         text = entity.text,
         role = when (entity.role) {
             ChatRole.User.value -> ChatRole.User
+            ChatRole.Quote.value -> ChatRole.Quote
             else -> ChatRole.Assistant
         },
+        metadata = entity.metadata,
     )
 }

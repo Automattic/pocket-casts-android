@@ -40,7 +40,7 @@ class ChatViewModel @Inject constructor(
         episodeUuid: String,
         episodeTitle: String,
         episodeSubtitle: String,
-        podcastUuid: String?,
+        podcastUuid: String,
         welcomeMessage: String,
     ) {
         this.episodeUuid = episodeUuid
@@ -64,7 +64,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun ensureChatExists(podcastUuid: String?) {
+    private fun ensureChatExists(podcastUuid: String) {
         viewModelScope.launch {
             val existing = chatManager.getMessages(episodeUuid)
             if (existing.isEmpty()) {
@@ -101,7 +101,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: String, isRetry: Boolean) {
-        val podcastUuid = _uiState.value.podcastUuid ?: return
+        val podcastUuid = _uiState.value.podcastUuid
         val currentMessages = _uiState.value.messages
 
         _uiState.update { it.copy(isAwaitingReply = true, error = null) }
@@ -124,7 +124,7 @@ data class ChatUiState(
     val inputText: String = "",
     val episodeTitle: String = "",
     val episodeSubtitle: String = "",
-    val podcastUuid: String? = null,
+    val podcastUuid: String = "",
     val messages: List<ChatMessage> = emptyList(),
     val isConnected: Boolean = true,
     val isAwaitingReply: Boolean = false,

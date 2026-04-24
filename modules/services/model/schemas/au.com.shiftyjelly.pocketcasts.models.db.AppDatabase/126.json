@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 126,
-    "identityHash": "82b2a622966bdfcc5cd36e2255ec7e05",
+    "identityHash": "e128827baeee5652efb2906c9da3f9d6",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -2067,7 +2067,7 @@
       },
       {
         "tableName": "episode_chat_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `text` TEXT NOT NULL, `role` TEXT NOT NULL, `created_at` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `text` TEXT NOT NULL, `role` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `metadata` TEXT, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -2098,6 +2098,11 @@
             "columnName": "created_at",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "metadata",
+            "columnName": "metadata",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -2121,7 +2126,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '82b2a622966bdfcc5cd36e2255ec7e05')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e128827baeee5652efb2906c9da3f9d6')"
     ]
   }
 }

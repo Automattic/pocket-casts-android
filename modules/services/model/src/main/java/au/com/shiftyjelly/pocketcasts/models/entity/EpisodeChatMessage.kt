@@ -18,4 +18,5 @@ data class EpisodeChatMessage(
     @ColumnInfo(name = "text") val text: String,
     @ColumnInfo(name = "role") val role: String,
     @ColumnInfo(name = "created_at") val createdAt: Date = Date(),
+    @ColumnInfo(name = "metadata") val metadata: String? = null,
 )
