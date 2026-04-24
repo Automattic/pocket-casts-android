@@ -40,7 +40,7 @@ internal fun AiMessageBubble(
             )
         }
         Text(
-            text = text,
+            text = text.formatAiBullets(),
             color = theme.aiBubbleText,
             fontSize = 15.sp,
             lineHeight = 22.sp,
@@ -108,6 +108,11 @@ internal fun ThinkingBubble(
         }
         ChatTypingIndicator(theme = theme)
     }
+}
+
+private fun String.formatAiBullets(): String {
+    val bulletRegex = Regex("""(?m)^\s*[-*]\s+""")
+    return bulletRegex.replace(this, "•  ")
 }
 
 private val AiBubbleShape = RoundedCornerShape(
