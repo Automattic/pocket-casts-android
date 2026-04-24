@@ -1,18 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @Singleton
 class ChatManager @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
+    private val transcriptDao: TranscriptDao,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
 ) {
 
@@ -48,12 +52,21 @@ class ChatManager @Inject constructor(
             )
         }
 
-        val request = EpisodeChatRequest(
-            episodeUuid = episodeUuid,
-            podcastUuid = podcastUuid,
-            message = message,
-            conversationHistory = history,
-        )
+        val transcript = selectTranscript(episodeUuid)
+        val request = if (transcript != null && !transcript.isGenerated) {
+            EpisodeChatRequest(
+                transcriptUrl = transcript.url,
+                message = message,
+                conversationHistory = history,
+            )
+        } else {
+            EpisodeChatRequest(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                message = message,
+                conversationHistory = history,
+            )
+        }
 
         val response = podcastCacheServiceManager.episodeChat(request)
 
@@ -64,5 +77,12 @@ class ChatManager @Inject constructor(
     suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
         episodeChatDao.deleteMessagesByEpisode(episodeUuid)
         episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid))
+    }
+
+    // Pick the best transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
+    // Matches the priority used by TranscriptManagerImpl so chat and transcript UI pick the same source.
+    private suspend fun selectTranscript(episodeUuid: String): Transcript? {
+        val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()
+        return transcripts.minWithOrNull(compareBy({ it.isGenerated }, { it.type }))
     }
 }
