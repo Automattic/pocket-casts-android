@@ -24,8 +24,8 @@ fun List<EpisodeChatMessage>.toChatMessages() = map { entity ->
     ChatMessage(
         text = entity.text,
         role = when (entity.role) {
-            ChatRole.Assistant.value -> ChatRole.Assistant
-            else -> ChatRole.User
+            ChatRole.User.value -> ChatRole.User
+            else -> ChatRole.Assistant
         },
     )
 }
