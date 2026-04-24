@@ -15,7 +15,6 @@ Language: sv_SE
     <string name="error_streaming_server_error">Podcastservern har problem. Försök igen senare.</string>
     <string name="error_streaming_no_longer_available">Det här avsnittet är inte längre tillgängligt från utgivaren.</string>
     <string name="error_streaming_not_found">Det här avsnittet gick inte att hitta på servern. Det kan ha tagits bort av utgivaren.</string>
-    <string name="error_streaming_access_denied">Du har inte längre åtkomst att spela upp detta avsnitt.</string>
     <string name="settings_auto_download_storage_summary">När detta är inaktiverat kan nedladdningar ske när enhetens interna lagringsutrymme håller på att ta slut.</string>
     <string name="settings_auto_download_storage">Endast när det finns tillräckligt med lagringsutrymme</string>
     <string name="settings_auto_download_charging_summary">När detta är inaktiverat kan nedladdningar ske utan att enheten är ansluten till en laddare.</string>
