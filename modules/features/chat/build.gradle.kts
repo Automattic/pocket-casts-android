@@ -18,6 +18,7 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
 
     api(libs.compose.runtime)
     api(libs.dagger.hilt.android)
@@ -38,6 +39,7 @@ dependencies {
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.ktx)
+    implementation(libs.moshi)
 
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)

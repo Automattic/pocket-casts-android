@@ -60,7 +60,8 @@ internal fun AiMessageBubble(
 @Composable
 internal fun AiQuoteBubble(
     quote: String,
-    metadata: String?,
+    start: String,
+    end: String,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -95,13 +96,11 @@ internal fun AiQuoteBubble(
                     lineHeight = 22.sp,
                     fontStyle = FontStyle.Italic,
                 )
-                if (!metadata.isNullOrBlank()) {
-                    Text(
-                        text = metadata,
-                        color = theme.secondaryText,
-                        fontSize = 13.sp,
-                    )
-                }
+                Text(
+                    text = "$start – $end",
+                    color = theme.secondaryText,
+                    fontSize = 13.sp,
+                )
             }
         }
     }

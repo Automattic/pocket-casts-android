@@ -21,6 +21,12 @@ data class ConversationMessage(
 @JsonClass(generateAdapter = true)
 data class EpisodeChatResponse(
     @Json(name = "reply") val reply: String,
-    @Json(name = "quote") val quote: String?,
-    @Json(name = "quote_time") val quoteTime: String?,
+    @Json(name = "quote") val quote: EpisodeChatQuote?,
+)
+
+@JsonClass(generateAdapter = true)
+data class EpisodeChatQuote(
+    @Json(name = "text") val text: String,
+    @Json(name = "start") val start: String?,
+    @Json(name = "end") val end: String?,
 )

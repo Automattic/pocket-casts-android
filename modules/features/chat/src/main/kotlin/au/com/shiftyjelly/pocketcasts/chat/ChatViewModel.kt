@@ -68,7 +68,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val existing = chatManager.getMessages(episodeUuid)
             if (existing.isEmpty()) {
-                val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Assistant)
+                val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
                 chatManager.createChat(episodeUuid, podcastUuid, welcomeMsg)
             }
         }
@@ -82,7 +82,7 @@ class ChatViewModel @Inject constructor(
         sendJob?.cancel()
         _uiState.update { it.copy(isAwaitingReply = false, error = null) }
         viewModelScope.launch {
-            val welcomeMsg = ChatMessage(text = welcomeMessageText, role = ChatRole.Assistant)
+            val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
             chatManager.clearMessages(episodeUuid, welcomeMsg)
         }
     }
@@ -96,7 +96,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun retry() {
-        val lastUserMessage = _uiState.value.messages.lastOrNull { it.role == ChatRole.User } ?: return
+        val lastUserMessage = _uiState.value.messages.lastOrNull { it is ChatMessage.User } as? ChatMessage.User ?: return
         performSend(message = lastUserMessage.text, isRetry = true)
     }
 

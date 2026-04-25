@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
-import au.com.shiftyjelly.pocketcasts.chat.ChatRole
+import au.com.shiftyjelly.pocketcasts.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -62,18 +62,19 @@ fun ChatScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             uiState.messages.forEachIndexed { index, message ->
-                when (message.role) {
-                    ChatRole.Assistant -> AiMessageBubble(
+                when (message) {
+                    is ChatMessage.Assistant -> AiMessageBubble(
                         text = message.text,
                         podcastUuid = uiState.podcastUuid,
                         theme = theme,
                     )
-                    ChatRole.Quote -> AiQuoteBubble(
+                    is ChatMessage.Quote -> AiQuoteBubble(
                         quote = message.text,
-                        metadata = message.metadata,
+                        start = message.start,
+                        end = message.end,
                         theme = theme,
                     )
-                    ChatRole.User -> UserMessageBubble(
+                    is ChatMessage.User -> UserMessageBubble(
                         text = message.text,
                         theme = theme,
                         allowRetry = index == uiState.messages.lastIndex && uiState.error != null,
