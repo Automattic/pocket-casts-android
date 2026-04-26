@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
@@ -47,6 +48,7 @@ class Media3SessionCallbackTest {
     private lateinit var playbackManager: PlaybackManager
     private lateinit var episodeManager: EpisodeManager
     private lateinit var podcastManager: PodcastManager
+    private lateinit var playlistManager: PlaylistManager
     private lateinit var settings: Settings
     private lateinit var actions: MediaSessionActions
     private lateinit var bookmarkHelper: BookmarkHelper
@@ -60,6 +62,7 @@ class Media3SessionCallbackTest {
         playbackManager = mock()
         episodeManager = mock()
         podcastManager = mock()
+        playlistManager = mock()
         settings = mock()
         actions = mock()
         bookmarkHelper = mock()
@@ -71,6 +74,7 @@ class Media3SessionCallbackTest {
             playbackManager = playbackManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,
+            playlistManager = playlistManager,
             settings = settings,
             actions = actions,
             bookmarkHelper = bookmarkHelper,

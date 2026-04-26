@@ -342,6 +342,7 @@ class MediaSessionManager(
             playbackManager = playbackManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,
+            playlistManager = playlistManager,
             settings = settings,
             actions = actions,
             bookmarkHelper = bookmarkHelper,

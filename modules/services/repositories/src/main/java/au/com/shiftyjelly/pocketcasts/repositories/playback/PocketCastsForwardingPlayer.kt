@@ -310,10 +310,30 @@ class PocketCastsForwardingPlayer(
         }
     }
 
+    // Wrapped ExoPlayer returns false while loading; report true to keep AAOS seek bar visible.
+    override fun isCurrentMediaItemSeekable(): Boolean = currentMediaItem != MediaItem.EMPTY
+
+    // Avoid exposing STATE_IDLE before ExoPlayer's async prepare transition fires.
+    override fun getPlaybackState(): Int {
+        val state = super.getPlaybackState()
+        if (state == Player.STATE_IDLE && currentMediaItem != MediaItem.EMPTY) {
+            return Player.STATE_BUFFERING
+        }
+        return state
+    }
+
     override fun getDuration(): Long {
         val playerDuration = super.getDuration()
         if (playerDuration != C.TIME_UNSET) {
             return playerDuration
+        }
+        return currentMediaItem.mediaMetadata.durationMs ?: C.TIME_UNSET
+    }
+
+    override fun getContentDuration(): Long {
+        val contentDuration = super.getContentDuration()
+        if (contentDuration != C.TIME_UNSET) {
+            return contentDuration
         }
         return currentMediaItem.mediaMetadata.durationMs ?: C.TIME_UNSET
     }
@@ -354,11 +374,7 @@ class PocketCastsForwardingPlayer(
         return HeartRating(episode.isStarred)
     }
 
-    /**
-     * Dispatches a batched [Player.Events] callback to all listeners.
-     * Media3's notification system reacts to [Player.Listener.onEvents], not
-     * individual callbacks, so this must be called after individual callbacks.
-     */
+    /** Dispatches a batched [Player.Events] to all listeners after individual callbacks. */
     private fun dispatchEvents(vararg eventFlags: @Player.Event Int) {
         val events = Player.Events(FlagSet.Builder().addAll(*eventFlags).build())
         listeners.forEach { it.onEvents(this@PocketCastsForwardingPlayer, events) }
