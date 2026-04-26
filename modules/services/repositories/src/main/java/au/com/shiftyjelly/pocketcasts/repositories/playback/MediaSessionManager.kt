@@ -200,6 +200,8 @@ class MediaSessionManager(
     @Volatile
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
 
+    private var lastCustomLayout: List<CommandButton> = emptyList()
+
     @Volatile
     private var media3Service: MediaLibraryService? = null
 
@@ -696,7 +698,11 @@ class MediaSessionManager(
 
         if (isAutomotive) {
             val layout = automotiveStrategy!!.buildLayout(playbackManager, settings, context, ::buildCustomActionButton)
-            session.setCustomLayout(layout.primaryButtons + layout.overflowButtons)
+            val allButtons = layout.primaryButtons + layout.overflowButtons
+            if (allButtons != lastCustomLayout) {
+                lastCustomLayout = allButtons
+                session.setCustomLayout(allButtons)
+            }
             return
         } else {
             // Mobile/other: existing behavior unchanged
@@ -830,6 +836,7 @@ class MediaSessionManager(
         disposables.clear()
         scope.cancel()
         if (needsMedia3Session) {
+            lastCustomLayout = emptyList()
             media3Session?.release()
             media3Session = null
             media3Service = null

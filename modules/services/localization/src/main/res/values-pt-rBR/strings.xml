@@ -15,7 +15,6 @@ Language: pt_BR
     <string name="error_streaming_server_error">O servidor de podcast está com problemas. Tente novamente mais tarde.</string>
     <string name="error_streaming_no_longer_available">Este episódio não é mais oferecido por quem o publicou.</string>
     <string name="error_streaming_not_found">Não foi possível encontrar este episódio no servidor. Ele pode ter sido removido pelo distribuidor.</string>
-    <string name="error_streaming_access_denied">Você não tem mais acesso para reproduzir este episódio.</string>
     <string name="settings_auto_download_storage_summary">Se esta opção estiver desativada, os downloads poderão ocorrer quando o dispositivo estiver com pouco armazenamento interno.</string>
     <string name="settings_auto_download_storage">Somente quando houver armazenamento suficiente</string>
     <string name="settings_auto_download_charging_summary">Quando esta opção estiver desativada, os downloads poderão ocorrer sem que o dispositivo esteja conectado a um carregador.</string>

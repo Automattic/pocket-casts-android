@@ -319,7 +319,6 @@ class PocketCastsForwardingPlayer(
                         ?: podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
                 } else {
                     podcast?.getArtworkUrl(480)?.takeIf { it.isNotBlank() }
-                        ?: episode.imageUrl?.takeIf { it.isNotBlank() }
                 }
                 url?.let(Uri::parse)
             }

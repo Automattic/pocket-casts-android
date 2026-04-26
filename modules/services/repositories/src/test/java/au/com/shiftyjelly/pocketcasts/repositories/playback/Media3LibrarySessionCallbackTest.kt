@@ -6,9 +6,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionCommands
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -219,7 +221,7 @@ class Media3LibrarySessionCallbackTest {
     }
 
     @Test
-    fun `onConnect rejects unknown caller when packageValidator rejects`() {
+    fun `onConnect accepts unknown caller with transport-only commands`() {
         val packageValidator: PackageValidator = mock()
         whenever(mockController.packageName).thenReturn("com.unknown.app")
         whenever(mockController.uid).thenReturn(12345)
@@ -239,7 +241,14 @@ class Media3LibrarySessionCallbackTest {
 
         val result = callbackWithValidator.onConnect(mockSession, mockController)
 
-        assertFalse(result.isAccepted)
+        assertTrue(result.isAccepted)
+        // Unknown callers get transport controls but no session commands
+        assertEquals(SessionCommands.EMPTY, result.availableSessionCommands)
+        val playerCommands = result.availablePlayerCommands
+        assertTrue(playerCommands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertTrue(playerCommands.contains(Player.COMMAND_STOP))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        // Should NOT delegate to sessionCallback (which adds full session commands)
         verify(sessionCallback, never()).onConnect(any(), any())
     }
 
