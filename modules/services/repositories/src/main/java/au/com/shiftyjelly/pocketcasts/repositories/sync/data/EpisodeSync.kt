@@ -88,7 +88,7 @@ internal class EpisodeSync(
         episodeToFinish.forEach { episode ->
             episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
         }
-        episodeManager.updateAll(localEpisodes)
+        episodeManager.updateAllSyncFields(localEpisodes)
     }
 
     private fun PodcastEpisode.applyServerEpisode(

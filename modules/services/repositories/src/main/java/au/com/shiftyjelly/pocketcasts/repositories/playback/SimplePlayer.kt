@@ -22,6 +22,7 @@ import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListene
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -31,9 +32,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SimplePlayer(
-    val settings: Settings,
-    val statsManager: StatsManager,
-    val context: Context,
+    private val settings: Settings,
+    private val statsManager: StatsManager,
+    private val playbackStatsCollector: PlaybackStatsCollector,
+    private val context: Context,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
@@ -210,6 +212,7 @@ class SimplePlayer(
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
+        player.addListener(PlayPauseListener(playbackStatsCollector))
         player.addAnalyticsListener(renderer)
 
         handleStop()
@@ -340,5 +343,17 @@ class SimplePlayer(
             it.setBoostVolume(playbackEffects.isVolumeBoosted)
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
+    }
+}
+
+private class PlayPauseListener(
+    private val statsCollector: PlaybackStatsCollector,
+) : Player.Listener {
+    override fun onEvents(player: Player, events: Player.Events) {
+        if (player.isPlaying) {
+            statsCollector.onStart()
+        } else {
+            statsCollector.onStop()
+        }
     }
 }

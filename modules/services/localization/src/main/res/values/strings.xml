@@ -64,6 +64,7 @@
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
     <string name="mark_unplayed">Mark unplayed</string>
+    <string name="less">Less</string>
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
@@ -243,6 +244,7 @@
     <!-- "View" is used as a verb here. As in "view this object" -->
     <string name="view">View</string>
     <string name="no_episodes">No episodes</string>
+    <string name="explicit">Explicit</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

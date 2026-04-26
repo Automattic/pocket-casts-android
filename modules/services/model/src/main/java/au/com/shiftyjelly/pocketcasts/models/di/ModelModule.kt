@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaybackStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
@@ -79,6 +80,9 @@ object ModelModule {
 
     @Provides
     fun userCategoryVisits(database: AppDatabase): UserCategoryVisitsDao = database.userCategoryVisitsDao()
+
+    @Provides
+    fun playbackStatsDao(database: AppDatabase): PlaybackStatsDao = database.playbackStatsDao()
 }
 
 @Qualifier

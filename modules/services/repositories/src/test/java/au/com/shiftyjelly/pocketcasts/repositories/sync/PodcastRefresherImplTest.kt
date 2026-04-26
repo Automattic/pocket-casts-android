@@ -72,6 +72,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = podcast.episodeFrequency,
             refreshAvailable = podcast.refreshAvailable,
             fundingUrl = podcast.fundingUrl,
+            explicit = podcast.explicit,
         )
     }
 
@@ -92,6 +93,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -112,6 +114,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -132,6 +135,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -152,6 +156,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -174,6 +179,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -194,6 +200,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = "daily",
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -214,6 +221,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = true,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -234,6 +242,49 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = "https://new.com",
+            explicit = existingPodcast.explicit,
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired updates when the explicit changes`() = runTest {
+        val existingPodcast = createPodcast(explicit = false)
+        val updatedPodcast = existingPodcast.copy(explicit = true)
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = existingPodcast.title,
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = true,
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired updates when the explicit changes from null`() = runTest {
+        val existingPodcast = createPodcast(explicit = null)
+        val updatedPodcast = existingPodcast.copy(explicit = true)
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = existingPodcast.title,
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = true,
         )
     }
 
@@ -264,6 +315,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = true,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -288,6 +340,7 @@ class PodcastRefresherImplTest {
             episodeFrequency = existingPodcast.episodeFrequency,
             refreshAvailable = existingPodcast.refreshAvailable,
             fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
         )
     }
 
@@ -301,6 +354,7 @@ class PodcastRefresherImplTest {
         episodeFrequency: String? = "weekly",
         refreshAvailable: Boolean = false,
         fundingUrl: String? = null,
+        explicit: Boolean? = null,
     ) = Podcast(
         uuid = uuid,
         title = title,
@@ -311,5 +365,6 @@ class PodcastRefresherImplTest {
         episodeFrequency = episodeFrequency,
         refreshAvailable = refreshAvailable,
         fundingUrl = fundingUrl,
+        explicit = explicit,
     )
 }

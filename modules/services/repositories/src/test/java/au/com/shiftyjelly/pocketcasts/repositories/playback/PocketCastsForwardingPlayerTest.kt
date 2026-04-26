@@ -10,6 +10,7 @@ import androidx.media3.common.Player
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

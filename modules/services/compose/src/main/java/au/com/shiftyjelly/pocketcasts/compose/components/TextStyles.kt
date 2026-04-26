@@ -436,6 +436,7 @@ fun TextP60(
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
     letterSpacing: TextUnit = 0.sp,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
 ) {
     val fontSizeUpdated = fontSize ?: 13.sp
     Text(
@@ -449,6 +450,7 @@ fun TextP60(
         textAlign = textAlign,
         fontWeight = fontWeight,
         style = style,
+        inlineContent = inlineContent,
         modifier = modifier,
     )
 }

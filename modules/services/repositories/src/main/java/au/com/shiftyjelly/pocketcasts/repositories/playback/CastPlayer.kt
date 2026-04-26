@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
 import androidx.annotation.OptIn
@@ -12,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadOptions
 import com.google.android.gms.cast.MediaMetadata
@@ -28,7 +28,10 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 
-class CastPlayer(val context: Context, override val onPlayerEvent: (Player, PlayerEvent) -> Unit) : Player {
+class CastPlayer(
+    private val playbackStatsCollector: PlaybackStatsCollector,
+    override val onPlayerEvent: (Player, PlayerEvent) -> Unit,
+) : Player {
 
     private enum class CastPlaybackState { NONE, STOPPED, BUFFERING, PLAYING, PAUSED }
 
@@ -40,6 +43,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     private var remoteEpisodeUuid: String? = null
     private var playbackEffects: PlaybackEffects? = null
     private val remoteMediaClientListener = RemoteMediaClientListener()
+    private val playPauseCallback = PlayPauseCallback(playbackStatsCollector, currentClient = { remoteMediaClient })
 
     override var isPip: Boolean = false
 
@@ -164,6 +168,8 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
             state = CastPlaybackState.STOPPED
             remoteListenerAdded = false
             remoteMediaClient?.unregisterCallback(remoteMediaClientListener)
+            remoteMediaClient?.unregisterCallback(playPauseCallback)
+            playbackStatsCollector.onStop()
         }
     }
 
@@ -242,6 +248,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         }
         remoteListenerAdded = true
         remoteMediaClient?.registerCallback(remoteMediaClientListener)
+        remoteMediaClient?.registerCallback(playPauseCallback)
     }
 
     private fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
@@ -420,5 +427,19 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     companion object {
         private const val CUSTOM_DATA_EPISODE_UUID = "EPISODE_UUID"
+    }
+}
+
+private class PlayPauseCallback(
+    private val statsCollector: PlaybackStatsCollector,
+    private val currentClient: () -> RemoteMediaClient?,
+) : RemoteMediaClient.Callback() {
+    override fun onStatusUpdated() {
+        val playerState = currentClient()?.playerState ?: return
+        if (playerState == MediaStatus.PLAYER_STATE_PLAYING) {
+            statsCollector.onStart()
+        } else {
+            statsCollector.onStop()
+        }
     }
 }
