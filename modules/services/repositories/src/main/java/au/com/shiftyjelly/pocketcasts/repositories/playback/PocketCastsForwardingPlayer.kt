@@ -161,7 +161,7 @@ class PocketCastsForwardingPlayer(
             if (currentMediaItem != MediaItem.EMPTY) add(currentMediaItem)
             addAll(queueItems)
         }
-        return if (allItems.isEmpty()) Timeline.EMPTY else QueueTimeline(allItems)
+        return if (allItems.isEmpty()) super.getCurrentTimeline() else QueueTimeline(allItems)
     }
 
     override fun getCurrentMediaItemIndex(): Int = 0

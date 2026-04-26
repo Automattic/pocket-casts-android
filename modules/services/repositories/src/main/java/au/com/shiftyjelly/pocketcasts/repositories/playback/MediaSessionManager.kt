@@ -115,30 +115,29 @@ class MediaSessionManager(
         }
     }
 
-    // Evaluated once at construction — toggling requires a process restart.
-    // Swapping between Media3 and legacy session at runtime is not supported.
-    private val useMedia3Session = FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
+    // Evaluated lazily so that FeatureFlag.initialize() has completed before the
+    // first read. Toggling requires a process restart.
+    private val useMedia3Session by lazy { FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) }
     private val isAutomotive = Util.isAutomotive(context)
 
     // Automotive always needs a MediaLibrarySession for the service contract (it's the
-    // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
-    // is delegated to an AutomotiveSessionStrategy.
-    private val needsMedia3Session = useMedia3Session || isAutomotive
+    // app entry point on AAOS), even when the Media3 flag is OFF.
+    private val needsMedia3Session by lazy { useMedia3Session || isAutomotive }
 
-    // On non-automotive platforms with flag OFF, create a MediaSessionCompat.
-    // On automotive (regardless of flag), the MediaLibrarySession handles everything.
-    val mediaSession: MediaSessionCompat? = if (!useMedia3Session && !isAutomotive) {
-        MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-            session.setSessionActivity(context.getLaunchActivityPendingIntent())
-            session.setRatingType(RatingCompat.RATING_HEART)
-            session.setExtras(
-                Bundle().apply {
-                    putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
-                },
-            )
+    val mediaSession: MediaSessionCompat? by lazy {
+        if (!useMedia3Session && !isAutomotive) {
+            MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
+                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                session.setRatingType(RatingCompat.RATING_HEART)
+                session.setExtras(
+                    Bundle().apply {
+                        putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
+                    },
+                )
+            }
+        } else {
+            null
         }
-    } else {
-        null
     }
 
     val disposables = CompositeDisposable()
@@ -227,8 +226,8 @@ class MediaSessionManager(
             settings,
         )
 
-        if (mediaSession != null) {
-            mediaSession.setCallback(
+        mediaSession?.let { session ->
+            session.setCallback(
                 MediaSessionCallback(
                     playbackManager,
                     episodeManager,
@@ -499,6 +498,7 @@ class MediaSessionManager(
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
             it.isTransientLoss = currentPlayer.isTransientLoss
+            it.queueItems = currentPlayer.queueItems
         }
         forwardingPlayer = swapped
         media3Session?.player = swapped

@@ -7,6 +7,7 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -45,6 +46,7 @@ class PocketCastsForwardingPlayerTest {
             on { seekBackIncrement } doReturn 10_000L
             on { duration } doReturn C.TIME_UNSET
             on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
         }
         shadowOf(Looper.getMainLooper()).idle()
         forwardingPlayer = PocketCastsForwardingPlayer(mockPlayer)
@@ -694,8 +696,8 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `currentTimeline is empty by default`() {
-        assertTrue(forwardingPlayer.currentTimeline.isEmpty)
+    fun `currentTimeline delegates to wrapped player by default`() {
+        assertEquals(mockPlayer.currentTimeline, forwardingPlayer.currentTimeline)
     }
 
     @Test
@@ -905,7 +907,8 @@ class PocketCastsForwardingPlayerTest {
 
         forwardingPlayer.clearMetadata()
 
-        assertTrue(forwardingPlayer.currentTimeline.isEmpty)
+        assertEquals(MediaItem.EMPTY, forwardingPlayer.currentMediaItem)
+        assertTrue(forwardingPlayer.queueItems.isEmpty())
         verify(listener).onTimelineChanged(any(), eq(Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED))
         val events = argumentCaptor<Player.Events>()
         verify(listener).onEvents(eq(forwardingPlayer), events.capture())
