@@ -27,6 +27,7 @@ import com.google.common.util.concurrent.ListenableFuture
 @OptIn(UnstableApi::class)
 internal class SeedStatePlayer(
     applicationLooper: Looper,
+    private val canSeekProvider: () -> Boolean = { true },
 ) : SimpleBasePlayer(applicationLooper) {
 
     private var seeded = false
@@ -58,11 +59,15 @@ internal class SeedStatePlayer(
                 Player.Commands.Builder()
                     .addAll(
                         COMMAND_PLAY_PAUSE,
-                        COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
                         COMMAND_STOP,
                         COMMAND_GET_CURRENT_MEDIA_ITEM,
                         COMMAND_GET_METADATA,
                     )
+                    .apply {
+                        if (canSeekProvider()) {
+                            add(COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
+                        }
+                    }
                     .build(),
             )
             .setPlaylist(listOf(placeholderItem))

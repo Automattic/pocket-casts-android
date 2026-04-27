@@ -62,6 +62,7 @@ internal class Media3SessionCallback(
     private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+    private val canSeekProvider: () -> Boolean = { true },
     internal val commandMutex: Mutex = Mutex(),
 ) : MediaSession.Callback {
 
@@ -94,7 +95,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        return MediaSession.ConnectionResult.accept(sessionCommands, transportPlayerCommands(canSeekProvider()))
     }
 
     override fun onCustomCommand(
@@ -373,16 +374,22 @@ internal class Media3SessionCallback(
  */
 @OptIn(UnstableApi::class)
 @Suppress("UnsafeOptInUsageError")
-internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builder()
-    .addAll(
-        Player.COMMAND_PLAY_PAUSE,
-        Player.COMMAND_SET_MEDIA_ITEM,
-        Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-        Player.COMMAND_STOP,
-        Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
-        Player.COMMAND_GET_METADATA,
-    )
-    .build()
+internal fun transportPlayerCommands(canSeek: Boolean): Player.Commands {
+    return Player.Commands.Builder()
+        .addAll(
+            Player.COMMAND_PLAY_PAUSE,
+            Player.COMMAND_SET_MEDIA_ITEM,
+            Player.COMMAND_STOP,
+            Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+            Player.COMMAND_GET_METADATA,
+        )
+        .apply {
+            if (canSeek) {
+                add(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
+            }
+        }
+        .build()
+}
 
 internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
     return when (episode) {

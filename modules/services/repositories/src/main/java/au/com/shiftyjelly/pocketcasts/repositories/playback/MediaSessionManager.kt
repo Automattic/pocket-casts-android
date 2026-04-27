@@ -186,6 +186,10 @@ class MediaSessionManager(
         mediaSession?.setPlaybackState(stateBuilder.build())
     }
 
+    private fun canScrubPlayback(): Boolean {
+        return isAndroidAutoConnected || settings.enableLockScreenScrubbing.value
+    }
+
     private var bookmarkHelper: BookmarkHelper
 
     @OptIn(UnstableApi::class)
@@ -304,7 +308,10 @@ class MediaSessionManager(
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
-        val seedPlayer = SeedStatePlayer(Looper.getMainLooper())
+        val seedPlayer = SeedStatePlayer(
+            applicationLooper = Looper.getMainLooper(),
+            canSeekProvider = ::canScrubPlayback,
+        )
         placeholderPlayer = seedPlayer
         val placeholder = seedPlayer
 
@@ -340,6 +347,7 @@ class MediaSessionManager(
                     true
                 }
             },
+            canSeekProvider = ::canScrubPlayback,
         )
 
         media3Callback = Media3SessionCallback(
@@ -351,6 +359,7 @@ class MediaSessionManager(
             bookmarkHelper = bookmarkHelper,
             scopeProvider = { scope },
             contextProvider = { context },
+            canSeekProvider = ::canScrubPlayback,
             commandMutex = commandMutex,
         )
         media3LibraryCallback = Media3LibrarySessionCallback(
@@ -367,6 +376,7 @@ class MediaSessionManager(
             },
             scopeProvider = { scope },
             contextProvider = { context },
+            canSeekProvider = ::canScrubPlayback,
         )
 
         media3Session = MediaLibraryService.MediaLibrarySession.Builder(service, forwardingPlayer!!, media3LibraryCallback!!)
@@ -452,6 +462,7 @@ class MediaSessionManager(
                 }
             },
             onStop = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+            canSeekProvider = ::canScrubPlayback,
         )
         castStatePlayer = player
         installCastPlayerInternal(player)
@@ -479,6 +490,7 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
+            canSeekProvider = ::canScrubPlayback,
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
@@ -968,7 +980,7 @@ class MediaSessionManager(
             PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID or
             PlaybackStateCompat.ACTION_PREPARE_FROM_SEARCH
 
-        val scrubbingAction = if (isAndroidAutoConnected || settings.enableLockScreenScrubbing.value) {
+        val scrubbingAction = if (canScrubPlayback()) {
             PlaybackStateCompat.ACTION_SEEK_TO
         } else {
             0L
