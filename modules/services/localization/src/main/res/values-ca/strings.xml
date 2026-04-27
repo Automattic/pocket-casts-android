@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-06 23:05:30+0000
+Translation-Revision-Date: 2026-04-23 22:46:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="less">Menys</string>
+    <string name="error_streaming_access_denied">Aquest episodi no es pot reproduir.</string>
     <string name="error_episode_not_available">Episodi no disponible</string>
     <string name="error_playback_connected">Estàs connectat</string>
     <string name="error_playback_offline">Estàs fora de línia</string>
@@ -14,7 +16,6 @@ Language: ca
     <string name="error_decoder_initialization">No es pot reproduir aquest format d\'àudio al teu dispositiu.</string>
     <string name="error_streaming_no_longer_available">Aquest episodi ja no està disponible a través de l\'autor.</string>
     <string name="error_streaming_not_found">No s\'ha pogut trobar aquest episodi al servidor. Pot ser que l\'autor l\'hagi eliminat.</string>
-    <string name="error_streaming_access_denied">Ja no tens accés per reproduir aquest episodi.</string>
     <string name="error_streaming_server_error">El servidor del pòdcast té problemes. Torna-ho a provar més tard.</string>
     <string name="settings_auto_download_storage_summary">Quan està desactivat, les descàrregues poden produir-se encara que el dispositiu tingui poc espai d\'emmagatzematge intern.</string>
     <string name="settings_auto_download_storage">Només quan hi ha prou espai</string>

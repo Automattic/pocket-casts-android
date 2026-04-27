@@ -240,6 +240,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    EXPLICIT_PODCAST_INDICATOR(
+        key = "explicit_podcast_indicator",
+        title = "Explicit podcast indicator",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
