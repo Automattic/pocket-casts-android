@@ -19,6 +19,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -66,6 +68,7 @@ internal fun AiQuoteBubble(
     quote: String,
     timestampLabel: String,
     isPlayable: Boolean,
+    isPlaying: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     onClickPlay: () -> Unit = {},
@@ -108,12 +111,21 @@ internal fun AiQuoteBubble(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (isPlayable) {
-                            Icon(
-                                imageVector = Icons.Filled.PlayArrow,
-                                contentDescription = stringResource(LR.string.chat_play_quote),
-                                tint = theme.secondaryText,
-                                modifier = Modifier.size(16.dp),
-                            )
+                            if (isPlaying) {
+                                Icon(
+                                    painter = painterResource(IR.drawable.ic_stop),
+                                    contentDescription = stringResource(LR.string.chat_stop_quote),
+                                    tint = theme.secondaryText,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.PlayArrow,
+                                    contentDescription = stringResource(LR.string.chat_play_quote),
+                                    tint = theme.secondaryText,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
                         }
                         Text(
                             text = timestampLabel,

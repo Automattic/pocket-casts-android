@@ -97,8 +97,7 @@ class ChatManager @Inject constructor(
         episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
-    // Pick the best transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
-    // Matches the priority used by TranscriptManagerImpl so chat and transcript UI pick the same source.
+    // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
     private suspend fun selectTranscript(episodeUuid: String): Transcript? {
         val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()
         return transcripts.minWithOrNull(compareBy({ it.isGenerated }, { it.type }))

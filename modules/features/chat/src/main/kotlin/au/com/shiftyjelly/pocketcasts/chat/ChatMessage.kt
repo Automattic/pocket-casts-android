@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.chat
 
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
 import java.util.UUID
 
 sealed interface ChatMessage {
@@ -35,8 +34,9 @@ sealed interface ChatMessage {
             get() = if (start.isNotBlank() && end.isNotBlank()) "$start – $end" else ""
 
         // Strip any straight or smart quotes the model wrapped around the text and re-add curly quotes.
-        val displayText: String
-            get() = "“${text.trim('"', '“', '”', ' ')}”"
+        val displayText: String by lazy {
+            "“${text.trim('"', '“', '”', ' ')}”"
+        }
     }
 }
 
@@ -45,9 +45,6 @@ enum class ChatRole(val value: String, val apiRole: String) {
     User(value = "user", apiRole = "user"),
     Quote(value = "quote", apiRole = "assistant"),
 }
-
-@JsonClass(generateAdapter = true)
-internal data class QuoteMetadata(val start: String, val end: String)
 
 // Text content for history payloads. Returns null for message types that carry no text.
 fun ChatMessage.textOrNull(): String? = when (this) {

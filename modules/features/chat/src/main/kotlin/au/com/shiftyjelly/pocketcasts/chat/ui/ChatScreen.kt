@@ -72,10 +72,14 @@ fun ChatScreen(
                     is ChatMessage.Quote -> {
                         val canPlay = uiState.isQuotePlaybackEnabled &&
                             message.startMs >= 0 && message.endMs > message.startMs
+                        val isPlaying = uiState.playingQuote.let {
+                            it != null && it.startMs == message.startMs && it.endMs == message.endMs
+                        }
                         AiQuoteBubble(
                             quote = message.displayText,
                             timestampLabel = message.timestampLabel,
                             isPlayable = canPlay,
+                            isPlaying = isPlaying,
                             theme = theme,
                             onClickPlay = { onPlayQuote(message.startMs, message.endMs) },
                         )

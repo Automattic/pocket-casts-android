@@ -250,7 +250,7 @@ enum class Feature(
     ),
     EPISODE_CHAT_PLAYABLE_QUOTES(
         key = "episode_chat_playable_quotes",
-        title = "Episode Chat: tap quote to play episode segment",
+        title = "Episode Chat: Playable Quotes",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,

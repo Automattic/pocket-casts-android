@@ -4,6 +4,7 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -12,10 +13,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,6 +30,7 @@ class ChatViewModel @Inject constructor(
     private val chatManager: ChatManager,
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -35,6 +40,8 @@ class ChatViewModel @Inject constructor(
 
     private var sendJob: Job? = null
     private var quotePlaybackJob: Job? = null
+    private var pendingPlaybackSnapshot: PlaybackSnapshot? = null
+    private var isQuoteInFlight: Boolean = false
     private lateinit var episodeUuid: String
     private lateinit var welcomeMessageText: String
 
@@ -113,44 +120,114 @@ class ChatViewModel @Inject constructor(
     }
 
     fun playQuote(startMs: Int, endMs: Int) {
+        // Tapping the currently-playing quote toggles it off — same effect as leaving the screen.
+        val current = _uiState.value.playingQuote
+        if (current?.startMs == startMs && current.endMs == endMs) {
+            stopQuote()
+            return
+        }
         quotePlaybackJob?.cancel()
+        // Snapshot before we touch playback so we can restore the user where they were.
+        val snapshot = capturePlaybackSnapshot()
+        pendingPlaybackSnapshot = snapshot
+        isQuoteInFlight = true
+        _uiState.update { it.copy(playingQuote = PlayingQuote(startMs, endMs)) }
         quotePlaybackJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@withContext
-                val isAlreadyCurrent = playbackManager.playbackStateRelay.blockingFirst().episodeUuid == episodeUuid
-                if (!isAlreadyCurrent) {
-                    playbackManager.playNowSuspend(episode = episode, sourceView = SourceView.EPISODE_DETAILS)
-                }
-                playbackManager.seekToTimeMsSuspend(positionMs = startMs)
-                if (isAlreadyCurrent && !playbackManager.isPlaying()) {
-                    playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
+                startQuotePlayback(startMs)
+            }
+            val reachedEnd = awaitEndOfQuote(startMs, endMs)
+            if (reachedEnd) {
+                withContext(Dispatchers.IO) {
+                    restorePreviousPlayback(snapshot)
                 }
             }
+            pendingPlaybackSnapshot = null
+            isQuoteInFlight = false
+            _uiState.update { it.copy(playingQuote = null) }
+        }
+    }
 
-            // Auto-pause once playback crosses the end of the quote window.
-            var sawStart = false
-            playbackManager.playbackStateFlow.collect { state ->
-                if (state.episodeUuid != episodeUuid) {
-                    quotePlaybackJob?.cancel()
-                    return@collect
-                }
-                val pos = state.positionMs
-                if (!sawStart && pos in startMs..endMs) {
-                    sawStart = true
-                }
-                if (sawStart && pos >= endMs) {
-                    withContext(Dispatchers.IO) {
-                        playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+    private fun stopQuote() {
+        if (!isQuoteInFlight) return
+        quotePlaybackJob?.cancel()
+        val snapshot = pendingPlaybackSnapshot
+        pendingPlaybackSnapshot = null
+        isQuoteInFlight = false
+        _uiState.update { it.copy(playingQuote = null) }
+        viewModelScope.launch(Dispatchers.IO) {
+            restorePreviousPlayback(snapshot)
+        }
+    }
+
+    private fun capturePlaybackSnapshot(): PlaybackSnapshot? {
+        val state = playbackManager.playbackStateRelay.blockingFirst()
+        if (state.isEmpty || state.episodeUuid.isEmpty()) return null
+        return PlaybackSnapshot(
+            episodeUuid = state.episodeUuid,
+            positionMs = state.positionMs,
+            wasPlaying = state.isPlaying,
+        )
+    }
+
+    private suspend fun startQuotePlayback(startMs: Int) {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
+        val isAlreadyCurrent = playbackManager.playbackStateRelay.blockingFirst().episodeUuid == episodeUuid
+        if (!isAlreadyCurrent) {
+            playbackManager.playNowSuspend(episode = episode, sourceView = SourceView.EPISODE_DETAILS)
+        }
+        playbackManager.seekToTimeMsSuspend(positionMs = startMs)
+        if (isAlreadyCurrent && !playbackManager.isPlaying()) {
+            playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
+        }
+    }
+
+    private suspend fun awaitEndOfQuote(startMs: Int, endMs: Int): Boolean {
+        var sawStart = false
+        return playbackManager.playbackStateFlow
+            .mapNotNull { state ->
+                when {
+                    state.episodeUuid != episodeUuid -> false
+                    else -> {
+                        val pos = state.positionMs
+                        if (!sawStart && pos in startMs..endMs) sawStart = true
+                        if (sawStart && pos >= endMs) true else null
                     }
-                    quotePlaybackJob?.cancel()
                 }
             }
+            .first()
+    }
+
+    private suspend fun restorePreviousPlayback(snapshot: PlaybackSnapshot?) {
+        if (snapshot == null) {
+            playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+            return
+        }
+        val currentEpisodeUuid = playbackManager.playbackStateRelay.blockingFirst().episodeUuid
+        if (currentEpisodeUuid != snapshot.episodeUuid) {
+            val previous = episodeManager.findEpisodeByUuid(snapshot.episodeUuid) ?: run {
+                playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+                return
+            }
+            playbackManager.playNowSuspend(episode = previous, sourceView = SourceView.EPISODE_DETAILS)
+        }
+        playbackManager.seekToTimeMsSuspend(positionMs = snapshot.positionMs)
+        if (!snapshot.wasPlaying) {
+            playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+        } else if (!playbackManager.isPlaying()) {
+            playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        quotePlaybackJob?.cancel()
+        if (!isQuoteInFlight) return
+        val snapshot = pendingPlaybackSnapshot
+        pendingPlaybackSnapshot = null
+        isQuoteInFlight = false
+        applicationScope.launch(Dispatchers.IO) {
+            restorePreviousPlayback(snapshot)
+        }
     }
 
     private fun performSend(message: String, isRetry: Boolean) {
@@ -173,6 +250,12 @@ class ChatViewModel @Inject constructor(
     }
 }
 
+private data class PlaybackSnapshot(
+    val episodeUuid: String,
+    val positionMs: Int,
+    val wasPlaying: Boolean,
+)
+
 data class ChatUiState(
     val inputText: String = "",
     val episodeTitle: String = "",
@@ -183,6 +266,9 @@ data class ChatUiState(
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
     val isQuotePlaybackEnabled: Boolean = false,
+    val playingQuote: PlayingQuote? = null,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 }
+
+data class PlayingQuote(val startMs: Int, val endMs: Int)
