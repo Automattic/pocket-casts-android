@@ -43,6 +43,7 @@ class PocketCastsForwardingPlayer(
     private val onPause: (() -> Unit)? = null,
     private val onSeekTo: ((Long) -> Unit)? = null,
     internal val playGuard: (() -> Boolean) = { true },
+    private val canSeekProvider: () -> Boolean = { true },
 ) : ForwardingPlayer(wrappedPlayer) {
 
     internal var currentMediaItem: MediaItem = MediaItem.EMPTY
@@ -68,7 +69,17 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard).also {
+        return PocketCastsForwardingPlayer(
+            newPlayer,
+            onSkipForward,
+            onSkipBack,
+            onStop,
+            onPlay,
+            onPause,
+            onSeekTo,
+            playGuard,
+            canSeekProvider,
+        ).also {
             it.currentMediaItem = this.currentMediaItem
             it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
@@ -163,20 +174,26 @@ class PocketCastsForwardingPlayer(
             .addAll(
                 Player.COMMAND_PLAY_PAUSE,
                 Player.COMMAND_SET_MEDIA_ITEM,
-                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
             )
+            .apply {
+                if (canSeekProvider()) {
+                    add(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
+                }
+            }
             .build()
     }
 
     override fun seekTo(positionMs: Long) {
+        if (!canSeekProvider()) return
         onSeekTo?.invoke(positionMs)
         super.seekTo(positionMs)
     }
 
     override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+        if (!canSeekProvider()) return
         onSeekTo?.invoke(positionMs)
         super.seekTo(mediaItemIndex, positionMs)
     }
