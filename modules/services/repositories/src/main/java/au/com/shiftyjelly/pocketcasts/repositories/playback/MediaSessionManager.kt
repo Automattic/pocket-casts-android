@@ -91,7 +91,7 @@ class MediaSessionManager(
     val eventHorizon: EventHorizon,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
-    private val applicationScope: CoroutineScope,
+    applicationScope: CoroutineScope,
 ) {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -115,23 +115,15 @@ class MediaSessionManager(
         }
     }
 
-    // Evaluated lazily on first access — must not be read before FeatureFlag.initialize().
-    // In practice the first access is in startObserving(), which runs after FeatureFlag init.
-    // Toggling requires a process restart; swapping at runtime is not supported.
-    private val useMedia3Session by lazy {
-        FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
-    }
+    // Evaluated lazily so that FeatureFlag.initialize() has completed before the
+    // first read. Toggling requires a process restart.
+    private val useMedia3Session by lazy { FeatureFlag.isEnabled(Feature.MEDIA3_SESSION) }
     private val isAutomotive = Util.isAutomotive(context)
 
     // Automotive always needs a MediaLibrarySession for the service contract (it's the
-    // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
-    // is delegated to an AutomotiveSessionStrategy.
-    private val needsMedia3Session by lazy {
-        useMedia3Session || isAutomotive
-    }
+    // app entry point on AAOS), even when the Media3 flag is OFF.
+    private val needsMedia3Session by lazy { useMedia3Session || isAutomotive }
 
-    // On non-automotive platforms with flag OFF, create a MediaSessionCompat.
-    // On automotive (regardless of flag), the MediaLibrarySession handles everything.
     val mediaSession: MediaSessionCompat? by lazy {
         if (!useMedia3Session && !isAutomotive) {
             MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
@@ -192,7 +184,7 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     @Suppress("UnsafeOptInUsageError")
     private val automotiveStrategy: AutomotiveSessionStrategy? = if (isAutomotive) {
-        Media3AutomotiveStrategy(::useCustomSkipButtons)
+        Media3AutomotiveStrategy(::useCustomSkipButtons, ::speedToDrawable, ::skipBackIconForDuration, ::skipForwardIconForDuration)
     } else {
         null
     }
@@ -201,9 +193,6 @@ class MediaSessionManager(
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
 
     private var lastCustomLayout: List<CommandButton> = emptyList()
-
-    @Volatile
-    private var media3Service: MediaLibraryService? = null
 
     @Volatile
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
@@ -236,26 +225,22 @@ class MediaSessionManager(
             bookmarkManager,
             settings,
         )
-    }
 
-    fun startObserving() {
-        if (!needsMedia3Session) {
-            applicationScope.launch(Dispatchers.Main) {
-                mediaSession!!.setCallback(
-                    MediaSessionCallback(
-                        playbackManager,
-                        episodeManager,
-                        enqueueCommand = { tag, command ->
-                            val added = commandQueue.tryEmit(Pair(tag, command))
-                            if (added) {
-                                Timber.i("Added command to queue: $tag")
-                            } else {
-                                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
-                            }
-                        },
-                    ),
-                )
-            }
+        mediaSession?.let { session ->
+            session.setCallback(
+                MediaSessionCallback(
+                    playbackManager,
+                    episodeManager,
+                    enqueueCommand = { tag, command ->
+                        val added = commandQueue.tryEmit(Pair(tag, command))
+                        if (added) {
+                            Timber.i("Added command to queue: $tag")
+                        } else {
+                            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
+                        }
+                    },
+                ),
+            )
 
             applicationScope.launch {
                 commandQueue.collect { (tag, command) ->
@@ -264,7 +249,9 @@ class MediaSessionManager(
                 }
             }
         }
+    }
 
+    fun startObserving() {
         if (needsMedia3Session) {
             observeForMedia3Updates()
         } else {
@@ -298,7 +285,6 @@ class MediaSessionManager(
     @MainThread
     fun createSession(service: MediaLibraryService) {
         if (!needsMedia3Session) return
-        media3Service = service
         // Recreate scope in case release() was called previously (service restart).
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -331,6 +317,16 @@ class MediaSessionManager(
                     }
                 }
             },
+            onSeekToQueueItem = { mediaId ->
+                scope.launch {
+                    commandMutex.withLock {
+                        val episode = episodeManager.findEpisodeByUuid(mediaId)
+                        if (episode != null) {
+                            playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        }
+                    }
+                }
+            },
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
@@ -345,6 +341,7 @@ class MediaSessionManager(
             playbackManager = playbackManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,
+            playlistManager = playlistManager,
             settings = settings,
             actions = actions,
             bookmarkHelper = bookmarkHelper,
@@ -400,7 +397,27 @@ class MediaSessionManager(
         }
 
         // Asynchronously enrich metadata with podcast name + artwork.
-        forwardingPlayer?.let { replayMetadataToPlayer(it) }
+        scope.launch(Dispatchers.IO) {
+            try {
+                val ep = playbackManager.getCurrentEpisode() ?: return@launch
+                val podcast = when (ep) {
+                    is PodcastEpisode -> podcastManager.findPodcastByUuid(ep.podcastUuid)
+                    else -> null
+                }
+                val showArtwork = settings.showArtworkOnLockScreen.value
+                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
+                val wrappedArtworkUri = if (showArtwork) {
+                    resolveAndWrapArtworkUri(ep, podcast, useEpisodeArtwork)
+                } else {
+                    null
+                }
+                withContext(Dispatchers.Main) {
+                    forwardingPlayer?.updateMetadata(ep, podcast, showArtwork, useEpisodeArtwork, artworkUri = wrappedArtworkUri, showRating = !isAutomotive)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to seed initial Media3 metadata")
+            }
+        }
     }
 
     /**
@@ -426,7 +443,6 @@ class MediaSessionManager(
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = null
-        replayMetadataToPlayer(swapped)
         Timber.i("Media3 session player swapped")
     }
 
@@ -482,71 +498,13 @@ class MediaSessionManager(
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
             it.isTransientLoss = currentPlayer.isTransientLoss
+            it.queueItems = currentPlayer.queueItems
         }
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = null
-        replayMetadataToPlayer(swapped)
         Timber.i("Media3 session cast player installed (no transport callbacks)")
-    }
-
-    /**
-     * Asynchronously fetches the current episode metadata and artwork, then applies
-     * it to the given [player]. Guarded by an identity check so that a stale replay
-     * (e.g., if another player swap happened during the async work) is discarded.
-     *
-     * Called after every player swap ([installPlayer], [installCastPlayerInternal],
-     * [createSession]) to ensure the Media3 notification has content. This is
-     * necessary because [observeForMedia3Updates] may have dropped the playback
-     * state event while [forwardingPlayer] was still null.
-     */
-    @OptIn(UnstableApi::class)
-    private fun replayMetadataToPlayer(player: PocketCastsForwardingPlayer) {
-        scope.launch(Dispatchers.IO) {
-            try {
-                val state = playbackManager.playbackStateRelay.blockingFirst()
-                if (state.isEmpty) return@launch
-                val episode = episodeManager.findEpisodeByUuid(state.episodeUuid) ?: return@launch
-                val podcast = when (episode) {
-                    is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
-                    else -> null
-                }
-                val showArtwork = settings.showArtworkOnLockScreen.value
-                val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
-                val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
-                    AutoConverter.getPodcastArtworkBitmap(episode, context, useEpisodeArtwork)?.let { bitmap ->
-                        java.io.ByteArrayOutputStream().use { stream ->
-                            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
-                            } else {
-                                @Suppress("DEPRECATION")
-                                android.graphics.Bitmap.CompressFormat.WEBP
-                            }
-                            bitmap.compress(format, 80, stream)
-                            stream.toByteArray()
-                        }
-                    }
-                } else {
-                    null
-                }
-                val wrappedArtworkUri = if (showArtwork) {
-                    resolveAndWrapArtworkUri(episode, podcast, useEpisodeArtwork)
-                } else {
-                    null
-                }
-                withContext(Dispatchers.Main) {
-                    if (forwardingPlayer === player) {
-                        player.updateMetadata(episode, podcast, showArtwork, useEpisodeArtwork, artworkData, artworkUri = wrappedArtworkUri, showRating = !isAutomotive)
-                        player.isTransientLoss = state.transientLoss
-                        updateMedia3CustomLayout()
-                        media3Service?.triggerNotificationUpdate()
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to replay metadata after player install")
-            }
-        }
     }
 
     /**
@@ -679,9 +637,31 @@ class MediaSessionManager(
 
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
+            .switchMap { state ->
+                if (state is UpNextQueue.State.Loaded) {
+                    Observable.fromCallable {
+                        // De-duplicate podcast lookups by uuid so a queue containing
+                        // several episodes of the same podcast only hits the DB once.
+                        val podcastsByUuid = state.queue
+                            .mapNotNull { (it as? PodcastEpisode)?.podcastUuid }
+                            .toSet()
+                            .associateWith { podcastManager.findPodcastByUuidBlocking(it) }
+                        state.queue.map { episode ->
+                            val podcast = (episode as? PodcastEpisode)?.let {
+                                podcastsByUuid[it.podcastUuid]
+                            }
+                            buildEpisodeMediaItem(episode, podcast)
+                        }
+                    }
+                } else {
+                    Observable.just(emptyList())
+                }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
-                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
+                onNext = { items ->
+                    forwardingPlayer?.updateQueue(items)
+                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, items.size, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
@@ -839,7 +819,6 @@ class MediaSessionManager(
             lastCustomLayout = emptyList()
             media3Session?.release()
             media3Session = null
-            media3Service = null
             forwardingPlayer = null
             placeholderPlayer?.release()
             placeholderPlayer = null
