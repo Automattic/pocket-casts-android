@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
+import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.squareup.moshi.Moshi
@@ -74,18 +75,21 @@ class ChatManager @Inject constructor(
         val aiReply = ChatMessage.Assistant(text = response.reply)
         episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid, quoteMetadataAdapter))
 
-        val quote = response.quote
-        val quoteText = quote?.text?.takeIf { it.isNotBlank() }
-        val quoteStart = quote?.start?.takeIf { it.isNotBlank() }
-        val quoteEnd = quote?.end?.takeIf { it.isNotBlank() }
-        if (quoteText != null && quoteStart != null && quoteEnd != null) {
-            val quoteMessage = ChatMessage.Quote(
-                text = quoteText,
-                start = quoteStart,
-                end = quoteEnd,
-            )
-            episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
-        }
+        persistQuoteIfPresent(episodeUuid, response.quote)
+    }
+
+    private suspend fun persistQuoteIfPresent(episodeUuid: String, quote: EpisodeChatQuote?) {
+        val quoteText = quote?.text?.takeIf { it.isNotBlank() } ?: return
+        val quoteStart = quote.start.orEmpty()
+        val quoteEnd = quote.end.orEmpty()
+        val quoteMessage = ChatMessage.Quote(
+            text = quoteText,
+            start = quoteStart,
+            end = quoteEnd,
+            startMs = parseTimestampMs(quoteStart) ?: -1,
+            endMs = parseTimestampMs(quoteEnd) ?: -1,
+        )
+        episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
     suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {

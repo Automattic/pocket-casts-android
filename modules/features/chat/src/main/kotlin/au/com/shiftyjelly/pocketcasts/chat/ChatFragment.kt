@@ -78,6 +78,7 @@ class ChatFragment : BaseDialogFragment() {
                 onInputTextChange = viewModel::onInputTextChange,
                 onSend = viewModel::onSend,
                 onRetry = viewModel::retry,
+                onPlayQuote = viewModel::playQuote,
                 modifier = Modifier.fillMaxSize(),
             )
         }

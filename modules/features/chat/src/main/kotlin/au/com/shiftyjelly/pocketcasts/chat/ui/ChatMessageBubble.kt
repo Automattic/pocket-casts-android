@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +49,7 @@ internal fun AiMessageBubble(
             elevation = null,
         )
         Text(
-            text = text.formatAiBullets(),
+            text = text,
             color = theme.aiBubbleText,
             fontSize = 15.sp,
             lineHeight = 22.sp,
@@ -60,10 +64,11 @@ internal fun AiMessageBubble(
 @Composable
 internal fun AiQuoteBubble(
     quote: String,
-    start: String,
-    end: String,
+    timestampLabel: String,
+    isPlayable: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    onClickPlay: () -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -77,6 +82,7 @@ internal fun AiQuoteBubble(
                 .widthIn(max = 300.dp)
                 .clip(QuoteCardShape)
                 .background(theme.aiBubble)
+                .then(if (isPlayable) Modifier.clickable(onClick = onClickPlay) else Modifier)
                 .height(IntrinsicSize.Min),
         ) {
             Box(
@@ -90,17 +96,32 @@ internal fun AiQuoteBubble(
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
             ) {
                 Text(
-                    text = "“${quote.trim('"', '“', '”', ' ')}”",
+                    text = quote,
                     color = theme.aiBubbleText,
                     fontSize = 15.sp,
                     lineHeight = 22.sp,
                     fontStyle = FontStyle.Italic,
                 )
-                Text(
-                    text = "$start – $end",
-                    color = theme.secondaryText,
-                    fontSize = 13.sp,
-                )
+                if (timestampLabel.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (isPlayable) {
+                            Icon(
+                                imageVector = Icons.Filled.PlayArrow,
+                                contentDescription = stringResource(LR.string.chat_play_quote),
+                                tint = theme.secondaryText,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                        Text(
+                            text = timestampLabel,
+                            color = theme.secondaryText,
+                            fontSize = 13.sp,
+                        )
+                    }
+                }
             }
         }
     }
@@ -160,11 +181,6 @@ internal fun ThinkingBubble(
         )
         ChatTypingIndicator(theme = theme)
     }
-}
-
-private fun String.formatAiBullets(): String {
-    val bulletRegex = Regex("""(?m)^\s*[-*]\s+""")
-    return bulletRegex.replace(this, "•  ")
 }
 
 private val AiBubbleShape = RoundedCornerShape(

@@ -2369,6 +2369,7 @@
     <string name="chat_error_server">Something went wrong. Please try again.</string>
     <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
     <string name="chat_tap_to_retry">Tap to retry</string>
+    <string name="chat_play_quote">Play quote</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>

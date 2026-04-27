@@ -30,6 +30,7 @@ fun ChatScreen(
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
+    onPlayQuote: (startMs: Int, endMs: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
@@ -64,16 +65,21 @@ fun ChatScreen(
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
-                        text = message.text,
+                        text = message.displayText,
                         podcastUuid = uiState.podcastUuid,
                         theme = theme,
                     )
-                    is ChatMessage.Quote -> AiQuoteBubble(
-                        quote = message.text,
-                        start = message.start,
-                        end = message.end,
-                        theme = theme,
-                    )
+                    is ChatMessage.Quote -> {
+                        val canPlay = uiState.isQuotePlaybackEnabled &&
+                            message.startMs >= 0 && message.endMs > message.startMs
+                        AiQuoteBubble(
+                            quote = message.displayText,
+                            timestampLabel = message.timestampLabel,
+                            isPlayable = canPlay,
+                            theme = theme,
+                            onClickPlay = { onPlayQuote(message.startMs, message.endMs) },
+                        )
+                    }
                     is ChatMessage.User -> UserMessageBubble(
                         text = message.text,
                         theme = theme,

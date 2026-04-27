@@ -248,6 +248,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    EPISODE_CHAT_PLAYABLE_QUOTES(
+        key = "episode_chat_playable_quotes",
+        title = "Episode Chat: tap quote to play episode segment",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

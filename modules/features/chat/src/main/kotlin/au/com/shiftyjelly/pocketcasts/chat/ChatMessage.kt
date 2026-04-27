@@ -14,10 +14,29 @@ sealed interface ChatMessage {
 
     data class Assistant(val text: String) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Assistant
+
+        // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
+        val displayText: String by lazy {
+            Regex("""(?m)^\s*[-*]\s+""").replace(text, "•  ")
+        }
     }
 
-    data class Quote(val text: String, val start: String, val end: String) : ChatMessage {
+    data class Quote(
+        val text: String,
+        val start: String,
+        val end: String,
+        val startMs: Int = -1,
+        val endMs: Int = -1,
+    ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Quote
+
+        // Empty when there's nothing meaningful to display (both strings missing/blank).
+        val timestampLabel: String
+            get() = if (start.isNotBlank() && end.isNotBlank()) "$start – $end" else ""
+
+        // Strip any straight or smart quotes the model wrapped around the text and re-add curly quotes.
+        val displayText: String
+            get() = "“${text.trim('"', '“', '”', ' ')}”"
     }
 }
 
@@ -70,5 +89,11 @@ private fun EpisodeChatMessage.toQuoteMessageOrNull(
 ): ChatMessage.Quote? {
     val raw = metadata ?: return null
     val parsed = runCatching { quoteMetadataAdapter.fromJson(raw) }.getOrNull() ?: return null
-    return ChatMessage.Quote(text = text, start = parsed.start, end = parsed.end)
+    return ChatMessage.Quote(
+        text = text,
+        start = parsed.start,
+        end = parsed.end,
+        startMs = parseTimestampMs(parsed.start) ?: -1,
+        endMs = parseTimestampMs(parsed.end) ?: -1,
+    )
 }
