@@ -1313,13 +1313,15 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val cause = event.error?.cause
                 val playbackIssue = when {
+                    stuckException != null && isBufferingStuck(stuckException) -> PlaybackIssue.TransientFailure
                     stuckException != null -> PlaybackIssue.StuckPlayer(errorClassifier.classifyErrorStringId(event))
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
-                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
+                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.TransientFailure
                     else -> null
                 }
                 val errorMessage = when (playbackIssue) {
                     is PlaybackIssue.ConnectionError -> application.getString(LR.string.player_play_failed_check_internet)
+                    is PlaybackIssue.TransientFailure -> application.getString(LR.string.error_playback_failed_try_again)
                     is PlaybackIssue.StuckPlayer -> application.getString(playbackIssue.messageResId)
                     else -> event.message
                 }
@@ -1369,6 +1371,12 @@ open class PlaybackManager @Inject constructor(
     @OptIn(UnstableApi::class)
     private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
         return application.getString(errorClassifier.classifyErrorStringId(event))
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun isBufferingStuck(exception: StuckPlayerException): Boolean {
+        return exception.stuckType == StuckPlayerException.STUCK_BUFFERING_NOT_LOADING ||
+            exception.stuckType == StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS
     }
 
     @OptIn(UnstableApi::class)

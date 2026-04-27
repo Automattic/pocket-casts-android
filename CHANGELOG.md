@@ -6,6 +6,8 @@
 *   Updates
     *   Make sure archived episode status is preserved across sync
         ([#5227](https://github.com/Automattic/pocket-casts-android/pull/5227))
+    *   Display dedicated error message for retryable playback errors
+        ([#5244](https://github.com/Automattic/pocket-casts-android/pull/5244))
 
 8.10
 -----
