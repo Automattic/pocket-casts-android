@@ -35,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -91,6 +93,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_ARCHIVE, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_PLAY_NEXT, Bundle.EMPTY))
+            .add(SessionCommand(APP_ACTION_ADD_BOOKMARK, Bundle.EMPTY))
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
@@ -112,6 +115,7 @@ internal class Media3SessionCallback(
             APP_ACTION_CHANGE_SPEED -> launchCommandFuture("Change speed") { actions.changePlaybackSpeedSuspend() }
             APP_ACTION_ARCHIVE -> launchCommandFuture("Archive") { actions.archiveSuspend() }
             APP_ACTION_PLAY_NEXT -> launchCommandFuture("Play next") { playbackManager.playNextInQueue() }
+            APP_ACTION_ADD_BOOKMARK -> launchCommandFuture(tag = "Bookmark", context = Dispatchers.Main) { addBookmark() }
             else -> Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
         }
     }
@@ -302,9 +306,9 @@ internal class Media3SessionCallback(
      * actual outcome — [SessionResult.RESULT_SUCCESS] on completion or
      * [SessionError.ERROR_UNKNOWN] on failure.
      */
-    private fun launchCommandFuture(tag: String, block: suspend () -> Unit): ListenableFuture<SessionResult> {
+    private fun launchCommandFuture(tag: String, context: CoroutineContext = EmptyCoroutineContext, block: suspend () -> Unit): ListenableFuture<SessionResult> {
         val future = SettableFuture.create<SessionResult>()
-        scope.launch {
+        scope.launch(context) {
             commandMutex.withLock {
                 try {
                     block()
@@ -318,13 +322,17 @@ internal class Media3SessionCallback(
         return future
     }
 
+    private suspend fun addBookmark() {
+        val isAutoConnected = Util.isAndroidAutoConnectedFlow(contextProvider()).first()
+        bookmarkHelper.handleAddBookmarkAction(contextProvider(), isAutoConnected)
+    }
+
     private fun handleMediaButtonAction(action: HeadphoneAction) {
         when (action) {
             HeadphoneAction.ADD_BOOKMARK -> {
                 scope.launch(Dispatchers.Main) {
                     try {
-                        val isAutoConnected = Util.isAndroidAutoConnectedFlow(contextProvider()).first()
-                        bookmarkHelper.handleAddBookmarkAction(contextProvider(), isAutoConnected)
+                        addBookmark()
                     } catch (e: Exception) {
                         Timber.e(e, "Add bookmark failed")
                     }

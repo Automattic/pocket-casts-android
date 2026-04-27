@@ -228,7 +228,7 @@ interface Settings {
     ) {
         companion object {
             val All
-                get() = listOf(PlaybackSpeed, Star, MarkAsPlayed, PlayNext, Archive)
+                get() = listOf(PlaybackSpeed, Star, MarkAsPlayed, PlayNext, Archive, Bookmark)
             val items = All.associateBy { it.key }
 
             const val MAX_VISIBLE_OPTIONS = 3
@@ -238,6 +238,7 @@ interface Settings {
             private const val PLAY_NEXT_KEY = "default_media_control_play_next_key"
             private const val PLAYBACK_SPEED_KEY = "default_media_control_playback_speed_key"
             private const val STAR_KEY = "default_media_control_star_key"
+            private const val BOOKMARK_KEY = "default_media_control_bookmark_key"
 
             fun itemForId(id: String): MediaNotificationControls? {
                 return items[id]
@@ -286,6 +287,13 @@ interface Settings {
             iconRes = IR.drawable.ic_star,
             key = STAR_KEY,
             serverId = "star",
+        )
+
+        data object Bookmark : MediaNotificationControls(
+            controlName = LR.string.bookmark,
+            iconRes = IR.drawable.ic_bookmark,
+            key = BOOKMARK_KEY,
+            serverId = "bookmark",
         )
     }
 

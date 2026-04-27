@@ -23,7 +23,6 @@ import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -70,6 +69,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -787,6 +787,13 @@ class MediaSessionManager(
                     null
                 }
             }
+
+            MediaNotificationControls.Bookmark ->
+                CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+                    .setSessionCommand(SessionCommand(APP_ACTION_ADD_BOOKMARK, Bundle.EMPTY))
+                    .setDisplayName(context.getString(LR.string.add_bookmark))
+                    .setCustomIconResId(IR.drawable.ic_bookmark)
+                    .build()
         }
     }
 
@@ -1143,6 +1150,8 @@ class MediaSessionManager(
                         }
                     }
                 }
+
+                MediaNotificationControls.Bookmark -> addCustomAction(stateBuilder, APP_ACTION_ADD_BOOKMARK, "Add bookmark", IR.drawable.ic_bookmark)
             }
         }
     }
@@ -1204,12 +1213,9 @@ class MediaSessionManager(
 
         private fun onAddBookmark() {
             logEvent("add bookmark")
-            val coroutineContext = CoroutineScope(Dispatchers.Main + Job())
-            coroutineContext.launch {
-                Util.isAndroidAutoConnectedFlow(context).collect {
-                    bookmarkHelper.handleAddBookmarkAction(context, it)
-                    coroutineContext.cancel()
-                }
+            scope.launch(Dispatchers.Main) {
+                val isAndroidAuto = Util.isAndroidAutoConnectedFlow(context).first()
+                bookmarkHelper.handleAddBookmarkAction(context, isAndroidAuto)
             }
         }
 
@@ -1362,6 +1368,8 @@ class MediaSessionManager(
                 APP_ACTION_PLAY_NEXT -> enqueueCommand("custom action: play next") {
                     playbackManager.playNextInQueue()
                 }
+
+                APP_ACTION_ADD_BOOKMARK -> onAddBookmark()
             }
         }
 
@@ -1463,6 +1471,7 @@ internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
 internal const val APP_ACTION_ARCHIVE = "archive"
 internal const val APP_ACTION_PLAY_NEXT = "playNext"
+internal const val APP_ACTION_ADD_BOOKMARK = "addBookmark"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
