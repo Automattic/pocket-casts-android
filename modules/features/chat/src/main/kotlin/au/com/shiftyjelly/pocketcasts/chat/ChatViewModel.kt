@@ -33,9 +33,7 @@ class ChatViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        ChatUiState(isQuotePlaybackEnabled = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES)),
-    )
+    private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
     private var sendJob: Job? = null
@@ -78,7 +76,9 @@ class ChatViewModel @Inject constructor(
     private fun observeMessages() {
         viewModelScope.launch {
             chatManager.observeMessages(episodeUuid).collect { messages ->
-                _uiState.update { it.copy(messages = messages) }
+                _uiState.update { state ->
+                    state.copy(messages = messages.withQuotePlaybackState(state.messages.playingQuoteUuid()))
+                }
             }
         }
     }
@@ -119,24 +119,31 @@ class ChatViewModel @Inject constructor(
         performSend(message = lastUserMessage.text, isRetry = true)
     }
 
-    fun playQuote(startMs: Int, endMs: Int) {
-        // Tapping the currently-playing quote toggles it off — same effect as leaving the screen.
-        val current = _uiState.value.playingQuote
-        if (current?.startMs == startMs && current.endMs == endMs) {
+    fun playQuote(quoteUuid: String) {
+        // Tapping the currently-playing quote toggles it off
+        val quote = _uiState.value.messages
+            .filterIsInstance<ChatMessage.Quote>()
+            .firstOrNull { it.uuid == quoteUuid && it.canPlay }
+            ?: return
+
+        if (quote.isPlaying) {
             stopQuote()
             return
         }
+
         quotePlaybackJob?.cancel()
         // Snapshot before we touch playback so we can restore the user where they were.
         val snapshot = capturePlaybackSnapshot()
         pendingPlaybackSnapshot = snapshot
         isQuoteInFlight = true
-        _uiState.update { it.copy(playingQuote = PlayingQuote(startMs, endMs)) }
+        _uiState.update { state ->
+            state.copy(messages = state.messages.withQuotePlaybackState(quoteUuid))
+        }
         quotePlaybackJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                startQuotePlayback(startMs)
+                startQuotePlayback(quote.startMs)
             }
-            val reachedEnd = awaitEndOfQuote(startMs, endMs)
+            val reachedEnd = awaitEndOfQuote(quote.startMs, quote.endMs)
             if (reachedEnd) {
                 withContext(Dispatchers.IO) {
                     restorePreviousPlayback(snapshot)
@@ -144,7 +151,9 @@ class ChatViewModel @Inject constructor(
             }
             pendingPlaybackSnapshot = null
             isQuoteInFlight = false
-            _uiState.update { it.copy(playingQuote = null) }
+            _uiState.update { state ->
+                state.copy(messages = state.messages.withQuotePlaybackState(playingQuoteUuid = null))
+            }
         }
     }
 
@@ -154,7 +163,9 @@ class ChatViewModel @Inject constructor(
         val snapshot = pendingPlaybackSnapshot
         pendingPlaybackSnapshot = null
         isQuoteInFlight = false
-        _uiState.update { it.copy(playingQuote = null) }
+        _uiState.update { state ->
+            state.copy(messages = state.messages.withQuotePlaybackState(playingQuoteUuid = null))
+        }
         viewModelScope.launch(Dispatchers.IO) {
             restorePreviousPlayback(snapshot)
         }
@@ -248,6 +259,25 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    private fun List<ChatMessage>.playingQuoteUuid(): String? {
+        return filterIsInstance<ChatMessage.Quote>().firstOrNull { it.isPlaying }?.uuid
+    }
+
+    private fun List<ChatMessage>.withQuotePlaybackState(playingQuoteUuid: String?): List<ChatMessage> {
+        val isQuotePlaybackEnabled = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES)
+        return map { message ->
+            if (message is ChatMessage.Quote) {
+                val canPlay = isQuotePlaybackEnabled && message.startMs >= 0 && message.endMs > message.startMs
+                message.copy(
+                    canPlay = canPlay,
+                    isPlaying = canPlay && message.uuid == playingQuoteUuid,
+                )
+            } else {
+                message
+            }
+        }
+    }
 }
 
 private data class PlaybackSnapshot(
@@ -265,10 +295,6 @@ data class ChatUiState(
     val isConnected: Boolean = true,
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
-    val isQuotePlaybackEnabled: Boolean = false,
-    val playingQuote: PlayingQuote? = null,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 }
-
-data class PlayingQuote(val startMs: Int, val endMs: Int)

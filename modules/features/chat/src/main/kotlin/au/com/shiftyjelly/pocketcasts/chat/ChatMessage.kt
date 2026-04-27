@@ -5,13 +5,20 @@ import com.squareup.moshi.JsonAdapter
 import java.util.UUID
 
 sealed interface ChatMessage {
+    val uuid: String
     val role: ChatRole
 
-    data class User(val text: String) : ChatMessage {
+    data class User(
+        val text: String,
+        override val uuid: String = UUID.randomUUID().toString(),
+    ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.User
     }
 
-    data class Assistant(val text: String) : ChatMessage {
+    data class Assistant(
+        val text: String,
+        override val uuid: String = UUID.randomUUID().toString(),
+    ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Assistant
 
         // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
@@ -26,6 +33,9 @@ sealed interface ChatMessage {
         val end: String,
         val startMs: Int = -1,
         val endMs: Int = -1,
+        val canPlay: Boolean = false,
+        val isPlaying: Boolean = false,
+        override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Quote
 
@@ -63,7 +73,7 @@ internal fun ChatMessage.toEntity(
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end))
     }
     return EpisodeChatMessage(
-        uuid = UUID.randomUUID().toString(),
+        uuid = uuid,
         episodeUuid = episodeUuid,
         text = text,
         role = role.value,
@@ -75,9 +85,9 @@ internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
-        ChatRole.User.value -> ChatMessage.User(text = entity.text)
+        ChatRole.User.value -> ChatMessage.User(text = entity.text, uuid = entity.uuid)
         ChatRole.Quote.value -> entity.toQuoteMessageOrNull(quoteMetadataAdapter)
-        else -> ChatMessage.Assistant(text = entity.text)
+        else -> ChatMessage.Assistant(text = entity.text, uuid = entity.uuid)
     }
 }
 
@@ -92,5 +102,6 @@ private fun EpisodeChatMessage.toQuoteMessageOrNull(
         end = parsed.end,
         startMs = parseTimestampMs(parsed.start) ?: -1,
         endMs = parseTimestampMs(parsed.end) ?: -1,
+        uuid = uuid,
     )
 }
