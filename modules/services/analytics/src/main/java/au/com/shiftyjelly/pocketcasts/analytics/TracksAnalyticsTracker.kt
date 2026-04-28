@@ -75,7 +75,7 @@ class TracksAnalyticsTracker @Inject constructor(
 
     private fun shouldTrackEvent(event: Trackable): Boolean {
         return when (event) {
-            ListeningTimeEvent -> settings.collectListeningStats.value
+            is ListeningTimeEvent -> settings.collectListeningStats.value
             else -> settings.collectAnalytics.value
         }
     }
