@@ -143,7 +143,6 @@ class UserManagerImpl @Inject constructor(
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
 
                     settings.marketingOptIn.set(false, updateModifiedAt = false)
-                    settings.collectListeningStats.set(true, updateModifiedAt = false)
 
                     eventHorizon.track(
                         UserSignedOutEvent(
