@@ -4,8 +4,6 @@ import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import android.os.Build
 import android.system.ErrnoException
 import android.system.OsConstants
@@ -93,6 +91,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val fileStorage: FileStorage,
     private val progressCache: DownloadProgressCache,
     private val notificationObserver: DownloadNotificationObserver,
+    private val episodeDurationFixer: EpisodeDurationFixer,
 ) : Worker(context, params) {
     private val args = inputData.toArgs()
 
@@ -128,6 +127,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         if (!isStopped) {
             LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download started. Episode: ${args.episodeUuid}")
         }
+        var resolvedEpisode: BaseEpisode? = null
         val timedValue = measureTimedValue {
             try {
                 // Block the work until the state is dispatched to keep it consistent
@@ -137,6 +137,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 prepareForegroundNotification(episode)
 
                 episode = refreshDownloadUrlOrThrow(episode)
+                resolvedEpisode = episode
                 val downloadFile = getDownloadFileOrThrow(episode)
                 val tempFile = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
 
@@ -157,7 +158,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         return when (val result = timedValue.value) {
             is DownloadResult.Success -> {
-                fixMissingDuration(args.episodeUuid, result.file)
+                resolvedEpisode?.let { episodeDurationFixer.fixMissingDuration(it, result.file) }
                 val data = Data.Builder()
                     .putString(DOWNLOAD_FILE_PATH_KEY, result.file.path)
                     .build()
@@ -332,36 +333,6 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             throwable = throwable.cause
         }
         return false
-    }
-
-    private fun fixMissingDuration(episodeUuid: String, file: File) {
-        try {
-            val episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUuid) } ?: return
-            if (episode.duration > 0) {
-                return
-            }
-            val extractor = MediaExtractor()
-            try {
-                extractor.setDataSource(file.path)
-                for (i in 0 until extractor.trackCount) {
-                    val format = extractor.getTrackFormat(i)
-                    if (!format.containsKey(MediaFormat.KEY_DURATION)) {
-                        continue
-                    }
-                    val durationUs = format.getLong(MediaFormat.KEY_DURATION)
-                    if (durationUs <= 0) {
-                        continue
-                    }
-                    val durationInSecs = durationUs / 1_000_000.0
-                    episodeManager.updateDurationBlocking(episode, durationInSecs, syncChanges = true)
-                    return
-                }
-            } finally {
-                extractor.release()
-            }
-        } catch (e: Exception) {
-            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, e, "Failed to fix missing duration for episode: $episodeUuid")
-        }
     }
 
     private fun prepareForegroundNotification(episode: BaseEpisode) {
