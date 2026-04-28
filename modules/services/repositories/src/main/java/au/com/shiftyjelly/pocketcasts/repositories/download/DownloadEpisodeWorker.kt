@@ -337,6 +337,9 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private fun fixMissingDuration(episodeUuid: String, file: File) {
         try {
             val episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUuid) } ?: return
+            if (episode.duration > 0) {
+                return
+            }
             val extractor = MediaExtractor()
             try {
                 extractor.setDataSource(file.path)
