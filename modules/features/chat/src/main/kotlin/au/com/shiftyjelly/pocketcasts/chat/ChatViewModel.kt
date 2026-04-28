@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -252,6 +253,8 @@ class ChatViewModel @Inject constructor(
                 chatManager.sendMessage(episodeUuid, podcastUuid, message, currentMessages, isRetry)
             } catch (e: IOException) {
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = ChatError.ServerError) }
             } finally {
