@@ -46,7 +46,7 @@ class PrivacyViewModel @Inject constructor(
     }
 
     fun updateListeningStatsSetting(on: Boolean) {
-        settings.collectListeningStats.set(true, updateModifiedAt = true)
+        settings.collectListeningStats.set(on, updateModifiedAt = true)
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(listeningStats = on)
     }
 
