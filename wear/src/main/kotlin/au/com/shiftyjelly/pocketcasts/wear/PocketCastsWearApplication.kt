@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
@@ -123,6 +124,9 @@ class PocketCastsWearApplication :
 
         userManager.beginMonitoringAccountManager(playbackManager)
         downloadStatusObserver.monitorDownloadStatus()
+
+        PlaybackStatsSyncWorker.scheduleOneTimeWork(this)
+        PlaybackStatsSyncWorker.schedulePeriodicWork(this)
     }
 
     private fun setupAnalytics() {
