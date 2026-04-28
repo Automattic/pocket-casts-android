@@ -56,6 +56,7 @@ class PersistentPlaybackStatsCollector @Inject constructor(
     override fun onStop() {
         val endedAt = clock.instant()
         if (!shouldCollectStats()) {
+            partialEvent = null
             return
         }
 
