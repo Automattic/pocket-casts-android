@@ -12,6 +12,6 @@ enum class AppPlatform(
         analyticsValue = DeviceType.Phone,
     ),
     WearOs(
-        analyticsValue = DeviceType.Phone,
+        analyticsValue = DeviceType.Watch,
     ),
 }
