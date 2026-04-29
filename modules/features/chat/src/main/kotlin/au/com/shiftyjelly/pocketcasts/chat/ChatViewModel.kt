@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +31,6 @@ class ChatViewModel @Inject constructor(
     private val networkConnectionWatcher: NetworkConnectionWatcher,
     private val chatManager: ChatManager,
     private val playbackManager: PlaybackManager,
-    private val episodeManager: EpisodeManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -151,18 +150,16 @@ class ChatViewModel @Inject constructor(
                 if (quotePlaybackSession !== session) return@launch
 
                 session.captureSnapshotIfNeeded()
-                val quoteEpisode = withContext(Dispatchers.IO) {
-                    episodeManager.findEpisodeByUuid(episodeUuid)
+                session.hasStartedPlayback = true
+                val didStartPlayback = withContext(Dispatchers.IO) {
+                    startQuotePlayback(quote.startMs)
                 }
-                if (quoteEpisode == null) {
+                session.hasStartedPlayback = didStartPlayback
+                if (!didStartPlayback) {
                     finishQuotePlayback(session)
                     return@launch
                 }
 
-                session.hasStartedPlayback = true
-                withContext(Dispatchers.IO) {
-                    startQuotePlayback(quoteEpisode, quote.startMs)
-                }
                 if (awaitEndOfQuote(quote.startMs, quote.endMs)) {
                     finishQuotePlayback(session)
                 } else {
@@ -236,16 +233,19 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-    private suspend fun startQuotePlayback(episode: BaseEpisode, startMs: Int) {
-        val state = playbackManager.playbackStateFlow.first()
+    private suspend fun startQuotePlayback(startMs: Int): Boolean {
+        var state = playbackManager.playbackStateFlow.first()
         val isAlreadyCurrent = state.episodeUuid == episodeUuid
         if (!isAlreadyCurrent) {
-            playbackManager.playNowSuspend(episode = episode, sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.playNowSuspend(episodeUuid = episodeUuid, sourceView = SourceView.EPISODE_DETAILS)
+            state = playbackManager.playbackStateFlow.first()
+            if (state.episodeUuid != episodeUuid) return false
         }
         playbackManager.seekToTimeMsSuspend(positionMs = startMs)
         if (isAlreadyCurrent && !state.isPlaying) {
             playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
         }
+        return true
     }
 
     private suspend fun awaitEndOfQuote(startMs: Int, endMs: Int): Boolean {
@@ -271,11 +271,11 @@ class ChatViewModel @Inject constructor(
         }
         val currentEpisodeUuid = playbackManager.playbackStateFlow.first().episodeUuid
         if (currentEpisodeUuid != snapshot.episodeUuid) {
-            val previous = episodeManager.findEpisodeByUuid(snapshot.episodeUuid) ?: run {
+            playbackManager.playNowSuspend(episodeUuid = snapshot.episodeUuid, sourceView = SourceView.EPISODE_DETAILS)
+            if (playbackManager.playbackStateFlow.first().episodeUuid != snapshot.episodeUuid) {
                 playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
                 return
             }
-            playbackManager.playNowSuspend(episode = previous, sourceView = SourceView.EPISODE_DETAILS)
         }
         playbackManager.seekToTimeMsSuspend(positionMs = snapshot.positionMs)
         if (!snapshot.wasPlaying) {

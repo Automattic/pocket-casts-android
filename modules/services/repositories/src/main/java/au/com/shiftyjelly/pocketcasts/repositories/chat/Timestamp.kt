@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.chat
+package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 // Parses "HH:MM:SS" or "HH:MM:SS,mmm" / "HH:MM:SS.mmm" into milliseconds; null if malformed.
 internal fun parseTimestampMs(value: String): Int? {

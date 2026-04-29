@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.chat
+package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import com.squareup.moshi.JsonClass
 

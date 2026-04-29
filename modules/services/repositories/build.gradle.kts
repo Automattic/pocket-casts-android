@@ -15,6 +15,7 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
 
     api(libs.billing.ktx)
     api(libs.dagger.hilt.android)

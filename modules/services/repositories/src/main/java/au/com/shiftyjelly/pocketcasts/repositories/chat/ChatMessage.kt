@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.chat
+package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import com.squareup.moshi.JsonAdapter
@@ -57,7 +57,7 @@ enum class ChatRole(val value: String, val apiRole: String) {
 }
 
 // Text content for history payloads. Returns null for message types that carry no text.
-fun ChatMessage.textOrNull(): String? = when (this) {
+internal fun ChatMessage.textOrNull(): String? = when (this) {
     is ChatMessage.User -> text
     is ChatMessage.Assistant -> text
     is ChatMessage.Quote -> text

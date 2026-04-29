@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.chat
+package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
@@ -16,33 +16,33 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @Singleton
-class ChatManager @Inject constructor(
+class ChatManagerImpl @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
     private val transcriptDao: TranscriptDao,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
     moshi: Moshi,
-) {
+) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
 
-    fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
+    override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
         return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter) }
     }
 
-    suspend fun getMessages(episodeUuid: String): List<ChatMessage> {
+    override suspend fun getMessages(episodeUuid: String): List<ChatMessage> {
         return episodeChatDao.getMessages(episodeUuid).toChatMessages(quoteMetadataAdapter)
     }
 
-    suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
+    override suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
         episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
         episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
-    suspend fun sendMessage(
+    override suspend fun sendMessage(
         episodeUuid: String,
         podcastUuid: String,
         message: String,
         allMessages: List<ChatMessage>,
-        isRetry: Boolean = false,
+        isRetry: Boolean,
     ) {
         if (!isRetry) {
             val userMessage = ChatMessage.User(text = message)
@@ -92,7 +92,7 @@ class ChatManager @Inject constructor(
         episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
-    suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
+    override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
         episodeChatDao.deleteMessagesByEpisode(episodeUuid)
         episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }

@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
-import au.com.shiftyjelly.pocketcasts.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
