@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
+import au.com.shiftyjelly.pocketcasts.repositories.download.MediaDurationExtractor
+import au.com.shiftyjelly.pocketcasts.repositories.download.MediaDurationExtractorImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -204,6 +206,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideExternalDataManager(externalDataManagerImpl: ExternalDataManagerImpl): ExternalDataManager
+
+    @Binds
+    abstract fun provideMediaDurationExtractor(mediaDurationExtractorImpl: MediaDurationExtractorImpl): MediaDurationExtractor
 
     @Binds
     abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
