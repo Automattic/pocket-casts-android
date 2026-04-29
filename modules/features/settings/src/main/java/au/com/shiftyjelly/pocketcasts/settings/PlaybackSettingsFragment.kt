@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
@@ -77,7 +76,6 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -307,11 +305,9 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_ENABLE_LOCK_SCREEN_SCRUBBING -> {
-                            Timber.tag("enableLockScreen").d("${settings.enableLockScreenScrubbing.flow.collectAsState().value}")
                             EnableLockScreenScrubbing(
                                 saved = settings.enableLockScreenScrubbing.flow.collectAsState().value,
                                 onSave = { isLockScreenScrubbingEnabled ->
-                                    Timber.tag("isLockScreenScrub").d("$isLockScreenScrubbingEnabled")
                                     settings.enableLockScreenScrubbing.set(isLockScreenScrubbingEnabled, updateModifiedAt = true)
                                 },
                             )
