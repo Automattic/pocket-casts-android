@@ -1,5 +1,8 @@
 8.12
 -----
+*   New Features 
+    *   Enable scrubbing in notification.
+        ([#5209](https://github.com/Automattic/pocket-casts-android/pull/5209))
 
 
 8.11

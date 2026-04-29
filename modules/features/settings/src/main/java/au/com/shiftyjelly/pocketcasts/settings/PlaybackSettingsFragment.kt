@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
@@ -76,6 +77,7 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -300,6 +302,17 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         ),
                                     )
                                     settings.openPlayerAutomatically.set(isOpenPlayerEnabled, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
+                        SettingsItems.SETTINGS_ENABLE_LOCK_SCREEN_SCRUBBING -> {
+                            Timber.tag("enableLockScreen").d("${settings.enableLockScreenScrubbing.flow.collectAsState().value}")
+                            EnableLockScreenScrubbing(
+                                saved = settings.enableLockScreenScrubbing.flow.collectAsState().value,
+                                onSave = { isLockScreenScrubbingEnabled ->
+                                    Timber.tag("isLockScreenScrub").d("$isLockScreenScrubbingEnabled")
+                                    settings.enableLockScreenScrubbing.set(isLockScreenScrubbingEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -558,6 +571,14 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun EnableLockScreenScrubbing(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(id = LR.string.settings_enable_lock_screen_scrubbing),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_playback_resumption),
         secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
@@ -674,6 +695,7 @@ private enum class SettingsItems {
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
     SETTINGS_INTELLIGENT_PLAYBACK,
+    SETTINGS_ENABLE_LOCK_SCREEN_SCRUBBING,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
