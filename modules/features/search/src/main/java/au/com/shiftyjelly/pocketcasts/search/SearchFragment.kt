@@ -43,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -260,7 +258,7 @@ class SearchFragment : BaseFragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.updateSearchQuery(query, immediate = true)
+                viewModel.updateSearchQuery(query)
                 binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
@@ -288,7 +286,7 @@ class SearchFragment : BaseFragment() {
         binding.searchHistoryPanel.apply {
             setContentWithViewCompositionStrategy {
                 val state = viewModel.state.collectAsState()
-                if ((state.value is SearchUiState.Suggestions || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) && state.value.searchTerm.isNullOrBlank()) {
+                if (state.value is SearchUiState.Suggestions && state.value.searchTerm.isNullOrBlank()) {
                     searchHistoryViewModel.start()
                 }
 

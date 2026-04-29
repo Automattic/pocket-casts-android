@@ -159,14 +159,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    IMPROVED_SEARCH_SUGGESTIONS(
-        key = "search_predictive",
-        title = "Predictive search suggestions",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     IMPROVED_SEARCH_RESULTS(
         key = "search_improvements",
         title = "Improved search results",
