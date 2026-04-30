@@ -72,7 +72,13 @@ class Support @Inject constructor(
         get() = Dispatchers.Default
 
     @Suppress("DEPRECATION")
-    suspend fun shareLogs(subject: String, intro: String, emailSupport: Boolean, context: Context): Intent {
+    suspend fun shareLogs(
+        subject: String,
+        intro: String,
+        emailSupport: Boolean,
+        context: Context,
+        recipient: String = "support@pocketcasts.com",
+    ): Intent {
         val dialog = withContext(Dispatchers.Main) {
             android.app.ProgressDialog.show(context, context.getString(R.string.loading), context.getString(R.string.settings_support_please_wait), true)
         }
@@ -81,7 +87,7 @@ class Support @Inject constructor(
         withContext(Dispatchers.IO) {
             intent.type = "message/rfc822"
             if (emailSupport) {
-                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
             }
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
