@@ -86,6 +86,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val disposables = CompositeDisposable()
 
     var episode: PodcastEpisode? = null
+    var podcast: Podcast? = null
     var isFragmentChangingConfigurations: Boolean = false
 
     private var startPlaybackTimestamp: Duration? = null
@@ -171,6 +172,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                         play(it.episode, playTimestamp)
                     }
                     episode = it.episode
+                    podcast = it.podcast
                 }
             }
             .onErrorReturn { EpisodeFragmentState.Error(it) }

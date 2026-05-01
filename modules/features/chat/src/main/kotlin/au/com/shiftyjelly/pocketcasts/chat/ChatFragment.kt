@@ -34,11 +34,16 @@ class ChatFragment : BaseDialogFragment() {
         fun newInstance(
             episodeUuid: String,
             podcastUuid: String,
+            podcastTitle: String,
             episodeTitle: String,
             episodeSubtitle: String,
+            episodeDurationMs: Int,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid, episodeTitle, episodeSubtitle))
+                putParcelable(
+                    ARGS_KEY,
+                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs),
+                )
             }
         }
     }
@@ -54,6 +59,8 @@ class ChatFragment : BaseDialogFragment() {
             episodeTitle = args.episodeTitle,
             episodeSubtitle = args.episodeSubtitle,
             podcastUuid = args.podcastUuid,
+            podcastTitle = args.podcastTitle,
+            episodeDurationMs = args.episodeDurationMs,
             welcomeMessage = getString(LR.string.chat_preview_ai_1),
         )
     }
@@ -109,7 +116,9 @@ class ChatFragment : BaseDialogFragment() {
     private class Args(
         val episodeUuid: String,
         val podcastUuid: String,
+        val podcastTitle: String,
         val episodeTitle: String,
         val episodeSubtitle: String,
+        val episodeDurationMs: Int,
     ) : Parcelable
 }

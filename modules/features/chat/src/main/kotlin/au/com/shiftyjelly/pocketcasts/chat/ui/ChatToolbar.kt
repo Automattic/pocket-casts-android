@@ -33,6 +33,7 @@ internal fun ChatToolbar(
     episodeTitle: String,
     episodeSubtitle: String,
     podcastUuid: String,
+    podcastTitle: String,
     onClickBack: () -> Unit,
     onClickMore: () -> Unit,
     theme: ChatTheme,
@@ -60,7 +61,7 @@ internal fun ChatToolbar(
         Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(LR.string.episode_chat),
+                text = podcastTitle.ifBlank { stringResource(LR.string.episode_chat) },
                 color = theme.primaryText,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,

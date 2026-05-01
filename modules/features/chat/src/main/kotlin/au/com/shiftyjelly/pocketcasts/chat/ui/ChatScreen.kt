@@ -50,6 +50,7 @@ fun ChatScreen(
             episodeTitle = uiState.episodeTitle,
             episodeSubtitle = uiState.episodeSubtitle,
             podcastUuid = uiState.podcastUuid,
+            podcastTitle = uiState.podcastTitle,
             onClickBack = onClickClose,
             onClickMore = onClickMore,
             theme = theme,
@@ -62,6 +63,10 @@ fun ChatScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
+            ChatContextBubble(
+                episodeDurationMs = uiState.episodeDurationMs,
+                theme = theme,
+            )
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
@@ -86,7 +91,7 @@ fun ChatScreen(
                 }
             }
             if (uiState.isAwaitingReply) {
-                ThinkingBubble(podcastUuid = uiState.podcastUuid, theme = theme)
+                ThinkingBubble(theme = theme)
             }
             if (uiState.error != null) {
                 ChatErrorMessage(error = uiState.error, theme = theme)

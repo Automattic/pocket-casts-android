@@ -17,12 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun ChatTypingIndicator(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    showBubble: Boolean = true,
+    dotColor: Color = theme.aiBubbleText,
 ) {
     val cycleDuration = 1200
     val transition = rememberInfiniteTransition(label = "typing")
@@ -62,27 +65,33 @@ internal fun ChatTypingIndicator(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .background(theme.aiBubble, shape)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier = modifier.then(
+            if (showBubble) {
+                Modifier
+                    .background(theme.aiBubble, shape)
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
+            } else {
+                Modifier
+            },
+        ),
     ) {
         Box(
             modifier = Modifier
                 .size(8.dp)
                 .alpha(dot1Alpha)
-                .background(theme.aiBubbleText, CircleShape),
+                .background(dotColor, CircleShape),
         )
         Box(
             modifier = Modifier
                 .size(8.dp)
                 .alpha(dot2Alpha)
-                .background(theme.aiBubbleText, CircleShape),
+                .background(dotColor, CircleShape),
         )
         Box(
             modifier = Modifier
                 .size(8.dp)
                 .alpha(dot3Alpha)
-                .background(theme.aiBubbleText, CircleShape),
+                .background(dotColor, CircleShape),
         )
     }
 }

@@ -624,12 +624,24 @@ class EpisodeFragment : BaseFragment() {
 //                                                if (isPlusUser) {
                                                     val episode = viewModel.episode ?: return@clickable
                                                     val chatPodcastUuid = podcastUuid ?: return@clickable
-                                                    if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                                                    val episodeSubtitle = PodcastEpisode
+                                                        .seasonPrefix(
+                                                            episode.episodeType,
+                                                            episode.season,
+                                                            episode.number,
+                                                            resources,
+                                                        )
+                                                        .orEmpty()
+                                                    val isChatOpen = parentFragmentManager
+                                                        .findFragmentByTag("episode_chat") != null
+                                                    if (!isChatOpen) {
                                                         val fragment = ChatFragment.newInstance(
                                                             episodeUuid,
                                                             chatPodcastUuid,
+                                                            viewModel.podcast?.title.orEmpty(),
                                                             episode.title,
-                                                            PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
+                                                            episodeSubtitle,
+                                                            episode.durationMs,
                                                         )
                                                         fragment.show(parentFragmentManager, "episode_chat")
                                                     }

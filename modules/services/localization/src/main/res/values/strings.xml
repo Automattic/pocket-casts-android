@@ -2359,6 +2359,10 @@
 
     <!-- Chat -->
     <string name="chat_paywall_title">Chat with this episode</string>
+    <string name="chat_context_label">Chatting with this episode</string>
+    <string name="chat_context_label_with_duration">Chatting with this episode · %1$s</string>
+    <string name="chat_episode_assistant">EPISODE ASSISTANT</string>
+    <string name="chat_thinking">THINKING</string>
     <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
     <string name="chat_preview_user_1">What was the main topic of this episode?</string>
     <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>

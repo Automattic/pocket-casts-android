@@ -61,6 +61,8 @@ class ChatViewModel @Inject constructor(
         episodeTitle: String,
         episodeSubtitle: String,
         podcastUuid: String,
+        podcastTitle: String,
+        episodeDurationMs: Int,
         welcomeMessage: String,
     ) {
         this.episodeUuid = episodeUuid
@@ -70,6 +72,8 @@ class ChatViewModel @Inject constructor(
                 episodeTitle = episodeTitle,
                 episodeSubtitle = episodeSubtitle,
                 podcastUuid = podcastUuid,
+                podcastTitle = podcastTitle,
+                episodeDurationMs = episodeDurationMs,
             )
         }
         observeMessages()
@@ -400,6 +404,8 @@ data class ChatUiState(
     val episodeTitle: String = "",
     val episodeSubtitle: String = "",
     val podcastUuid: String = "",
+    val podcastTitle: String = "",
+    val episodeDurationMs: Int = 0,
     val messages: List<ChatMessage> = emptyList(),
     val isConnected: Boolean = true,
     val isAwaitingReply: Boolean = false,
