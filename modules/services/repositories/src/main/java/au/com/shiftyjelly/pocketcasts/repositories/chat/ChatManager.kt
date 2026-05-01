@@ -15,7 +15,6 @@ interface ChatManager {
 
     suspend fun sendMessage(
         episodeUuid: String,
-        podcastUuid: String,
         message: String,
         allMessages: List<ChatMessage>,
         isRetry: Boolean = false,

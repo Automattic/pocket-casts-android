@@ -39,7 +39,6 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun sendMessage(
         episodeUuid: String,
-        podcastUuid: String,
         message: String,
         allMessages: List<ChatMessage>,
         isRetry: Boolean,
@@ -54,21 +53,14 @@ class ChatManagerImpl @Inject constructor(
             ConversationMessage(role = msg.role.apiRole, content = content)
         }
 
-        val transcript = selectTranscript(episodeUuid)
-        val request = if (transcript != null && !transcript.isGenerated) {
-            EpisodeChatRequest(
-                transcriptUrl = transcript.url,
-                message = message,
-                conversationHistory = history,
-            )
-        } else {
-            EpisodeChatRequest(
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-                message = message,
-                conversationHistory = history,
-            )
+        val transcript = checkNotNull(selectTranscript(episodeUuid)) {
+            "Transcript URL is required to send episode chat messages"
         }
+        val request = EpisodeChatRequest(
+            transcriptUrl = transcript.url,
+            message = message,
+            conversationHistory = history,
+        )
 
         val response = podcastCacheServiceManager.episodeChat(request)
 

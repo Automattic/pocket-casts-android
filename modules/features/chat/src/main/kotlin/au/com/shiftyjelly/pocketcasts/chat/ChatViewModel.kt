@@ -298,14 +298,13 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: String, isRetry: Boolean) {
-        val podcastUuid = _uiState.value.podcastUuid
         val currentMessages = _uiState.value.messages
 
         _uiState.update { it.copy(isAwaitingReply = true, error = null) }
 
         sendJob = viewModelScope.launch {
             try {
-                chatManager.sendMessage(episodeUuid, podcastUuid, message, currentMessages, isRetry)
+                chatManager.sendMessage(episodeUuid, message, currentMessages, isRetry)
             } catch (e: IOException) {
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: CancellationException) {

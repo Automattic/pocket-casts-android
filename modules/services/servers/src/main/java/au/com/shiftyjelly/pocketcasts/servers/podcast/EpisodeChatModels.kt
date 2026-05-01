@@ -5,9 +5,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class EpisodeChatRequest(
-    @Json(name = "episode_uuid") val episodeUuid: String? = null,
-    @Json(name = "podcast_uuid") val podcastUuid: String? = null,
-    @Json(name = "transcript_url") val transcriptUrl: String? = null,
+    @Json(name = "transcript_url") val transcriptUrl: String,
     @Json(name = "message") val message: String,
     @Json(name = "conversation_history") val conversationHistory: List<ConversationMessage>,
 )
