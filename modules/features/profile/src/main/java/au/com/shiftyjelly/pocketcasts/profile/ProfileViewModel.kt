@@ -181,6 +181,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun onSectionClick(section: ProfileSection) {
+        // TODO Change the Blogs event to BlogsShownEvent once it's in EventHorizon
         val event = when (section) {
             ProfileSection.Stats -> StatsShownEvent
             ProfileSection.Downloads -> DownloadsShownEvent
