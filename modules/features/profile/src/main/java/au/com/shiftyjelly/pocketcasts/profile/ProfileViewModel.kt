@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
+import com.automattic.eventhorizon.BlogsShownEvent
 import com.automattic.eventhorizon.DownloadsShownEvent
 import com.automattic.eventhorizon.EndOfYearProfileCardShownEvent
 import com.automattic.eventhorizon.EndOfYearProfileCardTappedEvent
@@ -180,14 +181,13 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun onSectionClick(section: ProfileSection) {
-        // TODO Change the Blogs event to BlogsShownEvent once it's in EventHorizon
         val event = when (section) {
             ProfileSection.Stats -> StatsShownEvent
             ProfileSection.Downloads -> DownloadsShownEvent
             ProfileSection.CloudFiles -> UploadedFilesShownEvent
             ProfileSection.Starred -> StarredShownEvent
             ProfileSection.Bookmarks -> ProfileBookmarksShowEvent
-            ProfileSection.Blogs -> ProfileBookmarksShowEvent
+            ProfileSection.Blogs -> BlogsShownEvent
             ProfileSection.ListeningHistory -> ListeningHistoryShownEvent
             ProfileSection.Help -> SettingsHelpShownEvent
         }
