@@ -168,43 +168,45 @@ private fun EpisodeRow(
         )
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        EpisodeImage(
-            episode = episode,
-            useEpisodeArtwork = useEpisodeArtwork,
-            modifier = Modifier.size(56.dp),
-        )
-
-        Column(
+    Column(modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            TextC70(
-                text = summary.toString(),
-                maxLines = 1,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Normal,
+            EpisodeImage(
+                episode = episode,
+                useEpisodeArtwork = useEpisodeArtwork,
+                modifier = Modifier.size(56.dp),
             )
 
-            TextP40(
-                text = episode.title,
-                maxLines = 2,
-            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp),
+            ) {
+                TextC70(
+                    text = summary.toString(),
+                    maxLines = 1,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                )
 
-            TextP60(
-                text = formattedDuration,
-                maxLines = 1,
-                color = MaterialTheme.theme.colors.primaryText02,
-            )
+                TextP40(
+                    text = episode.title,
+                    maxLines = 2,
+                )
+
+                TextP60(
+                    text = formattedDuration,
+                    maxLines = 1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+            }
         }
+        HorizontalDivider()
     }
-    HorizontalDivider()
 }
 
 @Composable
