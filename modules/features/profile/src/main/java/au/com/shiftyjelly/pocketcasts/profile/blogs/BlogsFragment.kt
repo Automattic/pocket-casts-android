@@ -3,21 +3,17 @@ package au.com.shiftyjelly.pocketcasts.profile.blogs
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private object BlogsRoutes {
+    const val EMPTY = "empty"
+}
 
 @AndroidEntryPoint
 class BlogsFragment : BaseFragment() {
@@ -28,17 +24,14 @@ class BlogsFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppTheme(themeType = theme.activeTheme) {
-            Column {
-                ThemedTopAppBar(
-                    title = stringResource(LR.string.profile_navigation_blogs),
-                    onNavigationClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = "Coming soon",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                )
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = BlogsRoutes.EMPTY) {
+                composable(BlogsRoutes.EMPTY) {
+                    EmptyBlogsPage(
+                        onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                        onAddBlogClick = { },
+                    )
+                }
             }
         }
     }

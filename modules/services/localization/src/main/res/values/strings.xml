@@ -2758,4 +2758,8 @@
     <!-- A label under the happy face emoji. A user will be redirected to leave a review after tapping it. -->
     <string name="app_rating_yes_label">Yes!</string>
     <string name="offline_icon_content_description">Offline icon</string>
+
+    <string name="blogs_empty_title">Turn any blog into a podcast</string>
+    <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
+    <string name="blogs_add_button">Add a blog</string>
 </resources>
