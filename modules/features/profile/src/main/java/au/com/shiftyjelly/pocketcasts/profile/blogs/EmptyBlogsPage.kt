@@ -90,7 +90,7 @@ private fun BlogsEmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        BlogsHeroIllustration()
+        BlogsIllustration()
 
         Spacer(Modifier.height(24.dp))
 
@@ -128,7 +128,7 @@ private val BlogArtworkBackground = Color(0xFFF2B53A)
 private val PodcastArtworkBackground = Color(0xFF0F0F0F)
 
 @Composable
-private fun BlogsHeroIllustration(
+private fun BlogsIllustration(
     modifier: Modifier = Modifier,
 ) {
     Box(
