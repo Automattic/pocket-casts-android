@@ -133,6 +133,29 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
+    override suspend fun loadSummaryText(episodeUuid: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val transcripts = withTimeoutOrNull(1.minutes) {
+                    transcriptDao.observeTranscripts(episodeUuid)
+                        .filter { it.isNotEmpty() }
+                        .firstOrNull()
+                }.orEmpty()
+                val generatedTranscript = transcripts.firstOrNull { it.isGenerated } ?: return@withContext null
+
+                val metaUrl = generatedTranscript.url.replace(".vtt", "-meta.json")
+                val response = transcriptService.getTranscriptOrThrow(metaUrl)
+                val json = org.json.JSONObject(response.string())
+                json.optString("summary").takeIf { it.isNotEmpty() }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
+                null
+            }
+        }
+    }
+
     override fun resetInvalidTranscripts(
         episodeUuid: String,
     ) {

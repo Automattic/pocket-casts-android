@@ -107,6 +107,10 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
+    private var loadSummaryJob: Job? = null
+    private val _summary = MutableStateFlow<String?>(null)
+    val summary = _summary.asStateFlow()
+
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,
@@ -195,6 +199,14 @@ class EpisodeFragmentViewModel @Inject constructor(
             loadTranscriptJob = launch {
                 oldJob?.cancelAndJoin()
                 _transcript.value = transcriptManager.loadTranscript(episodeUuid)
+            }
+        }
+
+        if (summary.value == null) {
+            val oldSummaryJob = loadSummaryJob
+            loadSummaryJob = launch {
+                oldSummaryJob?.cancelAndJoin()
+                _summary.value = transcriptManager.loadSummaryText(episodeUuid)
             }
         }
     }
