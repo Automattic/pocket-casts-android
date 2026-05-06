@@ -28,7 +28,7 @@ jobs:
 
       - name: Send Slack Notification
         if: env.SEND_SLACK == 'true'
-        uses: slackapi/slack-github-action@v3.0.2
+        uses: slackapi/slack-github-action@v3.0.3
         with:
           webhook: ${{ secrets.SLACK_NOTIFIER_WEBHOOK_URL }}
           webhook-type: webhook-trigger

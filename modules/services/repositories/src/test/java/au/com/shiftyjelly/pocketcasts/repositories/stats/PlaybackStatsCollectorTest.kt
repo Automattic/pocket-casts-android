@@ -6,9 +6,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.appreview.TestSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Date
@@ -21,6 +26,8 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
@@ -28,6 +35,9 @@ import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaybackStatsCollectorTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private var episode: BaseEpisode? = null
 
     private val storedEvents = mutableListOf<PlaybackStatsEvent>()
@@ -45,6 +55,8 @@ class PlaybackStatsCollectorTest {
         }
     }
 
+    private val statsSetting = TestSetting(true)
+
     private val testScope = TestScope()
 
     private val collector = PersistentPlaybackStatsCollector(
@@ -58,10 +70,18 @@ class PlaybackStatsCollectorTest {
                 Unit
             }
         },
+        settings = mock<Settings> {
+            on { collectListeningStats } doAnswer { statsSetting }
+        },
         clock = clock,
         uuidProvider = uuidProvider,
         scope = testScope,
     )
+
+    @Before
+    fun setup() {
+        FeatureFlag.setEnabled(Feature.IMPROVED_LISTENING_STATS, true)
+    }
 
     @Test
     fun `track podcast event`() = testScope.runTest {
@@ -203,6 +223,46 @@ class PlaybackStatsCollectorTest {
         runCurrent()
 
         clock += 5.minutes
+        collector.onStop()
+        runCurrent()
+
+        assertEquals(
+            listOf(
+                expectedEvent(
+                    uuidIndex = 0,
+                    startedAtMs = 34.seconds.inWholeMilliseconds,
+                    durationMs = 10.minutes.inWholeMilliseconds,
+                ),
+            ),
+            storedEvents,
+        )
+    }
+
+    @Test
+    fun `ignore event when listening stats collection is disabled`() = testScope.runTest {
+        episode = createPodcastEpisode()
+        statsSetting.set(false)
+
+        clock += 34.seconds
+        collector.onStart()
+
+        clock += 10.minutes
+        collector.onStop()
+        runCurrent()
+
+        assertEquals(emptyList<PlaybackStatsEvent>(), storedEvents)
+    }
+
+    @Test
+    fun `track event when listening stats collection is disabled and feature flag is disabled`() = testScope.runTest {
+        FeatureFlag.setEnabled(Feature.IMPROVED_LISTENING_STATS, false)
+        episode = createPodcastEpisode()
+        statsSetting.set(false)
+
+        clock += 34.seconds
+        collector.onStart()
+
+        clock += 10.minutes
         collector.onStop()
         runCurrent()
 

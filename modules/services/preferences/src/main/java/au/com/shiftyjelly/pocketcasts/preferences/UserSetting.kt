@@ -15,6 +15,8 @@ interface ReadSetting<T> {
 
 interface ReadWriteSetting<T> : ReadSetting<T> {
     fun set(value: T, updateModifiedAt: Boolean, commit: Boolean = false, clock: Clock = Clock.systemUTC())
+
+    fun getSyncValue(lastSyncTime: Instant): T?
 }
 
 class DelegatedReadSetting<T, R>(
@@ -43,7 +45,7 @@ abstract class UserSetting<T>(
         }.getOrNull()
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
-    fun getSyncValue(lastSyncTime: Instant): T? {
+    override fun getSyncValue(lastSyncTime: Instant): T? {
         return modifiedAt?.let { if (it >= lastSyncTime) value else null }
     }
 

@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -117,6 +118,9 @@ class AutomotiveApplication :
 
         // force the Automotive app into car mode as some car companies send the UI mode as normal, this makes sure the car resources such as layout-car are used.
         this.getSystemService<UiModeManager>()?.enableCarMode(0)
+
+        PlaybackStatsSyncWorker.scheduleOneTimeWork(this)
+        PlaybackStatsSyncWorker.schedulePeriodicWork(this)
     }
 
     override fun onTerminate() {

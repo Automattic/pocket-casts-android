@@ -4,7 +4,6 @@
     *   Restore episode duration after download for feeds without an RSS length attribute
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))
 
-
 8.11
 -----
 *   New Features

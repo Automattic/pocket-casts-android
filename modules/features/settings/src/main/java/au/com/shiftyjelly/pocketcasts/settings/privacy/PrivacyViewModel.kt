@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class PrivacyViewModel @Inject constructor(
-    settings: Settings,
+    private val settings: Settings,
     private val syncManager: SyncManager,
     private val userAnalyticsSettings: UserAnalyticsSettings,
 ) : ViewModel() {
@@ -20,6 +20,7 @@ class PrivacyViewModel @Inject constructor(
     sealed class UiState {
         data class Loaded(
             val analytics: Boolean,
+            val listeningStats: Boolean,
             val crashReports: Boolean,
             val linkAccount: Boolean,
             private val getUserEmail: () -> String?,
@@ -31,6 +32,7 @@ class PrivacyViewModel @Inject constructor(
     private val mutableUiState = MutableStateFlow<UiState>(
         UiState.Loaded(
             analytics = settings.collectAnalytics.value,
+            listeningStats = settings.collectListeningStats.value,
             crashReports = settings.sendCrashReports.value,
             linkAccount = settings.linkCrashReportsToUser.value,
             getUserEmail = { syncManager.getEmail() },
@@ -41,6 +43,11 @@ class PrivacyViewModel @Inject constructor(
     fun updateAnalyticsSetting(on: Boolean) {
         userAnalyticsSettings.updateAnalyticsSetting(on)
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
+    }
+
+    fun updateListeningStatsSetting(on: Boolean) {
+        settings.collectListeningStats.set(on, updateModifiedAt = true)
+        mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(listeningStats = on)
     }
 
     fun updateCrashReportsSetting(on: Boolean) {

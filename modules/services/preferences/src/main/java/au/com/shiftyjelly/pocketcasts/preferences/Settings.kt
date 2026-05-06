@@ -315,6 +315,7 @@ interface Settings {
     val prioritizeSeekAccuracy: UserSetting<Boolean>
     val cacheEntirePlayingEpisode: UserSetting<Boolean>
     val liveAnalyticsUrl: UserSetting<String>
+    val collectListeningStats: ReadWriteSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
