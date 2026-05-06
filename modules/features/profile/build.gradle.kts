@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)
     implementation(libs.media3.extractor)
