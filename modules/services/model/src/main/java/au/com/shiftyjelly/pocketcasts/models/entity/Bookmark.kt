@@ -46,6 +46,17 @@ data class Bookmark(
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
 
+    val displayTitle: String
+        get() {
+            val aiModified = aiTitleModified
+            val userModified = titleModified
+            return when {
+                aiTitle == null -> title
+                userModified != null && aiModified != null && userModified > aiModified -> title
+                else -> aiTitle ?: title
+            }
+        }
+
     fun createdAtDatePattern(): String {
         val calendar = Calendar.getInstance()
         val currentYear = calendar.get(Calendar.YEAR)
