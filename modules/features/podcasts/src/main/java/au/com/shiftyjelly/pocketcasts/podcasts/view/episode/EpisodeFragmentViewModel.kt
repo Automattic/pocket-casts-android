@@ -108,6 +108,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     }
 
     private var loadSummaryJob: Job? = null
+    private var lastSummaryEpisodeUuid: String? = null
     private val _summary = MutableStateFlow<String?>(null)
     val summary = _summary.asStateFlow()
 
@@ -202,7 +203,8 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
         }
 
-        if (summary.value == null) {
+        if (lastSummaryEpisodeUuid != episodeUuid) {
+            lastSummaryEpisodeUuid = episodeUuid
             val oldSummaryJob = loadSummaryJob
             loadSummaryJob = launch {
                 oldSummaryJob?.cancelAndJoin()

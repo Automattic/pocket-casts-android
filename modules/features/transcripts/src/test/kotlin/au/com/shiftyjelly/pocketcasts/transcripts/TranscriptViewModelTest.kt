@@ -298,4 +298,6 @@ private class TestTranscriptManager : TranscriptManager {
     override fun resetInvalidTranscripts(episodeUuid: String) {
         shouldLoadTranscripts = true
     }
+
+    override suspend fun loadSummaryText(episodeUuid: String): String? = null
 }

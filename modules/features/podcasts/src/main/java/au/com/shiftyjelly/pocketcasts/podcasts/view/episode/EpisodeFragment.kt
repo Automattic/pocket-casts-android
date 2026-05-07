@@ -598,8 +598,10 @@ class EpisodeFragment : BaseFragment() {
                                 role = Role.Button,
                                 onClickLabel = stringResource(LR.string.view_summary),
                                 onClick = {
-                                    val sheet = SummaryBottomSheet.newInstance(text)
-                                    sheet.show(parentFragmentManager, "episode_summary")
+                                    if (parentFragmentManager.findFragmentByTag("episode_summary") == null) {
+                                        val sheet = SummaryBottomSheet.newInstance(text)
+                                        sheet.show(parentFragmentManager, "episode_summary")
+                                    }
                                 },
                             ),
                         )
