@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.blogs
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -76,6 +77,7 @@ internal fun AddBlogPage(
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    BackHandler(onBack = onBackPress)
     val colors = MaterialTheme.theme.colors
     Column(
         modifier = modifier.background(colors.primaryUi02),

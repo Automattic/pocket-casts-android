@@ -33,14 +33,15 @@ class AddBlogViewModel @Inject constructor(
     }
 
     fun onFindFeeds(url: String) {
-        if (url.isBlank()) {
+        val cleanUrl = url.trim()
+        if (cleanUrl.isEmpty()) {
             return
         }
         findFeedsJob?.cancel()
         findFeedsJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val feeds = webFeedsService.getFeeds(url)
+                val feeds = webFeedsService.getFeeds(cleanUrl)
                 _uiState.value = when {
                     feeds.isEmpty() -> UiState.Error(ErrorReason.NoFeedsFound)
                     feeds.size == 1 -> UiState.Found(feeds.first())
@@ -49,10 +50,10 @@ class AddBlogViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {
-                Timber.e(e, "Failed to find feeds for url: $url")
+                Timber.e(e, "Failed to find feeds for url: $cleanUrl")
                 _uiState.value = UiState.Error(ErrorReason.NoInternet)
             } catch (e: Exception) {
-                Timber.e(e, "Failed to find feeds for url: $url")
+                Timber.e(e, "Failed to find feeds for url: $cleanUrl")
                 _uiState.value = UiState.Error(ErrorReason.Generic)
             }
         }
