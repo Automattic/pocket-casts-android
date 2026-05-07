@@ -79,16 +79,38 @@ class SummaryViewModelTest {
     }
 
     @Test
-    fun `state resets to Loading when switching episodes`() = runTest {
+    fun `state updates correctly when switching to episode without summary`() = runTest {
         whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary 1")
         val viewModel = createViewModel()
         viewModel.loadSummary("episode-1")
         assertEquals(SummaryState.Loaded("Summary 1"), viewModel.state.value)
 
-        // When loading a new episode, state should reset before the result arrives
         whenever(transcriptManager.loadSummaryText("episode-2")).thenReturn(null)
         viewModel.loadSummary("episode-2")
         assertEquals(SummaryState.NotAvailable, viewModel.state.value)
+    }
+
+    @Test
+    fun `clearSummary resets state to NotAvailable`() = runTest {
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary 1")
+        val viewModel = createViewModel()
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Loaded("Summary 1"), viewModel.state.value)
+
+        viewModel.clearSummary()
+        assertEquals(SummaryState.NotAvailable, viewModel.state.value)
+    }
+
+    @Test
+    fun `clearSummary allows reloading same episode`() = runTest {
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary 1")
+        val viewModel = createViewModel()
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Loaded("Summary 1"), viewModel.state.value)
+
+        viewModel.clearSummary()
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Loaded("Summary 1"), viewModel.state.value)
     }
 
     @Test

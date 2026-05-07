@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -35,7 +36,7 @@ fun SummaryContent(
         state = listState,
         contentPadding = contentPadding,
         modifier = modifier
-            .verticalScrollBar(scrollState = listState, thumbColor = scrollBarColor),
+            .verticalScrollBar(scrollState = listState, thumbColor = scrollBarColor, contentPadding = contentPadding),
     ) {
         item {
             Text(
@@ -47,8 +48,9 @@ fun SummaryContent(
             )
         }
         item {
+            val html = remember(text) { markdownToHtml(text) }
             HtmlText(
-                html = markdownToHtml(text),
+                html = html,
                 color = textColor,
                 textStyleResId = UR.style.P40,
             )
@@ -56,7 +58,7 @@ fun SummaryContent(
     }
 }
 
-fun markdownToHtml(markdown: String): String {
+internal fun markdownToHtml(markdown: String): String {
     return markdown.lines()
         .joinToString("\n") { line ->
             when {

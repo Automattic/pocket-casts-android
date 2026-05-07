@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -241,7 +242,7 @@ class PlayerContainerFragment :
             if (!it.podcastHeader.isUserEpisode) {
                 summaryViewModel.loadSummary(it.podcastHeader.episodeUuid)
             } else {
-                adapter.updateSummary(addSummary = false)
+                summaryViewModel.clearSummary()
             }
             val upNextCount = it.upNextEpisodes.size
             val drawableId = when {
@@ -449,6 +450,8 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         updateSections(hasChapters = addChapters)
     }
 
+    // Stable IDs via getItemId/containsItem allow FragmentStateAdapter to efficiently diff fragments
+    @SuppressLint("NotifyDataSetChanged")
     private fun updateSections(
         hasNotes: Boolean = sections.contains(Section.Notes),
         hasSummary: Boolean = sections.contains(Section.Summary),

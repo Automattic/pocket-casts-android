@@ -28,6 +28,12 @@ class SummaryViewModel @Inject constructor(
     private var currentEpisodeUuid: String? = null
     private var loadJob: Job? = null
 
+    fun clearSummary() {
+        currentEpisodeUuid = null
+        loadJob?.cancel()
+        _state.value = SummaryState.NotAvailable
+    }
+
     fun loadSummary(episodeUuid: String) {
         if (currentEpisodeUuid == episodeUuid) return
         currentEpisodeUuid = episodeUuid
