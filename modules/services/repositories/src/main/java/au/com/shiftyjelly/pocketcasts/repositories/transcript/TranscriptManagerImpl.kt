@@ -2,12 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
+import org.json.JSONObject
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
@@ -31,12 +33,11 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
+    private val chapterManager: ChapterManager,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
-    private val summaryMetaAdapter = Moshi.Builder().build().adapter(Map::class.java)
-
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
     }
@@ -143,14 +144,42 @@ class TranscriptManagerImpl @Inject constructor(
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
             val response = transcriptService.getTranscriptOrThrow(metaUrl)
             response.use { body ->
-                val json = summaryMetaAdapter.fromJson(body.string())
-                (json?.get("summary") as? String)?.takeIf { it.isNotBlank() }
+                val json = JSONObject(body.string())
+
+                saveAiChaptersIfNeeded(episodeUuid, json)
+
+                json.optString("summary").takeIf { it.isNotEmpty() }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
             null
+        }
+    }
+
+    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, json: JSONObject) {
+        val chaptersJson = json.optJSONArray("chapters") ?: return
+        if (chaptersJson.length() == 0) return
+
+        val existingChapters = chapterManager.observerChaptersForEpisode(episodeUuid).firstOrNull()
+        if (!existingChapters.isNullOrEmpty()) return
+
+        val dbChapters = (0 until chaptersJson.length()).mapNotNull { i ->
+            val chapter = chaptersJson.getJSONObject(i)
+            val title = chapter.optString("title").takeIf { it.isNotEmpty() } ?: return@mapNotNull null
+            val startTimeSec = chapter.optLong("startTime", -1)
+            if (startTimeSec < 0) return@mapNotNull null
+            DbChapter(
+                index = i,
+                episodeUuid = episodeUuid,
+                startTimeMs = startTimeSec * 1000,
+                title = title,
+            )
+        }
+        if (dbChapters.isNotEmpty()) {
+            chapterManager.updateChapters(episodeUuid, dbChapters)
+            Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
         }
     }
 
