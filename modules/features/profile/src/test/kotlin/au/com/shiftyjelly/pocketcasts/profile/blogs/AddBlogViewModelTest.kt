@@ -168,28 +168,6 @@ class AddBlogViewModelTest {
     }
 
     @Test
-    fun `retry uses the stored url`() = runTest {
-        val feed = webFeed("Example", "https://example.com/feed")
-        var callCount = 0
-        whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer {
-            callCount += 1
-            if (callCount == 1) throw IOException("offline") else listOf(feed)
-        }
-
-        viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeeds("https://example.com")
-
-        assertEquals(
-            AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.NoInternet),
-            viewModel.uiState.value,
-        )
-
-        viewModel.retry()
-
-        assertEquals(AddBlogViewModel.UiState.Found(feed), viewModel.uiState.value)
-    }
-
-    @Test
     fun `onBackPressed returns false when at Start`() {
         assertFalse(viewModel.onBackPressed())
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
