@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mod
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.SummaryViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -70,6 +71,7 @@ class PlayerContainerFragment :
     lateinit var eventHorizon: EventHorizon
 
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
+    private val summaryViewModel: SummaryViewModel by viewModels()
 
     var upNextBottomSheetBehavior: BottomSheetBehavior<View>? = null
 
@@ -206,6 +208,11 @@ class PlayerContainerFragment :
                         PlayerTabType.Chapters
                     }
 
+                    adapter.isSummaryTab(position) -> {
+                        // TODO: Add PlayerTabType.Summary when EventHorizon is updated
+                        null
+                    }
+
                     else -> {
                         Timber.e("Invalid tab selected")
                         null
@@ -231,6 +238,11 @@ class PlayerContainerFragment :
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.updateNotes(addNotes = !it.podcastHeader.isUserEpisode)
+            if (!it.podcastHeader.isUserEpisode) {
+                summaryViewModel.loadSummary(it.podcastHeader.episodeUuid)
+            } else {
+                adapter.updateSummary(addSummary = false)
+            }
             val upNextCount = it.upNextEpisodes.size
             val drawableId = when {
                 upNextCount == 0 -> R.drawable.mini_player_upnext
@@ -259,6 +271,14 @@ class PlayerContainerFragment :
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chaptersViewModel.uiState.collect {
                     adapter.updateChapters(addChapters = it.chaptersCount > 0)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                summaryViewModel.state.collect { state ->
+                    adapter.updateSummary(addSummary = state is SummaryViewModel.SummaryState.Loaded)
                 }
             }
         }
@@ -401,6 +421,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     private sealed class Section(@StringRes val titleRes: Int) {
         data object Player : Section(LR.string.player_tab_playing)
         data object Notes : Section(LR.string.player_tab_notes)
+        data object Summary : Section(LR.string.player_tab_summary)
         data object Bookmarks : Section(LR.string.player_tab_bookmarks)
         data object Chapters : Section(LR.string.player_tab_chapters)
     }
@@ -417,55 +438,33 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         get() = sections.indexOf(Section.Bookmarks)
 
     fun updateNotes(addNotes: Boolean) {
-        val currentSections = sections
-        val hasChapters = sections.contains(Section.Chapters)
+        updateSections(hasNotes = addNotes)
+    }
 
-        val newSections = buildList {
-            add(Section.Player)
-            if (addNotes) {
-                add(Section.Notes)
-            }
-
-            if (hasChapters) {
-                add(Section.Chapters)
-            }
-            add(Section.Bookmarks)
-        }
-
-        if (currentSections != newSections) {
-            sections = newSections
-            if (addNotes) {
-                notifyItemInserted(1)
-            } else {
-                notifyItemRemoved(1)
-            }
-        }
+    fun updateSummary(addSummary: Boolean) {
+        updateSections(hasSummary = addSummary)
     }
 
     fun updateChapters(addChapters: Boolean) {
-        val currentSections = sections
-        val hasNotes = sections.contains(Section.Notes)
+        updateSections(hasChapters = addChapters)
+    }
 
+    private fun updateSections(
+        hasNotes: Boolean = sections.contains(Section.Notes),
+        hasSummary: Boolean = sections.contains(Section.Summary),
+        hasChapters: Boolean = sections.contains(Section.Chapters),
+    ) {
+        val currentSections = sections
         val newSections = buildList {
             add(Section.Player)
-            if (hasNotes) {
-                add(Section.Notes)
-            }
-
-            if (addChapters) {
-                add(Section.Chapters)
-            }
+            if (hasNotes) add(Section.Notes)
+            if (hasSummary) add(Section.Summary)
+            if (hasChapters) add(Section.Chapters)
             add(Section.Bookmarks)
         }
-
         if (currentSections != newSections) {
             sections = newSections
-            val position = if (hasNotes) 2 else 1
-            if (addChapters) {
-                notifyItemInserted(position)
-            } else {
-                notifyItemRemoved(position)
-            }
+            notifyDataSetChanged()
         }
     }
 
@@ -485,6 +484,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         return when (sections[position]) {
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()
+            is Section.Summary -> SummaryFragment()
             is Section.Bookmarks -> BookmarksFragment.newInstance(SourceView.PLAYER)
             is Section.Chapters -> ChaptersFragment.forPlayer()
         }
@@ -497,6 +497,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
 
     fun isPlayerTab(position: Int) = sections[position] is Section.Player
     fun isNotesTab(position: Int) = sections[position] is Section.Notes
+    fun isSummaryTab(position: Int) = sections[position] is Section.Summary
     fun isBookmarksTab(position: Int) = sections[position] is Section.Bookmarks
     fun isChaptersTab(position: Int) = sections[position] is Section.Chapters
 }
