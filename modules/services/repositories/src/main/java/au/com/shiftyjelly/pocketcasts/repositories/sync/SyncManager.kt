@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
@@ -124,6 +125,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun upNextSyncProtobuf(request: UpNextSyncRequestProtobuf): UpNextResponse
     suspend fun getBookmarks(): List<Bookmark>
+    suspend fun enrichBookmark(transcriptSnippet: String): BookmarkEnrichResponse
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
 

@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -176,6 +178,10 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getBookmarks(token: AccessToken): BookmarksResponse {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {})
+    }
+
+    suspend fun enrichBookmark(request: BookmarkEnrichRequest, token: AccessToken): BookmarkEnrichResponse {
+        return service.enrichBookmark(addBearer(token), request)
     }
 
     suspend fun getEpisodes(request: PodcastsEpisodesRequest, token: AccessToken): EpisodesResponse {
