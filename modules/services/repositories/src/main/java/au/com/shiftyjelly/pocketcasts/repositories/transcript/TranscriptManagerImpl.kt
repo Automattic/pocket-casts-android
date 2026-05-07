@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
-import org.json.JSONObject
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
@@ -34,10 +34,13 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
+    private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
+
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
     }
@@ -144,11 +147,11 @@ class TranscriptManagerImpl @Inject constructor(
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
             val response = transcriptService.getTranscriptOrThrow(metaUrl)
             response.use { body ->
-                val json = JSONObject(body.string())
+                val meta = metaAdapter.fromJson(body.source()) ?: return@use null
 
-                saveAiChaptersIfNeeded(episodeUuid, json)
+                saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
 
-                json.optString("summary").takeIf { it.isNotEmpty() }
+                meta.summary?.takeIf { it.isNotEmpty() }
             }
         } catch (e: CancellationException) {
             throw e
@@ -158,20 +161,18 @@ class TranscriptManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, json: JSONObject) {
-        val chaptersJson = json.optJSONArray("chapters") ?: return
-        if (chaptersJson.length() == 0) return
+    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
+        if (chapters.isNullOrEmpty()) return
 
         val existingChapters = chapterManager.observerChaptersForEpisode(episodeUuid).firstOrNull()
         if (!existingChapters.isNullOrEmpty()) return
 
-        val dbChapters = (0 until chaptersJson.length()).mapNotNull { i ->
-            val chapter = chaptersJson.getJSONObject(i)
-            val title = chapter.optString("title").takeIf { it.isNotEmpty() } ?: return@mapNotNull null
-            val startTimeSec = chapter.optLong("startTime", -1)
-            if (startTimeSec < 0) return@mapNotNull null
+        val dbChapters = chapters.mapIndexedNotNull { index, chapter ->
+            val title = chapter.title?.takeIf { it.isNotEmpty() } ?: return@mapIndexedNotNull null
+            val startTimeSec = chapter.startTime ?: return@mapIndexedNotNull null
+            if (startTimeSec < 0) return@mapIndexedNotNull null
             DbChapter(
-                index = i,
+                index = index,
                 episodeUuid = episodeUuid,
                 startTimeMs = startTimeSec * 1000,
                 title = title,

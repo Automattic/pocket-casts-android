@@ -1,17 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
@@ -33,6 +37,9 @@ class TranscriptManagerTest {
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
+    private val chapterManager: ChapterManager = mock {
+        on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
+    }
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
@@ -53,6 +60,8 @@ class TranscriptManagerTest {
                 publishedDate = Date(),
             )
         },
+        chapterManager = chapterManager,
+        moshi = Moshi.Builder().build(),
         parsers = parsers,
     )
 
@@ -355,8 +364,7 @@ class TranscriptManagerTest {
 
     @Test
     fun `load summary text from generated transcript meta`() = runTest {
-        service.shouldThrow = false
-        service.responseBody = """{"summary": "Episode summary text"}"""
+        service.metaJsonResponse = """{"summary": "Episode summary text"}"""
         localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
 
         val summary = transcriptManager.loadSummaryText("summary-episode-id")
@@ -366,7 +374,6 @@ class TranscriptManagerTest {
 
     @Test
     fun `return null summary when no generated transcript exists`() = runTest {
-        service.shouldThrow = false
         localTranscriptsFlow.value = listOf(generatedVttDbTranscript.copy(isGenerated = false))
 
         val summary = transcriptManager.loadSummaryText("summary-episode-id")
@@ -376,8 +383,7 @@ class TranscriptManagerTest {
 
     @Test
     fun `return null summary when summary field is blank`() = runTest {
-        service.shouldThrow = false
-        service.responseBody = """{"summary": ""}"""
+        service.metaJsonResponse = """{"summary": ""}"""
         localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
 
         val summary = transcriptManager.loadSummaryText("summary-episode-id")
@@ -397,7 +403,6 @@ class TranscriptManagerTest {
 
     @Test
     fun `return null summary when transcripts not loaded in time`() = runTest {
-        service.shouldThrow = false
         val summary = async { transcriptManager.loadSummaryText("summary-episode-id") }
 
         advanceTimeBy(1.minutes)
@@ -425,10 +430,13 @@ private class TestParser(
 private class TestTranscriptService : TranscriptService {
     var shouldThrow = false
     var responseBody: String = "Ok"
+    var metaJsonResponse: String? = null
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
         return if (shouldThrow) {
             error("Test exception")
+        } else if (url.endsWith("-meta.json") && metaJsonResponse != null) {
+            metaJsonResponse!!.toResponseBody()
         } else {
             responseBody.toResponseBody()
         }
