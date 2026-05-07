@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -42,6 +44,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -145,27 +148,11 @@ private fun AddBlogContent(
         Spacer(Modifier.height(8.dp))
 
         when (state) {
-            is UiState.Start -> {
-                FormContent(
-                    onContinueClick = { onFindFeeds(url) },
-                )
-            }
-
-            is UiState.Loading -> {
-                LoadingContent()
-            }
-
-            is UiState.Found -> {
-                FoundContent(feed = state.feed, onFeedClick = onFeedClick)
-            }
-
-            is UiState.Pick -> {
-                PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
-            }
-
-            is UiState.Error -> {
-                ErrorContent(reason = state.reason, onRetry = onRetry)
-            }
+            is UiState.Start -> FormContent(onContinueClick = { onFindFeeds(url) })
+            is UiState.Loading -> LoadingContent()
+            is UiState.Found -> FoundContent(feed = state.feed, onFeedClick = onFeedClick)
+            is UiState.Pick -> PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
+            is UiState.Error -> ErrorContent(reason = state.reason, onRetry = onRetry)
         }
     }
 }
@@ -276,7 +263,7 @@ private fun PickContent(
         Spacer(Modifier.height(32.dp))
 
         TextP60(
-            text = stringResource(LR.string.blogs_pick_a_feed, feeds.size),
+            text = stringResource(LR.string.blogs_pick_a_feed),
             color = colors.primaryText02,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.5.sp,
@@ -285,14 +272,16 @@ private fun PickContent(
 
         Spacer(Modifier.height(10.dp))
 
-        feeds.forEach { feed ->
-            FeedChoiceRow(
-                feed = feed,
-                isSelected = feed == selectedFeed,
-                onClick = { selectedFeed = feed },
-            )
+        Column(modifier = Modifier.selectableGroup()) {
+            feeds.forEach { feed ->
+                FeedChoiceRow(
+                    feed = feed,
+                    isSelected = feed == selectedFeed,
+                    onClick = { selectedFeed = feed },
+                )
 
-            Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(10.dp))
+            }
         }
 
         RowButton(
@@ -324,7 +313,11 @@ private fun FeedChoiceRow(
             .clip(RoundedCornerShape(12.dp))
             .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
             .background(backgroundColor)
-            .clickable(onClick = onClick),
+            .selectable(
+                selected = isSelected,
+                role = Role.RadioButton,
+                onClick = onClick,
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

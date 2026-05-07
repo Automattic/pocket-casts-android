@@ -7,10 +7,13 @@ import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @HiltViewModel
 class AddBlogViewModel @Inject constructor(
@@ -23,6 +26,8 @@ class AddBlogViewModel @Inject constructor(
     private val _url = MutableStateFlow("")
     val url: StateFlow<String> = _url.asStateFlow()
 
+    private var findFeedsJob: Job? = null
+
     fun onUrlChange(url: String) {
         _url.value = url
     }
@@ -31,7 +36,8 @@ class AddBlogViewModel @Inject constructor(
         if (url.isBlank()) {
             return
         }
-        viewModelScope.launch {
+        findFeedsJob?.cancel()
+        findFeedsJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
                 val feeds = webFeedsService.getFeeds(url)
@@ -40,15 +46,20 @@ class AddBlogViewModel @Inject constructor(
                     feeds.size == 1 -> UiState.Found(feeds.first())
                     else -> UiState.Pick(feeds)
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: IOException) {
+                Timber.e(e, "Failed to find feeds for url: $url")
                 _uiState.value = UiState.Error(ErrorReason.NoInternet)
             } catch (e: Exception) {
+                Timber.e(e, "Failed to find feeds for url: $url")
                 _uiState.value = UiState.Error(ErrorReason.Generic)
             }
         }
     }
 
     fun resetToStart() {
+        findFeedsJob?.cancel()
         _uiState.value = UiState.Start
         _url.value = ""
     }
@@ -58,6 +69,7 @@ class AddBlogViewModel @Inject constructor(
     }
 
     fun editUrl() {
+        findFeedsJob?.cancel()
         _uiState.value = UiState.Start
     }
 
