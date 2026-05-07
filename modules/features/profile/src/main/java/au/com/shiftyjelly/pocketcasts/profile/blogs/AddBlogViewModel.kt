@@ -64,10 +64,6 @@ class AddBlogViewModel @Inject constructor(
         _url.value = ""
     }
 
-    fun retry() {
-        onFindFeeds(_url.value)
-    }
-
     fun editUrl() {
         findFeedsJob?.cancel()
         _uiState.value = UiState.Start

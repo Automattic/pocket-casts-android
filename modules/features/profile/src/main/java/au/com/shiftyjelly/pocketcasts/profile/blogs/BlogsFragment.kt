@@ -53,7 +53,6 @@ class BlogsFragment : BaseFragment() {
                         onFeedClick = { _ ->
                             // TODO
                         },
-                        onRetry = { viewModel.retry() },
                         onEditUrl = { viewModel.editUrl() },
                     )
                 }

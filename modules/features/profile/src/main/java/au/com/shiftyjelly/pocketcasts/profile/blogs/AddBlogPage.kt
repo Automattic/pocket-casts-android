@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -74,7 +73,6 @@ internal fun AddBlogPage(
     onBackPress: () -> Unit,
     onFindFeeds: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
-    onRetry: () -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -92,7 +90,6 @@ internal fun AddBlogPage(
             onUrlChange = onUrlChange,
             onFindFeeds = onFindFeeds,
             onFeedClick = onFeedClick,
-            onRetry = onRetry,
             onEditUrl = onEditUrl,
         )
     }
@@ -105,12 +102,11 @@ private fun AddBlogContent(
     onUrlChange: (String) -> Unit,
     onFindFeeds: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
-    onRetry: () -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val isEnabled = state is UiState.Start
+    val isEnabled = state is UiState.Start || state is UiState.Error
     LaunchedEffect(isEnabled) {
         if (isEnabled) focusRequester.requestFocus()
     }
@@ -152,7 +148,7 @@ private fun AddBlogContent(
             is UiState.Loading -> LoadingContent()
             is UiState.Found -> FoundContent(feed = state.feed, onFeedClick = onFeedClick)
             is UiState.Pick -> PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
-            is UiState.Error -> ErrorContent(reason = state.reason, onRetry = onRetry)
+            is UiState.Error -> ErrorContent(reason = state.reason, onRetry = { onFindFeeds(url) })
         }
     }
 }
@@ -209,22 +205,29 @@ private fun FoundContent(
 ) {
     val colors = MaterialTheme.theme.colors
     Column(modifier = modifier) {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            backgroundColor = colors.primaryUi03,
-            elevation = 0.dp,
-            modifier = Modifier.fillMaxWidth(),
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.5.dp, colors.primaryInteractive01, RoundedCornerShape(12.dp))
+                .background(colors.primaryInteractive01.copy(alpha = 0.06f))
+                .padding(12.dp),
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column {
                 TextP50(
                     text = feed.title,
                     fontWeight = FontWeight.Bold,
                     color = colors.primaryText01,
+                    lineHeight = 18.sp,
+                    maxLines = 2,
                 )
-                Spacer(Modifier.height(4.dp))
-                TextP60(
-                    text = feed.href,
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = feed.href.removePrefix("https://").removePrefix("http://"),
                     color = colors.primaryText02,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
                 )
             }
         }
@@ -364,7 +367,7 @@ private fun FeedChoiceRow(
                     Icon(
                         painter = painterResource(IR.drawable.ic_check_black_24dp),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = colors.primaryUi01,
                         modifier = Modifier.size(12.dp),
                     )
                 }
@@ -467,7 +470,7 @@ private fun DoneDot() {
         Icon(
             painter = painterResource(IR.drawable.ic_check_black_24dp),
             contentDescription = null,
-            tint = Color.White,
+            tint = MaterialTheme.theme.colors.primaryUi01,
             modifier = Modifier.size(14.dp),
         )
     }
@@ -485,7 +488,6 @@ private fun AddBlogPageStartPreview(
             onBackPress = {},
             onFindFeeds = { _ -> },
             onFeedClick = { _ -> },
-            onRetry = {},
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -504,7 +506,6 @@ private fun AddBlogPageLoadingPreview(
             onBackPress = {},
             onFindFeeds = { _ -> },
             onFeedClick = { _ -> },
-            onRetry = {},
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -528,7 +529,6 @@ private fun AddBlogPagePickPreview(
             onBackPress = {},
             onFindFeeds = { _ -> },
             onFeedClick = { _ -> },
-            onRetry = {},
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -547,7 +547,6 @@ private fun AddBlogPageErrorPreview(
             onBackPress = {},
             onFindFeeds = { _ -> },
             onFeedClick = { _ -> },
-            onRetry = {},
             onEditUrl = {},
             onUrlChange = {},
         )
