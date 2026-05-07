@@ -204,11 +204,15 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         if (lastSummaryEpisodeUuid != episodeUuid) {
-            lastSummaryEpisodeUuid = episodeUuid
+            _summary.value = null
             val oldSummaryJob = loadSummaryJob
             loadSummaryJob = launch {
                 oldSummaryJob?.cancelAndJoin()
-                _summary.value = transcriptManager.loadSummaryText(episodeUuid)
+                val result = transcriptManager.loadSummaryText(episodeUuid)
+                _summary.value = result
+                if (result != null) {
+                    lastSummaryEpisodeUuid = episodeUuid
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -134,25 +135,22 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     override suspend fun loadSummaryText(episodeUuid: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val transcripts = withTimeoutOrNull(1.minutes) {
-                    transcriptDao.observeTranscripts(episodeUuid)
-                        .filter { it.isNotEmpty() }
-                        .firstOrNull()
-                }.orEmpty()
-                val generatedTranscript = transcripts.firstOrNull { it.isGenerated } ?: return@withContext null
+        return try {
+            val generatedTranscript = loadLocalTranscripts(episodeUuid)
+                .firstOrNull { it.isGenerated } ?: return null
 
-                val metaUrl = generatedTranscript.url.replace(".vtt", "-meta.json")
-                val response = transcriptService.getTranscriptOrThrow(metaUrl)
-                val json = org.json.JSONObject(response.string())
-                json.optString("summary").takeIf { it.isNotEmpty() }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
-                null
+            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
+            val response = transcriptService.getTranscriptOrThrow(metaUrl)
+            response.use { body ->
+                val adapter = Moshi.Builder().build().adapter(Map::class.java)
+                val json = adapter.fromJson(body.string())
+                (json?.get("summary") as? String)?.takeIf { it.isNotEmpty() }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
+            null
         }
     }
 

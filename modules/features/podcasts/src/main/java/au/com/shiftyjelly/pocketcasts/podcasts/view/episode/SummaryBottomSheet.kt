@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import android.os.Bundle
-import androidx.core.text.htmlEncode
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.htmlEncode
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
