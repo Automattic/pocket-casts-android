@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
 import com.automattic.eventhorizon.BookmarkCreatedEvent
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
@@ -24,10 +26,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val eventHorizon: EventHorizon,
+    private val syncManager: SyncManager,
+    private val transcriptWindowExtractor: TranscriptWindowExtractor,
 ) : BookmarkManager,
     CoroutineScope {
 
@@ -225,5 +230,31 @@ class BookmarkManagerImpl @Inject constructor(
 
     override fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean> {
         return bookmarkDao.hasBookmarksFlow(episodeUuid)
+    }
+
+    override suspend fun enrichBookmark(bookmark: Bookmark) {
+        try {
+            val snippet = transcriptWindowExtractor.extractWindow(
+                episodeUuid = bookmark.episodeUuid,
+                timeSecs = bookmark.timeSecs,
+            ) ?: return
+
+            val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
+            val title = response.title
+            val summary = response.summary
+            if (title != null && summary != null) {
+                val now = System.currentTimeMillis()
+                bookmarkDao.updateAiData(
+                    bookmarkUuid = bookmark.uuid,
+                    aiTitle = title,
+                    aiSummary = summary,
+                    aiTitleModified = now,
+                    aiSummaryModified = now,
+                    syncStatus = SyncStatus.NOT_SYNCED,
+                )
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
+        }
     }
 }

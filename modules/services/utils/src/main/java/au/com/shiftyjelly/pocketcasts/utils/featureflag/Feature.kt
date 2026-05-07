@@ -264,6 +264,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    SMART_BOOKMARKS(
+        key = "smart_bookmarks",
+        title = "AI-enriched bookmarks with title and summary",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
