@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import android.os.Bundle
-import android.text.TextUtils
+import androidx.core.text.htmlEncode
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
@@ -98,13 +98,13 @@ private fun markdownToHtml(markdown: String): String {
     return markdown.lines()
         .joinToString("\n") { line ->
             when {
-                line.startsWith("### ") -> "<h3>${TextUtils.htmlEncode(line.removePrefix("### "))}</h3>"
-                line.startsWith("## ") -> "<h2>${TextUtils.htmlEncode(line.removePrefix("## "))}</h2>"
-                line.startsWith("# ") -> "<h1>${TextUtils.htmlEncode(line.removePrefix("# "))}</h1>"
-                line.startsWith("- ") -> "&#8226; ${TextUtils.htmlEncode(line.removePrefix("- "))}<br>"
-                line.startsWith("* ") -> "&#8226; ${TextUtils.htmlEncode(line.removePrefix("* "))}<br>"
+                line.startsWith("### ") -> "<h3>${line.removePrefix("### ").htmlEncode()}</h3>"
+                line.startsWith("## ") -> "<h2>${line.removePrefix("## ").htmlEncode()}</h2>"
+                line.startsWith("# ") -> "<h1>${line.removePrefix("# ").htmlEncode()}</h1>"
+                line.startsWith("- ") -> "&#8226; ${line.removePrefix("- ").htmlEncode()}<br>"
+                line.startsWith("* ") -> "&#8226; ${line.removePrefix("* ").htmlEncode()}<br>"
                 line.isBlank() -> "<br>"
-                else -> "${TextUtils.htmlEncode(line)}<br>"
+                else -> "${line.htmlEncode()}<br>"
             }
         }
         .replace(Regex("\\*\\*(.+?)\\*\\*"), "<b>$1</b>")
