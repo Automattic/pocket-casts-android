@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
@@ -30,6 +31,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,6 +50,7 @@ class TranscriptManagerTest {
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
     private val generatedVttDbTranscript = createDbTranscript("text/vtt", episodeUuid = "summary-episode-id", url = "transcript.vtt", isGenerated = true)
+    private val generatedVttTranscript = createDbTranscript("text/vtt", isGenerated = true, url = "transcript-url.vtt")
 
     private val transcriptManager = TranscriptManagerImpl(
         transcriptDao = mock {
@@ -409,6 +413,91 @@ class TranscriptManagerTest {
 
         assertNull(summary.await())
     }
+
+    @Test
+    fun `save ai chapters when no existing chapters`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadSummaryText("episode-id")
+
+        verify(chapterManager).updateChapters(
+            "episode-id",
+            listOf(
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction"),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic"),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up"),
+            ),
+        )
+    }
+
+    @Test
+    fun `do not save ai chapters when existing chapters present`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val existingChapter = au.com.shiftyjelly.pocketcasts.models.to.Chapter(
+            title = "Existing",
+            startTime = 0.seconds,
+            endTime = 60.seconds,
+            index = 0,
+            uiIndex = 1,
+        )
+        val chapterManagerWithExisting: ChapterManager = mock {
+            on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(listOf(existingChapter)))
+        }
+        val managerWithChapters = TranscriptManagerImpl(
+            transcriptDao = mock { on { observeTranscripts(any()) } doReturn localTranscriptsFlow },
+            transcriptService = service,
+            episodeManager = mock {
+                on { findByUuid(any()) } doReturn PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
+            },
+            chapterManager = chapterManagerWithExisting,
+            moshi = Moshi.Builder().build(),
+            parsers = parsers,
+        )
+
+        managerWithChapters.loadSummaryText("episode-id")
+
+        verify(chapterManagerWithExisting, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `return summary even when chapters are empty`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_NO_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertEquals("This is a summary.", summary)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `skip chapters with missing title`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_INVALID_CHAPTERS
+
+        transcriptManager.loadSummaryText("episode-id")
+
+        verify(chapterManager).updateChapters(
+            "episode-id",
+            listOf(
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter"),
+            ),
+        )
+    }
+
+    @Test
+    fun `return summary when meta json has no chapters field`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = """{"summary": "Just a summary"}"""
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertEquals("Just a summary", summary)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
 }
 
 private class TestParser(
@@ -455,3 +544,32 @@ private fun createDbTranscript(
     isGenerated = isGenerated,
     language = "en",
 )
+
+private val META_JSON_WITH_CHAPTERS = """
+    {
+        "summary": "A great episode.",
+        "chapters": [
+            {"title": "Introduction", "timestamp": "00:15", "startTime": 15},
+            {"title": "Main Topic", "timestamp": "01:13", "startTime": 73},
+            {"title": "Wrap Up", "timestamp": "03:00", "startTime": 180}
+        ]
+    }
+""".trimIndent()
+
+private val META_JSON_NO_CHAPTERS = """
+    {
+        "summary": "This is a summary.",
+        "chapters": []
+    }
+""".trimIndent()
+
+private val META_JSON_INVALID_CHAPTERS = """
+    {
+        "summary": "Summary with bad chapters.",
+        "chapters": [
+            {"title": "", "startTime": 30},
+            {"title": "Valid Chapter", "startTime": 60},
+            {"title": "No Start Time"}
+        ]
+    }
+""".trimIndent()
