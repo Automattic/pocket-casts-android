@@ -61,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.blogs.AddBlogViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.profile.extensions.displayHref
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -70,7 +71,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun AddBlogPage(
     state: UiState,
     url: String,
-    onUrlChange: (String) -> Unit,
+    onUrlChange: (url: String) -> Unit,
     onBackPress: () -> Unit,
     onFindFeeds: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
@@ -101,7 +102,7 @@ internal fun AddBlogPage(
 private fun AddBlogContent(
     state: UiState,
     url: String,
-    onUrlChange: (String) -> Unit,
+    onUrlChange: (url: String) -> Unit,
     onFindFeeds: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
     onEditUrl: () -> Unit,
@@ -341,7 +342,7 @@ private fun FeedChoiceRow(
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = feed.href.removePrefix("https://").removePrefix("http://"),
+                    text = feed.displayHref,
                     color = colors.primaryText02,
                     maxLines = 1,
                     fontFamily = FontFamily.Monospace,
