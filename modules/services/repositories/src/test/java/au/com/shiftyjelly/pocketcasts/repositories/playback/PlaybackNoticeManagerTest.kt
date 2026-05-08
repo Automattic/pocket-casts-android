@@ -38,6 +38,7 @@ class PlaybackNoticeManagerTest {
     private val episodeNotAvailableMessage = "Episode not available"
     private val unableToPlayMessage = "Unable to play"
     private val accessDeniedMessage = "This episode can't be played."
+    private val playbackFailedMessage = "Playback failed, please try again."
     private val accessDeniedAction = "Learn more"
 
     private val context: Context = mock {
@@ -46,6 +47,7 @@ class PlaybackNoticeManagerTest {
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_episode_not_available) } doReturn episodeNotAvailableMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_unable_to_play) } doReturn unableToPlayMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_streaming_access_denied) } doReturn accessDeniedMessage
+        on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.error_playback_failed_try_again) } doReturn playbackFailedMessage
         on { getString(au.com.shiftyjelly.pocketcasts.localization.R.string.settings_battery_learn_more) } doReturn accessDeniedAction
     }
 
@@ -595,9 +597,35 @@ class PlaybackNoticeManagerTest {
             )
             val notice = awaitItem()
             assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
-            assertEquals(accessDeniedMessage, notice?.message)
+            assertEquals(unableToPlayMessage, notice?.message)
             assertEquals(accessDeniedAction, notice?.linkText)
             assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
+        }
+    }
+
+    @Test
+    fun `transient failure shown with playback failed message`() = runTest {
+        FeatureFlag.setEnabled(Feature.PLAYBACK_ERROR_INFO_BAR, true)
+        networkCapabilities.value = onlineCapabilities()
+        val manager = createManager(backgroundScope)
+        runCurrent()
+
+        manager.playbackNotice.test {
+            assertNull(awaitItem())
+
+            playbackStateFlow.value = PlaybackState(
+                state = PlaybackState.State.ERROR,
+                playbackIssue = PlaybackIssue.TransientFailure,
+            )
+            val notice = awaitItem()
+            assertEquals(PlaybackNoticeType.PLAYBACK, notice?.type)
+            assertEquals(playbackFailedMessage, notice?.message)
+            assertEquals(accessDeniedAction, notice?.linkText)
+            assertEquals(Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL, notice?.supportUrl)
+
+            advanceTimeBy(PlaybackNoticeManager.AUTO_DISMISS_DURATION)
+            runCurrent()
+            assertNull(awaitItem())
         }
     }
 

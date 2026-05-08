@@ -256,6 +256,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    BLOGS(
+        key = "blogs",
+        title = "Blogs into a podcast",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

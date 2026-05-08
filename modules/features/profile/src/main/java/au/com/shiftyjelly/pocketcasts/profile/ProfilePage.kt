@@ -166,7 +166,7 @@ internal fun ProfilePage(
                 }
                 item {
                     ProfileSections(
-                        sections = ProfileSection.entries,
+                        sections = state.sections,
                         onClick = onSectionClick,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -216,6 +216,7 @@ internal fun ProfilePage(
 }
 
 internal data class ProfilePageState(
+    val sections: List<ProfileSection>,
     val isPlaybackEnabled: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
@@ -365,6 +366,7 @@ private fun ProfilePageStub(
 ) {
     ProfilePage(
         state = ProfilePageState(
+            sections = ProfileSection.entries,
             isPlaybackEnabled = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,

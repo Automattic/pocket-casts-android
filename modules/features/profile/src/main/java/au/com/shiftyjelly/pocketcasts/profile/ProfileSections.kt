@@ -32,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -103,6 +105,10 @@ internal enum class ProfileSection(
         iconId = IR.drawable.ic_bookmark,
         labelId = LR.string.bookmarks,
     ),
+    Blogs(
+        iconId = IR.drawable.ic_blogs,
+        labelId = LR.string.profile_navigation_blogs,
+    ),
     ListeningHistory(
         iconId = IR.drawable.ic_listen_history,
         labelId = LR.string.profile_navigation_listening_history,
@@ -111,6 +117,11 @@ internal enum class ProfileSection(
         iconId = IR.drawable.ic_help,
         labelId = LR.string.settings_title_help,
     ),
+    ;
+
+    companion object {
+        fun visibleEntries(): List<ProfileSection> = entries.filter { it != Blogs || FeatureFlag.isEnabled(Feature.BLOGS) }
+    }
 }
 
 @Preview

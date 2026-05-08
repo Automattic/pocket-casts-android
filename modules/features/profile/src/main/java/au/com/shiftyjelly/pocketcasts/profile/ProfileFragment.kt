@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
+import au.com.shiftyjelly.pocketcasts.profile.blogs.BlogsFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
@@ -56,6 +57,7 @@ class ProfileFragment :
             profileViewModel.onScreenShown()
         }
         val state = ProfilePageState(
+            sections = ProfileSection.visibleEntries(),
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
@@ -170,6 +172,7 @@ class ProfileFragment :
             ProfileSection.Stats -> StatsFragment()
             ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
             ProfileSection.CloudFiles -> CloudFilesFragment()
+            ProfileSection.Blogs -> BlogsFragment()
             ProfileSection.Starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
             ProfileSection.Bookmarks -> BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
             ProfileSection.ListeningHistory -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
