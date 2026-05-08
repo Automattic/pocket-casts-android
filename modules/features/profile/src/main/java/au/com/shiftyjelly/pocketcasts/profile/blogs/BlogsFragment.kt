@@ -9,8 +9,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,14 +52,36 @@ class BlogsFragment : BaseFragment() {
                                 navController.popBackStack()
                             }
                         },
-                        onFindFeeds = viewModel::onFindFeeds,
-                        onFeedClick = { _ ->
-                            // TODO
+                        onFindFeeds = {
+                            viewModel.onFindFeeds(
+                                url = it,
+                                onNavigateToPodcast = { uuid ->
+                                    navigateToPodcast(uuid)
+                                    viewModel.resetToStart()
+                                },
+                            )
+                        },
+                        onFeedClick = { webFeed ->
+                            viewModel.createFeed(
+                                webFeed = webFeed,
+                                onNavigateToPodcast = { uuid ->
+                                    navigateToPodcast(uuid)
+                                    viewModel.resetToStart()
+                                },
+                            )
                         },
                         onEditUrl = { viewModel.editUrl() },
                     )
                 }
             }
         }
+    }
+
+    private fun navigateToPodcast(uuid: String) {
+        val fragment = PodcastFragment.newInstance(
+            podcastUuid = uuid,
+            sourceView = SourceView.BLOGS,
+        )
+        (activity as FragmentHostListener).addFragment(fragment)
     }
 }

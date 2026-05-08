@@ -590,6 +590,7 @@ open class PlaybackManager @Inject constructor(
         SourceView.AUTO_DOWNLOAD,
         SourceView.CLIP_SHARING,
         SourceView.CHROMECAST,
+        SourceView.BLOGS,
         SourceView.DISCOVER,
         SourceView.DISCOVER_PLAIN_LIST,
         SourceView.DISCOVER_PODCAST_LIST,

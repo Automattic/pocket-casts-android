@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.profile.blogs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +20,8 @@ import timber.log.Timber
 @HiltViewModel
 class AddBlogViewModel @Inject constructor(
     private val webFeedsService: WebFeedsService,
+    private val syncManager: SyncManager,
+    private val podcastManager: PodcastManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Start)
@@ -27,25 +31,26 @@ class AddBlogViewModel @Inject constructor(
     val url: StateFlow<String> = _url.asStateFlow()
 
     private var findFeedsJob: Job? = null
+    private var createFeedJob: Job? = null
 
     fun onUrlChange(url: String) {
         _url.value = url
     }
 
-    fun onFindFeeds(url: String) {
+    fun onFindFeeds(url: String, onNavigateToPodcast: (String) -> Unit) {
         val cleanUrl = url.trim()
         if (cleanUrl.isEmpty()) {
             return
         }
-        findFeedsJob?.cancel()
+        cancelJobs()
         findFeedsJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
                 val feeds = webFeedsService.getFeeds(cleanUrl)
-                _uiState.value = when {
-                    feeds.isEmpty() -> UiState.Error(ErrorReason.NoFeedsFound)
-                    feeds.size == 1 -> UiState.Found(feeds.first())
-                    else -> UiState.Pick(feeds)
+                when {
+                    feeds.isEmpty() -> _uiState.value = UiState.Error(ErrorReason.NoFeedsFound)
+                    feeds.size == 1 -> createFeed(webFeed = feeds.first(), onNavigateToPodcast = onNavigateToPodcast)
+                    else -> _uiState.value = UiState.Pick(feeds)
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -59,15 +64,43 @@ class AddBlogViewModel @Inject constructor(
         }
     }
 
+    fun createFeed(webFeed: WebFeed, onNavigateToPodcast: (String) -> Unit) {
+        createFeedJob?.cancel()
+        createFeedJob = viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            try {
+                val response = syncManager.createWebFeedPodcastOrThrow(webFeed.href)
+                if (response.hasPodcast()) {
+                    val podcastUuid = response.podcast.uuid
+                    podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+                    onNavigateToPodcast(podcastUuid)
+                } else {
+                    Timber.e("Timed out waiting for podcast creation for ${webFeed.href}")
+                    _uiState.value = UiState.Error(ErrorReason.Generic)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to create feed for ${webFeed.href}")
+                _uiState.value = UiState.Error(ErrorReason.Generic)
+            }
+        }
+    }
+
     fun resetToStart() {
-        findFeedsJob?.cancel()
+        cancelJobs()
         _uiState.value = UiState.Start
         _url.value = ""
     }
 
     fun editUrl() {
-        findFeedsJob?.cancel()
+        cancelJobs()
         _uiState.value = UiState.Start
+    }
+
+    private fun cancelJobs() {
+        findFeedsJob?.cancel()
+        createFeedJob?.cancel()
     }
 
     fun onBackPressed(): Boolean {
@@ -82,7 +115,6 @@ class AddBlogViewModel @Inject constructor(
     sealed interface UiState {
         data object Start : UiState
         data object Loading : UiState
-        data class Found(val feed: WebFeed) : UiState
         data class Pick(val feeds: List<WebFeed>) : UiState
         data class Error(val reason: ErrorReason) : UiState
     }

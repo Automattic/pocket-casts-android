@@ -41,6 +41,7 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -105,6 +106,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getEpisodesOrThrow(request: PodcastsEpisodesRequest): EpisodesResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
     suspend fun getStarredEpisodesOrThrow(): StarredEpisodesResponse
+    suspend fun createWebFeedPodcastOrThrow(url: String): WebFeedCreateResponse
 
     suspend fun syncUpdateOrThrow(request: SyncUpdateRequest): SyncUpdateResponse
 
