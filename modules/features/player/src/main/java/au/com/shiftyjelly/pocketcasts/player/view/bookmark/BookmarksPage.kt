@@ -131,8 +131,8 @@ fun BookmarksPage(
 
     LaunchedEffect(onBookmarkDetailClick) {
         bookmarksViewModel.showBookmarkDetail.collect { bookmark ->
-            val state = bookmarksViewModel.uiState.value as? UiState.Loaded
-            val episodeTitle = state?.bookmarkIdAndEpisodeMap?.get(bookmark.uuid)?.title.orEmpty()
+            val loadedState = bookmarksViewModel.uiState.value as? UiState.Loaded
+            val episodeTitle = loadedState?.bookmarkIdAndEpisodeMap?.get(bookmark.uuid)?.title.orEmpty()
             onBookmarkDetailClick(bookmark, episodeTitle)
         }
     }

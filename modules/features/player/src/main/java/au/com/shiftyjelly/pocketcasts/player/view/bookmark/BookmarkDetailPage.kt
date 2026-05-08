@@ -32,13 +32,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -57,13 +56,6 @@ internal fun BookmarkDetailPage(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
-    val onPlayClick: () -> Unit = {
-        scope.launch {
-            playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
-            playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
-        }
-    }
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
     val colors = remember(theme.type, playerColors) {
@@ -71,13 +63,6 @@ internal fun BookmarkDetailPage(
             BookmarkRowColors.player(playerColors)
         } else {
             BookmarkRowColors.default(theme.colors)
-        }
-    }
-    val playButtonColors = remember(theme.type, playerColors) {
-        if (playerColors != null) {
-            TimePlayButtonColors.player(playerColors)
-        } else {
-            TimePlayButtonColors.default(theme.colors)
         }
     }
 
@@ -119,13 +104,11 @@ internal fun BookmarkDetailPage(
                 color = colors.primaryText,
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            TimePlayButton(
-                timeSecs = timeSecs,
-                contentDescriptionId = LR.string.bookmark_play,
-                onClick = onPlayClick,
-                colors = playButtonColors,
+            TextH70(
+                text = TimeHelper.formattedSeconds(timeSecs.toDouble()),
+                color = colors.secondaryText,
             )
 
             if (!aiSummary.isNullOrEmpty()) {
