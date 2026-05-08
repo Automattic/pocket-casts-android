@@ -2762,4 +2762,13 @@
     <string name="blogs_empty_title">Turn any blog into a podcast</string>
     <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
     <string name="blogs_add_button">Add a blog</string>
+    <string name="blogs_empty_url_label">Blog or RSS URL</string>
+    <string name="blogs_empty_url_placeholder" translatable="false">https://</string>
+    <string name="blogs_add_url_hint">Paste a blog or RSS URL and we\'ll find the feed for you.</string>
+    <string name="blogs_pick_a_feed">PICK A FEED TO FOLLOW</string>
+    <string name="blogs_found_on_this_site">Found %d feeds on this site</string>
+    <string name="blogs_looking_up_feed">Looking up feed...</string>
+    <string name="blogs_error_no_internet">Check your internet connection and try again.</string>
+    <string name="blogs_error_no_feeds_found">We couldn\'t find any feeds at that URL. Please check the URL and try again.</string>
+    <string name="blogs_error_generic">Something went wrong. Please try again.</string>
 </resources>
