@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
+import com.automattic.eventhorizon.ListeningTimeEvent
 import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -32,7 +33,7 @@ class TracksAnalyticsTracker @Inject constructor(
     override val id get() = ID
 
     override fun track(event: Trackable): TrackedEvent? {
-        if (tracksClient == null || !settings.collectAnalytics.value) {
+        if (tracksClient == null || !shouldTrackEvent(event)) {
             return null
         }
 
@@ -70,6 +71,13 @@ class TracksAnalyticsTracker @Inject constructor(
             key = eventKey,
             properties = usedProperties,
         )
+    }
+
+    private fun shouldTrackEvent(event: Trackable): Boolean {
+        return when (event) {
+            is ListeningTimeEvent -> settings.collectListeningStats.value
+            else -> settings.collectAnalytics.value
+        }
     }
 
     private fun updatePredefinedEventProperties() {

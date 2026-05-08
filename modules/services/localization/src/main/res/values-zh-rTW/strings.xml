@@ -15,7 +15,6 @@ Language: zh_TW
     <string name="error_streaming_server_error">Podcast 伺服器發生問題。 請稍後再試。</string>
     <string name="error_streaming_no_longer_available">本集無法再透過發表者收聽。</string>
     <string name="error_streaming_not_found">伺服器上找不到此集。 發行者可能已移除。</string>
-    <string name="error_streaming_access_denied">你無法再播放此集。</string>
     <string name="settings_auto_download_storage_summary">停用後，當裝置內部儲存空間不足時，就會進行下載。</string>
     <string name="settings_auto_download_storage">僅限儲存空間足夠時</string>
     <string name="settings_auto_download_charging_summary">停用後，你無須將裝置連結至充電器，即可進行下載。</string>

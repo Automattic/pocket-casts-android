@@ -35,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PrivacyShownEvent
@@ -72,6 +74,9 @@ class PrivacyFragment : BaseFragment() {
                 onAnalyticsClick = {
                     viewModel.updateAnalyticsSetting(it)
                 },
+                onStatsClick = {
+                    viewModel.updateListeningStatsSetting(it)
+                },
                 onCrashReportsClick = {
                     viewModel.updateCrashReportsSetting(it)
                 },
@@ -99,6 +104,7 @@ class PrivacyFragment : BaseFragment() {
     private fun PrivacySettings(
         state: PrivacyViewModel.UiState,
         onAnalyticsClick: (Boolean) -> Unit,
+        onStatsClick: (Boolean) -> Unit,
         onCrashReportsClick: (Boolean) -> Unit,
         onLinkAccountClick: (Boolean) -> Unit,
         onPrivacyPolicyClick: () -> Unit,
@@ -138,6 +144,20 @@ class PrivacyFragment : BaseFragment() {
                             ) { onAnalyticsClick(!state.analytics) },
                             indent = false,
                         )
+                    }
+                    if (FeatureFlag.isEnabled(Feature.IMPROVED_LISTENING_STATS)) {
+                        item {
+                            SettingRow(
+                                primaryText = stringResource(LR.string.settings_privacy_listening_stats),
+                                secondaryText = stringResource(LR.string.settings_privacy_listening_stats_summary),
+                                toggle = SettingRowToggle.Switch(checked = state.listeningStats),
+                                modifier = Modifier.toggleable(
+                                    value = state.listeningStats,
+                                    role = Role.Switch,
+                                ) { onStatsClick(!state.listeningStats) },
+                                indent = false,
+                            )
+                        }
                     }
                     item {
                         SettingRow(

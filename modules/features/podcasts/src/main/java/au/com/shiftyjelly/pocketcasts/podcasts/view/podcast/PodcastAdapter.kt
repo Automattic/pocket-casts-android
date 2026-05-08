@@ -824,6 +824,7 @@ class PodcastAdapter(
                         title = podcast.title,
                         category = podcast.getFirstCategory(itemView.context.resources),
                         author = podcast.author,
+                        explicit = podcast.explicit ?: false,
                         description = podcastDescription,
                         podcastInfoState = PodcastInfoState(
                             author = podcast.author,

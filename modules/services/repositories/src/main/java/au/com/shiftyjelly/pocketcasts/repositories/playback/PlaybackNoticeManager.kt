@@ -125,8 +125,15 @@ class PlaybackNoticeManager @Inject constructor(
                         type = PlaybackNoticeType.CONNECTION_LOST,
                     )
 
+                    playbackState.playbackIssue is PlaybackIssue.TransientFailure -> PlaybackNoticeInfo(
+                        message = context.getString(LR.string.error_playback_failed_try_again),
+                        type = PlaybackNoticeType.PLAYBACK,
+                        supportUrl = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL,
+                        linkText = context.getString(LR.string.settings_battery_learn_more),
+                    )
+
                     playbackState.playbackIssue is PlaybackIssue.StuckPlayer -> PlaybackNoticeInfo(
-                        message = context.getString(LR.string.error_streaming_access_denied),
+                        message = context.getString(playbackState.playbackIssue.messageResId),
                         type = PlaybackNoticeType.PLAYBACK,
                         supportUrl = Settings.INFO_DOWNLOAD_AND_PLAYBACK_URL,
                         linkText = context.getString(LR.string.settings_battery_learn_more),

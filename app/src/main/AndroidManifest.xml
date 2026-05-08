@@ -625,6 +625,17 @@
             </intent-filter>
         </service>
 
+        <!-- Receives ACTION_MEDIA_BUTTON broadcasts from external apps (e.g. Tasker,
+             Automate) and forwards them to whichever MediaBrowserService is enabled.
+             Without this, only AudioManager.dispatchMediaKeyEvent() reaches the session;
+             broadcast-based media button events are silently dropped. -->
+        <receiver android:name="androidx.media.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".PocketCastsWearListenerService"
             android:exported="true">

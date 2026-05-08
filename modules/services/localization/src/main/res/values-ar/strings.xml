@@ -15,7 +15,6 @@ Language: ar
     <string name="error_streaming_server_error">توجد بعض المشكلات في خادم البث الصوتي. يُرجى إعادة المحاولة لاحقًا.</string>
     <string name="error_streaming_no_longer_available">لم تعد هذه الحلقة متوفرة بعد الآن من قِبَل الناشر.</string>
     <string name="error_streaming_not_found">تعذّر العثور على هذه الحلقة على الخادم. ربما تمت إزالتها من قِبَل الناشر.</string>
-    <string name="error_streaming_access_denied">لم يعُد لديك حق الوصول لتشغيل هذه الحلقة.</string>
     <string name="settings_auto_download_storage_summary">عند التعطيل، يمكن أن تتم عمليات التنزيل حتى عندما تكون مساحة التخزين الداخلية للجهاز منخفضة.</string>
     <string name="settings_auto_download_storage">فقط عند توفر مساحة تخزين كافية</string>
     <string name="settings_auto_download_charging_summary">عند التعطيل، يمكن أن تتم عمليات التنزيل حتى دون توصيل الجهاز بالشاحن.</string>

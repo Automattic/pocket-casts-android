@@ -12,6 +12,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionCommands
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -56,8 +57,15 @@ internal class Media3LibrarySessionCallback(
         controller: MediaSession.ControllerInfo,
     ): MediaSession.ConnectionResult {
         if (packageValidator != null && !packageValidator.isKnownCaller(controller.packageName, controller.uid)) {
-            Timber.e("Unknown caller trying to connect to Media3 session: ${controller.packageName} ${controller.uid}")
-            return MediaSession.ConnectionResult.reject()
+            // Unknown callers (e.g., Tasker, Automate) get transport controls only — no library
+            // browsing or custom commands. This matches the legacy MediaBrowserServiceCompat
+            // behavior where onGetRoot() returned null for unknown callers but transport
+            // controls via MediaControllerCompat still worked independently.
+            LogBuffer.i(
+                LogBuffer.TAG_PLAYBACK,
+                "Unknown caller connected with transport-only access: ${controller.packageName} uid=${controller.uid}",
+            )
+            return MediaSession.ConnectionResult.accept(SessionCommands.EMPTY, TRANSPORT_PLAYER_COMMANDS)
         }
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")

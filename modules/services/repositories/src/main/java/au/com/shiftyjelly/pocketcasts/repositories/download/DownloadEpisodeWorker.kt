@@ -91,6 +91,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val fileStorage: FileStorage,
     private val progressCache: DownloadProgressCache,
     private val notificationObserver: DownloadNotificationObserver,
+    private val episodeDurationFixer: EpisodeDurationFixer,
 ) : Worker(context, params) {
     private val args = inputData.toArgs()
 
@@ -126,6 +127,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
         if (!isStopped) {
             LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download started. Episode: ${args.episodeUuid}")
         }
+        var resolvedEpisode: BaseEpisode? = null
         val timedValue = measureTimedValue {
             try {
                 // Block the work until the state is dispatched to keep it consistent
@@ -135,6 +137,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 prepareForegroundNotification(episode)
 
                 episode = refreshDownloadUrlOrThrow(episode)
+                resolvedEpisode = episode
                 val downloadFile = getDownloadFileOrThrow(episode)
                 val tempFile = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
 
@@ -155,6 +158,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
         return when (val result = timedValue.value) {
             is DownloadResult.Success -> {
+                resolvedEpisode?.let { episodeDurationFixer.fixMissingDuration(it, result.file) }
                 val data = Data.Builder()
                     .putString(DOWNLOAD_FILE_PATH_KEY, result.file.path)
                     .build()
