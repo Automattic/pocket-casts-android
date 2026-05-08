@@ -76,6 +76,9 @@ class BookmarksViewModel
     private val _message = MutableSharedFlow<BookmarkMessage>()
     val message = _message.asSharedFlow()
 
+    private val _showBookmarkDetail = MutableSharedFlow<Bookmark>()
+    val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
+
     private var isFragmentActive: Boolean = true
 
     private var sourceView: SourceView = SourceView.UNKNOWN
@@ -250,12 +253,16 @@ class BookmarksViewModel
     }
 
     private fun onRowClick(bookmark: Bookmark) {
-        if ((_uiState.value as? UiState.Loaded)?.isMultiSelecting == false) return
-
-        if (multiSelectHelper.isSelected(bookmark)) {
-            multiSelectHelper.deselect(bookmark)
+        if ((_uiState.value as? UiState.Loaded)?.isMultiSelecting == true) {
+            if (multiSelectHelper.isSelected(bookmark)) {
+                multiSelectHelper.deselect(bookmark)
+            } else {
+                multiSelectHelper.select(bookmark)
+            }
         } else {
-            multiSelectHelper.select(bookmark)
+            viewModelScope.launch {
+                _showBookmarkDetail.emit(bookmark)
+            }
         }
     }
 
