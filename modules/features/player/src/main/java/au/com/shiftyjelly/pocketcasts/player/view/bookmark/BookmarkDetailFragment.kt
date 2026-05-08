@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,8 +23,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         private const val ARG_EPISODE_TITLE = "episode_title"
         private const val ARG_EPISODE_UUID = "episode_uuid"
         private const val ARG_TIME_SECS = "time_secs"
-        private const val ARG_CREATED_AT = "created_at"
-        private const val ARG_CREATED_AT_PATTERN = "created_at_pattern"
+        private const val ARG_CREATED_AT_TEXT = "created_at_text"
         private const val ARG_SOURCE_VIEW = "source_view"
 
         fun show(
@@ -50,8 +48,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 putString(ARG_EPISODE_TITLE, episodeTitle)
                 putString(ARG_EPISODE_UUID, bookmark.episodeUuid)
                 putInt(ARG_TIME_SECS, bookmark.timeSecs)
-                putLong(ARG_CREATED_AT, bookmark.createdAt.time)
-                putString(ARG_CREATED_AT_PATTERN, bookmark.createdAtDatePattern())
+                putString(ARG_CREATED_AT_TEXT, bookmark.createdAt.toLocalizedFormatPattern(bookmark.createdAtDatePattern()))
                 putString(ARG_SOURCE_VIEW, sourceView.key)
             }
         }
@@ -65,8 +62,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     private val episodeTitle: String get() = requireArguments().getString(ARG_EPISODE_TITLE, "")
     private val episodeUuid: String get() = requireArguments().getString(ARG_EPISODE_UUID, "")
     private val timeSecs: Int get() = requireArguments().getInt(ARG_TIME_SECS)
-    private val createdAt: Date get() = Date(requireArguments().getLong(ARG_CREATED_AT))
-    private val createdAtPattern: String get() = requireArguments().getString(ARG_CREATED_AT_PATTERN, "")
+    private val createdAtText: String get() = requireArguments().getString(ARG_CREATED_AT_TEXT, "")
     private val sourceView: SourceView get() = SourceView.fromString(requireArguments().getString(ARG_SOURCE_VIEW))
 
     override fun onCreateView(
@@ -81,7 +77,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 episodeTitle = episodeTitle,
                 episodeUuid = episodeUuid,
                 timeSecs = timeSecs,
-                createdAtText = createdAt.toLocalizedFormatPattern(createdAtPattern),
+                createdAtText = createdAtText,
                 playbackManager = playbackManager,
                 sourceView = sourceView,
                 onClose = { dismiss() },

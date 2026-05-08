@@ -27,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -56,6 +57,13 @@ internal fun BookmarkDetailPage(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+    val onPlayClick: () -> Unit = {
+        scope.launch {
+            playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
+            playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
+        }
+    }
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
     val colors = remember(theme.type, playerColors) {
@@ -116,7 +124,7 @@ internal fun BookmarkDetailPage(
             TimePlayButton(
                 timeSecs = timeSecs,
                 contentDescriptionId = LR.string.bookmark_play,
-                onClick = {},
+                onClick = onPlayClick,
                 colors = playButtonColors,
             )
 
@@ -155,8 +163,8 @@ private fun Header(
     timeSecs: Int,
     playbackManager: PlaybackManager,
     sourceView: SourceView,
-    buttonColor: androidx.compose.ui.graphics.Color,
-    buttonBackgroundColor: androidx.compose.ui.graphics.Color,
+    buttonColor: Color,
+    buttonBackgroundColor: Color,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
