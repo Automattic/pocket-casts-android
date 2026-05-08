@@ -401,7 +401,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getStarredEpisodes(token)
     }
 
-    override suspend fun createWebFeedPodcastOrThrow(url: String): WebFeedCreateResponse {
+    override suspend fun createWebFeedPodcast(url: String): WebFeedCreateResponse {
         var response = getCacheTokenOrLogin { token ->
             syncServiceManager.createWebFeedPodcast(token = token, url = url)
         }

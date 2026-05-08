@@ -71,12 +71,12 @@ class AddBlogViewModelTest {
             on { podcast } doReturn podcastResponse
         }
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { listOf(feed) }
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).thenReturn(response)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
 
         var navigatedUuid: String? = null
         viewModel.onFindFeeds("https://example.com") { navigatedUuid = it }
 
-        verify(syncManager).createWebFeedPodcastOrThrow(feed.href)
+        verify(syncManager).createWebFeedPodcast(feed.href)
         assertEquals(podcastUuid, navigatedUuid)
     }
 
@@ -221,13 +221,13 @@ class AddBlogViewModelTest {
             on { hasPodcast() } doReturn true
             on { podcast } doReturn podcastResponse
         }
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).thenReturn(response)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
 
         var navigatedUuid: String? = null
         viewModel.createFeed(feed) { navigatedUuid = it }
 
         assertEquals(AddBlogViewModel.UiState.Loading, viewModel.uiState.value)
-        verify(syncManager).createWebFeedPodcastOrThrow(feed.href)
+        verify(syncManager).createWebFeedPodcast(feed.href)
         verify(podcastManager).subscribeToPodcast(podcastUuid = eq(podcastUuid), sync = eq(true), shouldAutoDownload = eq(true))
         assertEquals(podcastUuid, navigatedUuid)
     }
@@ -238,7 +238,7 @@ class AddBlogViewModelTest {
         val response = mock<WebFeedCreateResponse> {
             on { hasPodcast() } doReturn false
         }
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).thenReturn(response)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
 
         viewModel.createFeed(feed) { }
 
@@ -248,7 +248,7 @@ class AddBlogViewModelTest {
     @Test
     fun `createFeed with exception transitions to Generic error`() = runTest {
         val feed = webFeed("Example", "https://example.com/feed")
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).thenThrow(RuntimeException("boom"))
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenThrow(RuntimeException("boom"))
 
         viewModel.createFeed(feed) { }
 
@@ -259,7 +259,7 @@ class AddBlogViewModelTest {
     fun `resetToStart cancels in-flight createFeed and skips navigation`() = runTest {
         val feed = webFeed("Example", "https://example.com/feed")
         val gate = CompletableDeferred<WebFeedCreateResponse>()
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).doSuspendableAnswer { gate.await() }
+        whenever(syncManager.createWebFeedPodcast(feed.href)).doSuspendableAnswer { gate.await() }
 
         var navigatedUuid: String? = null
         viewModel.createFeed(feed) { navigatedUuid = it }
@@ -285,7 +285,7 @@ class AddBlogViewModelTest {
     fun `editUrl cancels in-flight createFeed and skips navigation`() = runTest {
         val feed = webFeed("Example", "https://example.com/feed")
         val gate = CompletableDeferred<WebFeedCreateResponse>()
-        whenever(syncManager.createWebFeedPodcastOrThrow(feed.href)).doSuspendableAnswer { gate.await() }
+        whenever(syncManager.createWebFeedPodcast(feed.href)).doSuspendableAnswer { gate.await() }
 
         viewModel.onUrlChange("https://example.com")
         var navigatedUuid: String? = null

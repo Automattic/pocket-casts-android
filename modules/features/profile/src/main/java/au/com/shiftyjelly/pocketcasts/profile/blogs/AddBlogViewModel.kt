@@ -69,7 +69,7 @@ class AddBlogViewModel @Inject constructor(
         createFeedJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val response = syncManager.createWebFeedPodcastOrThrow(webFeed.href)
+                val response = syncManager.createWebFeedPodcast(webFeed.href)
                 if (response.hasPodcast()) {
                     val podcastUuid = response.podcast.uuid
                     podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
