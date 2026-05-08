@@ -32,6 +32,11 @@ class PlaybackManagerSkipLastTest {
     }
 
     @Test
+    fun `effectiveSkipLastMs treats NaN speed as 1x`() {
+        assertEquals(120_000L, effectiveSkipLastMs(skipLastSecs = 120, playbackSpeed = Double.NaN))
+    }
+
+    @Test
     fun `effectiveSkipLastMs is zero when skipLastSecs is null or zero`() {
         assertEquals(0L, effectiveSkipLastMs(skipLastSecs = null, playbackSpeed = 2.0))
         assertEquals(0L, effectiveSkipLastMs(skipLastSecs = 0, playbackSpeed = 2.0))
@@ -144,8 +149,8 @@ class PlaybackManagerSkipLastTest {
     @Test
     fun `shouldSkipLast returns false when episode is shorter than the skip-last window`() {
         // A 60s episode with skipLast=120s at 1x: the whole episode is inside the window, but we
-        // intentionally do NOT fire because the guard `durationMs > thresholdMs` filters it out.
-        // (Preserves prior behaviour for very short episodes.)
+        // intentionally do NOT fire because the guard `durationMs > thresholdMs` filters it out
+        // to avoid skipping an entire short episode.
         assertFalse(
             shouldSkipLast(skipLastSecs = 120, playbackSpeed = 1.0, positionMs = 0, durationMs = 60_000),
         )

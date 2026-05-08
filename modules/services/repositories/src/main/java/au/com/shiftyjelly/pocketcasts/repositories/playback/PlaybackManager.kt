@@ -173,7 +173,8 @@ open class PlaybackManager @Inject constructor(
 
         internal fun effectiveSkipLastMs(skipLastSecs: Int?, playbackSpeed: Double): Long {
             val secs = skipLastSecs ?: 0
-            return (secs * 1000L * playbackSpeed.coerceAtLeast(1.0)).toLong()
+            val safeSpeed = (playbackSpeed.takeIf { it.isFinite() } ?: 1.0).coerceAtLeast(1.0)
+            return (secs * 1000L * safeSpeed).toLong()
         }
 
         internal fun shouldSkipLast(
@@ -2372,12 +2373,12 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun updateCurrentPosition() {
         val episode = getCurrentEpisode() ?: return
-        if (episode.uuid != playbackStateRelay.blockingFirst().episodeUuid) {
+        val currentPlaybackState = playbackStateRelay.blockingFirst()
+        if (episode.uuid != currentPlaybackState.episodeUuid) {
             Timber.d("Timer fired after onCompletion, ignoring")
             return
         }
 
-        val currentPlaybackState = playbackStateRelay.blockingFirst()
         val skipLast = currentPlaybackState.podcast?.skipLastSecs
         val playbackSpeed = currentPlaybackState.playbackSpeed
 
@@ -2389,7 +2390,7 @@ open class PlaybackManager @Inject constructor(
         val durationMs = player?.durationMs()
         if (shouldSkipLast(skipLast, playbackSpeed, positionMs, durationMs)) {
             // shouldSkipLast guarantees durationMs is non-null and positive when it returns true.
-            val remainingMs = durationMs!! - positionMs
+            val remainingMs = (durationMs!! - positionMs).coerceAtLeast(0)
             if (isSleepAfterEpisodeEnabled()) {
                 sleepEndOfEpisode(episode)
                 episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
