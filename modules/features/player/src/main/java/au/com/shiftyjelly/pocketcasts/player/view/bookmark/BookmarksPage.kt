@@ -73,6 +73,7 @@ fun BookmarksPage(
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
     onHeadphoneControlsButtonClick: () -> Unit,
+    onBookmarkDetailClick: (Bookmark, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -126,6 +127,14 @@ fun BookmarksPage(
                 }
                 Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
             }
+    }
+
+    LaunchedEffect(onBookmarkDetailClick) {
+        bookmarksViewModel.showBookmarkDetail.collect { bookmark ->
+            val state = bookmarksViewModel.uiState.value as? UiState.Loaded
+            val episodeTitle = state?.bookmarkIdAndEpisodeMap?.get(bookmark.uuid)?.title.orEmpty()
+            onBookmarkDetailClick(bookmark, episodeTitle)
+        }
     }
 }
 
