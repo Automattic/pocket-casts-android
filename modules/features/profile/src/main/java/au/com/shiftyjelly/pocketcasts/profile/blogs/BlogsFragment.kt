@@ -78,10 +78,12 @@ class BlogsFragment : BaseFragment() {
     }
 
     private fun navigateToPodcast(uuid: String) {
+        if (!isAdded) return
+        val host = activity as? FragmentHostListener ?: return
         val fragment = PodcastFragment.newInstance(
             podcastUuid = uuid,
             sourceView = SourceView.BLOGS,
         )
-        (activity as FragmentHostListener).addFragment(fragment)
+        host.addFragment(fragment)
     }
 }

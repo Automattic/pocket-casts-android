@@ -398,22 +398,22 @@ message UpNextResponse {
 }
 
 message WebFeedCreateRequest {
-    string url = 1;
-    google.protobuf.StringValue poll_uuid = 2;
+  string url = 1;
+  google.protobuf.StringValue poll_uuid = 2;
 }
 
 message ApiPodcastResponse {
-    string uuid = 1;
-    string title = 2;
-    string author = 3;
-    string description = 4;
-    string url = 5;
-    string slug = 6;
+  string uuid = 1;
+  string title = 2;
+  string author = 3;
+  string description = 4;
+  string url = 5;
+  string slug = 6;
 }
 
 message WebFeedCreateResponse {
-    oneof result {
-        ApiPodcastResponse podcast = 1;
-        string poll_uuid = 2;
-    }
+  oneof result {
+    ApiPodcastResponse podcast = 1;
+    string poll_uuid = 2;
+  }
 }
