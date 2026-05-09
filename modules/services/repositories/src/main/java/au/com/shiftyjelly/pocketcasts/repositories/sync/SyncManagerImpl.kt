@@ -71,6 +71,7 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -82,6 +83,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
 import retrofit2.HttpException
@@ -101,6 +103,10 @@ class SyncManagerImpl @Inject constructor(
     private val notificationManager: NotificationManager,
 ) : NamedSettingsCaller,
     SyncManager {
+
+    private companion object {
+        const val MAX_POLL_ATTEMPTS = 20
+    }
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
         accept(isLoggedIn())
@@ -393,6 +399,22 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun getStarredEpisodesOrThrow(): StarredEpisodesResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getStarredEpisodes(token)
+    }
+
+    override suspend fun createWebFeedPodcast(url: String): WebFeedCreateResponse {
+        var response = getCacheTokenOrLogin { token ->
+            syncServiceManager.createWebFeedPodcast(token = token, url = url)
+        }
+        var pollCount = 0
+        while (response.hasPollUuid() && pollCount < MAX_POLL_ATTEMPTS) {
+            delay((pollCount + 1) * 1_000L)
+            val pollUuid = response.pollUuid
+            response = getCacheTokenOrLogin { token ->
+                syncServiceManager.pollWebFeedPodcast(token, pollUuid)
+            }
+            pollCount++
+        }
+        return response
     }
 
     // Rating

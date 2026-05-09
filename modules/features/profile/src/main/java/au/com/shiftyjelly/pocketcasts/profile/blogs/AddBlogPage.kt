@@ -74,7 +74,7 @@ internal fun AddBlogPage(
     onUrlChange: (url: String) -> Unit,
     onBackPress: () -> Unit,
     onFindFeeds: (url: String) -> Unit,
-    onFeedClick: (WebFeed) -> Unit,
+    onFeedClick: (webFeed: WebFeed) -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -149,7 +149,6 @@ private fun AddBlogContent(
         when (state) {
             is UiState.Start -> FormContent(onContinueClick = { onFindFeeds(url) })
             is UiState.Loading -> LoadingContent()
-            is UiState.Found -> FoundContent(feed = state.feed, onFeedClick = onFeedClick)
             is UiState.Pick -> PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
             is UiState.Error -> ErrorContent(reason = state.reason, onRetry = { onFindFeeds(url) })
         }
@@ -198,54 +197,6 @@ private fun LoadingContent(
             .fillMaxWidth()
             .padding(start = 4.dp),
     )
-}
-
-@Composable
-private fun FoundContent(
-    feed: WebFeed,
-    onFeedClick: (WebFeed) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val colors = MaterialTheme.theme.colors
-    Column(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.5.dp, colors.primaryInteractive01, RoundedCornerShape(12.dp))
-                .background(colors.primaryInteractive01.copy(alpha = 0.06f))
-                .padding(12.dp),
-        ) {
-            Column {
-                TextP50(
-                    text = feed.title,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.primaryText01,
-                    lineHeight = 18.sp,
-                    maxLines = 2,
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = feed.href.removePrefix("https://").removePrefix("http://"),
-                    color = colors.primaryText02,
-                    maxLines = 1,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        RowButton(
-            text = stringResource(LR.string.navigation_continue),
-            onClick = { onFeedClick(feed) },
-            includePadding = false,
-            textColor = colors.primaryInteractive02,
-            colors = ButtonDefaults.buttonColors(backgroundColor = colors.primaryInteractive01),
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
 }
 
 @Composable

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
@@ -39,6 +40,8 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateRequest
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
@@ -298,6 +301,20 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getStarredEpisodes(token: AccessToken): StarredEpisodesResponse {
         return service.getStarredEpisodes(addBearer(token))
+    }
+
+    suspend fun createWebFeedPodcast(token: AccessToken, url: String): WebFeedCreateResponse {
+        val request = WebFeedCreateRequest.newBuilder()
+            .setUrl(url)
+            .build()
+        return service.createWebFeedPodcast(addBearer(token), request)
+    }
+
+    suspend fun pollWebFeedPodcast(token: AccessToken, pollUuid: String): WebFeedCreateResponse {
+        val request = WebFeedCreateRequest.newBuilder()
+            .setPollUuid(StringValue.of(pollUuid))
+            .build()
+        return service.createWebFeedPodcast(addBearer(token), request)
     }
 
     // Referral
