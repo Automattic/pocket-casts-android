@@ -6,6 +6,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.BlogsFeedSelectedEvent
+import com.automattic.eventhorizon.BlogsFeedsFoundEvent
+import com.automattic.eventhorizon.BlogsFindFeedsFailedEvent
+import com.automattic.eventhorizon.BlogsFindFeedsFailureReason
+import com.automattic.eventhorizon.BlogsFindFeedsTappedEvent
+import com.automattic.eventhorizon.BlogsRetryTappedEvent
+import com.automattic.eventhorizon.BlogsSubscribeFailedEvent
+import com.automattic.eventhorizon.BlogsSubscribedEvent
+import com.automattic.eventhorizon.EventHorizon
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import java.io.IOException
 import kotlinx.coroutines.CompletableDeferred
@@ -21,6 +30,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -31,12 +41,13 @@ class AddBlogViewModelTest {
     private val webFeedsService = mock<WebFeedsService>()
     private val syncManager = mock<SyncManager>()
     private val podcastManager = mock<PodcastManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     private lateinit var viewModel: AddBlogViewModel
 
     @Before
     fun setUp() {
-        viewModel = AddBlogViewModel(webFeedsService, syncManager, podcastManager)
+        viewModel = AddBlogViewModel(webFeedsService, syncManager, podcastManager, eventHorizon)
     }
 
     @Test
@@ -57,6 +68,7 @@ class AddBlogViewModelTest {
         viewModel.onFindFeeds("   ") { }
 
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
+        verify(eventHorizon, never()).track(BlogsFindFeedsTappedEvent)
     }
 
     @Test
@@ -78,6 +90,9 @@ class AddBlogViewModelTest {
 
         verify(syncManager).createWebFeedPodcast(feed.href)
         assertEquals(podcastUuid, navigatedUuid)
+        verify(eventHorizon).track(BlogsFindFeedsTappedEvent)
+        verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 1))
+        verify(eventHorizon).track(BlogsSubscribedEvent(uuid = podcastUuid))
     }
 
     @Test
@@ -98,6 +113,7 @@ class AddBlogViewModelTest {
             gate.complete(feeds)
             assertEquals(AddBlogViewModel.UiState.Pick(feeds), awaitItem())
         }
+        verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 2))
     }
 
     @Test
@@ -114,6 +130,7 @@ class AddBlogViewModelTest {
             gate.complete(emptyList())
             assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.NoFeedsFound), awaitItem())
         }
+        verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 0))
     }
 
     @Test
@@ -130,6 +147,7 @@ class AddBlogViewModelTest {
             gate.completeExceptionally(IOException("offline"))
             assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.NoInternet), awaitItem())
         }
+        verify(eventHorizon).track(BlogsFindFeedsFailedEvent(reason = BlogsFindFeedsFailureReason.NoInternet))
     }
 
     @Test
@@ -146,6 +164,7 @@ class AddBlogViewModelTest {
             gate.completeExceptionally(RuntimeException("boom"))
             assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), awaitItem())
         }
+        verify(eventHorizon).track(BlogsFindFeedsFailedEvent(reason = BlogsFindFeedsFailureReason.Generic))
     }
 
     @Test
@@ -243,6 +262,7 @@ class AddBlogViewModelTest {
         viewModel.createFeed(feed) { }
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
+        verify(eventHorizon).track(BlogsSubscribeFailedEvent)
     }
 
     @Test
@@ -253,6 +273,44 @@ class AddBlogViewModelTest {
         viewModel.createFeed(feed) { }
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
+        verify(eventHorizon).track(BlogsSubscribeFailedEvent)
+    }
+
+    @Test
+    fun `onFeedSelected tracks feed-selected event then subscribes`() = runTest {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+
+        var navigatedUuid: String? = null
+        viewModel.onFeedSelected(feed) { navigatedUuid = it }
+
+        assertEquals(podcastUuid, navigatedUuid)
+        verify(eventHorizon).track(BlogsFeedSelectedEvent)
+        verify(eventHorizon).track(BlogsSubscribedEvent(uuid = podcastUuid))
+    }
+
+    @Test
+    fun `onRetryTapped tracks retry event then runs find-feeds flow`() = runTest {
+        val feeds = listOf(
+            webFeed("Feed 1", "https://example.com/feed1"),
+            webFeed("Feed 2", "https://example.com/feed2"),
+        )
+        whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
+
+        viewModel.onRetryTapped("https://example.com") { }
+
+        assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
+        verify(eventHorizon).track(BlogsRetryTappedEvent)
+        verify(eventHorizon).track(BlogsFindFeedsTappedEvent)
+        verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 2))
     }
 
     @Test
