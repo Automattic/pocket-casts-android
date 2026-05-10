@@ -62,7 +62,7 @@ class BlogsFragment : BaseFragment() {
                             }
                         },
                         onFindFeeds = {
-                            viewModel.onFindFeeds(
+                            viewModel.onFindFeedsTapped(
                                 url = it,
                                 onNavigateToPodcast = { uuid ->
                                     navigateToPodcast(uuid)

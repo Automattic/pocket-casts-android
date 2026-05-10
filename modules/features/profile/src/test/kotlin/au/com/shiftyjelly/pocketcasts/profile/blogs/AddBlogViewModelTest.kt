@@ -6,13 +6,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.BlogsCreateFailedEvent
 import com.automattic.eventhorizon.BlogsFeedSelectedEvent
 import com.automattic.eventhorizon.BlogsFeedsFoundEvent
 import com.automattic.eventhorizon.BlogsFindFeedsFailedEvent
 import com.automattic.eventhorizon.BlogsFindFeedsFailureReason
 import com.automattic.eventhorizon.BlogsFindFeedsTappedEvent
 import com.automattic.eventhorizon.BlogsRetryTappedEvent
-import com.automattic.eventhorizon.BlogsSubscribeFailedEvent
 import com.automattic.eventhorizon.BlogsSubscribedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.pocketcasts.service.api.WebFeedCreateResponse
@@ -30,7 +30,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -65,10 +64,9 @@ class AddBlogViewModelTest {
 
     @Test
     fun `onFindFeeds with blank url is ignored`() = runTest {
-        viewModel.onFindFeeds("   ") { }
+        viewModel.onFindFeedsTapped("   ") { }
 
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
-        verify(eventHorizon, never()).track(BlogsFindFeedsTappedEvent)
     }
 
     @Test
@@ -86,7 +84,7 @@ class AddBlogViewModelTest {
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
 
         var navigatedUuid: String? = null
-        viewModel.onFindFeeds("https://example.com") { navigatedUuid = it }
+        viewModel.onFindFeedsTapped("https://example.com") { navigatedUuid = it }
 
         verify(syncManager).createWebFeedPodcast(feed.href)
         assertEquals(podcastUuid, navigatedUuid)
@@ -107,7 +105,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeeds("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com") { }
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.complete(feeds)
@@ -124,7 +122,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeeds("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com") { }
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.complete(emptyList())
@@ -141,7 +139,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeeds("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com") { }
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.completeExceptionally(IOException("offline"))
@@ -158,7 +156,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeeds("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com") { }
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.completeExceptionally(RuntimeException("boom"))
@@ -176,7 +174,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeeds("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com") { }
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -195,7 +193,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeeds("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com") { }
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -220,7 +218,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeeds("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com") { }
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -262,7 +260,7 @@ class AddBlogViewModelTest {
         viewModel.createFeed(feed) { }
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
-        verify(eventHorizon).track(BlogsSubscribeFailedEvent)
+        verify(eventHorizon).track(BlogsCreateFailedEvent)
     }
 
     @Test
@@ -273,7 +271,7 @@ class AddBlogViewModelTest {
         viewModel.createFeed(feed) { }
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
-        verify(eventHorizon).track(BlogsSubscribeFailedEvent)
+        verify(eventHorizon).track(BlogsCreateFailedEvent)
     }
 
     @Test
@@ -309,7 +307,6 @@ class AddBlogViewModelTest {
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
         verify(eventHorizon).track(BlogsRetryTappedEvent)
-        verify(eventHorizon).track(BlogsFindFeedsTappedEvent)
         verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 2))
     }
 

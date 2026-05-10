@@ -47,12 +47,21 @@ class AddBlogViewModel @Inject constructor(
         _url.value = url
     }
 
-    fun onFindFeeds(url: String, onNavigateToPodcast: (String) -> Unit) {
+    fun onFindFeedsTapped(url: String, onNavigateToPodcast: (String) -> Unit) {
+        eventHorizon.track(BlogsFindFeedsTappedEvent)
+        findFeeds(url = url, onNavigateToPodcast = onNavigateToPodcast)
+    }
+
+    fun onRetryTapped(url: String, onNavigateToPodcast: (String) -> Unit) {
+        eventHorizon.track(BlogsRetryTappedEvent)
+        findFeeds(url = url, onNavigateToPodcast = onNavigateToPodcast)
+    }
+
+    private fun findFeeds(url: String, onNavigateToPodcast: (String) -> Unit) {
         val cleanUrl = url.trim()
         if (cleanUrl.isEmpty()) {
             return
         }
-        eventHorizon.track(BlogsFindFeedsTappedEvent)
         cancelJobs()
         findFeedsJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
@@ -76,11 +85,6 @@ class AddBlogViewModel @Inject constructor(
                 _uiState.value = UiState.Error(ErrorReason.Generic)
             }
         }
-    }
-
-    fun onRetryTapped(url: String, onNavigateToPodcast: (String) -> Unit) {
-        eventHorizon.track(BlogsRetryTappedEvent)
-        onFindFeeds(url = url, onNavigateToPodcast = onNavigateToPodcast)
     }
 
     fun onFeedSelected(webFeed: WebFeed, onNavigateToPodcast: (String) -> Unit) {
