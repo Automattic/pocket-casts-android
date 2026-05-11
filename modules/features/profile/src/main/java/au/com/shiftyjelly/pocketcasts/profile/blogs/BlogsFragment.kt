@@ -15,7 +15,10 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.BlogsAddBlogTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private object BlogsRoutes {
     const val EMPTY = "empty"
@@ -24,6 +27,9 @@ private object BlogsRoutes {
 
 @AndroidEntryPoint
 class BlogsFragment : BaseFragment() {
+
+    @Inject
+    lateinit var eventHorizon: EventHorizon
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +42,10 @@ class BlogsFragment : BaseFragment() {
                 composable(BlogsRoutes.EMPTY) {
                     EmptyBlogsPage(
                         onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                        onAddBlogClick = { navController.navigate(BlogsRoutes.ADD_BLOG) },
+                        onAddBlogClick = {
+                            eventHorizon.track(BlogsAddBlogTappedEvent)
+                            navController.navigate(BlogsRoutes.ADD_BLOG)
+                        },
                     )
                 }
                 composable(BlogsRoutes.ADD_BLOG) {
@@ -53,7 +62,16 @@ class BlogsFragment : BaseFragment() {
                             }
                         },
                         onFindFeeds = {
-                            viewModel.onFindFeeds(
+                            viewModel.onFindFeedsTapped(
+                                url = it,
+                                onNavigateToPodcast = { uuid ->
+                                    navigateToPodcast(uuid)
+                                    viewModel.resetToStart()
+                                },
+                            )
+                        },
+                        onRetry = {
+                            viewModel.onRetryTapped(
                                 url = it,
                                 onNavigateToPodcast = { uuid ->
                                     navigateToPodcast(uuid)
@@ -62,7 +80,7 @@ class BlogsFragment : BaseFragment() {
                             )
                         },
                         onFeedClick = { webFeed ->
-                            viewModel.createFeed(
+                            viewModel.onFeedSelected(
                                 webFeed = webFeed,
                                 onNavigateToPodcast = { uuid ->
                                     navigateToPodcast(uuid)
