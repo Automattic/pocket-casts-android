@@ -99,6 +99,8 @@ class TranscriptFragment : BaseDialogFragment() {
 
             TranscriptPage(
                 uiState = uiState,
+                fingerprintTimingManager = viewModel.fingerprintTimingManager,
+                playbackManager = viewModel.playbackManager,
                 toolbarPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 transcriptPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 16.dp),

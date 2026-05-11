@@ -1016,6 +1016,8 @@ class PlayerHeaderFragment :
             val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             TranscriptPage(
                 uiState = state,
+                fingerprintTimingManager = transcriptViewModel.fingerprintTimingManager,
+                playbackManager = transcriptViewModel.playbackManager,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = navigationBarPadding + if (isPortraitPlayer) 96.dp else 16.dp),
