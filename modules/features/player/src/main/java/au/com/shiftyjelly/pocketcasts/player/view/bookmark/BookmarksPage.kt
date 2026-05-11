@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -129,11 +130,12 @@ fun BookmarksPage(
             }
     }
 
-    LaunchedEffect(onBookmarkDetailClick) {
+    val currentOnBookmarkDetailClick by rememberUpdatedState(onBookmarkDetailClick)
+    LaunchedEffect(bookmarksViewModel) {
         bookmarksViewModel.showBookmarkDetail.collect { bookmark ->
             val loadedState = bookmarksViewModel.uiState.value as? UiState.Loaded
             val episodeTitle = loadedState?.bookmarkIdAndEpisodeMap?.get(bookmark.uuid)?.title.orEmpty()
-            onBookmarkDetailClick(bookmark, episodeTitle)
+            currentOnBookmarkDetailClick(bookmark, episodeTitle)
         }
     }
 }
