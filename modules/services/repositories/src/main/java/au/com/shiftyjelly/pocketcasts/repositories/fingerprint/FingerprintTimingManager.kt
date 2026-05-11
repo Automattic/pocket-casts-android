@@ -22,6 +22,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -476,7 +477,7 @@ class FingerprintTimingManager @Inject constructor(
         val timeoutUs = 10_000L
 
         while (true) {
-            ensureActive()
+            currentCoroutineContext().ensureActive()
 
             // Feed input
             if (!inputDone) {

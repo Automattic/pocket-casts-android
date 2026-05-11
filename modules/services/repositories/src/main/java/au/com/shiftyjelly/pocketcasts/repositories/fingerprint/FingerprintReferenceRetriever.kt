@@ -4,19 +4,21 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.GZIPInputStream
+import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
 
 @Singleton
 class FingerprintReferenceRetriever @Inject constructor(
-    private val okHttpClient: OkHttpClient,
+    @NoCache private val okHttpClient: OkHttpClient,
 ) {
     private val inFlightRequests = ConcurrentHashMap<String, Deferred<ByteArray?>>()
 
@@ -51,7 +53,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         val url = "${baseUrl}${podcastUuid}/${episodeUuid}-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
-            kotlinx.coroutines.ensureActive(kotlin.coroutines.coroutineContext)
+            coroutineContext.ensureActive()
 
             if (attempt > 0) {
                 val delayMs = (1L shl attempt) * 1000L
@@ -77,7 +79,7 @@ class FingerprintReferenceRetriever @Inject constructor(
                     return null
                 }
 
-                val body = response.body?.bytes() ?: return null
+                val body = response.body.bytes()
                 val jsonData = decompressGzipIfNeeded(body)
 
                 Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")

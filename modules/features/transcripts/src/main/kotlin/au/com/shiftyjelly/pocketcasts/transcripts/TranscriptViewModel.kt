@@ -142,7 +142,8 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    fun onCleared() {
+    override fun onCleared() {
+        super.onCleared()
         fingerprintTimingManager.stop()
         syncedStateJob?.cancel()
     }
