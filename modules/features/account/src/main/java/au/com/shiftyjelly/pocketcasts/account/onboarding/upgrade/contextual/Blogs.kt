@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -60,11 +63,15 @@ private val WAVEFORM_HEIGHT = 22.dp
 fun BlogsUpsellHeader(
     modifier: Modifier = Modifier,
 ) {
+    val blogsString = stringResource(LR.string.profile_navigation_blogs)
     Box(
         modifier = modifier
-            .semantics(mergeDescendants = true) { role = Role.Image }
-            .focusable(false)
-            .height(240.dp),
+            .clearAndSetSemantics {
+                contentDescription = blogsString
+                role = Role.Image
+            }
+            .height(240.dp)
+            .width(350.dp),
         contentAlignment = Alignment.Center,
     ) {
         BlogPostPeekTile(
@@ -259,20 +266,6 @@ private fun PreviewBlogsUpsellHeader(
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        BlogsUpsellHeader(modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewHeroTile(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
-) = AppTheme(theme) {
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.theme.colors.primaryUi01)
-            .padding(24.dp),
-    ) {
-        HeroAudioTile()
+        BlogsUpsellHeader()
     }
 }
