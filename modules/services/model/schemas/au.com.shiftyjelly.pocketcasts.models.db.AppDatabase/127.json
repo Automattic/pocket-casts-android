@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 127,
-    "identityHash": "4fa0390366a41c74677fe6d42140c282",
+    "identityHash": "5b05595a0c611b53b85786a418768cd3",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -2093,98 +2093,11 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `playback_stats_events_started_at_ms` ON `${TABLE_NAME}` (`started_at_ms`)"
           }
         ]
-      },
-      {
-        "tableName": "episode_chats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`episode_uuid`))",
-        "fields": [
-          {
-            "fieldPath": "episodeUuid",
-            "columnName": "episode_uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "podcastUuid",
-            "columnName": "podcast_uuid",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "created_at",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "episode_uuid"
-          ]
-        }
-      },
-      {
-        "tableName": "episode_chat_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `text` TEXT NOT NULL, `role` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `metadata` TEXT, PRIMARY KEY(`uuid`))",
-        "fields": [
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "episodeUuid",
-            "columnName": "episode_uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "text",
-            "columnName": "text",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "role",
-            "columnName": "role",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "created_at",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "metadata",
-            "columnName": "metadata",
-            "affinity": "TEXT"
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "uuid"
-          ]
-        },
-        "indices": [
-          {
-            "name": "episode_chat_messages_episode_uuid",
-            "unique": false,
-            "columnNames": [
-              "episode_uuid"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `episode_chat_messages_episode_uuid` ON `${TABLE_NAME}` (`episode_uuid`)"
-          }
-        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4fa0390366a41c74677fe6d42140c282')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b05595a0c611b53b85786a418768cd3')"
     ]
   }
 }
