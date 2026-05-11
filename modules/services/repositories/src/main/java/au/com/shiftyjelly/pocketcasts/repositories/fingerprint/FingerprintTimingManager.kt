@@ -1,27 +1,39 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.media.MediaCodec
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import java.io.File
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
+import uniffi.fingerprint_uniffi.CheckpointMatcher
+import uniffi.fingerprint_uniffi.StreamingWindowedFingerprinter
+import uniffi.fingerprint_uniffi.WindowedFingerprint
 
 @Singleton
 class FingerprintTimingManager @Inject constructor(
@@ -76,6 +88,8 @@ class FingerprintTimingManager @Inject constructor(
     private var currentReferenceData: ByteArray? = null
     private var currentReferenceFilePath: String? = null
     private var currentReferenceDuration: Double = 0.0
+    private var currentMatcher: CheckpointMatcher? = null
+    private var hasReachedActive = false
 
     // endregion
 
@@ -162,6 +176,9 @@ class FingerprintTimingManager @Inject constructor(
         currentReferenceData = null
         currentReferenceFilePath = null
         currentReferenceDuration = 0.0
+        currentMatcher?.close()
+        currentMatcher = null
+        hasReachedActive = false
     }
 
     // endregion
@@ -256,6 +273,17 @@ class FingerprintTimingManager @Inject constructor(
                 "${libraryCheckpoints.size} checkpoints",
         )
 
+        // Create matcher and populate with reference checkpoints
+        val matcher = CheckpointMatcher()
+        for (checkpoint in libraryCheckpoints) {
+            matcher.add(
+                checkpoint.timestampSeconds,
+                checkpoint.hashes.map { it.toUInt() },
+                reference.checkpointDurationSeconds,
+            )
+        }
+        currentMatcher = matcher
+
         // Try loading mapping cache
         val cached = FingerprintMappingCache.load(audioFilePath, refPath, referenceData)
         if (cached != null) {
@@ -270,10 +298,9 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        // TODO: Start streaming fingerprint generation when the fingerprint library is available.
-        // For now, transition to Unavailable since the library doesn't exist yet.
-        _stateFlow.value = State.Unavailable
-        Timber.d("FingerprintTimingManager: fingerprint library not available — cannot generate mappings for $episodeUuid")
+        // Start streaming fingerprint generation
+        val currentTime = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
+        startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
     }
 
     // endregion
@@ -294,13 +321,32 @@ class FingerprintTimingManager @Inject constructor(
         if (lastProgressPositionMs >= 0) {
             val deltaMs = abs(positionMs - lastProgressPositionMs)
             if (deltaMs > FingerprintConstants.RESTART_DELTA_SECONDS * 1000) {
-                Timber.d("FingerprintTimingManager: playback jumped ${deltaMs}ms — would restart")
-                // TODO: restart fingerprint generation from new position
+                Timber.d("FingerprintTimingManager: playback jumped ${deltaMs}ms — restarting")
+                val matcher = currentMatcher
+                val audioPath = currentAudioFilePath
+                val uuid = currentEpisodeUuid
+                if (matcher != null && audioPath != null && uuid != null) {
+                    filterLastTrusted = null
+                    filterCandidatePool.clear()
+                    startStream(audioPath, matcher, uuid, startPosition = positionMs / 1000.0)
+                }
                 lastProgressPositionMs = positionMs
                 return
             }
         }
         lastProgressPositionMs = positionMs
+
+        if (!isWithinMappedRange(positionMs / 1000.0) && playbackToReference.isNotEmpty()) {
+            Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
+            val matcher = currentMatcher
+            val audioPath = currentAudioFilePath
+            val uuid = currentEpisodeUuid
+            if (matcher != null && audioPath != null && uuid != null) {
+                filterLastTrusted = null
+                filterCandidatePool.clear()
+                startStream(audioPath, matcher, uuid, startPosition = positionMs / 1000.0)
+            }
+        }
     }
 
     private fun isWithinMappedRange(playbackTimeSec: Double): Boolean {
@@ -310,6 +356,257 @@ class FingerprintTimingManager @Inject constructor(
         val margin = FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS
         return playbackTimeSec >= first.playbackTime - margin &&
             playbackTimeSec <= last.playbackTime + margin
+    }
+
+    // endregion
+
+    // region Streaming Fingerprint Generation
+
+    private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
+        generationJob?.cancel()
+        generationJob = scope.launch {
+            val aligned = alignToWindowGrid(startPosition)
+            try {
+                streamFingerprint(audioFilePath, matcher, episodeUuid, startingAt = aligned)
+                persistMappingCacheIfFull()
+            } catch (_: CancellationException) {
+                Timber.d("FingerprintTimingManager: streaming fingerprint cancelled")
+            } catch (e: Exception) {
+                Timber.w(e, "FingerprintTimingManager: streaming fingerprint failed")
+                if (state !is State.Active) {
+                    _stateFlow.value = State.Failed(e)
+                }
+            }
+        }
+    }
+
+    private suspend fun streamFingerprint(
+        audioFilePath: String,
+        matcher: CheckpointMatcher,
+        episodeUuid: String,
+        startingAt: Double,
+    ) {
+        val file = File(audioFilePath)
+        if (!file.exists()) {
+            Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
+            _stateFlow.value = State.Unavailable
+            return
+        }
+
+        val extractor = MediaExtractor()
+        try {
+            extractor.setDataSource(audioFilePath)
+        } catch (e: Exception) {
+            Timber.w(e, "FingerprintTimingManager: failed to open audio file")
+            _stateFlow.value = State.Failed(e)
+            return
+        }
+
+        // Find audio track
+        val audioTrackIndex = (0 until extractor.trackCount).firstOrNull { i ->
+            extractor.getTrackFormat(i).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
+        }
+        if (audioTrackIndex == null) {
+            extractor.release()
+            _stateFlow.value = State.Unavailable
+            Timber.w("FingerprintTimingManager: no audio track found")
+            return
+        }
+
+        extractor.selectTrack(audioTrackIndex)
+        val format = extractor.getTrackFormat(audioTrackIndex)
+        val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+        val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+        val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
+
+        // Seek to start position
+        if (startingAt > 0) {
+            extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+        }
+
+        val codec = MediaCodec.createDecoderByType(mime)
+        val outputFormat = MediaFormat.createAudioFormat(
+            MediaFormat.MIMETYPE_AUDIO_RAW,
+            sampleRate,
+            channelCount,
+        ).apply {
+            setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
+        }
+
+        codec.configure(format, null, null, 0)
+        codec.start()
+
+        val streamer = StreamingWindowedFingerprinter(
+            sampleRate.toUInt(),
+            channelCount.toUShort(),
+            FingerprintConstants.WINDOW_DURATION_MS.toUInt(),
+            FingerprintConstants.WINDOW_INTERVAL_MS.toUInt(),
+        )
+
+        try {
+            decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+
+            // Flush remaining windows
+            val tail = streamer.flush()
+            if (tail.isNotEmpty()) {
+                mutex.withLock {
+                    processMatches(tail, matcher, startingAt)
+                }
+            }
+        } finally {
+            streamer.close()
+            codec.stop()
+            codec.release()
+            extractor.release()
+        }
+    }
+
+    private suspend fun decodeAndFingerprint(
+        extractor: MediaExtractor,
+        codec: MediaCodec,
+        streamer: StreamingWindowedFingerprinter,
+        matcher: CheckpointMatcher,
+        episodeUuid: String,
+        startOffset: Double,
+        sampleRate: Int,
+        channelCount: Int,
+    ) {
+        val bufferInfo = MediaCodec.BufferInfo()
+        var inputDone = false
+        val timeoutUs = 10_000L
+
+        while (true) {
+            ensureActive()
+
+            // Feed input
+            if (!inputDone) {
+                val inputIndex = codec.dequeueInputBuffer(timeoutUs)
+                if (inputIndex >= 0) {
+                    val inputBuffer = codec.getInputBuffer(inputIndex)!!
+                    val bytesRead = extractor.readSampleData(inputBuffer, 0)
+                    if (bytesRead < 0) {
+                        codec.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                        inputDone = true
+                    } else {
+                        codec.queueInputBuffer(inputIndex, 0, bytesRead, extractor.sampleTime, 0)
+                        extractor.advance()
+                    }
+                }
+            }
+
+            // Read decoded output
+            val outputIndex = codec.dequeueOutputBuffer(bufferInfo, timeoutUs)
+            if (outputIndex >= 0) {
+                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                    codec.releaseOutputBuffer(outputIndex, false)
+                    break
+                }
+
+                val outputBuffer = codec.getOutputBuffer(outputIndex)
+                if (outputBuffer != null && bufferInfo.size > 0) {
+                    val samples = extractFloatSamples(outputBuffer, bufferInfo, channelCount)
+                    if (samples.isNotEmpty()) {
+                        val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
+                        if (windows.isNotEmpty()) {
+                            mutex.withLock {
+                                processMatches(windows, matcher, startOffset)
+                            }
+                        }
+                    }
+
+                    // Throttle if we're far ahead of playback
+                    val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
+                    val currentPlayback = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
+                    if (decodedSeconds - currentPlayback > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                        delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                    }
+                }
+                codec.releaseOutputBuffer(outputIndex, false)
+            }
+        }
+    }
+
+    private fun extractFloatSamples(
+        buffer: ByteBuffer,
+        info: MediaCodec.BufferInfo,
+        channelCount: Int,
+    ): List<Float> {
+        buffer.position(info.offset)
+        buffer.limit(info.offset + info.size)
+
+        // Try reading as float PCM first (if decoder outputs float)
+        val byteOrder = buffer.order()
+        buffer.order(ByteOrder.nativeOrder())
+
+        return try {
+            val floatBuffer = buffer.asFloatBuffer()
+            val floatCount = floatBuffer.remaining()
+            if (floatCount == 0) return emptyList()
+            val result = FloatArray(floatCount)
+            floatBuffer.get(result)
+            result.toList()
+        } catch (_: Exception) {
+            // Fallback: read as 16-bit PCM and convert to float
+            val shortBuffer = buffer.asShortBuffer()
+            val shortCount = shortBuffer.remaining()
+            if (shortCount == 0) return emptyList()
+            val result = mutableListOf<Float>()
+            for (i in 0 until shortCount) {
+                result.add(shortBuffer.get() / 32768f)
+            }
+            result
+        } finally {
+            buffer.order(byteOrder)
+        }
+    }
+
+    private fun processMatches(
+        windows: List<WindowedFingerprint>,
+        matcher: CheckpointMatcher,
+        startOffset: Double,
+    ) {
+        var inserted = 0
+
+        for (window in windows) {
+            val matches = matcher.findTopMatches(window.hashes, 2u)
+            val best = matches.firstOrNull() ?: continue
+
+            if (best.score < FingerprintConstants.MATCH_SCORE_THRESHOLD) continue
+
+            val absolutePlaybackTime = startOffset + window.timestampMs.toDouble() / 1000.0
+            val candidate = TimeMappingEntry(
+                playbackTime = absolutePlaybackTime,
+                referenceTime = best.timestamp.toDouble(),
+                score = best.score,
+            )
+
+            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD) continue
+
+            val runnerUpScore = matches.getOrNull(1)?.score ?: 0f
+            val dominance = best.score - runnerUpScore
+            if (dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP) continue
+
+            inserted += consider(candidate)
+        }
+
+        val coverage = playbackToReference.size
+        if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
+            _stateFlow.value = State.Active(coverage)
+            if (!hasReachedActive) {
+                hasReachedActive = true
+                Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
+            }
+        }
+    }
+
+    private fun persistMappingCacheIfFull() {
+        val audioPath = currentAudioFilePath ?: return
+        val refPath = currentReferenceFilePath ?: return
+        val refData = currentReferenceData ?: return
+        val refDuration = currentReferenceDuration
+
+        val snapshot = playbackToReference.toList()
+        FingerprintMappingCache.save(snapshot, audioPath, refPath, refData, refDuration)
     }
 
     // endregion
