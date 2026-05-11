@@ -64,6 +64,7 @@ class FingerprintTimingManager @Inject constructor(
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
     private var preparationJob: Job? = null
+    private var progressObserverJob: Job? = null
 
     // Drift filter state
     private var filterLastTrusted: TimeMappingEntry? = null
@@ -92,6 +93,19 @@ class FingerprintTimingManager @Inject constructor(
         scope.launch {
             mutex.withLock { resetState() }
             prepareForEpisode(episodeUuid, podcastUuid, episode.downloadedFilePath, episode.duration)
+        }
+
+        startPlaybackProgressObserver(episodeUuid)
+    }
+
+    private fun startPlaybackProgressObserver(episodeUuid: String) {
+        progressObserverJob?.cancel()
+        progressObserverJob = scope.launch {
+            playbackManager.playbackStateFlow.collect { state ->
+                if (state.episodeUuid == episodeUuid && state.isPlaying) {
+                    onPlaybackProgress(state.positionMs, state.episodeUuid)
+                }
+            }
         }
     }
 
@@ -136,6 +150,8 @@ class FingerprintTimingManager @Inject constructor(
         generationJob = null
         preparationJob?.cancel()
         preparationJob = null
+        progressObserverJob?.cancel()
+        progressObserverJob = null
         playbackToReference.clear()
         referenceToPlayback.clear()
         lastProgressPositionMs = -1
@@ -264,7 +280,7 @@ class FingerprintTimingManager @Inject constructor(
 
     // region Playback Progress Handling
 
-    fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
+    private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
         if (episodeUuid != currentEpisodeUuid) return
 
         scope.launch {
