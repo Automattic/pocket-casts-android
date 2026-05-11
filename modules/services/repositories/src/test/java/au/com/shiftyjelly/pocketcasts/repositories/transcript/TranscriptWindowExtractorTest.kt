@@ -75,6 +75,37 @@ class TranscriptWindowExtractorTest {
     }
 
     @Test
+    fun `extract window from mm-ss-mmm timestamps`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00.000 --> 00:05.000
+            |Welcome to the show everyone.
+            |
+            |00:05.000 --> 00:10.000
+            |Today we are going to discuss artificial intelligence.
+            |
+            |00:10.000 --> 00:20.000
+            |Let me start by defining what AI actually means in practice.
+            |
+            |00:20.000 --> 00:30.000
+            |AI is a broad field that includes machine learning, deep learning, and more.
+            |
+            |00:30.000 --> 00:40.000
+            |The recent advances have been truly remarkable for the industry.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, timeSecs = 15, windowSecs = 10)
+
+        assertEquals(
+            "Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice. " +
+                "AI is a broad field that includes machine learning, deep learning, and more.",
+            result,
+        )
+    }
+
+    @Test
     fun `strip html tags from cue text`() {
         val vttWithTags = """
             |WEBVTT
