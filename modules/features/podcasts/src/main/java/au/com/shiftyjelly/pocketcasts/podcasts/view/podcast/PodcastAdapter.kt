@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -236,7 +237,7 @@ class PodcastAdapter(
 
     private var headerExpanded: Boolean = false
     private var isDescriptionExpanded = false
-    private var tintColor: Int = 0x000000
+    private var tintColor: Int = context.getThemeColor(UR.attr.primary_icon_01)
     private var signInState: SignInState = SignInState.SignedOut
     private var ratingState: RatingState = RatingState.Loading
 
