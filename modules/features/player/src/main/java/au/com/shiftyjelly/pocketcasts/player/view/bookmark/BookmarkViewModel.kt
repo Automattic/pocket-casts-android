@@ -113,9 +113,7 @@ class BookmarkViewModel
                 if (bookmark != null) {
                     onSaved(bookmark, isExistingBookmark)
                     if (!isExistingBookmark && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                        viewModelScope.launch(Dispatchers.IO) {
-                            bookmarkManager.enrichBookmark(bookmark)
-                        }
+                        bookmarkManager.enrichBookmark(bookmark)
                     }
                 }
             } catch (e: Exception) {

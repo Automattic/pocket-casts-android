@@ -27,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
@@ -233,34 +234,36 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmarkDao.hasBookmarksFlow(episodeUuid)
     }
 
-    override suspend fun enrichBookmark(bookmark: Bookmark) {
-        try {
-            val snippet = transcriptWindowExtractor.extractWindow(
-                episodeUuid = bookmark.episodeUuid,
-                timeSecs = bookmark.timeSecs,
-            ) ?: return
+    override fun enrichBookmark(bookmark: Bookmark) {
+        launch {
+            try {
+                val snippet = transcriptWindowExtractor.extractWindow(
+                    episodeUuid = bookmark.episodeUuid,
+                    timeSecs = bookmark.timeSecs,
+                ) ?: return@launch
 
-            val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
-            if (response.error != null) {
-                Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
+                val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
+                if (response.error != null) {
+                    Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
+                }
+                val title = response.title
+                val summary = response.summary
+                if (title != null && summary != null) {
+                    val now = System.currentTimeMillis()
+                    bookmarkDao.updateAiData(
+                        bookmarkUuid = bookmark.uuid,
+                        aiTitle = title,
+                        aiSummary = summary,
+                        aiTitleModified = now,
+                        aiSummaryModified = now,
+                        syncStatus = SyncStatus.NOT_SYNCED,
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
             }
-            val title = response.title
-            val summary = response.summary
-            if (title != null && summary != null) {
-                val now = System.currentTimeMillis()
-                bookmarkDao.updateAiData(
-                    bookmarkUuid = bookmark.uuid,
-                    aiTitle = title,
-                    aiSummary = summary,
-                    aiTitleModified = now,
-                    aiSummaryModified = now,
-                    syncStatus = SyncStatus.NOT_SYNCED,
-                )
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
         }
     }
 }
