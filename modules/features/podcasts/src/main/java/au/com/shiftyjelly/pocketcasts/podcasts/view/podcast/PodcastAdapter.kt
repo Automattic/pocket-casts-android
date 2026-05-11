@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -407,6 +408,7 @@ class PodcastAdapter(
             text = episodeHeader.searchTerm
         }
         holder.binding.btnArchived.setText(if (episodeHeader.showingArchived) LR.string.podcast_hide_archived else LR.string.podcast_show_archived)
+        holder.binding.btnArchived.setTextColor(ThemeColor.podcastText02(theme.activeTheme, tintColor))
         holder.binding.btnArchived.setOnClickListener { onShowArchivedClicked() }
     }
 
@@ -422,6 +424,7 @@ class PodcastAdapter(
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
             streamByDefault = settings.streamingMode.value,
+            tint = tintColor,
             animateMultiSelection = animateMultiSelection,
         )
     }
@@ -467,7 +470,9 @@ class PodcastAdapter(
     }
 
     fun setTint(tintColor: Int) {
+        if (this.tintColor == tintColor) return
         this.tintColor = tintColor
+        notifyDataSetChanged()
     }
 
     fun setSignInState(signInState: SignInState) {
@@ -832,6 +837,7 @@ class PodcastAdapter(
                             schedule = podcast.displayableFrequency(context.resources),
                             next = podcast.displayableNextEpisodeDate(context),
                         ),
+                        linkColor = Color(ThemeColor.podcastText02(theme.activeTheme, tintColor)),
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,

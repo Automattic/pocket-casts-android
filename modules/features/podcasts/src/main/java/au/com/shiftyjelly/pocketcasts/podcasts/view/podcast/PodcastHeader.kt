@@ -132,6 +132,7 @@ internal fun PodcastHeader(
     explicit: Boolean,
     description: AnnotatedString,
     podcastInfoState: PodcastInfoState,
+    linkColor: Color,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
@@ -225,6 +226,7 @@ internal fun PodcastHeader(
                 PodcastDetails(
                     description = description,
                     podcastInfoState = podcastInfoState,
+                    linkColor = linkColor,
                     isDescriptionExpanded = isDescriptionExpanded,
                     onClickShowNotes = onToggleDescription,
                     onClickWebsiteLink = onClickWebsiteLink,
@@ -729,36 +731,40 @@ private fun ActionButton(
 private fun PodcastDetails(
     description: AnnotatedString,
     podcastInfoState: PodcastInfoState,
+    linkColor: Color,
     isDescriptionExpanded: Boolean,
     onClickShowNotes: () -> Unit,
     onClickWebsiteLink: () -> Unit,
 ) {
     Column {
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        ExpandableText(
-            text = description,
-            overflowText = stringResource(LR.string.see_more),
-            isExpanded = isDescriptionExpanded,
-            style = detailsInfoTextStyle.copy(
-                color = MaterialTheme.theme.colors.primaryText01,
-            ),
-            maxLines = 4,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    indication = null,
-                    interactionSource = null,
-                    onClick = onClickShowNotes,
+        if (description.isNotEmpty()) {
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            ExpandableText(
+                text = description,
+                overflowText = stringResource(LR.string.see_more),
+                isExpanded = isDescriptionExpanded,
+                style = detailsInfoTextStyle.copy(
+                    color = MaterialTheme.theme.colors.primaryText01,
                 ),
-        )
+                maxLines = 4,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        indication = null,
+                        interactionSource = null,
+                        onClick = onClickShowNotes,
+                    ),
+            )
+        }
         Spacer(
             modifier = Modifier.height(16.dp),
         )
         PodcastInfoView(
             state = podcastInfoState,
             onWebsiteLinkClick = onClickWebsiteLink,
+            linkColor = linkColor,
         )
     }
 }
@@ -982,6 +988,7 @@ private fun PodcastHeaderPreview(
                     schedule = "Every two weeks",
                     next = "Meaning of life",
                 ),
+                linkColor = MaterialTheme.theme.colors.primaryIcon01,
                 rating = RatingState.Loaded(
                     ratings = PodcastRatings(
                         podcastUuid = "uuid",
