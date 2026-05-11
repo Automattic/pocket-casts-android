@@ -250,6 +250,8 @@ data class OnboardingSubscriptionPlan private constructor(
             OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
             -> LR.string.onboarding_bookmarks_title
 
+            OnboardingUpgradeSource.BLOGS -> LR.string.onboarding_blogs_title
+
             else -> LR.string.onboarding_upgrade_generic_title
         }
 

@@ -14,6 +14,9 @@ enum class OnboardingUpgradeSource(
     BANNER_AD(
         analyticsValue = OnboardingSourceType.BannerAd,
     ),
+    BLOGS(
+        analyticsValue = OnboardingSourceType.Blogs,
+    ),
     ICONS(
         analyticsValue = OnboardingSourceType.Icons,
     ),
