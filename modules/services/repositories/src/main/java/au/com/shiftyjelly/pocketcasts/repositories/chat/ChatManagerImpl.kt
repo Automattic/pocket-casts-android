@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,6 +21,7 @@ class ChatManagerImpl @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
     private val transcriptDao: TranscriptDao,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
+    private val tokenHandler: TokenHandler,
     moshi: Moshi,
 ) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
@@ -62,7 +64,13 @@ class ChatManagerImpl @Inject constructor(
             conversationHistory = history,
         )
 
-        val response = podcastCacheServiceManager.episodeChat(request)
+        val accessToken = checkNotNull(tokenHandler.getAccessToken()) {
+            "Access token is required to send episode chat messages"
+        }
+        val response = podcastCacheServiceManager.episodeChat(
+            authorization = "Bearer ${accessToken.value}",
+            request = request,
+        )
 
         val aiReply = ChatMessage.Assistant(text = response.reply)
         episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid, quoteMetadataAdapter))

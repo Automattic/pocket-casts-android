@@ -127,6 +127,9 @@ interface PodcastCacheService {
         @Body request: CombinedSearchRequest,
     ): CombinedSearchResponse
 
-    @POST("/mobile/episode/chat")
-    suspend fun episodeChat(@Body request: EpisodeChatRequest): EpisodeChatResponse
+    @POST("mobile/episode/chat")
+    suspend fun episodeChat(
+        @Header("Authorization") authorization: String,
+        @Body request: EpisodeChatRequest,
+    ): EpisodeChatResponse
 }
