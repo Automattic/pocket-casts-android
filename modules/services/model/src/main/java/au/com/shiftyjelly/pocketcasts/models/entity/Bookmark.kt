@@ -48,11 +48,10 @@ data class Bookmark(
 
     val displayTitle: String
         get() {
-            val aiModified = aiTitleModified
-            val userModified = titleModified
+            val userEdited = titleModified != null && titleModified!! > createdAt.time
             return when {
                 aiTitle == null -> title
-                userModified != null && aiModified != null && userModified > aiModified -> title
+                userEdited -> title
                 else -> aiTitle ?: title
             }
         }
