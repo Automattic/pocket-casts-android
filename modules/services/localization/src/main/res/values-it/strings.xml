@@ -15,7 +15,6 @@ Language: it
     <string name="error_streaming_server_error">Il server del podcast sta riscontrando problemi. Riprova più tardi.</string>
     <string name="error_streaming_no_longer_available">Questo episodio non è più disponibile dall\'editore.</string>
     <string name="error_streaming_not_found">Impossibile trovare questo episodio sul server. Potrebbe essere stato rimosso dall\'editore.</string>
-    <string name="error_streaming_access_denied">Non hai più accesso a questo episodio.</string>
     <string name="settings_auto_download_storage_summary">Quando questa opzione è disattivata, i download possono essere eseguiti anche quando lo spazio di archiviazione interno del dispositivo è insufficiente.</string>
     <string name="settings_auto_download_storage">Solo quando lo spazio di archiviazione è sufficiente</string>
     <string name="settings_auto_download_charging_summary">Quando questa opzione è disattivata, i download possono essere eseguiti senza che il dispositivo sia in carica.</string>

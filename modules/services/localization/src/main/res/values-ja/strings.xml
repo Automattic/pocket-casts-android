@@ -15,7 +15,6 @@ Language: ja_JP
     <string name="error_streaming_server_error">ポッドキャストサーバーで問題が発生しています。 後でもう一度お試しください。</string>
     <string name="error_streaming_no_longer_available">このエピソードは公開元から利用できなくなりました。</string>
     <string name="error_streaming_not_found">このエピソードはサーバー上で見つかりませんでした。 公開者によって削除された可能性があります。</string>
-    <string name="error_streaming_access_denied">このエピソードを再生できなくなりました。</string>
     <string name="settings_auto_download_storage_summary">無効にすると、端末の内部ストレージが少なくなった際にダウンロードが発生する可能性があります。</string>
     <string name="settings_auto_download_storage">十分なストレージがある場合のみ</string>
     <string name="settings_auto_download_charging_summary">無効にすると、デバイスを充電器に接続せずにダウンロードが発生する可能性があります。</string>

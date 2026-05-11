@@ -15,7 +15,6 @@ Language: zh_CN
     <string name="error_streaming_server_error">播客服务器目前出现故障。 请稍后重试。</string>
     <string name="error_streaming_no_longer_available">该剧集已无法从发布方获取。</string>
     <string name="error_streaming_not_found">服务器上找不到此剧集。 可能是发布方已将其移除。</string>
-    <string name="error_streaming_access_denied">您无权再播放此剧集。</string>
     <string name="settings_auto_download_storage_summary">如果此选项被禁用，则即使设备内部存储空间不足，下载也仍会进行。</string>
     <string name="settings_auto_download_storage">仅在存储空间充足时</string>
     <string name="settings_auto_download_charging_summary">如果此选项被禁用，则即使设备未连接充电器，下载也仍会进行。</string>

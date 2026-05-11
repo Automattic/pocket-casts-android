@@ -193,6 +193,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val collectListeningStats = UserSetting.BoolPref(
+        sharedPrefKey = "collectListeningStats",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun getCancelledAcknowledged(): Boolean {
         return getBoolean("cancelled_acknowledged", false)
     }

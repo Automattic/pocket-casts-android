@@ -1,6 +1,23 @@
-8.11
+8.13
 -----
 
+
+8.12
+-----
+*   Bug Fixes
+    *   Restore episode duration after download for feeds without an RSS length attribute
+        ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))
+
+8.11
+-----
+*   New Features
+    *   Added explicit indicator to podcast page
+        ([#5243](https://github.com/Automattic/pocket-casts-android/pull/5243))
+*   Updates
+    *   Make sure archived episode status is preserved across sync
+        ([#5227](https://github.com/Automattic/pocket-casts-android/pull/5227))
+    *   Display dedicated error message for retryable playback errors
+        ([#5244](https://github.com/Automattic/pocket-casts-android/pull/5244))
 
 8.10
 -----

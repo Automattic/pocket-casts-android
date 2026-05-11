@@ -99,6 +99,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -589,6 +590,7 @@ open class PlaybackManager @Inject constructor(
         SourceView.AUTO_DOWNLOAD,
         SourceView.CLIP_SHARING,
         SourceView.CHROMECAST,
+        SourceView.BLOGS,
         SourceView.DISCOVER,
         SourceView.DISCOVER_PLAIN_LIST,
         SourceView.DISCOVER_PODCAST_LIST,
@@ -1288,6 +1290,16 @@ open class PlaybackManager @Inject constructor(
 
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
 
+        // If a downloaded episode's file is missing, clear the stale download status
+        // and retry playback via streaming instead of leaving the user stuck.
+        if (episode != null && episode.isDownloaded && episode.downloadUrl != null && isDownloadedFileMissing(event)) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Downloaded file missing for ${episode.uuid}, clearing download status and retrying via stream")
+            downloadQueue.cancel(episode.uuid, SourceView.UNKNOWN).join()
+            episodeManager.clearPlaybackErrorBlocking(episode)
+            playNow(episode = episode, forceStream = true, sourceView = SourceView.UNKNOWN)
+            return
+        }
+
         val currentEpisode = getCurrentEpisode()
         if (currentEpisode is BaseEpisode) {
             episodeManager.markAsPlaybackErrorBlocking(currentEpisode, event, isPlaybackRemote())
@@ -1302,13 +1314,15 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val cause = event.error?.cause
                 val playbackIssue = when {
+                    stuckException != null && isBufferingStuck(stuckException) -> PlaybackIssue.TransientFailure
                     stuckException != null -> PlaybackIssue.StuckPlayer(errorClassifier.classifyErrorStringId(event))
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
-                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.ConnectionError
+                    cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.TransientFailure
                     else -> null
                 }
                 val errorMessage = when (playbackIssue) {
                     is PlaybackIssue.ConnectionError -> application.getString(LR.string.player_play_failed_check_internet)
+                    is PlaybackIssue.TransientFailure -> application.getString(LR.string.error_playback_failed_try_again)
                     is PlaybackIssue.StuckPlayer -> application.getString(playbackIssue.messageResId)
                     else -> event.message
                 }
@@ -1346,9 +1360,24 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    private fun isDownloadedFileMissing(event: PlayerEvent.PlayerError): Boolean {
+        var cause: Throwable? = event.error
+        while (cause != null) {
+            if (cause is FileNotFoundException) return true
+            cause = cause.cause
+        }
+        return false
+    }
+
     @OptIn(UnstableApi::class)
     private fun mapPlaybackErrorToUserMessage(event: PlayerEvent.PlayerError): String {
         return application.getString(errorClassifier.classifyErrorStringId(event))
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun isBufferingStuck(exception: StuckPlayerException): Boolean {
+        return exception.stuckType == StuckPlayerException.STUCK_BUFFERING_NOT_LOADING ||
+            exception.stuckType == StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS
     }
 
     @OptIn(UnstableApi::class)

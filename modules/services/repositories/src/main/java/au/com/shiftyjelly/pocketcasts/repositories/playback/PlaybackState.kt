@@ -90,6 +90,7 @@ data class PlaybackState(
 
 sealed class PlaybackIssue {
     data object ConnectionError : PlaybackIssue()
+    data object TransientFailure : PlaybackIssue()
     data class HttpError(val statusCode: Int) : PlaybackIssue()
     data class StuckPlayer(@StringRes val messageResId: Int) : PlaybackIssue()
 }

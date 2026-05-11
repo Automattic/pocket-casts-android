@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -315,6 +316,67 @@ abstract class EpisodeDao {
     @Update
     abstract suspend fun updateAll(episodes: Collection<PodcastEpisode>)
 
+    @Query(
+        """
+        UPDATE podcast_episodes SET
+          starred = :starred,
+          starred_modified = :starredModified,
+          last_starred_date = :lastStarredDate,
+          duration = :duration,
+          duration_modified = :durationModified,
+          deselected_chapters = :deselectedChapters,
+          deselected_chapters_modified = :deselectedChaptersModified,
+          archived = :archived,
+          archived_modified = :archivedModified,
+          last_archive_interaction_date = :lastArchiveInteraction,
+          playing_status = :playingStatus,
+          playing_status_modified = :playingStatusModified,
+          played_up_to = :playedUpTo,
+          played_up_to_modified = :playedUpToModified
+        WHERE uuid = :uuid
+        """,
+    )
+    protected abstract suspend fun updateSyncFields(
+        uuid: String,
+        starred: Boolean,
+        starredModified: Long?,
+        lastStarredDate: Long?,
+        duration: Double,
+        durationModified: Long?,
+        deselectedChapters: String?,
+        deselectedChaptersModified: Date?,
+        archived: Boolean,
+        archivedModified: Long?,
+        lastArchiveInteraction: Long?,
+        playingStatus: EpisodePlayingStatus,
+        playingStatusModified: Long?,
+        playedUpTo: Double,
+        playedUpToModified: Long?,
+    )
+
+    @Transaction
+    open suspend fun updateAllSyncFields(episodes: Collection<PodcastEpisode>) {
+        episodes.forEach { episode ->
+            updateSyncFields(
+                uuid = episode.uuid,
+                starred = episode.isStarred,
+                starredModified = episode.starredModified,
+                lastStarredDate = episode.lastStarredDate,
+                duration = episode.duration,
+                durationModified = episode.durationModified,
+                deselectedChapters = ChapterIndices.toString(episode.deselectedChapters),
+                deselectedChaptersModified = episode.deselectedChaptersModified,
+                archived = episode.isArchived,
+                archivedModified = episode.archivedModified,
+                lastArchiveInteraction = episode.lastArchiveInteraction,
+                playingStatus = episode.playingStatus,
+                playingStatusModified = episode.playingStatusModified,
+                playedUpTo = episode.playedUpTo,
+                playedUpToModified = episode.playedUpToModified,
+            )
+        }
+    }
+
     @Delete
     abstract fun deleteBlocking(episode: PodcastEpisode)
 
@@ -580,6 +642,9 @@ abstract class EpisodeDao {
         UPDATE podcast_episodes
         SET
           archived = 0,
+          archived_modified = CASE WHEN archived = 1 THEN :archivedModified ELSE archived_modified END,
+          last_archive_interaction_date = CASE WHEN archived = 1 THEN :archivedModified ELSE last_archive_interaction_date END,
+          exclude_from_episode_limit = CASE WHEN archived = 1 THEN 1 ELSE exclude_from_episode_limit END,
           episode_status = 1,
           download_task_id = :downloadTaskId,
           last_download_attempt_date = :issuedAt
@@ -592,6 +657,7 @@ abstract class EpisodeDao {
         episodeUuid: String,
         downloadTaskId: String,
         issuedAt: Date,
+        archivedModified: Long,
         forceNewDownload: Boolean,
     ): Int
 
@@ -605,6 +671,7 @@ abstract class EpisodeDao {
             episodeUuid = episodeUuid,
             downloadTaskId = downloadTaskId.toString(),
             issuedAt = Date.from(issuedAt),
+            archivedModified = issuedAt.toEpochMilli(),
             forceNewDownload = forceNewDownload,
         )
         return rowUpdateCount == 1

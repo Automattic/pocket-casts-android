@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
+import au.com.shiftyjelly.pocketcasts.repositories.download.MediaDurationExtractor
+import au.com.shiftyjelly.pocketcasts.repositories.download.MediaDurationExtractorImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -65,6 +67,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PersistentPlaybackStatsCollector
+import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ServerPurchaseApprover
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
@@ -210,6 +214,9 @@ abstract class RepositoryModule {
     abstract fun provideExternalDataManager(externalDataManagerImpl: ExternalDataManagerImpl): ExternalDataManager
 
     @Binds
+    abstract fun provideMediaDurationExtractor(mediaDurationExtractorImpl: MediaDurationExtractorImpl): MediaDurationExtractor
+
+    @Binds
     abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
 
     @Binds
@@ -255,6 +262,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideDownloadStatusObserver(manager: DownloadManager): DownloadStatusObserver
+
+    @Binds
+    abstract fun providePlaybackStatsCollector(collector: PersistentPlaybackStatsCollector): PlaybackStatsCollector
 
     companion object {
         @Provides

@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaybackStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
@@ -65,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -109,16 +111,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserCategoryVisits::class,
         ManualPlaylistEpisode::class,
         BlazeAd::class,
+        PlaybackStatsEvent::class,
         EpisodeChat::class,
         EpisodeChatMessage::class,
     ],
-    version = 126,
+    version = 128,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
         AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
-        AutoMigration(from = 125, to = 126),
+        AutoMigration(from = 127, to = 128),
     ],
 )
 @TypeConverters(
@@ -165,6 +168,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userNotificationsDao(): UserNotificationsDao
     abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
     abstract fun blazeAdDao(): BlazeAdDao
+    abstract fun playbackStatsDao(): PlaybackStatsDao
     abstract fun episodeChatDao(): EpisodeChatDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
@@ -1420,6 +1424,25 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcast_episodes ADD COLUMN has_generated_transcript INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_125_126 = addMigration(125, 126) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE playback_stats_events (
+                        uuid TEXT PRIMARY KEY NOT NULL,
+                        episode_uuid TEXT NOT NULL,
+                        podcast_uuid TEXT NOT NULL,
+                        started_at_ms INTEGER NOT NULL,
+                        duration_ms INTEGER NOT NULL
+                    );
+                """.trimIndent(),
+            )
+            database.execSQL("CREATE INDEX playback_stats_events_started_at_ms ON playback_stats_events(started_at_ms)")
+        }
+
+        val MIGRATION_126_127 = addMigration(126, 127) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN explicit INTEGER")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1835,6 +1858,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_122_123,
                 MIGRATION_123_124,
                 MIGRATION_124_125,
+                MIGRATION_125_126,
+                MIGRATION_126_127,
             )
         }
 

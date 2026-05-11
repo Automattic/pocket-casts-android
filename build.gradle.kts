@@ -253,6 +253,7 @@ subprojects {
                 buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.com\"")
                 buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.com\"")
                 buildConfigField("String", "SERVER_SHOW_NOTES_URLS", "\"https://shownotes.pocketcasts.com\"")
+                buildConfigField("String", "WEB_FEEDS_API_URL", "\"https://web-feeds-api.pocketcasts.com\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"
@@ -309,6 +310,7 @@ subprojects {
                     buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_SHOW_NOTES_URLS", "\"https://shownotes.pocketcasts.net\"")
+                    buildConfigField("String", "WEB_FEEDS_API_URL", "\"https://web-feeds-api.pocketcasts.net\"")
                 }
 
                 maybeCreate("debugProd").apply {

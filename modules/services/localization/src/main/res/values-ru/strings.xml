@@ -15,7 +15,6 @@ Language: ru
     <string name="error_streaming_server_error">На сервере подкастов возникли проблемы. Повторите попытку позже.</string>
     <string name="error_streaming_no_longer_available">Этот выпуск больше не доступен у издателя.</string>
     <string name="error_streaming_not_found">Этот выпуск не найден на сервере. Возможно, он был удалён издателем.</string>
-    <string name="error_streaming_access_denied">У вас больше нет доступа для воспроизведения этого выпуска.</string>
     <string name="settings_auto_download_storage_summary">Если эта опция отключена, загрузка может происходить, когда устройству не хватает внутренней памяти.</string>
     <string name="settings_auto_download_storage">Только при достаточном объёме памяти</string>
     <string name="settings_auto_download_charging_summary">Если эта опция отключена, загрузка может происходить без подключения устройства к зарядке.</string>

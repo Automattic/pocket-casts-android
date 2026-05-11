@@ -18,6 +18,10 @@ enum class SourceView(
         key = "auto_download",
         analyticsValue = SourceViewType.AutoDownload,
     ),
+    BLOGS(
+        key = "blogs",
+        analyticsValue = SourceViewType.Blogs,
+    ),
     BOTTOM_SHELF(
         key = "bottom_shelf",
         analyticsValue = SourceViewType.BottomShelf,

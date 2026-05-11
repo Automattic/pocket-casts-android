@@ -33,6 +33,8 @@ import com.pocketcasts.service.api.UserPlaylistListRequest
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateRequest
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -218,4 +220,8 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @POST("/starred/list")
     suspend fun getStarredEpisodes(@Header("Authorization") authorization: String): StarredEpisodesResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/web-feeds/create")
+    suspend fun createWebFeedPodcast(@Header("Authorization") authorization: String, @Body request: WebFeedCreateRequest): WebFeedCreateResponse
 }

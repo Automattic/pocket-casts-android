@@ -94,18 +94,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        val playerCommands = Player.Commands.Builder()
-            .addAll(
-                Player.COMMAND_PLAY_PAUSE,
-                Player.COMMAND_SET_MEDIA_ITEM,
-                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_STOP,
-                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_GET_METADATA,
-            )
-            .build()
-
-        return MediaSession.ConnectionResult.accept(sessionCommands, playerCommands)
+        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
     }
 
     override fun onCustomCommand(
@@ -377,6 +366,23 @@ internal class Media3SessionCallback(
         }
     }
 }
+
+/**
+ * Player commands granted to all connected controllers (known and unknown).
+ * Covers basic transport controls: play/pause, stop, seek, and metadata retrieval.
+ */
+@OptIn(UnstableApi::class)
+@Suppress("UnsafeOptInUsageError")
+internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builder()
+    .addAll(
+        Player.COMMAND_PLAY_PAUSE,
+        Player.COMMAND_SET_MEDIA_ITEM,
+        Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+        Player.COMMAND_STOP,
+        Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+        Player.COMMAND_GET_METADATA,
+    )
+    .build()
 
 internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
     return when (episode) {

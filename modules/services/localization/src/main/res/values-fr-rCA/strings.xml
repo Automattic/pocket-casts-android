@@ -15,7 +15,6 @@ Language: fr
     <string name="error_streaming_server_error">Le serveur de podcast rencontre des problèmes. Veuillez réessayer plus tard.</string>
     <string name="error_streaming_no_longer_available">Cet épisode n’est plus disponible auprès de l’éditeur.</string>
     <string name="error_streaming_not_found">Cet épisode est introuvable sur le serveur. Il a peut-être été supprimé par l’éditeur.</string>
-    <string name="error_streaming_access_denied">Vous n’avez plus accès à cet épisode.</string>
     <string name="settings_auto_download_storage_summary">Si cette option est désactivée, des téléchargements peuvent être effectués lorsque le périphérique manque d’espace de stockage interne.</string>
     <string name="settings_auto_download_storage">Uniquement lorsque l’espace de stockage est suffisant</string>
     <string name="settings_auto_download_charging_summary">Si cette option est désactivée, des téléchargements peuvent être effectués même si le périphérique n’est pas branché.</string>

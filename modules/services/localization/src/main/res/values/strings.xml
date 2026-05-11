@@ -245,6 +245,7 @@
     <!-- "View" is used as a verb here. As in "view this object" -->
     <string name="view">View</string>
     <string name="no_episodes">No episodes</string>
+    <string name="explicit">Explicit</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1175,6 +1176,7 @@
     <string name="profile_navigation_listening_history">Listening History</string>
     <string name="profile_navigation_starred" translatable="false">@string/starred</string>
     <string name="profile_navigation_stats">Stats</string>
+    <string name="profile_navigation_blogs">Blogs</string>
     <string name="profile_new_email_address">New Email Address</string>
     <string name="profile_new_password">New Password</string>
     <string name="profile_newsletter_detail">Receive news, app updates, themed playlists, interviews, and more.</string>
@@ -1820,6 +1822,8 @@
     <string name="settings_privacy_analytics">Analytics</string>
     <string name="settings_privacy_analytics_first_party">First-party analytics</string>
     <string name="settings_privacy_analytics_summary">Allow us to collect analytics.</string>
+    <string name="settings_privacy_listening_stats">Listening statistics</string>
+    <string name="settings_privacy_listening_stats_summary">Allow us to collect listening statistics to display them in your Stats page.</string>
     <string name="settings_privacy_analytics_third_party">Third-party analytics</string>
     <string name="settings_privacy_analytics_third_party_summary">Allow us to use trusted third-party services to collect anonymous data.</string>
     <string name="settings_privacy_crash">Crash reports</string>
@@ -1876,6 +1880,7 @@
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
     <string name="error_playback_offline">You\'re offline</string>
     <string name="error_playback_connected">You\'re connected</string>
+    <string name="error_playback_failed_try_again">Playback failed, please try again.</string>
     <string name="error_episode_not_available">Episode not available</string>
     <string name="error_download_missing_episode">Unable to find the episode data on this device. Please contact support.</string>
     <string name="error_download_no_episode_file">Unable to create a download file for the episode. Please check that you have enough storage space on your device.</string>
@@ -2772,4 +2777,17 @@
     <!-- A label under the happy face emoji. A user will be redirected to leave a review after tapping it. -->
     <string name="app_rating_yes_label">Yes!</string>
     <string name="offline_icon_content_description">Offline icon</string>
+
+    <string name="blogs_empty_title">Turn any blog into a podcast</string>
+    <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
+    <string name="blogs_add_button">Add a blog</string>
+    <string name="blogs_empty_url_label">Blog or RSS URL</string>
+    <string name="blogs_empty_url_placeholder" translatable="false">https://</string>
+    <string name="blogs_add_url_hint">Paste a blog or RSS URL and we\'ll find the feed for you.</string>
+    <string name="blogs_pick_a_feed">PICK A FEED TO FOLLOW</string>
+    <string name="blogs_found_on_this_site">Found %d feeds on this site</string>
+    <string name="blogs_looking_up_feed">Looking up feed...</string>
+    <string name="blogs_error_no_internet">Check your internet connection and try again.</string>
+    <string name="blogs_error_no_feeds_found">We couldn\'t find any feeds at that URL. Please check the URL and try again.</string>
+    <string name="blogs_error_generic">Something went wrong. Please try again.</string>
 </resources>

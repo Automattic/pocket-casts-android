@@ -7,13 +7,21 @@ import kotlin.time.Duration
 
 class MutableClock(
     private var instant: Instant = Instant.EPOCH,
-    private val zoneId: ZoneId = ZoneId.of("UTC"),
+    private var zoneId: ZoneId = ZoneId.of("UTC"),
 ) : Clock() {
     override fun instant() = instant
 
     override fun getZone() = zoneId
 
     override fun withZone(zone: ZoneId) = MutableClock(instant, zone)
+
+    fun setInstant(instant: Instant) {
+        this.instant = instant
+    }
+
+    fun setZone(zoneId: ZoneId) {
+        this.zoneId = zoneId
+    }
 
     operator fun plusAssign(duration: Duration) {
         instant = instant.plusMillis(duration.inWholeMilliseconds)
