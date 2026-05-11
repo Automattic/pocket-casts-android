@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,15 +12,25 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -38,6 +49,8 @@ fun TranscriptPage(
     onShowTranscript: (Transcript) -> Unit,
     onShowTranscriptPaywall: (Transcript) -> Unit,
     modifier: Modifier = Modifier,
+    fingerprintTimingManager: FingerprintTimingManager? = null,
+    playbackManager: PlaybackManager? = null,
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
@@ -45,6 +58,9 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+    var highlightIndex by remember { mutableStateOf<Int?>(null) }
+    var isAutoScrollSuppressed by remember { mutableStateOf(false) }
+    val isSearching = uiState.searchState.isSearchOpen
 
     Column(
         modifier = modifier.background(theme.background),
@@ -71,11 +87,28 @@ fun TranscriptPage(
                 .weight(1f)
                 .fillMaxWidth(),
         ) {
+            val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? = if (uiState.isSyncedActive && fingerprintTimingManager != null && playbackManager != null) {
+                { entry, _ ->
+                    val textEntry = entry as? TranscriptEntry.Text
+                    if (textEntry != null && textEntry.startTimeMs >= 0) {
+                        val refTimeSec = textEntry.startTimeMs / 1000.0
+                        val seekTimeMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec)
+                        if (seekTimeMs != null) {
+                            playbackManager.seekToTimeMs(seekTimeMs)
+                        }
+                    }
+                }
+            } else {
+                null
+            }
+
             TranscriptContent(
                 uiState = uiState,
                 listState = listState,
                 theme = theme,
                 onClickReload = onClickReload,
+                highlightIndex = highlightIndex,
+                onEntryClick = tapToSeekHandler,
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .padding(transcriptPadding),
@@ -102,6 +135,29 @@ fun TranscriptPage(
         onShowTranscript = onShowTranscript,
         onShowTranscriptPaywall = onShowTranscriptPaywall,
     )
+
+    // Frame-rate highlight updates
+    HighlightEffect(
+        uiState = uiState,
+        fingerprintTimingManager = fingerprintTimingManager,
+        playbackManager = playbackManager,
+        onHighlightChanged = { highlightIndex = it },
+    )
+
+    // Auto-scroll to highlighted cue
+    AutoScrollEffect(
+        highlightIndex = highlightIndex,
+        listState = listState,
+        isSearching = isSearching,
+        isAutoScrollSuppressed = isAutoScrollSuppressed,
+    )
+
+    // Detect user scrolling and suppress auto-scroll for 5s
+    UserScrollDetectionEffect(
+        listState = listState,
+        onScrollSuppressed = { isAutoScrollSuppressed = true },
+        onScrollResumed = { isAutoScrollSuppressed = false },
+    )
 }
 
 @Composable
@@ -111,6 +167,8 @@ private fun TranscriptContent(
     theme: TranscriptTheme,
     onClickReload: () -> Unit,
     modifier: Modifier = Modifier,
+    highlightIndex: Int? = null,
+    onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
 ) {
     when (val transcriptState = uiState.transcriptState) {
         is TranscriptState.Loading -> {
@@ -126,6 +184,8 @@ private fun TranscriptContent(
                     transcript = transcript,
                     isContentObscured = uiState.isPaywallVisible,
                     searchState = uiState.searchState,
+                    highlightIndex = highlightIndex,
+                    onEntryClick = onEntryClick,
                     state = listState,
                     theme = theme,
                     modifier = modifier,
@@ -208,3 +268,109 @@ private fun ShowTranscriptEffect(
         }
     }
 }
+
+@Composable
+private fun HighlightEffect(
+    uiState: UiState,
+    fingerprintTimingManager: FingerprintTimingManager?,
+    playbackManager: PlaybackManager?,
+    onHighlightChanged: (Int?) -> Unit,
+) {
+    if (fingerprintTimingManager == null || playbackManager == null) return
+
+    val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
+    val isSyncedActive = uiState.isSyncedActive
+    val isPlaying = playbackManager.isPlaying()
+
+    if (isPlaying && isSyncedActive) {
+        LaunchedEffect(transcript.entries) {
+            var cachedIndex = 0
+            while (true) {
+                withFrameNanos { _ ->
+                    val posMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
+                    val refTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
+                    val refTimeMs = (refTime * 1000).toLong()
+                    val idx = findCueIndex(transcript.entries, refTimeMs, cachedIndex)
+                    if (idx != null) cachedIndex = idx
+                    onHighlightChanged(idx)
+                }
+            }
+        }
+    } else if (!isSyncedActive) {
+        LaunchedEffect(Unit) { onHighlightChanged(null) }
+    }
+}
+
+@Composable
+private fun AutoScrollEffect(
+    highlightIndex: Int?,
+    listState: LazyListState,
+    isSearching: Boolean,
+    isAutoScrollSuppressed: Boolean,
+) {
+    if (highlightIndex != null && !isSearching && !isAutoScrollSuppressed) {
+        LaunchedEffect(highlightIndex) {
+            val viewportHeight = listState.layoutInfo.viewportSize.height
+            val scrollOffset = (viewportHeight * 0.3f).roundToInt()
+            listState.animateScrollToItem(highlightIndex, -scrollOffset)
+        }
+    }
+}
+
+@Composable
+private fun UserScrollDetectionEffect(
+    listState: LazyListState,
+    onScrollSuppressed: () -> Unit,
+    onScrollResumed: () -> Unit,
+) {
+    LaunchedEffect(listState) {
+        listState.interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is DragInteraction.Start -> {
+                    onScrollSuppressed()
+                }
+                is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                    delay(AUTO_SCROLL_BACK_DELAY_MS)
+                    onScrollResumed()
+                }
+            }
+        }
+    }
+}
+
+private fun findCueIndex(
+    entries: List<TranscriptEntry>,
+    refTimeMs: Long,
+    cachedIndex: Int,
+): Int? {
+    if (entries.isEmpty()) return null
+    val cached = cachedIndex.coerceAtMost(entries.size - 1)
+
+    val cachedEntry = entries[cached]
+    if (cachedEntry is TranscriptEntry.Text && cachedEntry.startTimeMs >= 0 &&
+        refTimeMs >= cachedEntry.startTimeMs && refTimeMs <= cachedEntry.endTimeMs
+    ) {
+        return cached
+    }
+
+    // Forward scan from cached position
+    for (i in (cached + 1) until entries.size) {
+        val entry = entries[i]
+        if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+            if (entry.startTimeMs > refTimeMs) break
+            if (refTimeMs >= entry.startTimeMs && refTimeMs <= entry.endTimeMs) return i
+        }
+    }
+
+    // Backward scan
+    for (i in (cached - 1) downTo 0) {
+        val entry = entries[i]
+        if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+            if (refTimeMs >= entry.startTimeMs && refTimeMs <= entry.endTimeMs) return i
+        }
+    }
+
+    return null
+}
+
+private const val AUTO_SCROLL_BACK_DELAY_MS = 5000L
