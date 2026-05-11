@@ -181,7 +181,7 @@ private fun BlogPostPeekTile(
             .padding(12.dp),
     ) {
         TextC50(
-            text = "Blog · Apr 24",
+            text = stringResource(LR.string.onboarding_blogs_upsell_sample_label),
             color = BlogCardLabel,
             disableAutoScale = true,
             fontWeight = FontWeight.W700,
