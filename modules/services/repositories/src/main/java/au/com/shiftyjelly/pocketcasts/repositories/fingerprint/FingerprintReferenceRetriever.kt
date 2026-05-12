@@ -65,8 +65,8 @@ class FingerprintReferenceRetriever @Inject constructor(
                 val response = okHttpClient.newCall(request).execute()
                 val statusCode = response.code
 
-                if (statusCode == 404) {
-                    Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid (404)")
+                if (statusCode == 404 || statusCode == 403) {
+                    Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
                     return null
                 }
 
