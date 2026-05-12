@@ -105,9 +105,11 @@ class FingerprintTimingManager @Inject constructor(
         val episodeUuid = episode.uuid
         val podcastUuid = episode.podcastOrSubstituteUuid
 
+        val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
+
         scope.launch {
             mutex.withLock { resetState() }
-            prepareForEpisode(episodeUuid, podcastUuid, episode.downloadedFilePath, episode.duration)
+            prepareForEpisode(episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
         }
 
         startPlaybackProgressObserver(episodeUuid)
@@ -189,7 +191,8 @@ class FingerprintTimingManager @Inject constructor(
     private suspend fun prepareForEpisode(
         episodeUuid: String,
         podcastUuid: String,
-        downloadedFilePath: String?,
+        audioSource: String?,
+        isDownloaded: Boolean,
         durationSec: Double,
     ) {
         if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
@@ -204,23 +207,24 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        val audioFilePath = downloadedFilePath
-        if (audioFilePath == null) {
+        if (audioSource == null) {
             _stateFlow.value = State.Unavailable
-            Timber.d("FingerprintTimingManager: no audio file for $episodeUuid")
+            Timber.d("FingerprintTimingManager: no audio source for $episodeUuid")
             return
         }
 
         currentEpisodeUuid = episodeUuid
-        currentAudioFilePath = audioFilePath
+        currentAudioFilePath = audioSource
 
-        // Try loading cached reference from disk
-        var referenceData = referenceRetriever.loadReferenceData(audioFilePath)
-        if (referenceData != null) {
-            val reference = ReferenceFingerprint.decode(referenceData)
-            if (reference != null) {
-                configureForReference(reference, referenceData, audioFilePath, episodeUuid)
-                return
+        // Try loading cached reference from disk (only for downloaded episodes)
+        if (isDownloaded) {
+            val referenceData = referenceRetriever.loadReferenceData(audioSource)
+            if (referenceData != null) {
+                val reference = ReferenceFingerprint.decode(referenceData)
+                if (reference != null) {
+                    configureForReference(reference, referenceData, audioSource, episodeUuid)
+                    return
+                }
             }
         }
 
@@ -229,7 +233,7 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: fetching reference from server for $episodeUuid")
 
         val baseUrl = "https://shownotes.pocketcasts.com/generated_transcripts/"
-        referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        val referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
 
         if (referenceData == null) {
             _stateFlow.value = State.Unavailable
@@ -244,8 +248,10 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        referenceRetriever.saveReferenceData(referenceData, audioFilePath)
-        configureForReference(reference, referenceData, audioFilePath, episodeUuid)
+        if (isDownloaded) {
+            referenceRetriever.saveReferenceData(referenceData, audioSource)
+        }
+        configureForReference(reference, referenceData, audioSource, episodeUuid)
     }
 
     private suspend fun configureForReference(
@@ -285,8 +291,9 @@ class FingerprintTimingManager @Inject constructor(
         }
         currentMatcher = matcher
 
-        // Try loading mapping cache
-        val cached = FingerprintMappingCache.load(audioFilePath, refPath, referenceData)
+        // Try loading mapping cache (only for local files)
+        val isLocalFile = !audioFilePath.startsWith("http://") && !audioFilePath.startsWith("https://")
+        val cached = if (isLocalFile) FingerprintMappingCache.load(audioFilePath, refPath, referenceData) else null
         if (cached != null) {
             mutex.withLock {
                 playbackToReference = cached.entries.toMutableList()
@@ -387,8 +394,8 @@ class FingerprintTimingManager @Inject constructor(
         episodeUuid: String,
         startingAt: Double,
     ) {
-        val file = File(audioFilePath)
-        if (!file.exists()) {
+        val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
+        if (!isRemoteUrl && !File(audioFilePath).exists()) {
             Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
             _stateFlow.value = State.Unavailable
             return
@@ -602,6 +609,7 @@ class FingerprintTimingManager @Inject constructor(
 
     private fun persistMappingCacheIfFull() {
         val audioPath = currentAudioFilePath ?: return
+        if (audioPath.startsWith("http://") || audioPath.startsWith("https://")) return
         val refPath = currentReferenceFilePath ?: return
         val refData = currentReferenceData ?: return
         val refDuration = currentReferenceDuration
