@@ -73,6 +73,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -584,9 +586,10 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.episodeSummary?.setContentWithViewCompositionStrategy {
             val summaryText = viewModel.summary.collectAsState().value
+            val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
 
             AppTheme(activeTheme) {
-                AnimatedNonNullVisibility(item = summaryText) { text ->
+                AnimatedNonNullVisibility(item = summaryText.takeIf { isSummaryEnabled }) { text ->
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier

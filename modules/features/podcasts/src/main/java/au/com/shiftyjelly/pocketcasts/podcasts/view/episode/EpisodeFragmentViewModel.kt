@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EpisodeArchivedEvent
@@ -203,7 +205,7 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
         }
 
-        if (lastSummaryEpisodeUuid != episodeUuid) {
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
             _summary.value = null
             val oldSummaryJob = loadSummaryJob
             loadSummaryJob = launch {
@@ -214,6 +216,8 @@ class EpisodeFragmentViewModel @Inject constructor(
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
+        } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            _summary.value = null
         }
     }
 
