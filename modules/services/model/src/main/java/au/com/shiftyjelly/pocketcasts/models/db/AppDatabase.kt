@@ -115,13 +115,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChat::class,
         EpisodeChatMessage::class,
     ],
-    version = 129,
+    version = 130,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
         AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
         AutoMigration(from = 128, to = 129),
+        AutoMigration(from = 129, to = 130),
     ],
 )
 @TypeConverters(

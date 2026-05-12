@@ -9,6 +9,9 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
@@ -27,6 +30,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -37,6 +41,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TranscriptManagerTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
@@ -416,6 +423,7 @@ class TranscriptManagerTest {
 
     @Test
     fun `save ai chapters when no existing chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
@@ -424,15 +432,16 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction"),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic"),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up"),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", isGenerated = true),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", isGenerated = true),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", isGenerated = true),
             ),
         )
     }
 
     @Test
     fun `do not save ai chapters when existing chapters present`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
@@ -475,6 +484,7 @@ class TranscriptManagerTest {
 
     @Test
     fun `skip chapters with missing title`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_INVALID_CHAPTERS
 
@@ -483,7 +493,7 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter"),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", isGenerated = true),
             ),
         )
     }

@@ -8,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
@@ -149,9 +151,11 @@ class TranscriptManagerImpl @Inject constructor(
             response.use { body ->
                 val meta = metaAdapter.fromJson(body.source()) ?: return@use null
 
-                saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+                if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                    saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+                }
 
-                meta.summary?.takeIf { it.isNotEmpty() }
+                meta.summary?.takeIf { it.isNotBlank() }
             }
         } catch (e: CancellationException) {
             throw e
@@ -167,17 +171,17 @@ class TranscriptManagerImpl @Inject constructor(
         val existingChapters = chapterManager.observerChaptersForEpisode(episodeUuid).firstOrNull()
         if (!existingChapters.isNullOrEmpty()) return
 
-        val dbChapters = chapters.mapIndexedNotNull { index, chapter ->
-            val title = chapter.title?.takeIf { it.isNotEmpty() } ?: return@mapIndexedNotNull null
-            val startTimeSec = chapter.startTime ?: return@mapIndexedNotNull null
-            if (startTimeSec < 0) return@mapIndexedNotNull null
-            DbChapter(
-                index = index,
-                episodeUuid = episodeUuid,
-                startTimeMs = startTimeSec * 1000,
-                title = title,
-            )
-        }
+        val dbChapters = chapters
+            .filter { !it.title.isNullOrBlank() && it.startTime != null && it.startTime >= 0 }
+            .mapIndexed { index, chapter ->
+                DbChapter(
+                    index = index,
+                    episodeUuid = episodeUuid,
+                    startTimeMs = chapter.startTime!! * 1000,
+                    title = chapter.title!!.trim(),
+                    isGenerated = true,
+                )
+            }
         if (dbChapters.isNotEmpty()) {
             chapterManager.updateChapters(episodeUuid, dbChapters)
             Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")

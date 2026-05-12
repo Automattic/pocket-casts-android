@@ -52,6 +52,7 @@ class ChapterManagerImpl @Inject constructor(
                 index = firstChapter.index,
                 uiIndex = -1, // We set any value here as it is updated later in the processing chain
                 selected = firstChapter.index !in episode.deselectedChapters,
+                isGenerated = firstChapter.isGenerated,
             )
         }
         .filter { it.duration > Duration.ZERO }
