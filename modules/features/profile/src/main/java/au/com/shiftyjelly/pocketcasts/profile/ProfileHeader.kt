@@ -264,6 +264,7 @@ private fun ProfileHeaderActions(
             text = stringResource(LR.string.profile_set_up_account),
             onClick = onClick,
             config = config,
+            modifier = modifier,
         )
     }
 }
