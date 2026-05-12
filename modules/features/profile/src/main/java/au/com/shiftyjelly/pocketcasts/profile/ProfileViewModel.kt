@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.eventhorizon.BlogsShownEvent
 import com.automattic.eventhorizon.DownloadsShownEvent
@@ -70,6 +72,7 @@ class ProfileViewModel @Inject constructor(
                 subscriptionTier = state.subscription?.tier,
                 email = state.email,
                 expiresIn = state.subscription?.expiryDate?.toDurationFromNow(),
+                isShareVisible = FeatureFlag.isEnabled(Feature.PROFILE_SHARING),
             )
 
             is SignInState.SignedOut -> ProfileHeaderState(
@@ -77,6 +80,7 @@ class ProfileViewModel @Inject constructor(
                 subscriptionTier = null,
                 email = null,
                 expiresIn = null,
+                isShareVisible = false,
             )
         }
     }.stateIn(
@@ -87,6 +91,7 @@ class ProfileViewModel @Inject constructor(
             subscriptionTier = null,
             email = null,
             expiresIn = null,
+            isShareVisible = false,
         ),
     )
 
@@ -154,6 +159,10 @@ class ProfileViewModel @Inject constructor(
 
     internal fun onHeaderClick() {
         eventHorizon.track(ProfileAccountButtonTappedEvent)
+    }
+
+    internal fun onShareClick() {
+        // Placeholder for share action
     }
 
     internal fun refreshStats() {

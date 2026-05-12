@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -22,9 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,9 +37,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -44,12 +49,14 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ProfileHeader(
     state: ProfileHeaderState,
     onClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
     config: ProfileHeaderConfig = ProfileHeaderConfig(),
 ) {
@@ -59,6 +66,7 @@ fun ProfileHeader(
             config = config,
             modifier = modifier,
             onClick = onClick,
+            onShareClick = onShareClick,
         )
 
         else -> VerticalProfileHeader(
@@ -66,6 +74,7 @@ fun ProfileHeader(
             config = config,
             modifier = modifier,
             onClick = onClick,
+            onShareClick = onShareClick,
         )
     }
 }
@@ -75,6 +84,7 @@ data class ProfileHeaderState(
     val imageUrl: String?,
     val subscriptionTier: SubscriptionTier?,
     val expiresIn: Duration?,
+    val isShareVisible: Boolean,
 )
 
 data class ProfileHeaderConfig(
@@ -88,12 +98,14 @@ fun VerticalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
     onClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val accountLabel = if (state.email == null) {
-        stringResource(LR.string.profile_set_up_account)
-    } else {
+    val isSignedIn = state.email != null
+    val accountLabel = if (isSignedIn) {
         stringResource(LR.string.account)
+    } else {
+        stringResource(LR.string.profile_set_up_account)
     }
     val context = LocalContext.current
     val expirationLabel = remember(state.expiresIn) {
@@ -125,30 +137,24 @@ fun VerticalProfileHeader(
                 modifier = Modifier.padding(top = 4.dp * config.spacingScale),
             )
         }
-        if (state.email != null) {
+        if (isSignedIn) {
             TextH50(
                 text = state.email,
                 fontScale = config.infoFontScale,
                 textAlign = TextAlign.Center,
             )
         }
-        OutlinedButton(
-            border = ButtonDefaults.outlinedBorder.copy(
-                brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
-                width = 2.dp,
-            ),
-            colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent,
-            ),
-            shape = RoundedCornerShape(10.dp),
+        ProfileHeaderActions(
+            state = state,
+            isSignedIn = isSignedIn,
+            config = config,
             onClick = onClick,
-        ) {
-            TextP50(
-                text = accountLabel,
-                fontScale = config.infoFontScale,
-                letterSpacing = 0.5.sp,
-            )
-        }
+            onShareClick = onShareClick,
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .widthIn(max = 350.dp),
+
+        )
     }
 }
 
@@ -157,12 +163,14 @@ fun HorizontalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
     onClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val accountLabel = if (state.email == null) {
-        stringResource(LR.string.profile_set_up_account)
-    } else {
+    val isSignedIn = state.email != null
+    val accountLabel = if (isSignedIn) {
         stringResource(LR.string.account)
+    } else {
+        stringResource(LR.string.profile_set_up_account)
     }
     val context = LocalContext.current
     val expirationLabel = remember(state.expiresIn) {
@@ -201,30 +209,99 @@ fun HorizontalProfileHeader(
                     modifier = Modifier.padding(top = 4.dp * config.spacingScale),
                 )
             }
-            if (state.email != null) {
+            if (isSignedIn) {
                 TextH50(
                     text = state.email,
                     fontScale = config.infoFontScale,
                     textAlign = TextAlign.Center,
                 )
             }
-            OutlinedButton(
-                border = ButtonDefaults.outlinedBorder.copy(
-                    brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
-                    width = 2.dp,
-                ),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
-                ),
-                shape = RoundedCornerShape(10.dp),
+            ProfileHeaderActions(
+                state = state,
+                config = config,
                 onClick = onClick,
-            ) {
-                TextP50(
-                    text = accountLabel,
-                    fontScale = config.infoFontScale,
-                    letterSpacing = 0.5.sp,
+                onShareClick = onShareClick,
+                isSignedIn = isSignedIn,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileHeaderActions(
+    state: ProfileHeaderState,
+    isSignedIn: Boolean,
+    config: ProfileHeaderConfig,
+    onClick: () -> Unit,
+    onShareClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (isSignedIn) {
+        val showShare = state.email != null && state.isShareVisible
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier.padding(top = 8.dp * config.spacingScale),
+        ) {
+            ProfileButton(
+                text = stringResource(LR.string.account),
+                image = if (state.email != null) painterResource(IR.drawable.ic_profile_circle_solid) else null,
+                onClick = onClick,
+                config = config,
+                modifier = if (showShare) Modifier.weight(1f) else Modifier,
+            )
+            if (showShare) {
+                ProfileButton(
+                    text = stringResource(LR.string.share),
+                    image = painterResource(IR.drawable.ic_share),
+                    onClick = onShareClick,
+                    config = config,
+                    modifier = Modifier.weight(1f),
                 )
             }
+        }
+    } else {
+        ProfileButton(
+            text = stringResource(LR.string.profile_set_up_account),
+            onClick = onClick,
+            config = config,
+        )
+    }
+}
+
+@Composable
+private fun ProfileButton(
+    text: String,
+    config: ProfileHeaderConfig,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    image: Painter? = null,
+) {
+    OutlinedButton(
+        border = ButtonDefaults.outlinedBorder.copy(
+            brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
+            width = 2.dp,
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = Color.Transparent,
+        ),
+        shape = RoundedCornerShape(8.dp),
+        onClick = onClick,
+        modifier = modifier,
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (image != null) {
+                Image(
+                    painter = image,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText01),
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+            TextH40(
+                text = text,
+                fontScale = config.infoFontScale,
+                letterSpacing = 0.5.sp,
+            )
         }
     }
 }
@@ -254,8 +331,10 @@ private fun ProfileHeaderUnsignedPreview() {
                 imageUrl = null,
                 subscriptionTier = null,
                 expiresIn = null,
+                isShareVisible = false,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -272,8 +351,10 @@ private fun ProfileHeaderFreePreview() {
                 imageUrl = null,
                 subscriptionTier = null,
                 expiresIn = null,
+                isShareVisible = true,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -290,8 +371,10 @@ private fun ProfileHeaderPatronPreview() {
                 imageUrl = null,
                 subscriptionTier = SubscriptionTier.Patron,
                 expiresIn = 31.days,
+                isShareVisible = false,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -308,8 +391,10 @@ private fun ProfileHeaderPatronExpirePreview() {
                 imageUrl = null,
                 subscriptionTier = SubscriptionTier.Patron,
                 expiresIn = 25.days,
+                isShareVisible = true,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -326,8 +411,10 @@ private fun ProfileHeaderPlusPreview() {
                 imageUrl = null,
                 subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 31.days,
+                isShareVisible = true,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -344,8 +431,10 @@ private fun ProfileHeaderPlusExpirePreview() {
                 imageUrl = null,
                 subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 8.minutes,
+                isShareVisible = true,
             ),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
@@ -363,9 +452,11 @@ private fun ProfileHeaderHorizontalPreview() {
                 imageUrl = null,
                 subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 20.days,
+                isShareVisible = true,
             ),
             config = ProfileHeaderConfig(),
             onClick = {},
+            onShareClick = {},
         )
     }
 }
