@@ -603,7 +603,7 @@ class EpisodeFragment : BaseFragment() {
                                     ),
                                 )
                             },
-                            iconResId = IR.drawable.ic_ai,
+                            iconResId = if (transcript.isGenerated) IR.drawable.ic_ai else null,
                             trailingIconResId = IR.drawable.ic_chevron_right,
                         ),
                     )

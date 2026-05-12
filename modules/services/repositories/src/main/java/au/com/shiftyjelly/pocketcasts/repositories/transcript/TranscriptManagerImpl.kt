@@ -35,6 +35,7 @@ class TranscriptManagerImpl @Inject constructor(
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val summaryMetaAdapter = Moshi.Builder().build().adapter(Map::class.java)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
@@ -142,9 +143,8 @@ class TranscriptManagerImpl @Inject constructor(
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
             val response = transcriptService.getTranscriptOrThrow(metaUrl)
             response.use { body ->
-                val adapter = Moshi.Builder().build().adapter(Map::class.java)
-                val json = adapter.fromJson(body.string())
-                (json?.get("summary") as? String)?.takeIf { it.isNotEmpty() }
+                val json = summaryMetaAdapter.fromJson(body.string())
+                (json?.get("summary") as? String)?.takeIf { it.isNotBlank() }
             }
         } catch (e: CancellationException) {
             throw e
