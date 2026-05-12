@@ -10,7 +10,9 @@ internal fun parseTimestampMs(value: String): Int? {
     val hours = parts[0].toIntOrNull() ?: return null
     val minutes = parts[1].toIntOrNull() ?: return null
     val seconds = parts[2].toIntOrNull() ?: return null
-    val millis = fractionRaw?.padEnd(3, '0')?.take(3)?.toIntOrNull() ?: 0
+    val millis = fractionRaw?.let { fraction ->
+        fraction.padEnd(3, '0').take(3).toIntOrNull() ?: return null
+    } ?: 0
     if (hours < 0 || minutes < 0 || seconds < 0 || millis < 0) return null
     return ((hours * 3600 + minutes * 60 + seconds) * 1000 + millis)
 }

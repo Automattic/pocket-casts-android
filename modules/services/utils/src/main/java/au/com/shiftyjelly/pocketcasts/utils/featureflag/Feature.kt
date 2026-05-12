@@ -269,7 +269,7 @@ enum class Feature(
         title = "Episode Chat",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     EPISODE_CHAT_PLAYABLE_QUOTES(

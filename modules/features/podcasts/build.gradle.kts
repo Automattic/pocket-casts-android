@@ -32,7 +32,6 @@ dependencies {
     api(libs.rx2.java)
     api(libs.rx2.relay)
 
-    api(projects.modules.features.chat)
     api(projects.modules.features.player)
     api(projects.modules.features.transcripts)
     api(projects.modules.services.analytics)
@@ -73,6 +72,7 @@ dependencies {
 
     implementation(projects.modules.features.ads)
     implementation(projects.modules.features.account)
+    implementation(projects.modules.features.chat)
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.features.search)
     implementation(projects.modules.features.settings)

@@ -22,9 +22,6 @@ internal data class ChatTheme(
     val inputHint: Color,
     val sendButton: Color,
     val sendButtonIcon: Color,
-    val suggestionBackground: Color,
-    val suggestionText: Color,
-    val suggestionBorder: Color,
     val divider: Color,
 ) {
     companion object {
@@ -42,9 +39,6 @@ internal data class ChatTheme(
             inputHint = colors.primaryText02,
             sendButton = colors.primaryInteractive01,
             sendButtonIcon = colors.primaryInteractive02,
-            suggestionBackground = colors.primaryUi01,
-            suggestionText = colors.primaryText01,
-            suggestionBorder = colors.primaryUi05,
             divider = colors.primaryUi05,
         )
 
@@ -62,9 +56,6 @@ internal data class ChatTheme(
             inputHint = colors.contrast04,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
-            suggestionBackground = colors.background01,
-            suggestionText = colors.contrast02,
-            suggestionBorder = colors.contrast05,
             divider = colors.contrast05,
         )
     }
