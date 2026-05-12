@@ -244,7 +244,7 @@ private fun ProfileHeaderActions(
         ) {
             ProfileButton(
                 text = stringResource(LR.string.account),
-                image = if (state.email != null) painterResource(IR.drawable.ic_profile_circle_solid) else null,
+                image = if (showShare) painterResource(IR.drawable.ic_profile_circle_solid) else null,
                 onClick = onClick,
                 config = config,
                 modifier = if (showShare) Modifier.weight(1f) else Modifier,
@@ -288,7 +288,10 @@ private fun ProfileButton(
         onClick = onClick,
         modifier = modifier,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             if (image != null) {
                 Image(
                     painter = image,
