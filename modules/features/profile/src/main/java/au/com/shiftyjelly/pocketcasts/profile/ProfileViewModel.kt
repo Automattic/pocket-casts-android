@@ -62,17 +62,21 @@ class ProfileViewModel @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = SignInState.SignedOut,
     )
+    private val sharingFeatureFlag = FeatureFlag.isEnabledFlow(Feature.PROFILE_SHARING)
 
     internal val isSignedIn get() = signInState.value.isSignedIn
 
-    internal val profileHeaderState = signInState.map { state ->
+    internal val profileHeaderState = combine(
+        signInState,
+        sharingFeatureFlag,
+    ) { state, isProfileSharingEnabled ->
         when (state) {
             is SignInState.SignedIn -> ProfileHeaderState(
                 imageUrl = Gravatar.getUrl(state.email),
                 subscriptionTier = state.subscription?.tier,
                 email = state.email,
                 expiresIn = state.subscription?.expiryDate?.toDurationFromNow(),
-                isShareVisible = FeatureFlag.isEnabled(Feature.PROFILE_SHARING),
+                isShareVisible = isProfileSharingEnabled,
             )
 
             is SignInState.SignedOut -> ProfileHeaderState(

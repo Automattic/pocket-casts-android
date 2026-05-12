@@ -56,8 +56,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ProfileHeader(
     state: ProfileHeaderState,
     onClick: () -> Unit,
-    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onShareClick: () -> Unit = {},
     config: ProfileHeaderConfig = ProfileHeaderConfig(),
 ) {
     when (LocalConfiguration.current.orientation) {
@@ -84,7 +84,7 @@ data class ProfileHeaderState(
     val imageUrl: String?,
     val subscriptionTier: SubscriptionTier?,
     val expiresIn: Duration?,
-    val isShareVisible: Boolean,
+    val isShareVisible: Boolean = false,
 )
 
 data class ProfileHeaderConfig(
@@ -98,7 +98,7 @@ fun VerticalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
     onClick: () -> Unit,
-    onShareClick: () -> Unit,
+    onShareClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isSignedIn = state.email != null
