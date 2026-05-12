@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.compose.buttons
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +49,8 @@ private val ButtonPaddingValues = PaddingValues(
 data class ButtonTab(
     @StringRes val labelResId: Int,
     val onClick: () -> Unit,
+    @DrawableRes val iconResId: Int? = null,
+    @DrawableRes val trailingIconResId: Int? = null,
 )
 
 @Composable
@@ -89,6 +96,15 @@ fun ButtonTabs(
                 ),
                 interactionSource = interactionSource,
             ) {
+                if (tab.iconResId != null) {
+                    Image(
+                        painter = painterResource(tab.iconResId),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(textColor),
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(4.dp))
+                }
                 Text(
                     text = stringResource(tab.labelResId),
                     fontSize = 15.sp,
@@ -98,6 +114,15 @@ fun ButtonTabs(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (tab.trailingIconResId != null) {
+                    Spacer(Modifier.width(4.dp))
+                    Image(
+                        painter = painterResource(tab.trailingIconResId),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(textColor),
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
             }
             Spacer(Modifier.width(6.dp))
         }

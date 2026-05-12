@@ -289,20 +289,12 @@
             tools:text="1h 50m left" />
 
         <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/episodeSummary"
+            android:id="@+id/episodeContentTabs"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblDate" />
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/episodeTranscript"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/episodeSummary" />
 
         <FrameLayout
             android:id="@+id/webViewShowNotes"
@@ -315,7 +307,7 @@
             app:layout_constraintBottom_toTopOf="@+id/navigationBarSpacer"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/episodeTranscript" />
+            app:layout_constraintTop_toBottomOf="@+id/episodeContentTabs" />
 
         <TextView
             android:id="@+id/webViewErrorText"
@@ -329,7 +321,7 @@
             android:textColor="?attr/primary_text_01"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/episodeTranscript" />
+            app:layout_constraintTop_toBottomOf="@+id/episodeContentTabs" />
 
         <ProgressBar
             android:id="@+id/webViewLoader"
@@ -340,7 +332,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/episodeTranscript" />
+            app:layout_constraintTop_toBottomOf="@+id/episodeContentTabs" />
 
         <au.com.shiftyjelly.pocketcasts.views.component.NavigationBarSpacer
             android:id="@+id/navigationBarSpacer"

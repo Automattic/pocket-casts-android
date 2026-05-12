@@ -16,19 +16,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -41,11 +33,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
+import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -61,9 +51,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
-import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
-import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
-import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerDimensions
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -73,8 +60,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -106,7 +91,6 @@ import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
-import androidx.compose.ui.graphics.Color as ComposeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -197,8 +181,6 @@ class EpisodeFragment : BaseFragment() {
     private val forceDarkTheme: Boolean
         get() = args.forceDark
 
-    private var episodeBannerIconColor by mutableIntStateOf(Color.BLACK)
-
     var listener: FragmentHostListener? = null
     private var episodeLoadedListener: EpisodeLoadedListener? = null
 
@@ -270,7 +252,6 @@ class EpisodeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.loadingGroup?.isInvisible = true
-        episodeBannerIconColor = ThemeColor.podcastIcon02(activeTheme, Color.BLACK)
 
         viewModel.setup(
             episodeUuid = episodeUUID,
@@ -287,7 +268,6 @@ class EpisodeFragment : BaseFragment() {
                     is EpisodeFragmentState.Loaded -> {
                         binding.loadingGroup.isVisible = true
                         val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
-                        episodeBannerIconColor = iconColor
 
                         episodeLoadedListener?.onEpisodeLoaded(
                             EpisodeToolbarState(
@@ -584,137 +564,112 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
 
-        binding?.episodeSummary?.setContentWithViewCompositionStrategy {
+        binding?.episodeContentTabs?.setContentWithViewCompositionStrategy {
             val summaryText = viewModel.summary.collectAsState().value
+            val transcript = viewModel.transcript.collectAsState().value as? Transcript.Text
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
+            val isPlusUser = viewModel.isPlusUser.collectAsState().value
 
-            AppTheme(activeTheme) {
-                AnimatedNonNullVisibility(item = summaryText.takeIf { isSummaryEnabled }) { text ->
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    ) {
-                        SummaryExcerptBanner(
-                            modifier = Modifier.clickable(
-                                role = Role.Button,
-                                onClickLabel = stringResource(LR.string.view_summary),
-                                onClick = {
-                                    if (parentFragmentManager.findFragmentByTag("episode_summary") == null) {
-                                        val sheet = SummaryBottomSheet.newInstance(text)
-                                        sheet.show(parentFragmentManager, "episode_summary")
+            val tabs = buildList {
+                add(ButtonTab(labelResId = LR.string.description, onClick = {}))
+                if (isSummaryEnabled && summaryText != null) {
+                    add(
+                        ButtonTab(
+                            labelResId = LR.string.summary,
+                            onClick = {
+                                if (parentFragmentManager.findFragmentByTag("episode_summary") == null) {
+                                    SummaryBottomSheet.newInstance(summaryText)
+                                        .show(parentFragmentManager, "episode_summary")
+                                }
+                            },
+                            iconResId = IR.drawable.ic_ai,
+                            trailingIconResId = IR.drawable.ic_chevron_right,
+                        ),
+                    )
+                }
+                if (transcript != null) {
+                    add(
+                        ButtonTab(
+                            labelResId = LR.string.transcript,
+                            onClick = {
+                                if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                    TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
+                                        .show(parentFragmentManager, "episode_transcript")
+                                }
+                                eventHorizon.track(
+                                    EpisodeDetailTranscriptCardTappedEvent(
+                                        episodeUuid = transcript.episodeUuid,
+                                        podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                                    ),
+                                )
+                            },
+                            iconResId = IR.drawable.ic_ai,
+                            trailingIconResId = IR.drawable.ic_chevron_right,
+                        ),
+                    )
+                }
+                if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
+                    add(
+                        ButtonTab(
+                            labelResId = LR.string.episode_chat,
+                            onClick = {
+                                val episodeUuid = transcript.episodeUuid
+                                val podcastUuid = transcript.podcastUuid
+                                if (isPlusUser) {
+                                    val episode = viewModel.episode ?: return@ButtonTab
+                                    val chatPodcastUuid = podcastUuid ?: return@ButtonTab
+                                    val episodeSubtitle = PodcastEpisode
+                                        .seasonPrefix(
+                                            episode.episodeType,
+                                            episode.season,
+                                            episode.number,
+                                            resources,
+                                        )
+                                        .orEmpty()
+                                    if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                                        val fragment = ChatFragment.newInstance(
+                                            episodeUuid,
+                                            chatPodcastUuid,
+                                            viewModel.podcast?.title.orEmpty(),
+                                            episode.title,
+                                            episodeSubtitle,
+                                            episode.durationMs,
+                                        )
+                                        fragment.show(parentFragmentManager, "episode_chat")
                                     }
-                                },
-                            ),
-                        )
-                    }
+                                } else {
+                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
+                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
+                                    }
+                                }
+                            },
+                            trailingIconResId = IR.drawable.ic_chevron_right,
+                        ),
+                    )
                 }
             }
-        }
-
-        binding?.episodeTranscript?.setContentWithViewCompositionStrategy {
-            val transcript = viewModel.transcript.collectAsState().value
 
             AppTheme(activeTheme) {
-                val episodeIconColor = ComposeColor(episodeBannerIconColor)
-                val transcriptBannerColors = TranscriptExcerptBannerColors.default().copy(leadingIcon = episodeIconColor)
-                val chatBannerColors = ChatBannerColors.default().copy(leadingIcon = episodeIconColor)
+                if (tabs.size > 1) {
+                    ButtonTabs(
+                        tabs = tabs,
+                        selectedTab = tabs.first(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    )
+                }
+            }
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    AnimatedNonNullVisibility(
-                        item = transcript as? Transcript.Text,
-                    ) { textTranscript ->
-                        val episodeUuid = textTranscript.episodeUuid
-                        val podcastUuid = textTranscript.podcastUuid
-
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                        ) {
-                            TranscriptExcerptBanner(
-                                isGenerated = textTranscript.isGenerated,
-                                colors = transcriptBannerColors,
-                                dimensions = TranscriptExcerptBannerDimensions.compact(),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.transcript_open),
-                                        onClick = {
-                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                                val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
-                                                fragment.show(parentFragmentManager, "episode_transcript")
-                                            }
-                                            eventHorizon.track(
-                                                EpisodeDetailTranscriptCardTappedEvent(
-                                                    episodeUuid = episodeUuid,
-                                                    podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                                                ),
-                                            )
-                                        },
-                                    ),
-                            )
-                            if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
-                                val isPlusUser by viewModel.isPlusUser.collectAsState()
-
-                                ChatBanner(
-                                    colors = chatBannerColors,
-                                    dimensions = ChatBannerDimensions.compact(),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(
-                                            role = Role.Button,
-                                            onClickLabel = stringResource(LR.string.episode_chat),
-                                            onClick = {
-                                                if (isPlusUser) {
-                                                    val episode = viewModel.episode ?: return@clickable
-                                                    val chatPodcastUuid = podcastUuid ?: return@clickable
-                                                    val episodeSubtitle = PodcastEpisode
-                                                        .seasonPrefix(
-                                                            episode.episodeType,
-                                                            episode.season,
-                                                            episode.number,
-                                                            resources,
-                                                        )
-                                                        .orEmpty()
-                                                    val isChatOpen = parentFragmentManager
-                                                        .findFragmentByTag("episode_chat") != null
-                                                    if (!isChatOpen) {
-                                                        val fragment = ChatFragment.newInstance(
-                                                            episodeUuid,
-                                                            chatPodcastUuid,
-                                                            viewModel.podcast?.title.orEmpty(),
-                                                            episode.title,
-                                                            episodeSubtitle,
-                                                            episode.durationMs,
-                                                        )
-                                                        fragment.show(parentFragmentManager, "episode_chat")
-                                                    }
-                                                } else {
-                                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
-                                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
-                                                    }
-                                                }
-                                            },
-                                        ),
-                                )
-                            }
-                        }
-                        LaunchedEffect(podcastUuid, episodeUuid) {
-                            eventHorizon.track(
-                                EpisodeDetailTranscriptCardShownEvent(
-                                    episodeUuid = episodeUuid,
-                                    podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                                ),
-                            )
-                        }
-                    }
+            if (transcript != null) {
+                LaunchedEffect(transcript.podcastUuid, transcript.episodeUuid) {
+                    eventHorizon.track(
+                        EpisodeDetailTranscriptCardShownEvent(
+                            episodeUuid = transcript.episodeUuid,
+                            podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                        ),
+                    )
                 }
             }
         }

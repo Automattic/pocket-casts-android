@@ -127,6 +127,8 @@
     <string name="episode_chat">Chat with Episode</string>
     <string name="view_summary">View summary</string>
     <string name="episode_summary">Episode Summary</string>
+    <string name="description">Description</string>
+    <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
