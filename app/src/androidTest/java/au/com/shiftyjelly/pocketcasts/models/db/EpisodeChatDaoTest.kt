@@ -45,7 +45,7 @@ class EpisodeChatDaoTest {
         val chat = EpisodeChat(
             episodeUuid = EPISODE_UUID,
             podcastUuid = PODCAST_UUID,
-            createdAt = Date(100)
+            createdAt = Date(100),
         )
 
         episodeChatDao.insertChat(chat)
@@ -60,7 +60,7 @@ class EpisodeChatDaoTest {
         val replacement = EpisodeChat(
             episodeUuid = EPISODE_UUID,
             podcastUuid = PODCAST_UUID,
-            createdAt = Date(200)
+            createdAt = Date(200),
         )
 
         episodeChatDao.insertChat(replacement)
@@ -107,13 +107,13 @@ class EpisodeChatDaoTest {
         uuid: String,
         episodeUuid: String = EPISODE_UUID,
         text: String,
-        createdAt: Date = Date(100)
+        createdAt: Date = Date(100),
     ) = EpisodeChatMessage(
         uuid = uuid,
         episodeUuid = episodeUuid,
         text = text,
         role = "assistant",
-        createdAt = createdAt
+        createdAt = createdAt,
     )
 
     private companion object {

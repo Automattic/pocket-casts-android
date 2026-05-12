@@ -43,7 +43,7 @@ class ChatViewModelTest {
                 on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
             },
             episodeManager = mock<EpisodeManager>(),
-            applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher)
+            applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         )
     }
 
@@ -56,7 +56,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome"
+            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
@@ -84,7 +84,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome"
+            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
@@ -119,9 +119,9 @@ class ChatViewModelTest {
             SendMessage(
                 episodeUuid = EPISODE_UUID,
                 message = "What happened?",
-                isRetry = false
+                isRetry = false,
             ),
-            chatManager.sentMessages.single()
+            chatManager.sentMessages.single(),
         )
         assertFalse(viewModel.uiState.value.isAwaitingReply)
         assertEquals(null, viewModel.uiState.value.error)
@@ -145,7 +145,7 @@ class ChatViewModelTest {
         chatManager.messages.value = listOf(
             ChatMessage.User(text = "First question", uuid = "first-user-uuid"),
             ChatMessage.Assistant(text = "Failure", uuid = "assistant-uuid"),
-            ChatMessage.User(text = "Last question", uuid = "last-user-uuid")
+            ChatMessage.User(text = "Last question", uuid = "last-user-uuid"),
         )
         setEpisodeInfo()
 
@@ -156,9 +156,9 @@ class ChatViewModelTest {
             SendMessage(
                 episodeUuid = EPISODE_UUID,
                 message = "Last question",
-                isRetry = true
+                isRetry = true,
             ),
-            chatManager.sentMessages.single()
+            chatManager.sentMessages.single(),
         )
     }
 
@@ -188,7 +188,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome"
+            welcomeMessage = "Welcome",
         )
     }
 
@@ -216,7 +216,7 @@ class ChatViewModelTest {
             episodeUuid: String,
             message: String,
             allMessages: List<ChatMessage>,
-            isRetry: Boolean
+            isRetry: Boolean,
         ) {
             sendMessageException?.let { throw it }
             sentMessages += SendMessage(episodeUuid, message, isRetry)

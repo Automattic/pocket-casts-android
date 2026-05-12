@@ -298,7 +298,6 @@ private fun ChatBubble(
     }
 }
 
-
 @Preview
 @Composable
 private fun ChatPaywallPreview(

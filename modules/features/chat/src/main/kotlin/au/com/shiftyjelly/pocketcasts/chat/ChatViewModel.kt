@@ -272,6 +272,7 @@ class ChatViewModel @Inject constructor(
             .mapNotNull { state ->
                 when {
                     state.episodeUuid != episodeUuid -> true
+
                     else -> {
                         val pos = state.positionMs
                         if (!sawStart && pos in startMs..endMs) sawStart = true

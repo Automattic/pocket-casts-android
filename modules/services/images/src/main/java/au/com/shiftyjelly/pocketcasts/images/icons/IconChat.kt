@@ -16,7 +16,7 @@ val IconChat: ImageVector
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
             viewportWidth = 960f,
-            viewportHeight = 960f
+            viewportHeight = 960f,
         ).apply {
             path(fill = SolidColor(Color.Black)) {
                 moveTo(80f, 880f)

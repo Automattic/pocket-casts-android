@@ -36,11 +36,11 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BlazeAdDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
@@ -60,10 +60,10 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent

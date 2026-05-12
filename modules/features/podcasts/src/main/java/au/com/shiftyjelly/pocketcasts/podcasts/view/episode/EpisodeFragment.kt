@@ -37,6 +37,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
+import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -53,9 +56,6 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
-import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
-import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.ui.R
@@ -67,10 +67,10 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog

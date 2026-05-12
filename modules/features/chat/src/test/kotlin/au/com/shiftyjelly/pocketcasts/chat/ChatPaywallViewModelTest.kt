@@ -39,6 +39,6 @@ class ChatPaywallViewModelTest {
     }
 
     private fun createViewModel() = ChatPaywallViewModel(
-        paymentClient = PaymentClient.test(paymentDataSource)
+        paymentClient = PaymentClient.test(paymentDataSource),
     )
 }

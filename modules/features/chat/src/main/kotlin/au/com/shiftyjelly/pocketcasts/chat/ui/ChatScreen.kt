@@ -74,6 +74,7 @@ fun ChatScreen(
                         podcastUuid = uiState.podcastUuid,
                         theme = theme,
                     )
+
                     is ChatMessage.Quote -> AiQuoteBubble(
                         quote = message.displayText,
                         timestampLabel = message.timestampLabel,
@@ -82,6 +83,7 @@ fun ChatScreen(
                         theme = theme,
                         onClickPlay = { onPlayQuote(message.uuid) },
                     )
+
                     is ChatMessage.User -> UserMessageBubble(
                         text = message.text,
                         theme = theme,

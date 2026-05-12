@@ -35,7 +35,7 @@ class ChatManagerImplTest {
         episodeChatDao = episodeChatDao,
         transcriptDao = transcriptDao,
         podcastCacheServiceManager = podcastCacheServiceManager,
-        moshi = Moshi.Builder().build()
+        moshi = Moshi.Builder().build(),
     )
 
     @Test
@@ -43,7 +43,7 @@ class ChatManagerImplTest {
         manager.createChat(
             episodeUuid = EPISODE_UUID,
             podcastUuid = PODCAST_UUID,
-            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")
+            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
         )
 
         assertEquals(EPISODE_UUID, episodeChatDao.chats.single().episodeUuid)
@@ -54,9 +54,9 @@ class ChatManagerImplTest {
                 episodeUuid = EPISODE_UUID,
                 text = "Welcome",
                 role = ChatRole.Assistant.value,
-                createdAt = episodeChatDao.messages.single().createdAt
+                createdAt = episodeChatDao.messages.single().createdAt,
             ),
-            episodeChatDao.messages.single()
+            episodeChatDao.messages.single(),
         )
     }
 
@@ -64,7 +64,7 @@ class ChatManagerImplTest {
     fun `send message stores user message and assistant response with quote`() = runTest {
         transcripts.value = listOf(
             createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"),
-            createTranscript(type = "application/json", isGenerated = false, url = "author-url")
+            createTranscript(type = "application/json", isGenerated = false, url = "author-url"),
         )
         whenever(podcastCacheServiceManager.episodeChat(any())).thenReturn(
             EpisodeChatResponse(
@@ -72,9 +72,9 @@ class ChatManagerImplTest {
                 quote = EpisodeChatQuote(
                     text = "Quoted text",
                     start = "00:00:01",
-                    end = "00:00:03"
-                )
-            )
+                    end = "00:00:03",
+                ),
+            ),
         )
 
         manager.sendMessage(
@@ -83,9 +83,9 @@ class ChatManagerImplTest {
             allMessages = listOf(
                 ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
                 ChatMessage.User(text = "Earlier question", uuid = "earlier-user-uuid"),
-                ChatMessage.Quote(text = "Earlier quote", start = "00:00", end = "00:01", uuid = "quote-uuid")
+                ChatMessage.Quote(text = "Earlier quote", start = "00:00", end = "00:01", uuid = "quote-uuid"),
             ),
-            isRetry = false
+            isRetry = false,
         )
 
         val requestCaptor = argumentCaptor<EpisodeChatRequest>()
@@ -97,10 +97,10 @@ class ChatManagerImplTest {
                 conversationHistory = listOf(
                     ConversationMessage(role = "assistant", content = "Welcome"),
                     ConversationMessage(role = "user", content = "Earlier question"),
-                    ConversationMessage(role = "assistant", content = "Earlier quote")
-                )
+                    ConversationMessage(role = "assistant", content = "Earlier quote"),
+                ),
             ),
-            requestCaptor.firstValue
+            requestCaptor.firstValue,
         )
         assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value, ChatRole.Quote.value), episodeChatDao.messages.map { it.role })
         assertEquals("What happened?", episodeChatDao.messages[0].text)
@@ -126,7 +126,7 @@ class ChatManagerImplTest {
             episodeUuid = EPISODE_UUID,
             message = "Retry message",
             allMessages = emptyList(),
-            isRetry = true
+            isRetry = true,
         )
 
         assertEquals(listOf(ChatRole.Assistant.value), episodeChatDao.messages.map { it.role })
@@ -140,7 +140,7 @@ class ChatManagerImplTest {
                 episodeUuid = EPISODE_UUID,
                 message = "Question",
                 allMessages = emptyList(),
-                isRetry = false
+                isRetry = false,
             )
         }.exceptionOrNull() as IllegalStateException
 
@@ -152,12 +152,12 @@ class ChatManagerImplTest {
     fun `clear messages deletes episode messages and stores welcome message`() = runTest {
         episodeChatDao.messages += listOf(
             createMessage(uuid = "old-message", episodeUuid = EPISODE_UUID, text = "Old message"),
-            createMessage(uuid = "other-message", episodeUuid = "other-episode-uuid", text = "Other message")
+            createMessage(uuid = "other-message", episodeUuid = "other-episode-uuid", text = "Other message"),
         )
 
         manager.clearMessages(
             episodeUuid = EPISODE_UUID,
-            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")
+            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
         )
 
         assertEquals(listOf(EPISODE_UUID), episodeChatDao.deletedEpisodeUuids)
@@ -171,15 +171,15 @@ class ChatManagerImplTest {
         whenever(podcastCacheServiceManager.episodeChat(any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
-                quote = EpisodeChatQuote(text = " ", start = "00:01", end = "00:03")
-            )
+                quote = EpisodeChatQuote(text = " ", start = "00:01", end = "00:03"),
+            ),
         )
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
             message = "Question",
             allMessages = emptyList(),
-            isRetry = false
+            isRetry = false,
         )
 
         assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value), episodeChatDao.messages.map { it.role })
@@ -232,24 +232,24 @@ class ChatManagerImplTest {
         fun createTranscript(
             type: String = "text/vtt",
             isGenerated: Boolean = false,
-            url: String = "transcript-url"
+            url: String = "transcript-url",
         ) = Transcript(
             episodeUuid = EPISODE_UUID,
             url = url,
             type = type,
             isGenerated = isGenerated,
-            language = "en"
+            language = "en",
         )
 
         fun createMessage(
             uuid: String,
             episodeUuid: String,
-            text: String
+            text: String,
         ) = EpisodeChatMessage(
             uuid = uuid,
             episodeUuid = episodeUuid,
             text = text,
-            role = ChatRole.Assistant.value
+            role = ChatRole.Assistant.value,
         )
     }
 }
