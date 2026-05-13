@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -28,8 +29,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
 
 private object BlogsRoutes {
-    const val EMPTY = "empty"
     const val ADD_BLOG = "add_blog"
+    const val PODCASTS = "podcasts"
 }
 
 @AndroidEntryPoint
@@ -52,27 +53,52 @@ class BlogsFragment : BaseFragment() {
             }
             val isPlusOrPatron by isPlusOrPatronFlow.collectAsStateWithLifecycle(initialValue = false)
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = BlogsRoutes.EMPTY) {
-                composable(BlogsRoutes.EMPTY) {
-                    EmptyBlogsPage(
-                        onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                        onAddBlogClick = {
-                            eventHorizon.track(BlogsAddBlogTappedEvent)
-                            if (isPlusOrPatron) {
-                                navController.navigate(BlogsRoutes.ADD_BLOG)
-                            } else {
-                                OnboardingLauncher.openOnboardingFlow(
-                                    requireActivity(),
-                                    OnboardingFlow.Upsell(OnboardingUpgradeSource.BLOGS),
-                                )
-                            }
-                        },
+            val onAddBlogClick = {
+                eventHorizon.track(BlogsAddBlogTappedEvent)
+                if (isPlusOrPatron) {
+                    navController.navigate(BlogsRoutes.ADD_BLOG)
+                } else {
+                    OnboardingLauncher.openOnboardingFlow(
+                        requireActivity(),
+                        OnboardingFlow.Upsell(OnboardingUpgradeSource.BLOGS),
                     )
+                }
+            }
+            NavHost(navController = navController, startDestination = BlogsRoutes.PODCASTS) {
+                composable(BlogsRoutes.PODCASTS) {
+                    val viewModel = hiltViewModel<BlogsViewModel>()
+                    val blogPodcasts by viewModel.blogPodcasts.collectAsStateWithLifecycle()
+                    val bottomInsetPx by viewModel.bottomInset.collectAsStateWithLifecycle()
+                    val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
+                    val podcasts = blogPodcasts
+                    when {
+                        podcasts.isNullOrEmpty() -> EmptyBlogsPage(
+                            onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                            onAddBlogClick = onAddBlogClick,
+                            // don't flicker the empty state while the podcasts are loading
+                            showContent = podcasts != null,
+                        )
+
+                        else -> BlogsListPage(
+                            podcasts = podcasts,
+                            bottomInset = bottomInset,
+                            onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                            onAddBlogClick = onAddBlogClick,
+                            onPodcastClick = {
+                                viewModel.onPodcastTapped(it)
+                                navigateToPodcast(it)
+                            },
+                        )
+                    }
                 }
                 composable(BlogsRoutes.ADD_BLOG) {
                     val viewModel = hiltViewModel<AddBlogViewModel>()
                     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                     val url by viewModel.url.collectAsStateWithLifecycle()
+                    val onBlogAdded = { uuid: String ->
+                        navController.popBackStack(BlogsRoutes.PODCASTS, inclusive = false)
+                        navigateToPodcast(uuid)
+                    }
                     AddBlogPage(
                         state = uiState,
                         url = url,
@@ -83,31 +109,13 @@ class BlogsFragment : BaseFragment() {
                             }
                         },
                         onFindFeeds = {
-                            viewModel.onFindFeedsTapped(
-                                url = it,
-                                onNavigateToPodcast = { uuid ->
-                                    navigateToPodcast(uuid)
-                                    viewModel.resetToStart()
-                                },
-                            )
+                            viewModel.onFindFeedsTapped(url = it, onNavigateToPodcast = onBlogAdded)
                         },
                         onRetry = {
-                            viewModel.onRetryTapped(
-                                url = it,
-                                onNavigateToPodcast = { uuid ->
-                                    navigateToPodcast(uuid)
-                                    viewModel.resetToStart()
-                                },
-                            )
+                            viewModel.onRetryTapped(url = it, onNavigateToPodcast = onBlogAdded)
                         },
                         onFeedClick = { webFeed ->
-                            viewModel.onFeedSelected(
-                                webFeed = webFeed,
-                                onNavigateToPodcast = { uuid ->
-                                    navigateToPodcast(uuid)
-                                    viewModel.resetToStart()
-                                },
-                            )
+                            viewModel.onFeedSelected(webFeed = webFeed, onNavigateToPodcast = onBlogAdded)
                         },
                         onEditUrl = { viewModel.editUrl() },
                     )
