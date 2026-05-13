@@ -1226,6 +1226,11 @@
     <string name="profile_save_your_podcasts">Save your podcasts in the cloud and sync your progress with other devices</string>
     <string name="profile_set_up_account">Set up account</string>
     <string name="profile_share_stats">Share stats</string>
+    <string name="profile_sharing_title">Profile sharing</string>
+    <string name="profile_sharing_display_name_label">Display name</string>
+    <string name="profile_sharing_display_name_placeholder">Your name</string>
+    <string name="profile_sharing_display_name_helper">This is how you\'ll appear on shared profiles. You can change it later.</string>
+    <string name="profile_sharing_preview_title">Preview profile</string>
     <string name="profile_sign_in" translatable="false">@string/sign_in</string>
     <string name="profile_sign_in_or_create_account">Sign in or create account</string>
     <string name="profile_sign_out" translatable="false">@string/sign_out</string>
