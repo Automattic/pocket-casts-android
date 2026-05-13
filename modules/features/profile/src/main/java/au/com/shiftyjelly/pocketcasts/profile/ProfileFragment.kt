@@ -104,6 +104,9 @@ class ProfileFragment :
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
                 }
             },
+            onShareClick = {
+                profileViewModel.onShareClick()
+            },
             onCreateFreeAccountBannerClick = {
                 profileViewModel.onCreateFreeAccountClick()
                 OnboardingLauncher.openOnboardingFlow(

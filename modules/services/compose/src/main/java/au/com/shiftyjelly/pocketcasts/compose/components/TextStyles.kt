@@ -177,6 +177,7 @@ fun TextH40(
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
     lineHeight: TextUnit = 21.sp,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
 ) {
     Text(
         text = text,
@@ -187,6 +188,7 @@ fun TextH40(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        letterSpacing = letterSpacing,
         modifier = modifier,
     )
 }
