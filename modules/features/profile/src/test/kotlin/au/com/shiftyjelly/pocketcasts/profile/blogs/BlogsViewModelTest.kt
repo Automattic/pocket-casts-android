@@ -40,26 +40,44 @@ class BlogsViewModelTest {
     }
 
     @Test
-    fun `blogPodcasts initial value is null before any subscription`() {
+    fun `blogPodcasts is null before the first upstream emission`() {
         assertEquals(null, viewModel.blogPodcasts.value)
     }
 
     @Test
-    fun `bottomInset initial value is 0 before any subscription`() {
+    fun `bottomInset is 0 before the first upstream emission`() {
         assertEquals(0, viewModel.bottomInset.value)
     }
 
     @Test
-    fun `blogPodcasts mirrors emissions from podcastManager`() = runTest {
-        val initial = listOf(podcast("uuid-1"))
-        val updated = listOf(podcast("uuid-1"), podcast("uuid-2"))
-        podcastsFlow.value = initial
+    fun `blogPodcasts emits an empty list once podcastManager loads with no blogs`() = runTest {
+        viewModel.blogPodcasts.test {
+            assertEquals(emptyList<Podcast>(), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun `blogPodcasts emits the loaded podcasts from podcastManager`() = runTest {
+        val podcasts = listOf(podcast("uuid-1"), podcast("uuid-2"))
+        podcastsFlow.value = podcasts
 
         viewModel.blogPodcasts.test {
-            assertEquals(initial, expectMostRecentItem())
+            assertEquals(podcasts, expectMostRecentItem())
+        }
+    }
 
-            podcastsFlow.value = updated
-            assertEquals(updated, awaitItem())
+    @Test
+    fun `blogPodcasts emits subsequent updates from podcastManager`() = runTest {
+        viewModel.blogPodcasts.test {
+            assertEquals(emptyList<Podcast>(), expectMostRecentItem())
+
+            val firstUpdate = listOf(podcast("uuid-1"))
+            podcastsFlow.value = firstUpdate
+            assertEquals(firstUpdate, awaitItem())
+
+            val secondUpdate = listOf(podcast("uuid-1"), podcast("uuid-2"))
+            podcastsFlow.value = secondUpdate
+            assertEquals(secondUpdate, awaitItem())
         }
     }
 

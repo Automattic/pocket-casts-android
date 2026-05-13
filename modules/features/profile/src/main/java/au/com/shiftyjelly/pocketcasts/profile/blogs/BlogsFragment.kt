@@ -75,6 +75,7 @@ class BlogsFragment : BaseFragment() {
                         podcasts.isNullOrEmpty() -> EmptyBlogsPage(
                             onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
                             onAddBlogClick = onAddBlogClick,
+                            // don't flicker the empty state while the podcasts are loading
                             showContent = podcasts != null,
                         )
 
