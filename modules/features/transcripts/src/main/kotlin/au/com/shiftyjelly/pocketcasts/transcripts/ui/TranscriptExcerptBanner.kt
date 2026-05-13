@@ -38,7 +38,7 @@ fun TranscriptExcerptBanner(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
-            .shadow(elevation = 2.dp, shape = BackgroundShape)
+            .shadow(elevation = 1.dp, shape = BackgroundShape)
             .background(MaterialTheme.theme.colors.primaryUi04, BackgroundShape)
             .then(modifier)
             .padding(vertical = 12.dp, horizontal = 12.dp),
