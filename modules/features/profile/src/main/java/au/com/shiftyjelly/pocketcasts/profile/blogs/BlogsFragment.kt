@@ -83,7 +83,10 @@ class BlogsFragment : BaseFragment() {
                             bottomInset = bottomInset,
                             onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
                             onAddBlogClick = onAddBlogClick,
-                            onPodcastClick = { navigateToPodcast(it) },
+                            onPodcastClick = {
+                                viewModel.onPodcastTapped(it)
+                                navigateToPodcast(it)
+                            },
                         )
                     }
                 }
