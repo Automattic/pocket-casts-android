@@ -1443,6 +1443,10 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN explicit INTEGER")
         }
 
+        val MIGRATION_127_128 = addMigration(127, 128) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN web_feed INTEGER NOT NULL DEFAULT 0")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1860,6 +1864,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_124_125,
                 MIGRATION_125_126,
                 MIGRATION_126_127,
+                MIGRATION_127_128,
             )
         }
 

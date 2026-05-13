@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -13,12 +14,18 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.BlogsAddBlogTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactive.asFlow
 
 private object BlogsRoutes {
     const val EMPTY = "empty"
@@ -31,12 +38,19 @@ class BlogsFragment : BaseFragment() {
     @Inject
     lateinit var eventHorizon: EventHorizon
 
+    @Inject
+    lateinit var userManager: UserManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppTheme(themeType = theme.activeTheme) {
+            val isPlusOrPatronFlow = remember {
+                userManager.getSignInState().asFlow().map { it.isSignedInAsPlusOrPatron }
+            }
+            val isPlusOrPatron by isPlusOrPatronFlow.collectAsStateWithLifecycle(initialValue = false)
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = BlogsRoutes.EMPTY) {
                 composable(BlogsRoutes.EMPTY) {
@@ -44,7 +58,14 @@ class BlogsFragment : BaseFragment() {
                         onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
                         onAddBlogClick = {
                             eventHorizon.track(BlogsAddBlogTappedEvent)
-                            navController.navigate(BlogsRoutes.ADD_BLOG)
+                            if (isPlusOrPatron) {
+                                navController.navigate(BlogsRoutes.ADD_BLOG)
+                            } else {
+                                OnboardingLauncher.openOnboardingFlow(
+                                    requireActivity(),
+                                    OnboardingFlow.Upsell(OnboardingUpgradeSource.BLOGS),
+                                )
+                            }
                         },
                     )
                 }

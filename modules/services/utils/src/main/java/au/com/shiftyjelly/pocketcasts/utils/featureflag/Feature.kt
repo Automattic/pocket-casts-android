@@ -264,6 +264,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    PROFILE_SHARING(
+        key = "profile_sharing",
+        title = "Profile sharing",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     EPISODE_CHAT(
         key = "episode_chat",
         title = "Episode Chat",
