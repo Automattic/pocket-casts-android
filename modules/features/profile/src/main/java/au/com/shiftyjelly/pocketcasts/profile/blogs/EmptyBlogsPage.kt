@@ -57,6 +57,7 @@ internal fun EmptyBlogsPage(
     onBackPress: () -> Unit,
     onAddBlogClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showContent: Boolean = true,
 ) {
     val colors = MaterialTheme.theme.colors
     Column(
@@ -68,10 +69,12 @@ internal fun EmptyBlogsPage(
             title = stringResource(LR.string.profile_navigation_blogs),
             onNavigationClick = onBackPress,
         )
-        BlogsEmptyContent(
-            onAddBlogClick = onAddBlogClick,
-            modifier = Modifier.weight(1f),
-        )
+        if (showContent) {
+            BlogsEmptyContent(
+                onAddBlogClick = onAddBlogClick,
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 
