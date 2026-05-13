@@ -16,6 +16,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -575,6 +577,8 @@ class EpisodeFragment : BaseFragment() {
                 ) {
                     AnimatedNonNullVisibility(
                         item = transcript as? Transcript.Text,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                     ) { textTranscript ->
                         val episodeUuid = textTranscript.episodeUuid
                         val podcastUuid = textTranscript.podcastUuid
