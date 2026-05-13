@@ -66,7 +66,10 @@ internal fun BlogsListPage(
             val dateFormatter = remember(context) { RelativeDateFormatter(context) }
 
             LazyColumn(
-                contentPadding = PaddingValues(bottom = bottomInset + 16.dp),
+                contentPadding = PaddingValues(
+                    top = 8.dp,
+                    bottom = bottomInset + 16.dp,
+                ),
                 modifier = Modifier.fillMaxSize(),
             ) {
                 items(items = podcasts, key = { it.uuid }) { podcast ->
