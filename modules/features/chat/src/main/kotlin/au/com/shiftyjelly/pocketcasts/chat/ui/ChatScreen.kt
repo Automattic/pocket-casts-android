@@ -13,6 +13,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,8 @@ fun ChatScreen(
 ) {
     val theme = rememberChatTheme()
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
         scrollState.scrollTo(scrollState.maxValue)
@@ -52,7 +56,11 @@ fun ChatScreen(
             podcastUuid = uiState.podcastUuid,
             podcastTitle = uiState.podcastTitle,
             onClickBack = onClickClose,
-            onClickMore = onClickMore,
+            onClickMore = {
+                focusManager.clearFocus(force = true)
+                keyboardController?.hide()
+                onClickMore()
+            },
             theme = theme,
         )
 

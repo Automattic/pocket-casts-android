@@ -50,8 +50,8 @@ internal fun ChatInputBar(
             .background(theme.background)
             .navigationBarsPadding(),
     ) {
-        Divider(color = theme.divider, thickness = 0.5.dp)
         if (!isConnected) {
+            Divider(color = theme.divider, thickness = 0.5.dp)
             Text(
                 text = stringResource(LR.string.error_check_your_internet_connection),
                 color = theme.secondaryText,
