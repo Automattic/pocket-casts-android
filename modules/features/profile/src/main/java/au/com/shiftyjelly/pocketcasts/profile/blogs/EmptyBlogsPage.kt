@@ -91,13 +91,12 @@ private fun ExperimentBanner(modifier: Modifier = Modifier) {
         append(' ')
         append(stringResource(LR.string.blogs_experiment_banner_body))
     }
-    Row(
+    Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.theme.colors.support10.copy(alpha = 0.1f))
             .border(width = 1.dp, color = MaterialTheme.theme.colors.support10, shape = RoundedCornerShape(12.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         TextP40(text = text)
     }
