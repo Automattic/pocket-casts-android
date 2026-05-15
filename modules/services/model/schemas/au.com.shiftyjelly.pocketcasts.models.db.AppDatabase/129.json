@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 129,
-    "identityHash": "2a0eab9656dad6cd2dd72e00c8f71337",
+    "identityHash": "7dc03421e397a5c3017ad439bc9044fd",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -2103,7 +2103,7 @@
       },
       {
         "tableName": "episode_chats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`episode_uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`episode_uuid`), FOREIGN KEY(`episode_uuid`) REFERENCES `podcast_episodes`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "episodeUuid",
@@ -2128,11 +2128,24 @@
           "columnNames": [
             "episode_uuid"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "podcast_episodes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "episode_uuid"
+            ],
+            "referencedColumns": [
+              "uuid"
+            ]
+          }
+        ]
       },
       {
         "tableName": "episode_chat_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `text` TEXT NOT NULL, `role` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `metadata` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `text` TEXT NOT NULL, `role` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `metadata` TEXT, PRIMARY KEY(`uuid`), FOREIGN KEY(`episode_uuid`) REFERENCES `episode_chats`(`episode_uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -2186,12 +2199,25 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `episode_chat_messages_episode_uuid` ON `${TABLE_NAME}` (`episode_uuid`)"
           }
+        ],
+        "foreignKeys": [
+          {
+            "table": "episode_chats",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "episode_uuid"
+            ],
+            "referencedColumns": [
+              "episode_uuid"
+            ]
+          }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a0eab9656dad6cd2dd72e00c8f71337')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7dc03421e397a5c3017ad439bc9044fd')"
     ]
   }
 }

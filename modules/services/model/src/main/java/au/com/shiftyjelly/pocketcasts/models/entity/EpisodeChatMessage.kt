@@ -2,12 +2,21 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
 
 @Entity(
     tableName = "episode_chat_messages",
+    foreignKeys = [
+        ForeignKey(
+            entity = EpisodeChat::class,
+            parentColumns = ["episode_uuid"],
+            childColumns = ["episode_uuid"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
     indices = [
         Index(name = "episode_chat_messages_episode_uuid", value = ["episode_uuid"]),
     ],
