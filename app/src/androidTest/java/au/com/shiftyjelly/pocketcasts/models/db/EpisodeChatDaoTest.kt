@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,6 +43,7 @@ class EpisodeChatDaoTest {
 
     @Test
     fun testInsertAndGetChat() = runTest {
+        insertEpisode()
         val chat = EpisodeChat(
             episodeUuid = EPISODE_UUID,
             podcastUuid = PODCAST_UUID,
@@ -56,6 +58,7 @@ class EpisodeChatDaoTest {
 
     @Test
     fun testReplaceChat() = runTest {
+        insertEpisode()
         episodeChatDao.insertChat(EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = "old-podcast-uuid", createdAt = Date(100)))
         val replacement = EpisodeChat(
             episodeUuid = EPISODE_UUID,
@@ -70,6 +73,7 @@ class EpisodeChatDaoTest {
 
     @Test
     fun testInsertAndGetMessagesOrderedByCreatedAt() = runTest {
+        insertChat()
         val later = createMessage(uuid = "later-message-uuid", text = "Later", createdAt = Date(200))
         val earlier = createMessage(uuid = "earlier-message-uuid", text = "Earlier", createdAt = Date(100))
 
@@ -82,6 +86,7 @@ class EpisodeChatDaoTest {
 
     @Test
     fun testReplaceMessage() = runTest {
+        insertChat()
         episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", text = "Old text", createdAt = Date(100)))
         val replacement = createMessage(uuid = "message-uuid", text = "New text", createdAt = Date(200))
 
@@ -92,6 +97,8 @@ class EpisodeChatDaoTest {
 
     @Test
     fun testDeleteMessagesByEpisode() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
         val message = createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Message")
         val otherMessage = createMessage(uuid = "other-message-uuid", episodeUuid = "other-episode-uuid", text = "Other message")
         episodeChatDao.insertMessage(message)
@@ -101,6 +108,15 @@ class EpisodeChatDaoTest {
 
         assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages(EPISODE_UUID))
         assertEquals(listOf(otherMessage), episodeChatDao.getMessages("other-episode-uuid"))
+    }
+
+    private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {
+        insertEpisode(episodeUuid)
+        episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
+    }
+
+    private suspend fun insertEpisode(episodeUuid: String = EPISODE_UUID) {
+        testDb.episodeDao().insert(PodcastEpisode(uuid = episodeUuid, podcastUuid = PODCAST_UUID, publishedDate = Date()))
     }
 
     private fun createMessage(
