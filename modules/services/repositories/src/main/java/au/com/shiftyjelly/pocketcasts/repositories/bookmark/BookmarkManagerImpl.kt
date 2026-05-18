@@ -20,6 +20,7 @@ import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -240,6 +241,9 @@ class BookmarkManagerImpl @Inject constructor(
             ) ?: return
 
             val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
+            if (response.error != null) {
+                Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
+            }
             val title = response.title
             val summary = response.summary
             if (title != null && summary != null) {
@@ -253,6 +257,8 @@ class BookmarkManagerImpl @Inject constructor(
                     syncStatus = SyncStatus.NOT_SYNCED,
                 )
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
         }

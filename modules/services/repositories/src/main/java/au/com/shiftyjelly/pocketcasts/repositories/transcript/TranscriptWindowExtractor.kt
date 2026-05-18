@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
@@ -30,6 +31,8 @@ class TranscriptWindowExtractor @Inject constructor(
 
             val vttContent = body.use { it.string() }
             parseVttWindow(vttContent, timeSecs, windowSecs)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Failed to extract transcript window for episode $episodeUuid")
             null
@@ -39,6 +42,7 @@ class TranscriptWindowExtractor @Inject constructor(
     companion object {
         private val TIMESTAMP_REGEX =
             """(?:(\d{2}):)?(\d{2}):(\d{2})\.\d{3}\s*-->\s*(?:(\d{2}):)?(\d{2}):(\d{2})\.\d{3}""".toRegex()
+        private val HTML_TAG_REGEX = """<[^>]+>""".toRegex()
 
         internal fun parseVttWindow(content: String, timeSecs: Int, windowSecs: Int): String? {
             val windowStart = (timeSecs - windowSecs).coerceAtLeast(0)
@@ -63,7 +67,7 @@ class TranscriptWindowExtractor @Inject constructor(
                         i++
                         val cueLines = mutableListOf<String>()
                         while (i < lines.size && lines[i].isNotBlank()) {
-                            cueLines.add(lines[i].replace(Regex("<[^>]+>"), "").trim())
+                            cueLines.add(lines[i].replace(HTML_TAG_REGEX, "").trim())
                             i++
                         }
                         val text = cueLines.joinToString(" ").trim()
