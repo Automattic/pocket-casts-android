@@ -105,21 +105,25 @@
             "notNull": true
           },
           {
+            "fieldPath": "aiTitle",
             "columnName": "ai_title",
             "affinity": "TEXT",
             "notNull": false
           },
           {
+            "fieldPath": "aiSummary",
             "columnName": "ai_summary",
             "affinity": "TEXT",
             "notNull": false
           },
           {
+            "fieldPath": "aiTitleModified",
             "columnName": "ai_title_modified",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
+            "fieldPath": "aiSummaryModified",
             "columnName": "ai_summary_modified",
             "affinity": "INTEGER",
             "notNull": false
