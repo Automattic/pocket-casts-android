@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
@@ -175,13 +176,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun commitPlaylistChanges() {
-        viewModelScope.launch(NonCancellable) {
-            val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
-            for ((playlistUuid, isAdded) in playlistsChanges) {
-                if (isAdded) {
-                    playlistManager.addManualEpisodes(playlistUuid, uuids)
-                } else {
-                    playlistManager.deleteManualEpisodes(playlistUuid, uuids)
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
+                for ((playlistUuid, isAdded) in playlistsChanges) {
+                    if (isAdded) {
+                        playlistManager.addManualEpisodes(playlistUuid, uuids)
+                    } else {
+                        playlistManager.deleteManualEpisodes(playlistUuid, uuids)
+                    }
                 }
             }
         }
