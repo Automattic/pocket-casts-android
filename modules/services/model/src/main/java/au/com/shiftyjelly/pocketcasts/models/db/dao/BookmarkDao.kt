@@ -220,10 +220,10 @@ abstract class BookmarkDao {
     )
     abstract suspend fun updateAiData(
         bookmarkUuid: String,
-        aiTitle: String,
-        aiSummary: String,
-        aiTitleModified: Long,
-        aiSummaryModified: Long,
+        aiTitle: String?,
+        aiSummary: String?,
+        aiTitleModified: Long?,
+        aiSummaryModified: Long?,
         syncStatus: SyncStatus,
     )
 
