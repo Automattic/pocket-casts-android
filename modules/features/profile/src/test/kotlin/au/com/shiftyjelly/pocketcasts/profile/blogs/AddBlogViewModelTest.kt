@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.profile.blogs
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
@@ -15,13 +16,16 @@ import com.automattic.eventhorizon.BlogsFindFeedsTappedEvent
 import com.automattic.eventhorizon.BlogsRetryTappedEvent
 import com.automattic.eventhorizon.BlogsSubscribedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.pocketcasts.service.api.ApiPodcastResponse
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import java.io.IOException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -30,9 +34,11 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AddBlogViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
@@ -64,16 +70,16 @@ class AddBlogViewModelTest {
 
     @Test
     fun `onFindFeeds with blank url is ignored`() = runTest {
-        viewModel.onFindFeedsTapped("   ") { }
+        viewModel.onFindFeedsTapped("   ")
 
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
     }
 
     @Test
-    fun `onFindFeeds with single feed creates the feed and navigates to the podcast`() = runTest {
+    fun `onFindFeeds with single feed creates the feed and lands on Found state`() = runTest(coroutineRule.testDispatcher.scheduler) {
         val feed = webFeed("Example", "https://example.com/feed")
         val podcastUuid = "uuid-123"
-        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+        val podcastResponse = mock<ApiPodcastResponse> {
             on { uuid } doReturn podcastUuid
         }
         val response = mock<WebFeedCreateResponse> {
@@ -82,12 +88,14 @@ class AddBlogViewModelTest {
         }
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { listOf(feed) }
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(Podcast(uuid = podcastUuid))
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(0)
 
-        var navigatedUuid: String? = null
-        viewModel.onFindFeedsTapped("https://example.com") { navigatedUuid = it }
+        viewModel.onFindFeedsTapped("https://example.com")
+        advanceUntilIdle()
 
         verify(syncManager).createWebFeedPodcast(feed.href)
-        assertEquals(podcastUuid, navigatedUuid)
+        assertEquals(AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 0), viewModel.uiState.value)
         verify(eventHorizon).track(BlogsFindFeedsTappedEvent)
         verify(eventHorizon).track(BlogsFeedsFoundEvent(feedCount = 1))
         verify(eventHorizon).track(BlogsSubscribedEvent(uuid = podcastUuid))
@@ -105,7 +113,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeedsTapped("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com")
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.complete(feeds)
@@ -122,7 +130,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeedsTapped("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com")
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.complete(emptyList())
@@ -139,7 +147,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeedsTapped("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com")
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.completeExceptionally(IOException("offline"))
@@ -156,7 +164,7 @@ class AddBlogViewModelTest {
         viewModel.uiState.test {
             assertEquals(AddBlogViewModel.UiState.Start, awaitItem())
 
-            viewModel.onFindFeedsTapped("https://example.com") { }
+            viewModel.onFindFeedsTapped("https://example.com")
             assertEquals(AddBlogViewModel.UiState.Loading, awaitItem())
 
             gate.completeExceptionally(RuntimeException("boom"))
@@ -174,7 +182,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeedsTapped("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com")
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -193,7 +201,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeedsTapped("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com")
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -218,7 +226,7 @@ class AddBlogViewModelTest {
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
         viewModel.onUrlChange("https://example.com")
-        viewModel.onFindFeedsTapped("https://example.com") { }
+        viewModel.onFindFeedsTapped("https://example.com")
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
 
@@ -228,10 +236,10 @@ class AddBlogViewModelTest {
     }
 
     @Test
-    fun `createFeed with success transitions Loading to success and calls onNavigateToPodcast`() = runTest {
+    fun `createFeed with success subscribes and transitions to Found state`() = runTest(coroutineRule.testDispatcher.scheduler) {
         val feed = webFeed("Example", "https://example.com/feed")
         val podcastUuid = "uuid-123"
-        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+        val podcastResponse = mock<ApiPodcastResponse> {
             on { uuid } doReturn podcastUuid
         }
         val response = mock<WebFeedCreateResponse> {
@@ -239,14 +247,18 @@ class AddBlogViewModelTest {
             on { podcast } doReturn podcastResponse
         }
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(Podcast(uuid = podcastUuid))
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(0)
 
-        var navigatedUuid: String? = null
-        viewModel.createFeed(feed) { navigatedUuid = it }
+        viewModel.createFeed(feed)
+        advanceUntilIdle()
 
-        assertEquals(AddBlogViewModel.UiState.Loading, viewModel.uiState.value)
         verify(syncManager).createWebFeedPodcast(feed.href)
         verify(podcastManager).subscribeToPodcast(podcastUuid = eq(podcastUuid), sync = eq(true), shouldAutoDownload = eq(true))
-        assertEquals(podcastUuid, navigatedUuid)
+        assertEquals(
+            AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 0),
+            viewModel.uiState.value,
+        )
     }
 
     @Test
@@ -257,7 +269,7 @@ class AddBlogViewModelTest {
         }
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
 
-        viewModel.createFeed(feed) { }
+        viewModel.createFeed(feed)
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
         verify(eventHorizon).track(BlogsCreateFailedEvent)
@@ -268,17 +280,17 @@ class AddBlogViewModelTest {
         val feed = webFeed("Example", "https://example.com/feed")
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenThrow(RuntimeException("boom"))
 
-        viewModel.createFeed(feed) { }
+        viewModel.createFeed(feed)
 
         assertEquals(AddBlogViewModel.UiState.Error(AddBlogViewModel.ErrorReason.Generic), viewModel.uiState.value)
         verify(eventHorizon).track(BlogsCreateFailedEvent)
     }
 
     @Test
-    fun `onFeedSelected tracks feed-selected event then subscribes`() = runTest {
+    fun `onFeedSelected tracks feed-selected event then subscribes and lands on Found`() = runTest(coroutineRule.testDispatcher.scheduler) {
         val feed = webFeed("Example", "https://example.com/feed")
         val podcastUuid = "uuid-123"
-        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+        val podcastResponse = mock<ApiPodcastResponse> {
             on { uuid } doReturn podcastUuid
         }
         val response = mock<WebFeedCreateResponse> {
@@ -286,11 +298,16 @@ class AddBlogViewModelTest {
             on { podcast } doReturn podcastResponse
         }
         whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(Podcast(uuid = podcastUuid))
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(0)
 
-        var navigatedUuid: String? = null
-        viewModel.onFeedSelected(feed) { navigatedUuid = it }
+        viewModel.onFeedSelected(feed)
+        advanceUntilIdle()
 
-        assertEquals(podcastUuid, navigatedUuid)
+        assertEquals(
+            AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 0),
+            viewModel.uiState.value,
+        )
         verify(eventHorizon).track(BlogsFeedSelectedEvent)
         verify(eventHorizon).track(BlogsSubscribedEvent(uuid = podcastUuid))
     }
@@ -303,7 +320,7 @@ class AddBlogViewModelTest {
         )
         whenever(webFeedsService.getFeeds("https://example.com")).doSuspendableAnswer { feeds }
 
-        viewModel.onRetryTapped("https://example.com") { }
+        viewModel.onRetryTapped("https://example.com")
 
         assertEquals(AddBlogViewModel.UiState.Pick(feeds), viewModel.uiState.value)
         verify(eventHorizon).track(BlogsRetryTappedEvent)
@@ -311,18 +328,17 @@ class AddBlogViewModelTest {
     }
 
     @Test
-    fun `resetToStart cancels in-flight createFeed and skips navigation`() = runTest {
+    fun `resetToStart cancels in-flight createFeed and skips Found state`() = runTest {
         val feed = webFeed("Example", "https://example.com/feed")
         val gate = CompletableDeferred<WebFeedCreateResponse>()
         whenever(syncManager.createWebFeedPodcast(feed.href)).doSuspendableAnswer { gate.await() }
 
-        var navigatedUuid: String? = null
-        viewModel.createFeed(feed) { navigatedUuid = it }
+        viewModel.createFeed(feed)
         assertEquals(AddBlogViewModel.UiState.Loading, viewModel.uiState.value)
 
         viewModel.resetToStart()
 
-        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+        val podcastResponse = mock<ApiPodcastResponse> {
             on { uuid } doReturn "uuid-123"
         }
         gate.complete(
@@ -333,22 +349,20 @@ class AddBlogViewModelTest {
         )
 
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
-        assertNull(navigatedUuid)
     }
 
     @Test
-    fun `editUrl cancels in-flight createFeed and skips navigation`() = runTest {
+    fun `editUrl cancels in-flight createFeed and skips Found state`() = runTest {
         val feed = webFeed("Example", "https://example.com/feed")
         val gate = CompletableDeferred<WebFeedCreateResponse>()
         whenever(syncManager.createWebFeedPodcast(feed.href)).doSuspendableAnswer { gate.await() }
 
         viewModel.onUrlChange("https://example.com")
-        var navigatedUuid: String? = null
-        viewModel.createFeed(feed) { navigatedUuid = it }
+        viewModel.createFeed(feed)
 
         viewModel.editUrl()
 
-        val podcastResponse = mock<com.pocketcasts.service.api.ApiPodcastResponse> {
+        val podcastResponse = mock<ApiPodcastResponse> {
             on { uuid } doReturn "uuid-123"
         }
         gate.complete(
@@ -360,7 +374,80 @@ class AddBlogViewModelTest {
 
         assertEquals(AddBlogViewModel.UiState.Start, viewModel.uiState.value)
         assertEquals("https://example.com", viewModel.url.value)
-        assertNull(navigatedUuid)
+    }
+
+    @Test
+    fun `createFeed includes episode count when subscribed podcast has episodes`() = runTest(coroutineRule.testDispatcher.scheduler) {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        val podcast = Podcast(uuid = podcastUuid)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(3)
+
+        viewModel.createFeed(feed)
+        advanceUntilIdle()
+
+        assertEquals(
+            AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 3),
+            viewModel.uiState.value,
+        )
+    }
+
+    @Test
+    fun `createFeed has zero episode count when subscribed podcast has no episodes`() = runTest(coroutineRule.testDispatcher.scheduler) {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        val podcast = Podcast(uuid = podcastUuid)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(0)
+
+        viewModel.createFeed(feed)
+        runCurrent()
+
+        assertEquals(
+            AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 0),
+            viewModel.uiState.value,
+        )
+        viewModel.resetToStart()
+    }
+
+    @Test
+    fun `createFeed polls for podcast up to ten times before emitting navigation event`() = runTest(coroutineRule.testDispatcher.scheduler) {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(null)
+
+        viewModel.podcastNavigationEvents.test {
+            viewModel.createFeed(feed)
+            advanceUntilIdle()
+
+            assertEquals(podcastUuid, awaitItem())
+        }
+        verify(podcastManager, times(10)).findPodcastByUuid(podcastUuid)
     }
 
     private fun webFeed(title: String, href: String) = WebFeed(title = title, href = href, type = "rss")

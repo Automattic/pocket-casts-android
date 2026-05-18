@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile.blogs
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
@@ -99,6 +100,9 @@ class BlogsFragment : BaseFragment() {
                         navController.popBackStack(BlogsRoutes.PODCASTS, inclusive = false)
                         navigateToPodcast(uuid)
                     }
+                    LaunchedEffect(viewModel) {
+                        viewModel.podcastNavigationEvents.collect(onBlogAdded)
+                    }
                     AddBlogPage(
                         state = uiState,
                         url = url,
@@ -108,15 +112,10 @@ class BlogsFragment : BaseFragment() {
                                 navController.popBackStack()
                             }
                         },
-                        onFindFeeds = {
-                            viewModel.onFindFeedsTapped(url = it, onNavigateToPodcast = onBlogAdded)
-                        },
-                        onRetry = {
-                            viewModel.onRetryTapped(url = it, onNavigateToPodcast = onBlogAdded)
-                        },
-                        onFeedClick = { webFeed ->
-                            viewModel.onFeedSelected(webFeed = webFeed, onNavigateToPodcast = onBlogAdded)
-                        },
+                        onFindFeeds = { viewModel.onFindFeedsTapped(url = it) },
+                        onRetry = { viewModel.onRetryTapped(url = it) },
+                        onFeedClick = { webFeed -> viewModel.onFeedSelected(webFeed = webFeed) },
+                        onGoToPodcast = onBlogAdded,
                         onEditUrl = { viewModel.editUrl() },
                     )
                 }
