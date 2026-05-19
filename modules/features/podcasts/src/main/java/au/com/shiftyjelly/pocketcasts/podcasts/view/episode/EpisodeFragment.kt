@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -195,7 +195,7 @@ class EpisodeFragment : BaseFragment() {
     private val forceDarkTheme: Boolean
         get() = args.forceDark
 
-    private var episodeBannerIconColor by mutableStateOf(0xFF000000.toInt())
+    private var episodeBannerIconColor by mutableIntStateOf(Color.BLACK)
 
     var listener: FragmentHostListener? = null
     private var episodeLoadedListener: EpisodeLoadedListener? = null
@@ -268,7 +268,7 @@ class EpisodeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.loadingGroup?.isInvisible = true
-        episodeBannerIconColor = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
+        episodeBannerIconColor = ThemeColor.podcastIcon02(activeTheme, Color.BLACK)
 
         viewModel.setup(
             episodeUuid = episodeUUID,
@@ -487,11 +487,11 @@ class EpisodeFragment : BaseFragment() {
         }
 
         // Up Next
-        var podcastTint = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
+        var podcastTint = ThemeColor.podcastIcon02(activeTheme, Color.BLACK)
         var loadedPodcastUuid: String? = null
         viewModel.state.observe(viewLifecycleOwner) { state ->
             val loadedState = state as? EpisodeFragmentState.Loaded
-            val stateTint = loadedState?.tintColor ?: 0xFF000000.toInt()
+            val stateTint = loadedState?.tintColor ?: Color.BLACK
             podcastTint = ThemeColor.podcastIcon02(activeTheme, stateTint)
             loadedPodcastUuid = loadedState?.podcast?.uuid
         }
