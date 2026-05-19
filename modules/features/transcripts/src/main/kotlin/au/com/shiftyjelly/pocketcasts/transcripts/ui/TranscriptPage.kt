@@ -12,12 +12,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import kotlinx.coroutines.flow.map
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -280,7 +282,9 @@ private fun HighlightEffect(
 
     val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
     val isSyncedActive = uiState.isSyncedActive
-    val isPlaying = playbackManager.isPlaying()
+    val isPlaying by remember {
+        playbackManager.playbackStateFlow.map { it.isPlaying }
+    }.collectAsState(initial = playbackManager.isPlaying())
 
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {

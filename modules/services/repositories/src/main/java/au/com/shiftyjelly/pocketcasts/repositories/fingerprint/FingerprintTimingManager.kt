@@ -21,8 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -433,14 +433,10 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         val codec = MediaCodec.createDecoderByType(mime)
-        val outputFormat = MediaFormat.createAudioFormat(
-            MediaFormat.MIMETYPE_AUDIO_RAW,
-            sampleRate,
-            channelCount,
-        ).apply {
-            setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
-        }
 
+        // Request float PCM output. If the codec doesn't support it,
+        // it falls back to 16-bit; we detect the actual format below.
+        format.setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
         codec.configure(format, null, null, 0)
         codec.start()
 
@@ -482,6 +478,9 @@ class FingerprintTimingManager @Inject constructor(
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
         val timeoutUs = 10_000L
+        // Assume float output (what we requested). Updated if the codec
+        // reports a different format via INFO_OUTPUT_FORMAT_CHANGED.
+        var isOutputFloat = true
 
         while (true) {
             currentCoroutineContext().ensureActive()
@@ -504,32 +503,45 @@ class FingerprintTimingManager @Inject constructor(
 
             // Read decoded output
             val outputIndex = codec.dequeueOutputBuffer(bufferInfo, timeoutUs)
-            if (outputIndex >= 0) {
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                    codec.releaseOutputBuffer(outputIndex, false)
-                    break
+            when {
+                outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                    val actualFormat = codec.outputFormat
+                    val encoding = if (actualFormat.containsKey(MediaFormat.KEY_PCM_ENCODING)) {
+                        actualFormat.getInteger(MediaFormat.KEY_PCM_ENCODING)
+                    } else {
+                        android.media.AudioFormat.ENCODING_PCM_16BIT
+                    }
+                    isOutputFloat = encoding == android.media.AudioFormat.ENCODING_PCM_FLOAT
+                    Timber.d("FingerprintTimingManager: codec output encoding=${if (isOutputFloat) "float" else "int16"}")
                 }
 
-                val outputBuffer = codec.getOutputBuffer(outputIndex)
-                if (outputBuffer != null && bufferInfo.size > 0) {
-                    val samples = extractFloatSamples(outputBuffer, bufferInfo, channelCount)
-                    if (samples.isNotEmpty()) {
-                        val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
-                        if (windows.isNotEmpty()) {
-                            mutex.withLock {
-                                processMatches(windows, matcher, startOffset)
+                outputIndex >= 0 -> {
+                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                        codec.releaseOutputBuffer(outputIndex, false)
+                        break
+                    }
+
+                    val outputBuffer = codec.getOutputBuffer(outputIndex)
+                    if (outputBuffer != null && bufferInfo.size > 0) {
+                        val samples = extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
+                        if (samples.isNotEmpty()) {
+                            val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
+                            if (windows.isNotEmpty()) {
+                                mutex.withLock {
+                                    processMatches(windows, matcher, startOffset)
+                                }
                             }
                         }
-                    }
 
-                    // Throttle if we're far ahead of playback
-                    val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
-                    val currentPlayback = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
-                    if (decodedSeconds - currentPlayback > FingerprintConstants.LOOKAHEAD_SECONDS) {
-                        delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                        // Throttle if we're far ahead of playback
+                        val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
+                        val currentPlayback = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
+                        if (decodedSeconds - currentPlayback > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                            delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                        }
                     }
+                    codec.releaseOutputBuffer(outputIndex, false)
                 }
-                codec.releaseOutputBuffer(outputIndex, false)
             }
         }
     }
@@ -537,32 +549,33 @@ class FingerprintTimingManager @Inject constructor(
     private fun extractFloatSamples(
         buffer: ByteBuffer,
         info: MediaCodec.BufferInfo,
-        channelCount: Int,
+        isFloatPcm: Boolean,
     ): List<Float> {
         buffer.position(info.offset)
         buffer.limit(info.offset + info.size)
 
-        // Try reading as float PCM first (if decoder outputs float)
         val byteOrder = buffer.order()
         buffer.order(ByteOrder.nativeOrder())
 
         return try {
-            val floatBuffer = buffer.asFloatBuffer()
-            val floatCount = floatBuffer.remaining()
-            if (floatCount == 0) return emptyList()
-            val result = FloatArray(floatCount)
-            floatBuffer.get(result)
-            result.toList()
-        } catch (_: Exception) {
-            // Fallback: read as 16-bit PCM and convert to float
-            val shortBuffer = buffer.asShortBuffer()
-            val shortCount = shortBuffer.remaining()
-            if (shortCount == 0) return emptyList()
-            val result = mutableListOf<Float>()
-            for (i in 0 until shortCount) {
-                result.add(shortBuffer.get() / 32768f)
+            if (isFloatPcm) {
+                val floatBuffer = buffer.asFloatBuffer()
+                val floatCount = floatBuffer.remaining()
+                if (floatCount == 0) return emptyList()
+                val result = FloatArray(floatCount)
+                floatBuffer.get(result)
+                result.toList()
+            } else {
+                // 16-bit PCM: convert to normalized float [-1.0, 1.0]
+                val shortBuffer = buffer.asShortBuffer()
+                val shortCount = shortBuffer.remaining()
+                if (shortCount == 0) return emptyList()
+                val result = FloatArray(shortCount)
+                for (i in 0 until shortCount) {
+                    result[i] = shortBuffer.get() / 32768f
+                }
+                result.toList()
             }
-            result
         } finally {
             buffer.order(byteOrder)
         }
