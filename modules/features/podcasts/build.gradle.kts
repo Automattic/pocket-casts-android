@@ -72,6 +72,7 @@ dependencies {
 
     implementation(projects.modules.features.ads)
     implementation(projects.modules.features.account)
+    implementation(projects.modules.features.chat)
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.features.search)
     implementation(projects.modules.features.settings)

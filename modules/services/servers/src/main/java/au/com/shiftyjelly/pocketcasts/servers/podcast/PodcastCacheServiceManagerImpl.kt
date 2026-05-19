@@ -88,6 +88,10 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         return service.suggestedFolders(request).toSuggestedFolders()
     }
 
+    override suspend fun episodeChat(request: EpisodeChatRequest): EpisodeChatResponse {
+        return service.episodeChat(request)
+    }
+
     private fun Map<String, List<String>>.toSuggestedFolders(): List<SuggestedFolder> {
         return this.flatMap { (folderName, podcastList) ->
             podcastList.map { podcastUuid ->

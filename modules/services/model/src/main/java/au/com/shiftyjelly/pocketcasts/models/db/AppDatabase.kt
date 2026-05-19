@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
@@ -61,6 +62,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent
@@ -109,13 +112,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         ManualPlaylistEpisode::class,
         BlazeAd::class,
         PlaybackStatsEvent::class,
+        EpisodeChat::class,
+        EpisodeChatMessage::class,
     ],
-    version = 128,
+    version = 129,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
         AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
+        AutoMigration(from = 128, to = 129),
     ],
 )
 @TypeConverters(
@@ -163,6 +169,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
     abstract fun blazeAdDao(): BlazeAdDao
     abstract fun playbackStatsDao(): PlaybackStatsDao
+    abstract fun episodeChatDao(): EpisodeChatDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
         listOf(

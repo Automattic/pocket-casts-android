@@ -1,14 +1,14 @@
-package au.com.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,16 +28,16 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.icons.IconChat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun TranscriptExcerptBanner(
-    isGenerated: Boolean,
+fun ChatBanner(
     modifier: Modifier = Modifier,
-    colors: TranscriptExcerptBannerColors = TranscriptExcerptBannerColors.default(),
-    dimensions: TranscriptExcerptBannerDimensions = TranscriptExcerptBannerDimensions.default(),
+    colors: ChatBannerColors = ChatBannerColors.default(),
+    dimensions: ChatBannerDimensions = ChatBannerDimensions.default(),
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -48,16 +48,14 @@ fun TranscriptExcerptBanner(
             .then(modifier)
             .padding(vertical = dimensions.verticalPadding, horizontal = dimensions.horizontalPadding),
     ) {
-        if (isGenerated) {
-            Image(
-                painter = painterResource(IR.drawable.ic_ai),
-                colorFilter = ColorFilter.tint(colors.leadingIcon),
-                contentDescription = null,
-                modifier = Modifier.size(dimensions.iconSize),
-            )
-        }
+        Icon(
+            imageVector = IconChat,
+            contentDescription = null,
+            tint = colors.leadingIcon,
+            modifier = Modifier.size(dimensions.iconSize),
+        )
         Text(
-            text = stringResource(LR.string.view_transcript),
+            text = stringResource(LR.string.episode_chat),
             color = MaterialTheme.theme.colors.primaryText01,
             fontSize = dimensions.textSize,
             lineHeight = dimensions.textLineHeight,
@@ -74,14 +72,14 @@ fun TranscriptExcerptBanner(
     }
 }
 
-data class TranscriptExcerptBannerColors(
+data class ChatBannerColors(
     val background: Color,
     val leadingIcon: Color,
     val trailingIcon: Color,
 ) {
     companion object {
         @Composable
-        fun default() = TranscriptExcerptBannerColors(
+        fun default() = ChatBannerColors(
             background = MaterialTheme.theme.colors.primaryUi04,
             leadingIcon = MaterialTheme.theme.colors.primaryIcon02,
             trailingIcon = MaterialTheme.theme.colors.primaryIcon02,
@@ -89,7 +87,7 @@ data class TranscriptExcerptBannerColors(
     }
 }
 
-data class TranscriptExcerptBannerDimensions(
+data class ChatBannerDimensions(
     val horizontalPadding: Dp,
     val verticalPadding: Dp,
     val elevation: Dp,
@@ -99,7 +97,7 @@ data class TranscriptExcerptBannerDimensions(
     val itemSpacing: Dp,
 ) {
     companion object {
-        fun default() = TranscriptExcerptBannerDimensions(
+        fun default() = ChatBannerDimensions(
             horizontalPadding = 12.dp,
             verticalPadding = 12.dp,
             elevation = 2.dp,
@@ -109,7 +107,7 @@ data class TranscriptExcerptBannerDimensions(
             itemSpacing = 12.dp,
         )
 
-        fun compact() = TranscriptExcerptBannerDimensions(
+        fun compact() = ChatBannerDimensions(
             horizontalPadding = 16.dp,
             verticalPadding = 10.dp,
             elevation = 0.dp,
@@ -125,20 +123,12 @@ private val BackgroundShape = RoundedCornerShape(8.dp)
 
 @Preview
 @Composable
-private fun TranscriptExcerptBannerPreview(
+private fun ChatBannerPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
 ) {
     AppThemeWithBackground(theme) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ChatBanner(
             modifier = Modifier.padding(16.dp),
-        ) {
-            TranscriptExcerptBanner(
-                isGenerated = false,
-            )
-            TranscriptExcerptBanner(
-                isGenerated = true,
-            )
-        }
+        )
     }
 }
