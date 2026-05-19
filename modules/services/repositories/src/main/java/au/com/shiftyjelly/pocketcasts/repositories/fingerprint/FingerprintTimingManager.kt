@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -232,7 +233,7 @@ class FingerprintTimingManager @Inject constructor(
         _stateFlow.value = State.Preparing
         Timber.d("FingerprintTimingManager: fetching reference from server for $episodeUuid")
 
-        val baseUrl = "https://shownotes.pocketcasts.com/generated_transcripts/"
+        val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
         val referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
 
         if (referenceData == null) {
