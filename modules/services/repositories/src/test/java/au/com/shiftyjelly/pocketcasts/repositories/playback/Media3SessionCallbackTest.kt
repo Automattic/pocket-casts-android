@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.media3.common.HeartRating
@@ -106,8 +109,10 @@ class Media3SessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_BACK))
-        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        // SEEK_TO_NEXT / SEEK_TO_PREVIOUS are advertised so AAOS steering-wheel skip
+        // buttons route through seekToNext()/seekToPrevious(). See PCDROID-560.
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_METADATA))
@@ -436,6 +441,72 @@ class Media3SessionCallbackTest {
         )
     }
 
+    // --- FAST_FORWARD / REWIND keycode tests (PCDROID-560) ---
+
+    @Test
+    fun `KEYCODE_MEDIA_FAST_FORWARD calls skipForwardSuspend directly`() = runTest {
+        mockSkipSettings()
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_REWIND calls skipBackwardSuspend directly`() = runTest {
+        mockSkipSettings()
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_REWIND)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipBackwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(10),
+        )
+    }
+
+    // --- Automotive bypass tests (PCDROID-560) ---
+
+    @Test
+    fun `on automotive, KEYCODE_MEDIA_NEXT skips forward immediately`() = runTest {
+        mockSkipSettings()
+        val automotiveCallback = createCallbackWithAutomotiveContext()
+
+        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT)
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+            putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
+        }
+        automotiveCallback.onMediaButtonEvent(mockSession, mockController, intent)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `on automotive, KEYCODE_MEDIA_PREVIOUS skips backward immediately`() = runTest {
+        mockSkipSettings()
+        val automotiveCallback = createCallbackWithAutomotiveContext()
+
+        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+            putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
+        }
+        automotiveCallback.onMediaButtonEvent(mockSession, mockController, intent)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipBackwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(10),
+        )
+    }
+
     // --- onAddMediaItems resolved item tests ---
 
     @Test
@@ -545,6 +616,27 @@ class Media3SessionCallbackTest {
         val setting = mock<au.com.shiftyjelly.pocketcasts.preferences.UserSetting<HeadphoneAction>>()
         whenever(setting.value).thenReturn(action)
         whenever(settings.headphoneControlsPreviousAction).thenReturn(setting)
+    }
+
+    private fun createCallbackWithAutomotiveContext(): Media3SessionCallback {
+        val automotiveContext: Context = mock()
+        val automotivePackageManager: PackageManager = mock()
+        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
+        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
+        whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
+        whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
+        whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+
+        return Media3SessionCallback(
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
+            settings = settings,
+            actions = actions,
+            bookmarkHelper = bookmarkHelper,
+            scopeProvider = { testScope },
+            contextProvider = { automotiveContext },
+        )
     }
 
     private fun mockSkipSettings() {

@@ -163,7 +163,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `available commands expose only core controls`() {
+    fun `available commands expose core controls and skip-to-next-previous`() {
         val commands = forwardingPlayer.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
@@ -174,8 +174,11 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
         assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        // SEEK_TO_NEXT / SEEK_TO_PREVIOUS are advertised so AAOS steering-wheel skip
+        // buttons (and other Media3 controllers) route through seekToNext()/
+        // seekToPrevious() instead of falling back to STOP. See PCDROID-560.
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     @Test
@@ -595,7 +598,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `swapPlayer excludes seek to next and previous`() {
+    fun `swapPlayer preserves seek to next and previous`() {
         val player = PocketCastsForwardingPlayer(mockPlayer)
 
         val newWrappedPlayer = mock<Player> {
@@ -603,8 +606,11 @@ class PocketCastsForwardingPlayerTest {
         }
         val swapped = player.swapPlayer(newWrappedPlayer)
 
-        assertFalse(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertFalse(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        // SEEK_TO_NEXT / SEEK_TO_PREVIOUS are always advertised (PCDROID-560) so AAOS
+        // continues to route steering-wheel skip buttons after a player swap (e.g.
+        // local ↔ cast).
+        assertTrue(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(swapped.availableCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     // --- setMediaItems / addMediaItems / prepare interception tests ---

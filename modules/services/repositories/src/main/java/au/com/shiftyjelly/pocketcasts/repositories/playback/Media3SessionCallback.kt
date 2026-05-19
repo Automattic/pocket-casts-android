@@ -69,6 +69,8 @@ internal class Media3SessionCallback(
 
     private val mediaEventQueue = MediaEventQueue(scopeProvider = scopeProvider)
 
+    private val isAutomotive: Boolean by lazy { Util.isAutomotive(contextProvider()) }
+
     override fun onConnect(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
@@ -209,9 +211,12 @@ internal class Media3SessionCallback(
                 return true
             }
 
-            // PiP skip buttons use dedicated key codes that always skip forward/back,
-            // bypassing headphone control settings.
-            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> {
+            // PiP skip buttons and the FAST_FORWARD/REWIND media keys (used by some
+            // AAOS steering-wheel implementations) always skip forward/back, bypassing
+            // headphone control settings. See PCDROID-560.
+            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipForwardSuspend(
@@ -219,13 +224,15 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipForwardInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip forward failed")
+                        Timber.e(e, "Skip forward failed")
                     }
                 }
                 return true
             }
 
-            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> {
+            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
+            KeyEvent.KEYCODE_MEDIA_REWIND,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipBackwardSuspend(
@@ -233,10 +240,46 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipBackInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip backward failed")
+                        Timber.e(e, "Skip backward failed")
                     }
                 }
                 return true
+            }
+        }
+
+        // On Android Automotive OS the user controls are hardware buttons (e.g. the
+        // steering wheel) that send a single key event per press. Multi-tap detection
+        // adds a 250 ms response delay and never resolves to a higher tap count, so
+        // route NEXT/PREVIOUS straight to skip forward/back. See PCDROID-560.
+        if (isAutomotive) {
+            when (keyEvent.keyCode) {
+                KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    scope.launch {
+                        try {
+                            playbackManager.skipForwardSuspend(
+                                sourceView = source,
+                                jumpAmountSeconds = settings.skipForwardInSecs.value,
+                            )
+                        } catch (e: Exception) {
+                            Timber.e(e, "Skip forward failed")
+                        }
+                    }
+                    return true
+                }
+
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    scope.launch {
+                        try {
+                            playbackManager.skipBackwardSuspend(
+                                sourceView = source,
+                                jumpAmountSeconds = settings.skipBackInSecs.value,
+                            )
+                        } catch (e: Exception) {
+                            Timber.e(e, "Skip backward failed")
+                        }
+                    }
+                    return true
+                }
             }
         }
 
@@ -378,6 +421,11 @@ internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builde
         Player.COMMAND_PLAY_PAUSE,
         Player.COMMAND_SET_MEDIA_ITEM,
         Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+        // Advertise skip-to-next/previous so AAOS steering-wheel skip buttons (and
+        // other Media3 controllers) route through seekToNext()/seekToPrevious().
+        // See PCDROID-560.
+        Player.COMMAND_SEEK_TO_NEXT,
+        Player.COMMAND_SEEK_TO_PREVIOUS,
         Player.COMMAND_STOP,
         Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
         Player.COMMAND_GET_METADATA,
