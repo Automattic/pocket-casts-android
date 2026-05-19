@@ -479,9 +479,9 @@ class FingerprintTimingManager @Inject constructor(
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
         val timeoutUs = 10_000L
-        // Assume float output (what we requested). Updated if the codec
-        // reports a different format via INFO_OUTPUT_FORMAT_CHANGED.
-        var isOutputFloat = true
+        // Default to 16-bit (safest assumption). Updated when the codec
+        // reports its actual format via INFO_OUTPUT_FORMAT_CHANGED.
+        var isOutputFloat = false
 
         while (true) {
             currentCoroutineContext().ensureActive()
