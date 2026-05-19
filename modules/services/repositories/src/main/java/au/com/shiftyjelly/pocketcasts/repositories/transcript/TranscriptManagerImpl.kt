@@ -168,20 +168,21 @@ class TranscriptManagerImpl @Inject constructor(
     private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
         if (chapters.isNullOrEmpty()) return
 
-        val existingChapters = chapterManager.observerChaptersForEpisode(episodeUuid).firstOrNull()
-        if (!existingChapters.isNullOrEmpty()) return
+        if (chapterManager.hasChapters(episodeUuid)) return
 
         val dbChapters = chapters
-            .filter { !it.title.isNullOrBlank() && it.startTime != null && it.startTime >= 0 }
-            .mapIndexed { index, chapter ->
+            .mapNotNull { chapter ->
+                val title = chapter.title?.trim()?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                val startTime = chapter.startTime?.takeIf { it >= 0 } ?: return@mapNotNull null
                 DbChapter(
-                    index = index,
+                    index = 0,
                     episodeUuid = episodeUuid,
-                    startTimeMs = chapter.startTime!! * 1000,
-                    title = chapter.title!!.trim(),
+                    startTimeMs = startTime * 1000,
+                    title = title,
                     isGenerated = true,
                 )
             }
+            .mapIndexed { index, chapter -> chapter.copy(index = index) }
         if (dbChapters.isNotEmpty()) {
             chapterManager.updateChapters(episodeUuid, dbChapters)
             Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")

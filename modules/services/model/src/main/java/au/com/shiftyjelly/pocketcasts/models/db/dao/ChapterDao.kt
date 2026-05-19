@@ -49,6 +49,9 @@ abstract class ChapterDao {
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract suspend fun findEpisodeChapters(episodeUuid: String): List<Chapter>
 
+    @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid")
+    abstract suspend fun countForEpisode(episodeUuid: String): Int
+
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract fun observeRawChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
 

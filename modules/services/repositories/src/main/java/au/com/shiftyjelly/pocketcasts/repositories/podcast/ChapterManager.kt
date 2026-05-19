@@ -16,5 +16,7 @@ interface ChapterManager {
         select: Boolean,
     )
 
+    suspend fun hasChapters(episodeUuid: String): Boolean
+
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
 }

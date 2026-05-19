@@ -20,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
@@ -37,6 +38,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,9 +49,9 @@ class TranscriptManagerTest {
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
-    private val chapterManager: ChapterManager = mock {
+    private val chapterManager: ChapterManager = mock<ChapterManager> {
         on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
-    }
+    }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(false) } }
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
@@ -452,9 +454,9 @@ class TranscriptManagerTest {
             index = 0,
             uiIndex = 1,
         )
-        val chapterManagerWithExisting: ChapterManager = mock {
+        val chapterManagerWithExisting: ChapterManager = mock<ChapterManager> {
             on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(listOf(existingChapter)))
-        }
+        }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(true) } }
         val managerWithChapters = TranscriptManagerImpl(
             transcriptDao = mock { on { observeTranscripts(any()) } doReturn localTranscriptsFlow },
             transcriptService = service,

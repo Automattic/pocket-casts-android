@@ -27,6 +27,8 @@ class ChapterManagerImpl @Inject constructor(
         chapterDao.selectChapter(episodeUuid, chapterIndex, select)
     }
 
+    override suspend fun hasChapters(episodeUuid: String) = chapterDao.countForEpisode(episodeUuid) > 0
+
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
         episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
         chapterDao.observeChaptersForEpisode(episodeUuid),
