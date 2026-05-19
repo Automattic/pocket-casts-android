@@ -104,8 +104,11 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         val episodeUuid = episode.uuid
-        val podcastUuid = episode.podcastOrSubstituteUuid
 
+        // Already prepared for this episode — reuse existing state.
+        if (currentEpisodeUuid == episodeUuid && state !is State.Idle) return
+
+        val podcastUuid = episode.podcastOrSubstituteUuid
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
 
         scope.launch {

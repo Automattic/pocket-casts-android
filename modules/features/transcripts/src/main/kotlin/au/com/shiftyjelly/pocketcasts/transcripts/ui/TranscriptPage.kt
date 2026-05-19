@@ -61,6 +61,7 @@ fun TranscriptPage(
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
     var highlightIndex by remember { mutableStateOf<Int?>(null) }
+    var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
     val isSearching = uiState.searchState.isSearchOpen
 
@@ -152,6 +153,8 @@ fun TranscriptPage(
         listState = listState,
         isSearching = isSearching,
         isAutoScrollSuppressed = isAutoScrollSuppressed,
+        animate = hasInitiallyScrolled,
+        onScrolled = { hasInitiallyScrolled = true },
     )
 
     // Detect user scrolling and suppress auto-scroll for 5s
@@ -311,12 +314,19 @@ private fun AutoScrollEffect(
     listState: LazyListState,
     isSearching: Boolean,
     isAutoScrollSuppressed: Boolean,
+    animate: Boolean,
+    onScrolled: () -> Unit,
 ) {
     if (highlightIndex != null && !isSearching && !isAutoScrollSuppressed) {
         LaunchedEffect(highlightIndex) {
             val viewportHeight = listState.layoutInfo.viewportSize.height
             val scrollOffset = (viewportHeight * 0.3f).roundToInt()
-            listState.animateScrollToItem(highlightIndex, -scrollOffset)
+            if (animate) {
+                listState.animateScrollToItem(highlightIndex, -scrollOffset)
+            } else {
+                listState.scrollToItem(highlightIndex, -scrollOffset)
+            }
+            onScrolled()
         }
     }
 }
