@@ -29,7 +29,7 @@ internal data class TranscriptTheme(
         fun default(colors: ThemeColors) = TranscriptTheme(
             background = colors.primaryUi01,
             primaryText = colors.primaryText01,
-            highlightText = colors.primaryText01,
+            highlightText = colors.primaryInteractive01,
             secondaryText = colors.primaryText02,
             secondaryElement = colors.primaryUi05,
             searchDefaultSpanStyle = SpanStyle(
