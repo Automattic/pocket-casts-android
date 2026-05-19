@@ -19,6 +19,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * State holder for the media progress indicator that supports both ongoing predictive progress and
@@ -38,9 +39,11 @@ class ProgressStateHolderStyled(
         if (!canAnimate || animatable.isRunning || abs(offset) < ANIMATION_THRESHOLD) {
             return@coroutineScope
         }
-        launch(NonCancellable) {
-            animatable.animateTo(offset, PLAYBACK_PROGRESS_ANIMATION_SPEC)
-            animatable.snapTo(0f)
+        launch {
+            withContext(NonCancellable) {
+                animatable.animateTo(offset, PLAYBACK_PROGRESS_ANIMATION_SPEC)
+                animatable.snapTo(0f)
+            }
         }
     }
 
