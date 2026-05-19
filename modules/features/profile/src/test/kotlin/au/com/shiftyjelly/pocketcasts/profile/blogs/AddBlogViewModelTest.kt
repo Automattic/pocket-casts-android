@@ -450,5 +450,62 @@ class AddBlogViewModelTest {
         verify(podcastManager, times(10)).findPodcastByUuid(podcastUuid)
     }
 
+    @Test
+    fun `pollForFirstEpisode emits navigation event and updates Found state when an episode is found`() = runTest(coroutineRule.testDispatcher.scheduler) {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        val podcast = Podcast(uuid = podcastUuid)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid))
+            .thenReturn(0)
+            .thenReturn(0)
+            .thenReturn(3)
+
+        viewModel.podcastNavigationEvents.test {
+            viewModel.createFeed(feed)
+            advanceUntilIdle()
+
+            assertEquals(podcastUuid, awaitItem())
+        }
+        assertEquals(
+            AddBlogViewModel.UiState.Found(webFeed = feed, podcastUuid = podcastUuid, episodeCount = 3),
+            viewModel.uiState.value,
+        )
+        verify(podcastManager, times(2)).refreshPodcastFeed(podcast)
+    }
+
+    @Test
+    fun `pollForFirstEpisode emits navigation event after exhausting all attempts when no episodes are found`() = runTest(coroutineRule.testDispatcher.scheduler) {
+        val feed = webFeed("Example", "https://example.com/feed")
+        val podcastUuid = "uuid-123"
+        val podcastResponse = mock<ApiPodcastResponse> {
+            on { uuid } doReturn podcastUuid
+        }
+        val response = mock<WebFeedCreateResponse> {
+            on { hasPodcast() } doReturn true
+            on { podcast } doReturn podcastResponse
+        }
+        val podcast = Podcast(uuid = podcastUuid)
+        whenever(syncManager.createWebFeedPodcast(feed.href)).thenReturn(response)
+        whenever(podcastManager.findPodcastByUuid(podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.countEpisodesByPodcast(podcastUuid)).thenReturn(0)
+
+        viewModel.podcastNavigationEvents.test {
+            viewModel.createFeed(feed)
+            advanceUntilIdle()
+
+            assertEquals(podcastUuid, awaitItem())
+        }
+        verify(podcastManager, times(15)).refreshPodcastFeed(podcast)
+    }
+
     private fun webFeed(title: String, href: String) = WebFeed(title = title, href = href, type = "rss")
 }
