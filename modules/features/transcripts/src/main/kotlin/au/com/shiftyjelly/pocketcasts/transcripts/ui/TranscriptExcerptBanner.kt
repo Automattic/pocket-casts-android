@@ -59,7 +59,7 @@ fun TranscriptExcerptBanner(
         Text(
             text = stringResource(LR.string.view_transcript),
             color = MaterialTheme.theme.colors.primaryText01,
-            fontSize = 16.sp,
+            fontSize = dimensions.textSize,
             lineHeight = dimensions.textLineHeight,
         )
         Spacer(
@@ -93,6 +93,7 @@ data class TranscriptExcerptBannerDimensions(
     val horizontalPadding: Dp,
     val verticalPadding: Dp,
     val elevation: Dp,
+    val textSize: TextUnit,
     val textLineHeight: TextUnit,
     val iconSize: Dp,
     val itemSpacing: Dp,
@@ -102,6 +103,7 @@ data class TranscriptExcerptBannerDimensions(
             horizontalPadding = 12.dp,
             verticalPadding = 12.dp,
             elevation = 2.dp,
+            textSize = 16.sp,
             textLineHeight = 24.sp,
             iconSize = 20.dp,
             itemSpacing = 12.dp,
@@ -111,6 +113,7 @@ data class TranscriptExcerptBannerDimensions(
             horizontalPadding = 16.dp,
             verticalPadding = 10.dp,
             elevation = 0.dp,
+            textSize = 14.sp,
             textLineHeight = 20.sp,
             iconSize = 18.dp,
             itemSpacing = 14.dp,
