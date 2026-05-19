@@ -291,13 +291,23 @@ private fun HighlightEffect(
 
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
+            // Compute initial highlight immediately without waiting for a frame.
             var cachedIndex = 0
+            val posMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
+            val refTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs)
+            if (refTime != null) {
+                val refTimeMs = (refTime * 1000).toLong()
+                val idx = findCueIndex(transcript.entries, refTimeMs, 0)
+                if (idx != null) cachedIndex = idx
+                onHighlightChanged(idx)
+            }
+
             while (true) {
                 withFrameNanos { _ ->
-                    val posMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
-                    val refTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
-                    val refTimeMs = (refTime * 1000).toLong()
-                    val idx = findCueIndex(transcript.entries, refTimeMs, cachedIndex)
+                    val currentPosMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
+                    val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = currentPosMs) ?: return@withFrameNanos
+                    val currentRefTimeMs = (currentRefTime * 1000).toLong()
+                    val idx = findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
                     if (idx != null) cachedIndex = idx
                     onHighlightChanged(idx)
                 }

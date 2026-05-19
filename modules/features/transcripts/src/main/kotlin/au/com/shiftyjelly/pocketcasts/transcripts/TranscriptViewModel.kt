@@ -126,6 +126,7 @@ class TranscriptViewModel @AssistedInject constructor(
 
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
                 fingerprintTimingManager.prepareForCurrentEpisode()
+                _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
                 observeSyncedState()
             }
         }
