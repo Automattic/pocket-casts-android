@@ -16,6 +16,13 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -641,7 +648,11 @@ class EpisodeFragment : BaseFragment() {
                     // AI-enhanced layout: "Ask this episode" + simple tabs + inline summary
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // "Ask this episode" input-style banner
-                        if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
+                        AnimatedVisibility(
+                            visible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null,
+                            enter = BannerEnterTransition,
+                            exit = BannerExitTransition,
+                        ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -657,7 +668,7 @@ class EpisodeFragment : BaseFragment() {
                                         RoundedCornerShape(12.dp),
                                     )
                                     .clickable {
-                                        openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
+                                        openChat(transcript!!.episodeUuid, transcript.podcastUuid, isPlusUser)
                                     }
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -713,7 +724,11 @@ class EpisodeFragment : BaseFragment() {
                             }
                         }
 
-                        if (tabs.size > 1) {
+                        AnimatedVisibility(
+                            visible = tabs.size > 1,
+                            enter = BannerEnterTransition,
+                            exit = BannerExitTransition,
+                        ) {
                             val selectedButtonTab = when (selectedTab) {
                                 EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tabs.first()
                                 EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tabs.lastOrNull { it.labelResId == LR.string.summary } ?: tabs.first()
@@ -728,24 +743,31 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // Inline summary content
-                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                            ) {
-                                Text(
-                                    text = stringResource(LR.string.episode_summary),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(bottom = 16.dp),
-                                )
-                                HtmlText(
-                                    html = markdownToHtml(summaryText),
-                                    color = MaterialTheme.theme.colors.primaryText02,
-                                    textStyleResId = UR.style.P40,
-                                )
+                        AnimatedContent(
+                            targetState = selectedTab,
+                            transitionSpec = { TabContentTransitionSpec },
+                            contentKey = { it },
+                            label = "TabContent",
+                        ) { targetTab ->
+                            if (targetTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                                ) {
+                                    Text(
+                                        text = stringResource(LR.string.episode_summary),
+                                        color = MaterialTheme.theme.colors.primaryText01,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = 16.dp),
+                                    )
+                                    HtmlText(
+                                        html = markdownToHtml(summaryText),
+                                        color = MaterialTheme.theme.colors.primaryText02,
+                                        textStyleResId = UR.style.P40,
+                                    )
+                                }
                             }
                         }
                     }
@@ -962,3 +984,7 @@ class EpisodeFragment : BaseFragment() {
         @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
     ) : Parcelable
 }
+
+private val BannerEnterTransition = fadeIn() + expandVertically()
+private val BannerExitTransition = fadeOut() + shrinkVertically()
+private val TabContentTransitionSpec = fadeIn() togetherWith fadeOut()
