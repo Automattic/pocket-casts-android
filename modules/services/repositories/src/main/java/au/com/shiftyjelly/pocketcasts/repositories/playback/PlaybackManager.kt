@@ -113,6 +113,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -1935,18 +1936,26 @@ open class PlaybackManager @Inject constructor(
 
         try {
             loadCurrentEpisodeInternal(episode, play, showedStreamWarning, forceStream, sourceView)
+            // Both fields must be read under the same lock and gated on the UUID still
+            // matching — otherwise a different-UUID load that overwrote `loadingEpisodePlay`
+            // could be misread here as an upgrade for *this* episode.
             val upgradedToPlay = loadCurrentEpisodeGuardMutex.withLock {
-                !play && loadingEpisodePlay == true
+                !play && loadingEpisodeUuid == episode.uuid && loadingEpisodePlay == true
             }
             if (upgradedToPlay) {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "loadCurrentEpisode play upgraded by concurrent caller — starting playback for ${episode.uuid}")
                 play(sourceView)
             }
         } finally {
-            loadCurrentEpisodeGuardMutex.withLock {
-                if (loadingEpisodeUuid == episode.uuid) {
-                    loadingEpisodeUuid = null
-                    loadingEpisodePlay = null
+            // Cleanup must run even if this coroutine is cancelled while acquiring the
+            // mutex — otherwise the guard fields stay set and every future load for this
+            // UUID gets skipped forever.
+            withContext(NonCancellable) {
+                loadCurrentEpisodeGuardMutex.withLock {
+                    if (loadingEpisodeUuid == episode.uuid) {
+                        loadingEpisodeUuid = null
+                        loadingEpisodePlay = null
+                    }
                 }
             }
         }
