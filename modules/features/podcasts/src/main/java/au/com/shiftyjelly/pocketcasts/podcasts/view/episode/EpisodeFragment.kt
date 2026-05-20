@@ -16,13 +16,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -668,7 +666,8 @@ class EpisodeFragment : BaseFragment() {
                                         RoundedCornerShape(12.dp),
                                     )
                                     .clickable {
-                                        openChat(transcript!!.episodeUuid, transcript.podcastUuid, isPlusUser)
+                                        val t = transcript ?: return@clickable
+                                        openChat(t.episodeUuid, t.podcastUuid, isPlusUser)
                                     }
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -743,31 +742,28 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // Inline summary content
-                        AnimatedContent(
-                            targetState = selectedTab,
-                            transitionSpec = { TabContentTransitionSpec },
-                            contentKey = { it },
-                            label = "TabContent",
-                        ) { targetTab ->
-                            if (targetTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                                ) {
-                                    Text(
-                                        text = stringResource(LR.string.episode_summary),
-                                        color = MaterialTheme.theme.colors.primaryText01,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(bottom = 16.dp),
-                                    )
-                                    HtmlText(
-                                        html = markdownToHtml(summaryText),
-                                        color = MaterialTheme.theme.colors.primaryText02,
-                                        textStyleResId = UR.style.P40,
-                                    )
-                                }
+                        AnimatedVisibility(
+                            visible = selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null,
+                            enter = BannerEnterTransition,
+                            exit = BannerExitTransition,
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(LR.string.episode_summary),
+                                    color = MaterialTheme.theme.colors.primaryText01,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = 16.dp),
+                                )
+                                HtmlText(
+                                    html = markdownToHtml(summaryText.orEmpty()),
+                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    textStyleResId = UR.style.P40,
+                                )
                             }
                         }
                     }
@@ -987,4 +983,3 @@ class EpisodeFragment : BaseFragment() {
 
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
-private val TabContentTransitionSpec = fadeIn() togetherWith fadeOut()
