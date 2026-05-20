@@ -24,10 +24,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -56,6 +58,7 @@ internal class Media3SessionCallback(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
+    private val playlistManager: PlaylistManager,
     private val settings: Settings,
     private val actions: MediaSessionActions,
     private val bookmarkHelper: BookmarkHelper,
@@ -94,7 +97,20 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        val playerCommands = Player.Commands.Builder()
+            .addAll(
+                Player.COMMAND_PLAY_PAUSE,
+                Player.COMMAND_SET_MEDIA_ITEM,
+                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_STOP,
+                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_GET_METADATA,
+                Player.COMMAND_GET_TIMELINE,
+                Player.COMMAND_SEEK_TO_MEDIA_ITEM,
+            )
+            .build()
+
+        return MediaSession.ConnectionResult.accept(sessionCommands, playerCommands)
     }
 
     override fun onCustomCommand(
@@ -141,6 +157,15 @@ internal class Media3SessionCallback(
                 try {
                     val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                     val episodeId = autoMediaId.episodeId
+                    val sourceId = autoMediaId.sourceId?.takeIf { it.isNotBlank() }
+
+                    if (sourceId != null) {
+                        val autoPlaySource = AutoPlaySource.fromId(sourceId)
+                        if (autoPlaySource != AutoPlaySource.Predefined.None) {
+                            settings.trackingAutoPlaySource.set(autoPlaySource, updateModifiedAt = false)
+                        }
+                    }
+
                     val episode = episodeManager.findEpisodeByUuid(episodeId)
                     if (episode == null) {
                         future.set(emptyList())
@@ -154,7 +179,14 @@ internal class Media3SessionCallback(
                     val resolvedItem = buildEpisodeMediaItem(episode, podcast, mediaId)
                     future.set(listOf(resolvedItem))
 
-                    playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    // Queue remaining playlist episodes so playback continues in order.
+                    val playlistEpisodes = sourceId?.let { loadPlaylistEpisodesFrom(it, episodeId) }
+                    if (playlistEpisodes != null && playlistEpisodes.size > 1) {
+                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        playbackManager.upNextQueue.clearAndPlayAll(playlistEpisodes.drop(1))
+                    } else {
+                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    }
                 } catch (e: Exception) {
                     Timber.e(e, "Play from media ID failed")
                     future.set(emptyList())
@@ -316,6 +348,28 @@ internal class Media3SessionCallback(
             }
         }
         return future
+    }
+
+    /**
+     * Loads episodes from a playlist starting from [episodeId].
+     * Returns the sublist beginning with [episodeId], or null if [sourceId]
+     * is not a playlist (e.g., it's a podcast UUID) or the episode isn't found.
+     */
+    private suspend fun loadPlaylistEpisodesFrom(sourceId: String, episodeId: String): List<BaseEpisode>? {
+        return try {
+            if (podcastManager.findPodcastByUuid(sourceId) != null) return null
+
+            val episodes = playlistManager.getAutoPlayEpisodes(sourceId, null)
+            if (episodes.isEmpty()) return null
+
+            val selectedIndex = episodes.indexOfFirst { it.uuid == episodeId }
+            if (selectedIndex < 0) return null
+
+            episodes.subList(selectedIndex, episodes.size)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to load playlist episodes for source $sourceId")
+            null
+        }
     }
 
     private fun handleMediaButtonAction(action: HeadphoneAction) {

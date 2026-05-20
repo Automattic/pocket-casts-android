@@ -7,6 +7,7 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -22,7 +23,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -43,6 +46,7 @@ class PocketCastsForwardingPlayerTest {
             on { seekBackIncrement } doReturn 10_000L
             on { duration } doReturn C.TIME_UNSET
             on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
         }
         shadowOf(Looper.getMainLooper()).idle()
         forwardingPlayer = PocketCastsForwardingPlayer(mockPlayer)
@@ -172,6 +176,7 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_STOP))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_MEDIA_ITEM))
         assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
@@ -673,6 +678,249 @@ class PocketCastsForwardingPlayerTest {
 
         verify(listener, times(2)).onMediaMetadataChanged(any())
         verify(listener, times(1)).onMediaItemTransition(any(), any())
+    }
+
+    // --- Queue / timeline tests ---
+
+    @Test
+    fun `getCurrentMediaItemIndex returns zero when no current item`() {
+        assertEquals(0, forwardingPlayer.currentMediaItemIndex)
+    }
+
+    @Test
+    fun `getCurrentMediaItemIndex returns zero when current item set`() {
+        val episode = createPodcastEpisode(uuid = "ep-1")
+        forwardingPlayer.updateMetadata(episode, null)
+
+        assertEquals(0, forwardingPlayer.currentMediaItemIndex)
+    }
+
+    @Test
+    fun `currentTimeline delegates to wrapped player by default`() {
+        assertEquals(mockPlayer.currentTimeline, forwardingPlayer.currentTimeline)
+    }
+
+    @Test
+    fun `currentTimeline contains current item plus queue items`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        val queue = listOf(queueItemOf("q1"), queueItemOf("q2"))
+
+        forwardingPlayer.updateQueue(queue)
+
+        val timeline = forwardingPlayer.currentTimeline
+        assertEquals(3, timeline.windowCount)
+        assertEquals("ep-current", forwardingPlayer.getMediaItemAt(0).mediaId)
+        assertEquals("q1", forwardingPlayer.getMediaItemAt(1).mediaId)
+        assertEquals("q2", forwardingPlayer.getMediaItemAt(2).mediaId)
+    }
+
+    @Test
+    fun `updateQueue without current item exposes queue-only timeline`() {
+        val queue = listOf(queueItemOf("q1"), queueItemOf("q2"))
+
+        forwardingPlayer.updateQueue(queue)
+
+        assertEquals(2, forwardingPlayer.currentTimeline.windowCount)
+        assertEquals("q1", forwardingPlayer.getMediaItemAt(0).mediaId)
+    }
+
+    @Test
+    fun `updateQueue fires onTimelineChanged with PLAYLIST_CHANGED reason`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        forwardingPlayer.updateQueue(listOf(queueItemOf("q1")))
+
+        verify(listener).onTimelineChanged(
+            forwardingPlayer.currentTimeline,
+            Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED,
+        )
+    }
+
+    @Test
+    fun `updateQueue dispatches onEvents with EVENT_TIMELINE_CHANGED`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        forwardingPlayer.updateQueue(listOf(queueItemOf("q1")))
+
+        val events = argumentCaptor<Player.Events>()
+        verify(listener).onEvents(eq(forwardingPlayer), events.capture())
+        assertTrue(events.firstValue.contains(Player.EVENT_TIMELINE_CHANGED))
+    }
+
+    @Test
+    fun `updateMetadata fires onTimelineChanged when episode changes`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1"), null)
+
+        verify(listener).onTimelineChanged(
+            forwardingPlayer.currentTimeline,
+            Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED,
+        )
+        val events = argumentCaptor<Player.Events>()
+        verify(listener).onEvents(eq(forwardingPlayer), events.capture())
+        assertTrue(events.firstValue.contains(Player.EVENT_TIMELINE_CHANGED))
+    }
+
+    @Test
+    fun `updateMetadata does not fire onTimelineChanged when episode unchanged`() {
+        val listener = mock<Player.Listener>()
+        val episode = createPodcastEpisode(uuid = "ep-same")
+        forwardingPlayer.updateMetadata(episode, null)
+        forwardingPlayer.addListener(listener)
+
+        forwardingPlayer.updateMetadata(episode, null)
+
+        verify(listener, never()).onTimelineChanged(any(), any())
+    }
+
+    @Test
+    fun `seekTo with queue index invokes onSeekToQueueItem with correct mediaId`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1"), queueItemOf("q2")))
+
+        player.seekTo(2, 0L)
+
+        assertEquals("q2", capturedMediaId)
+        verify(mockPlayer, never()).seekTo(any<Int>(), any())
+    }
+
+    @Test
+    fun `seekTo with queue index falls back to super when onSeekToQueueItem is null`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        forwardingPlayer.updateQueue(listOf(queueItemOf("q1")))
+
+        forwardingPlayer.seekTo(1, 5_000L)
+
+        verify(mockPlayer).seekTo(1, 5_000L)
+    }
+
+    @Test
+    fun `seekTo with queue index out of range falls back to super`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        player.seekTo(5, 0L)
+
+        assertNull(capturedMediaId)
+        verify(mockPlayer).seekTo(5, 0L)
+    }
+
+    @Test
+    fun `seekToDefaultPosition with queue index invokes onSeekToQueueItem`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1"), queueItemOf("q2")))
+
+        player.seekToDefaultPosition(2)
+
+        assertEquals("q2", capturedMediaId)
+        verify(mockPlayer, never()).seekToDefaultPosition(any<Int>())
+    }
+
+    @Test
+    fun `seekToDefaultPosition with index 0 falls back to super`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        player.seekToDefaultPosition(0)
+
+        assertNull(capturedMediaId)
+        verify(mockPlayer).seekToDefaultPosition(0)
+    }
+
+    @Test
+    fun `seekToDefaultPosition with out of range index falls back to super`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateMetadata(createPodcastEpisode(uuid = "ep-current"), null)
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        player.seekToDefaultPosition(5)
+
+        assertNull(capturedMediaId)
+        verify(mockPlayer).seekToDefaultPosition(5)
+    }
+
+    @Test
+    fun `swapPlayer preserves queue items`() {
+        forwardingPlayer.updateQueue(listOf(queueItemOf("q1"), queueItemOf("q2")))
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = forwardingPlayer.swapPlayer(newWrappedPlayer)
+
+        assertEquals(2, swapped.currentTimeline.windowCount)
+        assertEquals("q1", swapped.getMediaItemAt(0).mediaId)
+    }
+
+    @Test
+    fun `swapPlayer preserves onSeekToQueueItem callback`() {
+        var capturedMediaId: String? = null
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSeekToQueueItem = { capturedMediaId = it },
+        )
+        player.updateQueue(listOf(queueItemOf("q1")))
+
+        val newWrappedPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+        }
+        val swapped = player.swapPlayer(newWrappedPlayer)
+        swapped.seekTo(1, 0L)
+
+        assertEquals("q1", capturedMediaId)
+    }
+
+    @Test
+    fun `clearMetadata clears queue and fires timeline change`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1"), null)
+        forwardingPlayer.updateQueue(listOf(queueItemOf("q1")))
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+
+        forwardingPlayer.clearMetadata()
+
+        assertEquals(MediaItem.EMPTY, forwardingPlayer.currentMediaItem)
+        assertTrue(forwardingPlayer.queueItems.isEmpty())
+        verify(listener).onTimelineChanged(any(), eq(Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED))
+        val events = argumentCaptor<Player.Events>()
+        verify(listener).onEvents(eq(forwardingPlayer), events.capture())
+        assertTrue(events.firstValue.contains(Player.EVENT_TIMELINE_CHANGED))
+        assertTrue(events.firstValue.contains(Player.EVENT_MEDIA_METADATA_CHANGED))
+    }
+
+    private fun queueItemOf(mediaId: String): MediaItem {
+        return MediaItem.Builder()
+            .setMediaId(mediaId)
+            .setMediaMetadata(MediaMetadata.Builder().setTitle(mediaId).build())
+            .build()
     }
 
     private fun createPodcastEpisode(
