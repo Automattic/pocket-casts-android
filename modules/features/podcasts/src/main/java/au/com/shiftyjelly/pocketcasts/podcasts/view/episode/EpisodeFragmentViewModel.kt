@@ -114,6 +114,15 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val _summary = MutableStateFlow<String?>(null)
     val summary = _summary.asStateFlow()
 
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY }
+
+    private val _selectedContentTab = MutableStateFlow(EpisodeContentTab.DESCRIPTION)
+    val selectedContentTab = _selectedContentTab.asStateFlow()
+
+    fun selectContentTab(tab: EpisodeContentTab) {
+        _selectedContentTab.value = tab
+    }
+
     data class DateDurationInfo(val publishedDate: java.util.Date?, val durationMs: Long)
     private val _dateDurationInfo = MutableStateFlow<DateDurationInfo?>(null)
     val dateDurationInfo = _dateDurationInfo.asStateFlow()

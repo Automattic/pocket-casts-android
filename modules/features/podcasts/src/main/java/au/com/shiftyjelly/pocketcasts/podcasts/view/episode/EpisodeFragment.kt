@@ -16,13 +16,27 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,14 +47,19 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -56,6 +75,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerDimensions
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -94,9 +116,11 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
+import androidx.compose.ui.graphics.Color as ComposeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -274,6 +298,23 @@ class EpisodeFragment : BaseFragment() {
                             .padding(top = 12.dp),
                         textAlign = TextAlign.Center,
                     )
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.selectedContentTab.collect { tab ->
+                val binding = binding ?: return@collect
+                when (tab) {
+                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> {
+                        binding.webViewShowNotes.isVisible = true
+                        binding.webViewErrorText?.isVisible = false
+                    }
+
+                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> {
+                        binding.webViewShowNotes.isVisible = false
+                        binding.webViewErrorText?.isVisible = false
+                    }
                 }
             }
         }
@@ -602,96 +643,164 @@ class EpisodeFragment : BaseFragment() {
             val transcript = viewModel.transcript.collectAsState().value as? Transcript.Text
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
             val isPlusUser = viewModel.isPlusUser.collectAsState().value
-
-            val tabs = buildList {
-                add(ButtonTab(labelResId = LR.string.description, onClick = {}))
-                if (isSummaryEnabled && summaryText != null) {
-                    add(
-                        ButtonTab(
-                            labelResId = LR.string.summary,
-                            onClick = {
-                                if (parentFragmentManager.findFragmentByTag("episode_summary") == null) {
-                                    SummaryBottomSheet.newInstance(summaryText)
-                                        .show(parentFragmentManager, "episode_summary")
-                                }
-                            },
-                            iconResId = IR.drawable.ic_ai,
-                            trailingIconResId = IR.drawable.ic_chevron_right,
-                        ),
-                    )
-                }
-                if (transcript != null) {
-                    add(
-                        ButtonTab(
-                            labelResId = LR.string.transcript,
-                            onClick = {
-                                if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                    TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
-                                        .show(parentFragmentManager, "episode_transcript")
-                                }
-                                eventHorizon.track(
-                                    EpisodeDetailTranscriptCardTappedEvent(
-                                        episodeUuid = transcript.episodeUuid,
-                                        podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                                    ),
-                                )
-                            },
-                            iconResId = if (transcript.isGenerated) IR.drawable.ic_ai else null,
-                            trailingIconResId = IR.drawable.ic_chevron_right,
-                        ),
-                    )
-                }
-                if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
-                    add(
-                        ButtonTab(
-                            labelResId = LR.string.episode_chat,
-                            onClick = {
-                                val episodeUuid = transcript.episodeUuid
-                                val podcastUuid = transcript.podcastUuid
-                                if (isPlusUser) {
-                                    val episode = viewModel.episode ?: return@ButtonTab
-                                    val chatPodcastUuid = podcastUuid ?: return@ButtonTab
-                                    val episodeSubtitle = PodcastEpisode
-                                        .seasonPrefix(
-                                            episode.episodeType,
-                                            episode.season,
-                                            episode.number,
-                                            resources,
-                                        )
-                                        .orEmpty()
-                                    if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
-                                        val fragment = ChatFragment.newInstance(
-                                            episodeUuid,
-                                            chatPodcastUuid,
-                                            viewModel.podcast?.title.orEmpty(),
-                                            episode.title,
-                                            episodeSubtitle,
-                                            episode.durationMs,
-                                        )
-                                        fragment.show(parentFragmentManager, "episode_chat")
-                                    }
-                                } else {
-                                    if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                                        val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
-                                        fragment.show(parentFragmentManager, "episode_chat_paywall")
-                                    }
-                                }
-                            },
-                            trailingIconResId = IR.drawable.ic_chevron_right,
-                        ),
-                    )
-                }
-            }
+            val selectedTab = viewModel.selectedContentTab.collectAsState().value
 
             AppTheme(activeTheme) {
-                if (tabs.size > 1) {
-                    ButtonTabs(
-                        tabs = tabs,
-                        selectedTab = tabs.first(),
+                if (isSummaryEnabled) {
+                    // AI-enhanced layout: "Ask this episode" + simple tabs + inline summary
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // "Ask this episode" input-style banner
+                        if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                modifier = Modifier
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                                    .border(
+                                        width = 0.5.dp,
+                                        color = MaterialTheme.theme.colors.primaryUi05,
+                                        shape = RoundedCornerShape(12.dp),
+                                    )
+                                    .background(
+                                        MaterialTheme.theme.colors.primaryUi04,
+                                        RoundedCornerShape(12.dp),
+                                    )
+                                    .clickable {
+                                        openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
+                                    }
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                            ) {
+                                Image(
+                                    painter = painterResource(IR.drawable.ic_ai),
+                                    contentDescription = null,
+                                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Text(
+                                    text = stringResource(LR.string.ask_this_episode),
+                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    fontSize = 16.sp,
+                                )
+                            }
+                        }
+
+                        // Simple tabs (no icons, no trailing chevrons)
+                        val tabs = buildList {
+                            add(
+                                ButtonTab(
+                                    labelResId = LR.string.description,
+                                    onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) },
+                                ),
+                            )
+                            if (transcript != null) {
+                                add(
+                                    ButtonTab(
+                                        labelResId = LR.string.transcript,
+                                        onClick = {
+                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                                TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
+                                                    .show(parentFragmentManager, "episode_transcript")
+                                            }
+                                            eventHorizon.track(
+                                                EpisodeDetailTranscriptCardTappedEvent(
+                                                    episodeUuid = transcript.episodeUuid,
+                                                    podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                                                ),
+                                            )
+                                        },
+                                    ),
+                                )
+                            }
+                            if (summaryText != null) {
+                                add(
+                                    ButtonTab(
+                                        labelResId = LR.string.summary,
+                                        onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY) },
+                                    ),
+                                )
+                            }
+                        }
+
+                        if (tabs.size > 1) {
+                            val selectedButtonTab = when (selectedTab) {
+                                EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tabs.first()
+                                EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tabs.lastOrNull { it.labelResId == LR.string.summary } ?: tabs.first()
+                            }
+                            ButtonTabs(
+                                tabs = tabs,
+                                selectedTab = selectedButtonTab,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
+                            )
+                        }
+
+                        // Inline summary content
+                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(LR.string.episode_summary),
+                                    color = MaterialTheme.theme.colors.primaryText01,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = 16.dp),
+                                )
+                                HtmlText(
+                                    html = markdownToHtml(summaryText),
+                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    textStyleResId = UR.style.P40,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    // Non-AI layout: transcript banner + chat banner (main's approach)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp),
-                    )
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    ) {
+                        if (transcript != null) {
+                            val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, android.graphics.Color.BLACK))
+                            TranscriptExcerptBanner(
+                                isGenerated = transcript.isGenerated,
+                                colors = TranscriptExcerptBannerColors.default().copy(leadingIcon = episodeIconColor),
+                                dimensions = TranscriptExcerptBannerDimensions.compact(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                            TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
+                                                .show(parentFragmentManager, "episode_transcript")
+                                        }
+                                        eventHorizon.track(
+                                            EpisodeDetailTranscriptCardTappedEvent(
+                                                episodeUuid = transcript.episodeUuid,
+                                                podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                                            ),
+                                        )
+                                    },
+                            )
+                        }
+                        if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
+                            val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, android.graphics.Color.BLACK))
+                            ChatBanner(
+                                colors = ChatBannerColors.default().copy(leadingIcon = episodeIconColor),
+                                dimensions = ChatBannerDimensions.compact(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
+                                    },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -710,6 +819,32 @@ class EpisodeFragment : BaseFragment() {
 
     private fun loadShowNotes(notes: String) {
         webView?.loadDataWithBaseURL("file://android_asset/", notes, "text/html", "UTF-8", null)
+    }
+
+    private fun openChat(episodeUuid: String, podcastUuid: String?, isPlusUser: Boolean) {
+        if (isPlusUser) {
+            val episode = viewModel.episode ?: return
+            val chatPodcastUuid = podcastUuid ?: return
+            val episodeSubtitle = PodcastEpisode
+                .seasonPrefix(episode.episodeType, episode.season, episode.number, resources)
+                .orEmpty()
+            if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                val fragment = ChatFragment.newInstance(
+                    episodeUuid,
+                    chatPodcastUuid,
+                    viewModel.podcast?.title.orEmpty(),
+                    episode.title,
+                    episodeSubtitle,
+                    episode.durationMs,
+                )
+                fragment.show(parentFragmentManager, "episode_chat")
+            }
+        } else {
+            if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
+                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                fragment.show(parentFragmentManager, "episode_chat_paywall")
+            }
+        }
     }
 
     override fun onPause() {
@@ -763,9 +898,10 @@ class EpisodeFragment : BaseFragment() {
 
                         override fun onPageFinished(view: WebView, url: String) {
                             binding?.webViewLoader?.hide()
-                            // fade in view
-                            binding?.webViewShowNotes?.run {
-                                visibility = View.VISIBLE
+                            if (viewModel.selectedContentTab.value == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) {
+                                binding?.webViewShowNotes?.run {
+                                    visibility = View.VISIBLE
+                                }
                             }
                         }
 

@@ -94,7 +94,7 @@ private fun SummaryContent(
     }
 }
 
-private fun markdownToHtml(markdown: String): String {
+internal fun markdownToHtml(markdown: String): String {
     return markdown.lines()
         .joinToString("\n") { line ->
             when {

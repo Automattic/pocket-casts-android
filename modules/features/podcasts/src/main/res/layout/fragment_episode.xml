@@ -313,7 +313,6 @@
             android:layout_marginTop="8dp"
             android:paddingStart="@dimen/episode_card_edge_padding"
             android:paddingEnd="@dimen/episode_card_edge_padding"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/navigationBarSpacer"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
