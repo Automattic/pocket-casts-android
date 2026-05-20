@@ -44,7 +44,9 @@ class ShowNotesServiceManager @Inject constructor(
                         loaded = true
                     }
                 } else {
-                    emit(ShowNotesState.NotFound)
+                    if (!loaded) {
+                        emit(ShowNotesState.NotFound)
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)

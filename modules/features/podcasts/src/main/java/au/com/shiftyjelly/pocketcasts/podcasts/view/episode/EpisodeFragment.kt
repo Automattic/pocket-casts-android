@@ -443,8 +443,10 @@ class EpisodeFragment : BaseFragment() {
                 }
 
                 is ShowNotesState.Error, is ShowNotesState.NotFound -> {
-                    formattedNotes = ""
-                    loadShowNotes("")
+                    if (formattedNotes.isNullOrEmpty()) {
+                        formattedNotes = ""
+                        loadShowNotes("")
+                    }
                 }
 
                 is ShowNotesState.Loading -> {
