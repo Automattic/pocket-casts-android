@@ -227,6 +227,17 @@ open class PlaybackManager @Inject constructor(
     @Volatile
     private var lastPrefetchedEpisodeUuid: String? = null
 
+    // PCDROID-569: Re-entrancy guard for [loadCurrentEpisode]. Set to the in-progress
+    // episode UUID; concurrent calls for the same UUID are skipped. AAOS dispatches both
+    // `Media3SessionCallback.onAddMediaItems → playNowSuspend` and
+    // `Player.play → playQueueSuspend` for a single user gesture, and without this guard
+    // both paths reach `resetPlayer()` and create separate ExoPlayer instances. The first
+    // is orphaned, keeps playing, and keeps holding audio focus — the "phantom" stream
+    // users hear mixed in after they leave the app.
+    @Volatile
+    private var loadingEpisodeUuid: String? = null
+    private val loadCurrentEpisodeGuardMutex = Mutex()
+
     private val resumptionHelper = ResumptionHelper(settings)
 
     private val errorClassifier = PlaybackErrorClassifier()
@@ -1572,7 +1583,8 @@ open class PlaybackManager @Inject constructor(
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                stop()
+                // PCDROID-569: shutdown() already calls stop() — calling both produced
+                // duplicate "Stopping playback" log lines at episode hand-off.
                 shutdown()
             }
         } else {
@@ -1886,6 +1898,42 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        // PCDROID-569: Skip if a concurrent call is already loading the same episode.
+        // The mutex guards the read-modify-write so two concurrent callers can't both
+        // observe a null `loadingEpisodeUuid` and both proceed. The heavy work below
+        // intentionally runs outside the mutex so loads for *different* episodes are
+        // not serialised against each other.
+        val acquiredLoad = loadCurrentEpisodeGuardMutex.withLock {
+            if (loadingEpisodeUuid == episode.uuid) {
+                false
+            } else {
+                loadingEpisodeUuid = episode.uuid
+                true
+            }
+        }
+        if (!acquiredLoad) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "loadCurrentEpisode skipped — already loading ${episode.uuid}")
+            return
+        }
+
+        try {
+            loadCurrentEpisodeInternal(episode, play, showedStreamWarning, forceStream, sourceView)
+        } finally {
+            loadCurrentEpisodeGuardMutex.withLock {
+                if (loadingEpisodeUuid == episode.uuid) {
+                    loadingEpisodeUuid = null
+                }
+            }
+        }
+    }
+
+    private suspend fun loadCurrentEpisodeInternal(
+        episode: BaseEpisode,
+        play: Boolean,
+        showedStreamWarning: Boolean,
+        forceStream: Boolean,
+        sourceView: SourceView,
+    ) {
         val podcast = findPodcastByEpisode(episode)
 
         cancelPauseTimer()
