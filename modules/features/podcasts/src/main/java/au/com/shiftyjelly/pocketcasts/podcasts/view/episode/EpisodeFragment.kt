@@ -47,7 +47,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
@@ -116,7 +115,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
@@ -298,23 +296,6 @@ class EpisodeFragment : BaseFragment() {
                             .padding(top = 12.dp),
                         textAlign = TextAlign.Center,
                     )
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.selectedContentTab.collect { tab ->
-                val binding = binding ?: return@collect
-                when (tab) {
-                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> {
-                        binding.webViewShowNotes.isVisible = true
-                        binding.webViewErrorText?.isVisible = false
-                    }
-
-                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> {
-                        binding.webViewShowNotes.isVisible = false
-                        binding.webViewErrorText?.isVisible = false
-                    }
                 }
             }
         }
@@ -644,6 +625,11 @@ class EpisodeFragment : BaseFragment() {
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
             val isPlusUser = viewModel.isPlusUser.collectAsState().value
             val selectedTab = viewModel.selectedContentTab.collectAsState().value
+
+            val showDescription = !isSummaryEnabled || selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
+            LaunchedEffect(showDescription) {
+                binding?.webViewShowNotes?.isVisible = showDescription
+            }
 
             AppTheme(activeTheme) {
                 if (isSummaryEnabled) {
