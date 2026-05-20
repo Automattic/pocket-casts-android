@@ -492,13 +492,18 @@ class EpisodeFragment : BaseFragment() {
                 is ShowNotesState.Loaded -> {
                     val showNotes = showNotesState.showNotes
                     formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
-                    loadShowNotes(formattedNotes ?: "")
+                    loadShowNotes(formattedNotes.orEmpty())
                 }
 
                 is ShowNotesState.Error, is ShowNotesState.NotFound -> {
                     if (formattedNotes.isNullOrEmpty()) {
-                        formattedNotes = ""
-                        loadShowNotes("")
+                        val fallback = viewModel.episode?.episodeDescription
+                        if (!fallback.isNullOrBlank()) {
+                            formattedNotes = showNotesFormatter.format(fallback) ?: fallback
+                        } else {
+                            formattedNotes = ""
+                        }
+                        loadShowNotes(formattedNotes.orEmpty())
                     }
                 }
 
