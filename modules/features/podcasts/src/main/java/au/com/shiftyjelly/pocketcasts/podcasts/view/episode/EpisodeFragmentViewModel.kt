@@ -114,6 +114,14 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val _summary = MutableStateFlow<String?>(null)
     val summary = _summary.asStateFlow()
 
+    data class DateDurationInfo(val publishedDate: java.util.Date?, val durationMs: Long)
+    private val _dateDurationInfo = MutableStateFlow<DateDurationInfo?>(null)
+    val dateDurationInfo = _dateDurationInfo.asStateFlow()
+
+    fun updateDateDuration(publishedDate: java.util.Date?, durationMs: Long) {
+        _dateDurationInfo.value = DateDurationInfo(publishedDate, durationMs)
+    }
+
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,

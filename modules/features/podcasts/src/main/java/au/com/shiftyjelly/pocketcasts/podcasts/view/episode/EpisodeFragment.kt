@@ -18,10 +18,14 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isInvisible
@@ -37,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -58,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -253,6 +259,25 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.loadingGroup?.isInvisible = true
 
+        binding?.episodeDateDuration?.setContentWithViewCompositionStrategy {
+            val info = viewModel.dateDurationInfo.collectAsState().value
+            if (info != null) {
+                val dateText = info.publishedDate?.let { DateUtil.toLocalizedFormatLongStyle(it) }.orEmpty()
+                val durationText = TimeHelper.getTimeDurationShortString(info.durationMs, context)
+                AppTheme(activeTheme) {
+                    Text(
+                        text = "$dateText \u00B7 $durationText",
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+
         viewModel.setup(
             episodeUuid = episodeUUID,
             podcastUuid = podcastUuid,
@@ -283,6 +308,12 @@ class EpisodeFragment : BaseFragment() {
                         binding.lblDate.setLongStyleDate(state.episode.publishedDate)
                         binding.lblAuthor.text = state.podcast.title
                         binding.lblAuthor.setTextColor(state.podcastColor)
+
+                        val isAiEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+                        binding.lblDate.isVisible = !isAiEnabled
+                        binding.lblTimeLeft.isVisible = !isAiEnabled
+                        binding.episodeDateDuration.isVisible = isAiEnabled
+                        viewModel.updateDateDuration(state.episode.publishedDate, state.episode.durationMs.toLong())
 
                         binding.btnDownload.tintColor = iconColor
                         binding.btnAddEpisode.tintColor = iconColor

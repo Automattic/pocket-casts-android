@@ -41,6 +41,16 @@
 
         </androidx.cardview.widget.CardView>
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/episodeDateDuration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintLeft_toRightOf="@id/episodeArt"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/episodeArt"
+            tools:visibility="gone" />
+
         <TextView
             android:id="@+id/lblTitle"
             style="?attr/textH2"
@@ -53,7 +63,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toRightOf="@id/episodeArt"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/episodeArt"
+            app:layout_constraintTop_toBottomOf="@+id/episodeDateDuration"
             tools:text="Vergecast 193: Encryption in the hype matrix" />
 
         <TextView
