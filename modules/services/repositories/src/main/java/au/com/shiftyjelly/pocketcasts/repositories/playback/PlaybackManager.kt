@@ -236,6 +236,13 @@ open class PlaybackManager @Inject constructor(
     // users hear mixed in after they leave the app.
     @Volatile
     private var loadingEpisodeUuid: String? = null
+
+    // Tracks the `play` intent of the in-flight load. A concurrent caller that
+    // arrives with `play=true` while the in-flight load is `play=false` upgrades
+    // this flag, and the in-flight call honours it once the load finishes — so a
+    // user-initiated play is never silently dropped by the re-entrancy guard.
+    @Volatile
+    private var loadingEpisodePlay: Boolean? = null
     private val loadCurrentEpisodeGuardMutex = Mutex()
 
     private val resumptionHelper = ResumptionHelper(settings)
@@ -1903,11 +1910,21 @@ open class PlaybackManager @Inject constructor(
         // observe a null `loadingEpisodeUuid` and both proceed. The heavy work below
         // intentionally runs outside the mutex so loads for *different* episodes are
         // not serialised against each other.
+        //
+        // If a skipped call requested `play=true` while the in-flight load was
+        // `play=false`, upgrade `loadingEpisodePlay` so the in-flight call starts
+        // playback once it finishes — otherwise the user-initiated play would be
+        // silently dropped (e.g. an internal `play=false` reload racing with an
+        // AAOS `play=true` for the same episode).
         val acquiredLoad = loadCurrentEpisodeGuardMutex.withLock {
             if (loadingEpisodeUuid == episode.uuid) {
+                if (play && loadingEpisodePlay == false) {
+                    loadingEpisodePlay = true
+                }
                 false
             } else {
                 loadingEpisodeUuid = episode.uuid
+                loadingEpisodePlay = play
                 true
             }
         }
@@ -1918,10 +1935,18 @@ open class PlaybackManager @Inject constructor(
 
         try {
             loadCurrentEpisodeInternal(episode, play, showedStreamWarning, forceStream, sourceView)
+            val upgradedToPlay = loadCurrentEpisodeGuardMutex.withLock {
+                !play && loadingEpisodePlay == true
+            }
+            if (upgradedToPlay) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "loadCurrentEpisode play upgraded by concurrent caller — starting playback for ${episode.uuid}")
+                play(sourceView)
+            }
         } finally {
             loadCurrentEpisodeGuardMutex.withLock {
                 if (loadingEpisodeUuid == episode.uuid) {
                     loadingEpisodeUuid = null
+                    loadingEpisodePlay = null
                 }
             }
         }
