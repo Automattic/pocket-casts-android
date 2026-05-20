@@ -900,6 +900,7 @@ class EpisodeFragment : BaseFragment() {
                     }
                 }
                 binding?.webViewShowNotes?.addView(webView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                formattedNotes?.let { loadShowNotes(it) }
             } catch (e: Exception) {
                 Timber.e(e)
                 binding?.webViewLoader?.hide()
