@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
@@ -178,6 +180,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given not multi-selecting, when row clicked, then showBookmarkDetail emits`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid)
         whenever(bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.TIMESTAMP))
             .thenReturn(flowOf(listOf(bookmark)))
@@ -187,7 +190,7 @@ class BookmarksViewModelTest {
         bookmarksViewModel.showBookmarkDetail.test {
             val loaded = bookmarksViewModel.uiState.value as BookmarksViewModel.UiState.Loaded
             loaded.onRowClick(bookmark)
-            assertEquals("uuid1", awaitItem().uuid)
+            assertEquals("uuid1", awaitItem().bookmark.uuid)
         }
     }
 
