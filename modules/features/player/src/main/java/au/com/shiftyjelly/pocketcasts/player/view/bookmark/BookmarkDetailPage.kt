@@ -178,10 +178,10 @@ private fun Header(
         AnimatedPlayPauseButton(
             isPlaying = isPlayingThisEpisode,
             onClick = {
-                scope.launch {
-                    if (isPlayingThisEpisode) {
-                        playbackManager.pause(sourceView = sourceView)
-                    } else {
+                if (isPlayingThisEpisode) {
+                    playbackManager.pause(sourceView = sourceView)
+                } else {
+                    scope.launch {
                         playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
                         playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
                     }
