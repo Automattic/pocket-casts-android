@@ -10,6 +10,9 @@
 
 8.12
 -----
+*   New Features
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
 *   Bug Fixes
     *   Restore episode duration after download for feeds without an RSS length attribute
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))
