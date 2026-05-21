@@ -213,6 +213,8 @@ open class PlaybackManager @Inject constructor(
     val playbackStateFlow: Flow<PlaybackState> = playbackStateRelay.asFlow()
 
     private var updateCount = 0
+
+    @Volatile
     private var resettingPlayer = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
