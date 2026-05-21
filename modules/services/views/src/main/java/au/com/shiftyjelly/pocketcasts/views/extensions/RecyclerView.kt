@@ -42,7 +42,9 @@ fun RecyclerView.quickScrollToTop() {
             val scrollRange = computeVerticalScrollRange()
 
             return if (scrollRange > 0 && scrollOffset > 0) {
-                val pixelsInRange = scrollRange * scrollOffset / scrollRange.toFloat()
+                // Float math + floor of 1 prevents a non-positive speed, which would yield a
+                // non-positive duration in LinearSmoothScroller and crash RecyclerView.
+                val pixelsInRange = scrollOffset.toFloat().coerceAtLeast(1f)
                 (MILLIS_PER_RANGE / pixelsInRange).coerceAtMost(MAX_MILLIS_PER_INCH / displayMetrics.densityDpi)
             } else {
                 super.calculateSpeedPerPixel(displayMetrics)
