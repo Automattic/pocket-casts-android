@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.models.to
 sealed interface TranscriptEntry {
     data class Text(
         val value: String,
+        val startTimeMs: Long = -1L,
+        val endTimeMs: Long = -1L,
     ) : TranscriptEntry
 
     data class Speaker(

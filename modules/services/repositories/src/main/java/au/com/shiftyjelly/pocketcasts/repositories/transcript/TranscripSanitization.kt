@@ -30,33 +30,45 @@ private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     val phraseAccumulator = StringBuilder()
     val entries = mutableListOf<TranscriptEntry>()
+    var accumulatedStartTimeMs = -1L
+    var accumulatedEndTimeMs = -1L
 
-    fun appendToAccumulator(text: String) {
+    fun appendToAccumulator(text: String, startTimeMs: Long, endTimeMs: Long) {
         phraseAccumulator.append(' ').append(text.trimStart())
+        if (accumulatedStartTimeMs == -1L || (startTimeMs in 0..<accumulatedStartTimeMs)) {
+            accumulatedStartTimeMs = startTimeMs
+        }
+        if (endTimeMs > accumulatedEndTimeMs) {
+            accumulatedEndTimeMs = endTimeMs
+        }
     }
 
-    fun buildFullSentence(text: String): TranscriptEntry {
-        appendToAccumulator(text)
+    fun buildFullSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry {
+        appendToAccumulator(text, startTimeMs, endTimeMs)
         val sentences = phraseAccumulator.toString()
         phraseAccumulator.clear()
-        return TranscriptEntry.Text(sentences)
+        val resultStartTimeMs = accumulatedStartTimeMs
+        val resultEndTimeMs = accumulatedEndTimeMs
+        accumulatedStartTimeMs = -1L
+        accumulatedEndTimeMs = -1L
+        return TranscriptEntry.Text(sentences, startTimeMs = resultStartTimeMs, endTimeMs = resultEndTimeMs)
     }
 
-    fun buildMidSentence(text: String): TranscriptEntry? {
+    fun buildMidSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry? {
         val midSentence = text.findMidSentence()
 
         return if (midSentence != null) {
             val (index, punctuation) = midSentence
 
             val midSentenceText = text.substring(0, index + punctuation.length)
-            val sentence = buildFullSentence(midSentenceText)
+            val sentence = buildFullSentence(midSentenceText, startTimeMs, endTimeMs)
 
             val leftOverText = text.drop(midSentenceText.length)
-            appendToAccumulator(leftOverText)
+            appendToAccumulator(leftOverText, startTimeMs, endTimeMs)
 
             sentence
         } else {
-            appendToAccumulator(text)
+            appendToAccumulator(text, startTimeMs, endTimeMs)
             null
         }
     }
@@ -68,15 +80,19 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
             is TranscriptEntry.Text -> {
                 val text = entry.value
                 if (text.endsAsSentence()) {
-                    buildFullSentence(text)
+                    buildFullSentence(text, entry.startTimeMs, entry.endTimeMs)
                 } else {
-                    buildMidSentence(text)
+                    buildMidSentence(text, entry.startTimeMs, entry.endTimeMs)
                 }
             }
         }
     }
     if (phraseAccumulator.isNotEmpty()) {
-        entries += TranscriptEntry.Text(phraseAccumulator.toString())
+        entries += TranscriptEntry.Text(
+            phraseAccumulator.toString(),
+            startTimeMs = accumulatedStartTimeMs,
+            endTimeMs = accumulatedEndTimeMs,
+        )
     }
     return entries
 }
