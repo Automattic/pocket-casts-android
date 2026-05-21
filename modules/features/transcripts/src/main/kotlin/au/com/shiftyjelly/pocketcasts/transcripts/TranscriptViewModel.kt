@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -21,9 +23,11 @@ import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.Trackable
 import com.automattic.eventhorizon.TranscriptErrorEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptSearchNextResultEvent
 import com.automattic.eventhorizon.TranscriptSearchPreviousResultEvent
 import com.automattic.eventhorizon.TranscriptSearchShownEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptSourceType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -48,6 +52,8 @@ class TranscriptViewModel @AssistedInject constructor(
     private val paymentClient: PaymentClient,
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
+    val fingerprintTimingManager: FingerprintTimingManager,
+    val playbackManager: PlaybackManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState.Empty)
@@ -119,7 +125,35 @@ class TranscriptViewModel @AssistedInject constructor(
                 }
             }
             _uiState.update { state -> state.copy(transcriptState = transcriptState) }
+
+            if (transcriptState is TranscriptState.Loaded) {
+                trackTranscriptShown(transcriptState.transcript)
+            }
+
+            if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
+                fingerprintTimingManager.prepareForCurrentEpisode()
+                _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
+                observeSyncedState()
+            }
         }
+    }
+
+    private var syncedStateJob: Job? = null
+
+    private fun observeSyncedState() {
+        syncedStateJob?.cancel()
+        syncedStateJob = viewModelScope.launch {
+            fingerprintTimingManager.stateFlow.collect { syncedState ->
+                _uiState.update { state -> state.copy(syncedState = syncedState) }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loadTranscriptJob?.cancel()
+        syncedStateJob?.cancel()
+        fingerprintTimingManager.stop()
     }
 
     fun reloadTranscript() {
@@ -259,6 +293,29 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
+    private fun trackTranscriptShown(transcript: Transcript) {
+        val isPaywallVisible = !_uiState.value.isPlusUser && transcript.isGenerated
+        if (isPaywallVisible) {
+            track { source, podcastUuid, episodeUuid ->
+                TranscriptGeneratedPaywallShownEvent(
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
+                )
+            }
+        } else {
+            track { source, podcastUuid, episodeUuid ->
+                TranscriptShownEvent(
+                    type = transcript.type.analyticsValue,
+                    showAsWebpage = transcript is Transcript.Web,
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
+                )
+            }
+        }
+    }
+
     fun track(event: (TranscriptSourceType, podcastUuid: String, episodeUuid: String) -> Trackable) {
         val podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
@@ -295,12 +352,15 @@ data class UiState(
     val searchState: SearchState,
     val isPlusUser: Boolean,
     val isFreeTrialAvailable: Boolean,
+    val syncedState: FingerprintTimingManager.State = FingerprintTimingManager.State.Idle,
 ) {
     val isPaywallVisible get() = !isPlusUser && (transcriptState as? TranscriptState.Loaded)?.transcript?.isGenerated == true
 
     val isTextTranscriptLoaded get() = (transcriptState as? TranscriptState.Loaded)?.transcript is Transcript.Text
 
     val transcriptEpisodeUuid get() = (transcriptState as? TranscriptState.Loaded)?.transcript?.episodeUuid
+
+    val isSyncedActive get() = syncedState is FingerprintTimingManager.State.Active
 
     companion object {
         val Empty = UiState(

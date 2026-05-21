@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R
 internal data class TranscriptTheme(
     val background: Color,
     val primaryText: Color,
+    val highlightText: Color,
     val secondaryText: Color,
     val secondaryElement: Color,
     val searchDefaultSpanStyle: SpanStyle,
@@ -28,6 +29,7 @@ internal data class TranscriptTheme(
         fun default(colors: ThemeColors) = TranscriptTheme(
             background = colors.primaryUi01,
             primaryText = colors.primaryText01,
+            highlightText = colors.primaryInteractive01,
             secondaryText = colors.primaryText02,
             secondaryElement = colors.primaryUi05,
             searchDefaultSpanStyle = SpanStyle(
@@ -45,6 +47,7 @@ internal data class TranscriptTheme(
         fun player(colors: PlayerColors) = TranscriptTheme(
             background = colors.background01,
             primaryText = colors.contrast02,
+            highlightText = colors.contrast01,
             secondaryText = colors.contrast04,
             secondaryElement = colors.contrast05,
             searchDefaultSpanStyle = SpanStyle(
