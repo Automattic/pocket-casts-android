@@ -70,13 +70,13 @@ class BookmarksViewModel
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
-    private val _showOptionsDialog = MutableSharedFlow<Int>()
+    private val _showOptionsDialog = MutableSharedFlow<Int>(extraBufferCapacity = 1)
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
-    private val _message = MutableSharedFlow<BookmarkMessage>()
+    private val _message = MutableSharedFlow<BookmarkMessage>(extraBufferCapacity = 1)
     val message = _message.asSharedFlow()
 
-    private val _showBookmarkDetail = MutableSharedFlow<Bookmark>()
+    private val _showBookmarkDetail = MutableSharedFlow<Bookmark>(extraBufferCapacity = 1)
     val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
 
     private var isFragmentActive: Boolean = true
