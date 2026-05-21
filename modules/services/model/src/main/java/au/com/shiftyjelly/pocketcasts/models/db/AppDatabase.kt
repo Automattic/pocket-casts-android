@@ -122,7 +122,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
         AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
         AutoMigration(from = 128, to = 129),
-        AutoMigration(from = 129, to = 130),
     ],
 )
 @TypeConverters(
@@ -1448,6 +1447,10 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN web_feed INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_129_130 = addMigration(129, 130) { database ->
+            database.execSQL("ALTER TABLE episode_chapters ADD COLUMN is_generated INTEGER NOT NULL DEFAULT 0")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1866,6 +1869,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_125_126,
                 MIGRATION_126_127,
                 MIGRATION_127_128,
+                MIGRATION_129_130,
             )
         }
 
