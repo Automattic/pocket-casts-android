@@ -41,12 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.text.htmlEncode
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
@@ -665,7 +667,10 @@ class EpisodeFragment : BaseFragment() {
                                         MaterialTheme.theme.colors.primaryUi04,
                                         RoundedCornerShape(12.dp),
                                     )
-                                    .clickable {
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.ask_this_episode),
+                                    ) {
                                         val t = transcript ?: return@clickable
                                         openChat(t.episodeUuid, t.podcastUuid, isPlusUser)
                                     }
@@ -769,6 +774,8 @@ class EpisodeFragment : BaseFragment() {
                     }
                 } else {
                     // Non-AI layout: transcript banner + chat banner (main's approach)
+                    val podcastTint = (viewModel.state.value as? EpisodeFragmentState.Loaded)?.tintColor ?: android.graphics.Color.BLACK
+                    val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, podcastTint))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
@@ -776,14 +783,16 @@ class EpisodeFragment : BaseFragment() {
                             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     ) {
                         if (transcript != null) {
-                            val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, android.graphics.Color.BLACK))
                             TranscriptExcerptBanner(
                                 isGenerated = transcript.isGenerated,
                                 colors = TranscriptExcerptBannerColors.default().copy(leadingIcon = episodeIconColor),
                                 dimensions = TranscriptExcerptBannerDimensions.compact(),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable {
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.transcript),
+                                    ) {
                                         if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
                                             TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
                                                 .show(parentFragmentManager, "episode_transcript")
@@ -798,13 +807,15 @@ class EpisodeFragment : BaseFragment() {
                             )
                         }
                         if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
-                            val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, android.graphics.Color.BLACK))
                             ChatBanner(
                                 colors = ChatBannerColors.default().copy(leadingIcon = episodeIconColor),
                                 dimensions = ChatBannerDimensions.compact(),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable {
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.ask_this_episode),
+                                    ) {
                                         openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
                                     },
                             )
@@ -983,3 +994,19 @@ class EpisodeFragment : BaseFragment() {
 
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
+
+private fun markdownToHtml(markdown: String): String {
+    return markdown.lines()
+        .joinToString("\n") { line ->
+            when {
+                line.startsWith("### ") -> "<h3>${line.removePrefix("### ").htmlEncode()}</h3>"
+                line.startsWith("## ") -> "<h2>${line.removePrefix("## ").htmlEncode()}</h2>"
+                line.startsWith("# ") -> "<h1>${line.removePrefix("# ").htmlEncode()}</h1>"
+                line.startsWith("- ") -> "&#8226; ${line.removePrefix("- ").htmlEncode()}<br>"
+                line.startsWith("* ") -> "&#8226; ${line.removePrefix("* ").htmlEncode()}<br>"
+                line.isBlank() -> "<br>"
+                else -> "${line.htmlEncode()}<br>"
+            }
+        }
+        .replace(Regex("\\*\\*(.+?)\\*\\*"), "<b>$1</b>")
+}
