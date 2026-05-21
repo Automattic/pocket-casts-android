@@ -17,9 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
-import kotlinx.coroutines.flow.map
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -144,7 +145,7 @@ fun TranscriptPage(
         uiState = uiState,
         fingerprintTimingManager = fingerprintTimingManager,
         playbackManager = playbackManager,
-        onHighlightChanged = { highlightIndex = it },
+        onHighlightChange = { highlightIndex = it },
     )
 
     // Auto-scroll to highlighted cue
@@ -154,14 +155,14 @@ fun TranscriptPage(
         isSearching = isSearching,
         isAutoScrollSuppressed = isAutoScrollSuppressed,
         animate = hasInitiallyScrolled,
-        onScrolled = { hasInitiallyScrolled = true },
+        onScroll = { hasInitiallyScrolled = true },
     )
 
     // Detect user scrolling and suppress auto-scroll for 5s
     UserScrollDetectionEffect(
         listState = listState,
-        onScrollSuppressed = { isAutoScrollSuppressed = true },
-        onScrollResumed = { isAutoScrollSuppressed = false },
+        onSuppressScroll = { isAutoScrollSuppressed = true },
+        onResumeScroll = { isAutoScrollSuppressed = false },
     )
 }
 
@@ -279,12 +280,13 @@ private fun HighlightEffect(
     uiState: UiState,
     fingerprintTimingManager: FingerprintTimingManager?,
     playbackManager: PlaybackManager?,
-    onHighlightChanged: (Int?) -> Unit,
+    onHighlightChange: (Int?) -> Unit,
 ) {
     if (fingerprintTimingManager == null || playbackManager == null) return
 
     val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
     val isSyncedActive = uiState.isSyncedActive
+    val latestOnHighlightChanged by rememberUpdatedState(onHighlightChange)
     val isPlaying by remember {
         playbackManager.playbackStateFlow.map { it.isPlaying }
     }.collectAsState(initial = playbackManager.isPlaying())
@@ -299,7 +301,7 @@ private fun HighlightEffect(
                 val refTimeMs = (refTime * 1000).toLong()
                 val idx = findCueIndex(transcript.entries, refTimeMs, 0)
                 if (idx != null) cachedIndex = idx
-                onHighlightChanged(idx)
+                latestOnHighlightChanged(idx)
             }
 
             while (true) {
@@ -309,12 +311,12 @@ private fun HighlightEffect(
                     val currentRefTimeMs = (currentRefTime * 1000).toLong()
                     val idx = findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
                     if (idx != null) cachedIndex = idx
-                    onHighlightChanged(idx)
+                    latestOnHighlightChanged(idx)
                 }
             }
         }
     } else if (!isSyncedActive) {
-        LaunchedEffect(Unit) { onHighlightChanged(null) }
+        LaunchedEffect(Unit) { latestOnHighlightChanged(null) }
     }
 }
 
@@ -325,8 +327,9 @@ private fun AutoScrollEffect(
     isSearching: Boolean,
     isAutoScrollSuppressed: Boolean,
     animate: Boolean,
-    onScrolled: () -> Unit,
+    onScroll: () -> Unit,
 ) {
+    val latestOnScroll by rememberUpdatedState(onScroll)
     if (highlightIndex != null && !isSearching && !isAutoScrollSuppressed) {
         LaunchedEffect(highlightIndex) {
             val viewportHeight = listState.layoutInfo.viewportSize.height
@@ -336,7 +339,7 @@ private fun AutoScrollEffect(
             } else {
                 listState.scrollToItem(highlightIndex, -scrollOffset)
             }
-            onScrolled()
+            latestOnScroll()
         }
     }
 }
@@ -344,18 +347,21 @@ private fun AutoScrollEffect(
 @Composable
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
-    onScrollSuppressed: () -> Unit,
-    onScrollResumed: () -> Unit,
+    onSuppressScroll: () -> Unit,
+    onResumeScroll: () -> Unit,
 ) {
+    val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
+    val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
-                    onScrollSuppressed()
+                    latestOnSuppressScroll()
                 }
+
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
                     delay(AUTO_SCROLL_BACK_DELAY_MS)
-                    onScrollResumed()
+                    latestOnResumeScroll()
                 }
             }
         }

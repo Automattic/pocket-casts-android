@@ -24,7 +24,7 @@ dependencies {
     api(libs.media3.exoplayer)
     api(libs.media3.extractor)
     api(libs.moshi)
-    api(libs.jna) { artifact { type = "aar" } }
+    api(projects.modules.services.fingerprint)
     api(libs.okhttp)
     api(libs.play.review)
     api(libs.rx2.java)

@@ -1,17 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.GZIPInputStream
-import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
-import kotlin.coroutines.coroutineContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
@@ -50,7 +50,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         podcastUuid: String,
         episodeUuid: String,
     ): ByteArray? {
-        val url = "${baseUrl}${podcastUuid}/${episodeUuid}-fingerprints.json.gz"
+        val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
             coroutineContext.ensureActive()
