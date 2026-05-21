@@ -1,6 +1,8 @@
 8.13
 -----
-
+*   Bug Fixes
+    *   Fix crash when scrolling to the top of a long Up Next queue
+        ([#5315](https://github.com/Automattic/pocket-casts-android/pull/5315))
 
 8.12
 -----

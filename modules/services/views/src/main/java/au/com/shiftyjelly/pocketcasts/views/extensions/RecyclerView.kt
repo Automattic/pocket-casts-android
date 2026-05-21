@@ -38,21 +38,23 @@ fun RecyclerView.quickScrollToTop() {
         override fun getVerticalSnapPreference() = LinearSmoothScroller.SNAP_TO_START
 
         override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-            val scrollOffset = computeVerticalScrollOffset()
-            val scrollRange = computeVerticalScrollRange()
-
-            return if (scrollRange > 0 && scrollOffset > 0) {
-                // Float math + floor of 1 prevents a non-positive speed, which would yield a
-                // non-positive duration in LinearSmoothScroller and crash RecyclerView.
-                val pixelsInRange = scrollOffset.toFloat().coerceAtLeast(1f)
-                (MILLIS_PER_RANGE / pixelsInRange).coerceAtMost(MAX_MILLIS_PER_INCH / displayMetrics.densityDpi)
-            } else {
-                super.calculateSpeedPerPixel(displayMetrics)
-            }
+            return quickScrollSpeedPerPixel(
+                scrollOffset = computeVerticalScrollOffset(),
+                scrollRange = computeVerticalScrollRange(),
+                densityDpi = displayMetrics.densityDpi,
+            ) ?: super.calculateSpeedPerPixel(displayMetrics)
         }
     }
 
     layoutManager?.startSmoothScroll(smoothScroller)
+}
+
+internal fun quickScrollSpeedPerPixel(scrollOffset: Int, scrollRange: Int, densityDpi: Int): Float? {
+    if (scrollRange <= 0 || scrollOffset <= 0 || densityDpi <= 0) return null
+    // Float math + floor of 1 prevents a non-positive speed, which would yield a
+    // non-positive duration in LinearSmoothScroller and crash RecyclerView.
+    val pixelsInRange = scrollOffset.toFloat().coerceAtLeast(1f)
+    return (MILLIS_PER_RANGE / pixelsInRange).coerceAtMost(MAX_MILLIS_PER_INCH / densityDpi)
 }
 
 fun RecyclerView.ViewHolder.hideRow() {
