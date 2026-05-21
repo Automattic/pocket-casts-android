@@ -310,9 +310,10 @@ open class SyncServiceManager @Inject constructor(
         return service.createWebFeedPodcast(addBearer(token), request)
     }
 
-    suspend fun pollWebFeedPodcast(token: AccessToken, pollUuid: String): WebFeedCreateResponse {
+    suspend fun pollWebFeedPodcast(token: AccessToken, pollUuid: String, url: String): WebFeedCreateResponse {
         val request = WebFeedCreateRequest.newBuilder()
             .setPollUuid(StringValue.of(pollUuid))
+            .setUrl(url)
             .build()
         return service.createWebFeedPodcast(addBearer(token), request)
     }

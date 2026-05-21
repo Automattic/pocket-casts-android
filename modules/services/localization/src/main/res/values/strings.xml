@@ -2784,6 +2784,8 @@
     <string name="blogs_empty_title">Turn any blog into a podcast</string>
     <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
     <string name="blogs_add_button">Add a blog</string>
+    <string name="blogs_experiment_banner_lead">This is an experiment.</string>
+    <string name="blogs_experiment_banner_body">Blogs is something we\'re trying out. It might stick around, get reworked, or quietly go away.</string>
     <string name="blogs_empty_url_label">Blog or RSS URL</string>
     <string name="blogs_empty_url_placeholder" translatable="false">https://</string>
     <string name="blogs_add_url_hint">Paste a blog or RSS URL and we\'ll find the feed for you.</string>

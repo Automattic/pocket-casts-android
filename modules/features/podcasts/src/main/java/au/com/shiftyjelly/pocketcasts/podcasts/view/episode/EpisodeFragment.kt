@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -40,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
+import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -58,6 +62,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerDimensions
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -98,6 +104,7 @@ import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
+import androidx.compose.ui.graphics.Color as ComposeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -188,6 +195,8 @@ class EpisodeFragment : BaseFragment() {
     private val forceDarkTheme: Boolean
         get() = args.forceDark
 
+    private var episodeBannerIconColor by mutableIntStateOf(Color.BLACK)
+
     var listener: FragmentHostListener? = null
     private var episodeLoadedListener: EpisodeLoadedListener? = null
 
@@ -259,6 +268,7 @@ class EpisodeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.loadingGroup?.isInvisible = true
+        episodeBannerIconColor = ThemeColor.podcastIcon02(activeTheme, Color.BLACK)
 
         viewModel.setup(
             episodeUuid = episodeUUID,
@@ -275,6 +285,7 @@ class EpisodeFragment : BaseFragment() {
                     is EpisodeFragmentState.Loaded -> {
                         binding.loadingGroup.isVisible = true
                         val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
+                        episodeBannerIconColor = iconColor
 
                         episodeLoadedListener?.onEpisodeLoaded(
                             EpisodeToolbarState(
@@ -476,11 +487,11 @@ class EpisodeFragment : BaseFragment() {
         }
 
         // Up Next
-        var podcastTint = ThemeColor.podcastIcon02(activeTheme, 0xFF000000.toInt())
+        var podcastTint = ThemeColor.podcastIcon02(activeTheme, Color.BLACK)
         var loadedPodcastUuid: String? = null
         viewModel.state.observe(viewLifecycleOwner) { state ->
             val loadedState = state as? EpisodeFragmentState.Loaded
-            val stateTint = loadedState?.tintColor ?: 0xFF000000.toInt()
+            val stateTint = loadedState?.tintColor ?: Color.BLACK
             podcastTint = ThemeColor.podcastIcon02(activeTheme, stateTint)
             loadedPodcastUuid = loadedState?.podcast?.uuid
         }
@@ -575,6 +586,10 @@ class EpisodeFragment : BaseFragment() {
             val transcript = viewModel.transcript.collectAsState().value
 
             AppTheme(activeTheme) {
+                val episodeIconColor = ComposeColor(episodeBannerIconColor)
+                val transcriptBannerColors = TranscriptExcerptBannerColors.default().copy(leadingIcon = episodeIconColor)
+                val chatBannerColors = ChatBannerColors.default().copy(leadingIcon = episodeIconColor)
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -592,6 +607,8 @@ class EpisodeFragment : BaseFragment() {
                         ) {
                             TranscriptExcerptBanner(
                                 isGenerated = textTranscript.isGenerated,
+                                colors = transcriptBannerColors,
+                                dimensions = TranscriptExcerptBannerDimensions.compact(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable(
@@ -615,6 +632,8 @@ class EpisodeFragment : BaseFragment() {
                                 val isPlusUser by viewModel.isPlusUser.collectAsState()
 
                                 ChatBanner(
+                                    colors = chatBannerColors,
+                                    dimensions = ChatBannerDimensions.compact(),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(

@@ -71,6 +71,10 @@ abstract class PodcastDao {
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
 
     @Transaction
+    @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND web_feed = 1 ORDER BY CASE WHEN latest_episode_date IS NULL THEN 0 ELSE 1 END, latest_episode_date DESC, LOWER(title) ASC")
+    abstract fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>>
+
+    @Transaction
     @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedUuids(): List<String>
 
