@@ -54,4 +54,7 @@ object FingerprintConstants {
 
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 3
+
+    /** Timeout for MediaCodec dequeue operations, in microseconds. */
+    const val CODEC_TIMEOUT_US = 10_000L
 }

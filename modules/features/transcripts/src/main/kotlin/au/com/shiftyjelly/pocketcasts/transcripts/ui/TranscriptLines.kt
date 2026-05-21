@@ -106,7 +106,7 @@ internal fun TranscriptLines(
                             Spacer(Modifier.height(8.dp))
                         }
                     }
-                    itemsIndexed(transcript.entries) { index, entry ->
+                    itemsIndexed(transcript.entries, key = { index, _ -> index }) { index, entry ->
                         TranscriptLine(
                             entryIndex = index,
                             entry = entry,

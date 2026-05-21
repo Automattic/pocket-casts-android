@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -28,6 +29,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -73,12 +75,22 @@ class FingerprintTimingManager @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
 
-    private var playbackToReference = mutableListOf<TimeMappingEntry>()
-    private var referenceToPlayback = mutableListOf<TimeMappingEntry>()
+    // Mapping state: writers build new lists under mutex, then atomically publish via @Volatile.
+    // Readers access the snapshot without locking, safe for use from the UI thread.
+    private var mappingPlaybackToReference = mutableListOf<TimeMappingEntry>()
+    private var mappingReferenceToPlayback = mutableListOf<TimeMappingEntry>()
+
+    @Volatile
+    private var snapshotPlaybackToReference: List<TimeMappingEntry> = emptyList()
+
+    @Volatile
+    private var snapshotReferenceToPlayback: List<TimeMappingEntry> = emptyList()
+
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
     private var preparationJob: Job? = null
     private var progressObserverJob: Job? = null
+    private var generation = 0L
 
     // Drift filter state
     private var filterLastTrusted: TimeMappingEntry? = null
@@ -104,15 +116,20 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         val episodeUuid = episode.uuid
-
-        // Already prepared for this episode — reuse existing state.
-        if (currentEpisodeUuid == episodeUuid && state !is State.Idle) return
-
         val podcastUuid = episode.podcastOrSubstituteUuid
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
 
         scope.launch {
-            mutex.withLock { resetState() }
+            val gen: Long
+            mutex.withLock {
+                // Already prepared for this episode — reuse existing state.
+                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) return@launch
+                resetState()
+                generation++
+                gen = generation
+            }
+            // Abort if a newer stop()/prepare() has started since we acquired the lock.
+            if (gen != generation) return@launch
             prepareForEpisode(episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
         }
 
@@ -133,6 +150,7 @@ class FingerprintTimingManager @Inject constructor(
     fun stop() {
         scope.launch {
             mutex.withLock {
+                generation++
                 resetState()
                 _stateFlow.value = State.Idle
             }
@@ -142,20 +160,18 @@ class FingerprintTimingManager @Inject constructor(
 
     fun referenceTime(forPlaybackTimeMs: Int): Double? {
         val playbackTimeSec = forPlaybackTimeMs / 1000.0
-        val entries = playbackToReference
         return interpolate(
             time = playbackTimeSec,
-            entries = entries,
+            entries = snapshotPlaybackToReference,
             keySelector = { it.playbackTime },
             valueSelector = { it.referenceTime },
         )
     }
 
     fun playbackTimeMs(forReferenceTime: Double): Int? {
-        val entries = referenceToPlayback
         val result = interpolate(
             time = forReferenceTime,
-            entries = entries,
+            entries = snapshotReferenceToPlayback,
             keySelector = { it.referenceTime },
             valueSelector = { it.playbackTime },
         ) ?: return null
@@ -173,8 +189,9 @@ class FingerprintTimingManager @Inject constructor(
         preparationJob = null
         progressObserverJob?.cancel()
         progressObserverJob = null
-        playbackToReference.clear()
-        referenceToPlayback.clear()
+        mappingPlaybackToReference.clear()
+        mappingReferenceToPlayback.clear()
+        publishSnapshot()
         lastProgressPositionMs = -1
         filterLastTrusted = null
         filterCandidatePool.clear()
@@ -300,8 +317,9 @@ class FingerprintTimingManager @Inject constructor(
         val cached = if (isLocalFile) FingerprintMappingCache.load(audioFilePath, refPath, referenceData) else null
         if (cached != null) {
             mutex.withLock {
-                playbackToReference = cached.entries.toMutableList()
-                referenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
+                mappingPlaybackToReference = cached.entries.toMutableList()
+                mappingReferenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
+                publishSnapshot()
                 filterLastTrusted = cached.entries.lastOrNull()
             }
             val coverage = cached.entries.size
@@ -311,7 +329,7 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         // Start streaming fingerprint generation
-        val currentTime = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
+        val currentTime = playbackManager.playbackStateFlow.first().positionMs / 1000.0
         startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
     }
 
@@ -348,7 +366,7 @@ class FingerprintTimingManager @Inject constructor(
         }
         lastProgressPositionMs = positionMs
 
-        if (!isWithinMappedRange(positionMs / 1000.0) && playbackToReference.isNotEmpty()) {
+        if (!isWithinMappedRange(positionMs / 1000.0) && mappingPlaybackToReference.isNotEmpty()) {
             Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
             val matcher = currentMatcher
             val audioPath = currentAudioFilePath
@@ -362,7 +380,7 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private fun isWithinMappedRange(playbackTimeSec: Double): Boolean {
-        val entries = playbackToReference
+        val entries = mappingPlaybackToReference
         val first = entries.firstOrNull() ?: return false
         val last = entries.lastOrNull() ?: return false
         val margin = FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS
@@ -481,7 +499,7 @@ class FingerprintTimingManager @Inject constructor(
     ) {
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
-        val timeoutUs = 10_000L
+        val timeoutUs = FingerprintConstants.CODEC_TIMEOUT_US
         // Default to 16-bit (safest assumption). Updated when the codec
         // reports its actual format via INFO_OUTPUT_FORMAT_CHANGED.
         var isOutputFloat = false
@@ -539,8 +557,8 @@ class FingerprintTimingManager @Inject constructor(
 
                         // Throttle if we're far ahead of playback
                         val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
-                        val currentPlayback = playbackManager.playbackStateRelay.blockingFirst().positionMs / 1000.0
-                        if (decodedSeconds - currentPlayback > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                        val lastKnownPositionMs = lastProgressPositionMs
+                        if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
                             delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
                         }
                     }
@@ -614,7 +632,8 @@ class FingerprintTimingManager @Inject constructor(
             inserted += consider(candidate)
         }
 
-        val coverage = playbackToReference.size
+        publishSnapshot()
+        val coverage = mappingPlaybackToReference.size
         if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
             _stateFlow.value = State.Active(coverage)
             if (!hasReachedActive) {
@@ -631,8 +650,8 @@ class FingerprintTimingManager @Inject constructor(
         val refData = currentReferenceData ?: return
         val refDuration = currentReferenceDuration
 
-        val snapshot = playbackToReference.toList()
-        FingerprintMappingCache.save(snapshot, audioPath, refPath, refData, refDuration)
+        val entries = mappingPlaybackToReference.toList()
+        FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 
     // endregion
@@ -695,23 +714,33 @@ class FingerprintTimingManager @Inject constructor(
     // region Time Mapping
 
     internal fun insertMapping(entry: TimeMappingEntry) {
-        val pbIdx = playbackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
-        playbackToReference.add(pbIdx, entry)
+        val pbIdx = mappingPlaybackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
+        mappingPlaybackToReference.add(pbIdx, entry)
 
-        val refIdx = referenceToPlayback.sortedInsertionIndex { it.referenceTime < entry.referenceTime }
-        referenceToPlayback.add(refIdx, entry)
+        val refIdx = mappingReferenceToPlayback.sortedInsertionIndex { it.referenceTime < entry.referenceTime }
+        mappingReferenceToPlayback.add(refIdx, entry)
     }
 
-    /** Test seam for inserting mappings synchronously. */
+    /** Publish an immutable snapshot of the mapping lists for lock-free reads. */
+    private fun publishSnapshot() {
+        snapshotPlaybackToReference = mappingPlaybackToReference.toList()
+        snapshotReferenceToPlayback = mappingReferenceToPlayback.toList()
+    }
+
+    /** Test seam: insert a mapping directly. Must only be called from single-threaded tests. */
+    @VisibleForTesting
     fun insert(mapping: TimeMappingEntry) {
         insertMapping(mapping)
+        publishSnapshot()
     }
 
-    /** Test seam for routing candidates through the drift filter synchronously. */
+    /** Test seam: route candidates through the drift filter. Must only be called from single-threaded tests. */
+    @VisibleForTesting
     fun stubMatches(entries: List<TimeMappingEntry>) {
         for (entry in entries) {
             consider(entry)
         }
+        publishSnapshot()
     }
 
     // endregion

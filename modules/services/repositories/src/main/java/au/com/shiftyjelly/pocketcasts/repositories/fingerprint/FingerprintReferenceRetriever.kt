@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.GZIPInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,6 +11,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
@@ -20,7 +21,8 @@ import timber.log.Timber
 class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
 ) {
-    private val inFlightRequests = ConcurrentHashMap<String, Deferred<ByteArray?>>()
+    private val inFlightRequests = mutableMapOf<String, Deferred<ByteArray?>>()
+    private val requestMutex = Mutex()
 
     suspend fun fetchReferenceData(
         baseUrl: String,
@@ -29,19 +31,20 @@ class FingerprintReferenceRetriever @Inject constructor(
     ): ByteArray? = coroutineScope {
         val key = "$podcastUuid/$episodeUuid"
 
-        val existing = inFlightRequests[key]
-        if (existing != null && existing.isActive) {
-            return@coroutineScope existing.await()
-        }
-
-        val deferred = async {
-            try {
-                performFetch(baseUrl, podcastUuid, episodeUuid)
-            } finally {
-                inFlightRequests.remove(key)
+        val deferred = requestMutex.withLock {
+            val existing = inFlightRequests[key]
+            if (existing != null && existing.isActive) {
+                existing
+            } else {
+                async {
+                    try {
+                        performFetch(baseUrl, podcastUuid, episodeUuid)
+                    } finally {
+                        requestMutex.withLock { inFlightRequests.remove(key) }
+                    }
+                }.also { inFlightRequests[key] = it }
             }
         }
-        inFlightRequests[key] = deferred
         deferred.await()
     }
 
@@ -62,28 +65,29 @@ class FingerprintReferenceRetriever @Inject constructor(
 
             try {
                 val request = Request.Builder().url(url).build()
-                val response = okHttpClient.newCall(request).execute()
-                val statusCode = response.code
+                okHttpClient.newCall(request).execute().use { response ->
+                    val statusCode = response.code
 
-                if (statusCode == 404 || statusCode == 403) {
-                    Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
-                    return null
-                }
-
-                if (statusCode != 200) {
-                    if (statusCode >= 500) {
-                        Timber.w("FingerprintReferenceRetriever: server error $statusCode for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES")
-                        continue
+                    if (statusCode == 404 || statusCode == 403) {
+                        Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
+                        return null
                     }
-                    Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                    return null
+
+                    if (statusCode != 200) {
+                        if (statusCode >= 500) {
+                            Timber.w("FingerprintReferenceRetriever: server error $statusCode for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES")
+                            continue
+                        }
+                        Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
+                        return null
+                    }
+
+                    val body = response.body.bytes()
+                    val jsonData = decompressGzipIfNeeded(body)
+
+                    Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
+                    return jsonData
                 }
-
-                val body = response.body.bytes()
-                val jsonData = decompressGzipIfNeeded(body)
-
-                Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                return jsonData
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: java.io.IOException) {

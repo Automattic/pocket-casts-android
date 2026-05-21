@@ -62,10 +62,11 @@ data class ReferenceFingerprint(
     companion object {
         const val SUPPORTED_FORMAT = "fingerprint-compact-v2"
 
+        private val moshi = Moshi.Builder().build()
+        private val adapter = moshi.adapter(ReferenceFingerprint::class.java)
+
         fun decode(data: ByteArray): ReferenceFingerprint? {
             return try {
-                val moshi = Moshi.Builder().build()
-                val adapter = moshi.adapter(ReferenceFingerprint::class.java)
                 val fingerprint = adapter.fromJson(String(data)) ?: return null
 
                 if (fingerprint.format != SUPPORTED_FORMAT) {
