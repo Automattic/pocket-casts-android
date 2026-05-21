@@ -74,7 +74,7 @@ fun BookmarksPage(
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
     onHeadphoneControlsButtonClick: () -> Unit,
-    onBookmarkDetailClick: (Bookmark, String) -> Unit,
+    onBookmarkDetailClick: (BookmarksViewModel.BookmarkDetailData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -132,10 +132,8 @@ fun BookmarksPage(
 
     val currentOnBookmarkDetailClick by rememberUpdatedState(onBookmarkDetailClick)
     LaunchedEffect(bookmarksViewModel) {
-        bookmarksViewModel.showBookmarkDetail.collect { bookmark ->
-            val loadedState = bookmarksViewModel.uiState.value as? UiState.Loaded
-            val episodeTitle = loadedState?.bookmarkIdAndEpisodeMap?.get(bookmark.uuid)?.title.orEmpty()
-            currentOnBookmarkDetailClick(bookmark, episodeTitle)
+        bookmarksViewModel.showBookmarkDetail.collect { data ->
+            currentOnBookmarkDetailClick(data)
         }
     }
 }

@@ -27,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -76,7 +78,7 @@ class BookmarksViewModel
     private val _message = MutableSharedFlow<BookmarkMessage>(extraBufferCapacity = 1)
     val message = _message.asSharedFlow()
 
-    private val _showBookmarkDetail = MutableSharedFlow<Bookmark>(extraBufferCapacity = 1)
+    private val _showBookmarkDetail = MutableSharedFlow<BookmarkDetailData>(extraBufferCapacity = 1)
     val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
 
     private var isFragmentActive: Boolean = true
@@ -259,10 +261,25 @@ class BookmarksViewModel
             } else {
                 multiSelectHelper.select(bookmark)
             }
-        } else {
-            viewModelScope.launch {
-                _showBookmarkDetail.emit(bookmark)
+        } else if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+            viewModelScope.launch(ioDispatcher) {
+                val loadedState = _uiState.value as? UiState.Loaded ?: return@launch
+                val episodeTitle = loadedState.bookmarkIdAndEpisodeMap[bookmark.uuid]
+                    ?.title.orEmpty()
+                val podcastTitle = bookmark.podcastTitle.ifEmpty {
+                    podcastManager.findPodcastByUuid(bookmark.podcastUuid)?.title.orEmpty()
+                }
+                _showBookmarkDetail.emit(
+                    BookmarkDetailData(
+                        bookmark = bookmark,
+                        episodeTitle = episodeTitle,
+                        podcastUuid = bookmark.podcastUuid,
+                        podcastTitle = podcastTitle,
+                    ),
+                )
             }
+        } else {
+            play(bookmark)
         }
     }
 
@@ -405,6 +422,13 @@ class BookmarksViewModel
         data object BookmarkEpisodeNotFound : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
     }
+
+    data class BookmarkDetailData(
+        val bookmark: Bookmark,
+        val episodeTitle: String,
+        val podcastUuid: String,
+        val podcastTitle: String,
+    )
 }
 
 internal sealed class MessageViewColors {

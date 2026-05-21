@@ -153,11 +153,13 @@ class BookmarksFragment : BaseFragment() {
                                 addFragment(fragment)
                             }
                         },
-                        onBookmarkDetailClick = { bookmark, episodeTitle ->
+                        onBookmarkDetailClick = { data ->
                             BookmarkDetailFragment.show(
                                 fragmentManager = parentFragmentManager,
-                                bookmark = bookmark,
-                                episodeTitle = episodeTitle,
+                                bookmark = data.bookmark,
+                                episodeTitle = data.episodeTitle,
+                                podcastUuid = data.podcastUuid,
+                                podcastTitle = data.podcastTitle,
                                 sourceView = sourceView,
                             )
                         },

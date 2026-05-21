@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,33 +13,29 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
-import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -48,11 +43,11 @@ internal fun BookmarkDetailPage(
     displayTitle: String,
     aiSummary: String?,
     episodeTitle: String,
-    episodeUuid: String,
+    podcastUuid: String,
+    podcastTitle: String,
     timeSecs: Int,
     createdAtText: String,
-    playbackManager: PlaybackManager,
-    sourceView: SourceView,
+    onPlayClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -64,6 +59,16 @@ internal fun BookmarkDetailPage(
         } else {
             BookmarkRowColors.default(theme.colors)
         }
+    }
+    val playButtonBackground = if (playerColors != null) {
+        playerColors.contrast01
+    } else {
+        theme.colors.primaryInteractive01
+    }
+    val playButtonText = if (playerColors != null) {
+        playerColors.background01
+    } else {
+        theme.colors.primaryInteractive02
     }
 
     Column(
@@ -79,18 +84,29 @@ internal fun BookmarkDetailPage(
         )
 
         Header(
-            episodeUuid = episodeUuid,
-            timeSecs = timeSecs,
-            playbackManager = playbackManager,
-            sourceView = sourceView,
             buttonColor = colors.primaryText,
-            buttonBackgroundColor = colors.primaryText.copy(alpha = 0.15f),
             onClose = onClose,
         )
 
         Column(
             modifier = Modifier.padding(horizontal = 20.dp),
         ) {
+            PodcastImage(
+                uuid = podcastUuid,
+                imageSize = 48.dp,
+                elevation = null,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (podcastTitle.isNotEmpty()) {
+                TextH70(
+                    text = podcastTitle.uppercase(),
+                    color = colors.secondaryText,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
             if (episodeTitle.isNotEmpty()) {
                 TextH70(
                     text = episodeTitle,
@@ -125,6 +141,20 @@ internal fun BookmarkDetailPage(
                 text = createdAtText,
                 color = colors.secondaryText,
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            val formattedTime = TimeHelper.formattedSeconds(timeSecs.toDouble())
+            RowButton(
+                text = stringResource(LR.string.bookmark_play_from, formattedTime),
+                onClick = onPlayClick,
+                includePadding = false,
+                leadingIcon = IR.drawable.ic_play,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = playButtonBackground,
+                ),
+                textColor = playButtonText,
+            )
         }
     }
 }
@@ -142,24 +172,11 @@ private fun DragHandle(modifier: Modifier = Modifier) {
 
 @Composable
 private fun Header(
-    episodeUuid: String,
-    timeSecs: Int,
-    playbackManager: PlaybackManager,
-    sourceView: SourceView,
     buttonColor: Color,
-    buttonBackgroundColor: Color,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
-    val playbackState by remember {
-        playbackManager.playbackStateFlow.map { it.episodeUuid to it.isPlaying }
-    }.collectAsState(initial = null)
-    val isPlayingThisEpisode = playbackState?.first == episodeUuid && playbackState?.second == true
-
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 20.dp, top = 4.dp, bottom = 8.dp),
@@ -174,24 +191,5 @@ private fun Header(
                 tint = buttonColor,
             )
         }
-
-        AnimatedPlayPauseButton(
-            isPlaying = isPlayingThisEpisode,
-            onClick = {
-                if (isPlayingThisEpisode) {
-                    playbackManager.pause(sourceView = sourceView)
-                } else {
-                    scope.launch {
-                        playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
-                        playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
-                    }
-                }
-            },
-            iconWidth = 24.dp,
-            iconHeight = 24.dp,
-            circleSize = 48.dp,
-            iconTint = buttonColor,
-            circleColor = buttonBackgroundColor,
-        )
     }
 }
