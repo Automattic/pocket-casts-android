@@ -25,7 +25,7 @@ class SummaryViewModelTest {
     @Mock
     private lateinit var transcriptManager: TranscriptManager
 
-    private fun createViewModel() = SummaryViewModel(transcriptManager)
+    private fun createViewModel() = SummaryViewModel(transcriptManager, coroutineRule.testDispatcher)
 
     @Test
     fun `initial state is Loading`() {
@@ -55,7 +55,7 @@ class SummaryViewModelTest {
     }
 
     @Test
-    fun `loading same episode twice does not re-fetch`() = runTest {
+    fun `loading same episode twice does not re-fetch when already loaded`() = runTest {
         whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
         val viewModel = createViewModel()
 
@@ -63,6 +63,19 @@ class SummaryViewModelTest {
         viewModel.loadSummary("episode-1")
 
         verify(transcriptManager).loadSummaryText("episode-1")
+    }
+
+    @Test
+    fun `loading same episode retries when previous attempt returned NotAvailable`() = runTest {
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn(null)
+        val viewModel = createViewModel()
+
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.NotAvailable, viewModel.state.value)
+
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Loaded("Summary text"), viewModel.state.value)
     }
 
     @Test

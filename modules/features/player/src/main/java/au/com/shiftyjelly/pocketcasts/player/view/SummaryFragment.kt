@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +16,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.summary.SummaryContent
@@ -39,8 +39,8 @@ class SummaryFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val state by summaryViewModel.state.collectAsState()
-        val podcast by playerViewModel.podcastFlow.collectAsState()
+        val state by summaryViewModel.state.collectAsStateWithLifecycle()
+        val podcast by playerViewModel.podcastFlow.collectAsStateWithLifecycle()
         val backgroundColor = Color(theme.playerBackgroundColor(podcast))
 
         AppThemeWithBackground(Theme.ThemeType.DARK) {
