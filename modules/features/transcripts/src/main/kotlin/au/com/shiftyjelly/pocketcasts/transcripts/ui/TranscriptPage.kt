@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -49,8 +47,6 @@ fun TranscriptPage(
     onShowSearchBar: () -> Unit,
     onHideSearchBar: () -> Unit,
     onClickSubscribe: () -> Unit,
-    onShowTranscript: (Transcript) -> Unit,
-    onShowTranscriptPaywall: (Transcript) -> Unit,
     modifier: Modifier = Modifier,
     fingerprintTimingManager: FingerprintTimingManager? = null,
     playbackManager: PlaybackManager? = null,
@@ -134,13 +130,6 @@ fun TranscriptPage(
         listState = listState,
     )
 
-    ShowTranscriptEffect(
-        uiState = uiState,
-        onShowTranscript = onShowTranscript,
-        onShowTranscriptPaywall = onShowTranscriptPaywall,
-    )
-
-    // Frame-rate highlight updates
     HighlightEffect(
         uiState = uiState,
         fingerprintTimingManager = fingerprintTimingManager,
@@ -148,7 +137,6 @@ fun TranscriptPage(
         onHighlightChange = { highlightIndex = it },
     )
 
-    // Auto-scroll to highlighted cue
     AutoScrollEffect(
         highlightIndex = highlightIndex,
         listState = listState,
@@ -158,7 +146,6 @@ fun TranscriptPage(
         onScroll = { hasInitiallyScrolled = true },
     )
 
-    // Detect user scrolling and suppress auto-scroll for 5s
     UserScrollDetectionEffect(
         listState = listState,
         onSuppressScroll = { isAutoScrollSuppressed = true },
@@ -241,41 +228,6 @@ private fun ScrollToItemEffect(
 }
 
 @Composable
-private fun ShowTranscriptEffect(
-    uiState: UiState,
-    onShowTranscript: (Transcript) -> Unit,
-    onShowTranscriptPaywall: (Transcript) -> Unit,
-) {
-    val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript
-    if (transcript != null) {
-        val isPaywallVisible = uiState.isPaywallVisible
-        LaunchedEffect(transcript, isPaywallVisible, onShowTranscript, onShowTranscriptPaywall) {
-            // This delay is necessary due to how transcript loading works in the player.
-            //
-            // We trigger the page open animation and transcript loading at the same time.
-            // This means that the callbacks from this effect can be invoked with
-            // lingering state from the previously shown transcript, followed by
-            // the new incoming state. This can result in issues such as analytics overreporting.
-            //
-            // Since loading happens almost immediately when the page opens,
-            // adding a small delay prevents the situation described above,
-            // because the effect will be cancelled before it runs.
-            //
-            // We could potentially clear the transcript state after
-            // closing the page, but this would trigger animations,
-            // resulting in a flicker-like visual experience.
-            delay(100)
-
-            if (isPaywallVisible) {
-                onShowTranscriptPaywall(transcript)
-            } else {
-                onShowTranscript(transcript)
-            }
-        }
-    }
-}
-
-@Composable
 private fun HighlightEffect(
     uiState: UiState,
     fingerprintTimingManager: FingerprintTimingManager?,
@@ -287,27 +239,20 @@ private fun HighlightEffect(
     val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
     val isSyncedActive = uiState.isSyncedActive
     val latestOnHighlightChanged by rememberUpdatedState(onHighlightChange)
-    val isPlaying by remember {
-        playbackManager.playbackStateFlow.map { it.isPlaying }
-    }.collectAsState(initial = playbackManager.isPlaying())
 
-    if (isPlaying && isSyncedActive) {
+    val playbackState by remember {
+        playbackManager.playbackStateFlow
+    }.collectAsState(initial = null)
+    val currentPosMs = playbackState?.positionMs
+    val isPlaying = playbackState?.isPlaying == true
+
+    if (isPlaying && isSyncedActive && currentPosMs != null) {
         LaunchedEffect(transcript.entries) {
-            // Compute initial highlight immediately without waiting for a frame.
             var cachedIndex = 0
-            val posMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
-            val refTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs)
-            if (refTime != null) {
-                val refTimeMs = (refTime * 1000).toLong()
-                val idx = findCueIndex(transcript.entries, refTimeMs, 0)
-                if (idx != null) cachedIndex = idx
-                latestOnHighlightChanged(idx)
-            }
-
             while (true) {
                 withFrameNanos { _ ->
-                    val currentPosMs = playbackManager.playbackStateRelay.blockingFirst().positionMs
-                    val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = currentPosMs) ?: return@withFrameNanos
+                    val posMs = currentPosMs
+                    val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
                     val currentRefTimeMs = (currentRefTime * 1000).toLong()
                     val idx = findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
                     if (idx != null) cachedIndex = idx
@@ -383,23 +328,54 @@ private fun findCueIndex(
         return cached
     }
 
-    // Forward scan from cached position
-    for (i in (cached + 1) until entries.size) {
+    val scanLimit = 10
+    val nearbyResult = findCueNearby(entries, refTimeMs, cached, scanLimit)
+    if (nearbyResult != null) return nearbyResult
+
+    return findCueBinarySearch(entries, refTimeMs)
+}
+
+private fun findCueNearby(
+    entries: List<TranscriptEntry>,
+    refTimeMs: Long,
+    cached: Int,
+    scanLimit: Int,
+): Int? {
+    for (i in (cached + 1) until minOf(cached + 1 + scanLimit, entries.size)) {
         val entry = entries[i]
         if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
             if (entry.startTimeMs > refTimeMs) break
             if (refTimeMs >= entry.startTimeMs && refTimeMs <= entry.endTimeMs) return i
         }
     }
-
-    // Backward scan
-    for (i in (cached - 1) downTo 0) {
+    for (i in (cached - 1) downTo maxOf(cached - scanLimit, 0)) {
         val entry = entries[i]
         if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
             if (refTimeMs >= entry.startTimeMs && refTimeMs <= entry.endTimeMs) return i
         }
     }
+    return null
+}
 
+private fun findCueBinarySearch(
+    entries: List<TranscriptEntry>,
+    refTimeMs: Long,
+): Int? {
+    var lo = 0
+    var hi = entries.size - 1
+    while (lo <= hi) {
+        val mid = (lo + hi) / 2
+        val entry = entries[mid]
+        if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+            when {
+                refTimeMs < entry.startTimeMs -> hi = mid - 1
+                refTimeMs > entry.endTimeMs -> lo = mid + 1
+                else -> return mid
+            }
+        } else {
+            lo = mid + 1
+        }
+    }
     return null
 }
 
