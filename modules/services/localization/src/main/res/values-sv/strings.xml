@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 11:56:35+0000
+Translation-Revision-Date: 2026-05-13 10:55:26+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Blogg · 24 apr</string>
+    <string name="onboarding_blogs_upsell_sample_title">Varför vi designade om spelaren</string>
+    <string name="onboarding_blogs_title">Bloggar: lyssna på\nvad du läser.</string>
+    <string name="blogs_error_generic">Något gick fel. Försök igen.</string>
+    <string name="blogs_error_no_feeds_found">Vi kunde inte hitta några webbflöden på denna URL. Kontrollera URL:en och försök igen.</string>
+    <string name="blogs_error_no_internet">Kontrollera din internetanslutning och försök igen.</string>
+    <string name="blogs_looking_up_feed">Söker efter webbflöde …</string>
+    <string name="blogs_found_on_this_site">Hittade %d webbflöden på denna webbplats</string>
+    <string name="blogs_pick_a_feed">VÄLJ ETT WEBBFLÖDE ATT FÖLJA</string>
+    <string name="blogs_add_url_hint">Klistra in en blogg eller RSS-URL så hittar vi webbflödet åt dig.</string>
+    <string name="blogs_empty_url_label">Blogg eller RSS-URL</string>
+    <string name="blogs_add_button">Lägg till en blogg</string>
+    <string name="blogs_empty_description">Klistra in en blogg eller RSS-URL. Vi kommer att avisera dig om varje inlägg och lägga till nya avsnitt automatiskt när webbplatsen publicerar något.</string>
+    <string name="blogs_empty_title">Förvandla vilken blogg som helst till en podcast</string>
+    <string name="profile_navigation_blogs">Bloggar</string>
+    <string name="settings_privacy_listening_stats_summary">Låt oss samla in lyssningsstatistik för att visa den på din statistiksida.</string>
+    <string name="settings_privacy_listening_stats">Lyssningsstatistik</string>
+    <string name="error_playback_failed_try_again">Uppspelningen misslyckades, försök igen.</string>
+    <string name="explicit">Explicit</string>
+    <string name="less">Mindre</string>
+    <string name="error_streaming_access_denied">Det här avsnittet kan inte spelas upp.</string>
     <string name="error_playback_connected">Du är ansluten</string>
     <string name="error_episode_not_available">Avsnitt inte tillgängligt</string>
     <string name="error_playback_offline">Du är offline</string>

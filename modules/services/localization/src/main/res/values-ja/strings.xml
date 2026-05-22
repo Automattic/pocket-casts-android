@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 09:55:30+0000
+Translation-Revision-Date: 2026-05-15 09:54:20+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">ブログ・4月24日</string>
+    <string name="onboarding_blogs_upsell_sample_title">プレーヤーをリデザインした理由</string>
+    <string name="onboarding_blogs_title">ブログ: 読みものを\n聴く。</string>
+    <string name="blogs_error_generic">エラーが発生しました。 もう一度お試しください。</string>
+    <string name="blogs_error_no_feeds_found">その URL ではフィードが見つかりませんでした。 URL を確認してからもう一度お試しください。</string>
+    <string name="blogs_error_no_internet">インターネット接続を確認して、もう一度お試しください。</string>
+    <string name="blogs_looking_up_feed">フィードを検索しています…</string>
+    <string name="blogs_found_on_this_site">このサイトで%d件のフィードが見つかりました</string>
+    <string name="blogs_pick_a_feed">フォローするフィードを選択</string>
+    <string name="blogs_add_url_hint">ブログまたは RSS URL を貼り付けると、フィードが見つかります。</string>
+    <string name="blogs_empty_url_label">ブログまたは RSS URL</string>
+    <string name="blogs_add_button">ブログを追加</string>
+    <string name="blogs_empty_description">ブログまたは RSS URL を貼り付けます。 すべての投稿にナレーションが付き、サイトの公開時に自動的に新しいエピソードが追加されます。</string>
+    <string name="blogs_empty_title">ブログをポッドキャストに変換</string>
+    <string name="profile_navigation_blogs">ブログ</string>
+    <string name="settings_privacy_listening_stats_summary">聴取統計を収集して統計ページに表示できるようにします。</string>
+    <string name="settings_privacy_listening_stats">聴取統計</string>
+    <string name="error_playback_failed_try_again">再生できませんでした。もう一度お試しください</string>
+    <string name="explicit">露骨</string>
+    <string name="less">少ない</string>
+    <string name="error_streaming_access_denied">このエピソードは再生できません。</string>
     <string name="error_episode_not_available">エピソードは利用できません</string>
     <string name="error_playback_connected">接続されています</string>
     <string name="error_playback_offline">オフラインになっています</string>
