@@ -137,7 +137,7 @@ fun BookmarkRow(
                     TextH70(
                         text = bookmark.episodeTitle,
                         color = colors.bookmarkRow.secondaryText,
-                        maxLines = 2,
+                        maxLines = 1,
                         modifier = Modifier.padding(top = 8.dp),
                     )
                 }
@@ -153,18 +153,9 @@ fun BookmarkRow(
                 TextH40(
                     text = displayTitle,
                     color = colors.bookmarkRow.primaryText,
-                    maxLines = 2,
+                    maxLines = 1,
                     lineHeight = 18.sp,
                 )
-
-                if (!bookmark.aiSummary.isNullOrEmpty()) {
-                    TextH70(
-                        text = bookmark.aiSummary.orEmpty(),
-                        color = colors.bookmarkRow.secondaryText,
-                        maxLines = 2,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                }
 
                 TextH70(
                     text = createdAtText,
