@@ -3,17 +3,22 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.BookmarkPlayTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class BookmarkDetailFragment : BaseDialogFragment() {
@@ -71,6 +76,12 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     @Inject
     internal lateinit var playbackManager: PlaybackManager
 
+    @Inject
+    internal lateinit var episodeManager: EpisodeManager
+
+    @Inject
+    internal lateinit var eventHorizon: EventHorizon
+
     private val displayTitle: String get() = requireArguments().getString(ARG_DISPLAY_TITLE, "")
     private val aiSummary: String? get() = requireArguments().getString(ARG_AI_SUMMARY)
     private val episodeTitle: String get() = requireArguments().getString(ARG_EPISODE_TITLE, "")
@@ -96,18 +107,34 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 podcastTitle = podcastTitle,
                 timeSecs = timeSecs,
                 createdAtText = createdAtText,
-                onPlayClick = {
-                    lifecycleScope.launch {
-                        playbackManager.playNowSuspend(
-                            episodeUuid = episodeUuid,
-                            sourceView = sourceView,
-                        )
-                        playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
-                    }
-                    dismiss()
-                },
+                onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
             )
         }
+    }
+
+    private fun onPlayClick() {
+        lifecycleScope.launch {
+            val episode = episodeManager.findEpisodeByUuid(episodeUuid)
+            if (episode == null) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(LR.string.episode_not_found),
+                    Toast.LENGTH_SHORT,
+                ).show()
+                dismiss()
+                return@launch
+            }
+            playbackManager.playNowSuspend(episode, sourceView = sourceView)
+            playbackManager.seekToTimeMs(positionMs = timeSecs * 1000)
+            eventHorizon.track(
+                BookmarkPlayTappedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
+        }
+        dismiss()
     }
 }

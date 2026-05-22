@@ -26,15 +26,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -191,5 +196,25 @@ private fun Header(
                 tint = buttonColor,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkDetailPagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        BookmarkDetailPage(
+            displayTitle = "Latency vs throughput tradeoff",
+            aiSummary = "Why optimizing for low latency often means sacrificing batch throughput.",
+            episodeTitle = "Can the U.S. Rein in Prediction Markets?",
+            podcastUuid = "",
+            podcastTitle = "Hard Fork",
+            timeSecs = 340,
+            createdAtText = "May 7, 2024 - 6:40 PM",
+            onPlayClick = {},
+            onClose = {},
+        )
     }
 }
