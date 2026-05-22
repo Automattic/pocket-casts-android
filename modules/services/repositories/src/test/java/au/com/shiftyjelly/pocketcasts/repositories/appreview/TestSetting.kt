@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import java.time.Clock
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -21,4 +22,6 @@ class TestSetting<T>(
     }
 
     fun set(value: T) = set(value, updateModifiedAt = false)
+
+    override fun getSyncValue(lastSyncTime: Instant): T? = value
 }

@@ -1,3 +1,7 @@
+8.13
+-----
+
+
 8.12
 -----
 *   Bug Fixes
@@ -5,7 +9,6 @@
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))
     *   Hide the "Plus expires in X days" label on the profile for auto-renewing subscribers
         ([#5263](https://github.com/Automattic/pocket-casts-android/pull/5263))
-
 
 8.11
 -----
@@ -15,6 +18,8 @@
 *   Updates
     *   Make sure archived episode status is preserved across sync
         ([#5227](https://github.com/Automattic/pocket-casts-android/pull/5227))
+    *   Display dedicated error message for retryable playback errors
+        ([#5244](https://github.com/Automattic/pocket-casts-android/pull/5244))
 
 8.10
 -----

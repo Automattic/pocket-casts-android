@@ -248,6 +248,46 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    IMPROVED_LISTENING_STATS(
+        key = "improved_listening_stats",
+        title = "Show improved listening stats",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    BLOGS(
+        key = "blogs",
+        title = "Blogs into a podcast",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    PROFILE_SHARING(
+        key = "profile_sharing",
+        title = "Profile sharing",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    EPISODE_CHAT(
+        key = "episode_chat",
+        title = "Episode Chat",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    EPISODE_CHAT_PLAYABLE_QUOTES(
+        key = "episode_chat_playable_quotes",
+        title = "Episode Chat: Playable Quotes",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

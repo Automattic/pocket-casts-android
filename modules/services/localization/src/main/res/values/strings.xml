@@ -124,6 +124,7 @@
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
+    <string name="episode_chat">Chat with Episode</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -1175,6 +1176,7 @@
     <string name="profile_navigation_listening_history">Listening History</string>
     <string name="profile_navigation_starred" translatable="false">@string/starred</string>
     <string name="profile_navigation_stats">Stats</string>
+    <string name="profile_navigation_blogs">Blogs</string>
     <string name="profile_new_email_address">New Email Address</string>
     <string name="profile_new_password">New Password</string>
     <string name="profile_newsletter_detail">Receive news, app updates, themed playlists, interviews, and more.</string>
@@ -1820,6 +1822,8 @@
     <string name="settings_privacy_analytics">Analytics</string>
     <string name="settings_privacy_analytics_first_party">First-party analytics</string>
     <string name="settings_privacy_analytics_summary">Allow us to collect analytics.</string>
+    <string name="settings_privacy_listening_stats">Listening statistics</string>
+    <string name="settings_privacy_listening_stats_summary">Allow us to collect listening statistics to display them in your Stats page.</string>
     <string name="settings_privacy_analytics_third_party">Third-party analytics</string>
     <string name="settings_privacy_analytics_third_party_summary">Allow us to use trusted third-party services to collect anonymous data.</string>
     <string name="settings_privacy_crash">Crash reports</string>
@@ -1876,6 +1880,7 @@
     <string name="error_check_your_internet_connection">Check your internet connection.</string>
     <string name="error_playback_offline">You\'re offline</string>
     <string name="error_playback_connected">You\'re connected</string>
+    <string name="error_playback_failed_try_again">Playback failed, please try again.</string>
     <string name="error_episode_not_available">Episode not available</string>
     <string name="error_download_missing_episode">Unable to find the episode data on this device. Please contact support.</string>
     <string name="error_download_no_episode_file">Unable to create a download file for the episode. Please check that you have enough storage space on your device.</string>
@@ -2357,8 +2362,26 @@
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
 
-    <!--    Tasker Plugin-->
+    <!-- Chat -->
+    <string name="chat_paywall_title">Chat with this episode</string>
+    <string name="chat_context_label">Chatting with this episode</string>
+    <string name="chat_context_label_with_duration">Chatting with this episode · %1$s</string>
+    <string name="chat_episode_assistant">EPISODE ASSISTANT</string>
+    <string name="chat_thinking">THINKING</string>
+    <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
+    <string name="chat_preview_user_1">What was the main topic of this episode?</string>
+    <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
+    <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
+    <string name="chat_input_hint">Ask about this episode…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_clear">Clear Chat</string>
+    <string name="chat_error_server">Something went wrong. Please try again.</string>
+    <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
+    <string name="chat_tap_to_retry">Tap to retry</string>
+    <string name="chat_play_quote">Play quote</string>
+    <string name="chat_stop_quote">Stop quote</string>
 
+    <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
     <string name="filter_x_not_found">Playlist %1$s not found</string>
     <string name="no_episodes_in_filter_x">No episodes in playlist %1$s</string>
@@ -2714,6 +2737,9 @@
     <string name="onboarding_shuffle_item_duration_hours">%1$dh %2$dm</string>
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
+    <string name="onboarding_blogs_title">Blogs: listen to\nwhat you read.</string>
+    <string name="onboarding_blogs_upsell_sample_title">Why we redesigned the player</string>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · Apr 24</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>
     <string name="onboarding_upgrade_pp">Privacy\u00A0Policy</string>
     <string name="onboarding_notification_popup_newsletter">Subscribe to our Newsletter</string>
@@ -2754,4 +2780,19 @@
     <!-- A label under the happy face emoji. A user will be redirected to leave a review after tapping it. -->
     <string name="app_rating_yes_label">Yes!</string>
     <string name="offline_icon_content_description">Offline icon</string>
+
+    <string name="blogs_empty_title">Turn any blog into a podcast</string>
+    <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
+    <string name="blogs_add_button">Add a blog</string>
+    <string name="blogs_experiment_banner_lead">This is an experiment.</string>
+    <string name="blogs_experiment_banner_body">Blogs is something we\'re trying out. It might stick around, get reworked, or quietly go away.</string>
+    <string name="blogs_empty_url_label">Blog or RSS URL</string>
+    <string name="blogs_empty_url_placeholder" translatable="false">https://</string>
+    <string name="blogs_add_url_hint">Paste a blog or RSS URL and we\'ll find the feed for you.</string>
+    <string name="blogs_pick_a_feed">PICK A FEED TO FOLLOW</string>
+    <string name="blogs_found_on_this_site">Found %d feeds on this site</string>
+    <string name="blogs_looking_up_feed">Looking up feed...</string>
+    <string name="blogs_error_no_internet">Check your internet connection and try again.</string>
+    <string name="blogs_error_no_feeds_found">We couldn\'t find any feeds at that URL. Please check the URL and try again.</string>
+    <string name="blogs_error_generic">Something went wrong. Please try again.</string>
 </resources>

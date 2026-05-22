@@ -426,13 +426,15 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
     private fun performDeleteDownload(list: List<BaseEpisode>) {
         closeMultiSelect()
-        launch(NonCancellable) {
-            val episodes = list.filterIsInstance<PodcastEpisode>().map(BaseEpisode::uuid)
-            downloadQueue.cancelAll(episodes, source)
+        launch {
+            withContext(NonCancellable) {
+                val episodes = list.filterIsInstance<PodcastEpisode>().map(BaseEpisode::uuid)
+                downloadQueue.cancelAll(episodes, source)
 
-            val userEpisodes = list.filterIsInstance<UserEpisode>()
-            userEpisodeManager.deleteAll(userEpisodes, playbackManager)
-            episodeManager.disableAutoDownload(list)
+                val userEpisodes = list.filterIsInstance<UserEpisode>()
+                userEpisodeManager.deleteAll(userEpisodes, playbackManager)
+                episodeManager.disableAutoDownload(list)
+            }
         }
     }
 

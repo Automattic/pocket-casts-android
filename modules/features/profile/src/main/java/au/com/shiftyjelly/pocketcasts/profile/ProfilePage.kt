@@ -71,6 +71,7 @@ internal fun ProfilePage(
     onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
     onHeaderClick: () -> Unit,
+    onShareClick: () -> Unit,
     onCreateFreeAccountBannerClick: () -> Unit,
     onDismissCreateFreeAccountBannerClick: () -> Unit,
     onEndOfYearCardShow: () -> Unit,
@@ -111,6 +112,7 @@ internal fun ProfilePage(
                     headerState = state.headerState,
                     statsState = state.statsState,
                     onHeaderClick = onHeaderClick,
+                    onShareClick = onShareClick,
                     isPortrait = isPortrait,
                 )
                 item {
@@ -166,7 +168,7 @@ internal fun ProfilePage(
                 }
                 item {
                     ProfileSections(
-                        sections = ProfileSection.entries,
+                        sections = state.sections,
                         onClick = onSectionClick,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -216,6 +218,7 @@ internal fun ProfilePage(
 }
 
 internal data class ProfilePageState(
+    val sections: List<ProfileSection>,
     val isPlaybackEnabled: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
@@ -281,6 +284,7 @@ private fun LazyListScope.headerWithStats(
     headerState: ProfileHeaderState,
     statsState: ProfileStatsState,
     onHeaderClick: () -> Unit,
+    onShareClick: () -> Unit,
     isPortrait: Boolean,
 ) {
     if (isPortrait) {
@@ -288,6 +292,7 @@ private fun LazyListScope.headerWithStats(
             ProfileHeader(
                 state = headerState,
                 onClick = onHeaderClick,
+                onShareClick = onShareClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = horizontalPadding),
@@ -318,6 +323,7 @@ private fun LazyListScope.headerWithStats(
                 ProfileHeader(
                     state = headerState,
                     onClick = onHeaderClick,
+                    onShareClick = onShareClick,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStats(
@@ -365,6 +371,7 @@ private fun ProfilePageStub(
 ) {
     ProfilePage(
         state = ProfilePageState(
+            sections = ProfileSection.entries,
             isPlaybackEnabled = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,
@@ -374,6 +381,7 @@ private fun ProfilePageStub(
                 imageUrl = null,
                 subscriptionTier = null,
                 expiresIn = null,
+                isShareVisible = true,
             ),
             statsState = ProfileStatsState(
                 podcastsCount = 50,
@@ -398,6 +406,7 @@ private fun ProfilePageStub(
         onReferralsTooltipShow = {},
         onSettingsClick = {},
         onHeaderClick = {},
+        onShareClick = {},
         onCreateFreeAccountBannerClick = {},
         onDismissCreateFreeAccountBannerClick = {},
         onEndOfYearCardShow = {},

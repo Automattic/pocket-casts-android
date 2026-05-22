@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncService
+import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Lazy
@@ -365,6 +366,23 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @WebFeedsServiceRetrofit
+    fun provideWebFeedsRetrofit(
+        builder: Retrofit.Builder,
+        @Cached httpClient: Lazy<OkHttpClient>,
+    ): Retrofit {
+        return builder
+            .baseUrl(Settings.WEB_FEEDS_API_URL)
+            .callFactory { request -> httpClient.get().newCall(request) }
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWebFeedsService(@WebFeedsServiceRetrofit retrofit: Retrofit): WebFeedsService = retrofit.create()
+
+    @Provides
+    @Singleton
     fun provideListWebService(@DiscoverServiceRetrofit retrofit: Retrofit): ListWebService = retrofit.create()
 
     @Singleton
@@ -504,3 +522,7 @@ annotation class SearchRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class AnalyticsLiveRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class WebFeedsServiceRetrofit

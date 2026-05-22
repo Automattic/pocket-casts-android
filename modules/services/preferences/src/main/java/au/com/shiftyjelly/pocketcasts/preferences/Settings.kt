@@ -51,6 +51,8 @@ interface Settings {
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
         const val SEARCH_API_URL = BuildConfig.SEARCH_API_URL
+        const val WEB_FEEDS_API_URL = BuildConfig.WEB_FEEDS_API_URL
+
         const val WP_COM_API_URL = "https://public-api.wordpress.com"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
@@ -315,6 +317,7 @@ interface Settings {
     val prioritizeSeekAccuracy: UserSetting<Boolean>
     val cacheEntirePlayingEpisode: UserSetting<Boolean>
     val liveAnalyticsUrl: UserSetting<String>
+    val collectListeningStats: ReadWriteSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType

@@ -181,6 +181,7 @@ private fun onLoginToExistingAccount(
 }
 
 val forcedPurchaseSources = listOf(
+    OnboardingUpgradeSource.BLOGS,
     OnboardingUpgradeSource.BOOKMARKS,
     OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
     OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,

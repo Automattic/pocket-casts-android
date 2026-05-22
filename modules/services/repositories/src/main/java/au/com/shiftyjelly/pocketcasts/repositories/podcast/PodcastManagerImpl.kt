@@ -368,6 +368,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observePodcastsOrderByRecentlyPlayedEpisode()
     }
 
+    override fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>> {
+        return podcastDao.observeSubscribedWebFeedPodcasts()
+    }
+
     override fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>> {
         return observePodcastsSortedByLatestEpisode().asFlowable()
     }

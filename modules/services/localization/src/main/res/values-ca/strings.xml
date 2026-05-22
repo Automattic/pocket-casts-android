@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-23 22:46:10+0000
+Translation-Revision-Date: 2026-05-19 22:05:21+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="chat_stop_quote">Atura la citació</string>
+    <string name="chat_play_quote">Reprodueix la citació</string>
+    <string name="chat_tap_to_retry">Toca per tornar-ho a intentar</string>
+    <string name="chat_error_network">No s\'ha pogut connectar al servidor. Comprova la connexió.</string>
+    <string name="chat_error_server">S\'ha produït un error. Torna-ho a intentar.</string>
+    <string name="chat_clear">Esborra el xat</string>
+    <string name="chat_send">Envia</string>
+    <string name="chat_input_hint">Pregunta sobre aquest episodi…</string>
+    <string name="chat_preview_user_2">S\'han esmentat consells pràctics?</string>
+    <string name="chat_preview_ai_2">Aquest episodi aprofundeix en la ciència de la formació d\'hàbits i explora com les petites rutines diàries poden generar grans canvis amb el temps.</string>
+    <string name="chat_preview_user_1">Quin era el tema principal d\'aquest episodi?</string>
+    <string name="chat_preview_ai_1">Hola! Soc aquí per ajudar-te a explorar aquest episodi. Pregunta\'m qualsevol cosa sobre els temes tractats, les conclusions principals o moments concrets.</string>
+    <string name="chat_thinking">PENSANT</string>
+    <string name="chat_episode_assistant">ASSISTENT DE L\'EPISODI</string>
+    <string name="chat_context_label_with_duration">Xatejant sobre aquest episodi · %1$s</string>
+    <string name="chat_context_label">Xatejant sobre aquest episodi</string>
+    <string name="chat_paywall_title">Xateja sobre aquest episodi</string>
+    <string name="episode_chat">Xateja sobre l\'episodi</string>
+    <string name="blogs_experiment_banner_body">Els blogs són una cosa que estem experimentant. Pot quedar-se, remodelar-se, o desaparèixer sense fer soroll.</string>
+    <string name="blogs_experiment_banner_lead">Això és un experiment.</string>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · 24 d\'abril</string>
+    <string name="onboarding_blogs_upsell_sample_title">Per què hem redissenyat el reproductor</string>
+    <string name="onboarding_blogs_title">Blocs: escolta el que llegeixes.</string>
+    <string name="blogs_error_generic">S\'ha produït un error. Torna-ho a provar.</string>
+    <string name="blogs_error_no_feeds_found">No s\'ha trobat cap feed a aquesta URL. Comprova la URL i torna-ho a provar.</string>
+    <string name="blogs_error_no_internet">Comprova la connexió a internet i torna-ho a provar.</string>
+    <string name="blogs_looking_up_feed">S\'està cercant el feed…</string>
+    <string name="blogs_found_on_this_site">S\'han trobat %d feeds en aquest lloc</string>
+    <string name="blogs_pick_a_feed">TRIA UN FEED PER SEGUIR</string>
+    <string name="blogs_add_url_hint">Enganxa la URL d\'un bloc o RSS i trobarem el feed per tu.</string>
+    <string name="blogs_empty_url_label">URL del bloc o RSS</string>
+    <string name="blogs_add_button">Afegeix un bloc</string>
+    <string name="blogs_empty_description">Enganxa la URL d\'un bloc o RSS. Narrarem cada entrada i afegirem nous episodis automàticament a mesura que el lloc publiqui.</string>
+    <string name="blogs_empty_title">Converteix qualsevol bloc en un pòdcast</string>
+    <string name="profile_navigation_blogs">Blocs</string>
+    <string name="settings_privacy_listening_stats_summary">Permet-nos recollir estadístiques d\'escolta per mostrar-les a la pàgina Estadístiques.</string>
+    <string name="settings_privacy_listening_stats">Estadístiques d\'escolta</string>
+    <string name="error_playback_failed_try_again">La reproducció ha fallat. Torna-ho a provar</string>
+    <string name="explicit">Explícit</string>
     <string name="less">Menys</string>
     <string name="error_streaming_access_denied">Aquest episodi no es pot reproduir.</string>
     <string name="error_episode_not_available">Episodi no disponible</string>
@@ -976,7 +1015,6 @@ Language: ca
     <string name="no_episodes_found_for_episode_ids_x">No s\'han trobat episodis amb els IDs d\'episodi %1$s</string>
     <string name="no_episode_ids_provided">No s\'ha introduït cap ID d\'episodi</string>
     <string name="pocket_casts_add_to_up_next">Opció \'Afegir a Tot seguit\' de Pocket Casts</string>
-    <string name="pocket_casts_query_podcast_episodes">Consultar episodios de pòdcast a Pocket Casts</string>
     <string name="pocket_casts_query_podcasts">Consultar pòdcasts a Pocket Casts</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Es pot cancel·lar en qualsevol moment.</string>
     <string name="filter_id_or_title">Títol o ID de la llista de reproducció</string>
@@ -987,6 +1025,7 @@ Language: ca
     <string name="add_mode">Mode d\'afegir</string>
     <string name="clear_up_next">Esborra la llista «Tot seguit»</string>
     <string name="pocket_casts_query_up_next_episodes">Consultar episodis afegits a «Tot seguit» a Pocket Casts</string>
+    <string name="pocket_casts_query_podcast_episodes">Consultar episodis de pòdcast a Pocket Casts</string>
     <string name="profile_cancel_confirm_item_folders">Les carpetes s\'eliminaran i els seus continguts es traslladaran a la pantalla Podcast.</string>
     <string name="profile_cancel_confirm_cancel_button_title">Sí, cancel·la la meva subscripció</string>
     <string name="profile_cancel_confirm_stay_button_title">De fet, vull quedar-me</string>

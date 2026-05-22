@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 09:56:13+0000
+Translation-Revision-Date: 2026-05-14 09:57:44+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">部落格· 4 月 24 日</string>
+    <string name="onboarding_blogs_upsell_sample_title">我們重新設計播放器的原因</string>
+    <string name="onboarding_blogs_title">部落格：聆聽\n閱讀的內容。</string>
+    <string name="blogs_error_generic">發生錯誤。 請再試一次。</string>
+    <string name="blogs_error_no_feeds_found">我們找不到該 URL 的任何摘要。 請檢查 URL 並再試一次。</string>
+    <string name="blogs_error_no_internet">請檢查你的網際網路連線並再試一次。</string>
+    <string name="blogs_looking_up_feed">正在查詢摘要…</string>
+    <string name="blogs_found_on_this_site">在這個網站找到 %d 則摘要</string>
+    <string name="blogs_pick_a_feed">挑選要追蹤的摘要</string>
+    <string name="blogs_add_url_hint">請貼上部落格或 RSS URL，我們會為你尋找摘要。</string>
+    <string name="blogs_empty_url_label">部落格或 RSS URL</string>
+    <string name="blogs_add_button">新增部落格</string>
+    <string name="blogs_empty_description">貼上部落格或 RSS URL。 我們會朗讀每篇文章，並在網站發表時自動新增單集。</string>
+    <string name="blogs_empty_title">將任意部落格轉成 Podcast</string>
+    <string name="profile_navigation_blogs">部落格</string>
+    <string name="settings_privacy_listening_stats_summary">允許我們收集聆聽統計資料，以便在統計頁面中顯示。</string>
+    <string name="settings_privacy_listening_stats">聆聽統計資料</string>
+    <string name="error_playback_failed_try_again">播放失敗，請再試一次。</string>
+    <string name="explicit">明確</string>
+    <string name="less">較少</string>
+    <string name="error_streaming_access_denied">本集無法播放。</string>
     <string name="error_episode_not_available">本集無法收聽</string>
     <string name="error_playback_connected">你並未連線</string>
     <string name="error_playback_offline">你目前為離線狀態</string>

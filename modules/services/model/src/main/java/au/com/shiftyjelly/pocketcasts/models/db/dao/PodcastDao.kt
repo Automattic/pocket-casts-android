@@ -71,6 +71,10 @@ abstract class PodcastDao {
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
 
     @Transaction
+    @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND web_feed = 1 ORDER BY CASE WHEN latest_episode_date IS NULL THEN 0 ELSE 1 END, latest_episode_date DESC, LOWER(title) ASC")
+    abstract fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>>
+
+    @Transaction
     @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedUuids(): List<String>
 
@@ -288,8 +292,8 @@ abstract class PodcastDao {
     @Update
     abstract suspend fun updateSuspend(podcast: Podcast)
 
-    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit WHERE uuid = :uuid")
-    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?)
+    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit, web_feed = :webFeed WHERE uuid = :uuid")
+    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?, webFeed: Boolean)
 
     @Query("DELETE FROM podcasts WHERE uuid = :uuid")
     abstract fun deleteByUuidBlocking(uuid: String)

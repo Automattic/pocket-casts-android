@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -130,10 +131,12 @@ class ManualCleanupViewModel
             trackCleanupCompleted()
             val episodeUuids = episodesToDelete.map(BaseEpisode::uuid)
 
-            viewModelScope.launch(NonCancellable) {
-                _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
-                downloadQueue.cancelAll(episodeUuids, SourceView.DOWNLOADS).join()
-                episodeManager.disableAutoDownload(episodesToDelete)
+            viewModelScope.launch {
+                withContext(NonCancellable) {
+                    _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
+                    downloadQueue.cancelAll(episodeUuids, SourceView.DOWNLOADS).join()
+                    episodeManager.disableAutoDownload(episodesToDelete)
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
 import com.automattic.eventhorizon.UpNextShownEvent
 import com.automattic.eventhorizon.UpNextSourceType
 import java.time.Clock
+import java.time.Instant
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -171,6 +172,8 @@ private class TestSetting<T>(
     override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) {
         stateFlow.value = value
     }
+
+    override fun getSyncValue(lastSyncTime: Instant): T? = value
 
     fun set(value: T) = set(value, updateModifiedAt = false)
 }
