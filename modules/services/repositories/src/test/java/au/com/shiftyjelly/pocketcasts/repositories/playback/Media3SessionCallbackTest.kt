@@ -34,6 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -492,6 +493,40 @@ class Media3SessionCallbackTest {
 
         val result = future.get()
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `onAddMediaItems with current episode resumes queue instead of forcing player switch`() = runTest {
+        val episode = PodcastEpisode(
+            uuid = "ep-uuid-1",
+            title = "My Episode",
+            duration = 3600.0,
+            publishedDate = Date(),
+            podcastUuid = "pod-uuid-1",
+        )
+        whenever(episodeManager.findEpisodeByUuid("ep-uuid-1")).thenReturn(episode)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("pod-uuid-1#ep-uuid-1")
+            .build()
+
+        val future = callback.onAddMediaItems(mockSession, mockController, listOf(mediaItem))
+        testScope.advanceUntilIdle()
+
+        val result = future.get()
+        assertEquals(1, result.size)
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = eq(false),
+        )
+        verify(playbackManager, never()).playNowSuspend(
+            episode = any(),
+            forceStream = any(),
+            showedStreamWarning = any(),
+            sourceView = any(),
+        )
     }
 
     @Test
