@@ -411,11 +411,6 @@ internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builde
         Player.COMMAND_PLAY_PAUSE,
         Player.COMMAND_SET_MEDIA_ITEM,
         Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-        // Advertise skip-to-next/previous so AAOS steering-wheel skip buttons (and
-        // other Media3 controllers) route through seekToNext()/seekToPrevious().
-        // See PCDROID-560.
-        Player.COMMAND_SEEK_TO_NEXT,
-        Player.COMMAND_SEEK_TO_PREVIOUS,
         Player.COMMAND_STOP,
         Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
         Player.COMMAND_GET_METADATA,

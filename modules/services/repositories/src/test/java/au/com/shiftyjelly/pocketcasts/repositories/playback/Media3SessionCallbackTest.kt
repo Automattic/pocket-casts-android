@@ -109,10 +109,8 @@ class Media3SessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_BACK))
-        // SEEK_TO_NEXT / SEEK_TO_PREVIOUS are advertised so AAOS steering-wheel skip
-        // buttons route through seekToNext()/seekToPrevious(). See PCDROID-560.
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
-        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_METADATA))
