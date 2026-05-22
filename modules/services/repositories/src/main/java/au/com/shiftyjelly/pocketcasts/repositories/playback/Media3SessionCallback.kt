@@ -154,7 +154,11 @@ internal class Media3SessionCallback(
                     val resolvedItem = buildEpisodeMediaItem(episode, podcast, mediaId)
                     future.set(listOf(resolvedItem))
 
-                    playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    if (playbackManager.getCurrentEpisode()?.uuid == episode.uuid) {
+                        playbackManager.playQueueSuspend(sourceView = source)
+                    } else {
+                        playbackManager.playNowSync(episode = episode, sourceView = source)
+                    }
                 } catch (e: Exception) {
                     Timber.e(e, "Play from media ID failed")
                     future.set(emptyList())
