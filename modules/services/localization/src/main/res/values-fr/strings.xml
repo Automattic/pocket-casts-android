@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-08 22:54:58+0000
+Translation-Revision-Date: 2026-05-14 11:58:34+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · Avr 24</string>
+    <string name="onboarding_blogs_upsell_sample_title">Pourquoi nous avons repensé le lecteur</string>
+    <string name="onboarding_blogs_title">Blogs : écouter\nce que vous lisez.</string>
+    <string name="blogs_error_generic">Un problème est survenu. Veuillez réessayer.</string>
+    <string name="blogs_error_no_feeds_found">Nous n’avons trouvé aucun flux à cette URL. Veuillez vérifier l’URL et réessayer.</string>
+    <string name="blogs_error_no_internet">Vérifiez votre connexion internet, puis réessayez.</string>
+    <string name="blogs_looking_up_feed">Vérification du flux…</string>
+    <string name="blogs_found_on_this_site">%d flux trouvé(s) sur ce site</string>
+    <string name="blogs_pick_a_feed">CHOISIR UN FLUX À SUIVRE</string>
+    <string name="blogs_add_url_hint">Collez une URL de blog ou de flux RSS et nous trouverons le flux pour vous.</string>
+    <string name="blogs_empty_url_label">URL du blog ou de flux RSS</string>
+    <string name="blogs_add_button">Ajouter un blog</string>
+    <string name="blogs_empty_description">Collez une URL de blog ou de flux RSS. Nous créerons un récit pour chaque article et ajouterons de nouveaux épisodes automatiquement à mesure de la publication du site.</string>
+    <string name="blogs_empty_title">Transformez n’importe quel blog en podcast</string>
+    <string name="profile_navigation_blogs">Blogs</string>
+    <string name="settings_privacy_listening_stats_summary">Autorisez-nous à collecter des statistiques d’écoute pour les afficher sur votre page de statistiques.</string>
+    <string name="settings_privacy_listening_stats">Statistiques d’écoute</string>
+    <string name="error_playback_failed_try_again">Échec de la lecture, veuillez réessayer.</string>
+    <string name="explicit">Explicite</string>
+    <string name="less">Réduire</string>
+    <string name="error_streaming_access_denied">Impossible de lire cet épisode.</string>
     <string name="error_episode_not_available">Épisode non disponible</string>
     <string name="error_playback_connected">Vous êtes connecté</string>
     <string name="error_playback_offline">Vous êtes hors ligne</string>

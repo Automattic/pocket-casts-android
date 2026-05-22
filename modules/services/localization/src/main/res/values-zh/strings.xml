@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-08 10:54:13+0000
+Translation-Revision-Date: 2026-05-15 09:54:19+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">博客 · 4 月 24 日</string>
+    <string name="onboarding_blogs_upsell_sample_title">我们重新设计播放器的原因</string>
+    <string name="onboarding_blogs_title">博客：用心聆听\n您所阅读的内容。</string>
+    <string name="blogs_error_generic">出错了。 请重试。</string>
+    <string name="blogs_error_no_feeds_found">我们在该 URL 上找不到任何源。 请检查该 URL，然后重试。</string>
+    <string name="blogs_error_no_internet">请检查您的网络连接，然后重试。</string>
+    <string name="blogs_looking_up_feed">正在查找源…</string>
+    <string name="blogs_found_on_this_site">在此站点上找到 %d 个源</string>
+    <string name="blogs_pick_a_feed">选择一个要关注的源</string>
+    <string name="blogs_add_url_hint">请粘贴博客或 RSS URL，我们将为您查找该源。</string>
+    <string name="blogs_empty_url_label">博客或 RSS URL</string>
+    <string name="blogs_add_button">添加博客</string>
+    <string name="blogs_empty_description">粘贴博客或 RSS URL。 我们将为每篇文章添加旁白，并随站点发布自动添加新剧集。</string>
+    <string name="blogs_empty_title">将任何博客转换为播客</string>
+    <string name="profile_navigation_blogs">博客</string>
+    <string name="settings_privacy_listening_stats_summary">请允许我们收集收听统计信息，以便在您的“统计信息”页面中显示。</string>
+    <string name="settings_privacy_listening_stats">收听统计信息</string>
+    <string name="error_playback_failed_try_again">播放失败，请重试。</string>
+    <string name="explicit">成人内容</string>
+    <string name="less">更少</string>
+    <string name="error_streaming_access_denied">无法播放此剧集。</string>
     <string name="error_episode_not_available">剧集暂不可用</string>
     <string name="error_playback_connected">您已连接</string>
     <string name="error_playback_offline">您处于离线状态</string>
