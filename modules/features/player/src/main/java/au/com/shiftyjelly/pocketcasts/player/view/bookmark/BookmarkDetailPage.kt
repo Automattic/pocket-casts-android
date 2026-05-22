@@ -96,29 +96,36 @@ internal fun BookmarkDetailPage(
         Column(
             modifier = Modifier.padding(horizontal = 20.dp),
         ) {
-            PodcastImage(
-                uuid = podcastUuid,
-                imageSize = 48.dp,
-                elevation = null,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PodcastImage(
+                    uuid = podcastUuid,
+                    imageSize = 48.dp,
+                    elevation = null,
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    if (podcastTitle.isNotEmpty()) {
+                        TextH70(
+                            text = podcastTitle.uppercase(),
+                            color = colors.secondaryText,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+
+                    if (episodeTitle.isNotEmpty()) {
+                        TextH70(
+                            text = episodeTitle,
+                            color = colors.primaryText,
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (podcastTitle.isNotEmpty()) {
-                TextH70(
-                    text = podcastTitle.uppercase(),
-                    color = colors.secondaryText,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            if (episodeTitle.isNotEmpty()) {
-                TextH70(
-                    text = episodeTitle,
-                    color = colors.secondaryText,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
 
             TextH30(
                 text = displayTitle,
@@ -154,7 +161,7 @@ internal fun BookmarkDetailPage(
                 text = stringResource(LR.string.bookmark_play_from, formattedTime),
                 onClick = onPlayClick,
                 includePadding = false,
-                leadingIcon = IR.drawable.ic_play,
+                textIcon = IR.drawable.ic_play,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = playButtonBackground,
                 ),
