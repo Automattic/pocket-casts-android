@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 11:54:47+0000
+Translation-Revision-Date: 2026-05-14 11:59:00+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · 24 apr</string>
+    <string name="onboarding_blogs_upsell_sample_title">Perché abbiamo riprogettato il lettore</string>
+    <string name="onboarding_blogs_title">Blog: ascolta\nciò che leggi.</string>
+    <string name="blogs_error_generic">Si è verificato un problema. Riprova.</string>
+    <string name="blogs_error_no_feeds_found">Non abbiamo trovato alcun feed su quell\'URL. Controlla l\'URL e riprova.</string>
+    <string name="blogs_error_no_internet">Controlla la tua connessione a Internet e riprova.</string>
+    <string name="blogs_looking_up_feed">Ricerca del feed…</string>
+    <string name="blogs_found_on_this_site">Trovati %d feed su questo sito</string>
+    <string name="blogs_pick_a_feed">SCEGLI UN FEED DA SEGUIRE</string>
+    <string name="blogs_add_url_hint">Incolla l\'URL di un blog o RSS e troveremo il feed adatto a te.</string>
+    <string name="blogs_empty_url_label">URL di un blog o RSS</string>
+    <string name="blogs_add_button">Aggiungi un blog</string>
+    <string name="blogs_empty_description">Incolla l\'URL di un blog o RSS. Narreremo ogni articolo e aggiungeremo automaticamente nuovi episodi man mano che vengono pubblicati sul sito.</string>
+    <string name="blogs_empty_title">Trasforma un blog in un podcast</string>
+    <string name="profile_navigation_blogs">Blog</string>
+    <string name="settings_privacy_listening_stats_summary">Consentici di raccogliere le statistiche di ascolto per visualizzarle nella tua pagina Statistiche.</string>
+    <string name="settings_privacy_listening_stats">Statistiche di ascolto</string>
+    <string name="error_playback_failed_try_again">Riproduzione non riuscita, riprova.</string>
+    <string name="explicit">Esplicito</string>
+    <string name="less">Meno</string>
+    <string name="error_streaming_access_denied">Questo episodio non può essere riprodotto.</string>
     <string name="error_episode_not_available">Episodio non disponibile</string>
     <string name="error_playback_connected">Sei connesso</string>
     <string name="error_playback_offline">Sei offline</string>

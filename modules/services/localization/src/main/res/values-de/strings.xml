@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-08 14:56:25+0000
+Translation-Revision-Date: 2026-05-13 10:54:50+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Blog ・ 24. April</string>
+    <string name="onboarding_blogs_upsell_sample_title">Warum wir den Player umgestaltet haben</string>
+    <string name="onboarding_blogs_title">Blogs: Anhören\nwas du liest.</string>
+    <string name="blogs_error_generic">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
+    <string name="blogs_error_no_feeds_found">Wir konnten unter dieser URL keine Feeds finden. Bitte überprüfe die URL und versuche es erneut.</string>
+    <string name="blogs_error_no_internet">Überprüfe deine Internetverbindung und versuche es erneut.</string>
+    <string name="blogs_looking_up_feed">Feed wird gesucht …</string>
+    <string name="blogs_found_on_this_site">%d Feeds auf dieser Website gefunden</string>
+    <string name="blogs_pick_a_feed">FEED ZUM FOLGEN AUSWÄHLEN</string>
+    <string name="blogs_add_url_hint">Füge eine Blog- oder RSS-URL ein, dann suchen wir den Feed für dich.</string>
+    <string name="blogs_empty_url_label">Blog- oder RSS-URL</string>
+    <string name="blogs_add_button">Blog hinzufügen</string>
+    <string name="blogs_empty_description">Füge eine Blog- oder RSS-URL ein. Wir vertonen jeden Beitrag und fügen neue Folgen automatisch hinzu, wenn die Website veröffentlicht wird.</string>
+    <string name="blogs_empty_title">Verwandle jedes Blog in einen Podcast</string>
+    <string name="profile_navigation_blogs">Blogs</string>
+    <string name="settings_privacy_listening_stats_summary">Erlaube uns, Hörstatistiken zu sammeln, um sie auf deiner Statistikseite anzuzeigen.</string>
+    <string name="settings_privacy_listening_stats">Hörstatistiken</string>
+    <string name="error_playback_failed_try_again">Wiedergabe fehlgeschlagen, bitte versuche es erneut.</string>
+    <string name="explicit">Explizit</string>
+    <string name="less">Weniger</string>
+    <string name="error_streaming_access_denied">Diese Folge kann nicht abgespielt werden.</string>
     <string name="error_episode_not_available">Folge nicht verfügbar</string>
     <string name="error_playback_connected">Du bist verbunden</string>
     <string name="error_playback_offline">Du bist offline</string>

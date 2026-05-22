@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 09:55:38+0000
+Translation-Revision-Date: 2026-05-14 09:56:09+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">مدوّنة · 24 أبريل</string>
+    <string name="onboarding_blogs_upsell_sample_title">لماذا أعدنا تصميم المشغل</string>
+    <string name="onboarding_blogs_title">المدوّنات: استمع إلى\nما تقرأه.</string>
+    <string name="blogs_error_generic">حدث خطأ ما. يُرجى المحاولة مرة أخرى.</string>
+    <string name="blogs_error_no_feeds_found">تعذر العثور على أي موجزات على عنوان الموقع هذا. يُرجى التحقق من عنوان الموقع والمحاولة مرة أخرى.</string>
+    <string name="blogs_error_no_internet">تحقق من اتصالك بالإنترنت ثم حاول مرة أخرى.</string>
+    <string name="blogs_looking_up_feed">جارٍ البحث عن الموجز…</string>
+    <string name="blogs_found_on_this_site">اكتمل العثور على %d موجزات على هذا الموقع</string>
+    <string name="blogs_pick_a_feed">اختر موجزًا لمتابعته</string>
+    <string name="blogs_add_url_hint">ألصق عنوان موقع لمدونة أو RSS وسنعثر على الموجز نيابةً عنك.</string>
+    <string name="blogs_empty_url_label">عنوان الموقع لمدونة أو RSS</string>
+    <string name="blogs_add_button">إضافة مدونة</string>
+    <string name="blogs_empty_description">ألصق عنوان الموقع لمدونة أو RSS. سنحوّل كل تدوينة إلى محتوى صوتي ونضيف الحلقات الجديدة تلقائيًا فور نشرها على الموقع.</string>
+    <string name="blogs_empty_title">حوّل أي مدونة إلى بث صوتي</string>
+    <string name="profile_navigation_blogs">المدونات</string>
+    <string name="settings_privacy_listening_stats_summary">اسمح لنا بجمع إحصاءات الاستماع لعرضها في صفحة الإحصاءات.</string>
+    <string name="settings_privacy_listening_stats">إحصاءات الاستماع</string>
+    <string name="error_playback_failed_try_again">تعذر تشغيل المحتوى، يُرجى المحاولة مرة أخرى.</string>
+    <string name="explicit">محتوى صريح</string>
+    <string name="less">أقل</string>
+    <string name="error_streaming_access_denied">يتعذر تشغيل هذه الحلقة.</string>
     <string name="error_episode_not_available">الحلقة غير متوفرة</string>
     <string name="error_playback_connected">أنت متصل</string>
     <string name="error_playback_offline">أنت غير متصل بالإنترنت</string>

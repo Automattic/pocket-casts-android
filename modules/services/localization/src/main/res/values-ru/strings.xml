@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 18:55:50+0000
+Translation-Revision-Date: 2026-05-14 13:54:55+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Блог · 24 апреля</string>
+    <string name="onboarding_blogs_upsell_sample_title">Почему мы изменили дизайн плеера</string>
+    <string name="onboarding_blogs_title">Блоги: слушайте то,\nчто вы читаете.</string>
+    <string name="blogs_error_generic">Что-то пошло не так. Повторите попытку.</string>
+    <string name="blogs_error_no_feeds_found">Не удалось найти ленты по этому URL-адресу. Проверьте URL-адрес и повторите попытку.</string>
+    <string name="blogs_error_no_internet">Проверьте подключение к Интернету и повторите попытку.</string>
+    <string name="blogs_looking_up_feed">Поиск ленты…</string>
+    <string name="blogs_found_on_this_site">Ленты, найденные на этом сайте: %d</string>
+    <string name="blogs_pick_a_feed">ВЫБЕРИТЕ ЛЕНТУ ДЛЯ ПОДПИСКИ</string>
+    <string name="blogs_add_url_hint">Вставьте URL-адрес блога или RSS, и мы найдём для вас ленту.</string>
+    <string name="blogs_empty_url_label">URL блога или RSS</string>
+    <string name="blogs_add_button">Добавить блог</string>
+    <string name="blogs_empty_description">Вставьте URL-адрес блога или RSS. Мы преобразуем каждую запись в голосовой формат и станем автоматически добавлять новые выпуски по мере публикации новых записей на сайте.</string>
+    <string name="blogs_empty_title">Превращайте любой блог в подкаст</string>
+    <string name="profile_navigation_blogs">Блоги</string>
+    <string name="settings_privacy_listening_stats_summary">Разрешите собирать статистику прослушиваний, чтобы отображать её на странице статистики.</string>
+    <string name="settings_privacy_listening_stats">Статистика прослушиваний</string>
+    <string name="error_playback_failed_try_again">Не удалось воспроизвести, повторите попытку.</string>
+    <string name="explicit">Бранная лексика</string>
+    <string name="less">Меньше</string>
+    <string name="error_streaming_access_denied">Невозможно воспроизвести выпуск.</string>
     <string name="error_episode_not_available">Выпуск недоступен</string>
     <string name="error_playback_connected">Вы подключены</string>
     <string name="error_playback_offline">Отсутствует подключение к Интернету</string>
