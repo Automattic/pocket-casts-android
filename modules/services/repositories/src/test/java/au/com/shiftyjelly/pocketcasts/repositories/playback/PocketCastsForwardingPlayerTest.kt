@@ -163,7 +163,7 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `available commands expose core controls and skip-to-next-previous`() {
+    fun `available commands expose only core controls`() {
         val commands = forwardingPlayer.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
