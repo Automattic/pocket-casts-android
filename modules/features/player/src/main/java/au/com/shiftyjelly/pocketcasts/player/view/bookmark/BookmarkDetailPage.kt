@@ -134,8 +134,9 @@ internal fun BookmarkDetailPage(
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            val formattedTime = TimeHelper.formattedSeconds(timeSecs.toDouble())
             TextH70(
-                text = TimeHelper.formattedSeconds(timeSecs.toDouble()),
+                text = formattedTime,
                 color = colors.secondaryText,
             )
 
@@ -155,8 +156,6 @@ internal fun BookmarkDetailPage(
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-
-            val formattedTime = TimeHelper.formattedSeconds(timeSecs.toDouble())
             RowButton(
                 text = stringResource(LR.string.bookmark_play_from, formattedTime),
                 onClick = onPlayClick,
