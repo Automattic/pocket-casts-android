@@ -10,7 +10,6 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -521,7 +520,7 @@ class Media3SessionCallbackTest {
             sourceView = any(),
             showedStreamWarning = eq(false),
         )
-        verify(playbackManager, never()).playNowSuspend(
+        verify(playbackManager, never()).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),
