@@ -439,7 +439,7 @@ class Media3SessionCallbackTest {
     // --- onAddMediaItems resolved item tests ---
 
     @Test
-    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSuspend`() = runTest {
+    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSync`() = runTest {
         val episode = PodcastEpisode(
             uuid = "ep-uuid-1",
             title = "My Episode",
@@ -471,7 +471,7 @@ class Media3SessionCallbackTest {
         assertNotNull(resolved.mediaMetadata.artworkUri)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),
@@ -551,7 +551,7 @@ class Media3SessionCallbackTest {
         assertEquals("My Upload", resolved.mediaMetadata.title)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),
