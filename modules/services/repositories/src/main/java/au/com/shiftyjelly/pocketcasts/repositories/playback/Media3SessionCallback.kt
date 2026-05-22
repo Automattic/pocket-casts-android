@@ -157,7 +157,7 @@ internal class Media3SessionCallback(
                     if (playbackManager.getCurrentEpisode()?.uuid == episode.uuid) {
                         playbackManager.playQueueSuspend(sourceView = source)
                     } else {
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        playbackManager.playNowSync(episode = episode, sourceView = source)
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Play from media ID failed")
