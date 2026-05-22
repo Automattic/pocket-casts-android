@@ -48,12 +48,9 @@ data class Bookmark(
 
     val displayTitle: String
         get() {
-            val userEdited = titleModified != null && titleModified!! > createdAt.time
-            return when {
-                aiTitle == null -> title
-                userEdited -> title
-                else -> aiTitle ?: title
-            }
+            val aiTitleValue = aiTitle ?: return title
+            val userEditedAt = titleModified ?: return aiTitleValue
+            return if (userEditedAt > createdAt.time) title else aiTitleValue
         }
 
     fun createdAtDatePattern(): String {
