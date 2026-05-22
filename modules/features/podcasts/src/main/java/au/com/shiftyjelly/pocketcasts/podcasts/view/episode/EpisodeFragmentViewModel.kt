@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -54,6 +55,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 
 @HiltViewModel
@@ -68,6 +70,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val showNotesManager: ShowNotesManager,
     private val eventHorizon: EventHorizon,
     private val transcriptManager: TranscriptManager,
+    private val userManager: UserManager,
 ) : ViewModel(),
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -83,6 +86,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val disposables = CompositeDisposable()
 
     var episode: PodcastEpisode? = null
+    var podcast: Podcast? = null
     var isFragmentChangingConfigurations: Boolean = false
 
     private var startPlaybackTimestamp: Duration? = null
@@ -91,6 +95,17 @@ class EpisodeFragmentViewModel @Inject constructor(
     private var loadTranscriptJob: Job? = null
     private val _transcript = MutableStateFlow<Transcript?>(null)
     val transcript = _transcript.asStateFlow()
+
+    private val _isPlusUser = MutableStateFlow(false)
+    val isPlusUser = _isPlusUser.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            userManager.getSignInState().asFlow().collect { signInState ->
+                _isPlusUser.value = signInState.isSignedInAsPlusOrPatron
+            }
+        }
+    }
 
     fun setup(
         episodeUuid: String,
@@ -157,6 +172,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                         play(it.episode, playTimestamp)
                     }
                     episode = it.episode
+                    podcast = it.podcast
                 }
             }
             .onErrorReturn { EpisodeFragmentState.Error(it) }

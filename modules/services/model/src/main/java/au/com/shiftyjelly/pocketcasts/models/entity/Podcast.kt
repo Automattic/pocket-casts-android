@@ -102,6 +102,7 @@ data class Podcast(
     @ColumnInfo(name = "funding_url") var fundingUrl: String? = null,
     @ColumnInfo(name = "slug") var slug: String = "",
     @ColumnInfo(name = "explicit") var explicit: Boolean? = null,
+    @ColumnInfo(name = "web_feed", defaultValue = "0") var webFeed: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
     @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {

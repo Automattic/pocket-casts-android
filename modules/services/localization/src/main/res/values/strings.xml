@@ -124,6 +124,7 @@
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
+    <string name="episode_chat">Chat with Episode</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -2361,8 +2362,26 @@
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
 
-    <!--    Tasker Plugin-->
+    <!-- Chat -->
+    <string name="chat_paywall_title">Chat with this episode</string>
+    <string name="chat_context_label">Chatting with this episode</string>
+    <string name="chat_context_label_with_duration">Chatting with this episode · %1$s</string>
+    <string name="chat_episode_assistant">EPISODE ASSISTANT</string>
+    <string name="chat_thinking">THINKING</string>
+    <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
+    <string name="chat_preview_user_1">What was the main topic of this episode?</string>
+    <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
+    <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
+    <string name="chat_input_hint">Ask about this episode…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_clear">Clear Chat</string>
+    <string name="chat_error_server">Something went wrong. Please try again.</string>
+    <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
+    <string name="chat_tap_to_retry">Tap to retry</string>
+    <string name="chat_play_quote">Play quote</string>
+    <string name="chat_stop_quote">Stop quote</string>
 
+    <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
     <string name="filter_x_not_found">Playlist %1$s not found</string>
     <string name="no_episodes_in_filter_x">No episodes in playlist %1$s</string>
@@ -2718,6 +2737,9 @@
     <string name="onboarding_shuffle_item_duration_hours">%1$dh %2$dm</string>
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
+    <string name="onboarding_blogs_title">Blogs: listen to\nwhat you read.</string>
+    <string name="onboarding_blogs_upsell_sample_title">Why we redesigned the player</string>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · Apr 24</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>
     <string name="onboarding_upgrade_pp">Privacy\u00A0Policy</string>
     <string name="onboarding_notification_popup_newsletter">Subscribe to our Newsletter</string>
@@ -2762,6 +2784,8 @@
     <string name="blogs_empty_title">Turn any blog into a podcast</string>
     <string name="blogs_empty_description">Paste a blog or RSS URL. We\'ll narrate every post and add new episodes automatically as the site publishes.</string>
     <string name="blogs_add_button">Add a blog</string>
+    <string name="blogs_experiment_banner_lead">This is an experiment.</string>
+    <string name="blogs_experiment_banner_body">Blogs is something we\'re trying out. It might stick around, get reworked, or quietly go away.</string>
     <string name="blogs_empty_url_label">Blog or RSS URL</string>
     <string name="blogs_empty_url_placeholder" translatable="false">https://</string>
     <string name="blogs_add_url_hint">Paste a blog or RSS URL and we\'ll find the feed for you.</string>

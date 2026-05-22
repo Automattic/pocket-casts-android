@@ -15,6 +15,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +34,7 @@ fun PodcastInfoView(
     state: PodcastInfoState,
     onWebsiteLinkClick: () -> Unit,
     modifier: Modifier = Modifier,
+    linkColor: Color = MaterialTheme.theme.colors.primaryIcon01,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -50,16 +52,19 @@ fun PodcastInfoView(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(16.dp),
         ) {
-            PodcastInfoItem(
-                state.author,
-                IR.drawable.ic_author,
-            )
+            if (state.author.isNotEmpty()) {
+                PodcastInfoItem(
+                    state.author,
+                    IR.drawable.ic_author,
+                )
+            }
 
             if (!state.link.isNullOrEmpty()) {
                 PodcastInfoItem(
                     text = state.link,
                     icon = IR.drawable.ic_link,
                     isLink = true,
+                    linkColor = linkColor,
                     onWebsiteLinkClick = onWebsiteLinkClick,
                 )
             }
@@ -87,6 +92,7 @@ private fun PodcastInfoItem(
     icon: Int,
     modifier: Modifier = Modifier,
     isLink: Boolean = false,
+    linkColor: Color = MaterialTheme.theme.colors.primaryIcon01,
     onWebsiteLinkClick: () -> Unit = {},
 ) {
     Row(
@@ -107,7 +113,7 @@ private fun PodcastInfoItem(
             TextP40(
                 text = text,
                 maxLines = 3,
-                color = MaterialTheme.theme.colors.support05,
+                color = linkColor,
                 fontWeight = FontWeight.W400,
                 modifier = Modifier.clickable {
                     onWebsiteLinkClick.invoke()

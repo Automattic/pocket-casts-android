@@ -74,6 +74,7 @@ internal fun AddBlogPage(
     onUrlChange: (url: String) -> Unit,
     onBackPress: () -> Unit,
     onFindFeeds: (url: String) -> Unit,
+    onRetry: (url: String) -> Unit,
     onFeedClick: (webFeed: WebFeed) -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
@@ -92,6 +93,7 @@ internal fun AddBlogPage(
             url = url,
             onUrlChange = onUrlChange,
             onFindFeeds = onFindFeeds,
+            onRetry = onRetry,
             onFeedClick = onFeedClick,
             onEditUrl = onEditUrl,
         )
@@ -104,6 +106,7 @@ private fun AddBlogContent(
     url: String,
     onUrlChange: (url: String) -> Unit,
     onFindFeeds: (url: String) -> Unit,
+    onRetry: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
@@ -150,7 +153,7 @@ private fun AddBlogContent(
             is UiState.Start -> FormContent(onContinueClick = { onFindFeeds(url) })
             is UiState.Loading -> LoadingContent()
             is UiState.Pick -> PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
-            is UiState.Error -> ErrorContent(reason = state.reason, onRetry = { onFindFeeds(url) })
+            is UiState.Error -> ErrorContent(reason = state.reason, onRetry = { onRetry(url) })
         }
     }
 }
@@ -441,6 +444,7 @@ private fun AddBlogPageStartPreview(
             url = "",
             onBackPress = {},
             onFindFeeds = { _ -> },
+            onRetry = { _ -> },
             onFeedClick = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
@@ -459,6 +463,7 @@ private fun AddBlogPageLoadingPreview(
             url = "",
             onBackPress = {},
             onFindFeeds = { _ -> },
+            onRetry = { _ -> },
             onFeedClick = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
@@ -482,6 +487,7 @@ private fun AddBlogPagePickPreview(
             url = "",
             onBackPress = {},
             onFindFeeds = { _ -> },
+            onRetry = { _ -> },
             onFeedClick = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
@@ -500,6 +506,7 @@ private fun AddBlogPageErrorPreview(
             url = "",
             onBackPress = {},
             onFindFeeds = { _ -> },
+            onRetry = { _ -> },
             onFeedClick = { _ -> },
             onEditUrl = {},
             onUrlChange = {},

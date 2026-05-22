@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile.blogs
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,8 +35,11 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -57,6 +61,7 @@ internal fun EmptyBlogsPage(
     onBackPress: () -> Unit,
     onAddBlogClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showContent: Boolean = true,
 ) {
     val colors = MaterialTheme.theme.colors
     Column(
@@ -68,10 +73,32 @@ internal fun EmptyBlogsPage(
             title = stringResource(LR.string.profile_navigation_blogs),
             onNavigationClick = onBackPress,
         )
-        BlogsEmptyContent(
-            onAddBlogClick = onAddBlogClick,
-            modifier = Modifier.weight(1f),
-        )
+        if (showContent) {
+            BlogsEmptyContent(
+                onAddBlogClick = onAddBlogClick,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExperimentBanner(modifier: Modifier = Modifier) {
+    val text = buildAnnotatedString {
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+            append(stringResource(LR.string.blogs_experiment_banner_lead))
+        }
+        append(' ')
+        append(stringResource(LR.string.blogs_experiment_banner_body))
+    }
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.theme.colors.support10.copy(alpha = 0.1f))
+            .border(width = 1.dp, color = MaterialTheme.theme.colors.support10, shape = RoundedCornerShape(12.dp))
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+    ) {
+        TextP40(text = text)
     }
 }
 
@@ -90,6 +117,10 @@ private fun BlogsEmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        ExperimentBanner()
+
+        Spacer(Modifier.weight(1f))
+
         BlogsIllustration()
 
         Spacer(Modifier.height(24.dp))
@@ -121,6 +152,10 @@ private fun BlogsEmptyContent(
             ),
             modifier = Modifier.fillMaxWidth(),
         )
+
+        Spacer(Modifier.height(60.dp))
+
+        Spacer(Modifier.weight(1f))
     }
 }
 

@@ -410,7 +410,7 @@ class SyncManagerImpl @Inject constructor(
             delay((pollCount + 1) * 1_000L)
             val pollUuid = response.pollUuid
             response = getCacheTokenOrLogin { token ->
-                syncServiceManager.pollWebFeedPodcast(token, pollUuid)
+                syncServiceManager.pollWebFeedPodcast(token = token, pollUuid = pollUuid, url = url)
             }
             pollCount++
         }
