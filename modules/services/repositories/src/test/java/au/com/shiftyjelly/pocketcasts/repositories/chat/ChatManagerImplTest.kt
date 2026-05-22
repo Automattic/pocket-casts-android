@@ -5,11 +5,13 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,10 +33,12 @@ class ChatManagerImplTest {
         on { observeTranscripts(any()) } doReturn transcripts
     }
     private val podcastCacheServiceManager = mock<PodcastCacheServiceManager>()
+    private val tokenHandler = TestTokenHandler()
     private val manager = ChatManagerImpl(
         episodeChatDao = episodeChatDao,
         transcriptDao = transcriptDao,
         podcastCacheServiceManager = podcastCacheServiceManager,
+        tokenHandler = tokenHandler,
         moshi = Moshi.Builder().build(),
     )
 
@@ -66,7 +70,7 @@ class ChatManagerImplTest {
             createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"),
             createTranscript(type = "application/json", isGenerated = false, url = "author-url"),
         )
-        whenever(podcastCacheServiceManager.episodeChat(any())).thenReturn(
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
                 quote = EpisodeChatQuote(
@@ -89,7 +93,9 @@ class ChatManagerImplTest {
         )
 
         val requestCaptor = argumentCaptor<EpisodeChatRequest>()
-        verify(podcastCacheServiceManager).episodeChat(requestCaptor.capture())
+        val authorizationCaptor = argumentCaptor<String>()
+        verify(podcastCacheServiceManager).episodeChat(authorizationCaptor.capture(), requestCaptor.capture())
+        assertEquals("Bearer access-token", authorizationCaptor.firstValue)
         assertEquals(
             EpisodeChatRequest(
                 transcriptUrl = "author-url",
@@ -120,7 +126,9 @@ class ChatManagerImplTest {
     @Test
     fun `send retry skips storing user message`() = runTest {
         transcripts.value = listOf(createTranscript())
-        whenever(podcastCacheServiceManager.episodeChat(any())).thenReturn(EpisodeChatResponse(reply = "Assistant reply", quote = null))
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(reply = "Assistant reply", quote = null),
+        )
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
@@ -168,7 +176,7 @@ class ChatManagerImplTest {
     @Test
     fun `blank quote text is ignored`() = runTest {
         transcripts.value = listOf(createTranscript())
-        whenever(podcastCacheServiceManager.episodeChat(any())).thenReturn(
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
                 quote = EpisodeChatQuote(text = " ", start = "00:01", end = "00:03"),
@@ -187,6 +195,12 @@ class ChatManagerImplTest {
     }
 
     private fun quoteAdapter() = Moshi.Builder().build().adapter(QuoteMetadata::class.java)
+
+    private class TestTokenHandler : TokenHandler {
+        override suspend fun getAccessToken() = AccessToken("access-token")
+
+        override fun invalidateAccessToken() = Unit
+    }
 
     private class TestEpisodeChatDao : EpisodeChatDao() {
         val chats = mutableListOf<EpisodeChat>()
