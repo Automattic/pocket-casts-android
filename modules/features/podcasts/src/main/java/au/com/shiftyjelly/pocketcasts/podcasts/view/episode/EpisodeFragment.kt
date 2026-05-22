@@ -298,9 +298,7 @@ class EpisodeFragment : BaseFragment() {
                         text = "$dateText \u00B7 $durationText",
                         color = MaterialTheme.theme.colors.primaryText02,
                         fontSize = 14.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                     )
                 }
