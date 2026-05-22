@@ -217,32 +217,14 @@ internal class Media3SessionCallback(
             KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
             -> {
-                scope.launch {
-                    try {
-                        playbackManager.skipForwardSuspend(
-                            sourceView = source,
-                            jumpAmountSeconds = settings.skipForwardInSecs.value,
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Skip forward failed")
-                    }
-                }
+                launchSkipForward()
                 return true
             }
 
             KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
             KeyEvent.KEYCODE_MEDIA_REWIND,
             -> {
-                scope.launch {
-                    try {
-                        playbackManager.skipBackwardSuspend(
-                            sourceView = source,
-                            jumpAmountSeconds = settings.skipBackInSecs.value,
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Skip backward failed")
-                    }
-                }
+                launchSkipBackward()
                 return true
             }
         }
@@ -254,30 +236,12 @@ internal class Media3SessionCallback(
         if (isAutomotive) {
             when (keyEvent.keyCode) {
                 KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                    scope.launch {
-                        try {
-                            playbackManager.skipForwardSuspend(
-                                sourceView = source,
-                                jumpAmountSeconds = settings.skipForwardInSecs.value,
-                            )
-                        } catch (e: Exception) {
-                            Timber.e(e, "Skip forward failed")
-                        }
-                    }
+                    launchSkipForward()
                     return true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                    scope.launch {
-                        try {
-                            playbackManager.skipBackwardSuspend(
-                                sourceView = source,
-                                jumpAmountSeconds = settings.skipBackInSecs.value,
-                            )
-                        } catch (e: Exception) {
-                            Timber.e(e, "Skip backward failed")
-                        }
-                    }
+                    launchSkipBackward()
                     return true
                 }
             }
@@ -326,6 +290,32 @@ internal class Media3SessionCallback(
 
     private fun handleMediaButtonTripleTap() {
         handleMediaButtonAction(settings.headphoneControlsPreviousAction.value)
+    }
+
+    private fun launchSkipForward() {
+        scope.launch {
+            try {
+                playbackManager.skipForwardSuspend(
+                    sourceView = source,
+                    jumpAmountSeconds = settings.skipForwardInSecs.value,
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Skip forward failed")
+            }
+        }
+    }
+
+    private fun launchSkipBackward() {
+        scope.launch {
+            try {
+                playbackManager.skipBackwardSuspend(
+                    sourceView = source,
+                    jumpAmountSeconds = settings.skipBackInSecs.value,
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Skip backward failed")
+            }
+        }
     }
 
     private fun launchCommand(tag: String, block: suspend () -> Unit) {
