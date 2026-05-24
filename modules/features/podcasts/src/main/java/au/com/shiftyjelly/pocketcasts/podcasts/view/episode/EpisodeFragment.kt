@@ -684,7 +684,7 @@ class EpisodeFragment : BaseFragment() {
                                 )
                                 Text(
                                     text = stringResource(LR.string.ask_this_episode),
-                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    color = MaterialTheme.theme.colors.primaryText01,
                                     fontSize = 16.sp,
                                 )
                             }
@@ -739,6 +739,7 @@ class EpisodeFragment : BaseFragment() {
                             ButtonTabs(
                                 tabs = tabs,
                                 selectedTab = selectedButtonTab,
+                                backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 4.dp),
