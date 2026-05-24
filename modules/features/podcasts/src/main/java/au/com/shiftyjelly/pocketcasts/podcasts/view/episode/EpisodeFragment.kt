@@ -746,11 +746,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // Inline summary content
-                        AnimatedVisibility(
-                            visible = selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null,
-                            enter = BannerEnterTransition,
-                            exit = BannerExitTransition,
-                        ) {
+                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -765,7 +761,7 @@ class EpisodeFragment : BaseFragment() {
                                 )
                                 HtmlText(
                                     html = markdownToHtml(summaryText.orEmpty()),
-                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    color = MaterialTheme.theme.colors.primaryText01,
                                     textStyleResId = UR.style.P40,
                                 )
                             }
