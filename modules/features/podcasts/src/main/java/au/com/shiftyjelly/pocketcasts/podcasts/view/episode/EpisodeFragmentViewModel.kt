@@ -108,7 +108,32 @@ class EpisodeFragmentViewModel @Inject constructor(
         val selectedContentTab: EpisodeContentTab = EpisodeContentTab.DESCRIPTION,
         val episodePublishedDate: Date? = null,
         val episodeDurationMs: Long? = null,
-    )
+    ) {
+        internal fun selectContentTab(tab: EpisodeContentTab): EpisodePageState {
+            val contentTab = when (tab) {
+                EpisodeContentTab.DESCRIPTION -> EpisodeContentTab.DESCRIPTION
+
+                EpisodeContentTab.SUMMARY -> if (summary == null) {
+                    EpisodeContentTab.DESCRIPTION
+                } else {
+                    EpisodeContentTab.SUMMARY
+                }
+            }
+            return copy(selectedContentTab = contentTab)
+        }
+
+        internal fun withSummary(summary: String?): EpisodePageState {
+            val contentTab = if (summary == null && selectedContentTab == EpisodeContentTab.SUMMARY) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                summary = summary,
+                selectedContentTab = contentTab,
+            )
+        }
+    }
 
     private val _pageState = MutableStateFlow(EpisodePageState())
     val pageState = _pageState.asStateFlow()
@@ -125,7 +150,7 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun selectContentTab(tab: EpisodeContentTab) {
         _pageState.update { state ->
-            state.copy(selectedContentTab = tab)
+            state.selectContentTab(tab)
         }
     }
 
@@ -240,14 +265,14 @@ class EpisodeFragmentViewModel @Inject constructor(
 
         if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
             _pageState.update { state ->
-                state.copy(summary = null)
+                state.withSummary(null)
             }
             val oldSummaryJob = loadSummaryJob
             loadSummaryJob = launch {
                 oldSummaryJob?.cancelAndJoin()
                 val result = transcriptManager.loadSummaryText(episodeUuid)
                 _pageState.update { state ->
-                    state.copy(summary = result)
+                    state.withSummary(result)
                 }
                 if (result != null) {
                     lastSummaryEpisodeUuid = episodeUuid
@@ -255,7 +280,7 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
         } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
             _pageState.update { state ->
-                state.copy(summary = null)
+                state.withSummary(null)
             }
         }
     }
