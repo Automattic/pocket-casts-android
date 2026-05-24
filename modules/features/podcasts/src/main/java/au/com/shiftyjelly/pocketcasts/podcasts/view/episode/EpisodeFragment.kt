@@ -674,18 +674,20 @@ class EpisodeFragment : BaseFragment() {
                                         openChat(t.episodeUuid, t.podcastUuid, isPlusUser)
                                     }
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
                             ) {
                                 Image(
                                     painter = painterResource(IR.drawable.ic_ai),
                                     contentDescription = null,
-                                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Text(
                                     text = stringResource(LR.string.ask_this_episode),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    fontSize = 16.sp,
+                                    color = MaterialTheme.theme.colors.primaryText02,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight(500),
+                                    letterSpacing = 0.5.sp,
                                 )
                             }
                         }
