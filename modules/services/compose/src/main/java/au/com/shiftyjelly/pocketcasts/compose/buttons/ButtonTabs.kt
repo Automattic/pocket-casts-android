@@ -70,7 +70,7 @@ fun ButtonTabs(
             val pressed by interactionSource.collectIsPressedAsState()
             val focused by interactionSource.collectIsFocusedAsState()
             val selected = selectedTab == tab
-            val backgroundColor = if (selected) {
+            val tabBackgroundColor = if (selected) {
                 // make the button background the same color as the text, black on the light theme and white on the dark theme
                 buttonSelectedColor
             } else {
@@ -87,7 +87,7 @@ fun ButtonTabs(
                 onClick = { tab.onClick() },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = backgroundColor,
+                    backgroundColor = tabBackgroundColor,
                 ),
                 contentPadding = ButtonPaddingValues,
                 elevation = ButtonDefaults.elevation(
