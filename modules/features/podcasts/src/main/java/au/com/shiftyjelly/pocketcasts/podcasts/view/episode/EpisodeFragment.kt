@@ -289,10 +289,11 @@ class EpisodeFragment : BaseFragment() {
         binding?.loadingGroup?.isInvisible = true
 
         binding?.episodeDateDuration?.setContentWithViewCompositionStrategy {
-            val info = viewModel.dateDurationInfo.collectAsState().value
-            if (info != null) {
-                val dateText = info.publishedDate?.let { DateUtil.toLocalizedFormatLongStyle(it) }.orEmpty()
-                val durationText = TimeHelper.getTimeDurationShortString(info.durationMs, context)
+            val pageState = viewModel.pageState.collectAsState().value
+            val durationMs = pageState.episodeDurationMs
+            if (durationMs != null) {
+                val dateText = pageState.episodePublishedDate?.let { DateUtil.toLocalizedFormatLongStyle(it) }.orEmpty()
+                val durationText = TimeHelper.getTimeDurationShortString(durationMs, context)
                 AppTheme(activeTheme) {
                     Text(
                         text = "$dateText \u00B7 $durationText",
@@ -340,7 +341,6 @@ class EpisodeFragment : BaseFragment() {
                         binding.lblDate.isVisible = !isAiEnabled
                         binding.lblTimeLeft.isVisible = !isAiEnabled
                         binding.episodeDateDuration.isVisible = isAiEnabled
-                        viewModel.updateDateDuration(state.episode.publishedDate, state.episode.durationMs.toLong())
 
                         binding.btnDownload.tintColor = iconColor
                         binding.btnAddEpisode.tintColor = iconColor
@@ -630,11 +630,12 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
 
         binding?.episodeContentTabs?.setContentWithViewCompositionStrategy {
-            val summaryText = viewModel.summary.collectAsState().value
-            val transcript = viewModel.transcript.collectAsState().value as? Transcript.Text
+            val pageState = viewModel.pageState.collectAsState().value
+            val summaryText = pageState.summary
+            val transcript = pageState.transcript as? Transcript.Text
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
-            val isPlusUser = viewModel.isPlusUser.collectAsState().value
-            val selectedTab = viewModel.selectedContentTab.collectAsState().value
+            val isPlusUser = pageState.isPlusUser
+            val selectedTab = pageState.selectedContentTab
 
             val showDescription = !isSummaryEnabled || selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
             LaunchedEffect(showDescription) {
@@ -916,7 +917,7 @@ class EpisodeFragment : BaseFragment() {
 
                         override fun onPageFinished(view: WebView, url: String) {
                             binding?.webViewLoader?.hide()
-                            if (viewModel.selectedContentTab.value == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) {
+                            if (viewModel.pageState.value.selectedContentTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) {
                                 binding?.webViewShowNotes?.run {
                                     visibility = View.VISIBLE
                                 }
