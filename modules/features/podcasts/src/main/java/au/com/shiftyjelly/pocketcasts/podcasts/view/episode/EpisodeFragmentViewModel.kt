@@ -196,10 +196,19 @@ class EpisodeFragmentViewModel @Inject constructor(
                     episode = it.episode
                     podcast = it.podcast
                     _pageState.update { state ->
-                        state.copy(
-                            episodePublishedDate = it.episode.publishedDate,
-                            episodeDurationMs = it.episode.durationMs.toLong(),
-                        )
+                        val episodePublishedDate = it.episode.publishedDate
+                        val episodeDurationMs = it.episode.durationMs.toLong()
+                        if (
+                            state.episodePublishedDate == episodePublishedDate &&
+                            state.episodeDurationMs == episodeDurationMs
+                        ) {
+                            state
+                        } else {
+                            state.copy(
+                                episodePublishedDate = episodePublishedDate,
+                                episodeDurationMs = episodeDurationMs,
+                            )
+                        }
                     }
                 }
             }
