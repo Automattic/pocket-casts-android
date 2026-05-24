@@ -49,8 +49,6 @@ private val ButtonPaddingValues = PaddingValues(
 data class ButtonTab(
     @StringRes val labelResId: Int,
     val onClick: () -> Unit,
-    @DrawableRes val iconResId: Int? = null,
-    @DrawableRes val trailingIconResId: Int? = null,
 )
 
 @Composable
@@ -96,15 +94,6 @@ fun ButtonTabs(
                 ),
                 interactionSource = interactionSource,
             ) {
-                if (tab.iconResId != null) {
-                    Image(
-                        painter = painterResource(tab.iconResId),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(textColor),
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                }
                 Text(
                     text = stringResource(tab.labelResId),
                     fontSize = 15.sp,
@@ -114,15 +103,6 @@ fun ButtonTabs(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (tab.trailingIconResId != null) {
-                    Spacer(Modifier.width(4.dp))
-                    Image(
-                        painter = painterResource(tab.trailingIconResId),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(textColor),
-                        modifier = Modifier.size(16.dp),
-                    )
-                }
             }
             Spacer(Modifier.width(6.dp))
         }
