@@ -647,8 +647,9 @@ class EpisodeFragment : BaseFragment() {
                     // AI-enhanced layout: "Ask this episode" + simple tabs + inline summary
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // "Ask this episode" input-style banner
+                        val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
                         AnimatedVisibility(
-                            visible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null,
+                            visible = askTheEpisodeVisible,
                             enter = BannerEnterTransition,
                             exit = BannerExitTransition,
                         ) {
@@ -744,7 +745,7 @@ class EpisodeFragment : BaseFragment() {
                                 backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 4.dp),
+                                    .padding(top = if (askTheEpisodeVisible) 4.dp else 16.dp),
                             )
                         }
 

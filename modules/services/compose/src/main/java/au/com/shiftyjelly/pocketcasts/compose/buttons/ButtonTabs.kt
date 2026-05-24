@@ -19,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,48 +67,51 @@ fun ButtonTabs(
             .padding(start = 16.dp, end = 10.dp),
     ) {
         for (tab in tabs) {
-            val interactionSource = remember { MutableInteractionSource() }
-            val pressed by interactionSource.collectIsPressedAsState()
-            val focused by interactionSource.collectIsFocusedAsState()
-            val selected = selectedTab == tab
-            val tabBackgroundColor = if (selected) {
-                // make the button background the same color as the text, black on the light theme and white on the dark theme
-                buttonSelectedColor
-            } else {
-                if (pressed || focused) {
-                    // the press and focus state is a lighter version of the button background color
-                    buttonPressedColor
+            key(tab.labelResId) {
+                val interactionSource = remember { MutableInteractionSource() }
+                val pressed by interactionSource.collectIsPressedAsState()
+                val focused by interactionSource.collectIsFocusedAsState()
+                val selected = selectedTab == tab
+                val tabBackgroundColor = if (selected) {
+                    // make the button background the same color as the text,
+                    // black on the light theme and white on the dark theme
+                    buttonSelectedColor
                 } else {
-                    // the unselected button is the same color as the layout background
-                    backgroundColor
+                    if (pressed || focused) {
+                        // the press and focus state is a lighter version of the button background color
+                        buttonPressedColor
+                    } else {
+                        // the unselected button is the same color as the layout background
+                        backgroundColor
+                    }
                 }
+                val textColor = if (selected) textSelectedColor else textUnselectedColor
+                Button(
+                    onClick = { tab.onClick() },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = tabBackgroundColor,
+                    ),
+                    contentPadding = ButtonPaddingValues,
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        focusedElevation = 0.dp,
+                    ),
+                    interactionSource = interactionSource,
+                ) {
+                    Text(
+                        text = stringResource(tab.labelResId),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight(500),
+                        letterSpacing = 0.5.sp,
+                        color = textColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(Modifier.width(6.dp))
             }
-            val textColor = if (selected) textSelectedColor else textUnselectedColor
-            Button(
-                onClick = { tab.onClick() },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = tabBackgroundColor,
-                ),
-                contentPadding = ButtonPaddingValues,
-                elevation = ButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    focusedElevation = 0.dp,
-                ),
-                interactionSource = interactionSource,
-            ) {
-                Text(
-                    text = stringResource(tab.labelResId),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight(500),
-                    letterSpacing = 0.5.sp,
-                    color = textColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Spacer(Modifier.width(6.dp))
         }
     }
 }
