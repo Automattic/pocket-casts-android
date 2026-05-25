@@ -16,11 +16,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.htmlEncode
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
+import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -73,20 +73,4 @@ private fun SummaryContentPreview(
             text = "## Episode Highlights\n\n- First key point discussed\n- Second important topic\n- **Notable quote** from the guest\n\nThe hosts wrap up with final thoughts.",
         )
     }
-}
-
-internal fun markdownToHtml(markdown: String): String {
-    return markdown.lines()
-        .joinToString("\n") { line ->
-            when {
-                line.startsWith("### ") -> "<h3>${line.removePrefix("### ").htmlEncode()}</h3>"
-                line.startsWith("## ") -> "<h2>${line.removePrefix("## ").htmlEncode()}</h2>"
-                line.startsWith("# ") -> "<h1>${line.removePrefix("# ").htmlEncode()}</h1>"
-                line.startsWith("- ") -> "&#8226; ${line.removePrefix("- ").htmlEncode()}<br>"
-                line.startsWith("* ") -> "&#8226; ${line.removePrefix("* ").htmlEncode()}<br>"
-                line.isBlank() -> "<br>"
-                else -> "${line.htmlEncode()}<br>"
-            }
-        }
-        .replace(Regex("\\*\\*(.+?)\\*\\*"), "<b>$1</b>")
 }

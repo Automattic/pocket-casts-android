@@ -40,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
@@ -239,7 +241,7 @@ class PlayerContainerFragment :
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.updateNotes(addNotes = !it.podcastHeader.isUserEpisode)
-            if (!it.podcastHeader.isUserEpisode) {
+            if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && !it.podcastHeader.isUserEpisode) {
                 summaryViewModel.loadSummary(it.podcastHeader.episodeUuid)
             } else {
                 summaryViewModel.clearSummary()

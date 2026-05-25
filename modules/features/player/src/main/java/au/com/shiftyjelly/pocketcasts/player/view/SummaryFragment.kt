@@ -61,7 +61,7 @@ class SummaryFragment : BaseFragment() {
                         SummaryContent(
                             text = s.text,
                             titleColor = MaterialTheme.theme.colors.playerContrast01,
-                            textColor = MaterialTheme.theme.colors.playerContrast02,
+                            textColor = MaterialTheme.theme.colors.playerContrast01,
                             scrollBarColor = MaterialTheme.theme.colors.playerContrast02,
                             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                         )
