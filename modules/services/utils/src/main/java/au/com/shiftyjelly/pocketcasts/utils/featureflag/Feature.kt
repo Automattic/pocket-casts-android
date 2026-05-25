@@ -288,6 +288,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    AI_SUMMARIES(
+        key = "ai_summaries",
+        title = "AI Summaries",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

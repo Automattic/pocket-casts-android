@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,6 +35,7 @@ class TranscriptManagerImpl @Inject constructor(
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val summaryMetaAdapter = Moshi.Builder().build().adapter(Map::class.java)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
@@ -131,6 +133,25 @@ class TranscriptManagerImpl @Inject constructor(
                 }
             }
             .getOrNull()
+    }
+
+    override suspend fun loadSummaryText(episodeUuid: String): String? {
+        return try {
+            val generatedTranscript = loadLocalTranscripts(episodeUuid)
+                .firstOrNull { it.isGenerated } ?: return null
+
+            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
+            val response = transcriptService.getTranscriptOrThrow(metaUrl)
+            response.use { body ->
+                val json = summaryMetaAdapter.fromJson(body.string())
+                (json?.get("summary") as? String)?.takeIf { it.isNotBlank() }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
+            null
+        }
     }
 
     override fun resetInvalidTranscripts(

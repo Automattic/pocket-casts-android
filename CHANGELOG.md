@@ -1,6 +1,8 @@
 8.13
 -----
-
+*   New Features
+    *   Show episode summaries where possible
+        ([#5276](https://github.com/Automattic/pocket-casts-android/pull/5276))
 
 8.12
 -----

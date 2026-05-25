@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EpisodeArchivedEvent
@@ -105,6 +107,28 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _isPlusUser.value = signInState.isSignedInAsPlusOrPatron
             }
         }
+    }
+
+    private var loadSummaryJob: Job? = null
+    private var lastSummaryEpisodeUuid: String? = null
+    private val _summary = MutableStateFlow<String?>(null)
+    val summary = _summary.asStateFlow()
+
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY }
+
+    private val _selectedContentTab = MutableStateFlow(EpisodeContentTab.DESCRIPTION)
+    val selectedContentTab = _selectedContentTab.asStateFlow()
+
+    fun selectContentTab(tab: EpisodeContentTab) {
+        _selectedContentTab.value = tab
+    }
+
+    data class DateDurationInfo(val publishedDate: java.util.Date?, val durationMs: Long)
+    private val _dateDurationInfo = MutableStateFlow<DateDurationInfo?>(null)
+    val dateDurationInfo = _dateDurationInfo.asStateFlow()
+
+    fun updateDateDuration(publishedDate: java.util.Date?, durationMs: Long) {
+        _dateDurationInfo.value = DateDurationInfo(publishedDate, durationMs)
     }
 
     fun setup(
@@ -196,6 +220,21 @@ class EpisodeFragmentViewModel @Inject constructor(
                 oldJob?.cancelAndJoin()
                 _transcript.value = transcriptManager.loadTranscript(episodeUuid)
             }
+        }
+
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
+            _summary.value = null
+            val oldSummaryJob = loadSummaryJob
+            loadSummaryJob = launch {
+                oldSummaryJob?.cancelAndJoin()
+                val result = transcriptManager.loadSummaryText(episodeUuid)
+                _summary.value = result
+                if (result != null) {
+                    lastSummaryEpisodeUuid = episodeUuid
+                }
+            }
+        } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            _summary.value = null
         }
     }
 

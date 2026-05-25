@@ -39,6 +39,7 @@ class TranscriptManagerTest {
     private val subripDbTranscript = createDbTranscript("application/x-subrip")
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
+    private val generatedVttDbTranscript = createDbTranscript("text/vtt", episodeUuid = "summary-episode-id", url = "transcript.vtt", isGenerated = true)
 
     private val transcriptManager = TranscriptManagerImpl(
         transcriptDao = mock {
@@ -351,6 +352,58 @@ class TranscriptManagerTest {
 
         assertNotNull(transcript)
     }
+
+    @Test
+    fun `load summary text from generated transcript meta`() = runTest {
+        service.shouldThrow = false
+        service.responseBody = """{"summary": "Episode summary text"}"""
+        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
+
+        val summary = transcriptManager.loadSummaryText("summary-episode-id")
+
+        assertEquals("Episode summary text", summary)
+    }
+
+    @Test
+    fun `return null summary when no generated transcript exists`() = runTest {
+        service.shouldThrow = false
+        localTranscriptsFlow.value = listOf(generatedVttDbTranscript.copy(isGenerated = false))
+
+        val summary = transcriptManager.loadSummaryText("summary-episode-id")
+
+        assertNull(summary)
+    }
+
+    @Test
+    fun `return null summary when summary field is blank`() = runTest {
+        service.shouldThrow = false
+        service.responseBody = """{"summary": ""}"""
+        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
+
+        val summary = transcriptManager.loadSummaryText("summary-episode-id")
+
+        assertNull(summary)
+    }
+
+    @Test
+    fun `return null summary on service failure`() = runTest {
+        service.shouldThrow = true
+        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
+
+        val summary = transcriptManager.loadSummaryText("summary-episode-id")
+
+        assertNull(summary)
+    }
+
+    @Test
+    fun `return null summary when transcripts not loaded in time`() = runTest {
+        service.shouldThrow = false
+        val summary = async { transcriptManager.loadSummaryText("summary-episode-id") }
+
+        advanceTimeBy(1.minutes)
+
+        assertNull(summary.await())
+    }
 }
 
 private class TestParser(
@@ -371,22 +424,26 @@ private class TestParser(
 
 private class TestTranscriptService : TranscriptService {
     var shouldThrow = false
+    var responseBody: String = "Ok"
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
         return if (shouldThrow) {
             error("Test exception")
         } else {
-            "Ok".toResponseBody()
+            responseBody.toResponseBody()
         }
     }
 }
 
 private fun createDbTranscript(
     type: String,
+    episodeUuid: String = "episode-id",
+    url: String = "transcript-url",
+    isGenerated: Boolean = false,
 ) = DbTranscript(
-    episodeUuid = "episode-id",
-    url = "transcript-url",
+    episodeUuid = episodeUuid,
+    url = url,
     type = type,
-    isGenerated = false,
+    isGenerated = isGenerated,
     language = "en",
 )
