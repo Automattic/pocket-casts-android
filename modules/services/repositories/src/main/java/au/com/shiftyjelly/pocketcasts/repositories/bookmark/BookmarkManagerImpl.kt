@@ -9,8 +9,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
 import com.automattic.eventhorizon.BookmarkCreatedEvent
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
@@ -33,7 +35,8 @@ import timber.log.Timber
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val eventHorizon: EventHorizon,
-    private val syncManager: SyncManager,
+    private val tokenHandler: TokenHandler,
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val transcriptWindowExtractor: TranscriptWindowExtractor,
 ) : BookmarkManager,
     CoroutineScope {
@@ -242,7 +245,15 @@ class BookmarkManagerImpl @Inject constructor(
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
 
-                val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
+                val token = tokenHandler.getAccessToken()
+                if (token == null) {
+                    Timber.w("Smart bookmark enrichment skipped: no access token")
+                    return@launch
+                }
+                val response = podcastCacheServiceManager.enrichBookmark(
+                    authorization = "Bearer ${token.value}",
+                    request = BookmarkEnrichRequest(transcriptSnippet = snippet),
+                )
                 if (response.error != null) {
                     Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
                 }
