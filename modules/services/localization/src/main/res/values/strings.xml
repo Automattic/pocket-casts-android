@@ -125,6 +125,10 @@
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
+    <string name="ask_this_episode">Ask this episode</string>
+    <string name="episode_summary">Episode Summary</string>
+    <string name="description">Description</string>
+    <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -434,6 +438,7 @@
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
+    <string name="player_tab_summary">Summary</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_time_saved_no_hour">Congrats! You\'re saving time and getting through more podcasts.</string>

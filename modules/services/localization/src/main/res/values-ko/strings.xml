@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-09 09:57:43+0000
+Translation-Revision-Date: 2026-05-15 09:54:48+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">블로그 · 4월 24일</string>
+    <string name="onboarding_blogs_upsell_sample_title">플레이어를 새롭게 디자인한 이유</string>
+    <string name="onboarding_blogs_title">블로그: 읽은 내용을\n음성으로 듣기.</string>
+    <string name="blogs_error_generic">문제가 발생했습니다. 다시 시도해 주세요.</string>
+    <string name="blogs_error_no_feeds_found">해당 URL에서 피드를 찾을 수 없습니다. URL을 확인하고 다시 시도해 주세요.</string>
+    <string name="blogs_error_no_internet">인터넷 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="blogs_looking_up_feed">피드 찾는 중…</string>
+    <string name="blogs_found_on_this_site">이 사이트에서 피드를 %d개 찾음</string>
+    <string name="blogs_pick_a_feed">팔로우할 피드 선택</string>
+    <string name="blogs_add_url_hint">블로그나 RSS URL을 붙여넣으면 저희가 피드를 찾아드립니다.</string>
+    <string name="blogs_empty_url_label">블로그 또는 RSS URL</string>
+    <string name="blogs_add_button">블로그 추가</string>
+    <string name="blogs_empty_description">블로그 또는 RSS URL을 붙여넣습니다. 사이트가 공개되면 모든 글에 내레이션을 적용하고 새 에피소드를 자동으로 추가합니다.</string>
+    <string name="blogs_empty_title">블로그를 팟캐스트로 바꾸기</string>
+    <string name="profile_navigation_blogs">블로그</string>
+    <string name="settings_privacy_listening_stats_summary">청취 통계를 수집하여 통계 페이지에 표시할 수 있도록 허용합니다.</string>
+    <string name="settings_privacy_listening_stats">청취 통계</string>
+    <string name="error_playback_failed_try_again">재생에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="explicit">명시적</string>
+    <string name="less">간단히</string>
+    <string name="error_streaming_access_denied">이 에피소드를 재생할 수 없습니다.</string>
     <string name="error_episode_not_available">에피소드가 제공되지 않았습니다</string>
     <string name="error_playback_connected">연결되었습니다</string>
     <string name="error_playback_offline">오프라인 상태입니다</string>

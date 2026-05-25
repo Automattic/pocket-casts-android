@@ -10,7 +10,6 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -34,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -439,7 +439,7 @@ class Media3SessionCallbackTest {
     // --- onAddMediaItems resolved item tests ---
 
     @Test
-    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSuspend`() = runTest {
+    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSync`() = runTest {
         val episode = PodcastEpisode(
             uuid = "ep-uuid-1",
             title = "My Episode",
@@ -471,7 +471,7 @@ class Media3SessionCallbackTest {
         assertNotNull(resolved.mediaMetadata.artworkUri)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),
@@ -492,6 +492,40 @@ class Media3SessionCallbackTest {
 
         val result = future.get()
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `onAddMediaItems with current episode resumes queue instead of forcing player switch`() = runTest {
+        val episode = PodcastEpisode(
+            uuid = "ep-uuid-1",
+            title = "My Episode",
+            duration = 3600.0,
+            publishedDate = Date(),
+            podcastUuid = "pod-uuid-1",
+        )
+        whenever(episodeManager.findEpisodeByUuid("ep-uuid-1")).thenReturn(episode)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("pod-uuid-1#ep-uuid-1")
+            .build()
+
+        val future = callback.onAddMediaItems(mockSession, mockController, listOf(mediaItem))
+        testScope.advanceUntilIdle()
+
+        val result = future.get()
+        assertEquals(1, result.size)
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = eq(false),
+        )
+        verify(playbackManager, never()).playNowSync(
+            episode = any(),
+            forceStream = any(),
+            showedStreamWarning = any(),
+            sourceView = any(),
+        )
     }
 
     @Test
@@ -517,7 +551,7 @@ class Media3SessionCallbackTest {
         assertEquals("My Upload", resolved.mediaMetadata.title)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),

@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-04-10 15:56:45+0000
+Translation-Revision-Date: 2026-05-13 16:58:53+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_blogs_upsell_sample_label">Blog · 24 apr</string>
+    <string name="onboarding_blogs_upsell_sample_title">Waarom we de speler opnieuw hebben ontworpen</string>
+    <string name="onboarding_blogs_title">Blogs: beluisteren\nwat je leest.</string>
+    <string name="blogs_error_generic">Er is iets misgegaan. Probeer het nog eens.</string>
+    <string name="blogs_error_no_feeds_found">We konden geen feeds vinden op die URL. Controleer de URL en probeer het nogmaals.</string>
+    <string name="blogs_error_no_internet">Controleer je internetverbinding en probeer het nogmaals.</string>
+    <string name="blogs_looking_up_feed">Feed aan het opzoeken …</string>
+    <string name="blogs_found_on_this_site">%d feeds gevonden op deze site</string>
+    <string name="blogs_pick_a_feed">KIES EEN FEED OM TE VOLGEN</string>
+    <string name="blogs_add_url_hint">Plak een blog of RSS-URL en wij vinden de feed voor je.</string>
+    <string name="blogs_empty_url_label">Blog of RSS URL</string>
+    <string name="blogs_add_button">Een blog toevoegen</string>
+    <string name="blogs_empty_description">Plak een blog of RSS-URL. We vertellen elk bericht en voegen automatisch nieuwe afleveringen toe wanneer de site wordt gepubliceerd.</string>
+    <string name="blogs_empty_title">Zet elke blog om in een podcast</string>
+    <string name="profile_navigation_blogs">Blogs</string>
+    <string name="settings_privacy_listening_stats_summary">Sta ons toe om luisterstatistieken te verzamelen om ze weer te geven op je Stats-pagina.</string>
+    <string name="settings_privacy_listening_stats">Luisterstatistieken</string>
+    <string name="error_playback_failed_try_again">Afspelen mislukt. Probeer het nog eens.</string>
+    <string name="explicit">Expliciet</string>
+    <string name="less">Minder</string>
+    <string name="error_streaming_access_denied">Deze aflevering kan niet worden afgespeeld.</string>
     <string name="error_episode_not_available">Aflevering niet beschikbaar</string>
     <string name="error_playback_connected">Je bent verbonden</string>
     <string name="error_playback_offline">Je bent offline</string>

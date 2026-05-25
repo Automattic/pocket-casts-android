@@ -1,5 +1,10 @@
 8.13
 -----
+*   New Features
+    *   Show episode summaries where possible
+        ([#5276](https://github.com/Automattic/pocket-casts-android/pull/5276))
+    *   Show episode summary on fullscreen player
+        ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
