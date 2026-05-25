@@ -860,7 +860,7 @@ class EpisodeFragment : BaseFragment() {
             }
         } else {
             if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                val fragment = ChatPaywallFragment()
                 fragment.show(parentFragmentManager, "episode_chat_paywall")
             }
         }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,28 +15,11 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ChatPaywallFragment : BaseDialogFragment() {
-    companion object {
-        private const val ARGS_KEY = "chat_paywall_args"
-
-        fun newInstance(
-            episodeUuid: String,
-            podcastUuid: String?,
-        ) = ChatPaywallFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid))
-            }
-        }
-    }
-
-    private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
-
     private val viewModel by viewModels<ChatPaywallViewModel>()
 
     override fun onCreateView(
@@ -62,10 +44,4 @@ class ChatPaywallFragment : BaseDialogFragment() {
             )
         }
     }
-
-    @Parcelize
-    private class Args(
-        val episodeUuid: String,
-        val podcastUuid: String?,
-    ) : Parcelable
 }
