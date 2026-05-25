@@ -451,32 +451,34 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         val codec = MediaCodec.createDecoderByType(mime)
-
-        // Request float PCM output. If the codec doesn't support it,
-        // it falls back to 16-bit; we detect the actual format below.
-        format.setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
-        codec.configure(format, null, null, 0)
-        codec.start()
-
-        val streamer = StreamingWindowedFingerprinter(
-            sampleRate.toUInt(),
-            channelCount.toUShort(),
-            FingerprintConstants.WINDOW_DURATION_MS.toUInt(),
-            FingerprintConstants.WINDOW_INTERVAL_MS.toUInt(),
-        )
-
         try {
-            decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+            // Request float PCM output. If the codec doesn't support it,
+            // it falls back to 16-bit; we detect the actual format below.
+            format.setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
+            codec.configure(format, null, null, 0)
+            codec.start()
 
-            // Flush remaining windows
-            val tail = streamer.flush()
-            if (tail.isNotEmpty()) {
-                mutex.withLock {
-                    processMatches(tail, matcher, startingAt)
+            val streamer = StreamingWindowedFingerprinter(
+                sampleRate.toUInt(),
+                channelCount.toUShort(),
+                FingerprintConstants.WINDOW_DURATION_MS.toUInt(),
+                FingerprintConstants.WINDOW_INTERVAL_MS.toUInt(),
+            )
+
+            try {
+                decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+
+                // Flush remaining windows
+                val tail = streamer.flush()
+                if (tail.isNotEmpty()) {
+                    mutex.withLock {
+                        processMatches(tail, matcher, startingAt)
+                    }
                 }
+            } finally {
+                streamer.close()
             }
         } finally {
-            streamer.close()
             codec.stop()
             codec.release()
             extractor.release()
@@ -602,8 +604,6 @@ class FingerprintTimingManager @Inject constructor(
         matcher: CheckpointMatcher,
         startOffset: Double,
     ) {
-        var inserted = 0
-
         for (window in windows) {
             val matches = matcher.findTopMatches(window.hashes, 2u)
             val best = matches.firstOrNull() ?: continue
@@ -623,7 +623,7 @@ class FingerprintTimingManager @Inject constructor(
             val dominance = best.score - runnerUpScore
             if (dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP) continue
 
-            inserted += consider(candidate)
+            consider(candidate)
         }
 
         publishSnapshot()
@@ -644,7 +644,7 @@ class FingerprintTimingManager @Inject constructor(
         val refData = currentReferenceData ?: return
         val refDuration = currentReferenceDuration
 
-        val entries = mappingPlaybackToReference.toList()
+        val entries = snapshotPlaybackToReference
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 

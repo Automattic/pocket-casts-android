@@ -8,11 +8,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
@@ -52,7 +54,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? {
+    ): ByteArray? = withContext(Dispatchers.IO) {
         val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
@@ -70,7 +72,7 @@ class FingerprintReferenceRetriever @Inject constructor(
 
                     if (statusCode == 404 || statusCode == 403) {
                         Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
-                        return null
+                        return@withContext null
                     }
 
                     if (statusCode != 200) {
@@ -79,25 +81,25 @@ class FingerprintReferenceRetriever @Inject constructor(
                             continue
                         }
                         Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                        return null
+                        return@withContext null
                     }
 
                     val body = response.body.bytes()
                     val jsonData = decompressGzipIfNeeded(body)
 
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                    return jsonData
+                    return@withContext jsonData
                 }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: java.io.IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
-                if (attempt == MAX_RETRIES - 1) return null
+                if (attempt == MAX_RETRIES - 1) return@withContext null
             }
         }
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
-        return null
+        null
     }
 
     fun saveReferenceData(data: ByteArray, audioFilePath: String) {
