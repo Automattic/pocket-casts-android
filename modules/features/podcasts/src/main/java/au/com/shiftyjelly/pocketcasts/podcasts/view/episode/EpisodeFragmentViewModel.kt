@@ -33,6 +33,8 @@ import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeSummarySourceType
+import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EpisodeUnarchivedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -151,6 +153,15 @@ class EpisodeFragmentViewModel @Inject constructor(
     fun selectContentTab(tab: EpisodeContentTab) {
         _pageState.update { state ->
             state.selectContentTab(tab)
+        }
+        if (tab == EpisodeContentTab.SUMMARY) {
+            eventHorizon.track(
+                EpisodeSummaryTappedEvent(
+                    source = EpisodeSummarySourceType.EpisodeDetails,
+                    episodeUuid = episode?.uuid.orEmpty(),
+                    podcastUuid = podcast?.uuid.orEmpty(),
+                ),
+            )
         }
     }
 

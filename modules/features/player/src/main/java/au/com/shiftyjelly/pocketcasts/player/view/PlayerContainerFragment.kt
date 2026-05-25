@@ -45,6 +45,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import com.automattic.eventhorizon.EpisodeSummarySourceType
+import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerTabSelectedEvent
 import com.automattic.eventhorizon.PlayerTabType
@@ -212,7 +214,14 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isSummaryTab(position) -> {
-                        // TODO: Add PlayerTabType.Summary when EventHorizon is updated
+                        val header = viewModel.listDataLive.value?.podcastHeader
+                        eventHorizon.track(
+                            EpisodeSummaryTappedEvent(
+                                source = EpisodeSummarySourceType.FullscreenPlayer,
+                                episodeUuid = header?.episodeUuid.orEmpty(),
+                                podcastUuid = header?.podcastUuid.orEmpty(),
+                            ),
+                        )
                         null
                     }
 
