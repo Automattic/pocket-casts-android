@@ -680,7 +680,7 @@ class FingerprintTimingManager @Inject constructor(
             return n
         }
 
-        val evicted = filterCandidatePool.removeFirst()
+        val evicted = filterCandidatePool.removeAt(0)
         Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${evicted.playbackTime}s")
         return 0
     }

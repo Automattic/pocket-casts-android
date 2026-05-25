@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlin.io.encoding.Base64
 import com.squareup.moshi.Moshi
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.io.encoding.Base64
 import timber.log.Timber
 
 @JsonClass(generateAdapter = true)
