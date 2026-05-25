@@ -296,6 +296,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    GENERATED_CHAPTERS(
+        key = "generated_chapters",
+        title = "AI-Generated Chapters",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

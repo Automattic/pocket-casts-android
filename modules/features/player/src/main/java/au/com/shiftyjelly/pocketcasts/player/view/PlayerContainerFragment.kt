@@ -24,6 +24,7 @@ import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
@@ -45,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import com.automattic.eventhorizon.EpisodeSummarySourceType
+import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerTabSelectedEvent
 import com.automattic.eventhorizon.PlayerTabType
@@ -212,7 +215,16 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isSummaryTab(position) -> {
-                        // TODO: Add PlayerTabType.Summary when EventHorizon is updated
+                        val episode = viewModel.listDataLive.value?.podcastHeader?.episode as? PodcastEpisode
+                        if (episode != null) {
+                            eventHorizon.track(
+                                EpisodeSummaryTappedEvent(
+                                    source = EpisodeSummarySourceType.FullscreenPlayer,
+                                    episodeUuid = episode.uuid,
+                                    podcastUuid = episode.podcastUuid,
+                                ),
+                            )
+                        }
                         null
                     }
 
