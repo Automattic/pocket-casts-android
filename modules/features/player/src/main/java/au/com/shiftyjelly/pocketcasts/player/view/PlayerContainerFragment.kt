@@ -24,6 +24,7 @@ import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
@@ -214,14 +215,16 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isSummaryTab(position) -> {
-                        val header = viewModel.listDataLive.value?.podcastHeader
-                        eventHorizon.track(
-                            EpisodeSummaryTappedEvent(
-                                source = EpisodeSummarySourceType.FullscreenPlayer,
-                                episodeUuid = header?.episodeUuid.orEmpty(),
-                                podcastUuid = header?.podcastUuid.orEmpty(),
-                            ),
-                        )
+                        val episode = viewModel.listDataLive.value?.podcastHeader?.episode as? PodcastEpisode
+                        if (episode != null) {
+                            eventHorizon.track(
+                                EpisodeSummaryTappedEvent(
+                                    source = EpisodeSummarySourceType.FullscreenPlayer,
+                                    episodeUuid = episode.uuid,
+                                    podcastUuid = episode.podcastUuid,
+                                ),
+                            )
+                        }
                         null
                     }
 

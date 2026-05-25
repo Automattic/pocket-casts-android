@@ -155,11 +155,13 @@ class EpisodeFragmentViewModel @Inject constructor(
             state.selectContentTab(tab)
         }
         if (tab == EpisodeContentTab.SUMMARY) {
+            val episodeUuid = episode?.uuid ?: return
+            val podcastUuid = podcast?.uuid ?: return
             eventHorizon.track(
                 EpisodeSummaryTappedEvent(
                     source = EpisodeSummarySourceType.EpisodeDetails,
-                    episodeUuid = episode?.uuid.orEmpty(),
-                    podcastUuid = podcast?.uuid.orEmpty(),
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
                 ),
             )
         }
