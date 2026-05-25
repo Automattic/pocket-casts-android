@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
-import android.util.Base64
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlin.io.encoding.Base64
 import com.squareup.moshi.Moshi
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -44,7 +44,7 @@ data class ReferenceFingerprint(
             accumulated += delta
 
             val payload = try {
-                Base64.decode(data, Base64.DEFAULT)
+                Base64.Default.decode(data)
             } catch (e: IllegalArgumentException) {
                 return@mapNotNull null
             }
