@@ -149,6 +149,7 @@ object FingerprintMappingCache {
             if (!tmpFile.renameTo(File(path))) {
                 Timber.w("FingerprintMappingCache: atomic rename failed for $path, falling back to direct write")
                 File(path).writeText(adapter.toJson(cached))
+                tmpFile.delete()
             }
             Timber.d("FingerprintMappingCache: saved ${entries.size} mappings to $path")
         } catch (e: Exception) {

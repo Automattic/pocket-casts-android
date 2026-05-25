@@ -16,13 +16,11 @@ import javax.inject.Singleton
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
-import kotlin.math.min
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -30,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -88,8 +85,9 @@ class FingerprintTimingManager @Inject constructor(
 
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
-    private var preparationJob: Job? = null
     private var progressObserverJob: Job? = null
+
+    @Volatile
     private var generation = 0L
 
     // Drift filter state
@@ -185,8 +183,6 @@ class FingerprintTimingManager @Inject constructor(
     private fun resetState() {
         generationJob?.cancel()
         generationJob = null
-        preparationJob?.cancel()
-        preparationJob = null
         progressObserverJob?.cancel()
         progressObserverJob = null
         mappingPlaybackToReference.clear()
@@ -538,10 +534,7 @@ class FingerprintTimingManager @Inject constructor(
                 }
 
                 outputIndex >= 0 -> {
-                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                        codec.releaseOutputBuffer(outputIndex, false)
-                        break
-                    }
+                    val isEos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
 
                     val outputBuffer = codec.getOutputBuffer(outputIndex)
                     if (outputBuffer != null && bufferInfo.size > 0) {
@@ -563,6 +556,7 @@ class FingerprintTimingManager @Inject constructor(
                         }
                     }
                     codec.releaseOutputBuffer(outputIndex, false)
+                    if (isEos) break
                 }
             }
         }

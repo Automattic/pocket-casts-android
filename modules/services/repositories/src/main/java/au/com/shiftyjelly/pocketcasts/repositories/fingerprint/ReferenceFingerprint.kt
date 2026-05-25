@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.util.Base64
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.Base64
 import timber.log.Timber
 
 @JsonClass(generateAdapter = true)
@@ -44,7 +44,7 @@ data class ReferenceFingerprint(
             accumulated += delta
 
             val payload = try {
-                Base64.getDecoder().decode(data)
+                Base64.decode(data, Base64.DEFAULT)
             } catch (e: IllegalArgumentException) {
                 return@mapNotNull null
             }
@@ -67,7 +67,7 @@ data class ReferenceFingerprint(
 
         fun decode(data: ByteArray): ReferenceFingerprint? {
             return try {
-                val fingerprint = adapter.fromJson(String(data)) ?: return null
+                val fingerprint = adapter.fromJson(String(data, Charsets.UTF_8)) ?: return null
 
                 if (fingerprint.format != SUPPORTED_FORMAT) {
                     Timber.w("ReferenceFingerprint: unknown format '${fingerprint.format}', expected '$SUPPORTED_FORMAT'")
