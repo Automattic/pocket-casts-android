@@ -39,7 +39,9 @@ abstract class ChapterDao {
                 insertAll(newEpisodeChapters)
             }
 
-            findEpisodeChapters(episodeUuid).let { currentChapters -> currentChapters.size <= chapters.size && currentChapters.none(Chapter::isEmbedded) } -> {
+            findEpisodeChapters(episodeUuid).let { currentChapters ->
+                currentChapters.none(Chapter::isEmbedded) && (currentChapters.size <= chapters.size || currentChapters.all { it.isGenerated })
+            } -> {
                 deleteForEpisode(episodeUuid)
                 insertAll(newEpisodeChapters)
             }

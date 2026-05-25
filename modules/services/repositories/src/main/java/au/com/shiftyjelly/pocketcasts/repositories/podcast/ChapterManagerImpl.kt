@@ -41,7 +41,7 @@ class ChapterManagerImpl @Inject constructor(
             val firstChapter = window[0].value
             val secondChapter = window.getOrNull(1)?.value
 
-            val newStartTime = if (sequenceIndex == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds
+            val newStartTime = if (sequenceIndex == 0 && !firstChapter.isGenerated) Duration.ZERO else firstChapter.startTimeMs.milliseconds
             val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
             val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
 
