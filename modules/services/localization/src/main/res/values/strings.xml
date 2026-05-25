@@ -125,7 +125,6 @@
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
-    <string name="ask_this_episode">Ask this episode</string>
     <string name="episode_summary">Episode Summary</string>
     <string name="description">Description</string>
     <string name="summary">Summary</string>
