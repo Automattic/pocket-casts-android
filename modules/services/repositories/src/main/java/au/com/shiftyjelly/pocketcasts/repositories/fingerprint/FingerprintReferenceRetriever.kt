@@ -9,6 +9,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
@@ -42,7 +43,7 @@ class FingerprintReferenceRetriever @Inject constructor(
                     try {
                         performFetch(baseUrl, podcastUuid, episodeUuid)
                     } finally {
-                        requestMutex.withLock { inFlightRequests.remove(key) }
+                        withContext(NonCancellable) { requestMutex.withLock { inFlightRequests.remove(key) } }
                     }
                 }.also { inFlightRequests[key] = it }
             }

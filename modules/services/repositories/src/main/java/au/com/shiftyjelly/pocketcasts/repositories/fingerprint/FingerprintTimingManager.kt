@@ -128,10 +128,9 @@ class FingerprintTimingManager @Inject constructor(
             }
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
+            startPlaybackProgressObserver(episodeUuid)
             prepareForEpisode(episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
         }
-
-        startPlaybackProgressObserver(episodeUuid)
     }
 
     private fun startPlaybackProgressObserver(episodeUuid: String) {
@@ -423,6 +422,7 @@ class FingerprintTimingManager @Inject constructor(
         try {
             extractor.setDataSource(audioFilePath)
         } catch (e: Exception) {
+            extractor.release()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
             _stateFlow.value = State.Failed(e)
             return
@@ -479,7 +479,7 @@ class FingerprintTimingManager @Inject constructor(
                 streamer.close()
             }
         } finally {
-            codec.stop()
+            runCatching { codec.stop() }
             codec.release()
             extractor.release()
         }
