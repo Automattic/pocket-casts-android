@@ -27,6 +27,8 @@ class ChapterManagerImpl @Inject constructor(
         chapterDao.selectChapter(episodeUuid, chapterIndex, select)
     }
 
+    override suspend fun hasChapters(episodeUuid: String) = chapterDao.countForEpisode(episodeUuid) > 0
+
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
         episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
         chapterDao.observeChaptersForEpisode(episodeUuid),
@@ -39,7 +41,7 @@ class ChapterManagerImpl @Inject constructor(
             val firstChapter = window[0].value
             val secondChapter = window.getOrNull(1)?.value
 
-            val newStartTime = if (sequenceIndex == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds
+            val newStartTime = if (sequenceIndex == 0 && !firstChapter.isGenerated) Duration.ZERO else firstChapter.startTimeMs.milliseconds
             val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
             val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
 
@@ -52,6 +54,7 @@ class ChapterManagerImpl @Inject constructor(
                 index = firstChapter.index,
                 uiIndex = -1, // We set any value here as it is updated later in the processing chain
                 selected = firstChapter.index !in episode.deselectedChapters,
+                isGenerated = firstChapter.isGenerated,
             )
         }
         .filter { it.duration > Duration.ZERO }

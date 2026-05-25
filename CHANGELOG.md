@@ -5,6 +5,8 @@
         ([#5276](https://github.com/Automattic/pocket-casts-android/pull/5276))
     *   Show episode summary on fullscreen player
         ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
+    *   Use generated chapters when author didn't provide them
+        ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
 
 8.12
 -----

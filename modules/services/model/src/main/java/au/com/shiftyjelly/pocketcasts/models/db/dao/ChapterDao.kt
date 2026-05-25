@@ -39,7 +39,9 @@ abstract class ChapterDao {
                 insertAll(newEpisodeChapters)
             }
 
-            findEpisodeChapters(episodeUuid).let { currentChapters -> currentChapters.size <= chapters.size && currentChapters.none(Chapter::isEmbedded) } -> {
+            findEpisodeChapters(episodeUuid).let { currentChapters ->
+                currentChapters.none(Chapter::isEmbedded) && (currentChapters.size <= chapters.size || currentChapters.all { it.isGenerated })
+            } -> {
                 deleteForEpisode(episodeUuid)
                 insertAll(newEpisodeChapters)
             }
@@ -48,6 +50,9 @@ abstract class ChapterDao {
 
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract suspend fun findEpisodeChapters(episodeUuid: String): List<Chapter>
+
+    @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid")
+    abstract suspend fun countForEpisode(episodeUuid: String): Int
 
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract fun observeRawChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>

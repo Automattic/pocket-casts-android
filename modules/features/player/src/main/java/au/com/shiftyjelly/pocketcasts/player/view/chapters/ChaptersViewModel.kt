@@ -171,6 +171,7 @@ class ChaptersViewModel @AssistedInject constructor(
     ) = UiState(
         podcast = playbackState.podcast,
         allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
+        hasGeneratedChapters = chapters.hasGeneratedChapters,
         isTogglingChapters = isToggling,
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
@@ -225,6 +226,7 @@ class ChaptersViewModel @AssistedInject constructor(
     data class UiState(
         val podcast: Podcast? = null,
         private val allChapters: List<ChapterState> = emptyList(),
+        val hasGeneratedChapters: Boolean = false,
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,

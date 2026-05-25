@@ -13,6 +13,7 @@ data class Chapter(
     val url: HttpUrl? = null,
     val imagePath: String? = null,
     val selected: Boolean = true,
+    val isGenerated: Boolean = false,
 ) {
 
     val isImagePresent: Boolean
