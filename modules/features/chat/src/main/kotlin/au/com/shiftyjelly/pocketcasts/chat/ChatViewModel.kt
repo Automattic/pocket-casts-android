@@ -43,6 +43,7 @@ class ChatViewModel @Inject constructor(
 
     private var sendJob: Job? = null
     private var quotePlaybackSession: QuotePlaybackSession? = null
+    private var transientUserMessage: ChatMessage.User? = null
     private lateinit var episodeUuid: String
     private lateinit var welcomeMessageText: String
 
@@ -84,7 +85,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatManager.observeMessages(episodeUuid).collect { messages ->
                 _uiState.update { state ->
-                    state.copy(messages = messages.withQuotePlaybackState(state.messages.playingQuoteUuid()))
+                    state.copy(messages = messages.withTransientUserMessage().withQuotePlaybackState(state.messages.playingQuoteUuid()))
                 }
             }
         }
@@ -106,9 +107,16 @@ class ChatViewModel @Inject constructor(
 
     fun clearChat() {
         sendJob?.cancel()
-        _uiState.update { it.copy(isAwaitingReply = false, error = null) }
+        transientUserMessage = null
+        val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
+        _uiState.update {
+            it.copy(
+                messages = listOf(welcomeMsg),
+                isAwaitingReply = false,
+                error = null,
+            )
+        }
         viewModelScope.launch {
-            val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
             chatManager.clearMessages(episodeUuid, welcomeMsg)
         }
     }
@@ -118,12 +126,12 @@ class ChatViewModel @Inject constructor(
         if (text.isEmpty()) return
 
         _uiState.update { it.copy(inputText = "") }
-        performSend(message = text, isRetry = false)
+        performSend(message = ChatMessage.User(text = text))
     }
 
     fun retry() {
-        val lastUserMessage = _uiState.value.messages.lastOrNull { it is ChatMessage.User } as? ChatMessage.User ?: return
-        performSend(message = lastUserMessage.text, isRetry = true)
+        val failedUserMessage = transientUserMessage ?: return
+        performSend(message = failedUserMessage)
     }
 
     fun playQuote(quoteUuid: String) {
@@ -339,14 +347,22 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun performSend(message: String, isRetry: Boolean) {
-        val currentMessages = _uiState.value.messages
+    private fun performSend(message: ChatMessage.User) {
+        transientUserMessage = message
+        val currentMessages = _uiState.value.messages.filterNot { it.uuid == message.uuid }
 
-        _uiState.update { it.copy(isAwaitingReply = true, error = null) }
+        _uiState.update {
+            it.copy(
+                isAwaitingReply = true,
+                error = null,
+                messages = it.messages.withTransientUserMessage(),
+            )
+        }
 
         sendJob = viewModelScope.launch {
             try {
-                chatManager.sendMessage(episodeUuid, message, currentMessages, isRetry)
+                chatManager.sendMessage(episodeUuid, message, currentMessages)
+                transientUserMessage = null
             } catch (e: IOException) {
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: CancellationException) {
@@ -357,6 +373,11 @@ class ChatViewModel @Inject constructor(
                 _uiState.update { it.copy(isAwaitingReply = false) }
             }
         }
+    }
+
+    private fun List<ChatMessage>.withTransientUserMessage(): List<ChatMessage> {
+        val message = transientUserMessage ?: return this
+        return if (any { it.uuid == message.uuid }) this else this + message
     }
 
     private fun List<ChatMessage>.playingQuoteUuid(): String? {
