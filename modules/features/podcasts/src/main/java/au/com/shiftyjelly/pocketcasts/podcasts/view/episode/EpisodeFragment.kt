@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.core.text.htmlEncode
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
@@ -66,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
+import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -993,19 +993,3 @@ class EpisodeFragment : BaseFragment() {
 
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
-
-private fun markdownToHtml(markdown: String): String {
-    return markdown.lines()
-        .joinToString("\n") { line ->
-            when {
-                line.startsWith("### ") -> "<h3>${line.removePrefix("### ").htmlEncode()}</h3>"
-                line.startsWith("## ") -> "<h2>${line.removePrefix("## ").htmlEncode()}</h2>"
-                line.startsWith("# ") -> "<h1>${line.removePrefix("# ").htmlEncode()}</h1>"
-                line.startsWith("- ") -> "&#8226; ${line.removePrefix("- ").htmlEncode()}<br>"
-                line.startsWith("* ") -> "&#8226; ${line.removePrefix("* ").htmlEncode()}<br>"
-                line.isBlank() -> "<br>"
-                else -> "${line.htmlEncode()}<br>"
-            }
-        }
-        .replace(Regex("\\*\\*(.+?)\\*\\*"), "<b>$1</b>")
-}
