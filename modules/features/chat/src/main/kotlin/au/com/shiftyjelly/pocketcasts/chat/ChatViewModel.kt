@@ -13,6 +13,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatClearedEvent
+import com.automattic.eventhorizon.EpisodeChatDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
+import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
@@ -35,6 +44,7 @@ class ChatViewModel @Inject constructor(
     private val chatManager: ChatManager,
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
+    private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -44,6 +54,7 @@ class ChatViewModel @Inject constructor(
     private var sendJob: Job? = null
     private var quotePlaybackSession: QuotePlaybackSession? = null
     private lateinit var episodeUuid: String
+    private lateinit var podcastUuid: String
     private lateinit var welcomeMessageText: String
 
     init {
@@ -66,6 +77,7 @@ class ChatViewModel @Inject constructor(
         welcomeMessage: String,
     ) {
         this.episodeUuid = episodeUuid
+        this.podcastUuid = podcastUuid
         this.welcomeMessageText = welcomeMessage
         _uiState.update {
             it.copy(
@@ -78,6 +90,7 @@ class ChatViewModel @Inject constructor(
         }
         observeMessages()
         ensureChatExists(podcastUuid)
+        trackShown()
     }
 
     private fun observeMessages() {
@@ -107,10 +120,27 @@ class ChatViewModel @Inject constructor(
     fun clearChat() {
         sendJob?.cancel()
         _uiState.update { it.copy(isAwaitingReply = false, error = null) }
+        eventHorizon.track(
+            EpisodeChatClearedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
         viewModelScope.launch {
             val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
             chatManager.clearMessages(episodeUuid, welcomeMsg)
         }
+    }
+
+    fun trackDismissed() {
+        eventHorizon.track(
+            EpisodeChatDismissedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
     }
 
     fun onSend() {
@@ -133,8 +163,22 @@ class ChatViewModel @Inject constructor(
             ?: return
 
         if (quote.isPlaying) {
+            eventHorizon.track(
+                EpisodeChatQuoteStopTappedEvent(
+                    source = SourceView.EPISODE_DETAILS.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
             stopQuote()
         } else {
+            eventHorizon.track(
+                EpisodeChatQuotePlayTappedEvent(
+                    source = SourceView.EPISODE_DETAILS.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
             startQuote(quote)
         }
     }
@@ -347,16 +391,47 @@ class ChatViewModel @Inject constructor(
         sendJob = viewModelScope.launch {
             try {
                 chatManager.sendMessage(episodeUuid, message, currentMessages, isRetry)
+                eventHorizon.track(
+                    EpisodeChatMessageSentEvent(
+                        source = SourceView.EPISODE_DETAILS.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        messageLength = message.length.toLong(),
+                    ),
+                )
             } catch (e: IOException) {
+                trackMessageFailed(EpisodeChatErrorType.Network)
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                trackMessageFailed(EpisodeChatErrorType.Server)
                 _uiState.update { it.copy(error = ChatError.ServerError) }
             } finally {
                 _uiState.update { it.copy(isAwaitingReply = false) }
             }
         }
+    }
+
+    private fun trackShown() {
+        eventHorizon.track(
+            EpisodeChatShownEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+    }
+
+    private fun trackMessageFailed(error: EpisodeChatErrorType) {
+        eventHorizon.track(
+            EpisodeChatMessageFailedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                error = error,
+            ),
+        )
     }
 
     private fun List<ChatMessage>.playingQuoteUuid(): String? {
