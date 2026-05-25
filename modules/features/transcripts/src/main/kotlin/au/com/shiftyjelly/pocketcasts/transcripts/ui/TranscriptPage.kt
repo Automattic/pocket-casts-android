@@ -32,7 +32,9 @@ import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -243,15 +245,14 @@ private fun HighlightEffect(
     val playbackState by remember {
         playbackManager.playbackStateFlow
     }.collectAsState(initial = null)
-    val currentPosMs = playbackState?.positionMs
     val isPlaying = playbackState?.isPlaying == true
 
-    if (isPlaying && isSyncedActive && currentPosMs != null) {
+    if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
             var cachedIndex = 0
             while (true) {
                 withFrameNanos { _ ->
-                    val posMs = currentPosMs
+                    val posMs = playbackState?.positionMs ?: return@withFrameNanos
                     val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
                     val currentRefTimeMs = (currentRefTime * 1000).toLong()
                     val idx = findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
@@ -298,15 +299,20 @@ private fun UserScrollDetectionEffect(
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
+        var resumeJob: Job? = null
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
+                    resumeJob?.cancel()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
-                    delay(AUTO_SCROLL_BACK_DELAY_MS)
-                    latestOnResumeScroll()
+                    resumeJob?.cancel()
+                    resumeJob = launch {
+                        delay(AUTO_SCROLL_BACK_DELAY_MS)
+                        latestOnResumeScroll()
+                    }
                 }
             }
         }
@@ -373,7 +379,41 @@ private fun findCueBinarySearch(
                 else -> return mid
             }
         } else {
-            lo = mid + 1
+            // Walk outward from mid to find the nearest timed Text entry for comparison.
+            val timedIdx = findNearestTimedEntry(entries, mid, lo, hi)
+            if (timedIdx == null) {
+                break
+            } else {
+                val timed = entries[timedIdx] as TranscriptEntry.Text
+                when {
+                    refTimeMs < timed.startTimeMs -> hi = timedIdx - 1
+                    refTimeMs > timed.endTimeMs -> lo = timedIdx + 1
+                    else -> return timedIdx
+                }
+            }
+        }
+    }
+    return null
+}
+
+private fun findNearestTimedEntry(
+    entries: List<TranscriptEntry>,
+    mid: Int,
+    lo: Int,
+    hi: Int,
+): Int? {
+    var left = mid - 1
+    var right = mid + 1
+    while (left >= lo || right <= hi) {
+        if (right <= hi) {
+            val entry = entries[right]
+            if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) return right
+            right++
+        }
+        if (left >= lo) {
+            val entry = entries[left]
+            if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) return left
+            left--
         }
     }
     return null
