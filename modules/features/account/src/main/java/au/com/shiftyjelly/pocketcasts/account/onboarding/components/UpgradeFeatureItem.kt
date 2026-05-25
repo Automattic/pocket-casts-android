@@ -42,7 +42,7 @@ fun UpgradeFeatureItem(
             .semantics(mergeDescendants = true) {}
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             painter = painterResource(item.image),
