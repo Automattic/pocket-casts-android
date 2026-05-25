@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.buttons
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,10 +19,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,8 +47,6 @@ private val ButtonPaddingValues = PaddingValues(
 data class ButtonTab(
     @StringRes val labelResId: Int,
     val onClick: () -> Unit,
-    @DrawableRes val iconResId: Int? = null,
-    @DrawableRes val trailingIconResId: Int? = null,
 )
 
 @Composable
@@ -58,73 +54,64 @@ fun ButtonTabs(
     tabs: List<ButtonTab>,
     selectedTab: ButtonTab,
     modifier: Modifier = Modifier,
+    buttonSelectedColor: Color = MaterialTheme.theme.colors.primaryText01,
+    buttonPressedColor: Color = MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.1f),
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryUi02,
+    textSelectedColor: Color = MaterialTheme.theme.colors.primaryUi02,
+    textUnselectedColor: Color = MaterialTheme.theme.colors.primaryText02,
 ) {
     Row(
         modifier = modifier
+            .background(color = backgroundColor)
             .horizontalScroll(rememberScrollState())
             .padding(start = 16.dp, end = 10.dp),
     ) {
         for (tab in tabs) {
-            val interactionSource = remember { MutableInteractionSource() }
-            val pressed by interactionSource.collectIsPressedAsState()
-            val focused by interactionSource.collectIsFocusedAsState()
-            val selected = selectedTab == tab
-            val backgroundColor = if (selected) {
-                // make the button background the same color as the text, black on the light theme and white on the dark theme
-                MaterialTheme.theme.colors.primaryText01
-            } else {
-                if (pressed || focused) {
-                    // the press and focus state is a lighter version of the button background color
-                    MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.1f)
+            key(tab.labelResId) {
+                val interactionSource = remember { MutableInteractionSource() }
+                val pressed by interactionSource.collectIsPressedAsState()
+                val focused by interactionSource.collectIsFocusedAsState()
+                val selected = selectedTab == tab
+                val tabBackgroundColor = if (selected) {
+                    // make the button background the same color as the text,
+                    // black on the light theme and white on the dark theme
+                    buttonSelectedColor
                 } else {
-                    // the unselected button is the same color as the layout background
-                    MaterialTheme.theme.colors.primaryUi02
+                    if (pressed || focused) {
+                        // the press and focus state is a lighter version of the button background color
+                        buttonPressedColor
+                    } else {
+                        // the unselected button is the same color as the layout background
+                        backgroundColor
+                    }
                 }
-            }
-            val textColor = if (selected) MaterialTheme.theme.colors.primaryUi02 else MaterialTheme.theme.colors.primaryText02
-            Button(
-                onClick = { tab.onClick() },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = backgroundColor,
-                ),
-                contentPadding = ButtonPaddingValues,
-                elevation = ButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    focusedElevation = 0.dp,
-                ),
-                interactionSource = interactionSource,
-            ) {
-                if (tab.iconResId != null) {
-                    Image(
-                        painter = painterResource(tab.iconResId),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(textColor),
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                }
-                Text(
-                    text = stringResource(tab.labelResId),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight(500),
-                    letterSpacing = 0.5.sp,
-                    color = textColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (tab.trailingIconResId != null) {
-                    Spacer(Modifier.width(4.dp))
-                    Image(
-                        painter = painterResource(tab.trailingIconResId),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(textColor),
-                        modifier = Modifier.size(16.dp),
+                val textColor = if (selected) textSelectedColor else textUnselectedColor
+                Button(
+                    onClick = { tab.onClick() },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = tabBackgroundColor,
+                    ),
+                    contentPadding = ButtonPaddingValues,
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        focusedElevation = 0.dp,
+                    ),
+                    interactionSource = interactionSource,
+                ) {
+                    Text(
+                        text = stringResource(tab.labelResId),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight(500),
+                        letterSpacing = 0.5.sp,
+                        color = textColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
+                Spacer(Modifier.width(6.dp))
             }
-            Spacer(Modifier.width(6.dp))
         }
     }
 }
@@ -149,7 +136,6 @@ private fun ButtonTabsPreview(themeType: Theme.ThemeType) {
         ButtonTabs(
             tabs = listOf(episodesTab, bookmarksTab),
             selectedTab = episodesTab,
-            modifier = Modifier.padding(horizontal = 8.dp),
         )
     }
 }

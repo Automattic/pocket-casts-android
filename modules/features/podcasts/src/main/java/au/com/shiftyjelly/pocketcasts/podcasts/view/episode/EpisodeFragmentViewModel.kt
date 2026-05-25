@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -95,40 +96,62 @@ class EpisodeFragmentViewModel @Inject constructor(
     private var autoDispatchPlay = false
 
     private var loadTranscriptJob: Job? = null
-    private val _transcript = MutableStateFlow<Transcript?>(null)
-    val transcript = _transcript.asStateFlow()
+    private var loadSummaryJob: Job? = null
+    private var lastSummaryEpisodeUuid: String? = null
 
-    private val _isPlusUser = MutableStateFlow(false)
-    val isPlusUser = _isPlusUser.asStateFlow()
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY }
+
+    data class EpisodePageState(
+        val transcript: Transcript? = null,
+        val isPlusUser: Boolean = false,
+        val summary: String? = null,
+        val selectedContentTab: EpisodeContentTab = EpisodeContentTab.DESCRIPTION,
+        val episodePublishedDate: Date? = null,
+        val episodeDurationMs: Long? = null,
+    ) {
+        internal fun selectContentTab(tab: EpisodeContentTab): EpisodePageState {
+            val contentTab = when (tab) {
+                EpisodeContentTab.DESCRIPTION -> EpisodeContentTab.DESCRIPTION
+
+                EpisodeContentTab.SUMMARY -> if (summary == null) {
+                    EpisodeContentTab.DESCRIPTION
+                } else {
+                    EpisodeContentTab.SUMMARY
+                }
+            }
+            return copy(selectedContentTab = contentTab)
+        }
+
+        internal fun withSummary(summary: String?): EpisodePageState {
+            val contentTab = if (summary == null && selectedContentTab == EpisodeContentTab.SUMMARY) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                summary = summary,
+                selectedContentTab = contentTab,
+            )
+        }
+    }
+
+    private val _pageState = MutableStateFlow(EpisodePageState())
+    val pageState = _pageState.asStateFlow()
 
     init {
         viewModelScope.launch {
             userManager.getSignInState().asFlow().collect { signInState ->
-                _isPlusUser.value = signInState.isSignedInAsPlusOrPatron
+                _pageState.update { state ->
+                    state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
+                }
             }
         }
     }
 
-    private var loadSummaryJob: Job? = null
-    private var lastSummaryEpisodeUuid: String? = null
-    private val _summary = MutableStateFlow<String?>(null)
-    val summary = _summary.asStateFlow()
-
-    enum class EpisodeContentTab { DESCRIPTION, SUMMARY }
-
-    private val _selectedContentTab = MutableStateFlow(EpisodeContentTab.DESCRIPTION)
-    val selectedContentTab = _selectedContentTab.asStateFlow()
-
     fun selectContentTab(tab: EpisodeContentTab) {
-        _selectedContentTab.value = tab
-    }
-
-    data class DateDurationInfo(val publishedDate: java.util.Date?, val durationMs: Long)
-    private val _dateDurationInfo = MutableStateFlow<DateDurationInfo?>(null)
-    val dateDurationInfo = _dateDurationInfo.asStateFlow()
-
-    fun updateDateDuration(publishedDate: java.util.Date?, durationMs: Long) {
-        _dateDurationInfo.value = DateDurationInfo(publishedDate, durationMs)
+        _pageState.update { state ->
+            state.selectContentTab(tab)
+        }
     }
 
     fun setup(
@@ -197,6 +220,21 @@ class EpisodeFragmentViewModel @Inject constructor(
                     }
                     episode = it.episode
                     podcast = it.podcast
+                    _pageState.update { state ->
+                        val episodePublishedDate = it.episode.publishedDate
+                        val episodeDurationMs = it.episode.durationMs.toLong()
+                        if (
+                            state.episodePublishedDate == episodePublishedDate &&
+                            state.episodeDurationMs == episodeDurationMs
+                        ) {
+                            state
+                        } else {
+                            state.copy(
+                                episodePublishedDate = episodePublishedDate,
+                                episodeDurationMs = episodeDurationMs,
+                            )
+                        }
+                    }
                 }
             }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
@@ -214,27 +252,36 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
             .distinctUntilChanged()
 
-        if (transcript.value?.episodeUuid != episodeUuid) {
+        if (pageState.value.transcript?.episodeUuid != episodeUuid) {
             val oldJob = loadTranscriptJob
             loadTranscriptJob = launch {
                 oldJob?.cancelAndJoin()
-                _transcript.value = transcriptManager.loadTranscript(episodeUuid)
+                val transcript = transcriptManager.loadTranscript(episodeUuid)
+                _pageState.update { state ->
+                    state.copy(transcript = transcript)
+                }
             }
         }
 
         if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
-            _summary.value = null
+            _pageState.update { state ->
+                state.withSummary(null)
+            }
             val oldSummaryJob = loadSummaryJob
             loadSummaryJob = launch {
                 oldSummaryJob?.cancelAndJoin()
                 val result = transcriptManager.loadSummaryText(episodeUuid)
-                _summary.value = result
+                _pageState.update { state ->
+                    state.withSummary(result)
+                }
                 if (result != null) {
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
         } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
-            _summary.value = null
+            _pageState.update { state ->
+                state.withSummary(null)
+            }
         }
     }
 
