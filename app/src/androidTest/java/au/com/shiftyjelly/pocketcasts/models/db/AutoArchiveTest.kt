@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -502,6 +503,42 @@ class AutoArchiveTest {
 
         val updatedOldestEpisode = episodeDao.findByUuid(oldestUuid)!!
         assertTrue("Episode should not be archived as global is off", !updatedOldestEpisode.isArchived)
+    }
+
+    @Test
+    fun testEpisodeLimitRespectsUpNext() = runTest {
+        // Regression for PCDROID-571: an episode queued in Up Next (behind the currently-playing
+        // one) should not be archived by the over-limit check when a newer episode arrives.
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlaying.Never, AutoArchiveInactive.Never, testDispatcher = testDispatcher)
+        val upNext = upNextQueueFor(testDb, episodeManager)
+        val playbackManager = mock<PlaybackManager> {
+            on { this.upNextQueue } doReturn upNext
+        }
+
+        val podcast = Podcast(UUID.randomUUID().toString(), rawAutoArchiveEpisodeLimit = AutoArchiveLimit.One, overrideGlobalArchive = true, isSubscribed = true)
+        val podcastManager = podcastManagerThatReturns(podcast)
+        testDb.podcastDao().insertBlocking(podcast)
+
+        val olderUuid = UUID.randomUUID().toString()
+        val newerUuid = UUID.randomUUID().toString()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -2)
+        val olderEpisode = PodcastEpisode(title = "Older", uuid = olderUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = calendar.time)
+        val newerEpisode = PodcastEpisode(title = "Newer", uuid = newerUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date())
+
+        episodeDao.insertBlocking(olderEpisode)
+        episodeDao.insertBlocking(newerEpisode)
+
+        // Newer at the top of Up Next, older queued behind it. Without this set-up the older
+        // episode would be at position 0 (== currentEpisode) and protected by the legacy guard,
+        // so the test would pass even with the old buggy filter.
+        runBlocking { upNext.playLast(newerEpisode, onAdd = null) }
+        runBlocking { upNext.playLast(olderEpisode, onAdd = null) }
+
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
+
+        val updatedOlder = episodeDao.findByUuid(olderUuid)!!
+        assertTrue("Older episode queued in Up Next should not be archived under the episode limit", !updatedOlder.isArchived)
     }
 
     @Test
