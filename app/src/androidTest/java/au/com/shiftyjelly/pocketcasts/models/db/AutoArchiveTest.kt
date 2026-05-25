@@ -532,8 +532,8 @@ class AutoArchiveTest {
         // Newer at the top of Up Next, older queued behind it. Without this set-up the older
         // episode would be at position 0 (== currentEpisode) and protected by the legacy guard,
         // so the test would pass even with the old buggy filter.
-        runBlocking { upNext.playLast(newerEpisode, onAdd = null) }
-        runBlocking { upNext.playLast(olderEpisode, onAdd = null) }
+        upNext.playLast(newerEpisode, onAdd = null)
+        upNext.playLast(olderEpisode, onAdd = null)
 
         episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
 
