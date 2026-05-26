@@ -73,7 +73,7 @@ class StatsViewModelTest {
     }
 
     @Test
-    fun `given last 7 days played up to sum less than 2_5 hrs, when stats are loaded, then app review dialog  is not shown`() = runTest {
+    fun `given last 7 days played up to sum less than 2_5 hrs, when stats are loaded, then app review dialog is not shown`() = runTest {
         initViewModel(playedUpToSumInHours = 2.0)
 
         viewModel.loadStats()
