@@ -3,15 +3,18 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.util.zip.GZIPInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -63,7 +66,7 @@ class FingerprintReferenceRetriever @Inject constructor(
 
             if (attempt > 0) {
                 val delayMs = (1L shl attempt) * 1000L
-                kotlinx.coroutines.delay(delayMs)
+                delay(delayMs)
             }
 
             try {
@@ -91,9 +94,9 @@ class FingerprintReferenceRetriever @Inject constructor(
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
                     return@withContext jsonData
                 }
-            } catch (e: kotlinx.coroutines.CancellationException) {
+            } catch (e: CancellationException) {
                 throw e
-            } catch (e: java.io.IOException) {
+            } catch (e: IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
                 if (attempt == MAX_RETRIES - 1) return@withContext null
             }
