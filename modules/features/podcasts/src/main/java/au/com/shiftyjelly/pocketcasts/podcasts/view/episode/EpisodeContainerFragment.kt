@@ -33,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.Epis
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -216,32 +218,40 @@ class EpisodeContainerFragment :
 
         viewPager.adapter = adapter
 
-        TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
-            tab.setText(adapter.pageTitle(position))
-        }.attach()
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            // Hide top tab bar — tabs are merged into EpisodeFragment's bottom tab bar
+            tabLayout.isVisible = false
+            viewPager.isUserInputEnabled = false
+        } else {
+            TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
+                tab.setText(adapter.pageTitle(position))
+            }.attach()
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-                viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
+            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
+                }
+
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    btnFav.isVisible = adapter.isDetailsTab(position)
+                    btnShare.isVisible = adapter.isDetailsTab(position)
+                    viewModel.onPageSelected(adapter.tabType(position))
+                }
+            })
+
+            if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
+                openBookmarks()
             }
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                btnFav.isVisible = adapter.isDetailsTab(position)
-                btnShare.isVisible = adapter.isDetailsTab(position)
-                viewModel.onPageSelected(adapter.tabType(position))
-            }
-        })
-
-        if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
-            openBookmarks()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chaptersViewModel.uiState.collect {
-                    adapter.update(addChapters = it.chaptersCount > 0)
+                    if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+                        adapter.update(addChapters = it.chaptersCount > 0)
+                    }
                 }
             }
         }
