@@ -8,11 +8,14 @@
     *   Use generated chapters when author didn't provide them
         ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
 
-8.12
+8.14
 -----
 *   New Features
     *   Synced episode transcripts
         ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+
+8.12
+-----
 *   Bug Fixes
     *   Restore episode duration after download for feeds without an RSS length attribute
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))

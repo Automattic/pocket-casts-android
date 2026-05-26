@@ -96,6 +96,7 @@ class TranscriptFragment : BaseDialogFragment() {
 
             TranscriptPage(
                 uiState = uiState,
+                viewModel = viewModel,
                 fingerprintTimingManager = viewModel.fingerprintTimingManager,
                 playbackManager = viewModel.playbackManager,
                 toolbarPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp),

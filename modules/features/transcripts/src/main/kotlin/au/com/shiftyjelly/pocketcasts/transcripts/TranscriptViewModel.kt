@@ -74,6 +74,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 }
             }
         }
+        observePlaybackState()
     }
 
     private var episodeUuid: String? = null
@@ -84,6 +85,7 @@ class TranscriptViewModel @AssistedInject constructor(
 
     fun loadTranscript(episodeUuid: String) {
         loadTranscriptJob?.cancel()
+        syncedStateJob?.cancel()
         loadTranscriptJob = viewModelScope.launch {
             searchJob?.cancelAndJoin()
 
@@ -91,6 +93,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 state.copy(
                     transcriptState = TranscriptState.Loading,
                     searchState = SearchState.Empty,
+                    syncedState = FingerprintTimingManager.State.Idle,
                 )
             }
 
@@ -131,9 +134,12 @@ class TranscriptViewModel @AssistedInject constructor(
             }
 
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
-                fingerprintTimingManager.prepareForCurrentEpisode()
-                _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
-                observeSyncedState()
+                val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
+                if (currentPlayingUuid == episodeUuid) {
+                    fingerprintTimingManager.prepareForCurrentEpisode()
+                    _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
+                    observeSyncedState()
+                }
             }
         }
     }
@@ -147,6 +153,27 @@ class TranscriptViewModel @AssistedInject constructor(
                 _uiState.update { state -> state.copy(syncedState = syncedState) }
             }
         }
+    }
+
+    private fun observePlaybackState() {
+        viewModelScope.launch {
+            playbackManager.playbackStateFlow.collect { playbackState ->
+                _uiState.update { state ->
+                    state.copy(playingEpisodeUuid = playbackState.episodeUuid.ifEmpty { null })
+                }
+            }
+        }
+    }
+
+    fun seekToTranscriptEntry(entry: TranscriptEntry) {
+        val textEntry = entry as? TranscriptEntry.Text ?: return
+        if (textEntry.startTimeMs < 0) return
+        val currentState = _uiState.value
+        if (!currentState.isSyncedActive) return
+
+        val refTimeSec = textEntry.startTimeMs / 1000.0
+        val seekTimeMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec) ?: return
+        playbackManager.seekToTimeMs(seekTimeMs)
     }
 
     override fun onCleared() {
@@ -352,6 +379,7 @@ data class UiState(
     val isPlusUser: Boolean,
     val isFreeTrialAvailable: Boolean,
     val syncedState: FingerprintTimingManager.State = FingerprintTimingManager.State.Idle,
+    val playingEpisodeUuid: String? = null,
 ) {
     val isPaywallVisible get() = !isPlusUser && (transcriptState as? TranscriptState.Loaded)?.transcript?.isGenerated == true
 
@@ -359,7 +387,9 @@ data class UiState(
 
     val transcriptEpisodeUuid get() = (transcriptState as? TranscriptState.Loaded)?.transcript?.episodeUuid
 
-    val isSyncedActive get() = syncedState is FingerprintTimingManager.State.Active
+    val isSyncedActive get() = syncedState is FingerprintTimingManager.State.Active &&
+        transcriptEpisodeUuid != null &&
+        transcriptEpisodeUuid == playingEpisodeUuid
 
     companion object {
         val Empty = UiState(

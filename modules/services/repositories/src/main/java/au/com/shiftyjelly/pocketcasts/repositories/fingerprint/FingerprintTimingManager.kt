@@ -56,13 +56,9 @@ class FingerprintTimingManager @Inject constructor(
         val score: Float = 0f,
     )
 
-
-
     private val _stateFlow = MutableStateFlow<State>(State.Idle)
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
-
-
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
@@ -98,8 +94,6 @@ class FingerprintTimingManager @Inject constructor(
     private var currentMatcher: CheckpointMatcher? = null
     private var hasReachedActive = false
 
-
-
     init {
         observePlaybackForProactivePreparation()
     }
@@ -117,8 +111,6 @@ class FingerprintTimingManager @Inject constructor(
             }
         }
     }
-
-
 
     fun prepareForCurrentEpisode() {
         val episode = playbackManager.getCurrentEpisode() ?: run {
@@ -188,8 +180,6 @@ class FingerprintTimingManager @Inject constructor(
         return (result * 1000).toInt()
     }
 
-
-
     private fun resetState() {
         generationJob?.cancel()
         generationJob = null
@@ -210,8 +200,6 @@ class FingerprintTimingManager @Inject constructor(
         currentMatcher = null
         hasReachedActive = false
     }
-
-
 
     private suspend fun prepareForEpisode(
         episodeUuid: String,
@@ -337,8 +325,6 @@ class FingerprintTimingManager @Inject constructor(
         startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
     }
 
-
-
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
         if (episodeUuid != currentEpisodeUuid) return
 
@@ -389,8 +375,6 @@ class FingerprintTimingManager @Inject constructor(
         return playbackTimeSec >= first.playbackTime - margin &&
             playbackTimeSec <= last.playbackTime + margin
     }
-
-
 
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
@@ -653,8 +637,6 @@ class FingerprintTimingManager @Inject constructor(
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 
-
-
     internal fun consider(candidate: TimeMappingEntry): Int {
         val trusted = filterLastTrusted
         if (trusted != null && isInTrend(candidate, trusted)) {
@@ -706,8 +688,6 @@ class FingerprintTimingManager @Inject constructor(
         return true
     }
 
-
-
     internal fun insertMapping(entry: TimeMappingEntry) {
         val pbIdx = mappingPlaybackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
         mappingPlaybackToReference.add(pbIdx, entry)
@@ -737,8 +717,6 @@ class FingerprintTimingManager @Inject constructor(
         }
         publishSnapshot()
     }
-
-
 
     companion object {
         fun interpolate(

@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -39,6 +40,7 @@ class TranscriptViewModelTest {
 
     private val transcriptManager = TestTranscriptManager()
     private val signInStateFlow = MutableStateFlow<SignInState>(SignInState.SignedOut)
+    private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = ""))
 
     lateinit var viewModel: TranscriptViewModel
 
@@ -63,7 +65,9 @@ class TranscriptViewModelTest {
                 on { state } doReturn FingerprintTimingManager.State.Idle
                 on { stateFlow } doReturn MutableStateFlow(FingerprintTimingManager.State.Idle)
             },
-            playbackManager = mock(),
+            playbackManager = mock {
+                on { playbackStateFlow } doReturn playbackStateFlow
+            },
         )
     }
 

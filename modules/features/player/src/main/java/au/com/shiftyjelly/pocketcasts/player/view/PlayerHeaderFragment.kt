@@ -1013,6 +1013,7 @@ class PlayerHeaderFragment :
             val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             TranscriptPage(
                 uiState = state,
+                viewModel = transcriptViewModel,
                 fingerprintTimingManager = transcriptViewModel.fingerprintTimingManager,
                 playbackManager = transcriptViewModel.playbackManager,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
