@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -256,8 +257,10 @@ private fun HighlightEffect(
                     val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
                     val currentRefTimeMs = (currentRefTime * 1000).toLong()
                     val idx = findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
-                    if (idx != null) cachedIndex = idx
-                    latestOnHighlightChanged(idx)
+                    if (idx != null) {
+                        cachedIndex = idx
+                        latestOnHighlightChanged(idx)
+                    }
                 }
             }
         }
@@ -393,7 +396,33 @@ private fun findCueBinarySearch(
             }
         }
     }
-    return null
+    return findClosestTimedEntry(entries, refTimeMs, lo.coerceIn(0, entries.size - 1))
+}
+
+private fun findClosestTimedEntry(
+    entries: List<TranscriptEntry>,
+    refTimeMs: Long,
+    around: Int,
+): Int? {
+    var bestIndex: Int? = null
+    var bestDistance = Long.MAX_VALUE
+    val scanRadius = 5
+    val start = maxOf(0, around - scanRadius)
+    val end = minOf(entries.size - 1, around + scanRadius)
+    for (i in start..end) {
+        val entry = entries[i]
+        if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+            val dist = minOf(
+                abs(refTimeMs - entry.startTimeMs),
+                abs(refTimeMs - entry.endTimeMs),
+            )
+            if (dist < bestDistance) {
+                bestDistance = dist
+                bestIndex = i
+            }
+        }
+    }
+    return if (bestDistance <= NEAREST_CUE_THRESHOLD_MS) bestIndex else null
 }
 
 private fun findNearestTimedEntry(
@@ -420,3 +449,5 @@ private fun findNearestTimedEntry(
 }
 
 private const val AUTO_SCROLL_BACK_DELAY_MS = 5000L
+
+private const val NEAREST_CUE_THRESHOLD_MS = 5000L

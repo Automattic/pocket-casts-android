@@ -153,7 +153,6 @@ class TranscriptViewModel @AssistedInject constructor(
         super.onCleared()
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
-        fingerprintTimingManager.stop()
     }
 
     fun reloadTranscript() {

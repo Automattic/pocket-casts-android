@@ -41,7 +41,6 @@ class FingerprintTimingManager @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val referenceRetriever: FingerprintReferenceRetriever,
 ) {
-    // region Public Types
 
     sealed interface State {
         data object Idle : State
@@ -57,17 +56,13 @@ class FingerprintTimingManager @Inject constructor(
         val score: Float = 0f,
     )
 
-    // endregion
 
-    // region Public State
 
     private val _stateFlow = MutableStateFlow<State>(State.Idle)
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
 
-    // endregion
 
-    // region Private State
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
@@ -103,9 +98,27 @@ class FingerprintTimingManager @Inject constructor(
     private var currentMatcher: CheckpointMatcher? = null
     private var hasReachedActive = false
 
-    // endregion
 
-    // region Public API
+
+    init {
+        observePlaybackForProactivePreparation()
+    }
+
+    private fun observePlaybackForProactivePreparation() {
+        scope.launch {
+            var lastEpisodeUuid: String? = null
+            playbackManager.playbackStateFlow.collect { state ->
+                if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) return@collect
+                val uuid = state.episodeUuid
+                if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
+                    lastEpisodeUuid = uuid
+                    prepareForCurrentEpisode()
+                }
+            }
+        }
+    }
+
+
 
     fun prepareForCurrentEpisode() {
         val episode = playbackManager.getCurrentEpisode() ?: run {
@@ -175,9 +188,7 @@ class FingerprintTimingManager @Inject constructor(
         return (result * 1000).toInt()
     }
 
-    // endregion
 
-    // region State Management
 
     private fun resetState() {
         generationJob?.cancel()
@@ -200,9 +211,7 @@ class FingerprintTimingManager @Inject constructor(
         hasReachedActive = false
     }
 
-    // endregion
 
-    // region Preparation
 
     private suspend fun prepareForEpisode(
         episodeUuid: String,
@@ -328,9 +337,7 @@ class FingerprintTimingManager @Inject constructor(
         startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
     }
 
-    // endregion
 
-    // region Playback Progress Handling
 
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
         if (episodeUuid != currentEpisodeUuid) return
@@ -383,9 +390,7 @@ class FingerprintTimingManager @Inject constructor(
             playbackTimeSec <= last.playbackTime + margin
     }
 
-    // endregion
 
-    // region Streaming Fingerprint Generation
 
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
@@ -648,9 +653,7 @@ class FingerprintTimingManager @Inject constructor(
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 
-    // endregion
 
-    // region Drift Filter
 
     internal fun consider(candidate: TimeMappingEntry): Int {
         val trusted = filterLastTrusted
@@ -703,9 +706,7 @@ class FingerprintTimingManager @Inject constructor(
         return true
     }
 
-    // endregion
 
-    // region Time Mapping
 
     internal fun insertMapping(entry: TimeMappingEntry) {
         val pbIdx = mappingPlaybackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
@@ -737,9 +738,7 @@ class FingerprintTimingManager @Inject constructor(
         publishSnapshot()
     }
 
-    // endregion
 
-    // region Interpolation
 
     companion object {
         fun interpolate(
@@ -788,8 +787,6 @@ class FingerprintTimingManager @Inject constructor(
             return max(0.0, floor(time / stride) * stride)
         }
     }
-
-    // endregion
 }
 
 private inline fun <T> MutableList<T>.sortedInsertionIndex(crossinline predicate: (T) -> Boolean): Int {
