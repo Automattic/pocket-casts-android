@@ -201,7 +201,7 @@ private class ExoPlayerClipPlayer(
     }
 
     private fun ExoPlayerDataSourceFactory.createMediaSource(clip: Clip): MediaSource? {
-        // Divide and multiple by 100 to drop insignificant for clip creation milliseconds resolution
+        // Divide and multiply by 100 to drop insignificant for clip creation milliseconds resolution
         val clipStart = (clip.range.start.inWholeMilliseconds / 100) * 100
         val clipEnd = (clip.range.end.inWholeMilliseconds / 100) * 100
         return createMediaSource(clip.episodeLocation, clipStart..clipEnd)
