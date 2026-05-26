@@ -87,6 +87,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersTheme
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
@@ -150,6 +151,7 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class EpisodeFragment : BaseFragment() {
@@ -668,7 +670,7 @@ class EpisodeFragment : BaseFragment() {
             val selectedTab = pageState.selectedContentTab
 
             val showDescription = !isSummaryEnabled ||
-                selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
+                selectedTab == EpisodeContentTab.DESCRIPTION
             LaunchedEffect(showDescription) {
                 binding?.webViewShowNotes?.isVisible = showDescription
             }
@@ -678,7 +680,6 @@ class EpisodeFragment : BaseFragment() {
                     val chaptersState = chaptersViewModel.uiState.collectAsState().value
                     val hasChapters = chaptersState.chaptersCount > 0
 
-                    // AI-enhanced layout: "Chat with episode" + merged tabs + inline content
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // "Chat with episode" input-style banner
                         val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
@@ -727,7 +728,6 @@ class EpisodeFragment : BaseFragment() {
                             }
                         }
 
-                        // Merged tabs: Description > Summary > Bookmarks > Chapters > Transcripts
                         val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
 
                         AnimatedVisibility(
@@ -737,10 +737,10 @@ class EpisodeFragment : BaseFragment() {
                         ) {
                             val selectedButtonTab = tabs.firstOrNull { tab ->
                                 when (selectedTab) {
-                                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
-                                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
-                                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
-                                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
+                                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
+                                    EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
+                                    EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
+                                    EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
                                 }
                             } ?: tabs.first()
                             ButtonTabs(
@@ -754,7 +754,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // Inline summary content
-                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY && summaryText != null) {
+                        if (selectedTab == EpisodeContentTab.SUMMARY && summaryText != null) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -775,8 +775,7 @@ class EpisodeFragment : BaseFragment() {
                             }
                         }
 
-                        // Inline bookmarks content
-                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS) {
+                        if (selectedTab == EpisodeContentTab.BOOKMARKS) {
                             val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                             BookmarksPage(
                                 episodeUuid = episodeUUID,
@@ -804,8 +803,7 @@ class EpisodeFragment : BaseFragment() {
                             )
                         }
 
-                        // Inline chapters content
-                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS) {
+                        if (selectedTab == EpisodeContentTab.CHAPTERS) {
                             val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                             val lazyListState = rememberLazyListState()
                             ChaptersTheme {
@@ -817,7 +815,7 @@ class EpisodeFragment : BaseFragment() {
                                     totalChaptersCount = chaptersState.chaptersCount,
                                     onSelectionChange = chaptersViewModel::selectChapter,
                                     onChapterClick = chaptersViewModel::playChapter,
-                                    onUrlClick = { /* handled by parent */ },
+                                    onUrlClick = {},
                                     onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
                                     isTogglingChapters = chaptersState.isTogglingChapters,
                                     showSubscriptionIcon = chaptersState.showSubscriptionIcon,
@@ -898,13 +896,13 @@ class EpisodeFragment : BaseFragment() {
         summaryText: String?,
         hasChapters: Boolean,
     ): List<ButtonTab> = buildList {
-        add(ButtonTab(labelResId = LR.string.description, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) }))
+        add(ButtonTab(labelResId = LR.string.description, onClick = { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) }))
         if (summaryText != null) {
-            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY) }))
+            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) }))
         }
-        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS) }))
+        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) }))
         if (hasChapters) {
-            add(ButtonTab(labelResId = LR.string.chapters, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS) }))
+            add(ButtonTab(labelResId = LR.string.chapters, onClick = { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) }))
         }
         if (transcript != null) {
             add(
@@ -990,7 +988,7 @@ class EpisodeFragment : BaseFragment() {
         val fragmentHostListener = (activity as? FragmentHostListener)
         fragmentHostListener?.apply {
             closePlayer()
-            openTab(au.com.shiftyjelly.pocketcasts.views.R.id.navigation_profile)
+            openTab(VR.id.navigation_profile)
             addFragment(SettingsFragment())
             addFragment(fragment)
         }
@@ -1077,7 +1075,7 @@ class EpisodeFragment : BaseFragment() {
 
                         override fun onPageFinished(view: WebView, url: String) {
                             binding?.webViewLoader?.hide()
-                            if (viewModel.pageState.value.selectedContentTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) {
+                            if (viewModel.pageState.value.selectedContentTab == EpisodeContentTab.DESCRIPTION) {
                                 binding?.webViewShowNotes?.run {
                                     visibility = View.VISIBLE
                                 }

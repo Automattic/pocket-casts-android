@@ -219,7 +219,6 @@ class EpisodeContainerFragment :
         viewPager.adapter = adapter
 
         if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
-            // Hide top tab bar — tabs are merged into EpisodeFragment's bottom tab bar
             tabLayout.isVisible = false
             viewPager.isUserInputEnabled = false
         } else {
