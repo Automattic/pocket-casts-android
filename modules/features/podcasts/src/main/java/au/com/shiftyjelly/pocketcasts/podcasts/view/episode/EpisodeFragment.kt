@@ -644,9 +644,9 @@ class EpisodeFragment : BaseFragment() {
 
             AppTheme(activeTheme) {
                 if (isSummaryEnabled) {
-                    // AI-enhanced layout: "Ask this episode" + simple tabs + inline summary
+                    // AI-enhanced layout: "Chat with episode" + simple tabs + inline summary
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        // "Ask this episode" input-style banner
+                        // "Chat with episode" input-style banner
                         val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
                         AnimatedVisibility(
                             visible = askTheEpisodeVisible,
@@ -669,7 +669,7 @@ class EpisodeFragment : BaseFragment() {
                                     )
                                     .clickable(
                                         role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.ask_this_episode),
+                                        onClickLabel = stringResource(LR.string.episode_chat),
                                     ) {
                                         val t = transcript ?: return@clickable
                                         openChat(t.episodeUuid, t.podcastUuid, isPlusUser)
@@ -684,7 +684,7 @@ class EpisodeFragment : BaseFragment() {
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Text(
-                                    text = stringResource(LR.string.ask_this_episode),
+                                    text = stringResource(LR.string.episode_chat),
                                     color = MaterialTheme.theme.colors.primaryText02,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight(500),
@@ -813,7 +813,7 @@ class EpisodeFragment : BaseFragment() {
                                     .fillMaxWidth()
                                     .clickable(
                                         role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.ask_this_episode),
+                                        onClickLabel = stringResource(LR.string.episode_chat),
                                     ) {
                                         openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
                                     },
@@ -860,7 +860,7 @@ class EpisodeFragment : BaseFragment() {
             }
         } else {
             if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                val fragment = ChatPaywallFragment()
                 fragment.show(parentFragmentManager, "episode_chat_paywall")
             }
         }
