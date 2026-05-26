@@ -158,6 +158,18 @@ class EpisodeFragment : BaseFragment() {
     companion object {
         private const val NEW_INSTANCE_ARG = "EpisodeFragmentArg"
 
+        internal fun mergedTabLabelResIds(
+            hasTranscript: Boolean,
+            hasSummary: Boolean,
+            hasChapters: Boolean,
+        ): List<Int> = buildList {
+            add(LR.string.details)
+            if (hasChapters) add(LR.string.chapters)
+            add(LR.string.bookmarks)
+            if (hasTranscript) add(LR.string.transcript)
+            if (hasSummary) add(LR.string.summary)
+        }
+
         fun newInstance(
             episodeUuid: String,
             source: EpisodeViewSource,
@@ -901,33 +913,33 @@ class EpisodeFragment : BaseFragment() {
         transcript: Transcript.Text?,
         summaryText: String?,
         hasChapters: Boolean,
-    ): List<ButtonTab> = buildList {
-        add(ButtonTab(labelResId = LR.string.details, onClick = { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) }))
-        if (hasChapters) {
-            add(ButtonTab(labelResId = LR.string.chapters, onClick = { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) }))
-        }
-        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) }))
-        if (transcript != null) {
-            add(
-                ButtonTab(
-                    labelResId = LR.string.transcript,
-                    onClick = {
-                        if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                            TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
-                                .show(parentFragmentManager, "episode_transcript")
-                        }
-                        eventHorizon.track(
-                            EpisodeDetailTranscriptCardTappedEvent(
-                                episodeUuid = transcript.episodeUuid,
-                                podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                            ),
-                        )
-                    },
-                ),
-            )
-        }
-        if (summaryText != null) {
-            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) }))
+    ): List<ButtonTab> {
+        val tabClickHandlers = mapOf<Int, () -> Unit>(
+            LR.string.details to { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) },
+            LR.string.chapters to { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) },
+            LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
+            LR.string.transcript to {
+                if (transcript != null) {
+                    if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                        TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
+                            .show(parentFragmentManager, "episode_transcript")
+                    }
+                    eventHorizon.track(
+                        EpisodeDetailTranscriptCardTappedEvent(
+                            episodeUuid = transcript.episodeUuid,
+                            podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                        ),
+                    )
+                }
+            },
+            LR.string.summary to { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) },
+        )
+        return mergedTabLabelResIds(
+            hasTranscript = transcript != null,
+            hasSummary = summaryText != null,
+            hasChapters = hasChapters,
+        ).map { labelResId ->
+            ButtonTab(labelResId = labelResId, onClick = tabClickHandlers.getValue(labelResId))
         }
     }
 
