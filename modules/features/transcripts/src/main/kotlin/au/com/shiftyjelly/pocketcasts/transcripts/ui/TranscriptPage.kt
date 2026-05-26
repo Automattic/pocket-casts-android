@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -63,6 +64,10 @@ fun TranscriptPage(
     var highlightIndex by remember { mutableStateOf<Int?>(null) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
+    val playbackState by remember {
+        playbackManager?.playbackStateFlow ?: flowOf(null)
+    }.collectAsState(initial = null)
+    val isPlaying = playbackState?.isPlaying == true
     val isSearching = uiState.searchState.isSearchOpen
 
     Column(
@@ -144,6 +149,7 @@ fun TranscriptPage(
         highlightIndex = highlightIndex,
         listState = listState,
         isSearching = isSearching,
+        isPlaying = isPlaying,
         isAutoScrollSuppressed = isAutoScrollSuppressed,
         animate = hasInitiallyScrolled,
         onScroll = { hasInitiallyScrolled = true },
@@ -274,12 +280,13 @@ private fun AutoScrollEffect(
     highlightIndex: Int?,
     listState: LazyListState,
     isSearching: Boolean,
+    isPlaying: Boolean,
     isAutoScrollSuppressed: Boolean,
     animate: Boolean,
     onScroll: () -> Unit,
 ) {
     val latestOnScroll by rememberUpdatedState(onScroll)
-    if (highlightIndex != null && !isSearching && !isAutoScrollSuppressed) {
+    if (highlightIndex != null && isPlaying && !isSearching && !isAutoScrollSuppressed) {
         LaunchedEffect(highlightIndex) {
             val viewportHeight = listState.layoutInfo.viewportSize.height
             val scrollOffset = (viewportHeight * 0.3f).roundToInt()
