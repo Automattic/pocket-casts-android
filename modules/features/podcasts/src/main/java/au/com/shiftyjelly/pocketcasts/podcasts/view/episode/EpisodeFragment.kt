@@ -85,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksPage
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersPage
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersTheme
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
@@ -945,20 +946,22 @@ class EpisodeFragment : BaseFragment() {
 
                     EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> {
                         val lazyListState = rememberLazyListState()
-                        ChaptersPage(
-                            lazyListState = lazyListState,
-                            chapters = chaptersState.chapters,
-                            showHeader = chaptersState.showHeader,
-                            hasGeneratedChapters = chaptersState.hasGeneratedChapters,
-                            totalChaptersCount = chaptersState.chaptersCount,
-                            onSelectionChange = chaptersViewModel::selectChapter,
-                            onChapterClick = chaptersViewModel::playChapter,
-                            onUrlClick = { /* handled by parent */ },
-                            onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
-                            isTogglingChapters = chaptersState.isTogglingChapters,
-                            showSubscriptionIcon = chaptersState.showSubscriptionIcon,
-                            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                        )
+                        ChaptersTheme {
+                            ChaptersPage(
+                                lazyListState = lazyListState,
+                                chapters = chaptersState.chapters,
+                                showHeader = chaptersState.showHeader,
+                                hasGeneratedChapters = chaptersState.hasGeneratedChapters,
+                                totalChaptersCount = chaptersState.chaptersCount,
+                                onSelectionChange = chaptersViewModel::selectChapter,
+                                onChapterClick = chaptersViewModel::playChapter,
+                                onUrlClick = { /* handled by parent */ },
+                                onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
+                                isTogglingChapters = chaptersState.isTogglingChapters,
+                                showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                            )
+                        }
                     }
 
                     else -> {}
