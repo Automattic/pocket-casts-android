@@ -90,7 +90,7 @@ private class ExoPlayerClipPlayer(
         }
     }.stateIn(coroutineScope, SharingStarted.Lazily, Duration.ZERO)
 
-    // Progress UI indicator syncs with playback progress emited from the player.
+    // Progress UI indicator syncs with playback progress emitted from the player.
     // Disable the dispatch to make dragging animation smoother.
     private var isPlaybackProgressDispatchEnabled = true
     private var playbackPollingFrequency = 100.milliseconds
@@ -201,7 +201,7 @@ private class ExoPlayerClipPlayer(
     }
 
     private fun ExoPlayerDataSourceFactory.createMediaSource(clip: Clip): MediaSource? {
-        // Divide and multiple by 100 to drop insignificant for clip creation millseconds resolution
+        // Divide and multiple by 100 to drop insignificant for clip creation milliseconds resolution
         val clipStart = (clip.range.start.inWholeMilliseconds / 100) * 100
         val clipEnd = (clip.range.end.inWholeMilliseconds / 100) * 100
         return createMediaSource(clip.episodeLocation, clipStart..clipEnd)
