@@ -31,14 +31,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -51,8 +55,12 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
@@ -73,13 +81,24 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksPage
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersPage
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
+import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
@@ -120,8 +139,11 @@ import com.automattic.eventhorizon.EpisodeDetailTranscriptCardTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
@@ -183,6 +205,15 @@ class EpisodeFragment : BaseFragment() {
     lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
+    private val bookmarksViewModel: BookmarksViewModel by viewModels({ requireParentFragment() })
+    private val chaptersViewModel by viewModels<ChaptersViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
+                factory.create(ChaptersViewModel.Mode.Episode(episodeUUID))
+            }
+        },
+    )
     private var binding: FragmentEpisodeBinding? = null
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
@@ -637,14 +668,22 @@ class EpisodeFragment : BaseFragment() {
             val isPlusUser = pageState.isPlusUser
             val selectedTab = pageState.selectedContentTab
 
-            val showDescription = !isSummaryEnabled || selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
-            LaunchedEffect(showDescription) {
-                binding?.webViewShowNotes?.isVisible = showDescription
+            val isListMode = selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS ||
+                selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS
+            val showDescription = !isSummaryEnabled ||
+                selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
+            LaunchedEffect(showDescription, isListMode) {
+                binding?.webViewShowNotes?.isVisible = showDescription && !isListMode
+                binding?.scrollableContent?.isVisible = !isListMode
+                binding?.listModeContent?.isVisible = isListMode
             }
 
             AppTheme(activeTheme) {
                 if (isSummaryEnabled) {
-                    // AI-enhanced layout: "Chat with episode" + simple tabs + inline summary
+                    val chaptersState = chaptersViewModel.uiState.collectAsState().value
+                    val hasChapters = chaptersState.chaptersCount > 0
+
+                    // AI-enhanced layout: "Chat with episode" + merged tabs + inline content
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // "Chat with episode" input-style banner
                         val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
@@ -693,52 +732,22 @@ class EpisodeFragment : BaseFragment() {
                             }
                         }
 
-                        // Simple tabs (no icons, no trailing chevrons)
-                        val tabs = buildList {
-                            add(
-                                ButtonTab(
-                                    labelResId = LR.string.description,
-                                    onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) },
-                                ),
-                            )
-                            if (transcript != null) {
-                                add(
-                                    ButtonTab(
-                                        labelResId = LR.string.transcript,
-                                        onClick = {
-                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                                TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
-                                                    .show(parentFragmentManager, "episode_transcript")
-                                            }
-                                            eventHorizon.track(
-                                                EpisodeDetailTranscriptCardTappedEvent(
-                                                    episodeUuid = transcript.episodeUuid,
-                                                    podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
-                                                ),
-                                            )
-                                        },
-                                    ),
-                                )
-                            }
-                            if (summaryText != null) {
-                                add(
-                                    ButtonTab(
-                                        labelResId = LR.string.summary,
-                                        onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY) },
-                                    ),
-                                )
-                            }
-                        }
+                        // Merged tabs: Description > Summary > Bookmarks > Chapters > Transcripts
+                        val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
 
                         AnimatedVisibility(
                             visible = tabs.size > 1,
                             enter = BannerEnterTransition,
                             exit = BannerExitTransition,
                         ) {
-                            val selectedButtonTab = when (selectedTab) {
-                                EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tabs.first()
-                                EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tabs.lastOrNull { it.labelResId == LR.string.summary } ?: tabs.first()
-                            }
+                            val selectedButtonTab = tabs.firstOrNull { tab ->
+                                when (selectedTab) {
+                                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
+                                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
+                                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
+                                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
+                                }
+                            } ?: tabs.first()
                             ButtonTabs(
                                 tabs = tabs,
                                 selectedTab = selectedButtonTab,
@@ -833,6 +842,197 @@ class EpisodeFragment : BaseFragment() {
                     )
                 }
             }
+        }
+
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            setupListModeContent()
+        }
+    }
+
+    private fun buildMergedTabs(
+        transcript: Transcript.Text?,
+        summaryText: String?,
+        hasChapters: Boolean,
+    ): List<ButtonTab> = buildList {
+        add(ButtonTab(labelResId = LR.string.description, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION) }))
+        if (summaryText != null) {
+            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY) }))
+        }
+        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS) }))
+        if (hasChapters) {
+            add(ButtonTab(labelResId = LR.string.chapters, onClick = { viewModel.selectContentTab(EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS) }))
+        }
+        if (transcript != null) {
+            add(
+                ButtonTab(
+                    labelResId = LR.string.transcript,
+                    onClick = {
+                        if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                            TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
+                                .show(parentFragmentManager, "episode_transcript")
+                        }
+                        eventHorizon.track(
+                            EpisodeDetailTranscriptCardTappedEvent(
+                                episodeUuid = transcript.episodeUuid,
+                                podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                            ),
+                        )
+                    },
+                ),
+            )
+        }
+    }
+
+    private fun setupListModeContent() {
+        binding?.listModeTabs?.setContentWithViewCompositionStrategy {
+            val pageState = viewModel.pageState.collectAsState().value
+            val summaryText = pageState.summary
+            val transcript = pageState.transcript as? Transcript.Text
+            val selectedTab = pageState.selectedContentTab
+            val chaptersState = chaptersViewModel.uiState.collectAsState().value
+            val hasChapters = chaptersState.chaptersCount > 0
+
+            val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
+            val selectedButtonTab = tabs.firstOrNull { tab ->
+                when (selectedTab) {
+                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
+                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
+                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
+                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
+                }
+            } ?: tabs.first()
+
+            AppTheme(activeTheme) {
+                ButtonTabs(
+                    tabs = tabs,
+                    selectedTab = selectedButtonTab,
+                    backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                )
+            }
+        }
+
+        binding?.listModeListContent?.setContentWithViewCompositionStrategy {
+            val selectedTab = viewModel.pageState.collectAsState().value.selectedContentTab
+            val chaptersState by chaptersViewModel.uiState.collectAsState()
+
+            AppTheme(activeTheme) {
+                when (selectedTab) {
+                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> {
+                        BookmarksPage(
+                            episodeUuid = episodeUUID,
+                            sourceView = SourceView.EPISODE_DETAILS,
+                            bottomInset = 0.dp,
+                            bookmarksViewModel = bookmarksViewModel,
+                            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
+                            onRowLongClick = { bookmark ->
+                                bookmarksViewModel.multiSelectHelper.defaultLongPress(
+                                    multiSelectable = bookmark,
+                                    fragmentManager = childFragmentManager,
+                                    forceDarkTheme = false,
+                                )
+                            },
+                            onShareBookmarkClick = ::onShareBookmarkClick,
+                            onEditBookmarkClick = ::onEditBookmarkClick,
+                            onUpgradeClick = ::onBookmarksUpgradeClick,
+                            showOptionsDialog = ::showBookmarksOptionsDialog,
+                            openFragment = ::openBookmarkSettingsFragment,
+                            onSearchBarClearButtonClick = { bookmarksViewModel.searchBarClearButtonTapped() },
+                            onHeadphoneControlsButtonClick = { bookmarksViewModel.onHeadphoneControlsButtonTapped() },
+                            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                        )
+                    }
+
+                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> {
+                        val lazyListState = rememberLazyListState()
+                        ChaptersPage(
+                            lazyListState = lazyListState,
+                            chapters = chaptersState.chapters,
+                            showHeader = chaptersState.showHeader,
+                            hasGeneratedChapters = chaptersState.hasGeneratedChapters,
+                            totalChaptersCount = chaptersState.chaptersCount,
+                            onSelectionChange = chaptersViewModel::selectChapter,
+                            onChapterClick = chaptersViewModel::playChapter,
+                            onUrlClick = { /* handled by parent */ },
+                            onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
+                            isTogglingChapters = chaptersState.isTogglingChapters,
+                            showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                        )
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    private fun onShareBookmarkClick() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val (podcast, episode, bookmark) = bookmarksViewModel.getSharedBookmark() ?: return@launch
+            bookmarksViewModel.onShare(podcast.uuid, episode.uuid, SourceView.EPISODE_DETAILS)
+            val timestamp = bookmark.timeSecs.seconds
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.EPISODE_DETAILS)
+                .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onEditBookmarkClick() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bookmarkArguments = bookmarksViewModel.createBookmarkArguments()
+            if (bookmarkArguments != null) {
+                startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
+            }
+        }
+    }
+
+    private fun onBookmarksUpgradeClick() {
+        bookmarksViewModel.onGetBookmarksButtonTapped()
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = OnboardingUpgradeSource.BOOKMARKS,
+        )
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun showBookmarksOptionsDialog(selectedValue: Int) {
+        activity?.supportFragmentManager?.let {
+            OptionsDialog()
+                .addTextOption(
+                    titleId = LR.string.bookmarks_select_option,
+                    imageId = IR.drawable.ic_multiselect,
+                    click = {
+                        bookmarksViewModel.multiSelectHelper.isMultiSelecting = true
+                    },
+                )
+                .addTextOption(
+                    titleId = LR.string.bookmarks_sort_option,
+                    imageId = IR.drawable.ic_sort,
+                    valueId = selectedValue,
+                    click = {
+                        BookmarksSortByDialog(
+                            settings = settings,
+                            changeSortOrder = bookmarksViewModel::changeSortOrder,
+                            sourceView = SourceView.EPISODE_DETAILS,
+                            forceDarkTheme = false,
+                        ).show(
+                            context = requireContext(),
+                            fragmentManager = it,
+                        )
+                    },
+                ).show(it, "bookmarks_options_dialog")
+        }
+    }
+
+    private fun openBookmarkSettingsFragment(fragment: Fragment) {
+        val bottomSheet = (parentFragment as? BaseDialogFragment)
+        bottomSheet?.dismiss()
+        val fragmentHostListener = (activity as? FragmentHostListener)
+        fragmentHostListener?.apply {
+            closePlayer()
+            openTab(au.com.shiftyjelly.pocketcasts.views.R.id.navigation_profile)
+            addFragment(SettingsFragment())
+            addFragment(fragment)
         }
     }
 
