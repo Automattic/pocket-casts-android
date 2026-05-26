@@ -1,3 +1,9 @@
+8.14
+-----
+*   New Features
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+
 8.13
 -----
 *   New Features
@@ -7,12 +13,6 @@
         ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
     *   Use generated chapters when author didn't provide them
         ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
-
-8.14
------
-*   New Features
-    *   Synced episode transcripts
-        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
 
 8.12
 -----

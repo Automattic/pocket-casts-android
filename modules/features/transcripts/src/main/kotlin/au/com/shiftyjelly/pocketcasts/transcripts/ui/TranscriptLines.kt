@@ -117,7 +117,7 @@ internal fun TranscriptLines(
                                 .fillMaxWidth()
                                 .padding(entry.padding())
                                 .then(
-                                    if (onEntryClick != null) {
+                                    if (onEntryClick != null && entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
                                         Modifier.clickable { onEntryClick(entry, index) }
                                     } else {
                                         Modifier

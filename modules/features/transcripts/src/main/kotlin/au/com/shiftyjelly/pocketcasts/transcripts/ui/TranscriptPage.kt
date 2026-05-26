@@ -278,9 +278,9 @@ private fun AutoScrollEffect(
     onScroll: () -> Unit,
 ) {
     val latestOnScroll by rememberUpdatedState(onScroll)
-    val totalItems = listState.layoutInfo.totalItemsCount
-    if (highlightIndex != null && highlightIndex < totalItems && isPlaying && !isSearching && !isAutoScrollSuppressed) {
+    if (highlightIndex != null && isPlaying && !isSearching && !isAutoScrollSuppressed) {
         LaunchedEffect(highlightIndex) {
+            if (highlightIndex >= listState.layoutInfo.totalItemsCount) return@LaunchedEffect
             val viewportHeight = listState.layoutInfo.viewportSize.height
             val scrollOffset = (viewportHeight * 0.3f).roundToInt()
             if (animate) {
