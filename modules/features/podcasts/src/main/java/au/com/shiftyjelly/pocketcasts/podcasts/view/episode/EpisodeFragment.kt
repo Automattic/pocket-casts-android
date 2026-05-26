@@ -902,14 +902,11 @@ class EpisodeFragment : BaseFragment() {
         summaryText: String?,
         hasChapters: Boolean,
     ): List<ButtonTab> = buildList {
-        add(ButtonTab(labelResId = LR.string.description, onClick = { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) }))
-        if (summaryText != null) {
-            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) }))
-        }
-        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) }))
+        add(ButtonTab(labelResId = LR.string.details, onClick = { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) }))
         if (hasChapters) {
             add(ButtonTab(labelResId = LR.string.chapters, onClick = { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) }))
         }
+        add(ButtonTab(labelResId = LR.string.bookmarks, onClick = { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) }))
         if (transcript != null) {
             add(
                 ButtonTab(
@@ -928,6 +925,9 @@ class EpisodeFragment : BaseFragment() {
                     },
                 ),
             )
+        }
+        if (summaryText != null) {
+            add(ButtonTab(labelResId = LR.string.summary, onClick = { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) }))
         }
     }
 
