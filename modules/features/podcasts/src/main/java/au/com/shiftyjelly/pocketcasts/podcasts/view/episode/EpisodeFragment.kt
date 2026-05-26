@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -41,8 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -57,10 +57,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
@@ -669,14 +667,10 @@ class EpisodeFragment : BaseFragment() {
             val isPlusUser = pageState.isPlusUser
             val selectedTab = pageState.selectedContentTab
 
-            val isListMode = selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS ||
-                selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS
             val showDescription = !isSummaryEnabled ||
                 selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
-            LaunchedEffect(showDescription, isListMode) {
-                binding?.webViewShowNotes?.isVisible = showDescription && !isListMode
-                binding?.scrollableContent?.isVisible = !isListMode
-                binding?.listModeContent?.isVisible = isListMode
+            LaunchedEffect(showDescription) {
+                binding?.webViewShowNotes?.isVisible = showDescription
             }
 
             AppTheme(activeTheme) {
@@ -780,6 +774,59 @@ class EpisodeFragment : BaseFragment() {
                                 )
                             }
                         }
+
+                        // Inline bookmarks content
+                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS) {
+                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            BookmarksPage(
+                                episodeUuid = episodeUUID,
+                                sourceView = SourceView.EPISODE_DETAILS,
+                                bottomInset = 0.dp,
+                                bookmarksViewModel = bookmarksViewModel,
+                                multiSelectHelper = bookmarksViewModel.multiSelectHelper,
+                                onRowLongClick = { bookmark ->
+                                    bookmarksViewModel.multiSelectHelper.defaultLongPress(
+                                        multiSelectable = bookmark,
+                                        fragmentManager = childFragmentManager,
+                                        forceDarkTheme = false,
+                                    )
+                                },
+                                onShareBookmarkClick = ::onShareBookmarkClick,
+                                onEditBookmarkClick = ::onEditBookmarkClick,
+                                onUpgradeClick = ::onBookmarksUpgradeClick,
+                                showOptionsDialog = ::showBookmarksOptionsDialog,
+                                openFragment = ::openBookmarkSettingsFragment,
+                                onSearchBarClearButtonClick = { bookmarksViewModel.searchBarClearButtonTapped() },
+                                onHeadphoneControlsButtonClick = { bookmarksViewModel.onHeadphoneControlsButtonTapped() },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = screenHeight),
+                            )
+                        }
+
+                        // Inline chapters content
+                        if (selectedTab == EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS) {
+                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            val lazyListState = rememberLazyListState()
+                            ChaptersTheme {
+                                ChaptersPage(
+                                    lazyListState = lazyListState,
+                                    chapters = chaptersState.chapters,
+                                    showHeader = chaptersState.showHeader,
+                                    hasGeneratedChapters = chaptersState.hasGeneratedChapters,
+                                    totalChaptersCount = chaptersState.chaptersCount,
+                                    onSelectionChange = chaptersViewModel::selectChapter,
+                                    onChapterClick = chaptersViewModel::playChapter,
+                                    onUrlClick = { /* handled by parent */ },
+                                    onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
+                                    isTogglingChapters = chaptersState.isTogglingChapters,
+                                    showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = screenHeight),
+                                )
+                            }
+                        }
                     }
                 } else {
                     // Non-AI layout: transcript banner + chat banner (main's approach)
@@ -844,10 +891,6 @@ class EpisodeFragment : BaseFragment() {
                 }
             }
         }
-
-        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
-            setupListModeContent()
-        }
     }
 
     private fun buildMergedTabs(
@@ -881,92 +924,6 @@ class EpisodeFragment : BaseFragment() {
                     },
                 ),
             )
-        }
-    }
-
-    private fun setupListModeContent() {
-        binding?.listModeTabs?.setContentWithViewCompositionStrategy {
-            val pageState = viewModel.pageState.collectAsState().value
-            val summaryText = pageState.summary
-            val transcript = pageState.transcript as? Transcript.Text
-            val selectedTab = pageState.selectedContentTab
-            val chaptersState = chaptersViewModel.uiState.collectAsState().value
-            val hasChapters = chaptersState.chaptersCount > 0
-
-            val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
-            val selectedButtonTab = tabs.firstOrNull { tab ->
-                when (selectedTab) {
-                    EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
-                    EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
-                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
-                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
-                }
-            } ?: tabs.first()
-
-            AppTheme(activeTheme) {
-                ButtonTabs(
-                    tabs = tabs,
-                    selectedTab = selectedButtonTab,
-                    backgroundColor = MaterialTheme.theme.colors.primaryUi01,
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                )
-            }
-        }
-
-        binding?.listModeListContent?.setContentWithViewCompositionStrategy {
-            val selectedTab = viewModel.pageState.collectAsState().value.selectedContentTab
-            val chaptersState by chaptersViewModel.uiState.collectAsState()
-
-            AppTheme(activeTheme) {
-                when (selectedTab) {
-                    EpisodeFragmentViewModel.EpisodeContentTab.BOOKMARKS -> {
-                        BookmarksPage(
-                            episodeUuid = episodeUUID,
-                            sourceView = SourceView.EPISODE_DETAILS,
-                            bottomInset = 0.dp,
-                            bookmarksViewModel = bookmarksViewModel,
-                            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
-                            onRowLongClick = { bookmark ->
-                                bookmarksViewModel.multiSelectHelper.defaultLongPress(
-                                    multiSelectable = bookmark,
-                                    fragmentManager = childFragmentManager,
-                                    forceDarkTheme = false,
-                                )
-                            },
-                            onShareBookmarkClick = ::onShareBookmarkClick,
-                            onEditBookmarkClick = ::onEditBookmarkClick,
-                            onUpgradeClick = ::onBookmarksUpgradeClick,
-                            showOptionsDialog = ::showBookmarksOptionsDialog,
-                            openFragment = ::openBookmarkSettingsFragment,
-                            onSearchBarClearButtonClick = { bookmarksViewModel.searchBarClearButtonTapped() },
-                            onHeadphoneControlsButtonClick = { bookmarksViewModel.onHeadphoneControlsButtonTapped() },
-                            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                        )
-                    }
-
-                    EpisodeFragmentViewModel.EpisodeContentTab.CHAPTERS -> {
-                        val lazyListState = rememberLazyListState()
-                        ChaptersTheme {
-                            ChaptersPage(
-                                lazyListState = lazyListState,
-                                chapters = chaptersState.chapters,
-                                showHeader = chaptersState.showHeader,
-                                hasGeneratedChapters = chaptersState.hasGeneratedChapters,
-                                totalChaptersCount = chaptersState.chaptersCount,
-                                onSelectionChange = chaptersViewModel::selectChapter,
-                                onChapterClick = chaptersViewModel::playChapter,
-                                onUrlClick = { /* handled by parent */ },
-                                onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
-                                isTogglingChapters = chaptersState.isTogglingChapters,
-                                showSubscriptionIcon = chaptersState.showSubscriptionIcon,
-                                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                            )
-                        }
-                    }
-
-                    else -> {}
-                }
-            }
         }
     }
 

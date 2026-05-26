@@ -373,25 +373,4 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <LinearLayout
-        android:id="@+id/listModeContent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="?attr/primary_ui_01"
-        android:visibility="gone">
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/listModeTabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/listModeListContent"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
 </FrameLayout>
