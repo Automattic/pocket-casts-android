@@ -737,7 +737,7 @@ class EpisodeFragment : BaseFragment() {
                         ) {
                             val selectedButtonTab = tabs.firstOrNull { tab ->
                                 when (selectedTab) {
-                                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.description
+                                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.details
                                     EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
                                     EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
                                     EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
