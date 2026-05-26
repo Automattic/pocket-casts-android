@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -8,6 +10,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EpisodeChatClearedEvent
+import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
+import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
+import com.automattic.eventhorizon.EpisodeChatShownEvent
+import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,10 +40,12 @@ class ChatViewModelTest {
     private val chatManager = TestChatManager()
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
+    private lateinit var eventSink: TestEventSink
     private lateinit var viewModel: ChatViewModel
 
     @Before
     fun setUp() {
+        eventSink = TestEventSink()
         viewModel = createViewModel()
     }
 
@@ -46,6 +56,7 @@ class ChatViewModelTest {
             on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
         },
         episodeManager = mock<EpisodeManager>(),
+        eventHorizon = EventHorizon(eventSink),
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
     )
 
@@ -72,6 +83,20 @@ class ChatViewModelTest {
             assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), state.messages)
         }
         assertEquals(CreateChat(EPISODE_UUID, PODCAST_UUID, "Welcome"), chatManager.createdChats.single())
+    }
+
+    @Test
+    fun `set episode info tracks chat shown`() = runTest {
+        setEpisodeInfo()
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -129,6 +154,26 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `send tracks message sent after success`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        viewModel.onInputTextChange("Question")
+
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Question".length.toLong(),
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `network failure sets network error`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageException = IOException()
@@ -142,6 +187,27 @@ class ChatViewModelTest {
         assertTrue(failedMessage is ChatMessage.User)
         assertEquals("Question", (failedMessage as ChatMessage.User).text)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
+    }
+
+    @Test
+    fun `network failure tracks message failed`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatMessageFailedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                error = EpisodeChatErrorType.Network,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -201,6 +267,24 @@ class ChatViewModelTest {
         assertEquals("Welcome", (message as ChatMessage.Assistant).text)
         assertEquals(null, viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
+    }
+
+    @Test
+    fun `clear chat tracks chat cleared`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+
+        viewModel.clearChat()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatClearedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     private fun setEpisodeInfo() {

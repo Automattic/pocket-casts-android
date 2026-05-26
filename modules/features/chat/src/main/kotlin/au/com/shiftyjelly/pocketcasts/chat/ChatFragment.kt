@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -110,6 +111,11 @@ class ChatFragment : BaseDialogFragment() {
                 click = { viewModel.clearChat() },
             )
             .show(parentFragmentManager, "chat_options")
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        viewModel.trackDismissed()
+        super.onDismiss(dialog)
     }
 
     @Suppress("DEPRECATION")
