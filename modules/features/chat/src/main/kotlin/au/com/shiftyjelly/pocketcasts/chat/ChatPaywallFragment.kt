@@ -46,9 +46,9 @@ class ChatPaywallFragment : BaseDialogFragment() {
 
     private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
 
-    @Inject lateinit var eventHorizon: EventHorizon
-
     private val viewModel by viewModels<ChatPaywallViewModel>()
+
+    @Inject lateinit var eventHorizon: EventHorizon
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

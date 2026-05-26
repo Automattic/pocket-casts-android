@@ -46,17 +46,19 @@ class ChatViewModelTest {
     @Before
     fun setUp() {
         eventSink = TestEventSink()
-        viewModel = ChatViewModel(
-            networkConnectionWatcher = networkConnectionWatcher,
-            chatManager = chatManager,
-            playbackManager = mock<PlaybackManager> {
-                on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
-            },
-            episodeManager = mock<EpisodeManager>(),
-            eventHorizon = EventHorizon(eventSink),
-            applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
-        )
+        viewModel = createViewModel()
     }
+
+    private fun createViewModel() = ChatViewModel(
+        networkConnectionWatcher = networkConnectionWatcher,
+        chatManager = chatManager,
+        playbackManager = mock<PlaybackManager> {
+            on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
+        },
+        episodeManager = mock<EpisodeManager>(),
+        eventHorizon = EventHorizon(eventSink),
+        applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
+    )
 
     @Test
     fun `set episode info creates chat with welcome message when empty`() = runTest {
@@ -144,7 +146,6 @@ class ChatViewModelTest {
             SendMessage(
                 episodeUuid = EPISODE_UUID,
                 message = "What happened?",
-                isRetry = false,
             ),
             chatManager.sentMessages.single(),
         )
@@ -182,6 +183,9 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+        val failedMessage = viewModel.uiState.value.messages.last()
+        assertTrue(failedMessage is ChatMessage.User)
+        assertEquals("Question", (failedMessage as ChatMessage.User).text)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
     }
 
@@ -207,13 +211,13 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `retry resends last user message`() = runTest {
-        chatManager.messages.value = listOf(
-            ChatMessage.User(text = "First question", uuid = "first-user-uuid"),
-            ChatMessage.Assistant(text = "Failure", uuid = "assistant-uuid"),
-            ChatMessage.User(text = "Last question", uuid = "last-user-uuid"),
-        )
+    fun `retry resends failed transient user message`() = runTest {
         setEpisodeInfo()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Last question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
 
         viewModel.retry()
         advanceUntilIdle()
@@ -222,10 +226,27 @@ class ChatViewModelTest {
             SendMessage(
                 episodeUuid = EPISODE_UUID,
                 message = "Last question",
-                isRetry = true,
             ),
             chatManager.sentMessages.single(),
         )
+    }
+
+    @Test
+    fun `failed user message is not restored in a new chat session`() = runTest {
+        setEpisodeInfo()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Failed question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        val failedMessage = viewModel.uiState.value.messages.last()
+        assertTrue(failedMessage is ChatMessage.User)
+        assertEquals("Failed question", (failedMessage as ChatMessage.User).text)
+
+        viewModel = createViewModel()
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), viewModel.uiState.value.messages)
     }
 
     @Test
@@ -241,7 +262,9 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(ClearMessages(EPISODE_UUID, "Welcome"), chatManager.clearedMessages.single())
-        assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), viewModel.uiState.value.messages)
+        val message = viewModel.uiState.value.messages.single()
+        assertTrue(message is ChatMessage.Assistant)
+        assertEquals("Welcome", (message as ChatMessage.Assistant).text)
         assertEquals(null, viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
     }
@@ -298,12 +321,12 @@ class ChatViewModelTest {
 
         override suspend fun sendMessage(
             episodeUuid: String,
-            message: String,
+            message: ChatMessage.User,
             allMessages: List<ChatMessage>,
-            isRetry: Boolean,
         ) {
             sendMessageException?.let { throw it }
-            sentMessages += SendMessage(episodeUuid, message, isRetry)
+            sentMessages += SendMessage(episodeUuid, message.text)
+            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid"))
         }
 
         override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
@@ -313,7 +336,7 @@ class ChatViewModelTest {
     }
 
     private data class CreateChat(val episodeUuid: String, val podcastUuid: String, val welcomeMessage: String)
-    private data class SendMessage(val episodeUuid: String, val message: String, val isRetry: Boolean)
+    private data class SendMessage(val episodeUuid: String, val message: String)
     private data class ClearMessages(val episodeUuid: String, val welcomeMessage: String)
 
     private companion object {
