@@ -146,6 +146,15 @@ class TranscriptFragment : BaseDialogFragment() {
                         )
                     }
                 },
+                onTextHighlighted = {
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptTextHighlightedEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
+                },
                 toolbarTrailingContent = { toolbarColors ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

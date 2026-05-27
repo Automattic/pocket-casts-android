@@ -65,6 +65,7 @@ internal fun TranscriptLines(
     isContentObscured: Boolean = false,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    onTextHighlighted: (() -> Unit)? = null,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -82,6 +83,7 @@ internal fun TranscriptLines(
                     }
                 },
                 clipboard = LocalClipboard.current,
+                onTextHighlighted = onTextHighlighted,
             ),
         ) {
             SelectionContainer {

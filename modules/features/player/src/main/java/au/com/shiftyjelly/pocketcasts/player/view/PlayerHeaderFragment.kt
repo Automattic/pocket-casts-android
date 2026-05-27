@@ -122,6 +122,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptTextHighlightedEvent
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
@@ -1054,6 +1055,15 @@ class PlayerHeaderFragment :
                 onShowTranscriptPaywall = {
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptGeneratedPaywallShownEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
+                },
+                onTextHighlighted = {
+                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptTextHighlightedEvent(
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,
                             source = source,

@@ -20,6 +20,7 @@ class CustomTextToolbar(
     private val view: View,
     private val customMenuItems: List<CustomMenuItemOption>,
     private val clipboard: Clipboard,
+    private val onTextHighlighted: (() -> Unit)? = null,
 ) : TextToolbar {
     private var actionMode: ActionMode? = null
     private val textActionModeCallback = TextActionModeCallback(
@@ -51,6 +52,7 @@ class CustomTextToolbar(
         }
         if (actionMode == null) {
             status = TextToolbarStatus.Shown
+            onTextHighlighted?.invoke()
             actionMode =
                 TextToolbarHelperMethods.startActionMode(
                     view,
