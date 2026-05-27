@@ -7,6 +7,8 @@
         ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
     *   Use generated chapters when author didn't provide them
         ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
+    *   Add an explicit podcast badge to search results
+        ([#5351](https://github.com/Automattic/pocket-casts-android/pull/5351)) 
 
 8.12
 -----
