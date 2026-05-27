@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -21,6 +22,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -151,12 +153,14 @@ private fun PodcastResultTitle(
         )
         if (isExplicit) {
             val explicitDescription = stringResource(LR.string.explicit)
+            // scale the icon to match the text size
+            val explicitIconSize = with(LocalDensity.current) { 16.sp.toDp() }
             Icon(
                 painter = painterResource(IR.drawable.explicit),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(explicitIconSize)
                     .clearAndSetSemantics { contentDescription = explicitDescription },
             )
         }
