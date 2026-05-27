@@ -20,7 +20,7 @@ aboutlibraries = "14.0.0-b02"
 android-gradle-plugin = "9.2.1"
 billing = "8.3.0"
 coil = "3.4.0"
-compose = "2025.12.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+compose = "2026.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.2.1"
 dependency-analysis = "3.13.0"
 firebase = "34.13.0"
@@ -31,9 +31,9 @@ hilt = "2.59.2"
 hilt-compiler = "1.3.0"
 horologist = "0.8.3-alpha"
 java = "17"
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 kotlin-coroutines = "1.11.0"
-ksp = "2.3.6"
+ksp = "2.3.7"
 ktlint = "1.8.0"
 ktlint-compose-rules = "0.5.9"
 lifecycle = "2.10.0"
@@ -53,6 +53,7 @@ security-lint = "1.0.4"
 sentry-plugin = "6.8.1"
 tasker-plugin = "0.4.10"
 test = "1.7.0"
+espresso = "3.7.0"
 tracks = "6.0.8"
 wear-compose = "1.6.0-alpha05"
 webkit = "1.16.0"
@@ -230,6 +231,7 @@ tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-pl
 
 # Test
 androidx-test-core = { module = "androidx.test:core", version.ref = "test" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 androidx-test-junit-ext = "androidx.test.ext:junit:1.3.0"
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "test" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test" }
