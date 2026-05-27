@@ -2,12 +2,15 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 
 class DriftFilterTest {
 
@@ -15,8 +18,10 @@ class DriftFilterTest {
 
     @Before
     fun setUp() {
+        val playbackManager = mock(PlaybackManager::class.java)
+        whenever(playbackManager.playbackStateFlow).thenReturn(MutableStateFlow(PlaybackState()))
         manager = FingerprintTimingManager(
-            playbackManager = mock(PlaybackManager::class.java),
+            playbackManager = playbackManager,
             referenceRetriever = mock(FingerprintReferenceRetriever::class.java),
         )
     }
