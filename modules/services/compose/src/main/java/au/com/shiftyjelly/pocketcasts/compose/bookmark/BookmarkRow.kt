@@ -118,7 +118,7 @@ fun BookmarkRow(
                     } else {
                         Image(
                             painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
-                            contentDescription = bookmark.title,
+                            contentDescription = bookmark.displayTitle,
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(RoundedCornerShape(8.dp)),
