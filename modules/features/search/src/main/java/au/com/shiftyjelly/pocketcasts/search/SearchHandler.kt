@@ -215,13 +215,20 @@ class SearchHandler @Inject constructor(
                 author = folderItem.podcast.author,
                 title = folderItem.title,
                 isSubscribed = true,
+                isExplicit = folderItem.podcast.explicit == true,
             )
 
             is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
                 uuid = folderItem.uuid,
                 title = folderItem.title,
                 podcasts = folderItem.podcasts.map {
-                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                    SearchAutoCompleteItem.Podcast(
+                        uuid = it.uuid,
+                        title = it.title,
+                        author = it.author,
+                        isSubscribed = true,
+                        isExplicit = it.explicit == true,
+                    )
                 },
                 color = folderItem.folder.color,
             )
@@ -374,7 +381,14 @@ class SearchHandler @Inject constructor(
                         val localResults = localPodcasts.map {
                             when (it) {
                                 is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
-                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = true, title = it.podcast.title, author = it.podcast.author)
+
+                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(
+                                    uuid = it.uuid,
+                                    isFollowed = true,
+                                    title = it.podcast.title,
+                                    author = it.podcast.author,
+                                    isExplicit = it.podcast.explicit == true,
+                                )
                             }
                         }
                         if (localResults.isNotEmpty()) {

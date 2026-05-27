@@ -366,7 +366,7 @@ private fun PodcastCategoriesLabel(
         textAlign = TextAlign.Center,
         inlineContent = if (showExplicitIndicator && explicit) {
             mapOf(
-                "explicit" to InlineTextContent(Placeholder(13.sp, 13.sp, PlaceholderVerticalAlign.TextCenter)) {
+                "explicit" to InlineTextContent(Placeholder(16.sp, 16.sp, PlaceholderVerticalAlign.TextCenter)) {
                     val explicitDescription = stringResource(LR.string.explicit)
                     Icon(
                         painter = painterResource(IR.drawable.explicit),
