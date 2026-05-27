@@ -248,9 +248,7 @@ class EpisodeContainerFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chaptersViewModel.uiState.collect {
-                    if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
-                        adapter.update(addChapters = it.chaptersCount > 0)
-                    }
+                    adapter.update(addChapters = it.chaptersCount > 0)
                 }
             }
         }
@@ -321,12 +319,14 @@ class EpisodeContainerFragment :
             )
         }
 
-        private var sections = listOf(
-            Section.Details,
-            Section.Bookmarks,
-        )
+        private var sections = if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            listOf(Section.Details)
+        } else {
+            listOf(Section.Details, Section.Bookmarks)
+        }
 
         fun update(addChapters: Boolean) {
+            if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) return
             val currentSections = sections
             val newSections = buildList {
                 add(Section.Details)

@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -53,7 +55,7 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = false,
         )
 
-        assert(tabs.contains(LR.string.bookmarks))
+        assertTrue(tabs.contains(LR.string.bookmarks))
     }
 
     @Test
@@ -69,8 +71,8 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = false,
         )
 
-        assert(withChapters.contains(LR.string.chapters))
-        assert(!withoutChapters.contains(LR.string.chapters))
+        assertTrue(withChapters.contains(LR.string.chapters))
+        assertFalse(withoutChapters.contains(LR.string.chapters))
     }
 
     @Test
@@ -86,8 +88,8 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = false,
         )
 
-        assert(withTranscript.contains(LR.string.transcript))
-        assert(!withoutTranscript.contains(LR.string.transcript))
+        assertTrue(withTranscript.contains(LR.string.transcript))
+        assertFalse(withoutTranscript.contains(LR.string.transcript))
     }
 
     @Test
@@ -103,8 +105,8 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = false,
         )
 
-        assert(withSummary.contains(LR.string.summary))
-        assert(!withoutSummary.contains(LR.string.summary))
+        assertTrue(withSummary.contains(LR.string.summary))
+        assertFalse(withoutSummary.contains(LR.string.summary))
     }
 
     @Test
@@ -115,7 +117,7 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = true,
         )
 
-        assert(tabs.indexOf(LR.string.chapters) < tabs.indexOf(LR.string.bookmarks))
+        assertTrue(tabs.indexOf(LR.string.chapters) < tabs.indexOf(LR.string.bookmarks))
     }
 
     @Test
@@ -126,7 +128,7 @@ class EpisodeFragmentMergedTabsTest {
             hasChapters = false,
         )
 
-        assert(tabs.indexOf(LR.string.transcript) > tabs.indexOf(LR.string.bookmarks))
+        assertTrue(tabs.indexOf(LR.string.transcript) > tabs.indexOf(LR.string.bookmarks))
     }
 
     @Test

@@ -42,7 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -357,6 +358,11 @@ class EpisodeFragment : BaseFragment() {
             autoPlay = autoPlay && savedInstanceState == null,
             forceDark = forceDarkTheme,
         )
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) &&
+            episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK
+        ) {
+            viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS)
+        }
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
@@ -791,7 +797,7 @@ class EpisodeFragment : BaseFragment() {
                             val bookmarksState by bookmarksViewModel.uiState.collectAsState()
                             val hasBookmarks = bookmarksState is BookmarksViewModel.UiState.Loaded
                             val maxHeight = if (hasBookmarks) {
-                                LocalConfiguration.current.screenHeightDp.dp
+                                with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             } else {
                                 300.dp
                             }
@@ -822,7 +828,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.CHAPTERS) {
-                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             val lazyListState = rememberLazyListState()
                             ChaptersTheme {
                                 ChaptersPage(
