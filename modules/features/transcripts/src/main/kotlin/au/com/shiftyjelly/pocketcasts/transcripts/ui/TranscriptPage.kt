@@ -41,6 +41,7 @@ fun TranscriptPage(
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
+    showCloseButton: Boolean = true,
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
 ) {
     val theme = rememberTranscriptTheme()
@@ -52,6 +53,7 @@ fun TranscriptPage(
         Toolbar(
             searchState = uiState.searchState,
             hideSearchBar = uiState.isPaywallVisible || !uiState.isTextTranscriptLoaded,
+            showCloseButton = showCloseButton,
             onClickClose = onClickClose,
             onUpdateSearchTerm = onUpdateSearchTerm,
             onClearSearchTerm = onClearSearchTerm,

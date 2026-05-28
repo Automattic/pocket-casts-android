@@ -119,6 +119,7 @@ internal fun Toolbar(
     modifier: Modifier = Modifier,
     colors: ToolbarColors = ToolbarColors.default(MaterialTheme.theme.colors),
     hideSearchBar: Boolean = false,
+    showCloseButton: Boolean = true,
     trailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -132,14 +133,16 @@ internal fun Toolbar(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier,
         ) {
-            CloseTranscriptButton(
-                colors = colors,
-                onClick = onClickClose,
-                modifier = Modifier.offset(x = -12.dp),
-            )
-            Spacer(
-                modifier = Modifier.width(16.dp),
-            )
+            if (showCloseButton) {
+                CloseTranscriptButton(
+                    colors = colors,
+                    onClick = onClickClose,
+                    modifier = Modifier.offset(x = -12.dp),
+                )
+                Spacer(
+                    modifier = Modifier.width(16.dp),
+                )
+            }
             AnimatedVisibility(
                 visible = !hideSearchBar,
                 enter = SearchEnterTransition,

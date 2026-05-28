@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -891,10 +892,8 @@ class EpisodeFragment : BaseFragment() {
                                 toolbarPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
                                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                                onClickClose = {
-                                    transcriptViewModel.hideSearch()
-                                    viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION)
-                                },
+                                showCloseButton = false,
+                                onClickClose = {},
                                 onClickReload = transcriptViewModel::reloadTranscript,
                                 onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
                                 onClearSearchTerm = transcriptViewModel::clearSearch,
@@ -950,7 +949,7 @@ class EpisodeFragment : BaseFragment() {
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = screenHeight)
+                                    .height(screenHeight)
                                     .nestedScroll(rememberViewInteropNestedScrollConnection()),
                             )
                         }
