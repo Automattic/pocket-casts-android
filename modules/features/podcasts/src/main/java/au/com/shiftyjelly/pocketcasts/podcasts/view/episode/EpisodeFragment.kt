@@ -1018,6 +1018,63 @@ class EpisodeFragment : BaseFragment() {
                 }
             }
         }
+
+        setupStickyTabBar()
+    }
+
+    private fun setupStickyTabBar() {
+        binding?.scrollableContent?.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            val tabsTop = binding?.episodeContentTabs?.top ?: return@setOnScrollChangeListener
+            binding?.stickyTabBar?.isVisible = scrollY > tabsTop
+        }
+
+        binding?.stickyTabBar?.setContentWithViewCompositionStrategy {
+            val pageState = viewModel.pageState.collectAsState().value
+            val summaryText = pageState.summary
+            val transcript = pageState.transcript as? Transcript.Text
+            val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
+            val selectedTab = pageState.selectedContentTab
+
+            AppTheme(activeTheme) {
+                if (isSummaryEnabled) {
+                    val chaptersState = chaptersViewModel.uiState.collectAsState().value
+                    val hasChapters = chaptersState.chaptersCount > 0
+                    val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
+
+                    EpisodeTabBar(
+                        tabs = tabs,
+                        selectedTab = selectedTab,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun EpisodeTabBar(
+        tabs: List<ButtonTab>,
+        selectedTab: EpisodeContentTab,
+    ) {
+        if (tabs.size > 1) {
+            val selectedButtonTab = tabs.firstOrNull { tab ->
+                when (selectedTab) {
+                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.details
+                    EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
+                    EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
+                    EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
+                    EpisodeContentTab.TRANSCRIPT -> tab.labelResId == LR.string.transcript
+                }
+            } ?: tabs.first()
+            ButtonTabs(
+                tabs = tabs,
+                selectedTab = selectedButtonTab,
+                backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.theme.colors.primaryUi01)
+                    .padding(top = 8.dp, bottom = 4.dp),
+            )
+        }
     }
 
     private fun buildMergedTabs(
