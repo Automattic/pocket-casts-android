@@ -7,6 +7,9 @@ android {
     buildFeatures {
         buildConfig = true
     }
+    defaultConfig {
+        consumerProguardFiles("proguard-rules.pro")
+    }
 }
 
 dependencies {
