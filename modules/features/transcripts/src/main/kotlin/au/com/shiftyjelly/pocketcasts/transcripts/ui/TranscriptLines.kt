@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
@@ -67,24 +68,31 @@ internal fun TranscriptLines(
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
     onTextHighlighted: (() -> Unit)? = null,
 ) {
+    val view = LocalView.current
+    val clipboard = LocalClipboard.current
+    val updatedOnTextHighlighted = rememberUpdatedState(onTextHighlighted)
+    val textToolbar = remember(view, clipboard) {
+        CustomTextToolbar(
+            view = view,
+            customMenuItems = buildList {
+                // Only show the share option on older versions of Android, as the new versions
+                // have a share feature built into the copy
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    add(CustomMenuItemOption.Share)
+                }
+            },
+            clipboard = clipboard,
+            onTextHighlighted = { updatedOnTextHighlighted.value?.invoke() },
+        )
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .then(if (isContentObscured) Modifier.obsureContent() else Modifier),
     ) {
         CompositionLocalProvider(
-            LocalTextToolbar provides CustomTextToolbar(
-                view = LocalView.current,
-                customMenuItems = buildList {
-                    // Only show the share option on older versions of Android, as the new versions
-                    // have a share feature built into the copy
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                        add(CustomMenuItemOption.Share)
-                    }
-                },
-                clipboard = LocalClipboard.current,
-                onTextHighlighted = onTextHighlighted,
-            ),
+            LocalTextToolbar provides textToolbar,
         ) {
             SelectionContainer {
                 FadedLazyColumn(
