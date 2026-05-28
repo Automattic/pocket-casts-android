@@ -22,8 +22,6 @@ updates:
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
-    reviewers:
-      - "Automattic/apps-infra-tooling"
     groups:
       kotlin-ksp:
         applies-to: version-updates
