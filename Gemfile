@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gem 'danger-dangermattic', '~> 1.2.1'
 gem 'fastlane', '~> 2.226'
-gem 'fastlane-plugin-firebase_app_distribution', '~> 0.10'
+gem 'fastlane-plugin-firebase_app_distribution', '~> 1.0'
 
 gem 'fastlane-plugin-wpmreleasetoolkit', '~> 14.4'
 # These lines are kept to help with testing Release Toolkit changes
