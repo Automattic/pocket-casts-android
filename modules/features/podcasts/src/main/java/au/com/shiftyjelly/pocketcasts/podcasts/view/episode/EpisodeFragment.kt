@@ -27,6 +27,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -36,12 +37,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -70,6 +75,8 @@ import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
+import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
@@ -95,15 +102,20 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
+import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerDimensions
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -138,12 +150,16 @@ import com.automattic.eventhorizon.EpisodeDetailShownEvent
 import com.automattic.eventhorizon.EpisodeDetailTranscriptCardShownEvent
 import com.automattic.eventhorizon.EpisodeDetailTranscriptCardTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
+import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
@@ -218,6 +234,9 @@ class EpisodeFragment : BaseFragment() {
     @Inject
     lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
 
+    @Inject
+    lateinit var playbackManager: PlaybackManager
+
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private val bookmarksViewModel: BookmarksViewModel by viewModels({ requireParentFragment() })
     private val chaptersViewModel by viewModels<ChaptersViewModel>(
@@ -225,6 +244,14 @@ class EpisodeFragment : BaseFragment() {
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
                 factory.create(ChaptersViewModel.Mode.Episode(episodeUUID))
+            }
+        },
+    )
+    private val transcriptViewModel by viewModels<TranscriptViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<TranscriptViewModel.Factory> { factory ->
+                factory.create(TranscriptViewModel.Source.Episode)
             }
         },
     )
@@ -759,6 +786,7 @@ class EpisodeFragment : BaseFragment() {
                                     EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
                                     EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
                                     EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
+                                    EpisodeContentTab.TRANSCRIPT -> tab.labelResId == LR.string.transcript
                                 }
                             } ?: tabs.first()
                             ButtonTabs(
@@ -849,6 +877,83 @@ class EpisodeFragment : BaseFragment() {
                                 )
                             }
                         }
+
+                        if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
+                            val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+
+                            LaunchedEffect(Unit) {
+                                transcriptViewModel.loadTranscript(episodeUUID)
+                            }
+
+                            TranscriptPage(
+                                uiState = transcriptUiState,
+                                toolbarPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+                                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                onClickClose = {
+                                    transcriptViewModel.hideSearch()
+                                    viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION)
+                                },
+                                onClickReload = transcriptViewModel::reloadTranscript,
+                                onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
+                                onClearSearchTerm = transcriptViewModel::clearSearch,
+                                onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
+                                onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
+                                onShowSearchBar = transcriptViewModel::openSearch,
+                                onHideSearchBar = transcriptViewModel::hideSearch,
+                                onClickSubscribe = {
+                                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                                        TranscriptGeneratedPaywallSubscribeTappedEvent(
+                                            podcastUuid = podcastUuid,
+                                            episodeUuid = episodeUuid,
+                                            source = source,
+                                        )
+                                    }
+                                    OnboardingLauncher.openOnboardingFlow(
+                                        requireActivity(),
+                                        OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS),
+                                    )
+                                },
+                                onShowTranscript = { loadedTranscript ->
+                                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                                        TranscriptShownEvent(
+                                            type = loadedTranscript.type.analyticsValue,
+                                            showAsWebpage = loadedTranscript is Transcript.Web,
+                                            podcastUuid = podcastUuid,
+                                            episodeUuid = episodeUuid,
+                                            source = source,
+                                        )
+                                    }
+                                },
+                                onShowTranscriptPaywall = {
+                                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
+                                        TranscriptGeneratedPaywallShownEvent(
+                                            podcastUuid = podcastUuid,
+                                            episodeUuid = episodeUuid,
+                                            source = source,
+                                        )
+                                    }
+                                },
+                                toolbarTrailingContent = { toolbarColors ->
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                            TranscriptShareButton(
+                                                toolbarColors = toolbarColors,
+                                                onClick = transcriptViewModel::shareTranscript,
+                                            )
+                                        }
+                                        TranscriptPlayPauseButton(toolbarColors)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = screenHeight)
+                                    .nestedScroll(rememberViewInteropNestedScrollConnection()),
+                            )
+                        }
                     }
                 } else {
                     // Non-AI layout: transcript banner + chat banner (main's approach)
@@ -926,10 +1031,7 @@ class EpisodeFragment : BaseFragment() {
             LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
             LR.string.transcript to {
                 if (transcript != null) {
-                    if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                        TranscriptFragment.newInstance(transcript.episodeUuid, transcript.podcastUuid)
-                            .show(parentFragmentManager, "episode_transcript")
-                    }
+                    viewModel.selectContentTab(EpisodeContentTab.TRANSCRIPT)
                     eventHorizon.track(
                         EpisodeDetailTranscriptCardTappedEvent(
                             episodeUuid = transcript.episodeUuid,
@@ -1147,6 +1249,37 @@ class EpisodeFragment : BaseFragment() {
         } else {
             Toast.makeText(context, LR.string.sharing_is_not_available_for_private_podcasts, Toast.LENGTH_LONG).show()
         }
+    }
+
+    @Composable
+    private fun TranscriptPlayPauseButton(
+        toolbarColors: ToolbarColors,
+        modifier: Modifier = Modifier,
+    ) {
+        val scope = rememberCoroutineScope()
+        val playbackState by remember {
+            playbackManager.playbackStateFlow.map { it.episodeUuid to it.isPlaying }
+        }.collectAsState(initial = null)
+        val isPlayingThisEpisode = playbackState?.first == episodeUUID && playbackState?.second == true
+
+        AnimatedPlayPauseButton(
+            isPlaying = isPlayingThisEpisode,
+            onClick = {
+                if (isPlayingThisEpisode) {
+                    playbackManager.pause(sourceView = SourceView.EPISODE_TRANSCRIPT)
+                } else {
+                    scope.launch {
+                        playbackManager.playNowSuspend(episodeUUID, sourceView = SourceView.EPISODE_TRANSCRIPT)
+                    }
+                }
+            },
+            iconWidth = 24.dp,
+            iconHeight = 24.dp,
+            circleSize = 48.dp,
+            iconTint = toolbarColors.button,
+            circleColor = toolbarColors.buttonBackground,
+            modifier = modifier,
+        )
     }
 
     interface EpisodeLoadedListener {

@@ -101,7 +101,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private var loadSummaryJob: Job? = null
     private var lastSummaryEpisodeUuid: String? = null
 
-    enum class EpisodeContentTab { DESCRIPTION, SUMMARY, BOOKMARKS, CHAPTERS }
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY, BOOKMARKS, CHAPTERS, TRANSCRIPT }
 
     data class EpisodePageState(
         val transcript: Transcript? = null,
@@ -124,6 +124,8 @@ class EpisodeFragmentViewModel @Inject constructor(
                 EpisodeContentTab.BOOKMARKS -> EpisodeContentTab.BOOKMARKS
 
                 EpisodeContentTab.CHAPTERS -> EpisodeContentTab.CHAPTERS
+
+                EpisodeContentTab.TRANSCRIPT -> EpisodeContentTab.TRANSCRIPT
             }
             return copy(selectedContentTab = contentTab)
         }
