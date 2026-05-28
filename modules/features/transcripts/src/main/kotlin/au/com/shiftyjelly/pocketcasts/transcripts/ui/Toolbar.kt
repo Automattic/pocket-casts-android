@@ -130,7 +130,7 @@ internal fun Toolbar(
     ) {
         Row(
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = if (showCloseButton) Arrangement.SpaceBetween else Arrangement.End,
             modifier = modifier,
         ) {
             if (showCloseButton) {
