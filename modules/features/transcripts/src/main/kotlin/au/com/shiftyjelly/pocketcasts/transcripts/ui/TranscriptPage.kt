@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -152,6 +154,8 @@ fun TranscriptPage(
         onSuppressScroll = { isAutoScrollSuppressed = true },
         onResumeScroll = { isAutoScrollSuppressed = false },
     )
+
+    KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
 }
 
 @Composable
@@ -318,6 +322,17 @@ private fun UserScrollDetectionEffect(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun KeepScreenOnEffect(keepOn: Boolean) {
+    val view = LocalView.current
+    DisposableEffect(keepOn) {
+        view.keepScreenOn = keepOn
+        onDispose {
+            view.keepScreenOn = false
         }
     }
 }
