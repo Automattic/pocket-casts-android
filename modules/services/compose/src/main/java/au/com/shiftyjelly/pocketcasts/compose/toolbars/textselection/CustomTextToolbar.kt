@@ -51,14 +51,16 @@ class CustomTextToolbar(
             onCustomMenuItemClicked(item = item, text = text)
         }
         if (actionMode == null) {
-            status = TextToolbarStatus.Shown
-            onTextHighlighted?.invoke()
             actionMode =
                 TextToolbarHelperMethods.startActionMode(
                     view,
                     FloatingTextActionModeCallback(textActionModeCallback),
                     ActionMode.TYPE_FLOATING,
                 )
+            if (actionMode != null) {
+                status = TextToolbarStatus.Shown
+                onTextHighlighted?.invoke()
+            }
         } else {
             actionMode?.invalidate()
         }
