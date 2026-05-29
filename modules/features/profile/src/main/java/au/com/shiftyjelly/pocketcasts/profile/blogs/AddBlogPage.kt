@@ -589,6 +589,12 @@ private fun DoneDot() {
     }
 }
 
+private val previewWebFeed = WebFeed(
+    title = "pocketcasts.com",
+    href = "https://pocketcasts.com/feed/",
+    type = "application/rss+xml",
+)
+
 @Preview
 @Composable
 private fun AddBlogPageStartPreview(
@@ -662,11 +668,7 @@ private fun AddBlogPageFoundEpisodesPreview(
     AppThemeWithBackground(themeType) {
         AddBlogPage(
             state = UiState.Found(
-                webFeed = WebFeed(
-                    title = "pocketcasts.com",
-                    href = "https://pocketcasts.com/feed/",
-                    type = "application/rss+xml",
-                ),
+                webFeed = previewWebFeed,
                 podcastUuid = "00000000-0000-0000-0000-000000000000",
                 episodeCount = 1,
             ),
@@ -690,11 +692,7 @@ private fun AddBlogPageFoundNoEpisodesPreview(
     AppThemeWithBackground(themeType) {
         AddBlogPage(
             state = UiState.Found(
-                webFeed = WebFeed(
-                    title = "pocketcasts.com",
-                    href = "https://pocketcasts.com/feed/",
-                    type = "application/rss+xml",
-                ),
+                webFeed = previewWebFeed,
                 podcastUuid = "00000000-0000-0000-0000-000000000000",
                 episodeCount = 0,
             ),

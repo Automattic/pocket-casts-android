@@ -224,8 +224,8 @@ class AddBlogViewModel @Inject constructor(
         Generic,
     }
 
-    companion object {
-        private const val POLL_FIRST_EPISODE_INTERVAL_MS = 20_000L
-        private const val POLL_FIRST_EPISODE_MAX_ATTEMPTS = 15
+    private companion object {
+        const val POLL_FIRST_EPISODE_INTERVAL_MS = 20_000L
+        const val POLL_FIRST_EPISODE_MAX_ATTEMPTS = 15
     }
 }

@@ -112,7 +112,7 @@ class BlogsFragment : BaseFragment() {
                                 navController.popBackStack()
                             }
                         },
-                        onFindFeeds = { viewModel.onFindFeedsTapped(url = it) },
+                        onFindFeeds = viewModel::onFindFeedsTapped,
                         onRetry = { viewModel.onRetryTapped(url = it) },
                         onFeedClick = { webFeed -> viewModel.onFeedSelected(webFeed = webFeed) },
                         onGoToPodcast = onBlogAdded,
