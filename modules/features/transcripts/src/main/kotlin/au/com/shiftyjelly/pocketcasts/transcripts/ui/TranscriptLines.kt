@@ -66,11 +66,11 @@ internal fun TranscriptLines(
     isContentObscured: Boolean = false,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
-    onTextHighlighted: (() -> Unit)? = null,
+    onHighlightText: (() -> Unit)? = null,
 ) {
     val view = LocalView.current
     val clipboard = LocalClipboard.current
-    val updatedOnTextHighlighted = rememberUpdatedState(onTextHighlighted)
+    val updatedOnHighlightText = rememberUpdatedState(onHighlightText)
     val textToolbar = remember(view, clipboard) {
         CustomTextToolbar(
             view = view,
@@ -82,7 +82,7 @@ internal fun TranscriptLines(
                 }
             },
             clipboard = clipboard,
-            onTextHighlighted = { updatedOnTextHighlighted.value?.invoke() },
+            onTextHighlighted = { updatedOnHighlightText.value?.invoke() },
         )
     }
 
