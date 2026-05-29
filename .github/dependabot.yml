@@ -8,6 +8,8 @@ updates:
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
+    reviewers:
+      - "Automattic/apps-infra-tooling"
     ignore:
       # These dependencies cannot be updated beyond v2 for non-Enterpise clients
       - dependency-name: "gradle-build-action"
@@ -62,6 +64,8 @@ updates:
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
+    reviewers:
+      - "Automattic/apps-infra-tooling"
     groups:
       ruby-minor-and-patch:
         update-types: [minor, patch]
