@@ -25,12 +25,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -45,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -59,6 +68,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -879,6 +889,10 @@ class EpisodeFragment : BaseFragment() {
                         if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
                             val transcriptUiState by transcriptViewModel.uiState.collectAsState()
                             val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                            val scrollView = binding?.scrollableContent
+                            val nestedScrollConnection = remember(scrollView) {
+                                parentScrollNestedScrollConnection(scrollView)
+                            }
 
                             LaunchedEffect(Unit) {
                                 transcriptViewModel.loadTranscript(episodeUUID)
@@ -946,7 +960,9 @@ class EpisodeFragment : BaseFragment() {
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = screenHeight),
+                                    .heightIn(max = screenHeight)
+                                    .nestedScroll(nestedScrollConnection)
+                                    .disableParentInterceptTouchEvent(),
                             )
                         }
                     }
@@ -1360,3 +1376,55 @@ class EpisodeFragment : BaseFragment() {
 
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
+
+@Composable
+private fun Modifier.disableParentInterceptTouchEvent(): Modifier {
+    val view = LocalView.current
+    return pointerInput(view) {
+        awaitEachGesture {
+            awaitFirstDown(requireUnconsumed = false)
+            view.parent?.requestDisallowInterceptTouchEvent(true)
+        }
+    }
+}
+
+/**
+ * Creates a [NestedScrollConnection] that coordinates scrolling between
+ * a child Compose scrollable (e.g. LazyColumn) and a parent [NestedScrollView].
+ *
+ * - **Scrolling down**: the parent scrolls first (collapsing the header),
+ *   then the child scrolls the remaining amount.
+ * - **Scrolling up**: the child scrolls first, then the parent scrolls
+ *   (revealing the header) with whatever is left over.
+ */
+private fun parentScrollNestedScrollConnection(
+    scrollView: NestedScrollView?,
+): NestedScrollConnection = object : NestedScrollConnection {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        val sv = scrollView ?: return Offset.Zero
+        val dy = -available.y
+        if (dy > 0) {
+            val before = sv.scrollY
+            sv.scrollBy(0, dy.toInt())
+            val consumed = sv.scrollY - before
+            return Offset(0f, -consumed.toFloat())
+        }
+        return Offset.Zero
+    }
+
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+        val sv = scrollView ?: return Offset.Zero
+        val dy = -available.y
+        if (dy < 0) {
+            val before = sv.scrollY
+            sv.scrollBy(0, dy.toInt())
+            val parentConsumed = sv.scrollY - before
+            return Offset(0f, -parentConsumed.toFloat())
+        }
+        return Offset.Zero
+    }
+
+    override suspend fun onPreFling(available: Velocity): Velocity {
+        return Velocity.Zero
+    }
+}
