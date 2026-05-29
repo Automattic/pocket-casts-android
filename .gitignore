@@ -67,3 +67,5 @@ sentry.properties
 .kotlin
 
 developer.properties
+
+.claude/settings.local.json
