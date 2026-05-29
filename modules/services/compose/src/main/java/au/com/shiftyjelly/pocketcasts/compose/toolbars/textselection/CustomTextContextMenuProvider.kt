@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection
 
 import android.content.Intent
