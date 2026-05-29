@@ -312,6 +312,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    SYNCED_TRANSCRIPT_DEBUG(
+        key = "synced_transcript_debug",
+        title = "Synced transcript debug timeline",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {

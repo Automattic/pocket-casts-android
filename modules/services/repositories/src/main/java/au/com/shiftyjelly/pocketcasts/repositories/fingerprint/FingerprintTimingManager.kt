@@ -56,9 +56,22 @@ class FingerprintTimingManager @Inject constructor(
         val score: Float = 0f,
     )
 
+    enum class DebugMatchQuality {
+        NO_MATCH,
+        WEAK_MATCH,
+        STRONG_MATCH,
+    }
+
+    data class DebugWindowResult(
+        val playbackTime: Double,
+        val quality: DebugMatchQuality,
+        val score: Float?,
+    )
+
     private val _stateFlow = MutableStateFlow<State>(State.Idle)
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
+    val mappingSnapshot: List<TimeMappingEntry> get() = snapshotPlaybackToReference
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
@@ -74,8 +87,16 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var snapshotReferenceToPlayback: List<TimeMappingEntry> = emptyList()
 
+    // Accumulated across seek-restarts, cleared only on episode change.
+    private var debugWindowResults = mutableListOf<DebugWindowResult>()
+
+    @Volatile
+    var debugSnapshot: List<DebugWindowResult> = emptyList()
+        private set
+
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
+    private var debugScanJob: Job? = null
     private var progressObserverJob: Job? = null
 
     @Volatile
@@ -183,10 +204,14 @@ class FingerprintTimingManager @Inject constructor(
     private fun resetState() {
         generationJob?.cancel()
         generationJob = null
+        debugScanJob?.cancel()
+        debugScanJob = null
         progressObserverJob?.cancel()
         progressObserverJob = null
         mappingPlaybackToReference.clear()
         mappingReferenceToPlayback.clear()
+        debugWindowResults.clear()
+        debugSnapshot = emptyList()
         publishSnapshot()
         lastProgressPositionMs = -1
         filterLastTrusted = null
@@ -317,12 +342,18 @@ class FingerprintTimingManager @Inject constructor(
             val coverage = cached.entries.size
             _stateFlow.value = State.Active(coverage)
             Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid ($coverage entries)")
+            if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)) {
+                startDebugScan(audioFilePath, matcher)
+            }
             return
         }
 
         // Start streaming fingerprint generation
         val currentTime = playbackManager.playbackStateFlow.first().positionMs / 1000.0
         startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
+        if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)) {
+            startDebugScan(audioFilePath, matcher)
+        }
     }
 
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
@@ -376,6 +407,19 @@ class FingerprintTimingManager @Inject constructor(
             playbackTimeSec <= last.playbackTime + margin
     }
 
+    private fun startDebugScan(audioFilePath: String, matcher: CheckpointMatcher) {
+        debugScanJob?.cancel()
+        debugScanJob = scope.launch {
+            try {
+                streamFingerprint(audioFilePath, matcher, episodeUuid = "", startingAt = 0.0, debugOnly = true)
+            } catch (_: CancellationException) {
+                Timber.d("FingerprintTimingManager: debug scan cancelled")
+            } catch (e: Exception) {
+                Timber.w(e, "FingerprintTimingManager: debug scan failed")
+            }
+        }
+    }
+
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
         generationJob = scope.launch {
@@ -399,11 +443,12 @@ class FingerprintTimingManager @Inject constructor(
         matcher: CheckpointMatcher,
         episodeUuid: String,
         startingAt: Double,
+        debugOnly: Boolean = false,
     ) {
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         if (!isRemoteUrl && !File(audioFilePath).exists()) {
             Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
-            _stateFlow.value = State.Unavailable
+            if (!debugOnly) _stateFlow.value = State.Unavailable
             return
         }
 
@@ -413,7 +458,7 @@ class FingerprintTimingManager @Inject constructor(
         } catch (e: Exception) {
             extractor.release()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
-            _stateFlow.value = State.Failed(e)
+            if (!debugOnly) _stateFlow.value = State.Failed(e)
             return
         }
 
@@ -423,7 +468,7 @@ class FingerprintTimingManager @Inject constructor(
         }
         if (audioTrackIndex == null) {
             extractor.release()
-            _stateFlow.value = State.Unavailable
+            if (!debugOnly) _stateFlow.value = State.Unavailable
             Timber.w("FingerprintTimingManager: no audio track found")
             return
         }
@@ -455,13 +500,13 @@ class FingerprintTimingManager @Inject constructor(
             )
 
             try {
-                decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+                decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount, debugOnly)
 
                 // Flush remaining windows
                 val tail = streamer.flush()
                 if (tail.isNotEmpty()) {
                     mutex.withLock {
-                        processMatches(tail, matcher, startingAt)
+                        processMatches(tail, matcher, startingAt, debugOnly)
                     }
                 }
             } finally {
@@ -483,6 +528,7 @@ class FingerprintTimingManager @Inject constructor(
         startOffset: Double,
         sampleRate: Int,
         channelCount: Int,
+        debugOnly: Boolean = false,
     ) {
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
@@ -534,16 +580,17 @@ class FingerprintTimingManager @Inject constructor(
                             val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
                             if (windows.isNotEmpty()) {
                                 mutex.withLock {
-                                    processMatches(windows, matcher, startOffset)
+                                    processMatches(windows, matcher, startOffset, debugOnly)
                                 }
                             }
                         }
 
-                        // Throttle if we're far ahead of playback
-                        val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
-                        val lastKnownPositionMs = lastProgressPositionMs
-                        if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
-                            delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                        if (!debugOnly) {
+                            val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
+                            val lastKnownPositionMs = lastProgressPositionMs
+                            if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                                delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                            }
                         }
                     }
                     codec.releaseOutputBuffer(outputIndex, false)
@@ -592,37 +639,55 @@ class FingerprintTimingManager @Inject constructor(
         windows: List<WindowedFingerprint>,
         matcher: CheckpointMatcher,
         startOffset: Double,
+        debugOnly: Boolean = false,
     ) {
+        val isDebug = FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
+
         for (window in windows) {
-            val matches = matcher.findTopMatches(window.hashes, 2u)
-            val best = matches.firstOrNull() ?: continue
-
-            if (best.score < FingerprintConstants.MATCH_SCORE_THRESHOLD) continue
-
             val absolutePlaybackTime = startOffset + window.timestampMs.toDouble() / 1000.0
-            val candidate = TimeMappingEntry(
-                playbackTime = absolutePlaybackTime,
-                referenceTime = best.timestamp.toDouble(),
-                score = best.score,
-            )
+            val matches = matcher.findTopMatches(window.hashes, 2u)
+            val best = matches.firstOrNull()
 
-            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD) continue
+            if (best == null || best.score < FingerprintConstants.MATCH_SCORE_THRESHOLD) {
+                if (isDebug) recordDebugResult(absolutePlaybackTime, DebugMatchQuality.NO_MATCH, best?.score)
+                continue
+            }
 
             val runnerUpScore = matches.getOrNull(1)?.score ?: 0f
             val dominance = best.score - runnerUpScore
-            if (dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP) continue
 
-            consider(candidate)
+            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD ||
+                dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP
+            ) {
+                if (isDebug) recordDebugResult(absolutePlaybackTime, DebugMatchQuality.WEAK_MATCH, best.score)
+                continue
+            }
+
+            if (isDebug) recordDebugResult(absolutePlaybackTime, DebugMatchQuality.STRONG_MATCH, best.score)
+
+            if (!debugOnly) {
+                val candidate = TimeMappingEntry(
+                    playbackTime = absolutePlaybackTime,
+                    referenceTime = best.timestamp.toDouble(),
+                    score = best.score,
+                )
+                consider(candidate)
+            }
         }
 
-        publishSnapshot()
-        val coverage = mappingPlaybackToReference.size
-        if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
-            _stateFlow.value = State.Active(coverage)
-            if (!hasReachedActive) {
-                hasReachedActive = true
-                Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
+        if (!debugOnly) {
+            publishSnapshot()
+            val coverage = mappingPlaybackToReference.size
+            if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
+                _stateFlow.value = State.Active(coverage)
+                if (!hasReachedActive) {
+                    hasReachedActive = true
+                    Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
+                }
             }
+        }
+        if (isDebug) {
+            debugSnapshot = debugWindowResults.toList()
         }
     }
 
@@ -686,6 +751,15 @@ class FingerprintTimingManager @Inject constructor(
             if (!isInTrend(entries[i], entries[i - 1])) return false
         }
         return true
+    }
+
+    private fun recordDebugResult(playbackTime: Double, quality: DebugMatchQuality, score: Float?) {
+        val idx = debugWindowResults.binarySearchBy(playbackTime) { it.playbackTime }
+        if (idx >= 0) {
+            debugWindowResults[idx] = DebugWindowResult(playbackTime, quality, score)
+        } else {
+            debugWindowResults.add(-(idx + 1), DebugWindowResult(playbackTime, quality, score))
+        }
     }
 
     internal fun insertMapping(entry: TimeMappingEntry) {
