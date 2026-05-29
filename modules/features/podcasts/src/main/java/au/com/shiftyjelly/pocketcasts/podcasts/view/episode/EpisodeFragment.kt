@@ -49,12 +49,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -265,6 +269,9 @@ class EpisodeFragment : BaseFragment() {
     )
     private var binding: FragmentEpisodeBinding? = null
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+
+    private var tabBarYInComposeView = -1
+    private val isStickyTabBarVisible = mutableStateOf(false)
 
     private var webView: WebView? = null
     private var formattedNotes: String? = null
@@ -802,7 +809,12 @@ class EpisodeFragment : BaseFragment() {
                                 selectedTab = selectedButtonTab,
                                 backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                                 modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        tabBarYInComposeView = coordinates.positionInRoot().y.toInt()
+                                    }
                                     .fillMaxWidth()
+                                    .background(MaterialTheme.theme.colors.primaryUi01)
+                                    .alpha(if (isStickyTabBarVisible.value) 0f else 1f)
                                     .padding(top = if (askTheEpisodeVisible) 4.dp else 16.dp),
                             )
                         }
@@ -1035,8 +1047,13 @@ class EpisodeFragment : BaseFragment() {
 
     private fun setupStickyTabBar() {
         binding?.scrollableContent?.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            val tabsTop = binding?.episodeContentTabs?.top ?: return@setOnScrollChangeListener
-            binding?.stickyTabBar?.isVisible = scrollY > tabsTop
+            val tabsView = binding?.episodeContentTabs ?: return@setOnScrollChangeListener
+            val tabBarOffset = tabBarYInComposeView
+            if (tabBarOffset < 0) return@setOnScrollChangeListener
+            val threshold = tabsView.top + tabBarOffset
+            val shouldStick = scrollY >= threshold
+            binding?.stickyTabBar?.isVisible = shouldStick
+            isStickyTabBarVisible.value = shouldStick
         }
 
         binding?.stickyTabBar?.setContentWithViewCompositionStrategy {
@@ -1051,10 +1068,12 @@ class EpisodeFragment : BaseFragment() {
                     val chaptersState = chaptersViewModel.uiState.collectAsState().value
                     val hasChapters = chaptersState.chaptersCount > 0
                     val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
+                    val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
 
                     EpisodeTabBar(
                         tabs = tabs,
                         selectedTab = selectedTab,
+                        askTheEpisodeVisible = askTheEpisodeVisible,
                     )
                 }
             }
@@ -1065,6 +1084,7 @@ class EpisodeFragment : BaseFragment() {
     private fun EpisodeTabBar(
         tabs: List<ButtonTab>,
         selectedTab: EpisodeContentTab,
+        askTheEpisodeVisible: Boolean,
     ) {
         if (tabs.size > 1) {
             val selectedButtonTab = tabs.firstOrNull { tab ->
@@ -1083,7 +1103,7 @@ class EpisodeFragment : BaseFragment() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.theme.colors.primaryUi01)
-                    .padding(top = 8.dp, bottom = 4.dp),
+                    .padding(top = if (askTheEpisodeVisible) 4.dp else 16.dp),
             )
         }
     }
