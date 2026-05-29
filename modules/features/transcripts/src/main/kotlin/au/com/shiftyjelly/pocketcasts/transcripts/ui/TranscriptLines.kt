@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +65,7 @@ internal fun TranscriptLines(
     searchState: SearchState,
     modifier: Modifier = Modifier,
     isContentObscured: Boolean = false,
-    highlightIndex: Int? = null,
+    highlightState: HighlightState = HighlightState(),
     onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
@@ -111,7 +112,7 @@ internal fun TranscriptLines(
                             entryIndex = index,
                             entry = entry,
                             searchState = searchState,
-                            isHighlighted = index == highlightIndex,
+                            highlightState = highlightState,
                             theme = theme,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -167,11 +168,14 @@ private fun TranscriptLine(
     entryIndex: Int,
     entry: TranscriptEntry,
     searchState: SearchState,
-    isHighlighted: Boolean,
+    highlightState: HighlightState,
     theme: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
     val entryText = entry.text()
+    val isEntryHighlighted = entryIndex == highlightState.entryIndex
+    val wordTimings = (entry as? TranscriptEntry.Text)?.words.orEmpty()
+
     val searchHighlights = remember(entryIndex, entryText, searchState) {
         val searchTermLength = searchState.searchTerm.length
         searchState
@@ -182,11 +186,22 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
-    val textColor = if (isHighlighted) theme.highlightText else theme.primaryText
+    val textColor = if (isEntryHighlighted && wordTimings.isEmpty()) theme.highlightText else theme.primaryText
 
     Text(
         text = buildAnnotatedString {
             append(entryText)
+            if (isEntryHighlighted && wordTimings.isNotEmpty() && highlightState.wordIndex != null) {
+                val wordIdx = highlightState.wordIndex.coerceAtMost(wordTimings.lastIndex)
+                val word = wordTimings[wordIdx]
+                if (word.charOffsetStart >= 0 && word.charOffsetEnd <= entryText.length) {
+                    addStyle(
+                        SpanStyle(color = theme.highlightText),
+                        word.charOffsetStart,
+                        word.charOffsetEnd,
+                    )
+                }
+            }
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
                 val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {

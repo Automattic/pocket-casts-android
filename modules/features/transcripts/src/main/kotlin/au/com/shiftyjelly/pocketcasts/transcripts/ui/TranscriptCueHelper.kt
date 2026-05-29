@@ -130,5 +130,20 @@ internal object TranscriptCueHelper {
         return null
     }
 
+    fun findWordIndex(
+        entry: TranscriptEntry.Text,
+        refTimeMs: Long,
+    ): Int? {
+        if (entry.words.isEmpty()) return null
+        var lastPassedIndex: Int? = null
+        for ((index, word) in entry.words.withIndex()) {
+            if (word.startTimeMs < 0) continue
+            if (refTimeMs < word.startTimeMs) return lastPassedIndex
+            if (refTimeMs < word.endTimeMs) return index
+            lastPassedIndex = index
+        }
+        return lastPassedIndex
+    }
+
     const val NEAREST_CUE_THRESHOLD_MS = 5000L
 }
