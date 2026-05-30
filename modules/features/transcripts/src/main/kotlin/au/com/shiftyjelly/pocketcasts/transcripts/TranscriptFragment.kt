@@ -40,6 +40,7 @@ import com.automattic.eventhorizon.EpisodeTranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
 import com.automattic.eventhorizon.TranscriptShownEvent
+import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -140,6 +141,15 @@ class TranscriptFragment : BaseDialogFragment() {
                 onShowTranscriptPaywall = {
                     viewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptGeneratedPaywallShownEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
+                },
+                onHighlightText = {
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptTextHighlightedEvent(
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,
                             source = source,

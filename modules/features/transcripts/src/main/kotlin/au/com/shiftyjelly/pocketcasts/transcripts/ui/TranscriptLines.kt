@@ -26,9 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -48,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
-import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.ProvideTextSelectionToolbar
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
@@ -65,24 +62,26 @@ internal fun TranscriptLines(
     isContentObscured: Boolean = false,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    onHighlightText: (() -> Unit)? = null,
 ) {
+    val customMenuItems = remember {
+        buildList {
+            // Only show the share option on older versions of Android, as the new versions
+            // have a share feature built into the copy
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                add(CustomMenuItemOption.Share)
+            }
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .then(if (isContentObscured) Modifier.obsureContent() else Modifier),
     ) {
-        CompositionLocalProvider(
-            LocalTextToolbar provides CustomTextToolbar(
-                view = LocalView.current,
-                customMenuItems = buildList {
-                    // Only show the share option on older versions of Android, as the new versions
-                    // have a share feature built into the copy
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                        add(CustomMenuItemOption.Share)
-                    }
-                },
-                clipboard = LocalClipboard.current,
-            ),
+        ProvideTextSelectionToolbar(
+            customMenuItems = customMenuItems,
+            onHighlightText = onHighlightText,
         ) {
             SelectionContainer {
                 FadedLazyColumn(

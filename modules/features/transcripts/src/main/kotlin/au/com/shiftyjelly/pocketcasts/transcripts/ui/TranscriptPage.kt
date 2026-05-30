@@ -42,6 +42,7 @@ fun TranscriptPage(
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
+    onHighlightText: (() -> Unit)? = null,
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
@@ -76,6 +77,7 @@ fun TranscriptPage(
                 listState = listState,
                 theme = theme,
                 onClickReload = onClickReload,
+                onHighlightText = onHighlightText,
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .padding(transcriptPadding),
@@ -110,6 +112,7 @@ private fun TranscriptContent(
     listState: LazyListState,
     theme: TranscriptTheme,
     onClickReload: () -> Unit,
+    onHighlightText: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     when (val transcriptState = uiState.transcriptState) {
@@ -128,6 +131,7 @@ private fun TranscriptContent(
                     searchState = uiState.searchState,
                     state = listState,
                     theme = theme,
+                    onHighlightText = onHighlightText,
                     modifier = modifier,
                 )
             }
