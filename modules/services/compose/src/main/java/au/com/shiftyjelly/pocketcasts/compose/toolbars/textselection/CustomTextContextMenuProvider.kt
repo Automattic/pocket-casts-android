@@ -259,6 +259,7 @@ internal class CustomTextContextMenuProvider(
                         menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                         menuItem.setOnMenuItemClickListener {
                             with(component) { session.onClick() }
+                            session.close()
                             true
                         }
                     }
