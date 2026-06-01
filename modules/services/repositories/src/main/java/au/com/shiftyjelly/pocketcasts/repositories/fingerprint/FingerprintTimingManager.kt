@@ -80,7 +80,7 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var snapshotReferenceToPlayback: List<TimeMappingEntry> = emptyList()
 
-    // Debug rejections: accumulated across seek-restarts, cleared only on episode change.
+    // Debug rejections: accumulated across seek-restarts, cleared on stop or episode change.
     private var debugRejections = mutableListOf<DebugRejection>()
 
     @Volatile

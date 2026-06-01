@@ -131,6 +131,7 @@ fun TranscriptPage(
         }
 
         if (
+            FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
             FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG) &&
             fingerprintTimingManager != null &&
             playbackManager != null
