@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +28,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.ExplicitIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
@@ -36,6 +39,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -108,9 +113,12 @@ private fun Labels(
     ) {
         val title = podcast.title
         if (title != null) {
-            TextP40(
-                text = title,
-                maxLines = 1,
+            val showExplicitIndicator by FeatureFlag
+                .isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR)
+                .collectAsStateWithLifecycle()
+            PodcastTitle(
+                title = title,
+                isExplicit = podcast.explicit == true && showExplicitIndicator,
             )
         }
 
@@ -121,6 +129,28 @@ private fun Labels(
                 maxLines = 1,
                 color = MaterialTheme.theme.colors.primaryText02,
             )
+        }
+    }
+}
+
+@Composable
+private fun PodcastTitle(
+    title: String,
+    isExplicit: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier,
+    ) {
+        TextP40(
+            text = title,
+            maxLines = 1,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        if (isExplicit) {
+            ExplicitIcon()
         }
     }
 }

@@ -51,7 +51,7 @@ class PodcastDescriptiveRow @JvmOverloads constructor(
             field = value
 
             if (value != null) {
-                lblTitle.text = value.title
+                lblTitle.setPodcastTitleWithExplicitBadge(value.title, value.explicit)
                 lblSubtitle.text = value.author
                 lblDescription.text = value.description
                 imageRequestFactory.createForPodcast(value.uuid).loadInto(imageView)
@@ -73,6 +73,7 @@ class PodcastDescriptiveRow @JvmOverloads constructor(
 
     fun clear() {
         lblTitle.text = null
+        lblTitle.contentDescription = null
         lblSubtitle.text = null
         lblDescription.text = null
         imageView.setImageBitmap(null)
