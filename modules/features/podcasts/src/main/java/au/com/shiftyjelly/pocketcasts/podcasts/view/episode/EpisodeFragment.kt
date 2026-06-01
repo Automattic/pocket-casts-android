@@ -846,13 +846,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.BOOKMARKS) {
-                            val bookmarksState by bookmarksViewModel.uiState.collectAsState()
-                            val hasBookmarks = bookmarksState is BookmarksViewModel.UiState.Loaded
-                            val maxHeight = if (hasBookmarks) {
-                                with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
-                            } else {
-                                300.dp
-                            }
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             BookmarksPage(
                                 episodeUuid = episodeUUID,
                                 sourceView = SourceView.EPISODE_DETAILS,
@@ -875,7 +869,7 @@ class EpisodeFragment : BaseFragment() {
                                 onHeadphoneControlsButtonClick = { bookmarksViewModel.onHeadphoneControlsButtonTapped() },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = maxHeight),
+                                    .height(screenHeight),
                             )
                         }
 
