@@ -1,6 +1,8 @@
 8.14
 -----
-
+*   New Features
+    *   Add the explicit badge to the Discover section
+        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
 
 8.13
 -----
