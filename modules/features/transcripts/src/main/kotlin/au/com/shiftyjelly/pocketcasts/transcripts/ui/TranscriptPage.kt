@@ -68,7 +68,7 @@ fun TranscriptPage(
     var highlightIndex by remember { mutableStateOf<Int?>(null) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
-    val playbackState by remember {
+    val playbackState by remember(playbackManager) {
         playbackManager?.playbackStateFlow ?: flowOf(null)
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
@@ -249,7 +249,7 @@ private fun HighlightEffect(
     val isSyncedActive = uiState.isSyncedActive
     val latestOnHighlightChanged by rememberUpdatedState(onHighlightChange)
 
-    val playbackState by remember {
+    val playbackState by remember(playbackManager) {
         playbackManager.playbackStateFlow
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
@@ -334,9 +334,10 @@ private fun UserScrollDetectionEffect(
 private fun KeepScreenOnEffect(keepOn: Boolean) {
     val view = LocalView.current
     DisposableEffect(keepOn) {
+        val previousKeepScreenOn = view.keepScreenOn
         view.keepScreenOn = keepOn
         onDispose {
-            view.keepScreenOn = false
+            view.keepScreenOn = previousKeepScreenOn
         }
     }
 }

@@ -11,7 +11,7 @@ internal object TranscriptCueHelper {
         cachedIndex: Int,
     ): Int? {
         if (entries.isEmpty()) return null
-        val cached = cachedIndex.coerceAtMost(entries.size - 1)
+        val cached = cachedIndex.coerceIn(0, entries.size - 1)
 
         val cachedEntry = entries[cached]
         if (cachedEntry is TranscriptEntry.Text && cachedEntry.startTimeMs >= 0 &&
