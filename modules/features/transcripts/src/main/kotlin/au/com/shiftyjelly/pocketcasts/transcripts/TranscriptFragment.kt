@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeTranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
+import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -125,6 +126,15 @@ class TranscriptFragment : BaseDialogFragment() {
                         requireActivity(),
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS),
                     )
+                },
+                onHighlightText = {
+                    viewModel.track { source, podcastUuid, episodeUuid ->
+                        TranscriptTextHighlightedEvent(
+                            podcastUuid = podcastUuid,
+                            episodeUuid = episodeUuid,
+                            source = source,
+                        )
+                    }
                 },
                 toolbarTrailingContent = { toolbarColors ->
                     Row(

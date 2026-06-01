@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,7 +74,6 @@ import com.automattic.eventhorizon.SettingsGeneralSkipForwardChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralUpNextSwipeChangedEvent
 import com.automattic.eventhorizon.SettingsUseRealTimeForPlaybackRemainingTimeEvent
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -408,7 +409,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         saved: Boolean,
         onSave: (Boolean) -> Unit,
     ) {
-        val savedString = stringResource(rowActionToStringRes(saved)).lowercase(Locale.getDefault())
+        val savedString = stringResource(rowActionToStringRes(saved)).toLowerCase(Locale.current)
         val secondaryText = stringResource(LR.string.settings_row_action_summary, savedString)
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_row_action),
@@ -433,7 +434,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         onSave: (Settings.UpNextAction) -> Unit,
     ) {
         val savedString =
-            stringResource(upNextActionToStringRes(saved)).lowercase(Locale.getDefault())
+            stringResource(upNextActionToStringRes(saved)).toLowerCase(Locale.current)
         val secondaryText = stringResource(LR.string.settings_up_next_swipe_summary, savedString)
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_up_next_swipe),
@@ -463,7 +464,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                 PodcastGrouping.None -> stringResource(LR.string.settings_podcast_episode_grouping_summary_none)
 
                 else -> {
-                    val selected = stringResource(saved.groupName).lowercase(Locale.getDefault())
+                    val selected = stringResource(saved.groupName).toLowerCase(Locale.current)
                     stringResource(LR.string.settings_podcast_episode_grouping_summary, selected)
                 }
             },
