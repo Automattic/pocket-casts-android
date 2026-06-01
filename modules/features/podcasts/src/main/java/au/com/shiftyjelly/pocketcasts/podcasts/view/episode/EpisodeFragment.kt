@@ -745,7 +745,6 @@ class EpisodeFragment : BaseFragment() {
                     val hasChapters = chaptersState.chaptersCount > 0
 
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        // "Chat with episode" input-style banner
                         val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
                         AnimatedVisibility(
                             visible = askTheEpisodeVisible,
@@ -823,7 +822,6 @@ class EpisodeFragment : BaseFragment() {
                             )
                         }
 
-                        // Inline summary content
                         if (selectedTab == EpisodeContentTab.SUMMARY && summaryText != null) {
                             Column(
                                 modifier = Modifier
@@ -977,8 +975,7 @@ class EpisodeFragment : BaseFragment() {
                         }
                     }
                 } else {
-                    // Non-AI layout: transcript banner + chat banner (main's approach)
-                    val podcastTint = (viewModel.state.value as? EpisodeFragmentState.Loaded)?.tintColor ?: android.graphics.Color.BLACK
+                    val podcastTint = (viewModel.state.value as? EpisodeFragmentState.Loaded)?.tintColor ?: Color.BLACK
                     val episodeIconColor = ComposeColor(ThemeColor.podcastIcon02(activeTheme, podcastTint))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1127,7 +1124,7 @@ class EpisodeFragment : BaseFragment() {
                                         Brush.verticalGradient(
                                             0f to backgroundColor,
                                             0.15f to backgroundColor,
-                                            1f to androidx.compose.ui.graphics.Color.Transparent,
+                                            1f to ComposeColor.Transparent,
                                         ),
                                     ),
                             )
