@@ -219,6 +219,8 @@ class EpisodeContainerFragment :
         viewPager.adapter = adapter
 
         if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            // Bookmarks, chapters, and transcripts are rendered inline in EpisodeFragment
+            // via Compose tabs, so the ViewPager only hosts the Details page.
             tabLayout.isVisible = false
             viewPager.isUserInputEnabled = false
         } else {

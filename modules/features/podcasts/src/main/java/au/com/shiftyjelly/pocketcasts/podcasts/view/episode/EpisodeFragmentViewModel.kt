@@ -130,6 +130,18 @@ class EpisodeFragmentViewModel @Inject constructor(
             return copy(selectedContentTab = contentTab)
         }
 
+        internal fun withTranscript(transcript: Transcript?): EpisodePageState {
+            val contentTab = if (transcript == null && selectedContentTab == EpisodeContentTab.TRANSCRIPT) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                transcript = transcript,
+                selectedContentTab = contentTab,
+            )
+        }
+
         internal fun withSummary(summary: String?): EpisodePageState {
             val contentTab = if (summary == null && selectedContentTab == EpisodeContentTab.SUMMARY) {
                 EpisodeContentTab.DESCRIPTION
@@ -277,7 +289,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 oldJob?.cancelAndJoin()
                 val transcript = transcriptManager.loadTranscript(episodeUuid)
                 _pageState.update { state ->
-                    state.copy(transcript = transcript)
+                    state.withTranscript(transcript)
                 }
             }
         }

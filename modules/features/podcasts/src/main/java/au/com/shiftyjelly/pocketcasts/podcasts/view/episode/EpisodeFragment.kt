@@ -798,15 +798,7 @@ class EpisodeFragment : BaseFragment() {
                             enter = BannerEnterTransition,
                             exit = BannerExitTransition,
                         ) {
-                            val selectedButtonTab = tabs.firstOrNull { tab ->
-                                when (selectedTab) {
-                                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.details
-                                    EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
-                                    EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
-                                    EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
-                                    EpisodeContentTab.TRANSCRIPT -> tab.labelResId == LR.string.transcript
-                                }
-                            } ?: tabs.first()
+                            val selectedButtonTab = tabs.firstOrNull { it.labelResId == selectedTab.labelResId } ?: tabs.first()
                             ButtonTabs(
                                 tabs = tabs,
                                 selectedTab = selectedButtonTab,
@@ -1142,15 +1134,7 @@ class EpisodeFragment : BaseFragment() {
         askTheEpisodeVisible: Boolean,
     ) {
         if (tabs.size > 1) {
-            val selectedButtonTab = tabs.firstOrNull { tab ->
-                when (selectedTab) {
-                    EpisodeContentTab.DESCRIPTION -> tab.labelResId == LR.string.details
-                    EpisodeContentTab.SUMMARY -> tab.labelResId == LR.string.summary
-                    EpisodeContentTab.BOOKMARKS -> tab.labelResId == LR.string.bookmarks
-                    EpisodeContentTab.CHAPTERS -> tab.labelResId == LR.string.chapters
-                    EpisodeContentTab.TRANSCRIPT -> tab.labelResId == LR.string.transcript
-                }
-            } ?: tabs.first()
+            val selectedButtonTab = tabs.firstOrNull { it.labelResId == selectedTab.labelResId } ?: tabs.first()
             ButtonTabs(
                 tabs = tabs,
                 selectedTab = selectedButtonTab,
@@ -1448,6 +1432,15 @@ class EpisodeFragment : BaseFragment() {
         @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
     ) : Parcelable
 }
+
+private val EpisodeContentTab.labelResId: Int
+    get() = when (this) {
+        EpisodeContentTab.DESCRIPTION -> LR.string.details
+        EpisodeContentTab.SUMMARY -> LR.string.summary
+        EpisodeContentTab.BOOKMARKS -> LR.string.bookmarks
+        EpisodeContentTab.CHAPTERS -> LR.string.chapters
+        EpisodeContentTab.TRANSCRIPT -> LR.string.transcript
+    }
 
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
