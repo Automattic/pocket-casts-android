@@ -107,7 +107,7 @@ data class ToolbarColors(
 }
 
 @Composable
-internal fun Toolbar(
+fun Toolbar(
     searchState: SearchState,
     onClickClose: () -> Unit,
     onUpdateSearchTerm: (String) -> Unit,

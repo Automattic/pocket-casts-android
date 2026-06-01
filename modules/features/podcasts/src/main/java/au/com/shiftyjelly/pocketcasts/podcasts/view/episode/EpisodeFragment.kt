@@ -28,17 +28,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -56,16 +52,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -122,6 +125,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.Toolbar
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBannerColors
@@ -1070,11 +1074,71 @@ class EpisodeFragment : BaseFragment() {
                     val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
                     val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
 
-                    EpisodeTabBar(
-                        tabs = tabs,
-                        selectedTab = selectedTab,
-                        askTheEpisodeVisible = askTheEpisodeVisible,
-                    )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.theme.colors.primaryUi01),
+                        ) {
+                            EpisodeTabBar(
+                                tabs = tabs,
+                                selectedTab = selectedTab,
+                                askTheEpisodeVisible = askTheEpisodeVisible,
+                            )
+
+                            if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
+                                val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+                                Toolbar(
+                                    searchState = transcriptUiState.searchState,
+                                    hideSearchBar = transcriptUiState.isPaywallVisible || !transcriptUiState.isTextTranscriptLoaded,
+                                    showCloseButton = false,
+                                    onClickClose = {},
+                                    onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
+                                    onClearSearchTerm = transcriptViewModel::clearSearch,
+                                    onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
+                                    onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
+                                    onShowSearchBar = transcriptViewModel::openSearch,
+                                    onHideSearchBar = transcriptViewModel::hideSearch,
+                                    colors = ToolbarColors.default(MaterialTheme.theme.colors),
+                                    trailingContent = { toolbarColors ->
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                                TranscriptShareButton(
+                                                    toolbarColors = toolbarColors,
+                                                    onClick = transcriptViewModel::shareTranscript,
+                                                )
+                                            }
+                                            TranscriptPlayPauseButton(toolbarColors)
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                                )
+                            }
+                        }
+
+                        if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
+                            val backgroundColor = MaterialTheme.theme.colors.primaryUi01
+                            val fadeHeight = with(LocalDensity.current) {
+                                LocalWindowInfo.current.containerSize.height.toDp() * 0.125f
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(fadeHeight)
+                                    .background(
+                                        Brush.verticalGradient(
+                                            0f to backgroundColor,
+                                            0.15f to backgroundColor,
+                                            1f to androidx.compose.ui.graphics.Color.Transparent,
+                                        ),
+                                    ),
+                            )
+                        }
+                    }
                 }
             }
         }
