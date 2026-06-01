@@ -331,7 +331,7 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `dispatch loading acknowledged subscription purchases succesfully`() = runTest {
+    fun `dispatch loading acknowledged subscription purchases successfully`() = runTest {
         client.loadAcknowledgedSubscriptions()
 
         listener.assertEvents(

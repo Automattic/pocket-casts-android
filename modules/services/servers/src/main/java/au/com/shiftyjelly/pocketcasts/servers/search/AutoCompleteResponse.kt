@@ -31,4 +31,5 @@ data class PodcastResultValue(
     val uuid: String,
     val title: String,
     val author: String? = null,
+    val explicit: Boolean? = null,
 )

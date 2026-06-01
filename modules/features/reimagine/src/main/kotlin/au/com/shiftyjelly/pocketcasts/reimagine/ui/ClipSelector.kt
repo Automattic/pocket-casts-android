@@ -264,7 +264,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
         mutableIntStateOf(state.calculateMaxSecondsPerTick(episodeDuration, maxWidth))
     }
 
-    val transformation = rememberTransformableState { zoom, _, _ ->
+    val transformation = rememberTransformableState { _, zoom, _, _ ->
         state.updateTimelineScale(zoom, maxSecondsPerTick, listener::onUpdateTimeline)
     }
 

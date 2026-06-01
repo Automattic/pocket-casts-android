@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptSegments
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import com.squareup.moshi.Moshi
+import kotlin.math.roundToLong
 import okio.BufferedSource
 import okio.use
 import androidx.media3.extractor.text.SubtitleParser as Media3SubtitleParser
@@ -148,8 +149,8 @@ internal class JsonParser(
         cue.speaker?.let { speaker ->
             add(TranscriptEntry.Speaker(speaker))
         }
-        val startTimeMs = cue.startTime?.let { (it * 1000).toLong() } ?: -1L
-        val endTimeMs = cue.endTime?.let { (it * 1000).toLong() } ?: -1L
+        val startTimeMs = cue.startTime?.let { (it * 1000).roundToLong() } ?: -1L
+        val endTimeMs = cue.endTime?.let { (it * 1000).roundToLong() } ?: -1L
         add(TranscriptEntry.Text(cue.body, startTimeMs = startTimeMs, endTimeMs = endTimeMs))
     }
 }

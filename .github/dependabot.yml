@@ -8,6 +8,8 @@ updates:
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
+    reviewers:
+      - "Automattic/apps-infra-tooling"
     ignore:
       # These dependencies cannot be updated beyond v2 for non-Enterpise clients
       - dependency-name: "gradle-build-action"
@@ -54,3 +56,16 @@ updates:
       - dependency-name: "androidx.wear.compose:compose-foundation"
       - dependency-name: "androidx.wear.compose:compose-material"
       - dependency-name: "androidx.wear.compose:compose-navigation"
+  - package-ecosystem: "bundler"
+    open-pull-requests-limit: 5
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
+    reviewers:
+      - "Automattic/apps-infra-tooling"
+    groups:
+      ruby-minor-and-patch:
+        update-types: [minor, patch]
