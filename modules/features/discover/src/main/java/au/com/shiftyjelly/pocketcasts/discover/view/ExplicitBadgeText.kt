@@ -3,14 +3,17 @@ package au.com.shiftyjelly.pocketcasts.discover.view
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
-import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ImageSpan
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.doOnLayout
+import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -27,6 +30,7 @@ internal fun TextView.setPodcastTitleWithExplicitBadge(
     val titleText = title?.toString().orEmpty()
     val showExplicitBadge = explicit == true && FeatureFlag.isEnabled(Feature.EXPLICIT_PODCAST_INDICATOR)
     if (!showExplicitBadge || titleText.isEmpty()) {
+        setTag(R.id.explicit_badge_title, null)
         text = title
         contentDescription = null
         return
@@ -35,6 +39,7 @@ internal fun TextView.setPodcastTitleWithExplicitBadge(
     val explicitDescription = context.getString(LR.string.explicit)
     val badge = AppCompatResources.getDrawable(context, IR.drawable.explicit)?.mutate()
     if (badge == null) {
+        setTag(R.id.explicit_badge_title, null)
         text = title
         contentDescription = "$titleText, $explicitDescription"
         return
@@ -49,15 +54,60 @@ internal fun TextView.setPodcastTitleWithExplicitBadge(
     DrawableCompat.setTint(wrappedBadge, context.getThemeColor(badgeTintAttr))
     wrappedBadge.setBounds(0, 0, iconSize, iconSize)
 
-    val textWithBadge = SpannableString("$titleText  ")
-    textWithBadge.setSpan(
-        CenteredImageSpan(wrappedBadge),
-        textWithBadge.length - 1,
-        textWithBadge.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-    )
-    text = textWithBadge
     contentDescription = "$titleText, $explicitDescription"
+
+    if (maxLines != 1) {
+        // Multi-line titles wrap rather than ellipsize, so the badge can simply follow the title.
+        setTag(R.id.explicit_badge_title, null)
+        text = buildTitleWithBadge(titleText, wrappedBadge)
+        return
+    }
+
+    // Single line titles ellipsize, which would otherwise truncate a trailing badge when the title is long.
+    // Reserve room for the icon and ellipsize the title ourselves so the badge stays visible.
+    setTag(R.id.explicit_badge_title, titleText)
+    if (width > 0) {
+        text = buildSingleLineTitleWithBadge(titleText, wrappedBadge, iconSize)
+    } else {
+        // The width is unknown until layout (e.g. the first bind in a RecyclerView).
+        text = titleText
+        doOnLayout {
+            // Use the tag to make sure the row hasn't been recycled when doing the layout with the badge.
+            if (getTag(R.id.explicit_badge_title) == titleText) {
+                text = buildSingleLineTitleWithBadge(titleText, wrappedBadge, iconSize)
+            }
+        }
+    }
+}
+
+private fun TextView.buildSingleLineTitleWithBadge(
+    titleText: String,
+    badge: Drawable,
+    iconSize: Int,
+): CharSequence {
+    val available = width - compoundPaddingStart - compoundPaddingEnd
+    if (available <= 0) {
+        return buildTitleWithBadge(titleText, badge)
+    }
+    // Reserve space for the gap before the icon and the icon itself.
+    val reserved = iconSize + paint.measureText(" ")
+    val ellipsizedTitle = TextUtils.ellipsize(
+        titleText,
+        paint,
+        (available - reserved).coerceAtLeast(0f),
+        TextUtils.TruncateAt.END,
+    )
+    return buildTitleWithBadge(ellipsizedTitle, badge)
+}
+
+private fun buildTitleWithBadge(
+    title: CharSequence,
+    badge: Drawable,
+): CharSequence {
+    // The trailing non-breaking space carries the image, and the preceding space is the gap.
+    return SpannableStringBuilder(title)
+        .append(' ')
+        .append(" ", CenteredImageSpan(badge), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
 
 private class CenteredImageSpan(
