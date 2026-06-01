@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,8 @@ internal fun TranscriptLines(
     searchState: SearchState,
     modifier: Modifier = Modifier,
     isContentObscured: Boolean = false,
+    highlightIndex: Int? = null,
+    onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
 ) {
@@ -103,15 +106,23 @@ internal fun TranscriptLines(
                             Spacer(Modifier.height(8.dp))
                         }
                     }
-                    itemsIndexed(transcript.entries) { index, entry ->
+                    itemsIndexed(transcript.entries, key = { index, _ -> index }) { index, entry ->
                         TranscriptLine(
                             entryIndex = index,
                             entry = entry,
                             searchState = searchState,
+                            isHighlighted = index == highlightIndex,
                             theme = theme,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(entry.padding()),
+                                .padding(entry.padding())
+                                .then(
+                                    if (onEntryClick != null && entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+                                        Modifier.clickable { onEntryClick(entry, index) }
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                         )
                     }
                     item {
@@ -156,6 +167,7 @@ private fun TranscriptLine(
     entryIndex: Int,
     entry: TranscriptEntry,
     searchState: SearchState,
+    isHighlighted: Boolean,
     theme: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -169,6 +181,8 @@ private fun TranscriptLine(
             ?.filter { (start, end) -> isValidHighlightRange(start, end, entryText.length) }
             .orEmpty()
     }
+
+    val textColor = if (isHighlighted) theme.highlightText else theme.primaryText
 
     Text(
         text = buildAnnotatedString {
@@ -184,7 +198,7 @@ private fun TranscriptLine(
             }
         },
         style = entry.textStyle(),
-        color = theme.primaryText,
+        color = textColor,
         modifier = modifier,
     )
 }
