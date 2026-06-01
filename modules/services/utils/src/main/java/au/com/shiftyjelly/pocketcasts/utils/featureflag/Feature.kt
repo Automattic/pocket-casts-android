@@ -58,7 +58,7 @@ enum class Feature(
     END_OF_YEAR_2025(
         key = "end_of_year_2025",
         title = "End of Year 2025",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
