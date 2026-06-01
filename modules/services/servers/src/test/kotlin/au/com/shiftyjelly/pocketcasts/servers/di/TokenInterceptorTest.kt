@@ -54,6 +54,7 @@ class TokenInterceptorTest {
         val request = requireNotNull(server.takeRequest(5, TimeUnit.SECONDS))
         assertNull(request.getHeader("Authorization"))
         assertEquals(0, tokenHandler.getAccessTokenCalls)
+    }
 
     @Test
     fun `throws when refresh token has expired and fallback is disabled`() {
@@ -82,6 +83,7 @@ class TokenInterceptorTest {
         val request = requireNotNull(server.takeRequest(5, TimeUnit.SECONDS))
         assertNull(request.getHeader("Authorization"))
         assertEquals(1, tokenHandler.getAccessTokenCalls)
+    }
 
     @Test
     fun `throws when refreshed token has expired and fallback is disabled`() {
