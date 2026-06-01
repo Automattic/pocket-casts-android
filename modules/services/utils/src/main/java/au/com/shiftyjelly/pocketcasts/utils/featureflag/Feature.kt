@@ -63,6 +63,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    INTERCEPTOR_REFRESH_TOKEN_FALLBACK(
+        key = "interceptor_refresh_token_fallback",
+        title = "Interceptor refresh token fallback",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
         title = "Intro Offer Plus",
