@@ -196,6 +196,60 @@ class TranscriptSanitizationTest {
         }
 
         @Test
+        fun `join split texts uses min start time and max end time`() {
+            val input = buildTranscript {
+                text("Text 1", startTimeMs = 1000, endTimeMs = 2000)
+                text("Text 2", startTimeMs = 2000, endTimeMs = 3000)
+                text("Text 3", startTimeMs = 3000, endTimeMs = 4000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("Text 1 Text 2 Text 3", startTimeMs = 1000, endTimeMs = 4000)
+                },
+                output,
+            )
+        }
+
+        @Test
+        fun `mid-sentence split preserves timing`() {
+            val input = buildTranscript {
+                text("Period. Unfinished", startTimeMs = 0, endTimeMs = 1000)
+                text("sentence.", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("Period.", startTimeMs = 0, endTimeMs = 1000)
+                    text("Unfinished sentence.", startTimeMs = 0, endTimeMs = 2000)
+                },
+                output,
+            )
+        }
+
+        @Test
+        fun `residual accumulator flush preserves timing`() {
+            val input = buildTranscript {
+                text("Finished.", startTimeMs = 0, endTimeMs = 1000)
+                text("Unfinished", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("Finished.", startTimeMs = 0, endTimeMs = 1000)
+                    text("Unfinished", startTimeMs = 1000, endTimeMs = 2000)
+                },
+                output,
+            )
+        }
+
+        @Test
         fun `move unfinished sentence to next text`() {
             val input = buildTranscript {
                 text("Period. Unfinished")
@@ -360,8 +414,8 @@ private fun buildTranscript(block: TranscriptBuilder.() -> Unit): List<Transcrip
 private class TranscriptBuilder {
     private val entries = mutableListOf<TranscriptEntry>()
 
-    fun text(value: String) {
-        entries += TranscriptEntry.Text(value)
+    fun text(value: String, startTimeMs: Long = -1L, endTimeMs: Long = -1L) {
+        entries += TranscriptEntry.Text(value, startTimeMs = startTimeMs, endTimeMs = endTimeMs)
     }
 
     fun speaker(value: String) {

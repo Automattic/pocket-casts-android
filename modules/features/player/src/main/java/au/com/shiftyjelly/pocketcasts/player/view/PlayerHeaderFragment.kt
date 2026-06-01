@@ -94,7 +94,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLoc
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -143,9 +142,7 @@ import com.automattic.eventhorizon.PlaybackErrorTappedEvent
 import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.TranscriptDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
-import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
-import com.automattic.eventhorizon.TranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -1016,6 +1013,9 @@ class PlayerHeaderFragment :
             val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             TranscriptPage(
                 uiState = state,
+                viewModel = transcriptViewModel,
+                fingerprintTimingManager = transcriptViewModel.fingerprintTimingManager,
+                playbackManager = transcriptViewModel.playbackManager,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = navigationBarPadding + if (isPortraitPlayer) 96.dp else 16.dp),
@@ -1039,26 +1039,6 @@ class PlayerHeaderFragment :
                         )
                     }
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-                },
-                onShowTranscript = { transcript ->
-                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptShownEvent(
-                            type = transcript.type.analyticsValue,
-                            showAsWebpage = transcript is Transcript.Web,
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
-                            source = source,
-                        )
-                    }
-                },
-                onShowTranscriptPaywall = {
-                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptGeneratedPaywallShownEvent(
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
-                            source = source,
-                        )
-                    }
                 },
                 onHighlightText = {
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
