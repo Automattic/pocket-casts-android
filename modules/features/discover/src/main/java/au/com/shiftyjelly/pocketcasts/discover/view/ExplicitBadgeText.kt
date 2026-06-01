@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.withSave
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -124,10 +125,10 @@ private class CenteredImageSpan(
         bottom: Int,
         paint: Paint,
     ) {
-        canvas.save()
-        val transY = top + (bottom - top - image.bounds.height()) / 2
-        canvas.translate(x, transY.toFloat())
-        image.draw(canvas)
-        canvas.restore()
+        canvas.withSave {
+            val transY = top + (bottom - top - image.bounds.height()) / 2
+            translate(x, transY.toFloat())
+            image.draw(this)
+        }
     }
 }
