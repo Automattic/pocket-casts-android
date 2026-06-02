@@ -56,9 +56,15 @@ class FingerprintTimingManager @Inject constructor(
         val score: Float = 0f,
     )
 
+    data class DebugRejection(
+        val playbackTime: Double,
+        val score: Float?,
+    )
+
     private val _stateFlow = MutableStateFlow<State>(State.Idle)
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
+    val mappingSnapshot: List<TimeMappingEntry> get() = snapshotPlaybackToReference
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
@@ -74,6 +80,13 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var snapshotReferenceToPlayback: List<TimeMappingEntry> = emptyList()
 
+    // Debug rejections: accumulated across seek-restarts, cleared on stop() or episode change.
+    private var debugRejections = mutableListOf<DebugRejection>()
+
+    @Volatile
+    var debugRejectionsSnapshot: List<DebugRejection> = emptyList()
+        private set
+
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
     private var progressObserverJob: Job? = null
@@ -84,6 +97,9 @@ class FingerprintTimingManager @Inject constructor(
     // Drift filter state
     private var filterLastTrusted: TimeMappingEntry? = null
     private var filterCandidatePool = mutableListOf<TimeMappingEntry>()
+
+    @VisibleForTesting
+    internal var debugTrackingEnabled = false
 
     // Context for current preparation
     private var currentEpisodeUuid: String? = null
@@ -187,6 +203,8 @@ class FingerprintTimingManager @Inject constructor(
         progressObserverJob = null
         mappingPlaybackToReference.clear()
         mappingReferenceToPlayback.clear()
+        debugRejections.clear()
+        debugRejectionsSnapshot = emptyList()
         publishSnapshot()
         lastProgressPositionMs = -1
         filterLastTrusted = null
@@ -539,7 +557,6 @@ class FingerprintTimingManager @Inject constructor(
                             }
                         }
 
-                        // Throttle if we're far ahead of playback
                         val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
                         val lastKnownPositionMs = lastProgressPositionMs
                         if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
@@ -593,26 +610,35 @@ class FingerprintTimingManager @Inject constructor(
         matcher: CheckpointMatcher,
         startOffset: Double,
     ) {
+        val isDebug = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
+
         for (window in windows) {
-            val matches = matcher.findTopMatches(window.hashes, 2u)
-            val best = matches.firstOrNull() ?: continue
-
-            if (best.score < FingerprintConstants.MATCH_SCORE_THRESHOLD) continue
-
             val absolutePlaybackTime = startOffset + window.timestampMs.toDouble() / 1000.0
+            val matches = matcher.findTopMatches(window.hashes, 2u)
+            val best = matches.firstOrNull()
+
+            // Below floor — invisible (neither green nor red per iOS spec)
+            if (best == null || best.score < FingerprintConstants.MATCH_SCORE_THRESHOLD) {
+                continue
+            }
+
+            val runnerUpScore = matches.getOrNull(1)?.score ?: 0f
+            val dominance = best.score - runnerUpScore
+
+            // Passes floor but fails anchor threshold or dominance → rejection (red)
+            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD ||
+                dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP
+            ) {
+                if (isDebug) recordDebugRejection(absolutePlaybackTime, best.score)
+                continue
+            }
+
             val candidate = TimeMappingEntry(
                 playbackTime = absolutePlaybackTime,
                 referenceTime = best.timestamp.toDouble(),
                 score = best.score,
             )
-
-            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD) continue
-
-            val runnerUpScore = matches.getOrNull(1)?.score ?: 0f
-            val dominance = best.score - runnerUpScore
-            if (dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP) continue
-
-            consider(candidate)
+            consider(candidate, isDebug)
         }
 
         publishSnapshot()
@@ -623,6 +649,9 @@ class FingerprintTimingManager @Inject constructor(
                 hasReachedActive = true
                 Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
             }
+        }
+        if (isDebug) {
+            debugRejectionsSnapshot = debugRejections.toList()
         }
     }
 
@@ -637,12 +666,16 @@ class FingerprintTimingManager @Inject constructor(
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 
-    internal fun consider(candidate: TimeMappingEntry): Int {
+    internal fun consider(
+        candidate: TimeMappingEntry,
+        isDebug: Boolean = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG),
+    ): Int {
         val trusted = filterLastTrusted
         if (trusted != null && isInTrend(candidate, trusted)) {
-            flushPoolAsRejected()
+            flushPoolAsRejected(isDebug)
             insertMapping(candidate)
             filterLastTrusted = candidate
+            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
             return 1
         }
 
@@ -655,6 +688,7 @@ class FingerprintTimingManager @Inject constructor(
         if (formsConsistentSequence(recent)) {
             val keepStart = filterCandidatePool.size - n
             for (i in 0 until keepStart) {
+                if (isDebug) recordDebugRejection(filterCandidatePool[i].playbackTime, filterCandidatePool[i].score)
                 Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${filterCandidatePool[i].playbackTime}s")
             }
             for (entry in recent) {
@@ -662,15 +696,23 @@ class FingerprintTimingManager @Inject constructor(
             }
             filterLastTrusted = recent.last()
             filterCandidatePool.clear()
+            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
             return n
         }
 
         val evicted = filterCandidatePool.removeAt(0)
+        if (isDebug) recordDebugRejection(evicted.playbackTime, evicted.score)
         Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${evicted.playbackTime}s")
+        if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
         return 0
     }
 
-    private fun flushPoolAsRejected() {
+    private fun flushPoolAsRejected(isDebug: Boolean) {
+        if (isDebug) {
+            for (candidate in filterCandidatePool) {
+                recordDebugRejection(candidate.playbackTime, candidate.score)
+            }
+        }
         filterCandidatePool.clear()
     }
 
@@ -686,6 +728,13 @@ class FingerprintTimingManager @Inject constructor(
             if (!isInTrend(entries[i], entries[i - 1])) return false
         }
         return true
+    }
+
+    private fun recordDebugRejection(playbackTime: Double, score: Float?) {
+        debugRejections.add(DebugRejection(playbackTime, score))
+        if (debugRejections.size > FingerprintConstants.DEBUG_REJECTION_CAP) {
+            debugRejections.removeAt(0)
+        }
     }
 
     internal fun insertMapping(entry: TimeMappingEntry) {
@@ -716,6 +765,7 @@ class FingerprintTimingManager @Inject constructor(
             consider(entry)
         }
         publishSnapshot()
+        debugRejectionsSnapshot = debugRejections.toList()
     }
 
     companion object {

@@ -36,7 +36,7 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     var accumulatedEndTimeMs = -1L
 
     fun appendToAccumulator(text: String, startTimeMs: Long, endTimeMs: Long) {
-        val trimmedText = text.trimStart()
+        val trimmedText = text.trim()
         phraseAccumulator.append(' ').append(trimmedText)
         if (accumulatedStartTimeMs == -1L || (startTimeMs in 0..<accumulatedStartTimeMs)) {
             accumulatedStartTimeMs = startTimeMs

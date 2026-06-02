@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -33,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
@@ -74,58 +77,75 @@ fun TranscriptPage(
     val isPlaying = playbackState?.isPlaying == true
     val isSearching = uiState.searchState.isSearchOpen
 
-    Column(
-        modifier = modifier.background(theme.background),
-    ) {
-        Toolbar(
-            searchState = uiState.searchState,
-            hideSearchBar = uiState.isPaywallVisible || !uiState.isTextTranscriptLoaded,
-            onClickClose = onClickClose,
-            onUpdateSearchTerm = onUpdateSearchTerm,
-            onClearSearchTerm = onClearSearchTerm,
-            onSelectPreviousSearch = onSelectPreviousSearch,
-            onSelectNextSearch = onSelectNextSearch,
-            onShowSearchBar = onShowSearchBar,
-            onHideSearchBar = onHideSearchBar,
-            colors = theme.toolbarColors,
-            trailingContent = toolbarTrailingContent,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(toolbarPadding),
-        )
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-        ) {
-            val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? = if (uiState.isSyncedActive && viewModel != null) {
-                { entry, _ -> viewModel.seekToTranscriptEntry(entry) }
-            } else {
-                null
-            }
-
-            TranscriptContent(
-                uiState = uiState,
-                listState = listState,
-                theme = theme,
-                onClickReload = onClickReload,
-                highlightState = highlightState,
-                onEntryClick = tapToSeekHandler,
-                onHighlightText = onHighlightText,
+    Box(modifier = modifier.background(theme.background)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Toolbar(
+                searchState = uiState.searchState,
+                hideSearchBar = uiState.isPaywallVisible || !uiState.isTextTranscriptLoaded,
+                onClickClose = onClickClose,
+                onUpdateSearchTerm = onUpdateSearchTerm,
+                onClearSearchTerm = onClearSearchTerm,
+                onSelectPreviousSearch = onSelectPreviousSearch,
+                onSelectNextSearch = onSelectNextSearch,
+                onShowSearchBar = onShowSearchBar,
+                onHideSearchBar = onHideSearchBar,
+                colors = theme.toolbarColors,
+                trailingContent = toolbarTrailingContent,
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .padding(transcriptPadding),
+                    .fillMaxWidth()
+                    .padding(toolbarPadding),
             )
 
-            if (uiState.isPaywallVisible) {
-                TranscriptsPaywall(
-                    isFreeTrialAvailable = uiState.isFreeTrialAvailable,
-                    onClickSubscribe = onClickSubscribe,
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            ) {
+                val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
+                    if (uiState.isSyncedActive && viewModel != null) {
+                        { entry, _ -> viewModel.seekToTranscriptEntry(entry) }
+                    } else {
+                        null
+                    }
+
+                TranscriptContent(
+                    uiState = uiState,
+                    listState = listState,
                     theme = theme,
-                    contentPadding = paywallPadding,
+                    onClickReload = onClickReload,
+                    highlightState = highlightState,
+                    onEntryClick = tapToSeekHandler,
+                    onHighlightText = onHighlightText,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .padding(transcriptPadding),
                 )
+
+                if (uiState.isPaywallVisible) {
+                    TranscriptsPaywall(
+                        isFreeTrialAvailable = uiState.isFreeTrialAvailable,
+                        onClickSubscribe = onClickSubscribe,
+                        theme = theme,
+                        contentPadding = paywallPadding,
+                    )
+                }
             }
+        }
+
+        if (
+            FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
+            FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG) &&
+            fingerprintTimingManager != null &&
+            playbackManager != null
+        ) {
+            val debugBottomPadding = transcriptPadding.calculateBottomPadding() + 16.dp
+            SyncDebugTimeline(
+                fingerprintTimingManager = fingerprintTimingManager,
+                playbackManager = playbackManager,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 16.dp, end = 16.dp, bottom = debugBottomPadding),
+            )
         }
     }
 

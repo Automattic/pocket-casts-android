@@ -57,4 +57,7 @@ object FingerprintConstants {
 
     /** Timeout for MediaCodec dequeue operations, in microseconds. */
     const val CODEC_TIMEOUT_US = 10_000L
+
+    /** Maximum stored debug rejections (FIFO eviction). */
+    const val DEBUG_REJECTION_CAP = 500
 }
