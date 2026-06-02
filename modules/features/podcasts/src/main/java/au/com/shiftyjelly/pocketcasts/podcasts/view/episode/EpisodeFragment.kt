@@ -60,8 +60,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -841,7 +842,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.BOOKMARKS) {
-                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             BookmarksPage(
                                 episodeUuid = episodeUUID,
                                 sourceView = SourceView.EPISODE_DETAILS,
@@ -869,7 +870,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.CHAPTERS) {
-                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             val lazyListState = rememberLazyListState()
                             ChaptersTheme {
                                 ChaptersPage(
@@ -893,7 +894,7 @@ class EpisodeFragment : BaseFragment() {
 
                         if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
                             val transcriptUiState by transcriptViewModel.uiState.collectAsState()
-                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
                             val scrollView = binding?.scrollableContent
                             val nestedScrollConnection = remember(scrollView) {
                                 parentScrollNestedScrollConnection(scrollView)
@@ -1102,7 +1103,9 @@ class EpisodeFragment : BaseFragment() {
 
                         if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
                             val backgroundColor = MaterialTheme.theme.colors.primaryUi01
-                            val fadeHeight = LocalConfiguration.current.screenHeightDp.dp * 0.125f
+                            val fadeHeight = with(LocalDensity.current) {
+                                LocalWindowInfo.current.containerSize.height.toDp() * 0.125f
+                            }
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
