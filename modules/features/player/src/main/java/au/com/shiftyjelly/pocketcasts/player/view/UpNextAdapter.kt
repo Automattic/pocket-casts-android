@@ -237,12 +237,11 @@ class UpNextAdapter(
                 }
 
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                lblUpNextTime.isVisible = hasEpisodeInProgress()
-                lblUpNextTime.text = if (header.episodeCount == 0) {
-                    root.resources.getString(LR.string.player_up_next_time_left, time)
-                } else {
-                    root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
-                }
+                // Only show the Up Next time summary when there are queued episodes. When the
+                // queue is empty the no-content banner below already communicates the empty
+                // state, so don't show a "0s left" line above it.
+                lblUpNextTime.isVisible = hasEpisodeInProgress() && header.episodeCount > 0
+                lblUpNextTime.text = root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
 
                 sort.isVisible = isUpNextNotEmpty
                 shuffle.isVisible = isUpNextNotEmpty

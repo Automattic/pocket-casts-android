@@ -456,7 +456,6 @@
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
-    <string name="player_up_next_time_left" translatable="false">@string/time_left</string>
     <plurals name="player_up_next_header_title">
         <item formatted="true" quantity="one">%1$d episode - %2$s left</item>
         <item formatted="true" quantity="other">%1$d episodes - %2$s left</item>
