@@ -197,9 +197,9 @@ class EpisodeFragment : BaseFragment() {
         ): List<Int> = buildList {
             add(LR.string.details)
             if (hasChapters) add(LR.string.chapters)
-            add(LR.string.bookmarks)
             if (hasTranscript) add(LR.string.transcript)
             if (hasSummary) add(LR.string.summary)
+            add(LR.string.bookmarks)
         }
 
         fun newInstance(

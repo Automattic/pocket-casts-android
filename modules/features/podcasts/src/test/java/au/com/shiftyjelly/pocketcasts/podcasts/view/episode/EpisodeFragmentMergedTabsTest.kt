@@ -17,7 +17,7 @@ class EpisodeFragmentMergedTabsTest {
         )
 
         assertEquals(
-            listOf(LR.string.details, LR.string.chapters, LR.string.bookmarks, LR.string.transcript, LR.string.summary),
+            listOf(LR.string.details, LR.string.chapters, LR.string.transcript, LR.string.summary, LR.string.bookmarks),
             tabs,
         )
     }
@@ -121,24 +121,24 @@ class EpisodeFragmentMergedTabsTest {
     }
 
     @Test
-    fun `transcript appears after bookmarks`() {
+    fun `transcript appears before bookmarks`() {
         val tabs = EpisodeFragment.mergedTabLabelResIds(
             hasTranscript = true,
             hasSummary = false,
             hasChapters = false,
         )
 
-        assertTrue(tabs.indexOf(LR.string.transcript) > tabs.indexOf(LR.string.bookmarks))
+        assertTrue(tabs.indexOf(LR.string.transcript) < tabs.indexOf(LR.string.bookmarks))
     }
 
     @Test
-    fun `summary is always the last tab when present`() {
+    fun `bookmarks is always the last tab`() {
         val tabs = EpisodeFragment.mergedTabLabelResIds(
             hasTranscript = true,
             hasSummary = true,
             hasChapters = true,
         )
 
-        assertEquals(LR.string.summary, tabs.last())
+        assertEquals(LR.string.bookmarks, tabs.last())
     }
 }
