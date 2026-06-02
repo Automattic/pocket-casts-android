@@ -53,6 +53,7 @@ security-lint = "1.0.4"
 sentry-plugin = "6.9.0"
 tasker-plugin = "0.4.10"
 test = "1.7.0"
+tv-material = "1.1.0"
 espresso = "3.7.0"
 tracks = "6.0.8"
 wear-compose = "1.6.0-alpha05"
@@ -248,6 +249,9 @@ automattic-explat = { module = "com.automattic.tracks:experimentation", version.
 wear-input = "androidx.wear:wear-input:1.2.0"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.2.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
+
+# TV
+tv-material = { module = "androidx.tv:tv-material", version.ref = "tv-material" }
 
 # Wear Compose
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wear-compose" }

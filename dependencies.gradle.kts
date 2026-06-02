@@ -2,6 +2,7 @@ import java.util.Properties
 
 val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
+val versionCodeDifferenceBetweenAppAndTv = 150000
 
 val secretProperties = loadPropertiesFromFile(file("secret.properties"))
 val versionProperties = loadPropertiesFromFile(file("version.properties"))
@@ -27,11 +28,13 @@ fun loadPropertiesFromFile(file: File): Properties {
 // app & automotive modules and pass this information to the modules that require it.
 val isAutomotiveBuild = (project.findProperty("IS_AUTOMOTIVE_BUILD") as? String)?.toBoolean() ?: false
 val isWearBuild = (project.findProperty("IS_WEAR_BUILD") as? String)?.toBoolean() ?: false
+val isTvBuild = (project.findProperty("IS_TV_BUILD") as? String)?.toBoolean() ?: false
 val getVersionCode = {
     val appVersionCode = versionProperties.getProperty("versionCode", null).toInt()
     when {
         isAutomotiveBuild -> appVersionCode + versionCodeDifferenceBetweenAppAndAutomotive
         isWearBuild -> appVersionCode + versionCodeDifferenceBetweenAppAndWear
+        isTvBuild -> appVersionCode + versionCodeDifferenceBetweenAppAndTv
         else -> appVersionCode
     }
 }
@@ -40,6 +43,7 @@ val getVersionName = {
     when {
         isAutomotiveBuild -> "${versionName}a"
         isWearBuild -> "${versionName}w"
+        isTvBuild -> "${versionName}t"
         else -> versionName
     }
 }
@@ -47,6 +51,7 @@ val getBuildPlatform = {
     when {
         isAutomotiveBuild -> "automotive"
         isWearBuild -> "wear"
+        isTvBuild -> "tv"
         else -> "mobile"
     }
 }
@@ -64,9 +69,11 @@ project.apply {
         set("minSdkVersion", 24)
         set("minSdkVersionWear", 26)
         set("minSdkVersionAutomotive", 28)
+        set("minSdkVersionTv", 28)
         set("targetSdkVersion", 36)
         set("targetSdkVersionWear", 36)
         set("targetSdkVersionAutomotive", 35)
+        set("targetSdkVersionTv", 35)
         set("compileSdkVersion", 36)
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
@@ -103,6 +110,7 @@ project.apply {
         val sentryDsn = when {
             isAutomotiveBuild -> secretProperties.getProperty("sentryAutomotiveDsn", "").ifBlank { sentryAndroidDsn }
             isWearBuild -> secretProperties.getProperty("sentryWearDsn", "").ifBlank { sentryAndroidDsn }
+            isTvBuild -> secretProperties.getProperty("sentryTvDsn", "").ifBlank { sentryAndroidDsn }
             else -> sentryAndroidDsn
         }
         set("pocketcastsSentryDsn", sentryDsn)
@@ -117,5 +125,6 @@ project.apply {
         set("sentryAndroidProject", secretProperties.getProperty("sentryAndroidProject", ""))
         set("sentryAutomotiveProject", secretProperties.getProperty("sentryAutomotiveProject", ""))
         set("sentryWearProject", secretProperties.getProperty("sentryWearProject", ""))
+        set("sentryTvProject", secretProperties.getProperty("sentryTvProject", ""))
     }
 }

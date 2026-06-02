@@ -43,6 +43,7 @@ rootProject.name = "pocket-casts-android"
 
 include(":app")
 include(":automotive")
+include(":tv")
 include(":wear")
 
 // features
