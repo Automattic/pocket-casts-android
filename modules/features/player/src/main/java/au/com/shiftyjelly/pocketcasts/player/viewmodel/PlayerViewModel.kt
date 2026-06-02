@@ -226,11 +226,12 @@ class PlayerViewModel @Inject constructor(
             upNextEpisodes = upNextState.queue
             episodeCount = upNextState.queue.size
 
-            val countEpisodes = listOf(nowPlaying) + upNextEpisodes
-            for (countEpisode in countEpisodes) {
-                totalTime += countEpisode.duration
-                if (countEpisode.isInProgress) {
-                    totalTime -= countEpisode.playedUpTo
+            // Keep the time total scoped to the same episodes as the count: the Up Next
+            // queue only, excluding the currently-playing episode (which has its own row).
+            for (upNextEpisode in upNextEpisodes) {
+                totalTime += upNextEpisode.duration
+                if (upNextEpisode.isInProgress) {
+                    totalTime -= upNextEpisode.playedUpTo
                 }
             }
         }
