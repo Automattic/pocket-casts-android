@@ -1,0 +1,80 @@
+package au.com.shiftyjelly.pocketcasts
+
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Tab
+import androidx.tv.material3.TabRow
+import androidx.tv.material3.Text
+
+@Composable
+fun TvTabBar(
+    tabs: List<TvTab>,
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TabRow(
+        selectedTabIndex = selectedTabIndex,
+        modifier = modifier,
+    ) {
+        tabs.forEachIndexed { index, tab ->
+            Tab(
+                selected = index == selectedTabIndex,
+                onFocus = { onTabSelected(index) },
+            ) {
+                val iconRes = tab.iconRes
+                if (iconRes != null) {
+                    Icon(
+                        painter = painterResource(iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(
+                    text = stringResource(tab.labelRes),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvTabBarPreview() {
+    MaterialTheme {
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        TvTabBar(
+            tabs = TvTab.entries,
+            selectedTabIndex = selectedIndex,
+            onTabSelected = { selectedIndex = it },
+        )
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvTabBarSecondSelectedPreview() {
+    MaterialTheme {
+        TvTabBar(
+            tabs = TvTab.entries,
+            selectedTabIndex = 1,
+            onTabSelected = {},
+        )
+    }
+}
