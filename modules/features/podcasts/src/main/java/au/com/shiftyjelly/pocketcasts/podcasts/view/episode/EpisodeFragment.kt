@@ -60,9 +60,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -792,12 +791,19 @@ class EpisodeFragment : BaseFragment() {
 
                         val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
 
+                        val isSelectedTabAvailable = tabs.any { it.labelResId == selectedTab.labelResId }
+                        LaunchedEffect(isSelectedTabAvailable) {
+                            if (!isSelectedTabAvailable) {
+                                viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION)
+                            }
+                        }
+
                         AnimatedVisibility(
                             visible = tabs.size > 1,
                             enter = BannerEnterTransition,
                             exit = BannerExitTransition,
                         ) {
-                            val selectedButtonTab = tabs.firstOrNull { it.labelResId == selectedTab.labelResId } ?: tabs.first()
+                            val selectedButtonTab = tabs.findSelected(selectedTab)
                             ButtonTabs(
                                 tabs = tabs,
                                 selectedTab = selectedButtonTab,
@@ -835,7 +841,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.BOOKMARKS) {
-                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                             BookmarksPage(
                                 episodeUuid = episodeUUID,
                                 sourceView = SourceView.EPISODE_DETAILS,
@@ -863,7 +869,7 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.CHAPTERS) {
-                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                             val lazyListState = rememberLazyListState()
                             ChaptersTheme {
                                 ChaptersPage(
@@ -887,7 +893,7 @@ class EpisodeFragment : BaseFragment() {
 
                         if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
                             val transcriptUiState by transcriptViewModel.uiState.collectAsState()
-                            val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                             val scrollView = binding?.scrollableContent
                             val nestedScrollConnection = remember(scrollView) {
                                 parentScrollNestedScrollConnection(scrollView)
@@ -1096,9 +1102,7 @@ class EpisodeFragment : BaseFragment() {
 
                         if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
                             val backgroundColor = MaterialTheme.theme.colors.primaryUi01
-                            val fadeHeight = with(LocalDensity.current) {
-                                LocalWindowInfo.current.containerSize.height.toDp() * 0.125f
-                            }
+                            val fadeHeight = LocalConfiguration.current.screenHeightDp.dp * 0.125f
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -1125,7 +1129,7 @@ class EpisodeFragment : BaseFragment() {
         askTheEpisodeVisible: Boolean,
     ) {
         if (tabs.size > 1) {
-            val selectedButtonTab = tabs.firstOrNull { it.labelResId == selectedTab.labelResId } ?: tabs.first()
+            val selectedButtonTab = tabs.findSelected(selectedTab)
             ButtonTabs(
                 tabs = tabs,
                 selectedTab = selectedButtonTab,
@@ -1433,6 +1437,8 @@ private val EpisodeContentTab.labelResId: Int
         EpisodeContentTab.TRANSCRIPT -> LR.string.transcript
     }
 
+private fun List<ButtonTab>.findSelected(tab: EpisodeContentTab): ButtonTab = firstOrNull { it.labelResId == tab.labelResId } ?: first()
+
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
 
@@ -1443,6 +1449,13 @@ private fun Modifier.disableParentInterceptTouchEvent(): Modifier {
         awaitEachGesture {
             awaitFirstDown(requireUnconsumed = false)
             view.parent?.requestDisallowInterceptTouchEvent(true)
+            try {
+                do {
+                    val event = awaitPointerEvent()
+                } while (event.changes.any { it.pressed })
+            } finally {
+                view.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         }
     }
 }

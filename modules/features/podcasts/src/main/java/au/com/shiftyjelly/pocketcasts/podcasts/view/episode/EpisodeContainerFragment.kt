@@ -221,7 +221,11 @@ class EpisodeContainerFragment :
         if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
             // Bookmarks, chapters, and transcripts are rendered inline in EpisodeFragment
             // via Compose tabs, so the ViewPager only hosts the Details page.
+            // The NOTIFICATION_BOOKMARK deep-link is handled inside EpisodeFragment
+            // by selecting the BOOKMARKS content tab directly.
             tabLayout.isVisible = false
+            // Swiping is disabled because the single-page ViewPager only contains the
+            // Details section; additional sections would be unreachable anyway.
             viewPager.isUserInputEnabled = false
         } else {
             TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
