@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
@@ -7,6 +8,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,11 +64,11 @@ private fun ReferralsIconWithTooltip(
                 onIconClick = onIconClick,
                 colors = LocalColors.current.colors,
             )
-
+            val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
             if (state.showTooltip) {
                 TooltipPopup(
                     title = stringResource(LR.string.referrals_tooltip_message, state.referralPlan.offerDurationText),
-                    tipPosition = TipPosition.TopStart,
+                    tipPosition = if (isLandscape) TipPosition.TopEnd else TipPosition.TopStart,
                     anchorOffset = DpOffset(0.dp, (-4).dp),
                     onClick = onTooltipClick,
                 )

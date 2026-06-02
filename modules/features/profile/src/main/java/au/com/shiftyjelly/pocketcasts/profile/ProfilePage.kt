@@ -263,9 +263,11 @@ private fun Toolbar(
             onTooltipClick = onReferralsTooltipClick,
             onTooltipShow = onReferralsTooltipShow,
         )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
+        if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+        }
         IconButton(
             onClick = onSettingsClick,
         ) {
