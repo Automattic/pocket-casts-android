@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +28,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintConsta
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 
+// Color legend for the debug timeline bar:
+// - Green: fingerprint window matched the reference — transcript timing is trustworthy here.
+// - Red: fingerprint window passed the minimum score floor but was rejected by the drift filter
+//   (score too low for anchoring, or not enough dominance over the runner-up).
+// - Dark gray (backdrop): no fingerprint data yet, or the window scored below the floor
+//   and was silently discarded (not enough signal to classify either way).
+// - White cursor: current playback position.
 private val ColorGreen = Color(0xFF4CAF50)
 private val ColorRed = Color(0xFFF44336)
 private val ColorBackdrop = Color.DarkGray.copy(alpha = 0.5f)

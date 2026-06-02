@@ -80,7 +80,7 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var snapshotReferenceToPlayback: List<TimeMappingEntry> = emptyList()
 
-    // Debug rejections: accumulated across seek-restarts, cleared on stop or episode change.
+    // Debug rejections: accumulated across seek-restarts, cleared on stop() or episode change.
     private var debugRejections = mutableListOf<DebugRejection>()
 
     @Volatile
@@ -638,7 +638,7 @@ class FingerprintTimingManager @Inject constructor(
                 referenceTime = best.timestamp.toDouble(),
                 score = best.score,
             )
-            consider(candidate)
+            consider(candidate, isDebug)
         }
 
         publishSnapshot()
@@ -666,8 +666,10 @@ class FingerprintTimingManager @Inject constructor(
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
     }
 
-    internal fun consider(candidate: TimeMappingEntry): Int {
-        val isDebug = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
+    internal fun consider(
+        candidate: TimeMappingEntry,
+        isDebug: Boolean = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG),
+    ): Int {
         val trusted = filterLastTrusted
         if (trusted != null && isInTrend(candidate, trusted)) {
             flushPoolAsRejected(isDebug)
