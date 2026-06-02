@@ -1,6 +1,5 @@
 * @Automattic/pocket-casts-android 
 
-# Route Dependabot Ruby dependency PRs to the tooling team. See AINFRA-2437.
 /Gemfile* @Automattic/apps-infra-tooling
 /.ruby-version @Automattic/apps-infra-tooling
 /.bundle/ @Automattic/apps-infra-tooling
