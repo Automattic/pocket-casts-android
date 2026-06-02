@@ -10,7 +10,7 @@ class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TvPlaceholderScreen()
+            TvScaffold()
         }
     }
 }
