@@ -33,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.Epis
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -216,26 +218,37 @@ class EpisodeContainerFragment :
 
         viewPager.adapter = adapter
 
-        TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
-            tab.setText(adapter.pageTitle(position))
-        }.attach()
+        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            // Bookmarks, chapters, and transcripts are rendered inline in EpisodeFragment
+            // via Compose tabs, so the ViewPager only hosts the Details page.
+            // The NOTIFICATION_BOOKMARK deep-link is handled inside EpisodeFragment
+            // by selecting the BOOKMARKS content tab directly.
+            tabLayout.isVisible = false
+            // Swiping is disabled because the single-page ViewPager only contains the
+            // Details section; additional sections would be unreachable anyway.
+            viewPager.isUserInputEnabled = false
+        } else {
+            TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
+                tab.setText(adapter.pageTitle(position))
+            }.attach()
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-                viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
+            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
+                }
+
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    btnFav.isVisible = adapter.isDetailsTab(position)
+                    btnShare.isVisible = adapter.isDetailsTab(position)
+                    viewModel.onPageSelected(adapter.tabType(position))
+                }
+            })
+
+            if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
+                openBookmarks()
             }
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                btnFav.isVisible = adapter.isDetailsTab(position)
-                btnShare.isVisible = adapter.isDetailsTab(position)
-                viewModel.onPageSelected(adapter.tabType(position))
-            }
-        })
-
-        if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
-            openBookmarks()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -312,12 +325,14 @@ class EpisodeContainerFragment :
             )
         }
 
-        private var sections = listOf(
-            Section.Details,
-            Section.Bookmarks,
-        )
+        private var sections = if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+            listOf(Section.Details)
+        } else {
+            listOf(Section.Details, Section.Bookmarks)
+        }
 
         fun update(addChapters: Boolean) {
+            if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) return
             val currentSections = sections
             val newSections = buildList {
                 add(Section.Details)
