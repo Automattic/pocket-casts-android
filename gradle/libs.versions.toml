@@ -64,7 +64,7 @@ google-id = "1.2.0"
 
 [libraries]
 # JNA (required by UniFFI-generated fingerprint bindings)
-jna = { module = "net.java.dev.jna:jna", version = "5.16.0" }
+jna = { module = "net.java.dev.jna:jna", version = "5.18.1" }
 
 # About Libraries
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
