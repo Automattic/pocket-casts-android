@@ -166,9 +166,8 @@ import com.automattic.eventhorizon.EpisodeDetailShownEvent
 import com.automattic.eventhorizon.EpisodeDetailTranscriptCardShownEvent
 import com.automattic.eventhorizon.EpisodeDetailTranscriptCardTappedEvent
 import com.automattic.eventhorizon.EventHorizon
-import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
-import com.automattic.eventhorizon.TranscriptShownEvent
+import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -925,20 +924,12 @@ class EpisodeFragment : BaseFragment() {
                                         OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS),
                                     )
                                 },
-                                onShowTranscript = { loadedTranscript ->
+                                viewModel = transcriptViewModel,
+                                fingerprintTimingManager = transcriptViewModel.fingerprintTimingManager,
+                                playbackManager = transcriptViewModel.playbackManager,
+                                onHighlightText = {
                                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                                        TranscriptShownEvent(
-                                            type = loadedTranscript.type.analyticsValue,
-                                            showAsWebpage = loadedTranscript is Transcript.Web,
-                                            podcastUuid = podcastUuid,
-                                            episodeUuid = episodeUuid,
-                                            source = source,
-                                        )
-                                    }
-                                },
-                                onShowTranscriptPaywall = {
-                                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                                        TranscriptGeneratedPaywallShownEvent(
+                                        TranscriptTextHighlightedEvent(
                                             podcastUuid = podcastUuid,
                                             episodeUuid = episodeUuid,
                                             source = source,

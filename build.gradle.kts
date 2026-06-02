@@ -103,6 +103,29 @@ dependencyAnalysis {
 
 val ktlintVersion = libs.versions.ktlint.asProvider().get()
 val ktlintComposeRules = libs.ktlint.compose.rules.get().toString()
+val spotlessPreCommitFiles = providers.gradleProperty("spotlessPreCommitFiles").orNull
+    ?.let { fileList ->
+        file(fileList)
+            .readLines()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .map { rootProject.file(it) }
+            .filter { it.isFile }
+    }
+val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
+    val path = file.relativeTo(rootDir).invariantSeparatorsPath
+    path.endsWith(".kt") &&
+        (
+            path.startsWith("app/src/") ||
+                path.startsWith("automotive/src/") ||
+                path.startsWith("wear/src/") ||
+                (path.startsWith("modules/") && "/src/" in path)
+            )
+}
+val spotlessPreCommitKotlinGradleFiles = spotlessPreCommitFiles?.filter { file ->
+    val path = file.relativeTo(rootDir).invariantSeparatorsPath
+    path.endsWith(".kts") && "/" !in path
+}
 
 spotless {
     val ktLintConfigOverride = mapOf(
@@ -116,19 +139,28 @@ spotless {
     )
 
     kotlin {
-        target(
-            "app/src/**/*.kt",
-            "automotive/src/**/*.kt",
-            "modules/**/src/**/*.kt",
-            "wear/src/**/*.kt",
-        )
+        if (spotlessPreCommitKotlinFiles != null) {
+            target(spotlessPreCommitKotlinFiles)
+        } else {
+            target(
+                "app/src/**/*.kt",
+                "automotive/src/**/*.kt",
+                "modules/**/src/**/*.kt",
+                "wear/src/**/*.kt",
+            )
+        }
+        targetExclude("**/uniffi/**/*.kt")
         ktlint(ktlintVersion)
             .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
             .customRuleSets(listOf(ktlintComposeRules))
     }
 
     kotlinGradle {
-        target("*.kts")
+        if (spotlessPreCommitKotlinGradleFiles != null) {
+            target(spotlessPreCommitKotlinGradleFiles)
+        } else {
+            target("*.kts")
+        }
         ktlint(ktlintVersion).editorConfigOverride(ktLintConfigOverride)
     }
 }

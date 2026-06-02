@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -76,6 +79,7 @@ internal fun AddBlogPage(
     onFindFeeds: (url: String) -> Unit,
     onRetry: (url: String) -> Unit,
     onFeedClick: (webFeed: WebFeed) -> Unit,
+    onGoToPodcast: (podcastUuid: String) -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -95,6 +99,7 @@ internal fun AddBlogPage(
             onFindFeeds = onFindFeeds,
             onRetry = onRetry,
             onFeedClick = onFeedClick,
+            onGoToPodcast = onGoToPodcast,
             onEditUrl = onEditUrl,
         )
     }
@@ -108,6 +113,7 @@ private fun AddBlogContent(
     onFindFeeds: (url: String) -> Unit,
     onRetry: (url: String) -> Unit,
     onFeedClick: (WebFeed) -> Unit,
+    onGoToPodcast: (String) -> Unit,
     onEditUrl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -136,7 +142,7 @@ private fun AddBlogContent(
                     { LoadingDot() }
                 }
 
-                is UiState.Pick -> {
+                is UiState.Pick, is UiState.Found -> {
                     { DoneDot() }
                 }
 
@@ -151,8 +157,18 @@ private fun AddBlogContent(
 
         when (state) {
             is UiState.Start -> FormContent(onContinueClick = { onFindFeeds(url) })
+
             is UiState.Loading -> LoadingContent()
+
             is UiState.Pick -> PickContent(feeds = state.feeds, onFeedClick = onFeedClick)
+
+            is UiState.Found -> FoundContent(
+                webFeed = state.webFeed,
+                podcastUuid = state.podcastUuid,
+                episodeCount = state.episodeCount,
+                onGoToPodcastClick = { onGoToPodcast(state.podcastUuid) },
+            )
+
             is UiState.Error -> ErrorContent(reason = state.reason, onRetry = { onRetry(url) })
         }
     }
@@ -334,6 +350,146 @@ private fun FeedChoiceRow(
 }
 
 @Composable
+private fun FoundContent(
+    webFeed: WebFeed,
+    podcastUuid: String,
+    episodeCount: Int,
+    onGoToPodcastClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.theme.colors
+
+    Column(modifier = modifier) {
+        TextP60(
+            text = stringResource(LR.string.blogs_found_feed_detected),
+            color = colors.support02,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp),
+        )
+
+        Spacer(Modifier.height(22.dp))
+
+        FoundFeedCard(
+            webFeed = webFeed,
+            podcastUuid = podcastUuid,
+            episodeCount = episodeCount,
+        )
+
+        Spacer(Modifier.height(18.dp))
+
+        RowButton(
+            text = stringResource(LR.string.blogs_found_go_to_podcast),
+            onClick = onGoToPodcastClick,
+            includePadding = false,
+            textColor = colors.primaryInteractive02,
+            colors = ButtonDefaults.buttonColors(backgroundColor = colors.primaryInteractive01),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun FoundFeedCard(
+    webFeed: WebFeed,
+    podcastUuid: String,
+    episodeCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.theme.colors
+    val greenColor = colors.support02
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .border(1.5.dp, greenColor, RoundedCornerShape(14.dp))
+            .background(greenColor.copy(alpha = 0.08f))
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(greenColor, CircleShape),
+            ) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_check_black_24dp),
+                    contentDescription = null,
+                    tint = colors.primaryUi01,
+                    modifier = Modifier.size(10.dp),
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(LR.string.blogs_found_followed_badge),
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                color = greenColor,
+                letterSpacing = 1.1.sp,
+            )
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            PodcastImage(
+                uuid = podcastUuid,
+                imageSize = 56.dp,
+                cornerSize = 8.dp,
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                TextP50(
+                    text = webFeed.title,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.primaryText01,
+                    lineHeight = 18.sp,
+                    maxLines = 1,
+                )
+                Spacer(Modifier.height(2.dp))
+                TextP60(
+                    text = webFeed.displayHref,
+                    color = colors.primaryText02,
+                    maxLines = 1,
+                )
+            }
+        }
+
+        if (episodeCount == 0) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(greenColor.copy(alpha = 0.2f)),
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = colors.primaryInteractive01,
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    TextP40(
+                        text = stringResource(LR.string.blogs_found_headline),
+                        fontWeight = FontWeight.Bold,
+                        color = colors.primaryText01,
+                    )
+                }
+                TextP40(
+                    text = stringResource(LR.string.blogs_found_description),
+                    color = colors.primaryText02,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ErrorContent(
     reason: AddBlogViewModel.ErrorReason,
     onRetry: () -> Unit,
@@ -433,6 +589,12 @@ private fun DoneDot() {
     }
 }
 
+private val previewWebFeed = WebFeed(
+    title = "pocketcasts.com",
+    href = "https://pocketcasts.com/feed/",
+    type = "application/rss+xml",
+)
+
 @Preview
 @Composable
 private fun AddBlogPageStartPreview(
@@ -446,6 +608,7 @@ private fun AddBlogPageStartPreview(
             onFindFeeds = { _ -> },
             onRetry = { _ -> },
             onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -465,6 +628,7 @@ private fun AddBlogPageLoadingPreview(
             onFindFeeds = { _ -> },
             onRetry = { _ -> },
             onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -489,6 +653,55 @@ private fun AddBlogPagePickPreview(
             onFindFeeds = { _ -> },
             onRetry = { _ -> },
             onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
+            onEditUrl = {},
+            onUrlChange = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AddBlogPageFoundEpisodesPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        AddBlogPage(
+            state = UiState.Found(
+                webFeed = previewWebFeed,
+                podcastUuid = "00000000-0000-0000-0000-000000000000",
+                episodeCount = 1,
+            ),
+            url = "https://pocketcasts.com",
+            onBackPress = {},
+            onFindFeeds = { _ -> },
+            onRetry = { _ -> },
+            onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
+            onEditUrl = {},
+            onUrlChange = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AddBlogPageFoundNoEpisodesPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        AddBlogPage(
+            state = UiState.Found(
+                webFeed = previewWebFeed,
+                podcastUuid = "00000000-0000-0000-0000-000000000000",
+                episodeCount = 0,
+            ),
+            url = "https://pocketcasts.com",
+            onBackPress = {},
+            onFindFeeds = { _ -> },
+            onRetry = { _ -> },
+            onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
         )
@@ -508,6 +721,7 @@ private fun AddBlogPageErrorPreview(
             onFindFeeds = { _ -> },
             onRetry = { _ -> },
             onFeedClick = { _ -> },
+            onGoToPodcast = { _ -> },
             onEditUrl = {},
             onUrlChange = {},
         )

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,10 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
-import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.ProvideTextSelectionToolbar
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
@@ -63,26 +62,30 @@ internal fun TranscriptLines(
     searchState: SearchState,
     modifier: Modifier = Modifier,
     isContentObscured: Boolean = false,
+    highlightState: HighlightState = HighlightState(),
+    onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    onHighlightText: (() -> Unit)? = null,
 ) {
+    val customMenuItems = remember {
+        buildList {
+            // Only show the share option on older versions of Android, as the new versions
+            // have a share feature built into the copy
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                add(CustomMenuItemOption.Share)
+            }
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .then(if (isContentObscured) Modifier.obsureContent() else Modifier),
     ) {
-        CompositionLocalProvider(
-            LocalTextToolbar provides CustomTextToolbar(
-                view = LocalView.current,
-                customMenuItems = buildList {
-                    // Only show the share option on older versions of Android, as the new versions
-                    // have a share feature built into the copy
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                        add(CustomMenuItemOption.Share)
-                    }
-                },
-                clipboard = LocalClipboard.current,
-            ),
+        ProvideTextSelectionToolbar(
+            customMenuItems = customMenuItems,
+            onHighlightText = onHighlightText,
         ) {
             SelectionContainer {
                 FadedLazyColumn(
@@ -103,15 +106,23 @@ internal fun TranscriptLines(
                             Spacer(Modifier.height(8.dp))
                         }
                     }
-                    itemsIndexed(transcript.entries) { index, entry ->
+                    itemsIndexed(transcript.entries, key = { index, _ -> index }) { index, entry ->
                         TranscriptLine(
                             entryIndex = index,
                             entry = entry,
                             searchState = searchState,
+                            highlightState = highlightState,
                             theme = theme,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(entry.padding()),
+                                .padding(entry.padding())
+                                .then(
+                                    if (onEntryClick != null && entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
+                                        Modifier.clickable { onEntryClick(entry, index) }
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                         )
                     }
                     item {
@@ -156,10 +167,14 @@ private fun TranscriptLine(
     entryIndex: Int,
     entry: TranscriptEntry,
     searchState: SearchState,
+    highlightState: HighlightState,
     theme: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
     val entryText = entry.text()
+    val isEntryHighlighted = entryIndex == highlightState.entryIndex
+    val wordTimings = (entry as? TranscriptEntry.Text)?.words.orEmpty()
+
     val searchHighlights = remember(entryIndex, entryText, searchState) {
         val searchTermLength = searchState.searchTerm.length
         searchState
@@ -170,9 +185,22 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
+    val textColor = if (isEntryHighlighted && wordTimings.isEmpty()) theme.highlightText else theme.primaryText
+
     Text(
         text = buildAnnotatedString {
             append(entryText)
+            if (isEntryHighlighted && wordTimings.isNotEmpty() && highlightState.wordIndex != null) {
+                val wordIdx = highlightState.wordIndex.coerceAtMost(wordTimings.lastIndex)
+                val word = wordTimings[wordIdx]
+                if (word.charOffsetStart >= 0 && word.charOffsetEnd <= entryText.length) {
+                    addStyle(
+                        SpanStyle(color = theme.highlightText),
+                        word.charOffsetStart,
+                        word.charOffsetEnd,
+                    )
+                }
+            }
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
                 val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {
@@ -184,7 +212,7 @@ private fun TranscriptLine(
             }
         },
         style = entry.textStyle(),
-        color = theme.primaryText,
+        color = textColor,
         modifier = modifier,
     )
 }
