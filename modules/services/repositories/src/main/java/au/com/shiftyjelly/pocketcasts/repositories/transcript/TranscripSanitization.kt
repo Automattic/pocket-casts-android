@@ -8,6 +8,7 @@ internal fun List<TranscriptEntry>.sanitize() = map(TranscriptEntry::compactWhit
     .removeRepeatedSpeakers()
     .map(TranscriptEntry::trim)
     .filter(TranscriptEntry::isNotEmpty)
+    .map { if (it is TranscriptEntry.Text) it.recalculateWordOffsets() else it }
 
 private fun TranscriptEntry.compactWhiteSpace() = when (this) {
     is TranscriptEntry.Speaker -> {
@@ -29,17 +30,30 @@ private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 
 private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     val phraseAccumulator = StringBuilder()
+    val wordTimings = mutableListOf<TranscriptEntry.WordTiming>()
     val entries = mutableListOf<TranscriptEntry>()
     var accumulatedStartTimeMs = -1L
     var accumulatedEndTimeMs = -1L
 
     fun appendToAccumulator(text: String, startTimeMs: Long, endTimeMs: Long) {
-        phraseAccumulator.append(' ').append(text.trimStart())
+        val trimmedText = text.trimStart()
+        phraseAccumulator.append(' ').append(trimmedText)
         if (accumulatedStartTimeMs == -1L || (startTimeMs in 0..<accumulatedStartTimeMs)) {
             accumulatedStartTimeMs = startTimeMs
         }
         if (endTimeMs > accumulatedEndTimeMs) {
             accumulatedEndTimeMs = endTimeMs
+        }
+        if (trimmedText.isNotEmpty()) {
+            wordTimings.add(
+                TranscriptEntry.WordTiming(
+                    text = trimmedText,
+                    startTimeMs = startTimeMs,
+                    endTimeMs = endTimeMs,
+                    charOffsetStart = 0,
+                    charOffsetEnd = 0,
+                ),
+            )
         }
     }
 
@@ -51,7 +65,14 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
         val resultEndTimeMs = accumulatedEndTimeMs
         accumulatedStartTimeMs = -1L
         accumulatedEndTimeMs = -1L
-        return TranscriptEntry.Text(sentences, startTimeMs = resultStartTimeMs, endTimeMs = resultEndTimeMs)
+        val resultWords = if (wordTimings.size > 1) wordTimings.toList() else emptyList()
+        wordTimings.clear()
+        return TranscriptEntry.Text(
+            sentences,
+            startTimeMs = resultStartTimeMs,
+            endTimeMs = resultEndTimeMs,
+            words = resultWords,
+        )
     }
 
     fun buildMidSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry? {
@@ -92,6 +113,7 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
             phraseAccumulator.toString(),
             startTimeMs = accumulatedStartTimeMs,
             endTimeMs = accumulatedEndTimeMs,
+            words = if (wordTimings.size > 1) wordTimings.toList() else emptyList(),
         )
     }
     return entries
@@ -193,4 +215,19 @@ private val MidSentencePunctuation = listOf(
 private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
     val quotationMarks = listOf("\"", "”", "'", "’")
     quotationMarks.map { quotationMark -> "$punctuation$quotationMark" }
+}
+
+private fun TranscriptEntry.Text.recalculateWordOffsets(): TranscriptEntry.Text {
+    if (words.isEmpty()) return this
+    var searchFrom = 0
+    val updated = words.mapNotNull { word ->
+        val start = value.indexOf(word.text, searchFrom)
+        if (start >= 0) {
+            searchFrom = start + word.text.length
+            word.copy(charOffsetStart = start, charOffsetEnd = start + word.text.length)
+        } else {
+            null
+        }
+    }
+    return copy(words = updated)
 }

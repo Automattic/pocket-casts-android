@@ -191,7 +191,7 @@ class TranscriptSanitizationTest {
                 buildTranscript {
                     text("Text 1 Text 2 Text 3")
                 },
-                output,
+                output.withoutWords(),
             )
         }
 
@@ -209,8 +209,41 @@ class TranscriptSanitizationTest {
                 buildTranscript {
                     text("Text 1 Text 2 Text 3", startTimeMs = 1000, endTimeMs = 4000)
                 },
-                output,
+                output.withoutWords(),
             )
+        }
+
+        @Test
+        fun `join split texts preserves word timings`() {
+            val input = buildTranscript {
+                text("Text 1", startTimeMs = 1000, endTimeMs = 2000)
+                text("Text 2", startTimeMs = 2000, endTimeMs = 3000)
+                text("Text 3", startTimeMs = 3000, endTimeMs = 4000)
+            }
+
+            val output = input.sanitize()
+
+            val entry = output.single() as TranscriptEntry.Text
+            assertEquals(
+                listOf(
+                    TranscriptEntry.WordTiming("Text 1", 1000, 2000, 0, 6),
+                    TranscriptEntry.WordTiming("Text 2", 2000, 3000, 7, 13),
+                    TranscriptEntry.WordTiming("Text 3", 3000, 4000, 14, 20),
+                ),
+                entry.words,
+            )
+        }
+
+        @Test
+        fun `single fragment sentence has no word timings`() {
+            val input = buildTranscript {
+                text("Complete sentence.", startTimeMs = 0, endTimeMs = 1000)
+            }
+
+            val output = input.sanitize()
+
+            val entry = output.single() as TranscriptEntry.Text
+            assertEquals(emptyList<TranscriptEntry.WordTiming>(), entry.words)
         }
 
         @Test
@@ -227,7 +260,26 @@ class TranscriptSanitizationTest {
                     text("Period.", startTimeMs = 0, endTimeMs = 1000)
                     text("Unfinished sentence.", startTimeMs = 0, endTimeMs = 2000)
                 },
-                output,
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `mid-sentence split preserves word timings`() {
+            val input = buildTranscript {
+                text("Period. Unfinished", startTimeMs = 0, endTimeMs = 1000)
+                text("sentence.", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            val secondEntry = output[1] as TranscriptEntry.Text
+            assertEquals(
+                listOf(
+                    TranscriptEntry.WordTiming("Unfinished", 0, 1000, 0, 10),
+                    TranscriptEntry.WordTiming("sentence.", 1000, 2000, 11, 20),
+                ),
+                secondEntry.words,
             )
         }
 
@@ -266,7 +318,7 @@ class TranscriptSanitizationTest {
                     text("Unfinished sentence.")
                     text("And now next, unfinished sentence.")
                 },
-                output,
+                output.withoutWords(),
             )
         }
     }
@@ -291,7 +343,7 @@ class TranscriptSanitizationTest {
                     text("Some text end$pattern")
                     text("more text")
                 },
-                output,
+                output.withoutWords(),
             )
         }
 
@@ -335,7 +387,7 @@ class TranscriptSanitizationTest {
                     text("Some text$pattern")
                     text("and now more text")
                 },
-                output,
+                output.withoutWords(),
             )
         }
 
@@ -385,7 +437,7 @@ class TranscriptSanitizationTest {
                 buildTranscript {
                     text("Some text$pattern and now more text")
                 },
-                output,
+                output.withoutWords(),
             )
         }
 
@@ -405,6 +457,10 @@ class TranscriptSanitizationTest {
             )
         }
     }
+}
+
+private fun List<TranscriptEntry>.withoutWords() = map { entry ->
+    if (entry is TranscriptEntry.Text) entry.copy(words = emptyList()) else entry
 }
 
 private fun buildTranscript(block: TranscriptBuilder.() -> Unit): List<TranscriptEntry> {

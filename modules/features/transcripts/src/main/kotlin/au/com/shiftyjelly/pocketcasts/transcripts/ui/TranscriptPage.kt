@@ -65,7 +65,7 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
-    var highlightIndex by remember { mutableStateOf<Int?>(null) }
+    var highlightState by remember { mutableStateOf(HighlightState()) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
     val playbackState by remember(playbackManager) {
@@ -110,7 +110,7 @@ fun TranscriptPage(
                 listState = listState,
                 theme = theme,
                 onClickReload = onClickReload,
-                highlightIndex = highlightIndex,
+                highlightState = highlightState,
                 onEntryClick = tapToSeekHandler,
                 onHighlightText = onHighlightText,
                 modifier = Modifier
@@ -138,11 +138,11 @@ fun TranscriptPage(
         uiState = uiState,
         fingerprintTimingManager = fingerprintTimingManager,
         playbackManager = playbackManager,
-        onHighlightChange = { highlightIndex = it },
+        onHighlightChange = { highlightState = it },
     )
 
     AutoScrollEffect(
-        highlightIndex = highlightIndex,
+        highlightIndex = highlightState.entryIndex,
         listState = listState,
         isSearching = isSearching,
         isPlaying = isPlaying,
@@ -168,7 +168,7 @@ private fun TranscriptContent(
     onClickReload: () -> Unit,
     onHighlightText: (() -> Unit)?,
     modifier: Modifier = Modifier,
-    highlightIndex: Int? = null,
+    highlightState: HighlightState = HighlightState(),
     onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
 ) {
     when (val transcriptState = uiState.transcriptState) {
@@ -185,7 +185,7 @@ private fun TranscriptContent(
                     transcript = transcript,
                     isContentObscured = uiState.isPaywallVisible,
                     searchState = uiState.searchState,
-                    highlightIndex = highlightIndex,
+                    highlightState = highlightState,
                     onEntryClick = onEntryClick,
                     state = listState,
                     theme = theme,
@@ -241,7 +241,7 @@ private fun HighlightEffect(
     uiState: UiState,
     fingerprintTimingManager: FingerprintTimingManager?,
     playbackManager: PlaybackManager?,
-    onHighlightChange: (Int?) -> Unit,
+    onHighlightChange: (HighlightState) -> Unit,
 ) {
     if (fingerprintTimingManager == null || playbackManager == null) return
 
@@ -265,13 +265,19 @@ private fun HighlightEffect(
                     val idx = TranscriptCueHelper.findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
                     if (idx != null) {
                         cachedIndex = idx
-                        latestOnHighlightChanged(idx)
+                        val entry = transcript.entries[idx]
+                        val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
+                            TranscriptCueHelper.findWordIndex(entry, currentRefTimeMs)
+                        } else {
+                            null
+                        }
+                        latestOnHighlightChanged(HighlightState(entryIndex = idx, wordIndex = wordIdx))
                     }
                 }
             }
         }
     } else if (!isSyncedActive) {
-        LaunchedEffect(Unit) { latestOnHighlightChanged(null) }
+        LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
     }
 }
 
@@ -341,5 +347,10 @@ private fun KeepScreenOnEffect(keepOn: Boolean) {
         }
     }
 }
+
+internal data class HighlightState(
+    val entryIndex: Int? = null,
+    val wordIndex: Int? = null,
+)
 
 private const val AUTO_SCROLL_BACK_DELAY_MS = 5000L
