@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Icon
@@ -56,13 +57,19 @@ fun TvTabBar(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
-            .clip(RoundedCornerShape(percent = 50))
-            .padding(2.dp),
+            .clip(RoundedCornerShape(percent = 50)),
         containerColor = TvColors.Dark,
         indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
             tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
+                val inset = 2.dp
+                val insetPosition = DpRect(
+                    left = currentTabPosition.left + inset,
+                    top = currentTabPosition.top + inset,
+                    right = currentTabPosition.right - inset,
+                    bottom = currentTabPosition.bottom - inset,
+                )
                 TabRowDefaults.PillIndicator(
-                    currentTabPosition = currentTabPosition,
+                    currentTabPosition = insetPosition,
                     doesTabRowHaveFocus = doesTabRowHaveFocus,
                     activeColor = Color.White,
                     inactiveColor = Color.White.copy(alpha = 0.12f),
