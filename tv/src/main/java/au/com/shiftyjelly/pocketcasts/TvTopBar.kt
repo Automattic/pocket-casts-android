@@ -45,7 +45,7 @@ fun TvTopBar(
         Image(
             painter = painterResource(IR.drawable.ic_pocket_casts_logo),
             contentDescription = stringResource(LR.string.app_name),
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(40.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
         TvTabBar(
@@ -59,12 +59,13 @@ fun TvTopBar(
             colors = IconButtonDefaults.colors(
                 containerColor = Color(0xFF3C3E42),
             ),
-            modifier = Modifier.size(27.dp),
+            modifier = Modifier.size(40.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_profile),
                 contentDescription = stringResource(LR.string.profile),
                 tint = Color.White,
+                modifier = Modifier.padding(8.dp),
             )
         }
     }
