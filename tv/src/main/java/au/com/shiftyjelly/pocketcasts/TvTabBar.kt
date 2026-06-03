@@ -57,7 +57,7 @@ fun TvTabBar(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
             .clip(RoundedCornerShape(percent = 50))
-            .padding(1.dp),
+            .padding(2.dp),
         containerColor = TvColors.Dark,
         indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
             tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
@@ -122,9 +122,17 @@ fun TvTabBar(
                                     modifier = Modifier.size(13.dp),
                                 )
                                 Spacer(modifier = Modifier.width(5.dp))
-                                TextH40(
+                                Text(
                                     text = stringResource(tab.labelRes),
                                     color = LocalContentColor.current,
+                                    style = TextStyle(
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight(510),
+                                        lineHeight = 21.sp,
+                                        letterSpacing = 0.sp,
+                                        textAlign = TextAlign.Center,
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                    ),
                                 )
                             }
                         }
