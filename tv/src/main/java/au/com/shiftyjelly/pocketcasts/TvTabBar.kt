@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -41,6 +44,9 @@ fun TvTabBar(
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
@@ -62,7 +68,10 @@ fun TvTabBar(
             Tab(
                 selected = index == selectedTabIndex,
                 onFocus = { onTabSelect(index) },
-                modifier = Modifier.height(66.dp).padding(horizontal = 32.dp),
+                modifier = Modifier
+                    .height(66.dp)
+                    .padding(horizontal = 32.dp)
+                    .then(if (index == 0) Modifier.focusRequester(focusRequester) else Modifier),
                 colors = TabDefaults.pillIndicatorTabColors(
                     contentColor = Color.White,
                     selectedContentColor = TvColors.Dark,
