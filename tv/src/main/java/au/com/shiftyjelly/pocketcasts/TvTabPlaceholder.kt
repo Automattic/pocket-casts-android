@@ -24,7 +24,7 @@ fun TvTabPlaceholder(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = stringResource(tab.labelRes),
+            text = stringResource(tab.contentDescriptionRes),
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )

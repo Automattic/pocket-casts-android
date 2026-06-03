@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,20 +45,34 @@ fun TvTabBar(
                     inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
             ) {
-                val iconRes = tab.iconRes
-                if (iconRes != null) {
-                    Icon(
-                        painter = painterResource(iconRes),
-                        contentDescription = stringResource(tab.labelRes),
-                        modifier = Modifier
-                            .size(20.dp)
-                            .padding(horizontal = 4.dp),
-                    )
-                } else {
-                    Text(
-                        text = stringResource(tab.labelRes),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
+                when (tab) {
+                    is TvTab.TextTab -> {
+                        Text(
+                            text = stringResource(tab.labelRes),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
+                    is TvTab.IconTab -> {
+                        Icon(
+                            painter = painterResource(tab.iconRes),
+                            contentDescription = stringResource(tab.contentDescriptionRes),
+                            modifier = Modifier
+                                .size(20.dp)
+                                .padding(horizontal = 4.dp),
+                        )
+                    }
+                    is TvTab.TextWithIconTab -> {
+                        Icon(
+                            painter = painterResource(tab.iconRes),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(tab.labelRes),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
                 }
             }
         }
