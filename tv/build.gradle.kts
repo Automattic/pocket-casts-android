@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.tv.material)
 
+    implementation(projects.modules.features.shared)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
