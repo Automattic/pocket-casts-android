@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,6 +38,7 @@ fun TvTabBar(
             Tab(
                 selected = index == selectedTabIndex,
                 onFocus = { onTabSelect(index) },
+                modifier = Modifier.height(66.dp),
                 colors = TabDefaults.pillIndicatorTabColors(
                     contentColor = MaterialTheme.colorScheme.onSurface,
                     selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
