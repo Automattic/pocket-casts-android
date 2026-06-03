@@ -35,6 +35,6 @@ fun TvTabPlaceholder(
 @Composable
 private fun TvTabPlaceholderPreview() {
     MaterialTheme {
-        TvTabPlaceholder(tab = TvTab.Podcasts)
+        TvTabPlaceholder(tab = TvTab.Home)
     }
 }

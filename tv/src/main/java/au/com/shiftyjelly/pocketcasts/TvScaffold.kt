@@ -18,14 +18,14 @@ import androidx.tv.material3.MaterialTheme
 
 @Composable
 fun TvScaffold(
-    viewModel: TvScaffoldViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: TvScaffoldViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     TvScaffoldContent(
         tabs = uiState.tabs,
         selectedTabIndex = uiState.selectedTabIndex,
-        onTabSelected = viewModel::selectTab,
+        onTabSelect = viewModel::selectTab,
         modifier = modifier,
     )
 }
@@ -34,7 +34,7 @@ fun TvScaffold(
 private fun TvScaffoldContent(
     tabs: List<TvTab>,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit,
+    onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MaterialTheme {
@@ -46,7 +46,7 @@ private fun TvScaffoldContent(
             TvTopBar(
                 tabs = tabs,
                 selectedTabIndex = selectedTabIndex,
-                onTabSelected = onTabSelected,
+                onTabSelect = onTabSelect,
                 onProfileClick = {},
             )
             Box(modifier = Modifier.weight(1f)) {
@@ -64,6 +64,6 @@ private fun TvScaffoldPreview() {
     TvScaffoldContent(
         tabs = TvTab.entries,
         selectedTabIndex = selectedIndex,
-        onTabSelected = { selectedIndex = it },
+        onTabSelect = { selectedIndex = it },
     )
 }

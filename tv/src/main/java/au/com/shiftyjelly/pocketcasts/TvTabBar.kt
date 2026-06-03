@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts
 
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -17,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Tab
+import androidx.tv.material3.TabDefaults
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.Text
 
@@ -24,7 +24,7 @@ import androidx.tv.material3.Text
 fun TvTabBar(
     tabs: List<TvTab>,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit,
+    onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TabRow(
@@ -34,21 +34,30 @@ fun TvTabBar(
         tabs.forEachIndexed { index, tab ->
             Tab(
                 selected = index == selectedTabIndex,
-                onFocus = { onTabSelected(index) },
+                onFocus = { onTabSelect(index) },
+                colors = TabDefaults.pillIndicatorTabColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    focusedContentColor = MaterialTheme.colorScheme.onSurface,
+                    focusedSelectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
             ) {
                 val iconRes = tab.iconRes
                 if (iconRes != null) {
                     Icon(
                         painter = painterResource(iconRes),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
+                        contentDescription = stringResource(tab.labelRes),
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(horizontal = 4.dp),
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                } else {
+                    Text(
+                        text = stringResource(tab.labelRes),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
                 }
-                Text(
-                    text = stringResource(tab.labelRes),
-                    style = MaterialTheme.typography.labelLarge,
-                )
             }
         }
     }
@@ -58,23 +67,35 @@ fun TvTabBar(
 @Composable
 private fun TvTabBarPreview() {
     MaterialTheme {
-        var selectedIndex by remember { mutableIntStateOf(0) }
+        var selectedIndex by remember { mutableIntStateOf(1) }
         TvTabBar(
             tabs = TvTab.entries,
             selectedTabIndex = selectedIndex,
-            onTabSelected = { selectedIndex = it },
+            onTabSelect = { selectedIndex = it },
         )
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvTabBarSecondSelectedPreview() {
+private fun TvTabBarFirstSelectedPreview() {
     MaterialTheme {
         TvTabBar(
             tabs = TvTab.entries,
-            selectedTabIndex = 1,
-            onTabSelected = {},
+            selectedTabIndex = 0,
+            onTabSelect = {},
+        )
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvTabBarSearchSelectedPreview() {
+    MaterialTheme {
+        TvTabBar(
+            tabs = TvTab.entries,
+            selectedTabIndex = 4,
+            onTabSelect = {},
         )
     }
 }
