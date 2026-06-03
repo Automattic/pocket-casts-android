@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.focus.FocusRequester
@@ -82,42 +87,48 @@ fun TvTabBar(
                     inactiveContentColor = Color.White.copy(alpha = 0.6f),
                 ),
             ) {
-                when (tab) {
-                    is TvTab.TextTab -> {
-                        Text(
-                            text = stringResource(tab.labelRes),
-                            color = LocalContentColor.current,
-                            style = TextStyle(
-                                fontSize = 25.sp,
-                                fontWeight = FontWeight(510),
-                                lineHeight = 32.sp,
-                                letterSpacing = 0.sp,
-                                textAlign = TextAlign.Center,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            ),
-                        )
-                    }
+                Box(
+                    modifier = Modifier.fillMaxHeight(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (tab) {
+                        is TvTab.TextTab -> {
+                            Text(
+                                text = stringResource(tab.labelRes),
+                                color = LocalContentColor.current,
+                                style = TextStyle(
+                                    fontSize = 25.sp,
+                                    fontWeight = FontWeight(510),
+                                    lineHeight = 32.sp,
+                                    letterSpacing = 0.sp,
+                                    textAlign = TextAlign.Center,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                ),
+                            )
+                        }
 
-                    is TvTab.IconTab -> {
-                        Icon(
-                            painter = painterResource(tab.iconRes),
-                            contentDescription = stringResource(tab.contentDescriptionRes),
-                            modifier = Modifier
-                                .size(36.dp),
-                        )
-                    }
+                        is TvTab.IconTab -> {
+                            Icon(
+                                painter = painterResource(tab.iconRes),
+                                contentDescription = stringResource(tab.contentDescriptionRes),
+                                modifier = Modifier.size(36.dp),
+                            )
+                        }
 
-                    is TvTab.TextWithIconTab -> {
-                        Icon(
-                            painter = painterResource(tab.iconRes),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        TextH40(
-                            text = stringResource(tab.labelRes),
-                            color = LocalContentColor.current,
-                        )
+                        is TvTab.TextWithIconTab -> {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    painter = painterResource(tab.iconRes),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                TextH40(
+                                    text = stringResource(tab.labelRes),
+                                    color = LocalContentColor.current,
+                                )
+                            }
+                        }
                     }
                 }
             }
