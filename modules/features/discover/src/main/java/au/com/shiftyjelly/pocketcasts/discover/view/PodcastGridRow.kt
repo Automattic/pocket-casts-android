@@ -102,8 +102,7 @@ class PodcastGridRow @JvmOverloads constructor(
     }
 
     fun clear() {
-        lblTitle.text = null
-        lblTitle.contentDescription = null
+        lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         lblSubtitle.text = null
         imagePodcast.setImageBitmap(null)
         isVisible = false
