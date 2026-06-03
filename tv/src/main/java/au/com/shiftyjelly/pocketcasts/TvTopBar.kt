@@ -57,14 +57,14 @@ fun TvTopBar(
         IconButton(
             onClick = onProfileClick,
             colors = IconButtonDefaults.colors(
-                containerColor = Color.Transparent,
+                containerColor = Color(0xFF3C3E42),
             ),
             modifier = Modifier.size(27.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_profile),
                 contentDescription = stringResource(LR.string.profile),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = Color.White,
             )
         }
     }
