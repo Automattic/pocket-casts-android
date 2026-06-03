@@ -146,7 +146,7 @@ private fun WhatsNewPageLoaded(
                 TextP40(
                     text = stringResource(state.feature.message),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
+                    color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.padding(horizontal = 32.dp).padding(bottom = 8.dp),
                 )
 
