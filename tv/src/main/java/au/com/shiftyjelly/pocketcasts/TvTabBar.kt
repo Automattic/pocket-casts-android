@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -40,7 +40,7 @@ fun TvTabBar(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
-            .background(TvColors.Dark, RoundedCornerShape(percent = 50))
+            .clip(RoundedCornerShape(percent = 50))
             .padding(1.dp),
         containerColor = TvColors.Dark,
         indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
