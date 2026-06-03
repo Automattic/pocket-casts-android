@@ -135,9 +135,33 @@ class SimplePlayer(
         if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            player?.seekTo(positionMs.toLong())
-            super.onSeekComplete(positionMs)
+            val currentPlayer = player ?: return
+            val state = currentPlayer.playbackState
+            // attempting to fix this crash: https://linear.app/a8c/issue/PCDROID-591/attempt-to-fix-classcastexception-crash-of-exoplayer
+            if (state == Player.STATE_READY || state == Player.STATE_BUFFERING) {
+                seekPlayer(currentPlayer, positionMs)
+            } else {
+                currentPlayer.addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
+                            currentPlayer.removeListener(this)
+                            seekPlayer(currentPlayer, positionMs)
+                        } else if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
+                            currentPlayer.removeListener(this)
+                        }
+                    }
+                })
+            }
         }
+    }
+
+    private fun seekPlayer(player: ExoPlayer, positionMs: Int) {
+        try {
+            player.seekTo(positionMs.toLong())
+        } catch (e: ClassCastException) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Seek to %.3f failed due to Media3 timeline race", positionMs / 1000f)
+        }
+        super.onSeekComplete(positionMs)
     }
 
     override fun handleIsBuffering(): Boolean {
