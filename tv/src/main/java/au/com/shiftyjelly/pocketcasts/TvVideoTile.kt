@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,7 +40,7 @@ fun TvVideoTile(
     ) {
         Box(
             modifier = Modifier
-                .width(477.dp)
+                .width(323.dp)
                 .aspectRatio(16f / 9f),
         ) {
             AsyncImage(
@@ -52,13 +53,15 @@ fun TvVideoTile(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.75f)
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
                         ),
                     )
-                    .padding(16.dp),
+                    .padding(14.dp),
+                contentAlignment = Alignment.BottomStart,
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),

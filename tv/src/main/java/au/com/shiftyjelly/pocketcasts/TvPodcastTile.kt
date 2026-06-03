@@ -30,7 +30,7 @@ fun TvPodcastTile(
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .width(181.dp)
+                .width(123.dp)
                 .aspectRatio(1f),
         )
     }

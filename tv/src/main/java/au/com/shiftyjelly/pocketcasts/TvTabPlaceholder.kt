@@ -31,10 +31,12 @@ fun TvTabPlaceholder(
             TvRow(
                 title = "Made for TV",
                 items = (1..3).toList(),
+                itemSpacing = 32.dp,
             ) { index ->
                 TvFeaturedTile(
                     artworkUrl = "https://picsum.photos/seed/featured$index/500/500",
                     isSponsored = true,
+                    sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
                     title = "Superhuman",
                     description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries",
                     onGoToPodcast = {},
@@ -47,6 +49,7 @@ fun TvTabPlaceholder(
             TvRow(
                 title = "Trending Videos",
                 items = (1..6).toList(),
+                itemSpacing = 32.dp,
             ) { index ->
                 TvVideoTile(
                     thumbnailUrl = "https://picsum.photos/seed/video$index/716/403",

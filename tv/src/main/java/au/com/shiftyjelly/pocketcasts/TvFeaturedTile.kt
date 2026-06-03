@@ -7,11 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.PlatformTextStyle
@@ -40,83 +47,127 @@ fun TvFeaturedTile(
     onGoToPodcast: () -> Unit,
     onPlayLastEpisode: () -> Unit,
     modifier: Modifier = Modifier,
+    sponsoredLabel: String? = null,
 ) {
     TvTile(
         onClick = onPlayLastEpisode,
         scale = CardDefaults.scale(focusedScale = 1.05f),
+        colors = CardDefaults.colors(
+            containerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+        ),
         modifier = modifier,
     ) {
-        Row(
-            modifier = Modifier.height(333.dp),
+        Box(
+            modifier = Modifier
+                .width(642.dp)
+                .height(200.dp),
         ) {
+
             AsyncImage(
                 model = artworkUrl,
-                contentDescription = title,
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(333.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(40.dp),
             )
 
-            Column(
+
+            Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .padding(24.dp),
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colorStops = arrayOf(
+                                0f to Color.Transparent,
+                                0.2f to TvColors.Dark.copy(alpha = 0.7f),
+                                0.45f to TvColors.Dark,
+                                1f to TvColors.Dark,
+                            ),
+                        ),
+                    ),
+            )
+
+
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (isSponsored) {
+                AsyncImage(
+                    model = artworkUrl,
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(168.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .padding(horizontal = 14.dp, vertical = 17.dp),
+                ) {
+                    if (isSponsored) {
+                        Text(
+                            text = sponsoredLabel ?: "Sponsored",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            ),
+                            color = Color.White.copy(alpha = 0.7f),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
                     Text(
-                        text = "Sponsored",
+                        text = title,
                         style = TextStyle(
-                            fontSize = 14.sp,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                        ),
+                        color = Color.White,
+                    )
+
+                    Spacer(modifier = Modifier.height(7.dp))
+
+                    Text(
+                        text = description,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 20.sp,
                             platformStyle = PlatformTextStyle(includeFontPadding = false),
                         ),
                         color = Color.White.copy(alpha = 0.7f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
 
-                Text(
-                    text = title,
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                    ),
-                    color = Color.White,
-                )
+                    Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = description,
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                    ),
-                    color = Color.White.copy(alpha = 0.7f),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    OutlinedButton(
-                        onClick = onPlayLastEpisode,
-                        colors = OutlinedButtonDefaults.colors(
-                            contentColor = Color.White,
-                        ),
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Text("Play latest episode")
-                    }
-                    OutlinedButton(
-                        onClick = onGoToPodcast,
-                        colors = OutlinedButtonDefaults.colors(
-                            contentColor = Color.White,
-                        ),
-                    ) {
-                        Text("Go to podcast")
+                        OutlinedButton(
+                            onClick = onPlayLastEpisode,
+                            colors = OutlinedButtonDefaults.colors(
+                                contentColor = Color.White,
+                            ),
+                        ) {
+                            Text("Play latest episode")
+                        }
+                        OutlinedButton(
+                            onClick = onGoToPodcast,
+                            colors = OutlinedButtonDefaults.colors(
+                                contentColor = Color.White,
+                            ),
+                        ) {
+                            Text("Go to podcast")
+                        }
                     }
                 }
             }
@@ -133,6 +184,7 @@ private fun TvFeaturedTilePreview() {
                 TvFeaturedTile(
                     artworkUrl = "",
                     isSponsored = true,
+                    sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
                     title = "Superhuman",
                     description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries that dives into the launch of what many have called the \"Doping Olympics\"",
                     onGoToPodcast = {},
