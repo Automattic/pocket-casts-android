@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardBorder
 import androidx.tv.material3.CardColors
@@ -36,7 +37,11 @@ fun TvTile(
         containerColor = TvColors.DarkGray,
         focusedContainerColor = TvColors.Gray,
     ),
-    border: CardBorder = CardDefaults.border(),
+    border: CardBorder = CardDefaults.border(
+        border = Border.None,
+        focusedBorder = Border.None,
+        pressedBorder = Border.None,
+    ),
     glow: CardGlow = CardDefaults.glow(),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
