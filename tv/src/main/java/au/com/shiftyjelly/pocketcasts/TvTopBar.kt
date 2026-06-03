@@ -57,7 +57,7 @@ fun TvTopBar(
         IconButton(
             onClick = onProfileClick,
             colors = IconButtonDefaults.colors(
-                containerColor = Color(0xFF3C3E42),
+                containerColor = TvColors.Gray,
                 contentColor = Color.White,
                 focusedContainerColor = Color.White,
                 focusedContentColor = TvColors.Dark,
