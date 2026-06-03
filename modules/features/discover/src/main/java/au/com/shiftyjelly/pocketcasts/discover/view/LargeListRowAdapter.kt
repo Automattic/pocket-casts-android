@@ -92,8 +92,7 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.isVisible = true
         } else {
             holder.imageView.setImageResource(holder.placeholderDrawable)
-            holder.lblTitle.text = ""
-            holder.lblTitle.contentDescription = null
+            holder.lblTitle.setPodcastTitleWithExplicitBadge("", null)
             holder.lblSubtitle.text = ""
             holder.itemView.isClickable = false
             holder.btnSubscribe.isClickable = false

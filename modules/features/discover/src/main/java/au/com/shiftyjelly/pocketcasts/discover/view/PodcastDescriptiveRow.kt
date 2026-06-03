@@ -72,8 +72,7 @@ class PodcastDescriptiveRow @JvmOverloads constructor(
         }
 
     fun clear() {
-        lblTitle.text = null
-        lblTitle.contentDescription = null
+        lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         lblSubtitle.text = null
         lblDescription.text = null
         imageView.setImageBitmap(null)

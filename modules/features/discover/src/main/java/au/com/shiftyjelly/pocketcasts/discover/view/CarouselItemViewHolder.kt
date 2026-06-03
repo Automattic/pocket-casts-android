@@ -38,8 +38,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
     private fun reset() {
         setBackingGradient(0)
         imageView.setImageDrawable(null)
-        lblTitle.text = null
-        lblTitle.contentDescription = null
+        lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         lblSubtitle.text = null
         lblTagline.text = null
     }

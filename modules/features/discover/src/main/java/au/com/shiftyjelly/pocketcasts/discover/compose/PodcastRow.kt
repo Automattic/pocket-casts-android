@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.ExplicitIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
@@ -39,8 +37,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -48,6 +44,7 @@ internal fun PodcastRow(
     podcast: DiscoverPodcast,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
+    showExplicitIndicator: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
 ) {
     Box(
@@ -69,6 +66,7 @@ internal fun PodcastRow(
 
             Labels(
                 podcast = podcast,
+                showExplicitIndicator = showExplicitIndicator,
                 modifier = Modifier.weight(1f),
             )
 
@@ -105,6 +103,7 @@ internal fun PodcastRowPlaceholder(
 @Composable
 private fun Labels(
     podcast: DiscoverPodcast,
+    showExplicitIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -113,9 +112,6 @@ private fun Labels(
     ) {
         val title = podcast.title
         if (title != null) {
-            val showExplicitIndicator by FeatureFlag
-                .isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR)
-                .collectAsStateWithLifecycle()
             PodcastTitle(
                 title = title,
                 isExplicit = podcast.explicit == true && showExplicitIndicator,
