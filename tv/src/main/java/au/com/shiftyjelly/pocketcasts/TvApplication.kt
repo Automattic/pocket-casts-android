@@ -10,7 +10,7 @@ class TvApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree())
         }
     }
 }
