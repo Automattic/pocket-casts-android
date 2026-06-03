@@ -18,12 +18,15 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Tab
 import androidx.tv.material3.TabDefaults
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
-import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun TvTabBar(
@@ -51,7 +54,7 @@ fun TvTabBar(
             Tab(
                 selected = index == selectedTabIndex,
                 onFocus = { onTabSelect(index) },
-                modifier = Modifier.height(24.dp),
+                modifier = Modifier.height(66.dp).padding(horizontal = 32.dp),
                 colors = TabDefaults.pillIndicatorTabColors(
                     contentColor = Color.White,
                     selectedContentColor = TvColors.Dark,
@@ -62,9 +65,9 @@ fun TvTabBar(
             ) {
                 when (tab) {
                     is TvTab.TextTab -> {
-                        Text(
+                        TextH40(
                             text = stringResource(tab.labelRes),
-                            style = MaterialTheme.typography.titleSmall,
+                            color = LocalContentColor.current,
                         )
                     }
 
@@ -85,9 +88,9 @@ fun TvTabBar(
                             modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
+                        TextH40(
                             text = stringResource(tab.labelRes),
-                            style = MaterialTheme.typography.titleSmall,
+                            color = LocalContentColor.current,
                         )
                     }
                 }
@@ -99,36 +102,42 @@ fun TvTabBar(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTabBarPreview() {
-    MaterialTheme {
-        var selectedIndex by remember { mutableIntStateOf(1) }
-        TvTabBar(
-            tabs = TvTab.entries,
-            selectedTabIndex = selectedIndex,
-            onTabSelect = { selectedIndex = it },
-        )
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            var selectedIndex by remember { mutableIntStateOf(1) }
+            TvTabBar(
+                tabs = TvTab.entries,
+                selectedTabIndex = selectedIndex,
+                onTabSelect = { selectedIndex = it },
+            )
+        }
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTabBarFirstSelectedPreview() {
-    MaterialTheme {
-        TvTabBar(
-            tabs = TvTab.entries,
-            selectedTabIndex = 0,
-            onTabSelect = {},
-        )
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            TvTabBar(
+                tabs = TvTab.entries,
+                selectedTabIndex = 0,
+                onTabSelect = {},
+            )
+        }
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTabBarSearchSelectedPreview() {
-    MaterialTheme {
-        TvTabBar(
-            tabs = TvTab.entries,
-            selectedTabIndex = 4,
-            onTabSelect = {},
-        )
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            TvTabBar(
+                tabs = TvTab.entries,
+                selectedTabIndex = 4,
+                onTabSelect = {},
+            )
+        }
     }
 }

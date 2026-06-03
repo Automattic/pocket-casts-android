@@ -63,8 +63,10 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.tv.material)
 
+    implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.ui)
     implementation(projects.modules.services.utils)
 
     debugImplementation(libs.compose.ui.tooling)

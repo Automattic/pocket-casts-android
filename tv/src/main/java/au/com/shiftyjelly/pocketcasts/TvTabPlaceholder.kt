@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun TvTabPlaceholder(
@@ -20,10 +23,9 @@ fun TvTabPlaceholder(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        TextH10(
             text = stringResource(tab.contentDescriptionRes),
-            style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = Color.White,
         )
     }
 }
@@ -31,7 +33,9 @@ fun TvTabPlaceholder(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTabPlaceholderPreview() {
-    MaterialTheme {
-        TvTabPlaceholder(tab = TvTab.Home)
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            TvTabPlaceholder(tab = TvTab.Home)
+        }
     }
 }

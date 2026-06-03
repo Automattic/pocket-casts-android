@@ -23,6 +23,8 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -71,13 +73,15 @@ fun TvTopBar(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTopBarPreview() {
-    MaterialTheme {
-        var selectedIndex by remember { mutableIntStateOf(1) }
-        TvTopBar(
-            tabs = TvTab.entries,
-            selectedTabIndex = selectedIndex,
-            onTabSelect = { selectedIndex = it },
-            onProfileClick = {},
-        )
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            var selectedIndex by remember { mutableIntStateOf(1) }
+            TvTopBar(
+                tabs = TvTab.entries,
+                selectedTabIndex = selectedIndex,
+                onTabSelect = { selectedIndex = it },
+                onProfileClick = {},
+            )
+        }
     }
 }

@@ -16,6 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun TvScaffold(
@@ -38,28 +40,30 @@ private fun TvScaffoldContent(
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    MaterialTheme {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            TvColors.DarkGray,
-                            TvColors.Dark,
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                TvColors.DarkGray,
+                                TvColors.Dark,
+                            ),
                         ),
                     ),
-                ),
-        ) {
-            TvTopBar(
-                tabs = tabs,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelect = onTabSelect,
-                onProfileClick = {},
-            )
-            Box(modifier = Modifier.weight(1f)) {
-                val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
-                TvTabPlaceholder(tab = currentTab)
+            ) {
+                TvTopBar(
+                    tabs = tabs,
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelect = onTabSelect,
+                    onProfileClick = {},
+                )
+                Box(modifier = Modifier.weight(1f)) {
+                    val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+                    TvTabPlaceholder(tab = currentTab)
+                }
             }
         }
     }
