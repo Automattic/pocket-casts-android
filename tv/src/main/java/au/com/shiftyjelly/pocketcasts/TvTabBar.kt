@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -21,6 +22,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Tab
 import androidx.tv.material3.TabDefaults
 import androidx.tv.material3.TabRow
+import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 
 @Composable
@@ -33,18 +35,29 @@ fun TvTabBar(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        containerColor = TvColors.Dark,
+        indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
+            tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
+                TabRowDefaults.PillIndicator(
+                    currentTabPosition = currentTabPosition,
+                    doesTabRowHaveFocus = doesTabRowHaveFocus,
+                    activeColor = Color.White,
+                    inactiveColor = Color.White.copy(alpha = 0.12f),
+                )
+            }
+        },
     ) {
         tabs.forEachIndexed { index, tab ->
             Tab(
                 selected = index == selectedTabIndex,
                 onFocus = { onTabSelect(index) },
-                modifier = Modifier.height(66.dp),
+                modifier = Modifier.height(24.dp),
                 colors = TabDefaults.pillIndicatorTabColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                    focusedContentColor = MaterialTheme.colorScheme.onSurface,
-                    focusedSelectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    contentColor = Color.White,
+                    selectedContentColor = TvColors.Dark,
+                    focusedContentColor = Color.White,
+                    focusedSelectedContentColor = TvColors.Dark,
+                    inactiveContentColor = Color.White.copy(alpha = 0.6f),
                 ),
             ) {
                 when (tab) {
@@ -54,6 +67,7 @@ fun TvTabBar(
                             style = MaterialTheme.typography.titleSmall,
                         )
                     }
+
                     is TvTab.IconTab -> {
                         Icon(
                             painter = painterResource(tab.iconRes),
@@ -63,6 +77,7 @@ fun TvTabBar(
                                 .padding(horizontal = 4.dp),
                         )
                     }
+
                     is TvTab.TextWithIconTab -> {
                         Icon(
                             painter = painterResource(tab.iconRes),

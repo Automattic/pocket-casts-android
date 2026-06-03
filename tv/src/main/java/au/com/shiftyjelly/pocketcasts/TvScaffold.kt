@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -41,7 +42,14 @@ private fun TvScaffoldContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface),
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            TvColors.DarkGray,
+                            TvColors.Dark,
+                        ),
+                    ),
+                ),
         ) {
             TvTopBar(
                 tabs = tabs,
