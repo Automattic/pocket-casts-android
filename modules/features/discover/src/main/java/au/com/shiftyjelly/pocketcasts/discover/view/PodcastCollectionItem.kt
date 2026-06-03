@@ -54,8 +54,7 @@ class PodcastCollectionItem @JvmOverloads constructor(
     fun clear() {
         val binding = binding ?: return
 
-        binding.lblTitle.text = null
-        binding.lblTitle.contentDescription = null
+        binding.lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         binding.lblSubtitle.text = null
         binding.imageView.setImageResource(binding.imageView.context.getThemeDrawable(UR.attr.defaultArtworkSmall))
     }
