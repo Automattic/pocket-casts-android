@@ -23,7 +23,7 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
 
     init {
         _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.Shuffle,
+            feature = WhatsNewFeature.SyncedTranscripts,
         )
     }
 
@@ -52,9 +52,9 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
         val hasOffer: Boolean
         val isUserEntitled: Boolean
 
-        data object Shuffle : WhatsNewFeature {
-            override val title = LR.string.shuffle_whats_new_title
-            override val message = LR.string.shuffle_whats_new_message
+        data object SyncedTranscripts : WhatsNewFeature {
+            override val title = LR.string.synced_transcripts_whats_new_title
+            override val message = LR.string.synced_transcripts_whats_new_message
             override val confirmButtonTitle = LR.string.got_it
             override val hasOffer = false
             override val isUserEntitled = true
