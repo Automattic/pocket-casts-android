@@ -76,8 +76,8 @@ fun TvTabBar(
                 selected = index == selectedTabIndex,
                 onFocus = { onTabSelect(index) },
                 modifier = Modifier
-                    .height(66.dp)
-                    .padding(horizontal = 32.dp)
+                    .height(33.dp)
+                    .padding(horizontal = 16.dp)
                     .then(if (index == 0) Modifier.focusRequester(focusRequester) else Modifier),
                 colors = TabDefaults.pillIndicatorTabColors(
                     contentColor = Color.White,
@@ -97,9 +97,9 @@ fun TvTabBar(
                                 text = stringResource(tab.labelRes),
                                 color = LocalContentColor.current,
                                 style = TextStyle(
-                                    fontSize = 25.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight(510),
-                                    lineHeight = 32.sp,
+                                    lineHeight = 16.sp,
                                     letterSpacing = 0.sp,
                                     textAlign = TextAlign.Center,
                                     platformStyle = PlatformTextStyle(includeFontPadding = false),
@@ -111,7 +111,7 @@ fun TvTabBar(
                             Icon(
                                 painter = painterResource(tab.iconRes),
                                 contentDescription = stringResource(tab.contentDescriptionRes),
-                                modifier = Modifier.size(36.dp),
+                                modifier = Modifier.size(18.dp),
                             )
                         }
 
@@ -120,9 +120,9 @@ fun TvTabBar(
                                 Icon(
                                     painter = painterResource(tab.iconRes),
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(10.dp),
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
                                 TextH40(
                                     text = stringResource(tab.labelRes),
                                     color = LocalContentColor.current,

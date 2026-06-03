@@ -39,13 +39,13 @@ fun TvTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 48.dp, vertical = 24.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(IR.drawable.ic_launcher_foreground),
             contentDescription = stringResource(LR.string.app_name),
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
         TvTabBar(
@@ -59,7 +59,7 @@ fun TvTopBar(
             colors = IconButtonDefaults.colors(
                 containerColor = Color.Transparent,
             ),
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(20.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_profile),
