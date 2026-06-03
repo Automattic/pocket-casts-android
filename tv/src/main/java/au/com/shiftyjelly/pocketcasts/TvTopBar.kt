@@ -58,13 +58,15 @@ fun TvTopBar(
             onClick = onProfileClick,
             colors = IconButtonDefaults.colors(
                 containerColor = Color(0xFF3C3E42),
+                contentColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedContentColor = TvColors.Dark,
             ),
             modifier = Modifier.size(40.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_profile),
                 contentDescription = stringResource(LR.string.profile),
-                tint = Color.White,
                 modifier = Modifier.padding(8.dp),
             )
         }
