@@ -56,8 +56,7 @@ fun TvTabBar(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
-            .clip(RoundedCornerShape(percent = 50))
-            .padding(2.dp),
+            .clip(RoundedCornerShape(percent = 50)),
         containerColor = TvColors.Dark,
         indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
             tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
