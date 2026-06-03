@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,6 +60,7 @@ fun TvTabBar(
     ) {
         TabRow(
             selectedTabIndex = selectedTabIndex,
+            modifier = Modifier.focusRestorer(),
             containerColor = Color.Transparent,
             indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
                 tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
@@ -66,7 +68,7 @@ fun TvTabBar(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
                         activeColor = Color.White,
-                        inactiveColor = Color.White.copy(alpha = 0.12f),
+                        inactiveColor = Color.White,
                     )
                 }
             },
@@ -84,7 +86,7 @@ fun TvTabBar(
                         selectedContentColor = TvColors.Dark,
                         focusedContentColor = Color.White,
                         focusedSelectedContentColor = TvColors.Dark,
-                        inactiveContentColor = Color.White.copy(alpha = 0.6f),
+                        inactiveContentColor = Color.White,
                     ),
                 ) {
                     Box(
