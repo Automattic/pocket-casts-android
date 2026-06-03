@@ -70,6 +70,11 @@ dependencies {
     implementation(projects.modules.services.ui)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
+    testImplementation(projects.modules.services.sharedtest)
+
     debugImplementation(libs.compose.ui.tooling)
 
     debugProdImplementation(libs.compose.ui.tooling)
