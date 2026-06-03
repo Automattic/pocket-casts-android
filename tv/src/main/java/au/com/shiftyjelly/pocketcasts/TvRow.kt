@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -71,18 +73,24 @@ fun <T> TvRow(
                 .padding(bottom = 17.dp),
         )
 
+        val firstItemFocusRequester = remember { FocusRequester() }
+
         LazyRow(
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             modifier = Modifier
                 .focusGroup()
-                .focusRestorer(),
+                .focusRestorer(firstItemFocusRequester),
         ) {
-            items(
+            itemsIndexed(
                 items = items,
-                key = key,
-            ) { item ->
-                content(item)
+                key = key?.let { k -> { _, item: T -> k(item) } },
+            ) { index, item ->
+                Box(
+                    modifier = if (index == 0) Modifier.focusRequester(firstItemFocusRequester) else Modifier,
+                ) {
+                    content(item)
+                }
             }
         }
     }
