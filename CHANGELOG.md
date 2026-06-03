@@ -1,8 +1,11 @@
 8.14
 -----
 *   New Features
-    *   Add the explicit badge to the Discover section
-        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+*   Bug Fixes
+    *   Fix Profile settings gear being unreachable in landscape
+        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
 
 8.13
 -----

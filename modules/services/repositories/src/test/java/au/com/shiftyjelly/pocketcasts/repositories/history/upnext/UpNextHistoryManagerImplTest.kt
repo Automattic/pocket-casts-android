@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
 import java.time.Duration
 import java.time.Instant
 import java.util.Date
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +11,6 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 
-@ExperimentalCoroutinesApi
 class UpNextHistoryManagerImplTest {
     private lateinit var upNextHistoryDao: UpNextHistoryDao
     private lateinit var upNextHistoryManager: UpNextHistoryManagerImpl

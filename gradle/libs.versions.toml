@@ -22,8 +22,8 @@ billing = "9.0.0"
 coil = "3.4.0"
 compose = "2026.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.2.1"
-dependency-analysis = "3.13.0"
-firebase = "34.13.0"
+dependency-analysis = "3.14.1"
+firebase = "34.14.0"
 fragment = "1.8.9"
 glance = "1.1.1"
 google-services = "4.4.4"
@@ -33,7 +33,7 @@ horologist = "0.8.3-alpha"
 java = "17"
 kotlin = "2.3.21"
 kotlin-coroutines = "1.11.0"
-ksp = "2.3.7"
+ksp = "2.3.9"
 ktlint = "1.8.0"
 ktlint-compose-rules = "0.5.9"
 lifecycle = "2.10.0"
@@ -50,7 +50,7 @@ protobuf-plugin = "0.10.0"
 retrofit = "3.0.0"
 room = "2.8.4"
 security-lint = "1.0.4"
-sentry-plugin = "6.8.1"
+sentry-plugin = "6.9.0"
 tasker-plugin = "0.4.10"
 test = "1.7.0"
 espresso = "3.7.0"
@@ -63,6 +63,9 @@ credentials = "1.6.0"
 google-id = "1.2.0"
 
 [libraries]
+# JNA (required by UniFFI-generated fingerprint bindings)
+jna = { module = "net.java.dev.jna:jna", version = "5.18.1" }
+
 # About Libraries
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
@@ -294,7 +297,7 @@ leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 material = "com.google.android.material:material:1.14.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
-play-auth = "com.google.android.gms:play-services-auth:21.5.1"
+play-auth = "com.google.android.gms:play-services-auth:21.6.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:22.3.1"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:20.0.1"
