@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -53,11 +53,14 @@ fun TvTabBar(
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
+    Box(
+        modifier = modifier
+            .background(TvColors.Dark, RoundedCornerShape(percent = 50))
+            .padding(3.dp),
+    ) {
     TabRow(
         selectedTabIndex = selectedTabIndex,
-        modifier = modifier
-            .clip(RoundedCornerShape(percent = 50)),
-        containerColor = TvColors.Dark,
+        containerColor = Color.Transparent,
         indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
             tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
                 TabRowDefaults.PillIndicator(
@@ -140,9 +143,10 @@ fun TvTabBar(
             }
         }
     }
+    }
 }
 
-@Preview(device = Devices.TV_1080p)
+@Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvTabBarPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
@@ -157,7 +161,7 @@ private fun TvTabBarPreview() {
     }
 }
 
-@Preview(device = Devices.TV_1080p)
+@Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvTabBarFirstSelectedPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
@@ -171,7 +175,7 @@ private fun TvTabBarFirstSelectedPreview() {
     }
 }
 
-@Preview(device = Devices.TV_1080p)
+@Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvTabBarSearchSelectedPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
