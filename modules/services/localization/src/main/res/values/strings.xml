@@ -2814,4 +2814,12 @@
     <string name="sponsored">Sponsored</string>
     <string name="play_latest_episode">Play latest episode</string>
     <string name="play_this_episode">Play this episode</string>
+
+    <!-- TV Onboarding -->
+    <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
+    <string name="tv_onboarding_continue_without_account">Continue without account</string>
+    <string name="tv_onboarding_sign_in_title">Sign in to Pocket Casts</string>
+    <string name="tv_onboarding_sign_in_instructions">Scan the QR code or visit the URL below and enter the code</string>
+    <string name="tv_onboarding_signed_in">I\'ve signed in</string>
+    <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
 </resources>

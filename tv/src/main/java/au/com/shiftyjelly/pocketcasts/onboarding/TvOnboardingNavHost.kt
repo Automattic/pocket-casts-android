@@ -18,6 +18,13 @@ fun TvOnboardingNavHost() {
                 navController = navController,
                 startDestination = TvOnboardingRoutes.HOME,
             ) {
+                composable(TvOnboardingRoutes.LANDING) {
+                    TvLandingScreen(
+                        onSignIn = {},
+                        onCreateAccount = {},
+                        onContinueWithoutAccount = {},
+                    )
+                }
                 composable(TvOnboardingRoutes.HOME) {
                     TvScaffold()
                 }
