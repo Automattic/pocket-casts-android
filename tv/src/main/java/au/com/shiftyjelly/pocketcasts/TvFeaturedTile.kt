@@ -1,5 +1,10 @@
 package au.com.shiftyjelly.pocketcasts
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,20 +154,26 @@ fun TvFeaturedTile(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    AnimatedVisibility(
+                        visible = buttonState.isFocused,
+                        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+                        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) {
-                        OutlinedButton(
-                            onClick = {},
-                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Text("Play latest episode")
-                        }
-                        OutlinedButton(
-                            onClick = {},
-                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
-                        ) {
-                            Text("Go to podcast")
+                            OutlinedButton(
+                                onClick = {},
+                                colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
+                            ) {
+                                Text(stringResource(LR.string.play_latest_episode))
+                            }
+                            OutlinedButton(
+                                onClick = {},
+                                colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
+                            ) {
+                                Text(stringResource(LR.string.go_to_podcast))
+                            }
                         }
                     }
                 }
