@@ -41,17 +41,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Disable startup initializers not needed for TV -->
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            tools:node="merge">
-            <meta-data
-                android:name="au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsStartupInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-        </provider>
-
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -64,6 +65,8 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
+
+    implementation(platform(libs.firebase.bom))
 
     implementation(projects.modules.features.shared)
     implementation(projects.modules.services.compose)
