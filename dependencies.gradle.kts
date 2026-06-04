@@ -2,7 +2,7 @@ import java.util.Properties
 
 val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
-val versionCodeDifferenceBetweenAppAndTv = 150000
+val versionCodeDifferenceBetweenAppAndTv = 50000 + versionCodeDifferenceBetweenAppAndWear
 
 val secretProperties = loadPropertiesFromFile(file("secret.properties"))
 val versionProperties = loadPropertiesFromFile(file("version.properties"))
