@@ -53,6 +53,9 @@ fun TvTabPlaceholder(
             ) { index ->
                 TvVideoTile(
                     thumbnailUrl = "https://picsum.photos/seed/video$index/716/403",
+                    podcastArtworkUrl = "https://picsum.photos/seed/podcast$index/100/100",
+                    podcastTitle = "Huberman Lab",
+                    episodeTitle = "How to overcome Social Anxiety",
                     onPlayEpisode = {},
                     onGoToPodcast = {},
                 )
