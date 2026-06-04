@@ -20,9 +20,14 @@ fun TvOnboardingNavHost() {
             ) {
                 composable(TvOnboardingRoutes.LANDING) {
                     TvLandingScreen(
-                        onSignIn = {},
-                        onCreateAccount = {},
+                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onContinueWithoutAccount = {},
+                    )
+                }
+                composable(TvOnboardingRoutes.SIGN_IN) {
+                    TvSignInScreen(
+                        onSignInComplete = {},
                     )
                 }
                 composable(TvOnboardingRoutes.HOME) {
