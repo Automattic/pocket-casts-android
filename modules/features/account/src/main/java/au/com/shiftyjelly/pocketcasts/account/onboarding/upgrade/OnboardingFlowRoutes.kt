@@ -351,6 +351,7 @@ object OnboardingFlowRoutes {
                 OnboardingUpgradeSource.EPISODE_CHAT,
                 OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.FINISHED_ONBOARDING,
+                OnboardingUpgradeSource.SYNCED_TRANSCRIPTS,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

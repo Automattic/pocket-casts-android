@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -14,7 +16,9 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
-class WhatsNewViewModel @Inject constructor() : ViewModel() {
+class WhatsNewViewModel @Inject constructor(
+    private val settings: Settings,
+) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
 
@@ -22,14 +26,24 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.SyncedTranscripts,
-        )
+        viewModelScope.launch {
+            settings.cachedSubscription.flow.collect { subscription ->
+                _state.value = UiState.Loaded(
+                    feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = subscription != null),
+                )
+            }
+        }
     }
 
     fun onConfirm() {
         viewModelScope.launch {
-            _navigationState.emit(NavigationState.ForceClose)
+            val feature = (state.value as? UiState.Loaded)?.feature ?: return@launch
+            val target = if (feature.isUserEntitled) {
+                NavigationState.ForceClose
+            } else {
+                NavigationState.StartUpsellFlow(source = OnboardingUpgradeSource.SYNCED_TRANSCRIPTS)
+            }
+            _navigationState.emit(target)
         }
     }
 
@@ -49,15 +63,20 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
         @get:StringRes val confirmButtonTitle: Int
 
         @get:StringRes val closeButtonTitle: Int? get() = null
-        val hasOffer: Boolean
-        val isUserEntitled: Boolean
 
-        data object SyncedTranscripts : WhatsNewFeature {
+        @get:StringRes val confirmButtonNote: Int? get() = null
+        val isUserEntitled: Boolean
+        val subscriptionTier: SubscriptionTier? get() = null
+
+        data class SyncedTranscripts(
+            override val isUserEntitled: Boolean,
+        ) : WhatsNewFeature {
             override val title = LR.string.synced_transcripts_whats_new_title
             override val message = LR.string.synced_transcripts_whats_new_message
-            override val confirmButtonTitle = LR.string.got_it
-            override val hasOffer = false
-            override val isUserEntitled = true
+            override val confirmButtonTitle
+                get() = if (isUserEntitled) LR.string.got_it else LR.string.profile_start_free_trial
+            override val confirmButtonNote = LR.string.synced_transcripts_whats_new_button_note
+            override val subscriptionTier get() = SubscriptionTier.Plus
         }
     }
 
