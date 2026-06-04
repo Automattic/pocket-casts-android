@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class TvOnboardingViewModelTest {
@@ -22,5 +23,12 @@ class TvOnboardingViewModelTest {
         whenever(settings.hasCompletedOnboarding()).thenReturn(true)
         val viewModel = TvOnboardingViewModel(settings)
         assertEquals(TvOnboardingRoutes.HOME, viewModel.startDestination)
+    }
+
+    @Test
+    fun `complete onboarding persists to settings`() {
+        val viewModel = TvOnboardingViewModel(settings)
+        viewModel.completeOnboarding()
+        verify(settings).setHasDoneInitialOnboarding()
     }
 }

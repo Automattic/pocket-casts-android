@@ -26,6 +26,7 @@ fun TvOnboardingNavHost(
                         onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onContinueWithoutAccount = {
+                            viewModel.completeOnboarding()
                             navController.navigate(TvOnboardingRoutes.HOME) {
                                 popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
                             }
@@ -44,6 +45,7 @@ fun TvOnboardingNavHost(
                 composable(TvOnboardingRoutes.SYNCING) {
                     TvSyncingScreen(
                         onSyncComplete = {
+                            viewModel.completeOnboarding()
                             navController.navigate(TvOnboardingRoutes.HOME) {
                                 popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
                             }

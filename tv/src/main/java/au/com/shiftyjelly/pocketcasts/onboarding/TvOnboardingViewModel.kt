@@ -7,11 +7,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TvOnboardingViewModel @Inject constructor(
-    settings: Settings,
+    private val settings: Settings,
 ) : ViewModel() {
     val startDestination: String = if (settings.hasCompletedOnboarding()) {
         TvOnboardingRoutes.HOME
     } else {
         TvOnboardingRoutes.LANDING
+    }
+
+    fun completeOnboarding() {
+        settings.setHasDoneInitialOnboarding()
     }
 }
