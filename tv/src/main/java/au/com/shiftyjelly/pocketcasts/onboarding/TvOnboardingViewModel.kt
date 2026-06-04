@@ -1,17 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.onboarding
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class TvOnboardingViewModel @Inject constructor(
-    settings: Settings,
-) : ViewModel() {
-    val startDestination: String = if (settings.hasCompletedOnboarding()) {
-        TvOnboardingRoutes.HOME
-    } else {
-        TvOnboardingRoutes.LANDING
-    }
+class TvOnboardingViewModel @Inject constructor() : ViewModel() {
+    // TODO: Read Settings.hasCompletedOnboarding() once Firebase is configured for TV.
+    //  Currently Settings pulls in FirebaseRemoteConfig which isn't initialized in the TV app.
+    val startDestination: String = TvOnboardingRoutes.LANDING
 }
