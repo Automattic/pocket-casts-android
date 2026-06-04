@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -49,6 +50,9 @@ fun TvFeaturedTile(
     modifier: Modifier = Modifier,
     sponsoredLabel: String? = null,
 ) {
+    val buttonState = rememberTvTileButtonState(buttonCount = 2)
+    val buttonActions = remember(onPlayLastEpisode, onGoToPodcast) { listOf(onPlayLastEpisode, onGoToPodcast) }
+
     TvTile(
         onClick = onPlayLastEpisode,
         scale = CardDefaults.scale(focusedScale = 1.05f),
@@ -56,14 +60,13 @@ fun TvFeaturedTile(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
         ),
-        modifier = modifier,
+        modifier = modifier.tvTileButtonNavigation(buttonState, buttonActions),
     ) {
         Box(
             modifier = Modifier
                 .width(642.dp)
                 .height(200.dp),
         ) {
-
             AsyncImage(
                 model = artworkUrl,
                 contentDescription = null,
@@ -72,7 +75,6 @@ fun TvFeaturedTile(
                     .fillMaxSize()
                     .blur(40.dp),
             )
-
 
             Box(
                 modifier = Modifier
@@ -88,7 +90,6 @@ fun TvFeaturedTile(
                         ),
                     ),
             )
-
 
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -153,17 +154,23 @@ fun TvFeaturedTile(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         OutlinedButton(
-                            onClick = onPlayLastEpisode,
+                            onClick = {},
                             colors = OutlinedButtonDefaults.colors(
-                                contentColor = Color.White,
+                                containerColor = if (buttonState.isButtonSelected(0)) Color.White else Color.Transparent,
+                                contentColor = if (buttonState.isButtonSelected(0)) Color.Black else Color.White,
+                                focusedContainerColor = Color.Transparent,
+                                focusedContentColor = Color.White,
                             ),
                         ) {
                             Text("Play latest episode")
                         }
                         OutlinedButton(
-                            onClick = onGoToPodcast,
+                            onClick = {},
                             colors = OutlinedButtonDefaults.colors(
-                                contentColor = Color.White,
+                                containerColor = if (buttonState.isButtonSelected(1)) Color.White else Color.Transparent,
+                                contentColor = if (buttonState.isButtonSelected(1)) Color.Black else Color.White,
+                                focusedContainerColor = Color.Transparent,
+                                focusedContentColor = Color.White,
                             ),
                         ) {
                             Text("Go to podcast")

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -34,9 +35,12 @@ fun TvVideoTile(
     onGoToPodcast: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val buttonState = rememberTvTileButtonState(buttonCount = 2)
+    val buttonActions = remember(onPlayEpisode, onGoToPodcast) { listOf(onPlayEpisode, onGoToPodcast) }
+
     TvTile(
         onClick = onPlayEpisode,
-        modifier = modifier,
+        modifier = modifier.tvTileButtonNavigation(buttonState, buttonActions),
     ) {
         Box(
             modifier = Modifier
@@ -67,19 +71,23 @@ fun TvVideoTile(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Button(
-                        onClick = onPlayEpisode,
+                        onClick = {},
                         colors = ButtonDefaults.colors(
-                            containerColor = Color.White,
+                            containerColor = if (buttonState.isButtonSelected(0)) Color.White else Color.White.copy(alpha = 0.7f),
                             contentColor = Color.Black,
+                            focusedContainerColor = Color.White,
+                            focusedContentColor = Color.Black,
                         ),
                     ) {
                         Text("Play this episode")
                     }
                     Button(
-                        onClick = onGoToPodcast,
+                        onClick = {},
                         colors = ButtonDefaults.colors(
-                            containerColor = Color.White.copy(alpha = 0.2f),
+                            containerColor = if (buttonState.isButtonSelected(1)) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.2f),
                             contentColor = Color.White,
+                            focusedContainerColor = Color.White.copy(alpha = 0.4f),
+                            focusedContentColor = Color.White,
                         ),
                     ) {
                         Text("Go to podcast")
