@@ -6,7 +6,7 @@
 *   Bug Fixes
     *   Fix Profile settings gear being unreachable in landscape
         ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
-    *   Fix missing episode dates and durations in Android Auto
+    *   Fix missing episode dates and durations in Android Auto and Wear OS
         ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
 
 8.13
