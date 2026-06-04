@@ -22,12 +22,29 @@ fun TvOnboardingNavHost() {
                     TvLandingScreen(
                         onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                        onContinueWithoutAccount = {},
+                        onContinueWithoutAccount = {
+                            navController.navigate(TvOnboardingRoutes.HOME) {
+                                popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
+                            }
+                        },
                     )
                 }
                 composable(TvOnboardingRoutes.SIGN_IN) {
                     TvSignInScreen(
-                        onSignInComplete = {},
+                        onSignInComplete = {
+                            navController.navigate(TvOnboardingRoutes.SYNCING) {
+                                popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable(TvOnboardingRoutes.SYNCING) {
+                    TvSyncingScreen(
+                        onSyncComplete = {
+                            navController.navigate(TvOnboardingRoutes.HOME) {
+                                popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
+                            }
+                        },
                     )
                 }
                 composable(TvOnboardingRoutes.HOME) {
