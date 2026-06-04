@@ -66,6 +66,9 @@ class FingerprintTimingManager @Inject constructor(
     val state: State get() = _stateFlow.value
     val mappingSnapshot: List<TimeMappingEntry> get() = snapshotPlaybackToReference
 
+    private val _isAdInProgress = MutableStateFlow(false)
+    val isAdInProgress: StateFlow<Boolean> = _isAdInProgress.asStateFlow()
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
 
@@ -93,6 +96,9 @@ class FingerprintTimingManager @Inject constructor(
 
     @Volatile
     private var generation = 0L
+
+    private var processedStart: Double = Double.MAX_VALUE
+    private var processedFrontier: Double = 0.0
 
     // Drift filter state
     private var filterLastTrusted: TimeMappingEntry? = null
@@ -217,6 +223,9 @@ class FingerprintTimingManager @Inject constructor(
         currentMatcher?.close()
         currentMatcher = null
         hasReachedActive = false
+        processedStart = Double.MAX_VALUE
+        processedFrontier = 0.0
+        _isAdInProgress.value = false
     }
 
     private suspend fun prepareForEpisode(
@@ -331,6 +340,8 @@ class FingerprintTimingManager @Inject constructor(
                 mappingReferenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
                 publishSnapshot()
                 filterLastTrusted = cached.entries.lastOrNull()
+                processedStart = 0.0
+                processedFrontier = currentReferenceDuration
             }
             val coverage = cached.entries.size
             _stateFlow.value = State.Active(coverage)
@@ -383,6 +394,8 @@ class FingerprintTimingManager @Inject constructor(
                 startStream(audioPath, matcher, uuid, startPosition = positionMs / 1000.0)
             }
         }
+
+        evaluateAdState(positionMs / 1000.0)
     }
 
     private fun isWithinMappedRange(playbackTimeSec: Double): Boolean {
@@ -394,10 +407,51 @@ class FingerprintTimingManager @Inject constructor(
             playbackTimeSec <= last.playbackTime + margin
     }
 
+    @VisibleForTesting
+    internal fun evaluateAdState(playbackTimeSeconds: Double) {
+        if (!hasReachedActive || processedStart == Double.MAX_VALUE) {
+            _isAdInProgress.value = false
+            return
+        }
+        if (playbackTimeSeconds < processedStart || playbackTimeSeconds > processedFrontier) {
+            _isAdInProgress.value = false
+            return
+        }
+
+        val entries = mappingPlaybackToReference
+        if (entries.isEmpty()) {
+            _isAdInProgress.value = (processedFrontier - processedStart) > FingerprintConstants.AD_COVERAGE_GAP_SECONDS
+            return
+        }
+
+        var lo = 0
+        var hi = entries.size
+        while (lo < hi) {
+            val mid = (lo + hi) / 2
+            if (entries[mid].playbackTime <= playbackTimeSeconds) {
+                lo = mid + 1
+            } else {
+                hi = mid
+            }
+        }
+        val insertionPoint = lo
+
+        val lowerBound = if (insertionPoint > 0) entries[insertionPoint - 1].playbackTime else processedStart
+        val upperBound = if (insertionPoint < entries.size) entries[insertionPoint].playbackTime else processedFrontier
+
+        _isAdInProgress.value = (upperBound - lowerBound) > FingerprintConstants.AD_COVERAGE_GAP_SECONDS
+    }
+
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
         generationJob = scope.launch {
             val aligned = alignToWindowGrid(startPosition)
+            if (aligned < processedStart) {
+                processedStart = aligned
+            }
+            if (aligned > processedFrontier) {
+                processedFrontier = aligned
+            }
             try {
                 streamFingerprint(audioFilePath, matcher, episodeUuid, startingAt = aligned)
                 persistMappingCacheIfFull()
@@ -610,6 +664,14 @@ class FingerprintTimingManager @Inject constructor(
         matcher: CheckpointMatcher,
         startOffset: Double,
     ) {
+        if (windows.isNotEmpty()) {
+            val lastWindow = windows.last()
+            val batchEnd = startOffset + lastWindow.timestampMs.toDouble() / 1000.0 + lastWindow.durationMs.toDouble() / 1000.0
+            if (batchEnd > processedFrontier) {
+                processedFrontier = batchEnd
+            }
+        }
+
         val isDebug = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
 
         for (window in windows) {
@@ -649,6 +711,10 @@ class FingerprintTimingManager @Inject constructor(
                 hasReachedActive = true
                 Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
             }
+        }
+        val currentPositionMs = lastProgressPositionMs
+        if (currentPositionMs >= 0) {
+            evaluateAdState(currentPositionMs / 1000.0)
         }
         if (isDebug) {
             debugRejectionsSnapshot = debugRejections.toList()
@@ -756,6 +822,19 @@ class FingerprintTimingManager @Inject constructor(
     fun insert(mapping: TimeMappingEntry) {
         insertMapping(mapping)
         publishSnapshot()
+    }
+
+    /** Test seam: set the processed range directly. Must only be called from single-threaded tests. */
+    @VisibleForTesting
+    fun setProcessedRange(start: Double, frontier: Double) {
+        processedStart = start
+        processedFrontier = frontier
+    }
+
+    /** Test seam: mark as having reached active state. Must only be called from single-threaded tests. */
+    @VisibleForTesting
+    fun setHasReachedActive(value: Boolean) {
+        hasReachedActive = value
     }
 
     /** Test seam: route candidates through the drift filter. Must only be called from single-threaded tests. */
