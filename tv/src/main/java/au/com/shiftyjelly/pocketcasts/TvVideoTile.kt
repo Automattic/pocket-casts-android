@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil3.compose.AsyncImage
 
@@ -93,13 +95,13 @@ fun TvVideoTile(
                                 onClick = {},
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                             ) {
-                                Text("Play this episode")
+                                Text(stringResource(LR.string.play_this_episode))
                             }
                             Button(
                                 onClick = {},
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
                             ) {
-                                Text("Go to podcast")
+                                Text(stringResource(LR.string.go_to_podcast))
                             }
                         }
                     } else {
