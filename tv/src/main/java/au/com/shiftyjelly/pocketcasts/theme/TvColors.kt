@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.theme
 
 import androidx.compose.ui.graphics.Color
 

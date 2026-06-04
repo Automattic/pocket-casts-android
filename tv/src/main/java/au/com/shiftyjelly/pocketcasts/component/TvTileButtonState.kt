@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.component
 
 import android.view.KeyEvent.KEYCODE_DPAD_CENTER
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
@@ -22,6 +22,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.TvColors
 
 @Stable
 class TvTileButtonState(val buttonCount: Int) {
