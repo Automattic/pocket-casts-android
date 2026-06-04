@@ -120,7 +120,7 @@ fun TvFeaturedTile(
                 ) {
                     if (isSponsored) {
                         Text(
-                            text = sponsoredLabel ?: "Sponsored",
+                            text = sponsoredLabel ?: stringResource(LR.string.sponsored),
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 platformStyle = PlatformTextStyle(includeFontPadding = false),
