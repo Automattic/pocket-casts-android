@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
-import androidx.tv.material3.OutlinedButtonDefaults
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -155,23 +154,13 @@ fun TvFeaturedTile(
                     ) {
                         OutlinedButton(
                             onClick = {},
-                            colors = OutlinedButtonDefaults.colors(
-                                containerColor = if (buttonState.isButtonSelected(0)) Color.White else Color.Transparent,
-                                contentColor = if (buttonState.isButtonSelected(0)) Color.Black else Color.White,
-                                focusedContainerColor = Color.Transparent,
-                                focusedContentColor = Color.White,
-                            ),
+                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                         ) {
                             Text("Play latest episode")
                         }
                         OutlinedButton(
                             onClick = {},
-                            colors = OutlinedButtonDefaults.colors(
-                                containerColor = if (buttonState.isButtonSelected(1)) Color.White else Color.Transparent,
-                                contentColor = if (buttonState.isButtonSelected(1)) Color.Black else Color.White,
-                                focusedContainerColor = Color.Transparent,
-                                focusedContentColor = Color.White,
-                            ),
+                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
                         ) {
                             Text("Go to podcast")
                         }

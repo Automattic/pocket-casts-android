@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -72,23 +71,13 @@ fun TvVideoTile(
                 ) {
                     Button(
                         onClick = {},
-                        colors = ButtonDefaults.colors(
-                            containerColor = if (buttonState.isButtonSelected(0)) Color.White else Color.White.copy(alpha = 0.7f),
-                            contentColor = Color.Black,
-                            focusedContainerColor = Color.White,
-                            focusedContentColor = Color.Black,
-                        ),
+                        colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                     ) {
                         Text("Play this episode")
                     }
                     Button(
                         onClick = {},
-                        colors = ButtonDefaults.colors(
-                            containerColor = if (buttonState.isButtonSelected(1)) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.2f),
-                            contentColor = Color.White,
-                            focusedContainerColor = Color.White.copy(alpha = 0.4f),
-                            focusedContentColor = Color.White,
-                        ),
+                        colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
                     ) {
                         Text("Go to podcast")
                     }

@@ -14,11 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.tv.material3.ButtonColors
+import androidx.tv.material3.ButtonDefaults
 
 @Stable
 class TvTileButtonState(val buttonCount: Int) {
@@ -105,3 +108,11 @@ fun Modifier.tvTileButtonNavigation(
             else -> false
         }
     }
+
+@Composable
+fun tileButtonColors(isSelected: Boolean): ButtonColors = ButtonDefaults.colors(
+    containerColor = if (isSelected) Color.White else TvColors.BgActive20,
+    contentColor = if (isSelected) Color.Black else TvColors.TextSecondary,
+    focusedContainerColor = TvColors.BgActive20,
+    focusedContentColor = TvColors.TextSecondary,
+)
