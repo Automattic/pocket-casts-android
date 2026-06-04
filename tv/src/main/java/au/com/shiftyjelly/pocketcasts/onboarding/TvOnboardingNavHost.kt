@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.onboarding
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -10,13 +11,15 @@ import au.com.shiftyjelly.pocketcasts.home.TvScaffold
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
-fun TvOnboardingNavHost() {
+fun TvOnboardingNavHost(
+    viewModel: TvOnboardingViewModel = hiltViewModel(),
+) {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
             val navController = rememberNavController()
             NavHost(
                 navController = navController,
-                startDestination = TvOnboardingRoutes.HOME,
+                startDestination = viewModel.startDestination,
             ) {
                 composable(TvOnboardingRoutes.LANDING) {
                     TvLandingScreen(
