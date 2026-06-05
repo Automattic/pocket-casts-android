@@ -139,20 +139,25 @@ class SimplePlayer(
             // https://linear.app/a8c/issue/PCDROID-591/attempt-to-fix-classcastexception-crash-of-exoplayer
             if (currentPlayer.isReadyForSeek()) {
                 seekPlayer(currentPlayer, positionMs)
-            } else {
-                val listener = object : Player.Listener {
-                    override fun onPlaybackStateChanged(playbackState: Int) {
-                        if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
-                            currentPlayer.removeListener(this)
-                            seekPlayer(currentPlayer, positionMs)
-                        } else if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
-                            currentPlayer.removeListener(this)
+            } else when (currentPlayer.playbackState) {
+                Player.STATE_IDLE -> {
+                    val listener = object : Player.Listener {
+                        override fun onPlaybackStateChanged(playbackState: Int) {
+                            if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
+                                currentPlayer.removeListener(this)
+                                seekPlayer(currentPlayer, positionMs)
+                            } else if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
+                                currentPlayer.removeListener(this)
+                            }
                         }
                     }
+                    currentPlayer.addListener(listener)
+                    if (currentPlayer.isReadyForSeek()) {
+                        currentPlayer.removeListener(listener)
+                        seekPlayer(currentPlayer, positionMs)
+                    }
                 }
-                currentPlayer.addListener(listener)
-                if (currentPlayer.isReadyForSeek()) {
-                    currentPlayer.removeListener(listener)
+                else -> {
                     seekPlayer(currentPlayer, positionMs)
                 }
             }
