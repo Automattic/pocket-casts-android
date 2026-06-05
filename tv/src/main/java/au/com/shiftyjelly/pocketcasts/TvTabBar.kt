@@ -40,7 +40,6 @@ import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
@@ -58,72 +57,42 @@ fun TvTabBar(
             .background(TvColors.Dark, RoundedCornerShape(percent = 50))
             .padding(3.dp),
     ) {
-    TabRow(
-        selectedTabIndex = selectedTabIndex,
-        containerColor = Color.Transparent,
-        indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
-            tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
-                TabRowDefaults.PillIndicator(
-                    currentTabPosition = currentTabPosition,
-                    doesTabRowHaveFocus = doesTabRowHaveFocus,
-                    activeColor = Color.White,
-                    inactiveColor = Color.White.copy(alpha = 0.12f),
-                )
-            }
-        },
-    ) {
-        tabs.forEachIndexed { index, tab ->
-            Tab(
-                selected = index == selectedTabIndex,
-                onFocus = { onTabSelect(index) },
-                modifier = Modifier
-                    .height(44.dp)
-                    .padding(horizontal = 21.dp)
-                    .then(if (index == 0) Modifier.focusRequester(focusRequester) else Modifier),
-                colors = TabDefaults.pillIndicatorTabColors(
-                    contentColor = Color.White,
-                    selectedContentColor = TvColors.Dark,
-                    focusedContentColor = Color.White,
-                    focusedSelectedContentColor = TvColors.Dark,
-                    inactiveContentColor = Color.White.copy(alpha = 0.6f),
-                ),
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.Center,
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
+                tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
+                    TabRowDefaults.PillIndicator(
+                        currentTabPosition = currentTabPosition,
+                        doesTabRowHaveFocus = doesTabRowHaveFocus,
+                        activeColor = Color.White,
+                        inactiveColor = Color.White.copy(alpha = 0.12f),
+                    )
+                }
+            },
+        ) {
+            tabs.forEachIndexed { index, tab ->
+                Tab(
+                    selected = index == selectedTabIndex,
+                    onFocus = { onTabSelect(index) },
+                    modifier = Modifier
+                        .height(44.dp)
+                        .padding(horizontal = 21.dp)
+                        .then(if (index == selectedTabIndex) Modifier.focusRequester(focusRequester) else Modifier),
+                    colors = TabDefaults.pillIndicatorTabColors(
+                        contentColor = Color.White,
+                        selectedContentColor = TvColors.Dark,
+                        focusedContentColor = Color.White,
+                        focusedSelectedContentColor = TvColors.Dark,
+                        inactiveContentColor = Color.White.copy(alpha = 0.6f),
+                    ),
                 ) {
-                    when (tab) {
-                        is TvTab.TextTab -> {
-                            Text(
-                                text = stringResource(tab.labelRes),
-                                color = LocalContentColor.current,
-                                style = TextStyle(
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight(510),
-                                    lineHeight = 21.sp,
-                                    letterSpacing = 0.sp,
-                                    textAlign = TextAlign.Center,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                ),
-                            )
-                        }
-
-                        is TvTab.IconTab -> {
-                            Icon(
-                                painter = painterResource(tab.iconRes),
-                                contentDescription = stringResource(tab.contentDescriptionRes),
-                                modifier = Modifier.size(24.dp),
-                            )
-                        }
-
-                        is TvTab.TextWithIconTab -> {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(tab.iconRes),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp),
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
+                    Box(
+                        modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        when (tab) {
+                            is TvTab.TextTab -> {
                                 Text(
                                     text = stringResource(tab.labelRes),
                                     color = LocalContentColor.current,
@@ -137,12 +106,42 @@ fun TvTabBar(
                                     ),
                                 )
                             }
+
+                            is TvTab.IconTab -> {
+                                Icon(
+                                    painter = painterResource(tab.iconRes),
+                                    contentDescription = stringResource(tab.contentDescriptionRes),
+                                    modifier = Modifier.size(24.dp),
+                                )
+                            }
+
+                            is TvTab.TextWithIconTab -> {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(tab.iconRes),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(13.dp),
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = stringResource(tab.labelRes),
+                                        color = LocalContentColor.current,
+                                        style = TextStyle(
+                                            fontSize = 17.sp,
+                                            fontWeight = FontWeight(510),
+                                            lineHeight = 21.sp,
+                                            letterSpacing = 0.sp,
+                                            textAlign = TextAlign.Center,
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                        ),
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }
 }
 

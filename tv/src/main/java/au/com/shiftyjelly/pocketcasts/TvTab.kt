@@ -22,7 +22,7 @@ sealed class TvTab(@StringRes val contentDescriptionRes: Int) {
     ) : TvTab(contentDescriptionRes = labelRes)
 
     data object Home : TextTab(labelRes = LR.string.home)
-    data object YourPodcasts : TextTab(labelRes = LR.string.your_podcasts)
+    data object YourPodcasts : TextTab(labelRes = LR.string.tv_tab_your_podcasts)
     data object Playlists : TextTab(labelRes = LR.string.playlists)
     data object UpNext : TextTab(labelRes = LR.string.up_next)
     data object Search : IconTab(contentDescriptionRes = LR.string.search, iconRes = IR.drawable.ic_search)

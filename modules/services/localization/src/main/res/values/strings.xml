@@ -242,6 +242,7 @@
     <string name="ad_report_confirmation">You reported this ad.</string>
     <string name="add_episodes">Add episodes</string>
     <string name="your_podcasts">Your podcasts</string>
+    <string name="tv_tab_your_podcasts">Your Podcasts</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>

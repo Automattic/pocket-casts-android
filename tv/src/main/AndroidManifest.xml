@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Disable startup initializers that require Firebase, which is not configured for TV -->
+        <!-- Disable startup initializers not needed for TV -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
