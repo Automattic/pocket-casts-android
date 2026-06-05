@@ -444,14 +444,10 @@ class FingerprintTimingManager @Inject constructor(
 
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
+        val aligned = alignToWindowGrid(startPosition)
+        processedStart = aligned
+        processedFrontier = aligned
         generationJob = scope.launch {
-            val aligned = alignToWindowGrid(startPosition)
-            if (aligned < processedStart) {
-                processedStart = aligned
-            }
-            if (aligned > processedFrontier) {
-                processedFrontier = aligned
-            }
             try {
                 streamFingerprint(audioFilePath, matcher, episodeUuid, startingAt = aligned)
                 persistMappingCacheIfFull()
