@@ -88,7 +88,7 @@ fun Modifier.tvTileButtonNavigation(
     actions: List<() -> Unit>,
 ): Modifier = this
     .onFocusChanged { focusState ->
-        state.onFocusChanged(focusState.isFocused)
+        state.onFocusChanged(focusState.hasFocus)
     }
     .onPreviewKeyEvent { keyEvent ->
         val keyCode = keyEvent.key.nativeKeyCode
