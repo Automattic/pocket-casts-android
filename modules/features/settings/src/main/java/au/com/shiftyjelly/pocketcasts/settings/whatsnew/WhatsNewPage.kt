@@ -206,7 +206,7 @@ private fun WhatsNewPageLoaded(
 
 @Preview(showBackground = true)
 @Composable
-private fun WhatsNewPageEntitledPreview(
+private fun WhatsNewPagePlusUserPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -221,7 +221,7 @@ private fun WhatsNewPageEntitledPreview(
 
 @Preview(showBackground = true)
 @Composable
-private fun WhatsNewPageNotEntitledPreview(
+private fun WhatsNewPageFreeUserPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
