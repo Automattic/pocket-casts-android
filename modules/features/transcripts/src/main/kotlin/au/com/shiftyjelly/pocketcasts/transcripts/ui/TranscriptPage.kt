@@ -275,8 +275,11 @@ private fun HighlightEffect(
         playbackManager.playbackStateFlow
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
+    val isAdInProgress by remember(fingerprintTimingManager) {
+        fingerprintTimingManager.isAdInProgress
+    }.collectAsState()
 
-    if (isPlaying && isSyncedActive) {
+    if (isPlaying && isSyncedActive && !isAdInProgress) {
         LaunchedEffect(transcript.entries) {
             var cachedIndex = 0
             while (true) {
@@ -298,8 +301,8 @@ private fun HighlightEffect(
                 }
             }
         }
-    } else if (!isSyncedActive) {
-        LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
+    } else if (!isSyncedActive || isAdInProgress) {
+        LaunchedEffect(isAdInProgress) { latestOnHighlightChanged(HighlightState()) }
     }
 }
 
