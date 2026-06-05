@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 13:54:55+0000
+Translation-Revision-Date: 2026-05-28 13:54:27+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
+    <string name="description">Описание</string>
+    <string name="player_tab_summary">Обзор</string>
+    <string name="summary">Обзор</string>
+    <string name="episode_summary">Обзор выпуска</string>
+    <string name="chat_stop_quote">Остановить цитату</string>
+    <string name="chat_play_quote">Воспроизвести цитату</string>
+    <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
+    <string name="chat_error_network">Не удалось подключиться к серверу. Проверьте подключение.</string>
+    <string name="chat_error_server">Что-то пошло не так. Повторите попытку.</string>
+    <string name="chat_clear">Очистить чат</string>
+    <string name="chat_send">Отправить</string>
+    <string name="chat_input_hint">Спросить об этом выпуске…</string>
+    <string name="chat_preview_user_2">Были ли в нём практические советы?</string>
+    <string name="chat_preview_ai_2">Этот выпуск посвящён науке о формировании привычек. В нём рассказывается, как небольшие ежедневные действия могут со временем вызвать серьёзные изменения.</string>
+    <string name="chat_preview_user_1">Какова главная тема этого выпуска?</string>
+    <string name="chat_preview_ai_1">Здравствуйте! Я здесь, чтобы помочь вам изучить этот выпуск. Спросите меня о темах, основных выводах или конкретных моментах.</string>
+    <string name="chat_thinking">Я ДУМАЮ…</string>
+    <string name="chat_episode_assistant">ПОМОЩНИК ПО ВЫПУСКАМ</string>
+    <string name="chat_context_label_with_duration">Чат по этому выпуску · %1$s</string>
+    <string name="chat_context_label">Чат по этому выпуску</string>
+    <string name="chat_paywall_title">Чат по этому выпуску</string>
+    <string name="episode_chat">Чат по выпуску</string>
+    <string name="blogs_experiment_banner_body">Блоги — наша свежая идея. Они могут остаться навсегда, подвергнуться переработке или тихо сойти со сцены.</string>
+    <string name="blogs_experiment_banner_lead">Это эксперимент.</string>
     <string name="onboarding_blogs_upsell_sample_label">Блог · 24 апреля</string>
     <string name="onboarding_blogs_upsell_sample_title">Почему мы изменили дизайн плеера</string>
     <string name="onboarding_blogs_title">Блоги: слушайте то,\nчто вы читаете.</string>
@@ -543,8 +568,6 @@ Language: ru
     <string name="player_sleep_custom_plus">Увеличить произвольную продолжительность</string>
     <string name="player_sleep_custom_minus">Уменьшить произвольную продолжительность</string>
     <string name="plus_subscription_finished">Подписка оформлена</string>
-    <string name="shuffle_whats_new_message">Воспроизводите любой выпуск, не меняя очередности в списке.</string>
-    <string name="shuffle_whats_new_title">Представляем режим случайного воспроизведения</string>
     <string name="chapter_time_remaining_content_description">%s до конца главы</string>
     <string name="chapter_count_summary">%1$d из %2$d</string>
     <string name="referrals_share_text">Здравствуйте!\n\nЭто гостевой пропуск на %1$s в Pocket Casts Plus — мой любимый плеер подкастов. В нём есть множество уникальных функций, которых больше нет нигде: закладки, папки и многое другое. Надеюсь, вам он тоже понравится!</string>

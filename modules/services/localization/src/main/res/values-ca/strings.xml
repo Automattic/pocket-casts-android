@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-19 22:05:21+0000
+Translation-Revision-Date: 2026-06-04 23:07:38+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="synced_transcripts_whats_new_title">Les transcripcions,\nara al teu ritme.</string>
+    <string name="synced_transcripts_whats_new_message">Cada paraula es ressalta a mesura que es parla. Segueix la transcripció, però si perds el punt,  torna-hi amb un sol toc.</string>
+    <string name="blogs_found_go_to_podcast">Ves al pòdcast</string>
+    <string name="blogs_found_description">Estem convertint les darreres entrades en episodis de pòdcast. Et portarem a la pàgina del pòdcast tan aviat com el primer episodi estigui llest, o torna a la pàgina del pòdcast quan vulguis i estira cap avall per actualitzar.</string>
+    <string name="blogs_found_headline">Llegim el teu blog en veu alta</string>
+    <string name="blogs_found_followed_badge">PÒDCAST SEGUIT</string>
+    <string name="blogs_found_feed_detected">S\'ha trobat el feed</string>
+    <string name="chapters_generated_disclaimer">Aquests capítols es generen automàticament i poden no ser del tot precisos.</string>
+    <string name="player_tab_summary">Resum</string>
+    <string name="summary">Resum</string>
+    <string name="description">Descripció</string>
+    <string name="episode_summary">Resum de l\'episodi</string>
     <string name="chat_stop_quote">Atura la citació</string>
     <string name="chat_play_quote">Reprodueix la citació</string>
     <string name="chat_tap_to_retry">Toca per tornar-ho a intentar</string>
@@ -563,8 +575,6 @@ Language: ca
     <string name="player_sleep_chapter_plus">Augmenta el nombre de capítols</string>
     <string name="player_sleep_custom_plus">Augmenta la durada personalitzada</string>
     <string name="plus_subscription_finished">Subscripció finalitzada</string>
-    <string name="shuffle_whats_new_message">Reprodueix fàcilment un episodi aleatori sense canviar l\'ordre de la cua.</string>
-    <string name="shuffle_whats_new_title">Presentem la reproducció aleatòria</string>
     <string name="chapter_time_remaining_content_description">%s queden al capítol</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
     <string name="referrals_share_text">Ep!\n\nAquí tens  %1$s  invitacions per a Pocket Casts Plus, el meu reproductor de pòdcasts favorit. Està ple de funcions úniques com ara marcadors, carpetes i més, que no trobaràs enlloc més. Crec que també t\'encantarà!</string>
@@ -694,8 +704,8 @@ Language: ca
     <string name="something_went_wrong_to_rate_this_podcast">Alguna cosa ha anat malament. Torneu-ho a provar més tard</string>
     <string name="thank_you_for_rating">Gràcies per la valoració!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">L\'episodi complet s\'emmagatzema temporalment a la memòria cau per minimitzar la reproducció en streaming.</string>
-    <string name="not_allowed_to_rate_description">Només els oients d\'aquest pòdcast poden donar-li una valoració. Escolta uns quants episodis i després torna per donar la teva. Estem desitjant saber què et sembla!</string>
     <string name="not_allowed_to_rate_title">Per favor, escolta aquest pòdcast primer.</string>
+    <string name="not_allowed_to_rate_description">Només els oients d\'aquest pòdcast poden valorar-lo. Escolta alguns episodis i torna per deixar la teva valoració. Estem desitjant saber què t\'ha semblat!</string>
     <string name="episode_cover_description">Portada de l\'episodi %s</string>
     <string name="podcast_share_clip_description">Crea un clip entre %2$d i %3$d segons per a l\'episodi %1$s</string>
     <string name="transcript">Transcripció</string>

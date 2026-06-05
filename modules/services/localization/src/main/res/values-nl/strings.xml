@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-13 16:58:53+0000
+Translation-Revision-Date: 2026-05-28 15:57:00+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
+    <string name="description">Omschrijving</string>
+    <string name="episode_summary">Overzicht aflevering</string>
+    <string name="player_tab_summary">Samenvatting</string>
+    <string name="summary">Samenvatting</string>
+    <string name="chat_stop_quote">Citaat stoppen</string>
+    <string name="chat_play_quote">Citaat afspelen</string>
+    <string name="chat_tap_to_retry">Tik om opnieuw te proberen</string>
+    <string name="chat_error_network">Kan de server niet bereiken. Controleer je netwerkverbinding.</string>
+    <string name="chat_error_server">Er is iets misgegaan. Probeer het nog eens.</string>
+    <string name="chat_clear">Chat wissen</string>
+    <string name="chat_send">Verzenden</string>
+    <string name="chat_preview_user_2">Zijn er praktische tips genoemd?</string>
+    <string name="chat_preview_ai_2">Deze aflevering duikt in de wetenschap van gewoontevorming en onderzoekt hoe kleine dagelijkse routines in de loop van de tijd tot grote veranderingen kunnen leiden.</string>
+    <string name="chat_preview_user_1">Wat was het hoofdonderwerp van deze aflevering?</string>
+    <string name="chat_preview_ai_1">Hallo! Ik ben er om je te helpen deze aflevering te verkennen. Vraag me iets over de besproken onderwerpen, belangrijke afhaalpunten of specifieke momenten.</string>
+    <string name="chat_episode_assistant">AFLEVERINGSASSISTENT</string>
+    <string name="chat_context_label_with_duration">Chat met deze aflevering · %1$s</string>
+    <string name="chat_input_hint">Vraag over deze aflevering…</string>
+    <string name="chat_thinking">AAN HET DENKEN</string>
+    <string name="chat_context_label">Aan het chatten met deze aflevering</string>
+    <string name="chat_paywall_title">Chat met deze aflevering</string>
+    <string name="episode_chat">Chat met aflevering</string>
+    <string name="blogs_experiment_banner_body">Blogs is iets wat we uitproberen. Het kan zo blijven, opnieuw worden uitgedacht of stilletjes verdwijnen.</string>
+    <string name="blogs_experiment_banner_lead">Dit is een experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 apr</string>
     <string name="onboarding_blogs_upsell_sample_title">Waarom we de speler opnieuw hebben ontworpen</string>
     <string name="onboarding_blogs_title">Blogs: beluisteren\nwat je leest.</string>
@@ -542,8 +567,6 @@ Language: nl
     <string name="player_sleep_custom_plus">Aangepaste duur verhogen</string>
     <string name="player_sleep_custom_minus">Aangepaste duur verlagen</string>
     <string name="plus_subscription_finished">Abonnement afgerond</string>
-    <string name="shuffle_whats_new_message">Speel eenvoudig een willekeurige aflevering af zonder de volgorde van je wachtrij te veranderen.</string>
-    <string name="shuffle_whats_new_title">Maak kennis met shuffle</string>
     <string name="chapter_time_remaining_content_description">nog %s te gaan in het hoofdstuk</string>
     <string name="chapter_count_summary">%1$d van %2$d</string>
     <string name="referrals_share_text">Hallo!\n\nHier is een %1$s gastenpas voor Pocket Casts Plus, mijn favoriete podcastspeler. Het zit vol met unieke functies die je nergens anders vindt, zoals bladwijzers, mappen en meer. Jij zal er vast ook dol op zijn!</string>

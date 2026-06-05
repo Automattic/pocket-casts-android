@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 09:57:44+0000
+Translation-Revision-Date: 2026-05-28 09:55:13+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
+    <string name="description">描述</string>
+    <string name="player_tab_summary">摘要</string>
+    <string name="summary">摘要</string>
+    <string name="episode_summary">單集摘要</string>
+    <string name="chat_stop_quote">停止引文</string>
+    <string name="chat_play_quote">播放引文</string>
+    <string name="chat_tap_to_retry">點選以重試</string>
+    <string name="chat_error_network">無法連結至伺服器。 請檢查你的連線。</string>
+    <string name="chat_error_server">發生錯誤。 請再試一次。</string>
+    <string name="chat_clear">清除對話</string>
+    <string name="chat_send">傳送</string>
+    <string name="chat_input_hint">詢問本集的相關資訊…</string>
+    <string name="chat_preview_user_2">是否有提及任何實用的秘訣？</string>
+    <string name="chat_preview_ai_2">本集深入探討習慣形成的科學，探索微小的日常慣例如何隨時間產生巨大變化。</string>
+    <string name="chat_preview_user_1">本集的主題是什麼？</string>
+    <string name="chat_preview_ai_1">你好！ 我可以協助你探索本集。 你可以詢問討論主題、要點或特定時刻的任何相關資訊。</string>
+    <string name="chat_thinking">正在思考</string>
+    <string name="chat_episode_assistant">單集助理</string>
+    <string name="chat_context_label_with_duration">正在與此單集對話 · %1$s</string>
+    <string name="chat_context_label">正在與此單集對話</string>
+    <string name="chat_paywall_title">與此單集對話</string>
+    <string name="episode_chat">與單集對話</string>
+    <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
+    <string name="blogs_experiment_banner_lead">目前仍為實驗階段。</string>
     <string name="onboarding_blogs_upsell_sample_label">部落格· 4 月 24 日</string>
     <string name="onboarding_blogs_upsell_sample_title">我們重新設計播放器的原因</string>
     <string name="onboarding_blogs_title">部落格：聆聽\n閱讀的內容。</string>
@@ -543,8 +568,6 @@ Language: zh_TW
     <string name="player_sleep_custom_plus">增加自訂長度</string>
     <string name="player_sleep_custom_minus">減少自訂長度</string>
     <string name="plus_subscription_finished">完成訂閱</string>
-    <string name="shuffle_whats_new_message">隨機播放節目很簡單，而且不會改變佇列的排序。</string>
-    <string name="shuffle_whats_new_title">隆重介紹隨機播放</string>
     <string name="chapter_time_remaining_content_description">本章剩餘 %s</string>
     <string name="chapter_count_summary">第 %1$d 章，共 %2$d 章</string>
     <string name="referrals_share_text">你好！\n\n在此送上 Pocket Casts Plus 的 %1$s訪客體驗券，這是我最愛的 Podcast 播放器。 Pocket Casts Plus 提供書籤、資料夾等其他播放器找不到的獨特功能。 我相信你也會愛上這個工具！</string>
