@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import java.time.LocalDate
 
 private val isDebugOrPrototypeBuild = BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE
 
@@ -11,6 +12,7 @@ enum class Feature(
     val tier: FeatureTier,
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
+    val addedOn: LocalDate,
 ) {
     // This is a set of features used only for testing purposes.
     TEST_FREE_FEATURE(
@@ -20,6 +22,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2025-06-05"),
     ),
     TEST_PLUS_FEATURE(
         key = "test_plus_feature",
@@ -28,6 +31,7 @@ enum class Feature(
         tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2025-06-05"),
     ),
     TEST_PLUS_RESTRICTED_FEATURE(
         key = "test_plus_restricted_feature",
@@ -36,6 +40,7 @@ enum class Feature(
         tier = FeatureTier.Plus(ReleaseVersion(1, 0)),
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2025-06-05"),
     ),
     TEST_PATRON_FEATURE(
         key = "test_patron_feature",
@@ -44,6 +49,7 @@ enum class Feature(
         tier = FeatureTier.Patron,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2025-06-05"),
     ),
 
     // Here are the feature flags used by the app
@@ -54,6 +60,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2024-10-23"),
     ),
     END_OF_YEAR_2025(
         key = "end_of_year_2025",
@@ -62,6 +69,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2025-10-27"),
     ),
     INTERCEPTOR_REFRESH_TOKEN_FALLBACK(
         key = "interceptor_refresh_token_fallback",
@@ -70,6 +78,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-01"),
     ),
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
@@ -78,6 +87,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2024-02-06"),
     ),
     SLUMBER_STUDIOS_YEARLY_PROMO(
         key = "slumber_studios_yearly_promo_code",
@@ -86,6 +96,7 @@ enum class Feature(
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2024-02-28"),
     ),
     EXPLAT_EXPERIMENT(
         key = "explat_experiment",
@@ -94,6 +105,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2024-09-26"),
     ),
     ENGAGE_SDK(
         key = "engage_sdk",
@@ -102,6 +114,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
+        addedOn = LocalDate.parse("2024-08-20"),
     ),
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
@@ -110,6 +123,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-03-07"),
     ),
     GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
         key = "guest_lists_network_highlights_redesign",
@@ -118,6 +132,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-03-07"),
     ),
     LIBRO_FM(
         key = "libro_fm",
@@ -126,6 +141,7 @@ enum class Feature(
         tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-04-11"),
     ),
     RECOMMENDATIONS(
         key = "recommendations",
@@ -134,6 +150,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-04-04"),
     ),
     NOTIFICATIONS_REVAMP(
         key = "notifications_revamp",
@@ -142,6 +159,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-04-03"),
     ),
     BANNER_ADS_PLAYER(
         key = "banner_ad_player",
@@ -150,6 +168,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-08-29"),
     ),
     BANNER_ADS_PODCASTS(
         key = "banner_ad_podcasts",
@@ -158,6 +177,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-08-29"),
     ),
     SHARE_TRANSCRIPTS(
         key = "share_transcripts",
@@ -166,6 +186,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-08-18"),
     ),
     IMPROVED_SEARCH_SUGGESTIONS(
         key = "search_predictive",
@@ -174,6 +195,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-10-07"),
     ),
     IMPROVED_SEARCH_RESULTS(
         key = "search_improvements",
@@ -182,6 +204,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-10-10"),
     ),
     IMPROVE_APP_RATINGS(
         key = "improve_app_ratings",
@@ -190,6 +213,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-11-05"),
     ),
     NEW_INSTALLMENT_PLAN(
         key = "new_installment_plan",
@@ -198,6 +222,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-01-08"),
     ),
 
     MEDIA3_SESSION(
@@ -207,6 +232,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-03-04"),
     ),
     NEXT_EPISODE_PREFETCH(
         key = "next_episode_prefetch",
@@ -215,6 +241,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-03-04"),
     ),
     LOAD_ERROR_HANDLING_POLICY(
         key = "load_error_handling_policy",
@@ -223,6 +250,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-03-13"),
     ),
     UP_NEXT_SYNC_PROTOBUF(
         key = "up_next_sync_protobuf",
@@ -231,6 +259,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2025-12-18"),
     ),
     LIVE_ANALYTICS(
         key = "live_analytics",
@@ -239,6 +268,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-03-17"),
     ),
     PLAYBACK_ERROR_INFO_BAR(
         key = "display_errors_on_player",
@@ -247,6 +277,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-03-31"),
     ),
     EXPLICIT_PODCAST_INDICATOR(
         key = "explicit_podcast_indicator",
@@ -255,6 +286,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-04-23"),
     ),
     IMPROVED_LISTENING_STATS(
         key = "improved_listening_stats",
@@ -263,6 +295,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-04-28"),
     ),
     BLOGS(
         key = "blogs",
@@ -271,6 +304,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-04"),
     ),
     PROFILE_SHARING(
         key = "profile_sharing",
@@ -279,6 +313,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-12"),
     ),
     EPISODE_CHAT(
         key = "episode_chat",
@@ -287,6 +322,7 @@ enum class Feature(
         tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-04-22"),
     ),
     EPISODE_CHAT_PLAYABLE_QUOTES(
         key = "episode_chat_playable_quotes",
@@ -295,6 +331,7 @@ enum class Feature(
         tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-04-27"),
     ),
     AI_SUMMARIES(
         key = "ai_summaries",
@@ -303,6 +340,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-12"),
     ),
     GENERATED_CHAPTERS(
         key = "generated_chapters",
@@ -311,6 +349,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-12"),
     ),
     SYNCED_TRANSCRIPTS(
         key = "synced_transcripts",
@@ -319,6 +358,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-08"),
     ),
     SYNCED_TRANSCRIPT_DEBUG(
         key = "synced_transcript_debug",
@@ -327,6 +367,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-29"),
     ),
 }
 
