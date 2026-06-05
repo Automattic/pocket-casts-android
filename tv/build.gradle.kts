@@ -57,12 +57,23 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.timber)
     implementation(libs.tv.material)
 
+    implementation(projects.modules.features.shared)
+    implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.ui)
     implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
+    testImplementation(projects.modules.services.sharedtest)
 
     debugImplementation(libs.compose.ui.tooling)
 
