@@ -96,7 +96,7 @@ fun TvSignInScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(LR.string.tv_sign_in_code_placeholder),
+                        text = "ABCD-1234",
                         color = Color.White,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
