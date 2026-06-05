@@ -2521,8 +2521,8 @@
     <string name="share_end_minutes">Clip end minutes</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
-    <string name="shuffle_whats_new_title">Introducing Shuffle</string>
-    <string name="shuffle_whats_new_message">Easily play a random episode without changing the order of your queue.</string>
+    <string name="synced_transcripts_whats_new_title">Transcripts, now\nkeeping up with you.</string>
+    <string name="synced_transcripts_whats_new_message">Every word highlighted as it\'s spoken. Follow along, lose your place, find it again in one tap.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
@@ -2800,4 +2800,9 @@
     <string name="blogs_error_no_internet">Check your internet connection and try again.</string>
     <string name="blogs_error_no_feeds_found">We couldn\'t find any feeds at that URL. Please check the URL and try again.</string>
     <string name="blogs_error_generic">Something went wrong. Please try again.</string>
+    <string name="blogs_found_feed_detected">Feed found</string>
+    <string name="blogs_found_followed_badge">PODCAST FOLLOWED</string>
+    <string name="blogs_found_headline">Reading your blog out loud</string>
+    <string name="blogs_found_description">We\'re turning the latest posts into podcast episodes. We\'ll take you to the podcast page as soon as the first episode is ready, or come back to the podcast page anytime and pull down to refresh.</string>
+    <string name="blogs_found_go_to_podcast">Go to podcast</string>
 </resources>

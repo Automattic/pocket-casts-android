@@ -58,10 +58,18 @@ enum class Feature(
     END_OF_YEAR_2025(
         key = "end_of_year_2025",
         title = "End of Year 2025",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
+    ),
+    INTERCEPTOR_REFRESH_TOKEN_FALLBACK(
+        key = "interceptor_refresh_token_fallback",
+        title = "Interceptor refresh token fallback",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
     ),
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
@@ -302,6 +310,22 @@ enum class Feature(
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    SYNCED_TRANSCRIPTS(
+        key = "synced_transcripts",
+        title = "Synced transcripts with playback timing",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    SYNCED_TRANSCRIPT_DEBUG(
+        key = "synced_transcript_debug",
+        title = "Synced transcript debug timeline",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
 }

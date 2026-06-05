@@ -9,6 +9,7 @@ sealed class SearchAutoCompleteItem {
         val title: String,
         val author: String,
         val isSubscribed: Boolean = false,
+        val isExplicit: Boolean = false,
     ) : SearchAutoCompleteItem()
     data class Folder(
         val uuid: String,

@@ -101,7 +101,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private var loadSummaryJob: Job? = null
     private var lastSummaryEpisodeUuid: String? = null
 
-    enum class EpisodeContentTab { DESCRIPTION, SUMMARY }
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY, BOOKMARKS, CHAPTERS, TRANSCRIPT }
 
     data class EpisodePageState(
         val transcript: Transcript? = null,
@@ -120,8 +120,26 @@ class EpisodeFragmentViewModel @Inject constructor(
                 } else {
                     EpisodeContentTab.SUMMARY
                 }
+
+                EpisodeContentTab.BOOKMARKS -> EpisodeContentTab.BOOKMARKS
+
+                EpisodeContentTab.CHAPTERS -> EpisodeContentTab.CHAPTERS
+
+                EpisodeContentTab.TRANSCRIPT -> EpisodeContentTab.TRANSCRIPT
             }
             return copy(selectedContentTab = contentTab)
+        }
+
+        internal fun withTranscript(transcript: Transcript?): EpisodePageState {
+            val contentTab = if (transcript == null && selectedContentTab == EpisodeContentTab.TRANSCRIPT) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                transcript = transcript,
+                selectedContentTab = contentTab,
+            )
         }
 
         internal fun withSummary(summary: String?): EpisodePageState {
@@ -271,7 +289,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 oldJob?.cancelAndJoin()
                 val transcript = transcriptManager.loadTranscript(episodeUuid)
                 _pageState.update { state ->
-                    state.copy(transcript = transcript)
+                    state.withTranscript(transcript)
                 }
             }
         }

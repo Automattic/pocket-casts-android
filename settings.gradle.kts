@@ -43,6 +43,7 @@ rootProject.name = "pocket-casts-android"
 
 include(":app")
 include(":automotive")
+include(":tv")
 include(":wear")
 
 // features
@@ -75,6 +76,7 @@ include(":modules:services:compose")
 include(":modules:services:coroutines")
 include(":modules:services:crashlogging")
 include(":modules:services:deeplink")
+include(":modules:services:fingerprint")
 include(":modules:services:images")
 include(":modules:services:localization")
 include(":modules:services:media-noop")

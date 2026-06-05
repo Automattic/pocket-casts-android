@@ -948,7 +948,7 @@ internal class DiscoverAdapter(
                             val context = holder.itemView.context
                             val podcastTitle = podcast.title
 
-                            holder.binding.lblTitle.text = podcastTitle
+                            holder.binding.lblTitle.setPodcastTitleWithExplicitBadge(podcastTitle, podcast.explicit)
                             holder.binding.lblBody.text = it.description
 
                             val btnSubscribe = holder.binding.btnSubscribe
@@ -1176,7 +1176,7 @@ internal class DiscoverAdapter(
                     val context = adHolder.itemView.context
                     val podcastTitle = podcast.title
 
-                    adHolder.binding.lblTitle.text = podcastTitle
+                    adHolder.binding.lblTitle.setPodcastTitleWithExplicitBadge(podcastTitle, podcast.explicit)
                     adHolder.binding.lblBody.text = it.description
 
                     imageRequestFactory.createForPodcast(podcast.uuid).loadInto(adHolder.binding.imgPodcast)

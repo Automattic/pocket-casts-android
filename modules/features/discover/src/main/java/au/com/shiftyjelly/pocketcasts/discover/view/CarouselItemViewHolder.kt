@@ -38,7 +38,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
     private fun reset() {
         setBackingGradient(0)
         imageView.setImageDrawable(null)
-        lblTitle.text = null
+        lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         lblSubtitle.text = null
         lblTagline.text = null
     }
@@ -69,7 +69,11 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
                 colorSubscribed = UR.attr.contrast_02,
                 colorUnsubscribed = UR.attr.contrast_02,
             )
-            lblTitle.text = podcast.title
+            lblTitle.setPodcastTitleWithExplicitBadge(
+                title = podcast.title,
+                explicit = podcast.explicit,
+                badgeTintAttr = UR.attr.contrast_02,
+            )
             lblTitle.setTextColor(ThemeColor.contrast01(theme.activeTheme))
             lblSubtitle.text = podcast.author
 

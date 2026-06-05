@@ -1,6 +1,14 @@
 8.14
 -----
 
+*   New Features
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+    *   Add the explicit badge to the Discover section
+        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+*   Bug Fixes
+    *   Fix Profile settings gear being unreachable in landscape
+        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
 
 8.13
 -----
@@ -11,6 +19,8 @@
         ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
     *   Use generated chapters when author didn't provide them
         ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
+    *   Add an explicit podcast badge to search results
+        ([#5351](https://github.com/Automattic/pocket-casts-android/pull/5351)) 
 
 8.12
 -----
