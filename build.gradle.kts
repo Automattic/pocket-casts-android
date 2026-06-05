@@ -98,6 +98,13 @@ dependencyAnalysis {
                 exclude("org.jetbrains.kotlin:kotlin-stdlib")
             }
         }
+
+        project(":tv") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
     }
 }
 
@@ -118,6 +125,7 @@ val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
         (
             path.startsWith("app/src/") ||
                 path.startsWith("automotive/src/") ||
+                path.startsWith("tv/src/") ||
                 path.startsWith("wear/src/") ||
                 (path.startsWith("modules/") && "/src/" in path)
             )
@@ -146,6 +154,7 @@ spotless {
                 "app/src/**/*.kt",
                 "automotive/src/**/*.kt",
                 "modules/**/src/**/*.kt",
+                "tv/src/**/*.kt",
                 "wear/src/**/*.kt",
             )
         }
@@ -475,5 +484,5 @@ tasks.register("aggregatedLintRelease") {
     group = "verification"
     description = "Run Lint tasks for application modules"
 
-    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":wear:lintRelease")
+    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":tv:lintRelease", ":wear:lintRelease")
 }
