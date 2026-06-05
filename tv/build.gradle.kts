@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.timber)
+    implementation(libs.coil.compose)
     implementation(libs.tv.material)
 
     implementation(projects.modules.features.shared)

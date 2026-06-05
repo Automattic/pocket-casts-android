@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -36,6 +36,8 @@ import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable

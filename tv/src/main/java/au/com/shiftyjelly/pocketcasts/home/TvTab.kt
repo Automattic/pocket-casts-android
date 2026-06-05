@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

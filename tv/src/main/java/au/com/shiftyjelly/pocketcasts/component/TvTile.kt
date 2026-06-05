@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,6 +24,7 @@ import androidx.tv.material3.CardShape
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -24,6 +24,7 @@ import androidx.tv.material3.IconButton
 import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR

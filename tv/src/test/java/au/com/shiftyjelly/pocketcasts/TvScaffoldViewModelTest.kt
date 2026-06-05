@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
+import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

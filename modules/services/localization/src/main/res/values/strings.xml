@@ -243,6 +243,10 @@
     <string name="add_episodes">Add episodes</string>
     <string name="your_podcasts">Your podcasts</string>
     <string name="tv_tab_your_podcasts">Your Podcasts</string>
+    <string name="tv_row_featured">Made for TV</string>
+    <string name="tv_row_trending_videos">Trending Videos</string>
+    <string name="tv_row_recommendations">Recommendations</string>
+    <string name="tv_row_because_you_liked">Because you liked Podcast</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -2807,4 +2811,7 @@
     <string name="blogs_found_headline">Reading your blog out loud</string>
     <string name="blogs_found_description">We\'re turning the latest posts into podcast episodes. We\'ll take you to the podcast page as soon as the first episode is ready, or come back to the podcast page anytime and pull down to refresh.</string>
     <string name="blogs_found_go_to_podcast">Go to podcast</string>
+    <string name="sponsored">Sponsored</string>
+    <string name="play_latest_episode">Play latest episode</string>
+    <string name="play_this_episode">Play this episode</string>
 </resources>
