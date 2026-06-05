@@ -24,14 +24,9 @@ import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
@@ -98,14 +93,7 @@ fun TvTabBar(
                                 Text(
                                     text = stringResource(tab.labelRes),
                                     color = LocalContentColor.current,
-                                    style = TextStyle(
-                                        fontSize = 17.sp,
-                                        fontWeight = FontWeight(510),
-                                        lineHeight = 21.sp,
-                                        letterSpacing = 0.sp,
-                                        textAlign = TextAlign.Center,
-                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                    ),
+                                    style = TvTextStyles.TabLabel,
                                 )
                             }
 
@@ -128,14 +116,7 @@ fun TvTabBar(
                                     Text(
                                         text = stringResource(tab.labelRes),
                                         color = LocalContentColor.current,
-                                        style = TextStyle(
-                                            fontSize = 17.sp,
-                                            fontWeight = FontWeight(510),
-                                            lineHeight = 21.sp,
-                                            letterSpacing = 0.sp,
-                                            textAlign = TextAlign.Center,
-                                            platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                        ),
+                                        style = TvTextStyles.TabLabel,
                                     )
                                 }
                             }
