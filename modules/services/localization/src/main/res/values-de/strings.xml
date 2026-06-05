@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-13 10:54:50+0000
+Translation-Revision-Date: 2026-05-27 12:55:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">Diese Kapitel werden automatisch generiert und sind möglicherweise nicht ganz korrekt.</string>
+    <string name="description">Beschreibung</string>
+    <string name="player_tab_summary">Zusammenfassung</string>
+    <string name="summary">Zusammenfassung</string>
+    <string name="episode_summary">Folgenzusammenfassung</string>
+    <string name="chat_stop_quote">Zitat anhalten</string>
+    <string name="chat_play_quote">Zitat abspielen</string>
+    <string name="chat_tap_to_retry">Tippen, um es erneut zu versuchen.</string>
+    <string name="chat_error_network">Der Server kann nicht erreicht werden. Überprüfe deine Netzwerkverbindung.</string>
+    <string name="chat_error_server">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
+    <string name="chat_clear">Chat löschen</string>
+    <string name="chat_send">Senden</string>
+    <string name="chat_input_hint">Frage zu dieser Folge stellen …</string>
+    <string name="chat_preview_user_2">Wurden praktische Tipps erwähnt?</string>
+    <string name="chat_preview_ai_2">Diese Folge befasst sich mit der Wissenschaft der Gewohnheitsbildung und erforscht, wie kleine tägliche Routinen im Laufe der Zeit zu großen Veränderungen führen können.</string>
+    <string name="chat_preview_user_1">Was war das Hauptthema dieser Folge?</string>
+    <string name="chat_preview_ai_1">Hallo! Ich bin hier, um dir zu helfen, diese Folge zu entdecken. Stell mir Fragen zu den angesprochenen Themen, wichtigen Punkten oder bestimmten Momenten.</string>
+    <string name="chat_thinking">LASS MICH NACHDENKEN …</string>
+    <string name="chat_episode_assistant">FOLGEN-ASSISTENT</string>
+    <string name="chat_context_label_with_duration">Mit dieser Folge chatten … ・ %1$s</string>
+    <string name="chat_context_label">Mit dieser Folge chatten …</string>
+    <string name="chat_paywall_title">Mit dieser Folge chatten</string>
+    <string name="episode_chat">Mit Folge chatten</string>
+    <string name="blogs_experiment_banner_body">Blogs sind etwas, das wir ausprobieren. Sie könnten bestehen bleiben, überarbeitet werden oder still und leise verschwinden.</string>
+    <string name="blogs_experiment_banner_lead">Es handelt sich um ein Experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog ・ 24. April</string>
     <string name="onboarding_blogs_upsell_sample_title">Warum wir den Player umgestaltet haben</string>
     <string name="onboarding_blogs_title">Blogs: Anhören\nwas du liest.</string>
@@ -543,8 +568,6 @@ Language: de
     <string name="player_sleep_custom_plus">Individuelle Dauer erhöhen</string>
     <string name="player_sleep_custom_minus">Individuelle Dauer verringern</string>
     <string name="plus_subscription_finished">Abonnement beendet</string>
-    <string name="shuffle_whats_new_message">Gib ganz einfach eine zufällige Folge wieder, ohne dabei die Reihenfolge deiner Warteschlange zu ändern.</string>
-    <string name="shuffle_whats_new_title">Jetzt neu: Mischen</string>
     <string name="chapter_time_remaining_content_description">Das Kapitel dauert noch %s</string>
     <string name="chapter_count_summary">%1$d von %2$d</string>
     <string name="referrals_share_text">Hallo!\n\nHier ist ein Gastpass für Pocket Casts Plus (%1$s) ‒ meinen liebsten Podcast Player. Er bietet eine Vielzahl einzigartiger Funktionen, die du sonst bei keinem anderen Podcast Player finden wirst, wie Lesezeichen, Ordner und vieles mehr. Ich bin mir sicher, er wird dir auch gefallen!</string>

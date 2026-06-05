@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-15 09:54:19+0000
+Translation-Revision-Date: 2026-05-28 13:58:47+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
+    <string name="description">描述</string>
+    <string name="player_tab_summary">摘要</string>
+    <string name="summary">摘要</string>
+    <string name="episode_summary">剧集摘要</string>
+    <string name="chat_stop_quote">结束引用</string>
+    <string name="chat_play_quote">播放引用</string>
+    <string name="chat_tap_to_retry">轻点以重试</string>
+    <string name="chat_error_network">无法连接到该服务器。 请检查您的连接。</string>
+    <string name="chat_error_server">出错了。 请重试。</string>
+    <string name="chat_clear">清除聊天记录</string>
+    <string name="chat_send">发送</string>
+    <string name="chat_input_hint">就此剧集进行提问…</string>
+    <string name="chat_preview_user_2">是否提到了任何实用建议？</string>
+    <string name="chat_preview_ai_2">此剧集深入探讨了习惯养成的科学原理，由此分析了日常的微小习惯如何随着时间的推移带来巨大改变。</string>
+    <string name="chat_preview_user_1">此剧集的主要话题是什么？</string>
+    <string name="chat_preview_ai_1">您好！ 我将带您深入了解此剧集。 就所讨论的话题、关键要点或具体片段向我进行提问。</string>
+    <string name="chat_thinking">思考</string>
+    <string name="chat_episode_assistant">剧集助手</string>
+    <string name="chat_context_label_with_duration">参与关于此剧集的讨论 · %1$s</string>
+    <string name="chat_context_label">参与关于此剧集的讨论</string>
+    <string name="chat_paywall_title">参与关于此剧集的讨论</string>
+    <string name="episode_chat">参与剧集讨论</string>
+    <string name="blogs_experiment_banner_body">博客是我们正在尝试推出的功能。 它可能会保留下来，也可能被优化调整，甚至悄然下架。</string>
+    <string name="blogs_experiment_banner_lead">这只是一项试用版功能。</string>
     <string name="onboarding_blogs_upsell_sample_label">博客 · 4 月 24 日</string>
     <string name="onboarding_blogs_upsell_sample_title">我们重新设计播放器的原因</string>
     <string name="onboarding_blogs_title">博客：用心聆听\n您所阅读的内容。</string>
@@ -543,8 +568,6 @@ Language: zh_CN
     <string name="player_sleep_custom_plus">增加自定义时长</string>
     <string name="player_sleep_custom_minus">减少自定义时长</string>
     <string name="plus_subscription_finished">订阅完成</string>
-    <string name="shuffle_whats_new_title">推出随机播放功能</string>
-    <string name="shuffle_whats_new_message">无需更改队列顺序，即可轻松播放随机剧集。</string>
     <string name="chapter_time_remaining_content_description">本章还剩 %s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
     <string name="referrals_share_text">您好！\n\n这是一张 %1$s 的 Pocket Casts Plus 访客通行证，Pocket Casts Plus 是我最喜欢的播客播放器。 它拥有您在别处享受不到的独特功能，如书签、文件夹等。 我想您也会喜欢！</string>

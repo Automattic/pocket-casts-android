@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-13 10:55:26+0000
+Translation-Revision-Date: 2026-05-28 09:56:28+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
+    <string name="description">Beskrivning</string>
+    <string name="player_tab_summary">Sammanfattning</string>
+    <string name="summary">Sammanfattning</string>
+    <string name="episode_summary">Avsnittssammanfattning</string>
+    <string name="chat_stop_quote">Stoppa citat</string>
+    <string name="chat_play_quote">Spela upp citat</string>
+    <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
+    <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>
+    <string name="chat_error_server">Något gick fel. Försök igen.</string>
+    <string name="chat_clear">Rensa chatt</string>
+    <string name="chat_send">Skicka</string>
+    <string name="chat_input_hint">Fråga om detta avsnitt …</string>
+    <string name="chat_preview_user_2">Nämndes några praktiska tips?</string>
+    <string name="chat_preview_ai_2">Detta avsnitt dyker in i vetenskapen om vanebildning och utforskar hur små dagliga rutiner kan leda till stora förändringar över tid.</string>
+    <string name="chat_preview_user_1">Vilket var huvudämnet för detta avsnitt?</string>
+    <string name="chat_preview_ai_1">Hej! Jag är här för att hjälpa dig att utforska detta avsnitt. Fråga mig vad som helst om de ämnen som diskuteras, viktiga saker att ta med sig eller specifika ögonblick.</string>
+    <string name="chat_thinking">TÄNKER</string>
+    <string name="chat_episode_assistant">AVSNITTSASSISTENT</string>
+    <string name="chat_context_label_with_duration">Chattar med detta avsnitt · %1$s</string>
+    <string name="chat_context_label">Chattar med detta avsnitt</string>
+    <string name="chat_paywall_title">Chatta med detta avsnitt</string>
+    <string name="episode_chat">Chatta med avsnitt</string>
+    <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>
+    <string name="blogs_experiment_banner_lead">Detta är ett experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blogg · 24 apr</string>
     <string name="onboarding_blogs_upsell_sample_title">Varför vi designade om spelaren</string>
     <string name="onboarding_blogs_title">Bloggar: lyssna på\nvad du läser.</string>
@@ -542,8 +567,6 @@ Language: sv_SE
     <string name="player_sleep_custom_plus">Öka anpassad varaktighet</string>
     <string name="player_sleep_custom_minus">Minska anpassad varaktighet</string>
     <string name="plus_subscription_finished">Prenumerationen har löpt ut</string>
-    <string name="shuffle_whats_new_message">Spela enkelt upp ett slumpmässigt avsnitt utan att ändra ordningen på din kö.</string>
-    <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
     <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
     <string name="chapter_count_summary">%1$d av %2$d</string>
     <string name="referrals_share_text">Hej!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
