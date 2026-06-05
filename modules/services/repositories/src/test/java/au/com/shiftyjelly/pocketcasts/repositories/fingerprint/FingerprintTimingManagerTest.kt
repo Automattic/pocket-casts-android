@@ -107,7 +107,7 @@ class FingerprintTimingManagerTest {
     @Test
     fun `alignToWindowGrid aligns to stride boundary`() {
         val aligned = FingerprintTimingManager.alignToWindowGrid(5.7)
-        assertEquals(4.0, aligned, 0.001)
+        assertEquals(5.0, aligned, 0.001)
     }
 
     @Test

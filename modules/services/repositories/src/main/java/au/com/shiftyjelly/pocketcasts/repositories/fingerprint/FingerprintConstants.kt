@@ -14,7 +14,7 @@ object FingerprintConstants {
     const val WINDOW_DURATION_MS = 8000
 
     /** Interval between windowed fingerprints during live matching, in milliseconds. */
-    const val WINDOW_INTERVAL_MS = 2000
+    const val WINDOW_INTERVAL_MS = 1000
 
     /** Seconds of decoded PCM read per chunk during fingerprint generation. */
     const val STREAM_CHUNK_SECONDS = 5.0
@@ -53,7 +53,7 @@ object FingerprintConstants {
     const val FULL_COVERAGE_THRESHOLD = 0.95
 
     /** Persistent cache schema version. Bump when on-disk shape changes. */
-    const val MAPPING_CACHE_SCHEMA_VERSION = 3
+    const val MAPPING_CACHE_SCHEMA_VERSION = 4
 
     /** Timeout for MediaCodec dequeue operations, in microseconds. */
     const val CODEC_TIMEOUT_US = 10_000L
