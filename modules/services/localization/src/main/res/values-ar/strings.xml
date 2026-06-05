@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 09:56:09+0000
+Translation-Revision-Date: 2026-05-28 09:54:48+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
+    <string name="description">وصف</string>
+    <string name="player_tab_summary">الملخص</string>
+    <string name="summary">الملخص</string>
+    <string name="episode_summary">ملخص الحلقة</string>
+    <string name="chat_stop_quote">إيقاف الاقتباس</string>
+    <string name="chat_play_quote">تشغيل اقتباس</string>
+    <string name="chat_tap_to_retry">انقر لإعادة المحاولة</string>
+    <string name="chat_error_network">تعذّر الاتصال بالخادم. تحقق من اتصالك.</string>
+    <string name="chat_error_server">حدث خطأ ما. يُرجى إعادة المحاولة.</string>
+    <string name="chat_clear">مسح المحادثة</string>
+    <string name="chat_send">إرسال</string>
+    <string name="chat_input_hint">اسأل عن هذه الحلقة…</string>
+    <string name="chat_preview_user_2">هل ذُكرت أي نصائح عملية؟</string>
+    <string name="chat_preview_ai_2">تتناول هذه الحلقة علم تكوين العادات، وتستعرض كيف يمكن للعادات اليومية البسيطة أن تُحدث تغييرات كبيرة مع مرور الوقت.</string>
+    <string name="chat_preview_user_1">ما الموضوع الرئيسي لهذه الحلقة؟</string>
+    <string name="chat_preview_ai_1">مرحبًا! أنا هنا لمساعدتك على استكشاف هذه الحلقة. اسألني أي شيء عن الموضوعات المطروحة، أو أبرز النقاط، أو لحظات محددة من الحلقة.</string>
+    <string name="chat_thinking">جارٍ التفكير</string>
+    <string name="chat_episode_assistant">مساعد الحلقة</string>
+    <string name="chat_context_label_with_duration">تجري الآن المحادثة حول هذه الحلقة · ⁦%1$s⁩</string>
+    <string name="chat_context_label">تجري الآن المحادثة حول هذه الحلقة</string>
+    <string name="chat_paywall_title">المحادثة حول هذه الحلقة</string>
+    <string name="episode_chat">المحادثة حول الحلقة</string>
+    <string name="blogs_experiment_banner_body">المدوّنات ميزة نقوم بتجربتها حاليًا. قد تستمر كما هي، أو تخضع لتعديلات، أو تختفي بهدوء.</string>
+    <string name="blogs_experiment_banner_lead">هذه مجرد تجربة.</string>
     <string name="onboarding_blogs_upsell_sample_label">مدوّنة · 24 أبريل</string>
     <string name="onboarding_blogs_upsell_sample_title">لماذا أعدنا تصميم المشغل</string>
     <string name="onboarding_blogs_title">المدوّنات: استمع إلى\nما تقرأه.</string>
@@ -543,8 +568,6 @@ Language: ar
     <string name="player_sleep_custom_plus">زيادة المدة المخصصة</string>
     <string name="player_sleep_custom_minus">تقليل المدة المخصصة</string>
     <string name="plus_subscription_finished">انتهى الاشتراك</string>
-    <string name="shuffle_whats_new_message">قم بتشغيل حلقة عشوائية بسهولة من دون تغيير ترتيب قائمة الانتظار الخاصة بك.</string>
-    <string name="shuffle_whats_new_title">طرح مقدمة حول الخلط</string>
     <string name="chapter_time_remaining_content_description">تم ترك %s في الفصل</string>
     <string name="chapter_count_summary">⁦%1$d⁩ من ⁦%2$d⁩</string>
     <string name="referrals_share_text">مرحبًا!\n\nإليك ⁦%1$s⁩ دعوة ضيف إلى Pocket Casts Plus - مشغّل البودكاست المفضل لدي. يحتوي على ميزات فريدة مثل العلامات المرجعية والمجلدات والمزيد، وهي أشياء لن تجدها في أي مكان آخر. أعتقد أنك ستحبه أيضًا!</string>

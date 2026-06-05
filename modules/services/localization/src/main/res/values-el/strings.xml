@@ -233,8 +233,6 @@ Language: el_GR
     <string name="player_sleep_custom_plus">Αύξηση προσαρμοσμένης διάρκειας</string>
     <string name="player_sleep_custom_minus">Μείωση προσαρμοσμένης διάρκειας</string>
     <string name="plus_subscription_finished">Η Συνδρομή Ολοκληρώθηκε</string>
-    <string name="shuffle_whats_new_title">Παρουσιάζουμε το Ανακάτεμα</string>
-    <string name="shuffle_whats_new_message">Παίξε εύκολα ένα τυχαίο επεισόδιο χωρίς να αλλάξεις τη σειρά της ουράς σου.</string>
     <string name="chapter_time_remaining_content_description">%s ακόμη στο κεφάλαιο</string>
     <string name="chapter_count_summary">%1$d από %2$d</string>
     <string name="files_plus_prompt">Ανέβασε τα αρχεία σου με το Pocket Casts Plus και άλλα</string>

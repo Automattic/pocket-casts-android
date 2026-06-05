@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 09:57:41+0000
+Translation-Revision-Date: 2026-05-28 11:54:58+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">Estos capítulos se generan automáticamente y puede que no sean del todo precisos.</string>
+    <string name="description">Descripción</string>
+    <string name="player_tab_summary">Resumen</string>
+    <string name="summary">Resumen</string>
+    <string name="episode_summary">Resumen del episodio</string>
+    <string name="chat_stop_quote">Detener cita</string>
+    <string name="chat_play_quote">Reproducir cita</string>
+    <string name="chat_tap_to_retry">Tocar para intentar de nuevo</string>
+    <string name="chat_error_network">No se puede establecer conexión con el servidor. Comprueba tu conexión.</string>
+    <string name="chat_error_server">Se ha producido un error. Inténtalo de nuevo.</string>
+    <string name="chat_clear">Borrar chat</string>
+    <string name="chat_send">Enviar</string>
+    <string name="chat_input_hint">Pregunta sobre este episodio…</string>
+    <string name="chat_preview_user_2">¿Se han mencionado algunos consejos prácticos?</string>
+    <string name="chat_preview_ai_2">Este episodio profundiza en la ciencia de la adquisición de hábitos, ya que analiza cómo las pequeñas rutinas diarias pueden conducir a grandes cambios a lo largo del tiempo.</string>
+    <string name="chat_preview_user_1">¿Cuál ha sido el tema principal de este episodio?</string>
+    <string name="chat_preview_ai_1">¡Hola! Estoy aquí para ayudarte a explorar este episodio. Pregúntame cualquier cosa sobre los temas que se han tratado, las conclusiones clave o momentos específicos.</string>
+    <string name="chat_thinking">PENSANDO</string>
+    <string name="chat_episode_assistant">ASISTENTE DE EPISODIOS</string>
+    <string name="chat_context_label_with_duration">Chateando sobre este episodio · %1$s</string>
+    <string name="chat_context_label">Chateando sobre este episodio</string>
+    <string name="chat_paywall_title">Chatear sobre este episodio</string>
+    <string name="episode_chat">Chatear sobre el episodio</string>
+    <string name="blogs_experiment_banner_body">Estamos probando los blogs. Puede que se queden, que se modifiquen o que desaparezcan sin hacer ruido.</string>
+    <string name="blogs_experiment_banner_lead">Esto es un experimento.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 de abril</string>
     <string name="onboarding_blogs_upsell_sample_title">Por qué hemos rediseñado el reproductor</string>
     <string name="onboarding_blogs_title">Blogs: escuchar\nlo que lees.</string>
@@ -543,8 +568,6 @@ Language: es
     <string name="player_sleep_custom_plus">Aumentar duración personalizada</string>
     <string name="player_sleep_custom_minus">Reducir duración personalizada</string>
     <string name="plus_subscription_finished">Suscripción terminada</string>
-    <string name="shuffle_whats_new_title">Te presentamos Shuffle</string>
-    <string name="shuffle_whats_new_message">Reproduce un episodio aleatorio fácilmente sin cambiar el orden de la cola.</string>
     <string name="chapter_time_remaining_content_description">Quedan %s del capítulo</string>
     <string name="chapter_count_summary">%1$d de %2$d</string>
     <string name="referrals_share_text">Hola:\n\nAquí tienes un pase de invitado de %1$s para Pocket Casts Plus, mi reproductor de podcast favorito. Cuenta con funciones únicas como los marcadores, las carpetas y muchas más que no encontrarás en otras plataformas. Creemos que a ti también te encantará.</string>

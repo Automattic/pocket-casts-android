@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-15 09:54:20+0000
+Translation-Revision-Date: 2026-05-28 09:54:26+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
+    <string name="description">説明</string>
+    <string name="player_tab_summary">概要</string>
+    <string name="summary">概要</string>
+    <string name="episode_summary">エピソードの概要</string>
+    <string name="chat_stop_quote">引用を停止</string>
+    <string name="chat_play_quote">引用を再生</string>
+    <string name="chat_tap_to_retry">タップして再試行</string>
+    <string name="chat_error_network">サーバーにアクセスできません。 接続を確認してください。</string>
+    <string name="chat_error_server">エラーが発生しました。 もう一度お試しください。</string>
+    <string name="chat_clear">チャットを消去</string>
+    <string name="chat_send">送信</string>
+    <string name="chat_input_hint">このエピソードについて尋ねる…</string>
+    <string name="chat_preview_user_2">何か実用的なアドバイスについて言及していましたか ?</string>
+    <string name="chat_preview_ai_2">このエピソードは習慣形成の科学に深く切り込み、日々の小さな習慣がどのようにして時間をかけて大きな変化につながるのかを探ります。</string>
+    <string name="chat_preview_user_1">このエピソードのメインテーマは何でしたか ?</string>
+    <string name="chat_preview_ai_1">こんにちは ! このエピソードの内容確認をお手伝いします。 議論されたトピック、重要なポイント、特定の場面について、何でも質問してください。</string>
+    <string name="chat_thinking">考えています</string>
+    <string name="chat_episode_assistant">エピソードアシスタント</string>
+    <string name="chat_context_label_with_duration">このエピソード (%1$s) についてのチャット</string>
+    <string name="chat_context_label">このエピソードについてのチャット</string>
+    <string name="chat_paywall_title">このエピソードについてチャットする</string>
+    <string name="episode_chat">エピソードについてチャットする</string>
+    <string name="blogs_experiment_banner_body">ブログ機能は実験中です。 継続する可能性や、手直しされる可能性、静かに消える可能性があります。</string>
+    <string name="blogs_experiment_banner_lead">これは実験です。</string>
     <string name="onboarding_blogs_upsell_sample_label">ブログ・4月24日</string>
     <string name="onboarding_blogs_upsell_sample_title">プレーヤーをリデザインした理由</string>
     <string name="onboarding_blogs_title">ブログ: 読みものを\n聴く。</string>
@@ -543,8 +568,6 @@ Language: ja_JP
     <string name="player_sleep_custom_plus">カスタム時間を増やす</string>
     <string name="player_sleep_custom_minus">カスタム時間を減らす</string>
     <string name="plus_subscription_finished">サブスクリプションが終了しました</string>
-    <string name="shuffle_whats_new_message">キューの順序を変更せずに、ランダムなエピソードを簡単に再生できます。</string>
-    <string name="shuffle_whats_new_title">シャッフルの紹介</string>
     <string name="chapter_time_remaining_content_description">チャプターの残り%s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
     <string name="referrals_share_text">こんにちは。\n\nこちらは、私のお気に入りのポッドキャストプレイヤー、Pocket Casts Plus を利用できる%1$sのゲストパスです。 ブックマークやフォルダーなど、他にはないユニークな機能が満載です。 きっと気に入ってもらえると思います。</string>
