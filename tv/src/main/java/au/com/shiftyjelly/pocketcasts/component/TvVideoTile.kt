@@ -24,19 +24,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -121,21 +118,14 @@ fun TvVideoTile(
                             Column {
                                 Text(
                                     text = podcastTitle,
-                                    style = TextStyle(
-                                        fontSize = 12.sp,
-                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                    ),
+                                    style = TvTextStyles.VideoTilePodcastTitle,
                                     color = TvColors.TextSecondary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = episodeTitle,
-                                    style = TextStyle(
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                    ),
+                                    style = TvTextStyles.VideoTileEpisodeTitle,
                                     color = Color.White,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
