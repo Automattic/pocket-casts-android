@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,9 +67,10 @@ fun TvSyncingScreen(
         }
     }
 
+    val currentOnSyncComplete by rememberUpdatedState(onSyncComplete)
     LaunchedEffect(Unit) {
         delay(SIMULATED_SYNC_DELAY_MS)
-        onSyncComplete()
+        currentOnSyncComplete()
     }
 }
 

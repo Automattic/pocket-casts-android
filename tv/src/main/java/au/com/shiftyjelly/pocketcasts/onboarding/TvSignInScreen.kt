@@ -79,7 +79,7 @@ fun TvSignInScreen(
                         .background(Color.White, RoundedCornerShape(12.dp)),
                 ) {
                     Text(
-                        text = "QR Code",
+                        text = stringResource(LR.string.tv_sign_in_qr_placeholder),
                         color = TvColors.Dark,
                         fontSize = 18.sp,
                     )
@@ -89,14 +89,14 @@ fun TvSignInScreen(
                     horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
-                        text = "pocketcasts.com/activate",
+                        text = stringResource(LR.string.tv_sign_in_url),
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "ABCD-1234",
+                        text = stringResource(LR.string.tv_sign_in_code_placeholder),
                         color = Color.White,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
