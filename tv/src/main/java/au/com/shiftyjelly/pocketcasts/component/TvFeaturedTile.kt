@@ -166,13 +166,13 @@ fun TvFeaturedTile(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             OutlinedButton(
-                                onClick = {},
+                                onClick = onPlayLastEpisode,
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                             ) {
                                 Text(stringResource(LR.string.play_latest_episode))
                             }
                             OutlinedButton(
-                                onClick = {},
+                                onClick = onGoToPodcast,
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
                             ) {
                                 Text(stringResource(LR.string.go_to_podcast))

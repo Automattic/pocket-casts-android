@@ -19,6 +19,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun TvPodcastTile(
     artworkUrl: String,
+    podcastTitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -28,7 +29,7 @@ fun TvPodcastTile(
     ) {
         AsyncImage(
             model = artworkUrl,
-            contentDescription = null,
+            contentDescription = podcastTitle,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .width(123.dp)
@@ -45,6 +46,7 @@ private fun TvPodcastTilePreview() {
             Box(modifier = Modifier.background(TvColors.Dark)) {
                 TvPodcastTile(
                     artworkUrl = "",
+                    podcastTitle = "Sample Podcast",
                     onClick = {},
                 )
             }

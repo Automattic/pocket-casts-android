@@ -93,13 +93,13 @@ fun TvVideoTile(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Button(
-                                onClick = {},
+                                onClick = onPlayEpisode,
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                             ) {
                                 Text(stringResource(LR.string.play_this_episode))
                             }
                             Button(
-                                onClick = {},
+                                onClick = onGoToPodcast,
                                 colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
                             ) {
                                 Text(stringResource(LR.string.go_to_podcast))
