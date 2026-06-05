@@ -103,14 +103,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    PODCASTS_SORT_CHANGES(
-        key = "podcasts_sort_changes",
-        title = "Podcasts Sort Changes",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
         key = "guest_lists_network_highlights_redesign",
         title = "Guest Lists and Network Highlights Redesign",
