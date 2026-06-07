@@ -28,20 +28,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -121,10 +118,7 @@ fun TvFeaturedTile(
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            ),
+                            style = TvTextStyles.FeaturedTileSponsoredLabel,
                             color = Color.White.copy(alpha = 0.7f),
                         )
                     }
@@ -133,11 +127,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            platformStyle = PlatformTextStyle(includeFontPadding = false),
-                        ),
+                        style = TvTextStyles.FeaturedTileTitle,
                         color = Color.White,
                     )
 
@@ -145,11 +135,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = description,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 20.sp,
-                            platformStyle = PlatformTextStyle(includeFontPadding = false),
-                        ),
+                        style = TvTextStyles.FeaturedTileDescription,
                         color = Color.White.copy(alpha = 0.7f),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

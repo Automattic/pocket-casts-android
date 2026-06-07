@@ -15,4 +15,32 @@ object TvTextStyles {
         textAlign = TextAlign.Center,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
+
+    val VideoTilePodcastTitle = TextStyle(
+        fontSize = 12.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val VideoTileEpisodeTitle = TextStyle(
+        fontSize = 13.sp,
+        fontWeight = FontWeight.SemiBold,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val FeaturedTileSponsoredLabel = TextStyle(
+        fontSize = 14.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val FeaturedTileTitle = TextStyle(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val FeaturedTileDescription = TextStyle(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
 }
