@@ -11,10 +11,6 @@ object MediaItemCompatConverter {
         val descBuilder = MediaDescriptionCompat.Builder()
             .setMediaId(item.mediaId)
             .setTitle(metadata.title)
-            // The browse-row subtitle (episode date + duration) is carried in MediaMetadata.subtitle,
-            // not artist, which is never set on browse items. Reading artist here left the subtitle
-            // blank for the legacy MediaBrowser clients (Android Auto and Wear OS). Android Automotive
-            // OS uses the media3 MediaLibraryService path instead, so it is unaffected by this converter.
             .setSubtitle(metadata.subtitle)
             .setDescription(metadata.description)
             .setIconUri(metadata.artworkUri)
