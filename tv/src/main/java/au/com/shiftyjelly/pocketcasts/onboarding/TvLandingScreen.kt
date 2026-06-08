@@ -104,8 +104,8 @@ fun TvLandingScreen(
                 Button(
                     onClick = onSignIn,
                     colors = ButtonDefaults.colors(
-                        containerColor = Color.White,
-                        contentColor = TvColors.Dark,
+                        containerColor = TvColors.DarkGray,
+                        contentColor = Color.White,
                         focusedContainerColor = Color.White,
                         focusedContentColor = TvColors.Dark,
                     ),

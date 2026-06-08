@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -25,10 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
-private const val TILE_SIZE_DP = 181
-private const val TILE_SPACING_DP = 11
-private const val TILE_CORNER_RADIUS_DP = 8
-private const val ANIMATION_OFFSET_DP = 133
+private const val TILE_SIZE_DP = 145
+private const val TILE_SPACING_DP = 9
+private const val TILE_CORNER_RADIUS_DP = 6
+private const val ANIMATION_OFFSET_DP = 107
+private const val GRID_VERTICAL_OFFSET_DP = -73
 private const val ANIMATION_DURATION_MS = 20_000
 private const val ROW_COUNT = 3
 private const val TILES_PER_ROW = 8
@@ -78,7 +80,9 @@ fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
     }
 
     Column(
-        modifier = modifier.clipToBounds(),
+        modifier = modifier
+            .clipToBounds()
+            .offset(y = GRID_VERTICAL_OFFSET_DP.dp),
         verticalArrangement = Arrangement.spacedBy(TILE_SPACING_DP.dp),
     ) {
         rows.forEachIndexed { rowIndex, artworks ->
