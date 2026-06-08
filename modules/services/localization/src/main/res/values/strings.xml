@@ -247,7 +247,6 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
-    <string name="tv_sign_in_url" translatable="false">pocketcasts.com/pair</string>
     <string name="tv_sign_in_or_enter_code">or enter the following code</string>
     <string name="tv_sign_in_go_to_url">going to %1$s</string>
     <string name="unavailable">Unavailable</string>
