@@ -8,17 +8,15 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -61,7 +59,7 @@ private val ArtworkResIds = listOf(
 fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "podcast_grid")
     val animationProgress by infiniteTransition.animateFloat(
-        initialValue = 0f,
+        initialValue = -1f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = ANIMATION_DURATION_MS, easing = LinearEasing),
@@ -90,24 +88,21 @@ fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
             val direction = if (rowIndex % 2 == 0) 1f else -1f
             val translationX = animationProgress * offsetPx * direction
 
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(TILE_SPACING_DP.dp),
+                modifier = Modifier
+                    .wrapContentWidth(unbounded = true)
+                    .graphicsLayer { this.translationX = translationX },
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(TILE_SPACING_DP.dp),
-                    modifier = Modifier.graphicsLayer { this.translationX = translationX },
-                ) {
-                    artworks.forEach { resId ->
-                        Image(
-                            painter = painterResource(resId),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(TILE_SIZE_DP.dp)
-                                .clip(RoundedCornerShape(TILE_CORNER_RADIUS_DP.dp)),
-                        )
-                    }
+                artworks.forEach { resId ->
+                    Image(
+                        painter = painterResource(resId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(TILE_SIZE_DP.dp)
+                            .clip(RoundedCornerShape(TILE_CORNER_RADIUS_DP.dp)),
+                    )
                 }
             }
         }
