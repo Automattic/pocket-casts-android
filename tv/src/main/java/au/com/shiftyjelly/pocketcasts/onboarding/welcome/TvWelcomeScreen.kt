@@ -64,8 +64,8 @@ fun TvWelcomeScreen(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
                             0f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.17f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.45f to TvColors.Dark,
+                            0.12f to TvColors.Dark.copy(alpha = 0.5f),
+                            0.35f to TvColors.Dark,
                             1f to TvColors.Dark,
                         ),
                     ),
