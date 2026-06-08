@@ -9,31 +9,32 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class WhatsNewViewModel @Inject constructor(
-    private val settings: Settings,
+    settings: Settings,
 ) : ViewModel() {
-    private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
-    val state = _state.asStateFlow()
+    val state: StateFlow<UiState> = settings.cachedSubscription.flow
+        .map { subscription ->
+            UiState.Loaded(
+                feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = subscription != null),
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UiState.Loading,
+        )
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            settings.cachedSubscription.flow.collect { subscription ->
-                _state.value = UiState.Loaded(
-                    feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = subscription != null),
-                )
-            }
-        }
-    }
 
     fun onConfirm() {
         viewModelScope.launch {
