@@ -31,4 +31,37 @@ enum class UpNextSortType(
             return comparatorDelegate.compare(o1, o2)
         }
     },
+    ShortestToLongest(
+        // TODO: Add a dedicated UpNextSortOrderType once the eventhorizon schema supports duration sorting.
+        analyticsValue = UpNextSortOrderType.Unknown,
+        descriptionId = LR.string.sort_shortest_to_longest,
+    ) {
+        // Episodes without a known duration always sort to the bottom.
+        private val comparatorDelegate = compareBy<BaseEpisode> { it.hasNoDuration }
+            .thenBy { it.duration }
+            .thenBy { it.addedDate }
+
+        override fun compare(o1: BaseEpisode, o2: BaseEpisode): Int {
+            return comparatorDelegate.compare(o1, o2)
+        }
+    },
+    LongestToShortest(
+        // TODO: Add a dedicated UpNextSortOrderType once the eventhorizon schema supports duration sorting.
+        analyticsValue = UpNextSortOrderType.Unknown,
+        descriptionId = LR.string.sort_longest_to_shortest,
+    ) {
+        // Episodes without a known duration always sort to the bottom.
+        private val comparatorDelegate = compareBy<BaseEpisode> { it.hasNoDuration }
+            .thenByDescending { it.duration }
+            .thenBy { it.addedDate }
+
+        override fun compare(o1: BaseEpisode, o2: BaseEpisode): Int {
+            return comparatorDelegate.compare(o1, o2)
+        }
+    },
+    ;
+
+    private companion object {
+        private val BaseEpisode.hasNoDuration get() = duration <= 0
+    }
 }

@@ -13,6 +13,8 @@ import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.components.SelectedOptionColumn
 import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.UpNextViewModel
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -28,9 +30,16 @@ internal class UpNextSortFragment : BaseDialogFragment() {
             fillMaxHeight = false,
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
+            val options = if (FeatureFlag.isEnabled(Feature.UP_NEXT_DURATION)) {
+                UpNextSortType.entries
+            } else {
+                UpNextSortType.entries.filterNot {
+                    it == UpNextSortType.ShortestToLongest || it == UpNextSortType.LongestToShortest
+                }
+            }
             SelectedOptionColumn(
                 title = getString(LR.string.player_up_next_sort),
-                options = UpNextSortType.entries,
+                options = options,
                 selectedOption = null,
                 optionLabel = { option -> stringResource(option.descriptionId) },
                 onClickOption = { option ->
