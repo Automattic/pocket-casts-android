@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -33,29 +34,87 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.component.rememberQrPainter
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private const val MOCK_QR_URL = "https://pocketcasts.com/pair?code=JMR3W2"
-private val MOCK_CODE_CHARACTERS = listOf("J", "M", "R", "3", "W", "2")
-private const val MOCK_SIGN_IN_DELAY_MS = 15_000L
 
 @Composable
 fun TvSignInScreen(
     onSignInComplete: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TvSignInViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val currentOnSignInComplete by rememberUpdatedState(onSignInComplete)
+
+    LaunchedEffect(uiState) {
+        if (uiState is TvSignInUiState.Complete) {
+            currentOnSignInComplete()
+        }
+    }
+
+    when (val state = uiState) {
+        is TvSignInUiState.Loading -> TvSignInLoading(modifier)
+
+        is TvSignInUiState.Ready -> TvSignInContent(
+            userCode = state.userCode,
+            verificationUriComplete = state.verificationUriComplete,
+            modifier = modifier,
+        )
+
+        is TvSignInUiState.Error -> TvSignInLoading(modifier)
+
+        is TvSignInUiState.Complete -> TvSignInLoading(modifier)
+    }
+}
+
+@Composable
+private fun TvSignInLoading(modifier: Modifier = Modifier) {
+    val focusRequester = remember { FocusRequester() }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(TvColors.Dark)
+            .focusRequester(focusRequester)
+            .focusable(),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+                contentDescription = null,
+                modifier = Modifier.size(36.dp),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(LR.string.tv_onboarding_sign_in_title),
+                color = Color.White,
+                style = TvTextStyles.WelcomeTitle,
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun TvSignInContent(
+    userCode: List<String>,
+    verificationUriComplete: String,
+    modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val currentOnSignInComplete by rememberUpdatedState(onSignInComplete)
-    val qrPainter = rememberQrPainter(content = MOCK_QR_URL, size = 148.dp)
+    val qrPainter = rememberQrPainter(content = verificationUriComplete, size = 148.dp)
     val url = stringResource(LR.string.tv_sign_in_url)
 
     Box(
@@ -113,7 +172,7 @@ fun TvSignInScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MOCK_CODE_CHARACTERS.forEach { char ->
+                userCode.forEach { char ->
                     CodeCharacterBox(character = char)
                 }
             }
@@ -140,11 +199,6 @@ fun TvSignInScreen(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-
-    LaunchedEffect(Unit) {
-        delay(MOCK_SIGN_IN_DELAY_MS)
-        currentOnSignInComplete()
-    }
 }
 
 @Composable
@@ -169,10 +223,23 @@ private fun CodeCharacterBox(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSignInScreenPreview() {
+private fun TvSignInScreenLoadingPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            TvSignInScreen(onSignInComplete = {})
+            TvSignInLoading()
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSignInScreenContentPreview() {
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            TvSignInContent(
+                userCode = listOf("J", "M", "R", "3", "W", "2"),
+                verificationUriComplete = "https://pocketcasts.com/pair?code=JMR3W2",
+            )
         }
     }
 }

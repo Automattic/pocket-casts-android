@@ -55,9 +55,11 @@ class TvSignInViewModel @Inject constructor(
                     _uiState.value = TvSignInUiState.Complete
                     return
                 }
+
                 result is LoginResult.Failed && result.messageId == AUTHORIZATION_PENDING -> {
                     // Keep polling
                 }
+
                 else -> {
                     Timber.w("Device auth polling stopped: ${(result as? LoginResult.Failed)?.message}")
                     _uiState.value = TvSignInUiState.Error
