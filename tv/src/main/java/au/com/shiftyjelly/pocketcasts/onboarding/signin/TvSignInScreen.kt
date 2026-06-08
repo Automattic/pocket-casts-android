@@ -65,6 +65,7 @@ fun TvSignInScreen(
 
         is TvSignInUiState.Ready -> TvSignInContent(
             userCode = state.userCode,
+            verificationUri = state.verificationUri,
             verificationUriComplete = state.verificationUriComplete,
             modifier = modifier,
         )
@@ -110,12 +111,18 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
 @Composable
 private fun TvSignInContent(
     userCode: List<String>,
+    verificationUri: String,
     verificationUriComplete: String,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
     val qrPainter = rememberQrPainter(content = verificationUriComplete, size = 118.dp)
-    val url = stringResource(LR.string.tv_sign_in_url)
+    val url = remember(verificationUri) {
+        verificationUri
+            .removePrefix("https://")
+            .removePrefix("http://")
+            .trimEnd('/')
+    }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -238,6 +245,7 @@ private fun TvSignInScreenContentPreview() {
         MaterialTheme {
             TvSignInContent(
                 userCode = listOf("J", "M", "R", "3", "W", "2"),
+                verificationUri = "https://pocketcasts.com/pair",
                 verificationUriComplete = "https://pocketcasts.com/pair?code=JMR3W2",
             )
         }
