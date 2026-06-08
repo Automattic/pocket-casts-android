@@ -39,9 +39,11 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.parseTokenErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
@@ -214,6 +216,31 @@ class SyncManagerImpl @Inject constructor(
         signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
         syncServiceManager.login(email = email, password = password)
+    }
+
+    override suspend fun deviceAuthorize(): DeviceAuthorizeResponse {
+        return syncServiceManager.deviceAuthorize()
+    }
+
+    override suspend fun loginWithDeviceAuth(
+        deviceCode: String,
+        signInSource: SignInSource,
+    ): LoginResult {
+        return try {
+            val response = syncServiceManager.deviceToken(deviceCode)
+            val result = handleTokenResponse(LoginIdentity.PocketCasts, response)
+            trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.PocketCasts)
+            LoginResult.Success(result)
+        } catch (ex: HttpException) {
+            val tokenError = ex.parseTokenErrorResponse(moshi)
+            LoginResult.Failed(
+                message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
+                messageId = tokenError?.error,
+            )
+        } catch (ex: Exception) {
+            Timber.e(ex, "Device auth failed")
+            exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+        }
     }
 
     private suspend fun handleLogin(
