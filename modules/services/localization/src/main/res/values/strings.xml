@@ -247,8 +247,9 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
-    <string name="tv_sign_in_qr_placeholder">QR Code</string>
-    <string name="tv_sign_in_url" translatable="false">pocketcasts.com/activate</string>
+    <string name="tv_sign_in_url" translatable="false">pocketcasts.com/pair</string>
+    <string name="tv_sign_in_or_enter_code">or enter the following code</string>
+    <string name="tv_sign_in_go_to_url">going to %1$s</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -2827,8 +2828,7 @@
     <string name="tv_onboarding_create_free_account">Create free account</string>
     <string name="tv_onboarding_browse_without_account">Browse without an account</string>
     <string name="tv_onboarding_continue_without_account">Continue without account</string>
-    <string name="tv_onboarding_sign_in_title">Sign in to Pocket Casts</string>
-    <string name="tv_onboarding_sign_in_instructions">Scan the QR code or visit the URL below and enter the code</string>
-    <string name="tv_onboarding_signed_in">I\'ve signed in</string>
+    <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
+    <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
 </resources>
