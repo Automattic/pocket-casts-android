@@ -74,12 +74,11 @@ fun TvWelcomeScreen(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 48.dp, vertical = 27.dp),
         ) {
-            Spacer(modifier = Modifier.weight(0.45f))
-
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
@@ -114,16 +113,17 @@ fun TvWelcomeScreen(
                     Text(text = stringResource(LR.string.tv_onboarding_create_free_account))
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.weight(0.55f))
-
-            Button(
-                onClick = onContinueWithoutAccount,
-                colors = TvButtonDefaults.borderlessButtonColors(),
-                border = TvButtonDefaults.borderlessButtonBorder(),
-            ) {
-                Text(text = stringResource(LR.string.tv_onboarding_browse_without_account))
-            }
+        Button(
+            onClick = onContinueWithoutAccount,
+            colors = TvButtonDefaults.borderlessButtonColors(),
+            border = TvButtonDefaults.borderlessButtonBorder(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 27.dp),
+        ) {
+            Text(text = stringResource(LR.string.tv_onboarding_browse_without_account))
         }
     }
 
