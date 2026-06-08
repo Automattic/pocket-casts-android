@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.onboarding
+package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

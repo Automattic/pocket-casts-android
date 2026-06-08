@@ -8,6 +8,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.home.TvScaffold
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInScreen
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingScreen
+import au.com.shiftyjelly.pocketcasts.onboarding.welcome.TvWelcomeScreen
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
@@ -22,7 +25,7 @@ fun TvOnboardingNavHost(
                 startDestination = viewModel.startDestination,
             ) {
                 composable(TvOnboardingRoutes.LANDING) {
-                    TvLandingScreen(
+                    TvWelcomeScreen(
                         onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onContinueWithoutAccount = {

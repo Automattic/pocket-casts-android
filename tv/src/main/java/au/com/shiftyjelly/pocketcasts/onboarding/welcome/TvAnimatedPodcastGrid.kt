@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.onboarding
+package au.com.shiftyjelly.pocketcasts.onboarding.welcome
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

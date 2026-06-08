@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.onboarding
+package au.com.shiftyjelly.pocketcasts.onboarding.welcome
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun TvLandingScreen(
+fun TvWelcomeScreen(
     onSignIn: () -> Unit,
     onCreateAccount: () -> Unit,
     onContinueWithoutAccount: () -> Unit,
@@ -153,10 +153,10 @@ fun TvLandingScreen(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvLandingScreenPreview() {
+private fun TvWelcomeScreenPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            TvLandingScreen(
+            TvWelcomeScreen(
                 onSignIn = {},
                 onCreateAccount = {},
                 onContinueWithoutAccount = {},

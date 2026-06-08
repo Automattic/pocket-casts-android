@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.onboarding
+package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
