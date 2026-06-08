@@ -143,7 +143,7 @@ private fun TvSignInContent(
             Text(
                 text = stringResource(LR.string.tv_onboarding_sign_in_instructions),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.SignInSubtitle,
             )
             Spacer(modifier = Modifier.height(24.dp))
             Box(
@@ -162,13 +162,13 @@ private fun TvSignInContent(
                 modifier = Modifier
                     .width(377.dp)
                     .height(1.dp)
-                    .background(TvColors.Gray),
+                    .background(TvColors.TextSecondary),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_sign_in_or_enter_code),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.SignInSubtitle,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -191,7 +191,7 @@ private fun TvSignInContent(
                         )
                     }
                 },
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.SignInSubtitle,
             )
         }
     }
@@ -210,11 +210,11 @@ private fun CodeCharacterBox(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(width = 48.dp, height = 56.dp)
-            .background(TvColors.Gray, RoundedCornerShape(8.dp)),
+            .background(TvColors.BgActive20, RoundedCornerShape(8.dp)),
     ) {
         Text(
             text = character,
-            color = Color.White,
+            color = TvColors.TextSecondary,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
         )
