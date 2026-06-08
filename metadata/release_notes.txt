@@ -1,7 +1,11 @@
+
 *   New Features
-    *   Show episode summaries where possible
-        ([#5276](https://github.com/Automattic/pocket-casts-android/pull/5276))
-    *   Show episode summary on fullscreen player
-        ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
-    *   Use generated chapters when author didn't provide them
-        ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+    *   Add the explicit badge to the Discover section
+        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+*   Bug Fixes
+    *   Fix Profile settings gear being unreachable in landscape
+        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
+    *   Fix missing episode dates and durations in Android Auto and Wear OS
+        ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
