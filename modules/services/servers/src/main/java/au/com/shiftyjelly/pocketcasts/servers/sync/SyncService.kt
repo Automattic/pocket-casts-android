@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncReques
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
@@ -70,7 +71,7 @@ interface SyncService {
     suspend fun deviceAuthorize(@Body request: DeviceAuthorizeRequest): DeviceAuthorizeResponse
 
     @POST("/user/token")
-    suspend fun deviceToken(@Body request: DeviceTokenRequest): LoginTokenResponse
+    suspend fun deviceToken(@Body request: DeviceTokenRequest): DeviceTokenResponse
 
     @POST("/user/register_pocket_casts")
     suspend fun register(@Body request: RegisterRequest): LoginTokenResponse

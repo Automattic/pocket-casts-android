@@ -228,7 +228,23 @@ class SyncManagerImpl @Inject constructor(
     ): LoginResult {
         return try {
             val response = syncServiceManager.deviceToken(deviceCode)
-            val result = handleTokenResponse(LoginIdentity.PocketCasts, response)
+            val email = response.email.orEmpty()
+            val uuid = response.uuid.orEmpty()
+            syncAccountManager.addAccount(
+                email = email,
+                uuid = uuid,
+                refreshToken = response.refreshToken,
+                accessToken = response.accessToken,
+                loginIdentity = LoginIdentity.PocketCasts,
+            )
+            isLoggedInObservable.accept(true)
+            settings.setFullySignedOut(false)
+            settings.setLastModified(null)
+            val result = AuthResultModel(
+                token = response.accessToken,
+                uuid = uuid,
+                isNewAccount = false,
+            )
             trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.PocketCasts)
             LoginResult.Success(result)
         } catch (ex: HttpException) {

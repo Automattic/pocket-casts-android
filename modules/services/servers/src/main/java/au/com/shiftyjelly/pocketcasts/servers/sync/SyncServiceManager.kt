@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncReques
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
@@ -120,7 +121,7 @@ open class SyncServiceManager @Inject constructor(
         return service.deviceAuthorize(request)
     }
 
-    suspend fun deviceToken(deviceCode: String, scope: String = SCOPE_TV): LoginTokenResponse {
+    suspend fun deviceToken(deviceCode: String, scope: String = SCOPE_TV): DeviceTokenResponse {
         val request = DeviceTokenRequest(deviceCode = deviceCode, scope = scope)
         return service.deviceToken(request)
     }
