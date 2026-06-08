@@ -114,7 +114,7 @@ private fun TvSignInContent(
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val qrPainter = rememberQrPainter(content = verificationUriComplete, size = 148.dp)
+    val qrPainter = rememberQrPainter(content = verificationUriComplete, size = 118.dp)
     val url = stringResource(LR.string.tv_sign_in_url)
 
     Box(
@@ -148,21 +148,21 @@ private fun TvSignInContent(
             Spacer(modifier = Modifier.height(24.dp))
             Box(
                 modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(8.dp),
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .padding(4.dp),
             ) {
                 Image(
                     painter = qrPainter,
                     contentDescription = stringResource(LR.string.tv_onboarding_sign_in_title),
-                    modifier = Modifier.size(148.dp),
+                    modifier = Modifier.size(118.dp),
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
             Box(
                 modifier = Modifier
                     .width(377.dp)
-                    .height(1.dp)
-                    .background(TvColors.TextSecondary),
+                    .height(0.5.dp)
+                    .background(TvColors.Divider),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
