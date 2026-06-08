@@ -26,14 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.tv.material3.Border
 import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -84,43 +83,33 @@ fun TvWelcomeScreen(
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(36.dp),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
                 color = Color.White,
-                fontSize = 32.sp,
+                style = TvTextStyles.WelcomeTitle,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
                 color = TvColors.TextSecondary,
-                fontSize = 18.sp,
+                style = TvTextStyles.WelcomeSubtitle,
             )
             Spacer(modifier = Modifier.height(32.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(
                     onClick = onSignIn,
-                    colors = ButtonDefaults.colors(
-                        containerColor = TvColors.DarkGray,
-                        contentColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        focusedContentColor = TvColors.Dark,
-                    ),
+                    colors = TvButtonDefaults.filledButtonColors(),
                     modifier = Modifier.focusRequester(focusRequester),
                 ) {
                     Text(text = stringResource(LR.string.sign_in))
                 }
                 Button(
                     onClick = onCreateAccount,
-                    colors = ButtonDefaults.colors(
-                        containerColor = TvColors.DarkGray,
-                        contentColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        focusedContentColor = TvColors.Dark,
-                    ),
+                    colors = TvButtonDefaults.filledButtonColors(),
                 ) {
                     Text(text = stringResource(LR.string.tv_onboarding_create_free_account))
                 }
@@ -130,16 +119,8 @@ fun TvWelcomeScreen(
 
             Button(
                 onClick = onContinueWithoutAccount,
-                colors = ButtonDefaults.colors(
-                    containerColor = Color.Transparent,
-                    contentColor = TvColors.TextSecondary,
-                    focusedContainerColor = Color.White.copy(alpha = 0.1f),
-                    focusedContentColor = Color.White,
-                ),
-                border = ButtonDefaults.border(
-                    border = Border.None,
-                    focusedBorder = Border.None,
-                ),
+                colors = TvButtonDefaults.borderlessButtonColors(),
+                border = TvButtonDefaults.borderlessButtonBorder(),
             ) {
                 Text(text = stringResource(LR.string.tv_onboarding_browse_without_account))
             }
