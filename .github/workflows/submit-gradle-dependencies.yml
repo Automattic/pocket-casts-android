@@ -16,4 +16,4 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Setup Gradle to generate and submit dependency graphs
-        uses: gradle/actions/dependency-submission@v6
+        uses: gradle/actions/dependency-submission@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
