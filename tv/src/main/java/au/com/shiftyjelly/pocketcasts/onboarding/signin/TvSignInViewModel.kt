@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,8 @@ class TvSignInViewModel @Inject constructor(
                     verificationUriComplete = response.verificationUriComplete,
                 )
                 pollForApproval(response.deviceCode, response.interval.toLong())
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Timber.e(e, "Failed to request device code")
                 _uiState.value = TvSignInUiState.Error
@@ -46,7 +49,7 @@ class TvSignInViewModel @Inject constructor(
 
     private suspend fun pollForApproval(deviceCode: String, intervalSeconds: Long) {
         while (true) {
-            delay(intervalSeconds * 1000)
+            delay(intervalSeconds.coerceAtLeast(MIN_POLL_INTERVAL_SECONDS) * 1000)
             val result = syncManager.loginWithDeviceAuth(
                 deviceCode = deviceCode,
                 signInSource = SignInSource.UserInitiated.Onboarding,
@@ -76,6 +79,7 @@ class TvSignInViewModel @Inject constructor(
 
     companion object {
         private const val AUTHORIZATION_PENDING = "authorization_pending"
+        private const val MIN_POLL_INTERVAL_SECONDS = 5L
     }
 }
 

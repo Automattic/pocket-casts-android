@@ -35,10 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.rememberQrPainter
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -70,7 +72,7 @@ fun TvSignInScreen(
             modifier = modifier,
         )
 
-        is TvSignInUiState.Error -> TvSignInLoading(modifier)
+        is TvSignInUiState.Error -> TvSignInError(onRetry = viewModel::retry, modifier = modifier)
 
         is TvSignInUiState.Complete -> TvSignInLoading(modifier)
     }
@@ -100,6 +102,47 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
                 color = Color.White,
                 style = TvTextStyles.WelcomeTitle,
             )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun TvSignInError(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(TvColors.Dark),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+                contentDescription = null,
+                modifier = Modifier.size(36.dp),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(LR.string.error_generic_message),
+                color = TvColors.TextSecondary,
+                style = TvTextStyles.SignInSubtitle,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onRetry,
+                colors = TvButtonDefaults.filledButtonColors(),
+                modifier = Modifier.focusRequester(focusRequester),
+            ) {
+                Text(text = stringResource(LR.string.retry))
+            }
         }
     }
 
@@ -234,6 +277,16 @@ private fun TvSignInScreenLoadingPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
             TvSignInLoading()
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSignInScreenErrorPreview() {
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            TvSignInError(onRetry = {})
         }
     }
 }
