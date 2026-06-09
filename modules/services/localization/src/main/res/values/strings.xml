@@ -2830,4 +2830,6 @@
     <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
     <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
+    <string name="tv_onboarding_welcome_back">Welcome back!</string>
+    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
 </resources>
