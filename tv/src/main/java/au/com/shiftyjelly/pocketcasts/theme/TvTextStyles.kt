@@ -61,7 +61,6 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
-
     val WelcomeSubtitle = TextStyle(
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
