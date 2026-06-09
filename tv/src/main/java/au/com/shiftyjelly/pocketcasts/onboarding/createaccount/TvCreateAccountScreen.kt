@@ -43,7 +43,7 @@ fun TvCreateAccountScreen(
 ) {
     val focusRequester = remember { FocusRequester() }
     val createAccountUrl = remember { "https://${BuildConfig.WEB_BASE_HOST}/create" }
-    val qrPainter = rememberQrPainter(content = createAccountUrl, size = 160.dp)
+    val qrPainter = rememberQrPainter(content = createAccountUrl, size = 118.dp)
 
     Box(
         contentAlignment = Alignment.Center,
@@ -80,7 +80,7 @@ fun TvCreateAccountScreen(
                 Image(
                     painter = qrPainter,
                     contentDescription = stringResource(LR.string.tv_create_account_subtitle),
-                    modifier = Modifier.size(160.dp),
+                    modifier = Modifier.size(118.dp),
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
