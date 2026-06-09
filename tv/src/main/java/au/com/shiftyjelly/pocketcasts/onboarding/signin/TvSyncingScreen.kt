@@ -38,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -57,6 +57,7 @@ private const val COVER_CORNER_RADIUS_DP = 11
 private const val COVER_SPACING_DP = 12
 private const val ANIMATION_OFFSET_DP = 200
 private const val SCROLL_DURATION_MS = 20_000
+private const val MIN_COVERS_IN_ROW = 10
 
 @Composable
 fun TvSyncingScreen(
@@ -155,10 +156,8 @@ private fun TvSyncingCoverRow(
 
     val offsetPx = with(LocalDensity.current) { ANIMATION_OFFSET_DP.dp.toPx() }
 
-    val artworkUrls = remember(podcastUuids) {
-        podcastUuids.map { uuid ->
-            PodcastImage.getArtworkUrl(size = 480, uuid = uuid, isWearOS = false)
-        }
+    val coverItems = remember(podcastUuids) {
+        buildCoverItems(podcastUuids)
     }
 
     Box(modifier = modifier.clipToBounds()) {
@@ -168,21 +167,18 @@ private fun TvSyncingCoverRow(
                 .wrapContentWidth(unbounded = true)
                 .graphicsLayer { translationX = animationProgress * offsetPx },
         ) {
-            if (artworkUrls.isNotEmpty()) {
-                artworkUrls.forEach { url ->
-                    AsyncImage(
-                        model = url,
+            coverItems.forEach { item ->
+                when (item) {
+                    is CoverItem.Remote -> AsyncImage(
+                        model = item.url,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(COVER_SIZE_DP.dp)
                             .clip(RoundedCornerShape(COVER_CORNER_RADIUS_DP.dp)),
                     )
-                }
-            } else {
-                artworkResIds.forEach { resId ->
-                    Image(
-                        painter = painterResource(resId),
+                    is CoverItem.Local -> Image(
+                        painter = painterResource(item.resId),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -193,6 +189,24 @@ private fun TvSyncingCoverRow(
             }
         }
     }
+}
+
+private sealed interface CoverItem {
+    data class Remote(val url: String) : CoverItem
+    data class Local(val resId: Int) : CoverItem
+}
+
+private fun buildCoverItems(podcastUuids: List<String>): List<CoverItem> {
+    val remoteItems = podcastUuids.map { uuid ->
+        CoverItem.Remote(PodcastImage.getArtworkUrl(size = 480, uuid = uuid, isWearOS = false))
+    }
+    if (remoteItems.size >= MIN_COVERS_IN_ROW) return remoteItems
+
+    val localItems = artworkResIds.map { CoverItem.Local(it) }
+    if (remoteItems.isEmpty()) return localItems
+
+    val padding = localItems.take(MIN_COVERS_IN_ROW - remoteItems.size)
+    return remoteItems + padding
 }
 
 @Preview(device = Devices.TV_1080p)
