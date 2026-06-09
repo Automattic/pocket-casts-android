@@ -18,6 +18,14 @@ object TvButtonDefaults {
     )
 
     @Composable
+    fun prominentButtonColors(): ButtonColors = ButtonDefaults.colors(
+        containerColor = Color.White,
+        contentColor = TvColors.Dark,
+        focusedContainerColor = Color.White,
+        focusedContentColor = TvColors.Dark,
+    )
+
+    @Composable
     fun borderlessButtonColors(): ButtonColors = ButtonDefaults.colors(
         containerColor = Color.Transparent,
         contentColor = TvColors.TextSecondary,

@@ -28,10 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -107,12 +107,7 @@ fun TvSignInScreen(
             Spacer(modifier = Modifier.height(48.dp))
             Button(
                 onClick = onSignInComplete,
-                colors = ButtonDefaults.colors(
-                    containerColor = Color.White,
-                    contentColor = TvColors.Dark,
-                    focusedContainerColor = Color.White,
-                    focusedContentColor = TvColors.Dark,
-                ),
+                colors = TvButtonDefaults.prominentButtonColors(),
                 modifier = Modifier
                     .widthIn(min = 280.dp)
                     .focusRequester(focusRequester),
