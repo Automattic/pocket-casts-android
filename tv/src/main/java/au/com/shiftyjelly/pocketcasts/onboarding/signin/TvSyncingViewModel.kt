@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.coroutines.EmptyCoroutineContext
 
 fun interface SyncCompletionWaiter {
     suspend fun awaitCompletion()
@@ -33,10 +33,27 @@ object SyncCompletionModule {
     @Provides
     fun provideSyncCompletionWaiter(
         @ApplicationContext context: Context,
+        podcastManager: PodcastManager,
     ): SyncCompletionWaiter = SyncCompletionWaiter {
         RefreshPodcastsTask.runNowSync(context, CoroutineScope(EmptyCoroutineContext))
+        awaitSubscriptionQueueDrain(podcastManager)
+    }
+
+    private suspend fun awaitSubscriptionQueueDrain(podcastManager: PodcastManager) {
+        var consecutiveEmptyChecks = 0
+        while (consecutiveEmptyChecks < REQUIRED_EMPTY_CHECKS) {
+            delay(SUBSCRIPTION_POLL_INTERVAL_MS)
+            if (podcastManager.isSubscribingToPodcasts()) {
+                consecutiveEmptyChecks = 0
+            } else {
+                consecutiveEmptyChecks++
+            }
+        }
     }
 }
+
+private const val SUBSCRIPTION_POLL_INTERVAL_MS = 300L
+private const val REQUIRED_EMPTY_CHECKS = 5
 
 @HiltViewModel
 class TvSyncingViewModel @Inject constructor(

@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -67,42 +68,55 @@ class TvSyncingViewModelTest {
     }
 
     @Test
-    fun `sync complete after both sync finishes and minimum display time`() = runTest {
+    fun `waits for both sync and minimum display time`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitItem().syncComplete)
 
-            // Sync finishes but minimum time hasn't elapsed
             syncCompletion.complete(Unit)
             advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS - 1)
             expectNoEvents()
 
-            // Minimum time elapses
             advanceTimeBy(1)
             assertTrue(awaitItem().syncComplete)
         }
     }
 
     @Test
-    fun `sync complete waits for sync even after minimum display time`() = runTest {
+    fun `waits for sync even after minimum display time elapsed`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitItem().syncComplete)
 
-            // Minimum time passes but sync hasn't finished
             advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS)
             expectNoEvents()
 
-            // Sync finishes
             syncCompletion.complete(Unit)
             assertTrue(awaitItem().syncComplete)
         }
     }
 
     @Test
-    fun `sync complete is set even when sync fails`() = runTest {
+    fun `waits for slow sync that exceeds minimum display time`() = runTest {
+        val slowSyncDuration = TvSyncingViewModel.MIN_DISPLAY_TIME_MS * 3
+        val slowWaiter = SyncCompletionWaiter { delay(slowSyncDuration) }
+        val viewModel = createViewModel(syncWaiter = slowWaiter)
+
+        viewModel.uiState.test {
+            assertFalse(awaitItem().syncComplete)
+
+            advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS)
+            expectNoEvents()
+
+            advanceTimeBy(slowSyncDuration - TvSyncingViewModel.MIN_DISPLAY_TIME_MS)
+            assertTrue(awaitItem().syncComplete)
+        }
+    }
+
+    @Test
+    fun `completes on sync failure after minimum display time`() = runTest {
         whenever(podcastManager.refreshPodcastsAfterSignIn()).thenThrow(RuntimeException("Network error"))
 
         val viewModel = createViewModel()
@@ -115,18 +129,32 @@ class TvSyncingViewModelTest {
     }
 
     @Test
-    fun `sync not complete before minimum display time elapses`() = runTest {
-        val viewModel = createViewModel()
+    fun `completes on waiter failure after minimum display time`() = runTest {
+        val failingWaiter = SyncCompletionWaiter { throw RuntimeException("Sync crashed") }
+        val viewModel = createViewModel(syncWaiter = failingWaiter)
+
+        viewModel.uiState.test {
+            awaitItem()
+            advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS)
+            assertTrue(awaitItem().syncComplete)
+        }
+    }
+
+    @Test
+    fun `not complete before minimum display time even if sync finished`() = runTest {
+        val instantWaiter = SyncCompletionWaiter { }
+        val viewModel = createViewModel(syncWaiter = instantWaiter)
 
         viewModel.uiState.test {
             assertFalse(awaitItem().syncComplete)
-            syncCompletion.complete(Unit)
             advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS - 1)
             expectNoEvents()
         }
     }
 
-    private fun createViewModel() = TvSyncingViewModel(podcastManager, syncCompletionWaiter)
+    private fun createViewModel(
+        syncWaiter: SyncCompletionWaiter = syncCompletionWaiter,
+    ) = TvSyncingViewModel(podcastManager, syncWaiter)
 
     private fun podcast(uuid: String) = Podcast(uuid = uuid)
 }
