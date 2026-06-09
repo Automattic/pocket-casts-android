@@ -1,12 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
@@ -20,7 +17,6 @@ import timber.log.Timber
 @HiltViewModel
 class TvSyncingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TvSyncingUiState())
@@ -47,7 +43,6 @@ class TvSyncingViewModel @Inject constructor(
             val minimumDisplayTime = launch { delay(MIN_DISPLAY_TIME_MS) }
             try {
                 podcastManager.refreshPodcastsAfterSignIn()
-                RefreshPodcastsTask.runNowSync(context, viewModelScope)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
