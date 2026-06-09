@@ -192,12 +192,12 @@ class TranscriptViewModel @AssistedInject constructor(
             return
         }
 
-        val fromPositionSeconds = currentPlaybackPositionMs / 1000
+        val fromPositionSeconds = currentPlaybackPositionMs / 1000L
         playbackManager.seekToTimeMs(seekTimeMs)
         track { source, podcastUuid, episodeUuid ->
             SyncedTranscriptsSeekUsedEvent(
                 fromPositionSeconds = fromPositionSeconds,
-                toPositionSeconds = seekTimeMs / 1000,
+                toPositionSeconds = seekTimeMs / 1000L,
                 podcastUuid = podcastUuid,
                 episodeUuid = episodeUuid,
                 source = source,
@@ -371,7 +371,7 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    fun trackAutoScrollResumed(manualScrollDurationMs: Int?) {
+    fun trackAutoScrollResumed(manualScrollDurationMs: Long?) {
         track { source, podcastUuid, episodeUuid ->
             SyncedTranscriptsAutoScrollResumedEvent(
                 manualScrollDurationMs = manualScrollDurationMs,

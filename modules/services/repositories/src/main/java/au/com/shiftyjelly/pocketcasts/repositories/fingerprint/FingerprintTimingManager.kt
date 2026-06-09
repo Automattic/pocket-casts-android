@@ -193,8 +193,8 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: stopped")
     }
 
-    private fun elapsedPreparationMs(): Int =
-        if (preparationStartMs == 0L) 0 else (System.currentTimeMillis() - preparationStartMs).toInt()
+    private fun elapsedPreparationMs(): Long =
+        if (preparationStartMs == 0L) 0L else System.currentTimeMillis() - preparationStartMs
 
     private fun markUnavailable(
         reason: String,
@@ -318,7 +318,7 @@ class FingerprintTimingManager @Inject constructor(
         preparationStartMs = System.currentTimeMillis()
         eventHorizon.track(
             SyncedTranscriptsPreparationStartedEvent(
-                episodeDurationSeconds = durationSec.toInt(),
+                episodeDurationSeconds = durationSec.toLong(),
                 isStreaming = currentIsStreaming,
                 episodeUuid = episodeUuid,
             ),

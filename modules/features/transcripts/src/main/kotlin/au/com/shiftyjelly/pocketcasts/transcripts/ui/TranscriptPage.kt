@@ -341,7 +341,7 @@ private fun AutoScrollEffect(
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
     onSuppressScroll: () -> Unit,
-    onResumeScroll: (manualScrollDurationMs: Int?) -> Unit,
+    onResumeScroll: (manualScrollDurationMs: Long?) -> Unit,
 ) {
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
@@ -357,7 +357,7 @@ private fun UserScrollDetectionEffect(
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
-                    val manualScrollDurationMs = dragStartMs?.let { (System.currentTimeMillis() - it).toInt() }
+                    val manualScrollDurationMs = dragStartMs?.let { System.currentTimeMillis() - it }
                     dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {
