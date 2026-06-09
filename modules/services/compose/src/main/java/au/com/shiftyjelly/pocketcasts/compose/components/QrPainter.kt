@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.compose
+package au.com.shiftyjelly.pocketcasts.compose.components
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -33,6 +33,8 @@ private sealed class QrState {
 fun rememberQrPainter(
     content: String,
     size: Dp = 300.dp,
+    foregroundColor: Int = Color.BLACK,
+    backgroundColor: Int = Color.WHITE,
 ): Painter {
     val density = LocalDensity.current
     val sizePx = with(density) { size.roundToPx() }
@@ -64,8 +66,8 @@ fun rememberQrPainter(
                 for (x in 0 until bitMatrix.width) {
                     for (y in 0 until bitMatrix.height) {
                         val shouldColorPixel = bitMatrix[x, y]
-                        val color = if (shouldColorPixel) Color.WHITE else Color.BLACK
-                        newBitmap[x, y] = color
+                        val pixelColor = if (shouldColorPixel) foregroundColor else backgroundColor
+                        newBitmap[x, y] = pixelColor
                     }
                 }
 
@@ -76,7 +78,6 @@ fun rememberQrPainter(
             }
         }
 
-        // Recycle the bitmap
         awaitDispose {
             val currentState = value
             if (currentState is QrState.Success) {

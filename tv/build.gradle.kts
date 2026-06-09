@@ -65,7 +65,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
-    implementation(libs.zxing)
 
     implementation(platform(libs.firebase.bom))
 
