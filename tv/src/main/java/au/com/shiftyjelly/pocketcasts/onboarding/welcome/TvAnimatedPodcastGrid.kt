@@ -56,7 +56,7 @@ private val ArtworkResIds = listOf(
 )
 
 @Composable
-fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
+internal fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "podcast_grid")
     val animationProgress by infiniteTransition.animateFloat(
         initialValue = -1f,
