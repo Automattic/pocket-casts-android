@@ -36,7 +36,7 @@ private const val ANIMATION_DURATION_MS = 20_000
 private const val ROW_COUNT = 3
 private const val TILES_PER_ROW = 10
 
-private val ArtworkResIds = listOf(
+private val artworkResIds = listOf(
     IR.drawable.artwork_0,
     IR.drawable.artwork_1,
     IR.drawable.artwork_2,
@@ -56,7 +56,7 @@ private val ArtworkResIds = listOf(
 )
 
 @Composable
-fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
+internal fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "podcast_grid")
     val animationProgress by infiniteTransition.animateFloat(
         initialValue = -1f,
@@ -73,7 +73,7 @@ fun TvAnimatedPodcastGrid(modifier: Modifier = Modifier) {
     val rows = remember {
         (0 until ROW_COUNT).map { rowIndex ->
             (0 until TILES_PER_ROW).map { tileIndex ->
-                ArtworkResIds[(rowIndex * TILES_PER_ROW + tileIndex) % ArtworkResIds.size]
+                artworkResIds[(rowIndex * TILES_PER_ROW + tileIndex) % artworkResIds.size]
             }
         }
     }
