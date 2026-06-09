@@ -367,6 +367,7 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-09"),
     ),
 }
 

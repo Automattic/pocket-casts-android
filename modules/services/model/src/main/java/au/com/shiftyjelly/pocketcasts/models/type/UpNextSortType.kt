@@ -32,8 +32,7 @@ enum class UpNextSortType(
         }
     },
     ShortestToLongest(
-        // TODO: Add a dedicated UpNextSortOrderType once the eventhorizon schema supports duration sorting.
-        analyticsValue = UpNextSortOrderType.Unknown,
+        analyticsValue = UpNextSortOrderType.ShortestToLongest,
         descriptionId = LR.string.sort_shortest_to_longest,
     ) {
         // Episodes without a known duration always sort to the bottom.
@@ -46,8 +45,7 @@ enum class UpNextSortType(
         }
     },
     LongestToShortest(
-        // TODO: Add a dedicated UpNextSortOrderType once the eventhorizon schema supports duration sorting.
-        analyticsValue = UpNextSortOrderType.Unknown,
+        analyticsValue = UpNextSortOrderType.LongestToShortest,
         descriptionId = LR.string.sort_longest_to_shortest,
     ) {
         // Episodes without a known duration always sort to the bottom.
