@@ -2,10 +2,11 @@ package au.com.shiftyjelly.pocketcasts.onboarding
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingUiState
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.SyncCompletionWaiter
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.advanceTimeBy
@@ -29,6 +30,8 @@ class TvSyncingViewModelTest {
     private val podcastManager = mock<PodcastManager> {
         whenever(it.findSubscribedFlow()).thenReturn(podcastsFlow)
     }
+    private val syncCompletion = CompletableDeferred<Unit>()
+    private val syncCompletionWaiter = SyncCompletionWaiter { syncCompletion.await() }
 
     @Test
     fun `initial state has no podcasts and sync not complete`() = runTest {
@@ -64,13 +67,36 @@ class TvSyncingViewModelTest {
     }
 
     @Test
-    fun `sync complete is set after minimum display time`() = runTest {
+    fun `sync complete after both sync finishes and minimum display time`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitItem().syncComplete)
 
+            // Sync finishes but minimum time hasn't elapsed
+            syncCompletion.complete(Unit)
+            advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS - 1)
+            expectNoEvents()
+
+            // Minimum time elapses
+            advanceTimeBy(1)
+            assertTrue(awaitItem().syncComplete)
+        }
+    }
+
+    @Test
+    fun `sync complete waits for sync even after minimum display time`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertFalse(awaitItem().syncComplete)
+
+            // Minimum time passes but sync hasn't finished
             advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS)
+            expectNoEvents()
+
+            // Sync finishes
+            syncCompletion.complete(Unit)
             assertTrue(awaitItem().syncComplete)
         }
     }
@@ -94,13 +120,13 @@ class TvSyncingViewModelTest {
 
         viewModel.uiState.test {
             assertFalse(awaitItem().syncComplete)
-
+            syncCompletion.complete(Unit)
             advanceTimeBy(TvSyncingViewModel.MIN_DISPLAY_TIME_MS - 1)
             expectNoEvents()
         }
     }
 
-    private fun createViewModel() = TvSyncingViewModel(podcastManager)
+    private fun createViewModel() = TvSyncingViewModel(podcastManager, syncCompletionWaiter)
 
     private fun podcast(uuid: String) = Podcast(uuid = uuid)
 }
