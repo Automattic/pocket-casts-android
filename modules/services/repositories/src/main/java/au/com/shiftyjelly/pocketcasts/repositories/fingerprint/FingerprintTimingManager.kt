@@ -193,8 +193,7 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: stopped")
     }
 
-    private fun elapsedPreparationMs(): Long =
-        if (preparationStartMs == 0L) 0L else System.currentTimeMillis() - preparationStartMs
+    private fun elapsedPreparationMs(): Long = if (preparationStartMs == 0L) 0L else System.currentTimeMillis() - preparationStartMs
 
     private fun markUnavailable(
         reason: String,
