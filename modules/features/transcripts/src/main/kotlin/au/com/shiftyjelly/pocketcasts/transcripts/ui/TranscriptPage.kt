@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -352,12 +353,12 @@ private fun UserScrollDetectionEffect(
             when (interaction) {
                 is DragInteraction.Start -> {
                     resumeJob?.cancel()
-                    dragStartMs = System.currentTimeMillis()
+                    dragStartMs = SystemClock.elapsedRealtime()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
-                    val manualScrollDurationMs = dragStartMs?.let { System.currentTimeMillis() - it }
+                    val manualScrollDurationMs = dragStartMs?.let { SystemClock.elapsedRealtime() - it }
                     dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {

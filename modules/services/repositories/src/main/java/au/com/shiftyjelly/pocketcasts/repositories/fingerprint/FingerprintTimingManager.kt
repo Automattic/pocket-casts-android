@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
@@ -147,7 +148,8 @@ class FingerprintTimingManager @Inject constructor(
 
     fun prepareForCurrentEpisode() {
         val episode = playbackManager.getCurrentEpisode() ?: run {
-            markUnavailable(reason = "no_episode")
+            // No episode is currently loaded, so there is no episode UUID to attribute this to.
+            markUnavailable(reason = "no_episode", episodeUuid = null)
             return
         }
 
@@ -193,7 +195,7 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: stopped")
     }
 
-    private fun elapsedPreparationMs(): Long = if (preparationStartMs == 0L) 0L else System.currentTimeMillis() - preparationStartMs
+    private fun elapsedPreparationMs(): Long = if (preparationStartMs == 0L) 0L else SystemClock.elapsedRealtime() - preparationStartMs
 
     private fun markUnavailable(
         reason: String,
@@ -306,7 +308,8 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         if (audioSource == null) {
-            markUnavailable(reason = "no_audio_source", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            // Neither downloaded nor streamable, so isStreaming would be misleading here.
+            markUnavailable(reason = "no_audio_source", episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no audio source for $episodeUuid")
             return
         }
@@ -314,7 +317,7 @@ class FingerprintTimingManager @Inject constructor(
         currentEpisodeUuid = episodeUuid
         currentAudioFilePath = audioSource
         currentIsStreaming = !isDownloaded
-        preparationStartMs = System.currentTimeMillis()
+        preparationStartMs = SystemClock.elapsedRealtime()
         eventHorizon.track(
             SyncedTranscriptsPreparationStartedEvent(
                 episodeDurationSeconds = durationSec.toLong(),
