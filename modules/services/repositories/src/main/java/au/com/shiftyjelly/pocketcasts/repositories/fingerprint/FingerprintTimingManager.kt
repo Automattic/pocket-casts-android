@@ -4,10 +4,16 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import androidx.annotation.VisibleForTesting
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsPreparationStartedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsUnavailableEvent
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -40,6 +46,7 @@ import uniffi.fingerprint_uniffi.WindowedFingerprint
 class FingerprintTimingManager @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val referenceRetriever: FingerprintReferenceRetriever,
+    private val eventHorizon: EventHorizon,
 ) {
 
     sealed interface State {
@@ -116,6 +123,10 @@ class FingerprintTimingManager @Inject constructor(
     private var currentMatcher: CheckpointMatcher? = null
     private var hasReachedActive = false
 
+    // Analytics context for the current preparation.
+    private var preparationStartMs: Long = 0
+    private var currentIsStreaming: Boolean = false
+
     init {
         observePlaybackForProactivePreparation()
     }
@@ -136,7 +147,7 @@ class FingerprintTimingManager @Inject constructor(
 
     fun prepareForCurrentEpisode() {
         val episode = playbackManager.getCurrentEpisode() ?: run {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "no_episode")
             return
         }
 
@@ -182,6 +193,52 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: stopped")
     }
 
+    private fun elapsedPreparationMs(): Int =
+        if (preparationStartMs == 0L) 0 else (System.currentTimeMillis() - preparationStartMs).toInt()
+
+    private fun markUnavailable(
+        reason: String,
+        isStreaming: Boolean? = null,
+        episodeUuid: String? = currentEpisodeUuid,
+    ) {
+        _stateFlow.value = State.Unavailable
+        eventHorizon.track(
+            SyncedTranscriptsUnavailableEvent(
+                reason = reason,
+                isStreaming = isStreaming,
+                episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+        )
+    }
+
+    private fun markFailed(error: Throwable, stage: String) {
+        _stateFlow.value = State.Failed(error)
+        eventHorizon.track(
+            SyncedTranscriptsPreparationFailedEvent(
+                errorCode = 0,
+                errorDomain = error.javaClass.name,
+                stage = stage,
+                durationMs = elapsedPreparationMs(),
+                episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+        )
+    }
+
+    private fun markActive(coverage: Int) {
+        _stateFlow.value = State.Active(coverage)
+        if (!hasReachedActive) {
+            hasReachedActive = true
+            Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
+            eventHorizon.track(
+                SyncedTranscriptsPreparationCompletedEvent(
+                    durationMs = elapsedPreparationMs(),
+                    isStreaming = currentIsStreaming,
+                    episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                ),
+            )
+        }
+    }
+
     fun referenceTime(forPlaybackTimeMs: Int): Double? {
         val playbackTimeSec = forPlaybackTimeMs / 1000.0
         return interpolate(
@@ -223,6 +280,8 @@ class FingerprintTimingManager @Inject constructor(
         currentMatcher?.close()
         currentMatcher = null
         hasReachedActive = false
+        preparationStartMs = 0
+        currentIsStreaming = false
         processedStart = Double.MAX_VALUE
         processedFrontier = 0.0
         _isAdInProgress.value = false
@@ -236,25 +295,34 @@ class FingerprintTimingManager @Inject constructor(
         durationSec: Double,
     ) {
         if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "feature_disabled", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: feature disabled")
             return
         }
 
         if (durationSec <= 0) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "invalid_duration", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: invalid duration for $episodeUuid")
             return
         }
 
         if (audioSource == null) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "no_audio_source", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no audio source for $episodeUuid")
             return
         }
 
         currentEpisodeUuid = episodeUuid
         currentAudioFilePath = audioSource
+        currentIsStreaming = !isDownloaded
+        preparationStartMs = System.currentTimeMillis()
+        eventHorizon.track(
+            SyncedTranscriptsPreparationStartedEvent(
+                episodeDurationSeconds = durationSec.toInt(),
+                isStreaming = currentIsStreaming,
+                episodeUuid = episodeUuid,
+            ),
+        )
 
         // Try loading cached reference from disk (only for downloaded episodes)
         if (isDownloaded) {
@@ -276,14 +344,14 @@ class FingerprintTimingManager @Inject constructor(
         val referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
 
         if (referenceData == null) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "no_reference", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no reference available for $episodeUuid")
             return
         }
 
         val reference = ReferenceFingerprint.decode(referenceData)
         if (reference == null) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "reference_decode_failed", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: failed to decode reference for $episodeUuid")
             return
         }
@@ -302,7 +370,7 @@ class FingerprintTimingManager @Inject constructor(
     ) {
         val libraryCheckpoints = reference.libraryCheckpoints()
         if (libraryCheckpoints.isEmpty()) {
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "no_checkpoints", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no usable checkpoints for $episodeUuid")
             return
         }
@@ -344,7 +412,7 @@ class FingerprintTimingManager @Inject constructor(
                 processedFrontier = currentReferenceDuration
             }
             val coverage = cached.entries.size
-            _stateFlow.value = State.Active(coverage)
+            markActive(coverage)
             Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid ($coverage entries)")
             return
         }
@@ -456,7 +524,7 @@ class FingerprintTimingManager @Inject constructor(
             } catch (e: Exception) {
                 Timber.w(e, "FingerprintTimingManager: streaming fingerprint failed")
                 if (state !is State.Active) {
-                    _stateFlow.value = State.Failed(e)
+                    markFailed(e, stage = "fingerprint_stream")
                 }
             }
         }
@@ -471,7 +539,7 @@ class FingerprintTimingManager @Inject constructor(
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         if (!isRemoteUrl && !File(audioFilePath).exists()) {
             Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
             return
         }
 
@@ -481,7 +549,7 @@ class FingerprintTimingManager @Inject constructor(
         } catch (e: Exception) {
             extractor.release()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
-            _stateFlow.value = State.Failed(e)
+            markFailed(e, stage = "audio_open")
             return
         }
 
@@ -491,7 +559,7 @@ class FingerprintTimingManager @Inject constructor(
         }
         if (audioTrackIndex == null) {
             extractor.release()
-            _stateFlow.value = State.Unavailable
+            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
             Timber.w("FingerprintTimingManager: no audio track found")
             return
         }
@@ -702,11 +770,7 @@ class FingerprintTimingManager @Inject constructor(
         publishSnapshot()
         val coverage = mappingPlaybackToReference.size
         if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
-            _stateFlow.value = State.Active(coverage)
-            if (!hasReachedActive) {
-                hasReachedActive = true
-                Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
-            }
+            markActive(coverage)
         }
         val currentPositionMs = lastProgressPositionMs
         if (currentPositionMs >= 0) {

@@ -176,7 +176,12 @@ fun TranscriptPage(
     UserScrollDetectionEffect(
         listState = listState,
         onSuppressScroll = { isAutoScrollSuppressed = true },
-        onResumeScroll = { isAutoScrollSuppressed = false },
+        onResumeScroll = { manualScrollDurationMs ->
+            isAutoScrollSuppressed = false
+            if (uiState.isSyncedActive) {
+                viewModel?.trackAutoScrollResumed(manualScrollDurationMs)
+            }
+        },
     )
 
     KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
@@ -336,24 +341,28 @@ private fun AutoScrollEffect(
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
     onSuppressScroll: () -> Unit,
-    onResumeScroll: () -> Unit,
+    onResumeScroll: (manualScrollDurationMs: Int?) -> Unit,
 ) {
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
         var resumeJob: Job? = null
+        var dragStartMs: Long? = null
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
                     resumeJob?.cancel()
+                    dragStartMs = System.currentTimeMillis()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                    val manualScrollDurationMs = dragStartMs?.let { (System.currentTimeMillis() - it).toInt() }
+                    dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {
                         delay(AUTO_SCROLL_BACK_DELAY_MS)
-                        latestOnResumeScroll()
+                        latestOnResumeScroll(manualScrollDurationMs)
                     }
                 }
             }
