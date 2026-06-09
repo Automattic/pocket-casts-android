@@ -132,7 +132,7 @@ class UpNextSortTypeTest {
                 addedDate = Date(1),
             ),
             PodcastEpisode(
-                uuid = "1",
+                uuid = "3",
                 duration = 100.0,
                 publishedDate = Date(0),
                 addedDate = Date(0),
@@ -142,7 +142,7 @@ class UpNextSortTypeTest {
         assertEquals(
             listOf(
                 PodcastEpisode(
-                    uuid = "1",
+                    uuid = "3",
                     duration = 100.0,
                     publishedDate = Date(0),
                     addedDate = Date(0),
