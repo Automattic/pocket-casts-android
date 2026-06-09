@@ -249,13 +249,19 @@ class SyncManagerImpl @Inject constructor(
             LoginResult.Success(result)
         } catch (ex: HttpException) {
             val tokenError = ex.parseTokenErrorResponse(moshi)
-            LoginResult.Failed(
+            val result = LoginResult.Failed(
                 message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
                 messageId = tokenError?.error,
             )
+            if (tokenError?.error != "authorization_pending") {
+                trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            }
+            result
         } catch (ex: Exception) {
             Timber.e(ex, "Device auth failed")
-            exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+            val result = exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+            trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            result
         }
     }
 

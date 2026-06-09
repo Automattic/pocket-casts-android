@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -35,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.rememberQrPainter
@@ -51,7 +51,7 @@ fun TvSignInScreen(
     modifier: Modifier = Modifier,
     viewModel: TvSignInViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentOnSignInComplete by rememberUpdatedState(onSignInComplete)
 
     LaunchedEffect(uiState) {
@@ -160,7 +160,7 @@ private fun TvSignInContent(
             ) {
                 Image(
                     painter = qrPainter,
-                    contentDescription = stringResource(LR.string.tv_onboarding_sign_in_title),
+                    contentDescription = stringResource(LR.string.tv_onboarding_sign_in_instructions),
                     modifier = Modifier.size(118.dp),
                 )
             }

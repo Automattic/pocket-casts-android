@@ -43,7 +43,8 @@
 
         <service
             android:name=".auth.TvAuthenticatorService"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCOUNT_AUTHENTICATOR">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
