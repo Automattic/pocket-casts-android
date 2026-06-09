@@ -123,7 +123,13 @@ class UpNextSortTypeTest {
                 uuid = "0",
                 duration = 0.0,
                 publishedDate = Date(0),
-                addedDate = Date(0),
+                addedDate = Date(2),
+            ),
+            PodcastEpisode(
+                uuid = "1",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(1),
             ),
             PodcastEpisode(
                 uuid = "1",
@@ -149,10 +155,16 @@ class UpNextSortTypeTest {
                 ),
                 // Episodes without a known duration sort to the bottom.
                 PodcastEpisode(
+                    uuid = "1",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(1),
+                ),
+                PodcastEpisode(
                     uuid = "0",
                     duration = 0.0,
                     publishedDate = Date(0),
-                    addedDate = Date(0),
+                    addedDate = Date(2),
                 ),
             ),
             episodes.sortedWith(UpNextSortType.ShortestToLongest),
@@ -163,7 +175,7 @@ class UpNextSortTypeTest {
     fun `sort longest to shortest`() {
         val episodes = listOf(
             PodcastEpisode(
-                uuid = "1",
+                uuid = "2",
                 duration = 100.0,
                 publishedDate = Date(0),
                 addedDate = Date(0),
@@ -172,10 +184,16 @@ class UpNextSortTypeTest {
                 uuid = "0",
                 duration = 0.0,
                 publishedDate = Date(0),
-                addedDate = Date(0),
+                addedDate = Date(2),
             ),
             PodcastEpisode(
-                uuid = "2",
+                uuid = "1",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "3",
                 duration = 200.0,
                 publishedDate = Date(0),
                 addedDate = Date(0),
@@ -185,23 +203,29 @@ class UpNextSortTypeTest {
         assertEquals(
             listOf(
                 PodcastEpisode(
-                    uuid = "2",
+                    uuid = "3",
                     duration = 200.0,
                     publishedDate = Date(0),
                     addedDate = Date(0),
                 ),
                 PodcastEpisode(
-                    uuid = "1",
+                    uuid = "2",
                     duration = 100.0,
                     publishedDate = Date(0),
                     addedDate = Date(0),
                 ),
                 // Episodes without a known duration sort to the bottom.
                 PodcastEpisode(
+                    uuid = "1",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(1),
+                ),
+                PodcastEpisode(
                     uuid = "0",
                     duration = 0.0,
                     publishedDate = Date(0),
-                    addedDate = Date(0),
+                    addedDate = Date(2),
                 ),
             ),
             episodes.sortedWith(UpNextSortType.LongestToShortest),
