@@ -36,7 +36,7 @@ private const val ANIMATION_DURATION_MS = 20_000
 private const val ROW_COUNT = 3
 private const val TILES_PER_ROW = 10
 
-private val artworkResIds = listOf(
+internal val artworkResIds = listOf(
     IR.drawable.artwork_0,
     IR.drawable.artwork_1,
     IR.drawable.artwork_2,
