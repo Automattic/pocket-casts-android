@@ -53,6 +53,14 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
+    val SignInSubtitle = TextStyle(
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 18.sp,
+        textAlign = TextAlign.Center,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
     val WelcomeSubtitle = TextStyle(
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
