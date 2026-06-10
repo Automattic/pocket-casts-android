@@ -67,7 +67,10 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
-    implementation(libs.zxing)
+
+    implementation(platform(libs.firebase.bom))
+
+    implementation(platform(libs.firebase.bom))
 
     implementation(platform(libs.firebase.bom))
 
@@ -75,6 +78,7 @@ dependencies {
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.ui)
