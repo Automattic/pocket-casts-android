@@ -98,6 +98,8 @@
     <string name="you_might_like">You might like</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
+    <string name="sort_shortest_to_longest">Shortest to longest</string>
+    <string name="sort_longest_to_shortest">Longest to shortest</string>
     <string name="not_selected">Not selected</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
