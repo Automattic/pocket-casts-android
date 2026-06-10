@@ -52,8 +52,8 @@ object FingerprintConstants {
     /** Minimum fraction of reference timeline a cached mapping must cover. */
     const val FULL_COVERAGE_THRESHOLD = 0.95
 
-    /** Minimum unmatched gap in the processed range (seconds) to consider as an ad. */
-    const val AD_COVERAGE_GAP_SECONDS = 12.0
+    /** Max gap between bracketing anchors to consider playback on matched content. */
+    const val HIGHLIGHT_MAX_GAP_SECONDS = 8.0
 
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 4
