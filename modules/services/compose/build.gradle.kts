@@ -41,7 +41,6 @@ dependencies {
     implementation(libs.lottie.compose)
     implementation(libs.navigation.compose)
     implementation(libs.reorderable)
-    implementation(libs.zxing)
 
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)

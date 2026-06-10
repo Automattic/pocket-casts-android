@@ -115,6 +115,7 @@ dependencies {
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.preferences)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.sharing)

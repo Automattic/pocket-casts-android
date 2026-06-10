@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.compose.components
+package au.com.shiftyjelly.pocketcasts.qr
 
 import android.graphics.Bitmap
 import android.graphics.Color

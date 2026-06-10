@@ -72,6 +72,7 @@ dependencies {
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.ui)
