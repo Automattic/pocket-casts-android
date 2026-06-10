@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -24,6 +25,7 @@ class DriftFilterTest {
         manager = FingerprintTimingManager(
             playbackManager = playbackManager,
             referenceRetriever = mock(FingerprintReferenceRetriever::class.java),
+            eventHorizon = mock(EventHorizon::class.java),
         )
         manager.debugTrackingEnabled = true
     }

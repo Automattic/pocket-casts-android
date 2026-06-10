@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -176,7 +177,12 @@ fun TranscriptPage(
     UserScrollDetectionEffect(
         listState = listState,
         onSuppressScroll = { isAutoScrollSuppressed = true },
-        onResumeScroll = { isAutoScrollSuppressed = false },
+        onResumeScroll = { manualScrollDurationMs ->
+            isAutoScrollSuppressed = false
+            if (uiState.isSyncedActive) {
+                viewModel?.trackAutoScrollResumed(manualScrollDurationMs)
+            }
+        },
     )
 
     KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
@@ -346,24 +352,28 @@ private fun AutoScrollEffect(
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
     onSuppressScroll: () -> Unit,
-    onResumeScroll: () -> Unit,
+    onResumeScroll: (manualScrollDurationMs: Long?) -> Unit,
 ) {
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
         var resumeJob: Job? = null
+        var dragStartMs: Long? = null
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
                     resumeJob?.cancel()
+                    dragStartMs = SystemClock.elapsedRealtime()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                    val manualScrollDurationMs = dragStartMs?.let { SystemClock.elapsedRealtime() - it }
+                    dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {
                         delay(AUTO_SCROLL_BACK_DELAY_MS)
-                        latestOnResumeScroll()
+                        latestOnResumeScroll(manualScrollDurationMs)
                     }
                 }
             }
