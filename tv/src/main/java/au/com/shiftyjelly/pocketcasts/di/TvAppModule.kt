@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.di
 
 import android.content.Context
-import androidx.core.content.getSystemService
 import android.net.ConnectivityManager
+import androidx.core.content.getSystemService
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import dagger.Binds
 import dagger.Module
@@ -21,7 +21,7 @@ abstract class TvAppModule {
     companion object {
         @Provides
         fun connectivityManager(@ApplicationContext application: Context): ConnectivityManager {
-            return application.getSystemService<ConnectivityManager>()!!
+            return requireNotNull(application.getSystemService<ConnectivityManager>())
         }
 
         @Provides

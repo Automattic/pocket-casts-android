@@ -41,19 +41,22 @@ object SyncCompletionModule {
 
     private suspend fun awaitSubscriptionQueueDrain(podcastManager: PodcastManager) {
         var consecutiveEmptyChecks = 0
-        while (consecutiveEmptyChecks < REQUIRED_EMPTY_CHECKS) {
+        var totalChecks = 0
+        while (consecutiveEmptyChecks < REQUIRED_EMPTY_CHECKS && totalChecks < MAX_TOTAL_CHECKS) {
             delay(SUBSCRIPTION_POLL_INTERVAL_MS)
             if (podcastManager.isSubscribingToPodcasts()) {
                 consecutiveEmptyChecks = 0
             } else {
                 consecutiveEmptyChecks++
             }
+            totalChecks++
         }
     }
 }
 
 private const val SUBSCRIPTION_POLL_INTERVAL_MS = 300L
 private const val REQUIRED_EMPTY_CHECKS = 5
+private const val MAX_TOTAL_CHECKS = 100 // 30 seconds max wait
 
 @HiltViewModel
 class TvSyncingViewModel @Inject constructor(
