@@ -249,6 +249,8 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
+    <string name="tv_sign_in_qr_placeholder">QR Code</string>
+    <string name="tv_sign_in_url" translatable="false">pocketcasts.com/activate</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -2820,4 +2822,15 @@
     <string name="sponsored">Sponsored</string>
     <string name="play_latest_episode">Play latest episode</string>
     <string name="play_this_episode">Play this episode</string>
+
+    <!-- TV Onboarding -->
+    <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
+    <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
+    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_create_free_account">Create free account</string>
+    <string name="tv_onboarding_browse_without_account">Browse without an account</string>
+    <string name="tv_onboarding_sign_in_title">Sign in to Pocket Casts</string>
+    <string name="tv_onboarding_sign_in_instructions">Scan the QR code or visit the URL below and enter the code</string>
+    <string name="tv_onboarding_signed_in">I\'ve signed in</string>
+    <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
 </resources>

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -58,11 +59,14 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
+
+    implementation(platform(libs.firebase.bom))
 
     implementation(projects.modules.features.shared)
     implementation(projects.modules.services.compose)
@@ -73,6 +77,7 @@ dependencies {
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
     testImplementation(libs.turbine)
     testImplementation(projects.modules.services.sharedtest)
 
