@@ -42,6 +42,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
@@ -134,6 +137,16 @@ private fun WhatsNewPageLoaded(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                if (!state.feature.isUserEntitled) {
+                    state.feature.subscriptionTier?.let { tier ->
+                        SubscriptionBadgeForTier(
+                            tier = tier,
+                            displayMode = SubscriptionBadgeDisplayMode.Black,
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+
                 TextH10(
                     text = stringResource(id = state.feature.title),
                     textAlign = TextAlign.Center,
@@ -167,6 +180,17 @@ private fun WhatsNewPageLoaded(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            state.feature.confirmButtonNote?.let {
+                TextP50(
+                    text = stringResource(it),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             state.feature.closeButtonTitle?.let {
                 RowTextButton(
                     text = stringResource(it),
@@ -182,12 +206,27 @@ private fun WhatsNewPageLoaded(
 
 @Preview(showBackground = true)
 @Composable
-private fun WhatsNewPagePreview(
+private fun WhatsNewPagePlusUserPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
-            state = UiState.Loaded(feature = WhatsNewFeature.SyncedTranscripts),
+            state = UiState.Loaded(feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = true)),
+            onConfirm = {},
+            onClose = {},
+            header = { SyncedTranscriptsHeader() },
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WhatsNewPageFreeUserPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        WhatsNewPageLoaded(
+            state = UiState.Loaded(feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = false)),
             onConfirm = {},
             onClose = {},
             header = { SyncedTranscriptsHeader() },

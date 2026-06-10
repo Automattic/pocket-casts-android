@@ -2532,8 +2532,9 @@
     <string name="share_end_minutes">Clip end minutes</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
-    <string name="synced_transcripts_whats_new_title">Transcripts, now\nkeeping up with you.</string>
-    <string name="synced_transcripts_whats_new_message">Every word highlighted as it\'s spoken. Follow along, lose your place, find it again in one tap.</string>
+    <string name="synced_transcripts_whats_new_title">Read along. Even at&#160;2x.</string>
+    <string name="synced_transcripts_whats_new_message">Read fast, miss nothing. The name you blew past, the book they recommended, the stat you wanted — tap the word, jump&#160;back.</string>
+    <string name="synced_transcripts_whats_new_button_note">Synced transcripts available for recent episodes only.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
