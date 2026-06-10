@@ -360,6 +360,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
+    UP_NEXT_DURATION(
+        key = "up_next_duration",
+        title = "Up Next Duration",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-09"),
+    ),
 }
 
 sealed class FeatureTier {
