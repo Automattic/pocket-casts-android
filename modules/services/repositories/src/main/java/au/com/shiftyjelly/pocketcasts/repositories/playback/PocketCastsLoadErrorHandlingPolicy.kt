@@ -92,6 +92,15 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
         fallbackOptions: LoadErrorHandlingPolicy.FallbackOptions,
         loadErrorInfo: LoadErrorInfo,
     ): LoadErrorHandlingPolicy.FallbackSelection? {
+        if (fallbackOptions.isFallbackAvailable(LoadErrorHandlingPolicy.FALLBACK_TYPE_TRACK)) {
+            val exception = loadErrorInfo.exception
+            if (exception is InvalidResponseCodeException && exception.responseCode in 400..499) {
+                return LoadErrorHandlingPolicy.FallbackSelection(
+                    LoadErrorHandlingPolicy.FALLBACK_TYPE_TRACK,
+                    DEFAULT_TRACK_EXCLUSION_MS,
+                )
+            }
+        }
         return null
     }
 
@@ -151,5 +160,6 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
         const val MAX_RETRIES_MANIFEST = 4
         const val MAX_RETRIES_OTHER = 3
         private const val MAX_SHIFT = 20
+        private const val DEFAULT_TRACK_EXCLUSION_MS = 60_000L
     }
 }
