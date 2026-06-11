@@ -81,6 +81,18 @@ class BaseEpisodeHlsDetectionTest {
         assert(episode.getFileExtension() == ".m3u8")
     }
 
+    @Test
+    fun `HLS episode cannot be queued for auto download`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.m3u8")
+        assertFalse(episode.canQueueForAutoDownload)
+    }
+
+    @Test
+    fun `non-HLS episode can be queued for auto download`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3")
+        assertTrue(episode.canQueueForAutoDownload)
+    }
+
     private fun createEpisode(
         downloadUrl: String? = null,
         fileType: String? = null,

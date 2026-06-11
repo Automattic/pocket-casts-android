@@ -105,7 +105,7 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHLS
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
