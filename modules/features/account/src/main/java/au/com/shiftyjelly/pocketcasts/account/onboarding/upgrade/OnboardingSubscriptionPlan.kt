@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.patronPurple
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -178,11 +179,20 @@ data class OnboardingSubscriptionPlan private constructor(
         }
 
     @Composable
-    fun ctaButtonText(isRenewingSubscription: Boolean) = if (isRenewingSubscription) {
+    fun ctaButtonText(
+        isRenewingSubscription: Boolean,
+        trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
+    ) = if (isRenewingSubscription) {
         stringResource(LR.string.renew_your_subscription)
     } else {
         when (key.offer) {
-            SubscriptionOffer.Trial -> stringResource(LR.string.profile_start_free_trial)
+            SubscriptionOffer.Trial -> stringResource(
+                when (trialCtaCopyTreatment) {
+                    TrialCtaCopyTreatment.START_30_DAY_TRIAL -> LR.string.profile_start_free_trial_specific_duration
+                    TrialCtaCopyTreatment.TRY_30_DAYS_FREE -> LR.string.profile_try_days_for_free
+                    null -> LR.string.profile_start_free_trial
+                },
+            )
 
             SubscriptionOffer.IntroOffer,
             SubscriptionOffer.Referral,
