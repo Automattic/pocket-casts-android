@@ -92,9 +92,11 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
         fallbackOptions: LoadErrorHandlingPolicy.FallbackOptions,
         loadErrorInfo: LoadErrorInfo,
     ): LoadErrorHandlingPolicy.FallbackSelection? {
+        // Track fallback is only reported as available for adaptive sources with alternate
+        // variants, so progressive single-track sources fall through to the retry logic.
         if (fallbackOptions.isFallbackAvailable(LoadErrorHandlingPolicy.FALLBACK_TYPE_TRACK)) {
             val exception = loadErrorInfo.exception
-            if (exception is InvalidResponseCodeException && exception.responseCode in 400..499) {
+            if (exception is InvalidResponseCodeException && shouldExcludeTrack(exception.responseCode)) {
                 return LoadErrorHandlingPolicy.FallbackSelection(
                     LoadErrorHandlingPolicy.FALLBACK_TYPE_TRACK,
                     DEFAULT_TRACK_EXCLUSION_MS,
@@ -106,6 +108,14 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
 
     override fun getMinimumLoadableRetryCount(dataType: Int): Int {
         return Int.MAX_VALUE
+    }
+
+    // Auth/forbidden failures affect every variant, not just one, so excluding a single track
+    // only delays an unavoidable error and can churn through all variants. Other 4xx codes
+    // (e.g. 404 on a stale segment) are variant-specific and worth falling back from.
+    @VisibleForTesting
+    internal fun shouldExcludeTrack(responseCode: Int): Boolean {
+        return responseCode in 400..499 && responseCode !in NON_FALLBACK_RESPONSE_CODES
     }
 
     @VisibleForTesting
@@ -161,5 +171,6 @@ class PocketCastsLoadErrorHandlingPolicy : LoadErrorHandlingPolicy {
         const val MAX_RETRIES_OTHER = 3
         private const val MAX_SHIFT = 20
         private const val DEFAULT_TRACK_EXCLUSION_MS = 60_000L
+        private val NON_FALLBACK_RESPONSE_CODES = setOf(401, 403)
     }
 }
