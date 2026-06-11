@@ -114,7 +114,19 @@ sealed interface BaseEpisode {
         get() = fileType?.startsWith("video/") ?: false
 
     val isHLS: Boolean
-        get() = downloadUrl?.endsWith("m3u8") ?: false
+        get() {
+            val url = downloadUrl
+            if (url != null) {
+                val path = url.substringBefore('?').substringBefore('#')
+                if (path.endsWith(".m3u8", ignoreCase = true)) return true
+            }
+            val type = fileType
+            if (type != null) {
+                if (type.equals("application/x-mpegURL", ignoreCase = true)) return true
+                if (type.equals("application/vnd.apple.mpegurl", ignoreCase = true)) return true
+            }
+            return false
+        }
 
     val isAudio: Boolean
         get() = !isVideo
@@ -158,6 +170,8 @@ sealed interface BaseEpisode {
             fileType.equals("audio/x-m4p", ignoreCase = true) -> return ".m4p"
             fileType.equals("audio/ogg", ignoreCase = true) -> return ".ogg"
             fileType.equals("audio/x-ms-wma", ignoreCase = true) -> return ".wma"
+            fileType.equals("application/x-mpegURL", ignoreCase = true) -> return ".m3u8"
+            fileType.equals("application/vnd.apple.mpegurl", ignoreCase = true) -> return ".m3u8"
             else -> return if (fileType.startsWith("video/")) ".mp4" else ".mp3"
         }
     }
