@@ -19,6 +19,7 @@ data class UpNextSyncResponse(
         @Json(name = "uuid") val uuid: String,
         @Json(name = "title") val title: String?,
         @Json(name = "url") val url: String?,
+        @Json(name = "hls_url") val hlsUrl: String?,
         @Json(name = "podcast") val podcast: String?,
         @Json(name = "published") val published: String?,
     ) {
@@ -31,6 +32,7 @@ data class UpNextSyncResponse(
                 downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
                 title = title ?: "",
                 downloadUrl = url ?: "",
+                hlsUrl = hlsUrl?.ifEmpty { null },
                 podcastUuid = podcastUuid,
             )
         }

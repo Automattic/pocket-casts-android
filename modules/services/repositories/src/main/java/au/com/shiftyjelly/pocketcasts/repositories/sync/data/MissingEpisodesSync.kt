@@ -52,6 +52,7 @@ internal class MissingEpisodesSync(
 private fun toPodcastEpisode(serverEpisode: EpisodeResponse) = PodcastEpisode(
     uuid = serverEpisode.uuid,
     downloadUrl = serverEpisode.url,
+    hlsUrl = serverEpisode.hlsUrl.ifEmpty { null },
     publishedDate = serverEpisode.publishedOrNull?.toDate() ?: Date(0),
     duration = serverEpisode.duration.toDouble(),
     fileType = serverEpisode.fileType,

@@ -327,6 +327,7 @@ message EpisodeResponse {
   reserved 18; // BookmarkResponse bookmarks
   string podcast_slug = 19;
   string slug = 20;
+  string hls_url = 21;
 }
 
 message StarredEpisodesResponse {
@@ -384,6 +385,7 @@ message UpNextResponse {
     string podcast = 3;
     string uuid = 4;
     google.protobuf.Timestamp published = 5;
+    string hls_url = 6;
   }
 
   message EpisodeSyncResponse {

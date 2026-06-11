@@ -324,6 +324,7 @@ private fun UpNextResponse.EpisodeResponse.toSkeletonEpisode(podcastUuid: String
         downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         title = title.orEmpty(),
         downloadUrl = url.orEmpty(),
+        hlsUrl = hlsUrl.ifEmpty { null },
         podcastUuid = podcastUuid,
     )
 }
