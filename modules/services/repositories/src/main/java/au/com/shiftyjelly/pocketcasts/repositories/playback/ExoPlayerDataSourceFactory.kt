@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.ClippingConfiguration
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
@@ -69,11 +70,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         val episodeUri = episodeLocation.uri ?: return null
         val mediaItem = MediaItem.Builder()
             .setUri(episodeUri)
-            .let { builder ->
+            .apply {
+                if (episodeLocation.episode.isHLS) {
+                    setMimeType(MimeTypes.APPLICATION_M3U8)
+                }
                 if (clipRange != null) {
-                    builder.setClippingConfiguration(clipRange.toClippingConfiguration())
-                } else {
-                    builder
+                    setClippingConfiguration(clipRange.toClippingConfiguration())
                 }
             }
             .setCustomCacheKey(episodeLocation.episode.uuid)
@@ -95,9 +97,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         )
 
         val dataFactory = cacheFactory ?: defaultFactory
+        // Only DefaultMediaSourceFactory applies the ClippingConfiguration, so clipping must win over HLS.
         val factory = when {
-            episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
+            episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }
         if (FeatureFlag.isEnabled(Feature.LOAD_ERROR_HANDLING_POLICY)) {
