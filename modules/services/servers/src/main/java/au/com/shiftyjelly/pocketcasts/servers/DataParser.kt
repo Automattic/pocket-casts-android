@@ -146,6 +146,7 @@ object DataParser {
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
             downloadUrl = getString(jsonEpisode, "url"),
+            hlsUrl = getString(jsonEpisode, "hls_url"),
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",

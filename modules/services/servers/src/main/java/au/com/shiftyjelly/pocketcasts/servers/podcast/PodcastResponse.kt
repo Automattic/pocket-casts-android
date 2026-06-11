@@ -87,6 +87,7 @@ data class EpisodeInfo(
     @Json(name = "number") val number: Long?,
     @Json(name = "type") val type: String?,
     @Json(name = "url") val url: String,
+    @Json(name = "hls_url") val hlsUrl: String?,
     @Json(name = "file_type") val fileType: String?,
     @Json(name = "file_size") val fileSize: Long?,
     @Json(name = "duration") val duration: Double?,
@@ -101,6 +102,7 @@ data class EpisodeInfo(
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
+            hlsUrl = hlsUrl,
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,
