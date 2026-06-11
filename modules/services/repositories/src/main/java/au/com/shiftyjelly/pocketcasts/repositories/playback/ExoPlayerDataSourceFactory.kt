@@ -156,7 +156,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && settings.cacheEntirePlayingEpisode.value
+    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && !isHLS && settings.cacheEntirePlayingEpisode.value
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)
