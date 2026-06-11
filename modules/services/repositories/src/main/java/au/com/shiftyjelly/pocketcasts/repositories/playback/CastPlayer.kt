@@ -286,6 +286,8 @@ class CastPlayer(
             putString(MediaMetadata.KEY_ALBUM_TITLE, podcast.title)
             addImage(WebImage(Uri.parse(podcast.getArtworkUrl(960))))
         }
+        // STREAM_TYPE_BUFFERED is correct for VOD podcasts (including VOD HLS). Live HLS would
+        // need STREAM_TYPE_LIVE, but we don't currently serve live streams.
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
         val contentType = if (episode.isHLS) {
             "application/x-mpegURL"
