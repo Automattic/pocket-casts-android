@@ -137,6 +137,7 @@ class FingerprintTimingManager @Inject constructor(
 
         val episodeUuid = episode.uuid
         val podcastUuid = episode.podcastOrSubstituteUuid
+        // Fingerprint the progressive enclosure, not the HLS rendition; timings may drift if the renditions differ.
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
 
         scope.launch {

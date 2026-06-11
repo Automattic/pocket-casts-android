@@ -18,7 +18,6 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -71,7 +70,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         val mediaItem = MediaItem.Builder()
             .setUri(episodeUri)
             .apply {
-                if (episodeLocation.episode.isHLS) {
+                if (episodeLocation.isHlsStream) {
                     setMimeType(MimeTypes.APPLICATION_M3U8)
                 }
                 if (clipRange != null) {
@@ -88,7 +87,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 
         val cacheFactory = cacheFactory
             .setCacheWriteDataSinkFactory(null)
-            .takeIf { episodeLocation.episode.shouldUseCache() }
+            .takeIf { episodeLocation.shouldUseCache() }
 
         startCachingEntireEpisodeIfNeeded(
             cacheDataSourceFactory = cacheFactory,
@@ -100,7 +99,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         // Only DefaultMediaSourceFactory applies the ClippingConfiguration, so clipping must win over HLS.
         val factory = when {
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
-            episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
+            episodeLocation.isHlsStream -> HlsMediaSource.Factory(dataFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }
         if (FeatureFlag.isEnabled(Feature.LOAD_ERROR_HANDLING_POLICY)) {
@@ -114,11 +113,11 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         episodeLocation: EpisodeLocation,
         onCachingComplete: (String) -> Unit,
     ) {
-        if (episodeLocation.episode.isHLS) return
+        if (episodeLocation.isHlsStream) return
         val episodeUri = episodeLocation.uri ?: return
         val cacheFactory = cacheDataSourceFactory ?: cacheFactory
             .setCacheWriteDataSinkFactory(null)
-            .takeIf { episodeLocation.episode.shouldUseCache() }
+            .takeIf { episodeLocation.shouldUseCache() }
 
         if (cacheFactory != null) {
             CacheWorker.startCachingEntireEpisode(
@@ -137,7 +136,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     ) {
         val episodeUuid = episodeLocation.episode.uuid
         try {
-            if (episodeLocation.episode.shouldUseCache().not()) return
+            if (episodeLocation.shouldUseCache().not()) return
 
             cache?.removeResource(episodeUuid)
             onCachingReset(episodeUuid)
@@ -156,7 +155,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && !isHLS && settings.cacheEntirePlayingEpisode.value
+    private fun EpisodeLocation.shouldUseCache() = !episode.isDownloaded && !episode.isDownloading && !isHlsStream && settings.cacheEntirePlayingEpisode.value
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)

@@ -330,8 +330,8 @@ private class DownloadQueueController(
             is DownloadType.UserTriggered -> true
             is DownloadType.Automatic -> !episode.isDownloadFailure && (downloadType.bypassAutoDownloadStatus || !episode.isAutoDownloadDisabled)
         }
-        // HLS is streaming-only: downloading would only save the manifest, not the playable segments.
-        return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed && !episode.isHLS
+        // HLS-only episodes have no progressive file to download, only a manifest.
+        return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed && !episode.isHlsOnly
     }
 
     private fun BaseEpisode.toDownloadCommand(

@@ -237,7 +237,7 @@ class CastPlayer(
     }
 
     override fun setEpisode(episode: BaseEpisode) {
-        this.episodeLocation = EpisodeLocation.Stream(episode, episode.downloadUrl)
+        this.episodeLocation = EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
         localEpisodeUuid = episode.uuid
         buildCustomData()
     }
@@ -262,7 +262,7 @@ class CastPlayer(
         if (episode == null || podcast == null || episodeUuid != episode.uuid) {
             return
         }
-        val url = episode.downloadUrl ?: return
+        val url = episodeLocation?.uri ?: return
         if (episode is UserEpisode && (episode.serverStatus != UserEpisodeServerStatus.UPLOADED || episode.downloadUrl == null)) {
             onPlayerEvent(this, PlayerEvent.PlayerError("Unable to cast local file"))
             return
@@ -289,7 +289,7 @@ class CastPlayer(
         // STREAM_TYPE_BUFFERED is correct for VOD podcasts (including VOD HLS). Live HLS would
         // need STREAM_TYPE_LIVE, but we don't currently serve live streams.
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
-        val contentType = if (episode.isHLS) {
+        val contentType = if (episodeLocation.isHlsStream) {
             "application/x-mpegURL"
         } else {
             episode.fileType
