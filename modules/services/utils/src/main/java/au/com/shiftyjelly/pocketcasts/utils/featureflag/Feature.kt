@@ -369,6 +369,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-09"),
     ),
+    HLS_STREAMING(
+        key = "hls_streaming",
+        title = "Prefer HLS stream when available",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-11"),
+    ),
 }
 
 sealed class FeatureTier {
