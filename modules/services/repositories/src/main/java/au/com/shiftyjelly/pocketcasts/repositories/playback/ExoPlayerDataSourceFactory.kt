@@ -111,6 +111,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         episodeLocation: EpisodeLocation,
         onCachingComplete: (String) -> Unit,
     ) {
+        if (episodeLocation.episode.isHLS) return
         val episodeUri = episodeLocation.uri ?: return
         val cacheFactory = cacheDataSourceFactory ?: cacheFactory
             .setCacheWriteDataSinkFactory(null)
