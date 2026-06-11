@@ -369,6 +369,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-09"),
     ),
+    TRIAL_CTA_COPY_AB_TEST(
+        key = "trial_cta_copy_ab_test",
+        title = "A/B test trial CTA button copy",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-11"),
+    ),
 }
 
 sealed class FeatureTier {
