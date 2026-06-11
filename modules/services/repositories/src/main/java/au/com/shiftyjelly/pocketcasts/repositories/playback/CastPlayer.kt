@@ -287,7 +287,12 @@ class CastPlayer(
             addImage(WebImage(Uri.parse(podcast.getArtworkUrl(960))))
         }
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
-        episode.fileType?.let {
+        val contentType = if (episode.isHLS) {
+            "application/x-mpegURL"
+        } else {
+            episode.fileType
+        }
+        contentType?.let {
             mediaInfo = mediaInfo.setContentType(it)
         }
         customData?.let {
