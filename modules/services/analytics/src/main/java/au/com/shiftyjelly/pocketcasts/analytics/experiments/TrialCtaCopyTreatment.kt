@@ -4,8 +4,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 enum class TrialCtaCopyTreatment(val treatmentName: String) {
-    START_30_DAY_TRIAL("start_30_day_trial"), // e.g. "Start your 1-month Free Trial"
-    TRY_30_DAYS_FREE("try_30_days_free"), // e.g. "Try 1 month for free"
+    START_30_DAY_TRIAL("start_30_day_trial"),
+    TRY_30_DAYS_FREE("try_30_days_free"),
     ;
 
     companion object {
