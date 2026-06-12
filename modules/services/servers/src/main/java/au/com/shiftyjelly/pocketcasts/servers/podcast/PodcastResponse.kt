@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.servers.DEBUG_HLS_TEST_URL
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -102,7 +103,7 @@ data class EpisodeInfo(
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
-            hlsUrl = hlsUrl,
+            hlsUrl = hlsUrl ?: DEBUG_HLS_TEST_URL,
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,

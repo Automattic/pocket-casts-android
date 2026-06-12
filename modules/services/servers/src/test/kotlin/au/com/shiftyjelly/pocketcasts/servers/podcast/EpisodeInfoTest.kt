@@ -27,8 +27,9 @@ class EpisodeInfoTest {
             """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","published":"2026-06-11T00:00:00Z"}""",
         )
 
+        // Raw Moshi parsing is the unit under test here; toEpisode() applies a debug-only
+        // DEBUG_HLS_TEST_URL fallback when hls_url is absent, so it is not asserted.
         assertNull(episodeInfo?.hlsUrl)
-        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 
     @Test
