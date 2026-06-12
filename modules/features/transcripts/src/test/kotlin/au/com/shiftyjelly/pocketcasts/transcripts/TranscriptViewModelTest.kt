@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -16,6 +19,11 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
+import com.automattic.eventhorizon.TranscriptSourceType
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -29,8 +37,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,6 +51,15 @@ class TranscriptViewModelTest {
     private val transcriptManager = TestTranscriptManager()
     private val signInStateFlow = MutableStateFlow<SignInState>(SignInState.SignedOut)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = ""))
+    private val syncedStateFlow = MutableStateFlow<FingerprintTimingManager.State>(FingerprintTimingManager.State.Idle)
+    private val eventSink = TestEventSink()
+    private val fingerprintTimingManager = mock<FingerprintTimingManager> {
+        on { state } doReturn FingerprintTimingManager.State.Idle
+        on { stateFlow } doReturn syncedStateFlow
+    }
+    private val playbackManager = mock<PlaybackManager> {
+        on { playbackStateFlow } doReturn playbackStateFlow
+    }
 
     lateinit var viewModel: TranscriptViewModel
 
@@ -53,7 +72,7 @@ class TranscriptViewModelTest {
                 on { getSignInState() } doReturn signInStateFlow.asFlowable()
             },
             paymentClient = PaymentClient.test(),
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             source = TranscriptViewModel.Source.Player,
             sharingClient = object : TranscriptSharingClient {
                 override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
@@ -61,13 +80,8 @@ class TranscriptViewModelTest {
                     return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
                 }
             },
-            fingerprintTimingManager = mock {
-                on { state } doReturn FingerprintTimingManager.State.Idle
-                on { stateFlow } doReturn MutableStateFlow(FingerprintTimingManager.State.Idle)
-            },
-            playbackManager = mock {
-                on { playbackStateFlow } doReturn playbackStateFlow
-            },
+            fingerprintTimingManager = fingerprintTimingManager,
+            playbackManager = playbackManager,
         )
     }
 
@@ -290,6 +304,92 @@ class TranscriptViewModelTest {
 
             viewModel.clearSearch()
             assertEquals(SearchState.Empty.copy(isSearchOpen = true), awaitItem().searchState)
+        }
+    }
+
+    @Test
+    fun `track synced transcript seek used event`() = runTest {
+        val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
+        whenever(fingerprintTimingManager.state).thenReturn(FingerprintTimingManager.State.Active(coverage = 1))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(20_000)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+
+        awaitSyncedActive()
+        drainEvents()
+
+        viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+        assertEquals(
+            SyncedTranscriptsSeekUsedEvent(
+                fromPositionSeconds = 10L,
+                toPositionSeconds = 20L,
+                source = TranscriptSourceType.Player,
+                episodeUuid = "episode-uuid",
+                podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `track synced transcript seek failed event`() = runTest {
+        val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
+        whenever(fingerprintTimingManager.state).thenReturn(FingerprintTimingManager.State.Active(coverage = 1))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(null)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+
+        awaitSyncedActive()
+        drainEvents()
+
+        viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+        assertEquals(
+            SyncedTranscriptsSeekFailedEvent(
+                reason = "mapping_unavailable",
+                syncedState = "active",
+                source = TranscriptSourceType.Player,
+                episodeUuid = "episode-uuid",
+                podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `track synced transcript auto scroll resumed event`() = runTest {
+        drainEvents()
+
+        viewModel.trackAutoScrollResumed(manualScrollDurationMs = 1_500L)
+
+        assertEquals(
+            SyncedTranscriptsAutoScrollResumedEvent(
+                manualScrollDurationMs = 1_500L,
+                source = TranscriptSourceType.Player,
+                episodeUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    private suspend fun awaitSyncedActive() {
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            var state = awaitItem()
+            while (!state.isSyncedActive) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun drainEvents() {
+        while (!eventSink.isEmpty()) {
+            eventSink.pollEvent()
         }
     }
 }
