@@ -128,6 +128,20 @@ Core Services (model, servers)
 
 ## Development Guidelines
 
+### Git Workflow
+
+**Develop feature work on a branch off `main`. The only reason to branch off a release branch is to cherry-pick an already-merged commit into that release.**
+
+Branching feature *development* off a release branch causes confusion later: when
+the release branch is merged back into `main`, it is unclear which commits belong
+to the release and which belong to the unrelated feature work. To avoid this:
+
+- **Create every feature branch from `main`** (`git checkout main && git pull && git checkout -b my-feature`), even if the change is also needed in an in-flight release. Never develop a feature on a branch based on `release/*`.
+- If a change must also land in a release branch (e.g. a fix needed for an upcoming release):
+  1. Develop and merge it on a branch off `main` first.
+  2. Create a **new branch off the release branch** and **cherry-pick** the relevant commit(s) onto it, then open a PR into the release branch (`git checkout release/x.y && git pull && git checkout -b cherry-pick/my-fix && git cherry-pick <sha>`).
+- Keep cherry-picks limited to the specific commits the release needs, so the release branch never accumulates feature work that does not belong in it.
+
 ### Technology Preferences
 
 **Use Jetpack Compose for new UI**:
