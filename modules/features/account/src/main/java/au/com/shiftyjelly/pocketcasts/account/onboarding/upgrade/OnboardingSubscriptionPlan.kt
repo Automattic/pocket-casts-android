@@ -186,13 +186,21 @@ data class OnboardingSubscriptionPlan private constructor(
         stringResource(LR.string.renew_your_subscription)
     } else {
         when (key.offer) {
-            SubscriptionOffer.Trial -> stringResource(
-                when (trialCtaCopyTreatment) {
-                    TrialCtaCopyTreatment.START_30_DAY_TRIAL -> LR.string.profile_start_free_trial_specific_duration
-                    TrialCtaCopyTreatment.TRY_30_DAYS_FREE -> LR.string.profile_try_days_for_free
-                    null -> LR.string.profile_start_free_trial
-                },
-            )
+            SubscriptionOffer.Trial -> when (val treatment = trialCtaCopyTreatment) {
+                null -> stringResource(LR.string.profile_start_free_trial)
+                else -> {
+                    val discountedPhase = requireNotNull(discountedPricingPhase)
+                    val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+                    val trialDuration = discountedPhase.schedule.period.toText(recurringPeriods)
+                    stringResource(
+                        when (treatment) {
+                            TrialCtaCopyTreatment.START_30_DAY_TRIAL -> LR.string.profile_start_free_trial_specific_duration
+                            TrialCtaCopyTreatment.TRY_30_DAYS_FREE -> LR.string.profile_try_days_for_free
+                        },
+                        trialDuration,
+                    )
+                }
+            }
 
             SubscriptionOffer.IntroOffer,
             SubscriptionOffer.Referral,
