@@ -145,13 +145,14 @@ to the release and which belong to the unrelated feature work. To avoid this:
   2. Create a **new branch off the release branch** and **cherry-pick** the relevant commit(s) onto it,
      then open a PR into the release branch:
 
-     ```
+     ```bash
      git checkout release/x.y
      git pull
      git checkout -b cherry-pick/my-fix
      git cherry-pick <sha>
      ```
-- Keep cherry-picks limited to the specific commits the release needs, so the release branch never accumulates feature work that does not belong in it.
+- Keep cherry-picks limited to the specific commits the release needs, so the release branch never accumulates
+  feature work that does not belong in it.
 
 ### Technology Preferences
 
