@@ -41,31 +41,27 @@ private fun TvScaffoldContent(
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                TvColors.DarkGray,
-                                TvColors.Dark,
-                            ),
-                        ),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.horizontalGradient(
+                    colors = listOf(
+                        TvColors.DarkGray,
+                        TvColors.Dark,
                     ),
-            ) {
-                TvTopBar(
-                    tabs = tabs,
-                    selectedTabIndex = selectedTabIndex,
-                    onTabSelect = onTabSelect,
-                    onProfileClick = {},
-                )
-                Box(modifier = Modifier.weight(1f)) {
-                    val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
-                    TvTabPlaceholder(tab = currentTab)
-                }
-            }
+                ),
+            ),
+    ) {
+        TvTopBar(
+            tabs = tabs,
+            selectedTabIndex = selectedTabIndex,
+            onTabSelect = onTabSelect,
+            onProfileClick = {},
+        )
+        Box(modifier = Modifier.weight(1f)) {
+            val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+            TvTabPlaceholder(tab = currentTab)
         }
     }
 }
@@ -73,10 +69,14 @@ private fun TvScaffoldContent(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvScaffoldPreview() {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    TvScaffoldContent(
-        tabs = TvTab.entries,
-        selectedTabIndex = selectedIndex,
-        onTabSelect = { selectedIndex = it },
-    )
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            var selectedIndex by remember { mutableIntStateOf(0) }
+            TvScaffoldContent(
+                tabs = TvTab.entries,
+                selectedTabIndex = selectedIndex,
+                onTabSelect = { selectedIndex = it },
+            )
+        }
+    }
 }
