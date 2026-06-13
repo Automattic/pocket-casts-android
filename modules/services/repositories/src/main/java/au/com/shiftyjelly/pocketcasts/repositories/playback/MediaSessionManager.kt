@@ -672,7 +672,9 @@ class MediaSessionManager(
         combine(
             settings.customMediaActionsVisibility.flow,
             settings.mediaControlItems.flow,
-        ) { visibility, items -> visibility to items }
+            settings.upNextShuffle.flow,
+            settings.cachedSubscription.flow,
+        ) { _, _, _, _ -> }
             .onEach { withContext(Dispatchers.Main) { updateMedia3CustomLayout() } }
             .catch { Timber.e(it) }
             .launchIn(scope)
@@ -684,6 +686,18 @@ class MediaSessionManager(
                     media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
+            )
+            .addTo(disposables)
+
+        // Rebuild the custom layout when the Up Next queue transitions between empty and
+        // non-empty so the automotive shuffle button appears/disappears accordingly.
+        playbackManager.upNextQueue.changesObservable
+            .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.isNotEmpty() ?: false }
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { updateMedia3CustomLayout() },
+                onError = { Timber.e(it, "Error observing Up Next size for shuffle button") },
             )
             .addTo(disposables)
     }
@@ -1463,6 +1477,7 @@ internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
 internal const val APP_ACTION_ARCHIVE = "archive"
 internal const val APP_ACTION_PLAY_NEXT = "playNext"
+internal const val APP_ACTION_SHUFFLE = "shuffleUpNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

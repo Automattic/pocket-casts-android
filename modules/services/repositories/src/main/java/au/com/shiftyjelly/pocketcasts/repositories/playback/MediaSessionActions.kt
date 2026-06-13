@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpNextShuffleEnabledEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,6 +133,17 @@ internal class MediaSessionActions(
                 )
             }
         }
+    }
+
+    suspend fun toggleUpNextShuffleSuspend() {
+        val newValue = !settings.upNextShuffle.value
+        settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+        eventHorizon.track(
+            UpNextShuffleEnabledEvent(
+                value = newValue,
+                source = UpNextSourceType.Player,
+            ),
+        )
     }
 
     fun performPlayFromSearchRx(searchTerm: String?): Completable {
