@@ -2,14 +2,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import androidx.media3.session.CommandButton
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -26,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 class Media3AutomotiveStrategyTest {
 
     private lateinit var playbackManager: PlaybackManager
-    private lateinit var upNextQueue: UpNextQueue
     private lateinit var settings: Settings
     private lateinit var customMediaActionsVisibility: UserSetting<Boolean>
     private lateinit var mediaControlItems: UserSetting<List<MediaNotificationControls>>
@@ -39,7 +35,6 @@ class Media3AutomotiveStrategyTest {
     @Before
     fun setUp() {
         playbackManager = mock()
-        upNextQueue = mock()
         settings = mock()
         customMediaActionsVisibility = mock()
         mediaControlItems = mock()
@@ -49,7 +44,6 @@ class Media3AutomotiveStrategyTest {
         whenever(context.getString(any())).thenReturn("Shuffle")
 
         whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
-        whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(settings.customMediaActionsVisibility).thenReturn(customMediaActionsVisibility)
         whenever(customMediaActionsVisibility.value).thenReturn(false)
         whenever(settings.mediaControlItems).thenReturn(mediaControlItems)
@@ -73,14 +67,9 @@ class Media3AutomotiveStrategyTest {
         whenever(cachedSubscription.value).thenReturn(if (isPaid) mock<Subscription>() else null)
     }
 
-    private fun setQueue(vararg episodes: BaseEpisode) {
-        whenever(upNextQueue.queueEpisodes).thenReturn(episodes.toList())
-    }
-
     @Test
-    fun `shuffle button present for paid user with non-empty queue`() {
+    fun `shuffle button present for paid user`() {
         setPaid(true)
-        setQueue(episode("ep-1"))
         whenever(upNextShuffle.value).thenReturn(false)
 
         val button = shuffleButton(buildLayout().primaryButtons)
@@ -91,18 +80,6 @@ class Media3AutomotiveStrategyTest {
     @Test
     fun `shuffle button hidden for free user`() {
         setPaid(false)
-        setQueue(episode("ep-1"))
-        whenever(upNextShuffle.value).thenReturn(false)
-
-        val button = shuffleButton(buildLayout().primaryButtons)
-
-        assertNull(button)
-    }
-
-    @Test
-    fun `shuffle button hidden when queue is empty`() {
-        setPaid(true)
-        setQueue()
         whenever(upNextShuffle.value).thenReturn(false)
 
         val button = shuffleButton(buildLayout().primaryButtons)
@@ -113,7 +90,6 @@ class Media3AutomotiveStrategyTest {
     @Test
     fun `shuffle button uses disabled icon when shuffle is off`() {
         setPaid(true)
-        setQueue(episode("ep-1"))
         whenever(upNextShuffle.value).thenReturn(false)
 
         val button = shuffleButton(buildLayout().primaryButtons)
@@ -124,15 +100,10 @@ class Media3AutomotiveStrategyTest {
     @Test
     fun `shuffle button uses enabled icon when shuffle is on`() {
         setPaid(true)
-        setQueue(episode("ep-1"))
         whenever(upNextShuffle.value).thenReturn(true)
 
         val button = shuffleButton(buildLayout().primaryButtons)
 
         assertEquals(IR.drawable.shuffle_enabled, button?.iconResId)
-    }
-
-    private fun episode(uuid: String): PodcastEpisode {
-        return PodcastEpisode(uuid = uuid, title = "Test", publishedDate = Date(), podcastUuid = "pod-1")
     }
 }

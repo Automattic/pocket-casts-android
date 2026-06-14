@@ -71,6 +71,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -669,12 +670,12 @@ class MediaSessionManager(
             )
             .addTo(disposables)
 
-        combine(
+        merge(
             settings.customMediaActionsVisibility.flow,
             settings.mediaControlItems.flow,
             settings.upNextShuffle.flow,
             settings.cachedSubscription.flow,
-        ) { _, _, _, _ -> }
+        )
             .onEach { withContext(Dispatchers.Main) { updateMedia3CustomLayout() } }
             .catch { Timber.e(it) }
             .launchIn(scope)
@@ -686,18 +687,6 @@ class MediaSessionManager(
                     media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
                 },
                 onError = { Timber.e(it, "Error observing Up Next changes") },
-            )
-            .addTo(disposables)
-
-        // Rebuild the custom layout when the Up Next queue transitions between empty and
-        // non-empty so the automotive shuffle button appears/disappears accordingly.
-        playbackManager.upNextQueue.changesObservable
-            .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.isNotEmpty() ?: false }
-            .distinctUntilChanged()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { updateMedia3CustomLayout() },
-                onError = { Timber.e(it, "Error observing Up Next size for shuffle button") },
             )
             .addTo(disposables)
     }
