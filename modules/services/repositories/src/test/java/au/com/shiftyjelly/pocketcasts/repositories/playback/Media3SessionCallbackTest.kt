@@ -340,12 +340,15 @@ class Media3SessionCallbackTest {
     // --- Headphone action handler tests ---
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
+    fun `KEYCODE_MEDIA_PLAY resumes playback instead of toggling`() = runTest {
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
-        // Routed through MediaEventQueue — single tap resolves as play/pause
-        verify(playbackManager).playPause(sourceView = any())
+        // KEYCODE_MEDIA_PLAY is an explicit "play" command, not a play/pause toggle.
+        // It must resume and never call playPause, which would pause already-playing
+        // audio. See https://github.com/Automattic/pocket-casts-android/issues/3919
+        verify(playbackManager).playQueueSuspend(sourceView = any(), showedStreamWarning = any())
+        verify(playbackManager, never()).playPause(sourceView = any())
     }
 
     @Test
