@@ -235,7 +235,7 @@ class BookmarkManagerImpl @Inject constructor(
     }
 
     override fun enrichBookmark(bookmark: Bookmark) {
-        launch {
+        launch(Dispatchers.IO) {
             try {
                 val snippet = transcriptWindowExtractor.extractWindow(
                     episodeUuid = bookmark.episodeUuid,
@@ -248,14 +248,14 @@ class BookmarkManagerImpl @Inject constructor(
                 }
                 val title = response.title
                 val summary = response.summary
-                if (title != null && summary != null) {
+                if (title != null || summary != null) {
                     val now = System.currentTimeMillis()
                     bookmarkDao.updateAiData(
                         bookmarkUuid = bookmark.uuid,
                         aiTitle = title,
                         aiSummary = summary,
-                        aiTitleModified = now,
-                        aiSummaryModified = now,
+                        aiTitleModified = now.takeIf { title != null },
+                        aiSummaryModified = now.takeIf { summary != null },
                         syncStatus = SyncStatus.NOT_SYNCED,
                     )
                 }
