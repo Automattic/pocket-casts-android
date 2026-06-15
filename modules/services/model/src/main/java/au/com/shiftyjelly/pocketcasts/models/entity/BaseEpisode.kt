@@ -144,9 +144,6 @@ sealed interface BaseEpisode {
             return (hlsUrl != null && url == hlsUrl) || isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
-    val isHLS: Boolean
-        get() = downloadUrl?.endsWith("m3u8") ?: false
-
     val isAudio: Boolean
         get() = !isVideo
 
