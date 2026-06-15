@@ -3,7 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@Config(manifest = Config.NONE)
+@RunWith(RobolectricTestRunner::class)
 class TranscriptWindowExtractorTest {
 
     private val sampleVtt = """

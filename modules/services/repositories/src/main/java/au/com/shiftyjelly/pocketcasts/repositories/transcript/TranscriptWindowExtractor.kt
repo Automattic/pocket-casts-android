@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
+import okio.Buffer
 import timber.log.Timber
 
 @Singleton
@@ -40,47 +42,24 @@ class TranscriptWindowExtractor @Inject constructor(
     }
 
     companion object {
-        private val TIMESTAMP_REGEX =
-            """(?:(\d{2}):)?(\d{2}):(\d{2})\.\d{3}\s*-->\s*(?:(\d{2}):)?(\d{2}):(\d{2})\.\d{3}""".toRegex()
-        private val HTML_TAG_REGEX = """<[^>]+>""".toRegex()
+        private const val MIN_WORDS = 10
 
         internal fun parseVttWindow(content: String, timeSecs: Int, windowSecs: Int): String? {
-            val windowStart = (timeSecs - windowSecs).coerceAtLeast(0)
-            val windowEnd = timeSecs + windowSecs
-            val lines = content.lines()
-            val texts = mutableListOf<String>()
-            var i = 0
+            val entries = WebVttParser().parse(Buffer().writeUtf8(content)).getOrNull() ?: return null
+            return windowText(entries, timeSecs, windowSecs)
+        }
 
-            while (i < lines.size) {
-                val match = TIMESTAMP_REGEX.find(lines[i])
-                if (match != null) {
-                    val sh = match.groupValues[1].takeIf { it.isNotEmpty() }?.toInt() ?: 0
-                    val sm = match.groupValues[2].toInt()
-                    val ss = match.groupValues[3].toInt()
-                    val eh = match.groupValues[4].takeIf { it.isNotEmpty() }?.toInt() ?: 0
-                    val em = match.groupValues[5].toInt()
-                    val es = match.groupValues[6].toInt()
-                    val start = sh * 3600 + sm * 60 + ss
-                    val end = eh * 3600 + em * 60 + es
+        private fun windowText(entries: List<TranscriptEntry>, timeSecs: Int, windowSecs: Int): String? {
+            val windowStartMs = (timeSecs - windowSecs).coerceAtLeast(0) * 1000L
+            val windowEndMs = (timeSecs + windowSecs) * 1000L
 
-                    if (start < windowEnd && end > windowStart) {
-                        i++
-                        val cueLines = mutableListOf<String>()
-                        while (i < lines.size && lines[i].isNotBlank()) {
-                            cueLines.add(lines[i].replace(HTML_TAG_REGEX, "").trim())
-                            i++
-                        }
-                        val text = cueLines.joinToString(" ").trim()
-                        if (text.isNotEmpty()) {
-                            texts.add(text)
-                        }
-                    }
-                }
-                i++
-            }
+            val result = entries
+                .filterIsInstance<TranscriptEntry.Text>()
+                .filter { it.startTimeMs >= 0 && it.startTimeMs < windowEndMs && it.endTimeMs > windowStartMs }
+                .joinToString(" ") { it.value.trim() }
+                .trim()
 
-            val result = texts.joinToString(" ")
-            return result.takeIf { it.split("\\s+".toRegex()).size >= 10 }
+            return result.takeIf { it.split("\\s+".toRegex()).size >= MIN_WORDS }
         }
     }
 }

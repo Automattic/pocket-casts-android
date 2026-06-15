@@ -356,8 +356,9 @@ enum class Feature(
         title = "AI-enriched bookmarks with title and summary",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-05-27"),
     ),
 }
 
