@@ -170,15 +170,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2025-08-29"),
     ),
-    SHARE_TRANSCRIPTS(
-        key = "share_transcripts",
-        title = "Share transcripts",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2025-08-18"),
-    ),
     IMPROVED_SEARCH_SUGGESTIONS(
         key = "search_predictive",
         title = "Predictive search suggestions",

@@ -126,8 +126,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
@@ -1050,7 +1048,7 @@ class PlayerHeaderFragment :
                     }
                 },
                 toolbarTrailingContent = { toolbarColors ->
-                    if (state.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                    if (state.isTextTranscriptLoaded) {
                         TranscriptShareButton(
                             toolbarColors = toolbarColors,
                             onClick = transcriptViewModel::shareTranscript,
