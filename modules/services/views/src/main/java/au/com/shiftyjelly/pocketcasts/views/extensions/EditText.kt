@@ -33,11 +33,20 @@ fun EditText.addOnTextChanged(onChange: (text: String) -> Unit) {
 }
 
 fun EditText.showKeyboard() {
-    requestFocus()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        windowInsetsController?.show(WindowInsets.Type.ime())
-    } else {
-        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        inputMethodManager?.showSoftInput(this, 0)
+    post {
+        requestFocus()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val controller = windowInsetsController
+            if (controller != null) {
+                controller.show(WindowInsets.Type.ime())
+            } else {
+                // The view isn't attached to a window yet (e.g. called from onViewCreated),
+                // so windowInsetsController is null. Retry once the view is attached.
+                post { windowInsetsController?.show(WindowInsets.Type.ime()) }
+            }
+        } else {
+            val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            inputMethodManager?.showSoftInput(this, 0)
+        }
     }
 }
