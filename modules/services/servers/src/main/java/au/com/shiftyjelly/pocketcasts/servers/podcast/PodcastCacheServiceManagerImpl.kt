@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import io.reactivex.Single
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -93,6 +95,10 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
             authorization = authorization,
             request = request,
         )
+    }
+
+    override suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse {
+        return service.enrichBookmark(authorization, request)
     }
 
     private fun Map<String, List<String>>.toSuggestedFolders(): List<SuggestedFolder> {

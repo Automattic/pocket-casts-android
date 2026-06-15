@@ -36,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -496,15 +494,6 @@ class SyncManagerImpl @Inject constructor(
         return getCacheTokenOrLogin { token ->
             syncServiceManager.getBookmarks(token).bookmarksList.map { it.toBookmark() }
         }
-    }
-
-    override suspend fun enrichBookmark(
-        transcriptSnippet: String,
-    ): BookmarkEnrichResponse = getCacheTokenOrLogin { token ->
-        syncServiceManager.enrichBookmark(
-            request = BookmarkEnrichRequest(transcriptSnippet = transcriptSnippet),
-            token = token,
-        )
     }
 
     override suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
