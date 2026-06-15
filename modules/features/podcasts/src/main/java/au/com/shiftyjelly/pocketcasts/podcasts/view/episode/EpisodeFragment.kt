@@ -947,7 +947,7 @@ class EpisodeFragment : BaseFragment() {
                                     Row(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
-                                        if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                        if (transcriptUiState.isTextTranscriptLoaded) {
                                             TranscriptShareButton(
                                                 toolbarColors = toolbarColors,
                                                 onClick = transcriptViewModel::shareTranscript,
@@ -1085,7 +1085,7 @@ class EpisodeFragment : BaseFragment() {
                                         Row(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                            if (transcriptUiState.isTextTranscriptLoaded) {
                                                 TranscriptShareButton(
                                                     toolbarColors = toolbarColors,
                                                     onClick = transcriptViewModel::shareTranscript,
