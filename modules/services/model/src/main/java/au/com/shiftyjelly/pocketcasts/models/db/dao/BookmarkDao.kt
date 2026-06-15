@@ -238,7 +238,7 @@ abstract class BookmarkDao {
 
     @Transaction
     open suspend fun getAll(uuids: Collection<String>): List<Bookmark> {
-        return uuids.chunked(999).flatMap { chunk ->
+        return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
             getAllUnsafe(chunk)
         }
     }
