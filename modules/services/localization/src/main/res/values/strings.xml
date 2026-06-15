@@ -2834,4 +2834,7 @@
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
     <string name="tv_onboarding_welcome_back">Welcome back!</string>
     <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_create_account_title">Create your free account</string>
+    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
+    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>
