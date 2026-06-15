@@ -9,9 +9,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.automattic.eventhorizon.BookmarkCreatedEvent
@@ -31,13 +31,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val eventHorizon: EventHorizon,
-    private val tokenHandler: TokenHandler,
+    private val syncManager: SyncManager,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val transcriptWindowExtractor: TranscriptWindowExtractor,
 ) : BookmarkManager,
@@ -247,7 +246,7 @@ class BookmarkManagerImpl @Inject constructor(
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
 
-                val response = callEnrichApi(bookmark, snippet)
+                val response = callEnrichApi(snippet)
                 if (response.error != null) {
                     Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
                 }
@@ -272,26 +271,12 @@ class BookmarkManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun callEnrichApi(bookmark: Bookmark, snippet: String): BookmarkEnrichResponse {
-        val token = tokenHandler.getAccessToken()
-            ?: error("Smart bookmark enrichment skipped for ${bookmark.uuid}: no access token")
-        return try {
+    private suspend fun callEnrichApi(snippet: String): BookmarkEnrichResponse {
+        return syncManager.getCacheTokenOrLogin { token ->
             podcastCacheServiceManager.enrichBookmark(
                 authorization = "Bearer ${token.value}",
                 request = BookmarkEnrichRequest(transcriptSnippet = snippet),
             )
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                tokenHandler.invalidateAccessToken()
-                val refreshedToken = tokenHandler.getAccessToken()
-                    ?: error("Smart bookmark enrichment skipped for ${bookmark.uuid}: no access token after refresh")
-                podcastCacheServiceManager.enrichBookmark(
-                    authorization = "Bearer ${refreshedToken.value}",
-                    request = BookmarkEnrichRequest(transcriptSnippet = snippet),
-                )
-            } else {
-                throw e
-            }
         }
     }
 }

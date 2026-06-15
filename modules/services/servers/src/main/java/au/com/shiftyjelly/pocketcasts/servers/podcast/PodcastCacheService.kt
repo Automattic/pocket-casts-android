@@ -136,7 +136,7 @@ interface PodcastCacheService {
         @Body request: EpisodeChatRequest,
     ): EpisodeChatResponse
 
-    @POST("mobile/bookmark/enrich")
+    @POST("/mobile/bookmark/enrich")
     suspend fun enrichBookmark(
         @Header("Authorization") authorization: String,
         @Body request: BookmarkEnrichRequest,
