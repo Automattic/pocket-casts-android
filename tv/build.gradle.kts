@@ -59,12 +59,16 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.work)
+    implementation(libs.work.runtime)
     implementation(libs.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
+
+    implementation(platform(libs.firebase.bom))
 
     implementation(platform(libs.firebase.bom))
 
