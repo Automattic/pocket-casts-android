@@ -50,6 +50,10 @@ class SummaryViewModel @Inject constructor(
                 BillingCycle.Monthly,
                 SubscriptionOffer.Trial,
             ) != null
+            val text = loadedText
+            if (text != null) {
+                _state.value = resolveState(text)
+            }
         }
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect {

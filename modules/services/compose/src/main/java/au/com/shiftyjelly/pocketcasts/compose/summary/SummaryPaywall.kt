@@ -19,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -123,7 +124,7 @@ fun SummaryPaywall(
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextH50(
-            text = stringResource(LR.string.transcript_generated_paywall_description),
+            text = stringResource(LR.string.summary_upsell_description),
             color = colors.secondaryText,
             textAlign = TextAlign.Center,
         )
@@ -172,13 +173,15 @@ private fun ColumnScope.BlurredSummaryPreview(
         1.0f to backgroundColor,
     )
 
+    val html = remember(summaryText) { markdownToHtml(summaryText) }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clipToBounds(),
     ) {
         HtmlText(
-            html = markdownToHtml(summaryText),
+            html = html,
             color = textColor,
             textStyleResId = UR.style.P40,
             modifier = Modifier.padding(horizontal = 8.dp),
