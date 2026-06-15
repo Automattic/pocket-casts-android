@@ -9,35 +9,75 @@ class EpisodeInfoTest {
     private val adapter = Moshi.Builder().build().adapter(EpisodeInfo::class.java)
 
     @Test
-    fun `parse episode with hls url`() {
+    fun `parse episode with hls alternate enclosure`() {
         val episodeInfo = adapter.fromJson(
-            """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","hls_url":"https://example.com/episode.m3u8","published":"2026-06-11T00:00:00Z"}""",
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
         )
-
-        assertEquals("https://example.com/episode.m3u8", episodeInfo?.hlsUrl)
 
         val episode = episodeInfo?.toEpisode("podcast-uuid")
         assertEquals("https://example.com/episode.mp3", episode?.downloadUrl)
-        assertEquals("https://example.com/episode.m3u8", episode?.hlsUrl)
+        assertEquals("https://example.com/master.m3u8", episode?.hlsUrl)
     }
 
     @Test
-    fun `parse episode without hls url`() {
+    fun `pick hls enclosure and ignore progressive mp4 alternates`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                {
+                  "type": "video/mp4",
+                  "bitrate": 681484,
+                  "height": 1080,
+                  "default": true,
+                  "sources": [{ "uri": "https://example.com/file-1080.mp4" }]
+                },
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals("https://example.com/master.m3u8", episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
+    }
+
+    @Test
+    fun `parse episode without alternate enclosures`() {
         val episodeInfo = adapter.fromJson(
             """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","published":"2026-06-11T00:00:00Z"}""",
         )
 
-        // Raw Moshi parsing is the unit under test here; toEpisode() applies a debug-only
-        // DEBUG_HLS_TEST_URL fallback when hls_url is absent, so it is not asserted.
-        assertNull(episodeInfo?.hlsUrl)
+        assertNull(episodeInfo?.alternateEnclosures)
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 
     @Test
-    fun `parse episode with null hls url`() {
+    fun `no hls url when enclosures have no hls entry`() {
         val episodeInfo = adapter.fromJson(
-            """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","hls_url":null,"published":"2026-06-11T00:00:00Z"}""",
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "video/mp4", "sources": [{ "uri": "https://example.com/file-1080.mp4" }] }
+              ]
+            }
+            """.trimIndent(),
         )
 
-        assertNull(episodeInfo?.hlsUrl)
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 }

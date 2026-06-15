@@ -3,7 +3,8 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.servers.DEBUG_HLS_TEST_URL
+import au.com.shiftyjelly.pocketcasts.servers.AlternateEnclosureData
+import au.com.shiftyjelly.pocketcasts.servers.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -88,7 +89,7 @@ data class EpisodeInfo(
     @Json(name = "number") val number: Long?,
     @Json(name = "type") val type: String?,
     @Json(name = "url") val url: String,
-    @Json(name = "hls_url") val hlsUrl: String?,
+    @Json(name = "alternate_enclosures") val alternateEnclosures: List<AlternateEnclosure>?,
     @Json(name = "file_type") val fileType: String?,
     @Json(name = "file_size") val fileSize: Long?,
     @Json(name = "duration") val duration: Double?,
@@ -103,7 +104,7 @@ data class EpisodeInfo(
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
-            hlsUrl = hlsUrl ?: DEBUG_HLS_TEST_URL,
+            hlsUrl = alternateEnclosures.toHlsUrl(),
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,
@@ -119,3 +120,19 @@ data class EpisodeInfo(
         )
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class AlternateEnclosure(
+    @Json(name = "type") val type: String?,
+    @Json(name = "sources") val sources: List<AlternateSource>?,
+)
+
+@JsonClass(generateAdapter = true)
+data class AlternateSource(
+    @Json(name = "uri") val uri: String?,
+    @Json(name = "content_type") val contentType: String?,
+)
+
+private fun List<AlternateEnclosure>?.toHlsUrl(): String? = this
+    ?.map { enclosure -> AlternateEnclosureData(enclosure.type, enclosure.sources?.mapNotNull(AlternateSource::uri).orEmpty()) }
+    .firstHlsStreamUrl()

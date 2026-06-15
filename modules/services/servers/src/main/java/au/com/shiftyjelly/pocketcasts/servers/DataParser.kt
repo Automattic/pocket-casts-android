@@ -14,14 +14,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
 
-// Debug-only: makes every parsed episode expose a known HLS rendition so HLS playback can be
-// exercised without server-provided hls_url. Null in release, so it can never ship.
-internal val DEBUG_HLS_TEST_URL: String? = if (BuildConfig.DEBUG) {
-    "https://customer-wr8fi2zppse29pbk.cloudflarestream.com/18e048e0c31c0c238b46ddf581b25174/manifest/video.m3u8"
-} else {
-    null
-}
-
 object DataParser {
 
     private val DATE_PARSER = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
@@ -154,7 +146,7 @@ object DataParser {
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
             downloadUrl = getString(jsonEpisode, "url"),
-            hlsUrl = getString(jsonEpisode, "hls_url") ?: DEBUG_HLS_TEST_URL,
+            hlsUrl = parseAlternateEnclosures(jsonEpisode).firstHlsStreamUrl(),
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
@@ -163,6 +155,22 @@ object DataParser {
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),
         )
+    }
+
+    private fun parseAlternateEnclosures(jsonEpisode: JSONObject): List<AlternateEnclosureData> {
+        val enclosures = jsonEpisode.optJSONArray("alternate_enclosures") ?: return emptyList()
+        return (0 until enclosures.length()).mapNotNull { i ->
+            val enclosure = enclosures.optJSONObject(i) ?: return@mapNotNull null
+            val sources = enclosure.optJSONArray("sources")
+            val sourceUris = if (sources == null) {
+                emptyList()
+            } else {
+                (0 until sources.length()).mapNotNull { j ->
+                    sources.optJSONObject(j)?.let { getString(it, "uri") }
+                }
+            }
+            AlternateEnclosureData(type = getString(enclosure, "type"), sourceUris = sourceUris)
+        }
     }
 
     fun getString(jsonObject: JSONObject, key: String): String? {

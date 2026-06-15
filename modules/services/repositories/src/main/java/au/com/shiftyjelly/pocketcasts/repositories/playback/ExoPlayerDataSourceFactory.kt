@@ -99,12 +99,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         // Only DefaultMediaSourceFactory applies the ClippingConfiguration, so clipping must win over HLS.
         val factory = when {
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
-
-            episodeLocation.isHlsStream -> {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Using HLS media source for episode ${episodeLocation.episode.uuid} (url=$episodeUri)")
-                HlsMediaSource.Factory(dataFactory)
-            }
-
+            episodeLocation.isHlsStream -> HlsMediaSource.Factory(dataFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }
         if (FeatureFlag.isEnabled(Feature.LOAD_ERROR_HANDLING_POLICY)) {
