@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
+import android.app.Activity
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 
 fun EditText.addAfterTextChanged(onChange: (text: String) -> Unit) {
     addTextChangedListener(object : TextWatcher {
@@ -32,6 +35,11 @@ fun EditText.addOnTextChanged(onChange: (text: String) -> Unit) {
 
 fun EditText.showKeyboard() {
     requestFocus()
-    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+    val activity = context as? Activity
+    if (activity != null) {
+        WindowCompat.getInsetsController(activity.window, this).show(WindowInsetsCompat.Type.ime())
+    } else {
+        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(this, 0)
+    }
 }
