@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import java.util.UUID
 
@@ -9,6 +11,17 @@ sealed interface BaseEpisode {
     companion object {
         const val AUTO_DOWNLOAD_STATUS_ALLOW = 0
         const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
+
+        fun isHlsUrl(url: String?): Boolean {
+            url ?: return false
+            val path = url.substringBefore('?').substringBefore('#')
+            return path.endsWith(".m3u8", ignoreCase = true)
+        }
+
+        private fun isHlsMimeType(type: String?): Boolean {
+            return type.equals("application/x-mpegURL", ignoreCase = true) ||
+                type.equals("application/vnd.apple.mpegurl", ignoreCase = true)
+        }
 
         /**
          * Used to reduce the changes sent out by the media session.
@@ -34,6 +47,9 @@ sealed interface BaseEpisode {
     var fileType: String?
     var duration: Double
     var downloadUrl: String?
+
+    val hlsUrl: String?
+        get() = null
     var playedUpTo: Double
     var playingStatus: EpisodePlayingStatus
     var addedDate: Date
@@ -105,13 +121,28 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHlsOnly
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
 
     val isVideo: Boolean
         get() = fileType?.startsWith("video/") ?: false
+
+    /** The enclosure itself is HLS or missing, so there is no progressive file to download. */
+    val isHlsOnly: Boolean
+        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType) || (downloadUrl == null && hlsUrl != null)
+
+    /** The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. */
+    val streamUrl: String?
+        get() = if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsUrl ?: downloadUrl else downloadUrl
+
+    /** Whether the URL that streaming will actually use is HLS. */
+    val isStreamUrlHls: Boolean
+        get() {
+            val url = streamUrl ?: return false
+            return (hlsUrl != null && url == hlsUrl) || isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
+        }
 
     val isHLS: Boolean
         get() = downloadUrl?.endsWith("m3u8") ?: false
@@ -158,6 +189,8 @@ sealed interface BaseEpisode {
             fileType.equals("audio/x-m4p", ignoreCase = true) -> return ".m4p"
             fileType.equals("audio/ogg", ignoreCase = true) -> return ".ogg"
             fileType.equals("audio/x-ms-wma", ignoreCase = true) -> return ".wma"
+            fileType.equals("application/x-mpegURL", ignoreCase = true) -> return ".m3u8"
+            fileType.equals("application/vnd.apple.mpegurl", ignoreCase = true) -> return ".m3u8"
             else -> return if (fileType.startsWith("video/")) ".mp4" else ".mp3"
         }
     }
