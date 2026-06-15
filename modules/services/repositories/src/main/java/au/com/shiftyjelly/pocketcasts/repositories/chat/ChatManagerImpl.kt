@@ -41,15 +41,9 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun sendMessage(
         episodeUuid: String,
-        message: String,
+        message: ChatMessage.User,
         allMessages: List<ChatMessage>,
-        isRetry: Boolean,
     ) {
-        if (!isRetry) {
-            val userMessage = ChatMessage.User(text = message)
-            episodeChatDao.insertMessage(userMessage.toEntity(episodeUuid, quoteMetadataAdapter))
-        }
-
         val history = allMessages.mapNotNull { msg ->
             val content = msg.textOrNull() ?: return@mapNotNull null
             ConversationMessage(role = msg.role.apiRole, content = content)
@@ -60,7 +54,7 @@ class ChatManagerImpl @Inject constructor(
         }
         val request = EpisodeChatRequest(
             transcriptUrl = transcript.url,
-            message = message,
+            message = message.text,
             conversationHistory = history,
         )
 
@@ -71,6 +65,8 @@ class ChatManagerImpl @Inject constructor(
             authorization = "Bearer ${accessToken.value}",
             request = request,
         )
+
+        episodeChatDao.insertMessage(message.toEntity(episodeUuid, quoteMetadataAdapter))
 
         val aiReply = ChatMessage.Assistant(text = response.reply)
         episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid, quoteMetadataAdapter))

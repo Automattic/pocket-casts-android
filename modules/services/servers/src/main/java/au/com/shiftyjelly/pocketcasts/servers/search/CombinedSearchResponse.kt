@@ -17,6 +17,7 @@ sealed interface CombinedResult {
         val title: String,
         val author: String? = "",
         val slug: String,
+        val explicit: Boolean? = null,
     ) : CombinedResult
 
     @JsonClass(generateAdapter = true)

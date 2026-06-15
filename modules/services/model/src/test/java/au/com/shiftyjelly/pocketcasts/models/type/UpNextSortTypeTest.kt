@@ -109,4 +109,126 @@ class UpNextSortTypeTest {
             episodes.sortedWith(UpNextSortType.OldestToNewest),
         )
     }
+
+    @Test
+    fun `sort shortest to longest`() {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "2",
+                duration = 200.0,
+                publishedDate = Date(0),
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "0",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(2),
+            ),
+            PodcastEpisode(
+                uuid = "1",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "3",
+                duration = 100.0,
+                publishedDate = Date(0),
+                addedDate = Date(0),
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                PodcastEpisode(
+                    uuid = "3",
+                    duration = 100.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(0),
+                ),
+                PodcastEpisode(
+                    uuid = "2",
+                    duration = 200.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(0),
+                ),
+                // Episodes without a known duration sort to the bottom.
+                PodcastEpisode(
+                    uuid = "1",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(1),
+                ),
+                PodcastEpisode(
+                    uuid = "0",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(2),
+                ),
+            ),
+            episodes.sortedWith(UpNextSortType.ShortestToLongest),
+        )
+    }
+
+    @Test
+    fun `sort longest to shortest`() {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "2",
+                duration = 100.0,
+                publishedDate = Date(0),
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "0",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(2),
+            ),
+            PodcastEpisode(
+                uuid = "1",
+                duration = 0.0,
+                publishedDate = Date(0),
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "3",
+                duration = 200.0,
+                publishedDate = Date(0),
+                addedDate = Date(0),
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                PodcastEpisode(
+                    uuid = "3",
+                    duration = 200.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(0),
+                ),
+                PodcastEpisode(
+                    uuid = "2",
+                    duration = 100.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(0),
+                ),
+                // Episodes without a known duration sort to the bottom.
+                PodcastEpisode(
+                    uuid = "1",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(1),
+                ),
+                PodcastEpisode(
+                    uuid = "0",
+                    duration = 0.0,
+                    publishedDate = Date(0),
+                    addedDate = Date(2),
+                ),
+            ),
+            episodes.sortedWith(UpNextSortType.LongestToShortest),
+        )
+    }
 }

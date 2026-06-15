@@ -1,3 +1,26 @@
+8.15
+-----
+*   New Features
+    *   Up Next sort by duration
+        ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+*   Bug Fixes
+    *   Fix crash when scrolling to the top of a long Up Next queue
+        ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+
+8.14
+-----
+
+*   New Features
+    *   Synced episode transcripts
+        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
+    *   Add the explicit badge to the Discover section
+        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+*   Bug Fixes
+    *   Fix Profile settings gear being unreachable in landscape
+        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
+    *   Fix missing episode dates and durations in Android Auto and Wear OS
+        ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
+
 8.13
 -----
 *   New Features
@@ -7,9 +30,8 @@
         ([#5278](https://github.com/Automattic/pocket-casts-android/pull/5278))
     *   Use generated chapters when author didn't provide them
         ([#5277](https://github.com/Automattic/pocket-casts-android/pull/5277))
-*   Bug Fixes
-    *   Fix crash when scrolling to the top of a long Up Next queue
-        ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+    *   Add an explicit podcast badge to search results
+        ([#5351](https://github.com/Automattic/pocket-casts-android/pull/5351)) 
 
 8.12
 -----

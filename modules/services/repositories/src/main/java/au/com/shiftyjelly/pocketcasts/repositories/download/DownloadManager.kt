@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintMappingCache
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintReferenceRetriever
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
@@ -259,7 +261,14 @@ private class DownloadQueueController(
             transcriptDao.deleteForEpisodes(episodes.keys)
             val deletedEpisodes = episodes.mapNotNull { (_, episode) ->
                 val deletedEpisode = runCatching {
-                    val isFileDeleted = episode.downloadedFilePath?.let(::File)?.delete() == true
+                    val isFileDeleted = episode.downloadedFilePath?.let { filePath ->
+                        val deleted = File(filePath).delete()
+                        if (deleted) {
+                            File(FingerprintMappingCache.mappingPath(filePath)).delete()
+                            File(FingerprintReferenceRetriever.referencePath(filePath)).delete()
+                        }
+                        deleted
+                    } == true
                     if (isFileDeleted) episode else null
                 }
                 if (episode is UserEpisode) {

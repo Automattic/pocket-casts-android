@@ -348,8 +348,10 @@ object OnboardingFlowRoutes {
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
+                OnboardingUpgradeSource.EPISODE_CHAT,
                 OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.FINISHED_ONBOARDING,
+                OnboardingUpgradeSource.SYNCED_TRANSCRIPTS,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

@@ -80,8 +80,14 @@ enum class OnboardingUpgradeSource(
     GENERATED_TRANSCRIPTS(
         analyticsValue = OnboardingSourceType.GeneratedTranscripts,
     ),
+    SYNCED_TRANSCRIPTS(
+        analyticsValue = OnboardingSourceType.SyncedTranscripts,
+    ),
     DEEP_LINK(
         analyticsValue = OnboardingSourceType.DeepLink,
+    ),
+    EPISODE_CHAT(
+        analyticsValue = OnboardingSourceType.EpisodeChat,
     ),
     FINISHED_ONBOARDING(
         analyticsValue = OnboardingSourceType.AccountCreated,

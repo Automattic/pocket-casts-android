@@ -34,6 +34,7 @@ dependencies {
     api(projects.modules.services.analytics)
     api(projects.modules.services.coroutines)
     api(projects.modules.services.crashlogging)
+    api(projects.modules.services.fingerprint)
     api(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.payment)

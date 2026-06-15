@@ -17,11 +17,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -139,4 +144,46 @@ private fun ChatErrorMessage(
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
     )
+}
+
+@Preview
+@Composable
+private fun ChatScreenPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        ChatScreen(
+            uiState = ChatUiState(
+                inputText = "Ask a follow-up",
+                episodeTitle = "The future of podcast discovery",
+                episodeSubtitle = "May 25",
+                podcastUuid = "preview-podcast-uuid",
+                podcastTitle = "Pocket Casts Weekly",
+                episodeDurationMs = 3_600_000,
+                messages = listOf(
+                    ChatMessage.Assistant(
+                        text = "Ask me anything about this episode. I can summarize topics or find key moments.",
+                    ),
+                    ChatMessage.User(
+                        text = "What was the main point?",
+                    ),
+                    ChatMessage.Assistant(
+                        text = "The hosts focused on making discovery feel personal without adding friction.",
+                    ),
+                    ChatMessage.Quote(
+                        text = "The important idea is to keep the interface simple while still surfacing useful context.",
+                        start = "12:04",
+                        end = "12:18",
+                        canPlay = true,
+                    ),
+                ),
+            ),
+            onClickClose = {},
+            onClickMore = {},
+            onInputTextChange = {},
+            onSend = {},
+            onRetry = {},
+            onPlayQuote = {},
+        )
+    }
 }
