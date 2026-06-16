@@ -6,11 +6,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 enum class TrialCtaCopyTreatment(val treatmentName: String) {
     START_30_DAY_TRIAL("start_30_day_trial"),
     TRY_30_DAYS_FREE("try_30_days_free"),
-    ;
-
-    companion object {
-        fun fromTreatmentName(name: String?): TrialCtaCopyTreatment? = entries.firstOrNull { it.treatmentName == name }
-    }
 }
 
 /**
@@ -24,6 +19,6 @@ fun ExperimentProvider.getTrialCtaCopyTreatment(): TrialCtaCopyTreatment? {
     if (!FeatureFlag.isEnabled(Feature.TRIAL_CTA_COPY_AB_TEST)) {
         return null
     }
-    val variation = getVariation(Experiment.TrialCtaCopyABTest)
-    return (variation as? Variation.Treatment)?.let { TrialCtaCopyTreatment.fromTreatmentName(it.name) }
+    val treatmentName = (getVariation(Experiment.TrialCtaCopyABTest) as? Variation.Treatment)?.name
+    return TrialCtaCopyTreatment.entries.firstOrNull { it.treatmentName == treatmentName }
 }
