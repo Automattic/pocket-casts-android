@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FingerprintTimingManagerTest {
@@ -102,6 +104,57 @@ class FingerprintTimingManagerTest {
             valueSelector = { it.referenceTime },
         )
         assertEquals(101.0, result!!, 0.001)
+    }
+
+    @Test
+    fun `computeEager runs for downloaded episode with generated chapters`() {
+        val eager = FingerprintTimingManager.computeEager(
+            hasGeneratedChapters = true,
+            isDownloaded = true,
+            isUnmetered = { false },
+        )
+        assertTrue(eager)
+    }
+
+    @Test
+    fun `computeEager runs for streaming episode on unmetered network`() {
+        val eager = FingerprintTimingManager.computeEager(
+            hasGeneratedChapters = true,
+            isDownloaded = false,
+            isUnmetered = { true },
+        )
+        assertTrue(eager)
+    }
+
+    @Test
+    fun `computeEager skips streaming episode on metered network`() {
+        val eager = FingerprintTimingManager.computeEager(
+            hasGeneratedChapters = true,
+            isDownloaded = false,
+            isUnmetered = { false },
+        )
+        assertFalse(eager)
+    }
+
+    @Test
+    fun `computeEager skips episode without generated chapters`() {
+        val eager = FingerprintTimingManager.computeEager(
+            hasGeneratedChapters = false,
+            isDownloaded = true,
+            isUnmetered = { true },
+        )
+        assertFalse(eager)
+    }
+
+    @Test
+    fun `computeEager does not query network for downloaded episode`() {
+        var queriedNetwork = false
+        FingerprintTimingManager.computeEager(
+            hasGeneratedChapters = true,
+            isDownloaded = true,
+            isUnmetered = { queriedNetwork = true; true },
+        )
+        assertFalse(queriedNetwork)
     }
 
     @Test
