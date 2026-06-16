@@ -210,8 +210,10 @@ class OnboardingUpgradeFeaturesViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.state.test {
-            val state = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
-            assertEquals(TrialCtaCopyTreatment.START_30_DAY_TRIAL, state?.trialCtaCopyTreatment)
+            val first = awaitItem()
+            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
+                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
+            assertEquals(TrialCtaCopyTreatment.START_30_DAY_TRIAL, state.trialCtaCopyTreatment)
         }
     }
 
@@ -224,8 +226,10 @@ class OnboardingUpgradeFeaturesViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.state.test {
-            val state = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
-            assertEquals(TrialCtaCopyTreatment.TRY_30_DAYS_FREE, state?.trialCtaCopyTreatment)
+            val first = awaitItem()
+            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
+                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
+            assertEquals(TrialCtaCopyTreatment.TRY_30_DAYS_FREE, state.trialCtaCopyTreatment)
         }
     }
 
@@ -238,8 +242,10 @@ class OnboardingUpgradeFeaturesViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.state.test {
-            val state = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
-            assertNull("Unrecognized treatment name should fall back to null (control copy)", state?.trialCtaCopyTreatment)
+            val first = awaitItem()
+            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
+                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
+            assertNull("Unrecognized treatment name should fall back to null (control copy)", state.trialCtaCopyTreatment)
         }
     }
 
