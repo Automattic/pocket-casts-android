@@ -179,8 +179,10 @@ class OnboardingUpgradeFeaturesViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.state.test {
-            val state = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
-            assertNull("Treatment should be null when the kill-switch flag is off", state?.trialCtaCopyTreatment)
+            val first = awaitItem()
+            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
+                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
+            assertNull("Treatment should be null when the kill-switch flag is off", state.trialCtaCopyTreatment)
         }
     }
 
