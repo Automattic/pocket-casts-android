@@ -152,7 +152,10 @@ class FingerprintTimingManagerTest {
         FingerprintTimingManager.computeEager(
             hasGeneratedChapters = true,
             isDownloaded = true,
-            isUnmetered = { queriedNetwork = true; true },
+            isUnmetered = {
+                queriedNetwork = true
+                true
+            },
         )
         assertFalse(queriedNetwork)
     }
