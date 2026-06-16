@@ -310,7 +310,7 @@ enum class Feature(
         key = "ai_summaries",
         title = "AI Summaries",
         defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
+        tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-12"),

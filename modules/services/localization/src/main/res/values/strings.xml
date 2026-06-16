@@ -128,6 +128,8 @@
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_summary">Episode Summary</string>
+    <string name="summary_upsell_title">AI-Powered Summaries</string>
+    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="description">Description</string>
     <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
