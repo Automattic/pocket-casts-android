@@ -1304,8 +1304,8 @@
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start Free Trial</string>
-    <string name="profile_start_free_trial_specific_duration">Start your free trial for %1$s</string>
-    <string name="profile_try_days_for_free">Try %1$s for free</string>
+    <string name="profile_start_free_trial_specific_duration">Start your 30-day Free Trial</string>
+    <string name="profile_try_days_for_free">Try 30 days for free</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
