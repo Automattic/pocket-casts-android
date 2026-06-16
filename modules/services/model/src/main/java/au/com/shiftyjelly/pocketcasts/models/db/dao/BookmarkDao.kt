@@ -32,7 +32,7 @@ abstract class BookmarkDao {
     @Transaction
     open suspend fun deleteAll(uuids: Collection<String>) {
         uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
-            deleteAllUnsafe(uuids)
+            deleteAllUnsafe(chunk)
         }
     }
 
@@ -211,10 +211,10 @@ abstract class BookmarkDao {
 
     @Query(
         """UPDATE bookmarks SET
-            ai_title = :aiTitle,
-            ai_summary = :aiSummary,
-            ai_title_modified = :aiTitleModified,
-            ai_summary_modified = :aiSummaryModified,
+            ai_title = COALESCE(:aiTitle, ai_title),
+            ai_summary = COALESCE(:aiSummary, ai_summary),
+            ai_title_modified = COALESCE(:aiTitleModified, ai_title_modified),
+            ai_summary_modified = COALESCE(:aiSummaryModified, ai_summary_modified),
             sync_status = :syncStatus
             WHERE uuid = :bookmarkUuid""",
     )
@@ -239,7 +239,7 @@ abstract class BookmarkDao {
     @Transaction
     open suspend fun getAll(uuids: Collection<String>): List<Bookmark> {
         return uuids.chunked(999).flatMap { chunk ->
-            getAllUnsafe(uuids)
+            getAllUnsafe(chunk)
         }
     }
 
