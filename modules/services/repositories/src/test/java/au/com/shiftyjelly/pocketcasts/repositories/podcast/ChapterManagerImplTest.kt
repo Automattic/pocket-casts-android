@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +25,13 @@ class ChapterManagerImplTest {
     private val chapterDao = mock<ChapterDao>()
     private val episodeManager = mock<EpisodeManager>()
 
-    private val chapterManager = ChapterManagerImpl(chapterDao, episodeManager)
+    // Non-Phone platform keeps alignment off, so these tests observe the raw reference timeline.
+    private val chapterManager = ChapterManagerImpl(
+        chapterDao = chapterDao,
+        episodeManager = episodeManager,
+        fingerprintTimingManager = Lazy { mock<FingerprintTimingManager>() },
+        appPlatform = AppPlatform.Automotive,
+    )
 
     @Test
     fun `observe no chapters`() = runBlocking {

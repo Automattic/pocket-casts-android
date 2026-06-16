@@ -5,16 +5,27 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.sample
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class ChapterManagerImpl @Inject constructor(
     private val chapterDao: ChapterDao,
     private val episodeManager: EpisodeManager,
+    private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
+    private val appPlatform: AppPlatform,
 ) : ChapterManager {
     override suspend fun updateChapters(
         episodeUuid: String,
@@ -31,10 +42,39 @@ class ChapterManagerImpl @Inject constructor(
 
     override suspend fun hasGeneratedChapters(episodeUuid: String) = chapterDao.countGeneratedForEpisode(episodeUuid) > 0
 
-    override fun observerChaptersForEpisode(episodeUuid: String) = combine(
-        episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
-        chapterDao.observeChaptersForEpisode(episodeUuid),
-    ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
+    @OptIn(FlowPreview::class)
+    override fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters> {
+        val rawChapters = combine(
+            episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
+            chapterDao.observeChaptersForEpisode(episodeUuid),
+        ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
+
+        // Generated chapter timestamps are in the server reference timeline; align them to the real audio
+        // stream via the fingerprint map. Phone only, to spare resources on automotive/TV/wear.
+        if (appPlatform != AppPlatform.Phone) return rawChapters
+
+        // -1L primes combine so chapters emit immediately, before sample's first throttled tick.
+        val mappingTicks = fingerprintTimingManager.get().mappingVersion
+            .sample(MAPPING_SAMPLE_MS)
+            .onStart { emit(-1L) }
+        return combine(rawChapters, mappingTicks) { chapters, _ ->
+            alignGeneratedChapters(episodeUuid, chapters)
+        }.distinctUntilChanged()
+    }
+
+    /**
+     * Translate generated chapters from reference time to stream time using the fingerprint map.
+     * Embedded chapters already match the file, so they are left untouched.
+     */
+    private fun alignGeneratedChapters(episodeUuid: String, chapters: Chapters): Chapters {
+        val manager = fingerprintTimingManager.get()
+        if (manager.activeEpisodeUuid != episodeUuid || manager.mappingSnapshot.isEmpty()) {
+            return chapters
+        }
+        return alignGeneratedChapters(chapters) { reference ->
+            manager.playbackTimeMs(reference.toDouble(DurationUnit.SECONDS))?.milliseconds
+        }
+    }
 
     private fun List<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = asSequence()
         .withIndex()
@@ -62,4 +102,31 @@ class ChapterManagerImpl @Inject constructor(
         .filter { it.duration > Duration.ZERO }
         .mapIndexed { index, chapter -> chapter.copy(uiIndex = index + 1) }
         .toList()
+
+    companion object {
+        private const val MAPPING_SAMPLE_MS = 1000L
+
+        /**
+         * Translate generated chapters from reference time to stream time with [align]. Embedded chapters
+         * already match the file, so they are left untouched; zero-duration chapters are dropped and the
+         * UI index re-derived, mirroring [fixChapterTimestamps].
+         */
+        internal fun alignGeneratedChapters(chapters: Chapters, align: (Duration) -> Duration?): Chapters {
+            if (chapters.none { it.isGenerated }) return chapters
+            val aligned = chapters
+                .map { chapter ->
+                    if (!chapter.isGenerated) {
+                        chapter
+                    } else {
+                        chapter.copy(
+                            startTime = align(chapter.startTime) ?: chapter.startTime,
+                            endTime = align(chapter.endTime) ?: chapter.endTime,
+                        )
+                    }
+                }
+                .filter { it.duration > Duration.ZERO }
+                .mapIndexed { index, chapter -> chapter.copy(uiIndex = index + 1) }
+            return Chapters(aligned)
+        }
+    }
 }
