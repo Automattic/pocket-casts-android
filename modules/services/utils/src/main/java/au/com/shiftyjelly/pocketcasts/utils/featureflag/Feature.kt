@@ -170,15 +170,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2025-10-07"),
     ),
-    IMPROVED_SEARCH_RESULTS(
-        key = "search_improvements",
-        title = "Improved search results",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2025-10-10"),
-    ),
     IMPROVE_APP_RATINGS(
         key = "improve_app_ratings",
         title = "Banner prompting for app rating",
