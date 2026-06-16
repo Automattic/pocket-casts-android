@@ -194,8 +194,10 @@ class OnboardingUpgradeFeaturesViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.state.test {
-            val state = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
-            assertNull("Control variation should map to null (control copy)", state?.trialCtaCopyTreatment)
+            val first = awaitItem()
+            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
+                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
+            assertNull("Control variation should map to null (control copy)", state.trialCtaCopyTreatment)
         }
     }
 
