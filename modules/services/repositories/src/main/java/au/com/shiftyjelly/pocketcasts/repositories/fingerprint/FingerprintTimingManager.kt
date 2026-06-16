@@ -74,6 +74,15 @@ class FingerprintTimingManager @Inject constructor(
     val state: State get() = _stateFlow.value
     val mappingSnapshot: List<TimeMappingEntry> get() = snapshotPlaybackToReference
 
+    // Monotonic counter bumped on every snapshot publish, so consumers can react to mapping growth.
+    private val _mappingVersion = MutableStateFlow(0L)
+    val mappingVersion: StateFlow<Long> = _mappingVersion.asStateFlow()
+
+    /** Episode the current mapping belongs to, or null when idle. Safe to read off the UI thread. */
+    @Volatile
+    var activeEpisodeUuid: String? = null
+        private set
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
 
@@ -323,6 +332,7 @@ class FingerprintTimingManager @Inject constructor(
         currentReferenceDuration = 0.0
         currentMatcher?.close()
         currentMatcher = null
+        activeEpisodeUuid = null
         hasReachedActive = false
         preparationStartMs = 0
         currentIsStreaming = false
@@ -355,6 +365,7 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         currentEpisodeUuid = episodeUuid
+        activeEpisodeUuid = episodeUuid
         currentAudioFilePath = audioSource
         currentIsStreaming = !isDownloaded
         preparationStartMs = SystemClock.elapsedRealtime()
@@ -868,6 +879,7 @@ class FingerprintTimingManager @Inject constructor(
     private fun publishSnapshot() {
         snapshotPlaybackToReference = mappingPlaybackToReference.toList()
         snapshotReferenceToPlayback = mappingReferenceToPlayback.toList()
+        _mappingVersion.value++
     }
 
     /** Test seam: insert a mapping directly. Must only be called from single-threaded tests. */
