@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -670,5 +671,90 @@ class ChapterManagerImplTest {
 
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `align translates generated chapter times`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = true),
+                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+            ),
+        )
+
+        // Simulate a 30s ad inserted before playback: every reference time shifts later by 30s.
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { it + 30.seconds }
+
+        assertEquals(
+            Chapters(
+                listOf(
+                    Chapter(title = "A", startTime = 30.seconds, endTime = 40.seconds, index = 0, uiIndex = 1, isGenerated = true),
+                    Chapter(title = "B", startTime = 40.seconds, endTime = 50.seconds, index = 1, uiIndex = 2, isGenerated = true),
+                ),
+            ),
+            aligned,
+        )
+    }
+
+    @Test
+    fun `align leaves embedded chapters untouched`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "Embedded", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = false),
+                Chapter(title = "Generated", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+            ),
+        )
+
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { it + 30.seconds }
+
+        assertEquals(0.seconds, aligned[0].startTime)
+        assertEquals(10.seconds, aligned[0].endTime)
+        assertEquals(40.seconds, aligned[1].startTime)
+        assertEquals(50.seconds, aligned[1].endTime)
+    }
+
+    @Test
+    fun `align keeps original time when mapping returns null`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "A", startTime = 5.seconds, endTime = 15.seconds, index = 0, uiIndex = 1, isGenerated = true),
+            ),
+        )
+
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { null }
+
+        assertEquals(5.seconds, aligned[0].startTime)
+        assertEquals(15.seconds, aligned[0].endTime)
+    }
+
+    @Test
+    fun `align drops collapsed chapters and re-derives uiIndex`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = true),
+                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+            ),
+        )
+
+        // Collapse everything up to 10s onto a single instant; chapter A becomes zero-duration.
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { time -> if (time <= 10.seconds) 10.seconds else time }
+
+        assertEquals(1, aligned.size)
+        assertEquals("B", aligned[0].title)
+        assertEquals(1, aligned[0].index) // DB index preserved
+        assertEquals(1, aligned[0].uiIndex) // UI index re-derived
+    }
+
+    @Test
+    fun `align returns chapters unchanged when none are generated`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = false),
+            ),
+        )
+
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { it + 30.seconds }
+
+        assertEquals(chapters, aligned)
     }
 }
