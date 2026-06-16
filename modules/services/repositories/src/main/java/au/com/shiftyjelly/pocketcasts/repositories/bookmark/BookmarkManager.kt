@@ -40,6 +40,7 @@ interface BookmarkManager {
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>>
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
+    suspend fun enrichBookmark(bookmark: Bookmark)
 
     var sourceView: SourceView
 }
