@@ -264,8 +264,8 @@ class BookmarksViewModel
         } else if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
             viewModelScope.launch(ioDispatcher) {
                 val loadedState = _uiState.value as? UiState.Loaded ?: return@launch
-                val episodeTitle = loadedState.bookmarkIdAndEpisodeMap[bookmark.uuid]
-                    ?.title.orEmpty()
+                val episodeTitle = loadedState.bookmarkIdAndEpisodeMap[bookmark.uuid]?.title
+                    ?: bookmark.episodeTitle
                 val podcastTitle = bookmark.podcastTitle.ifEmpty {
                     podcastManager.findPodcastByUuid(bookmark.podcastUuid)?.title.orEmpty()
                 }
