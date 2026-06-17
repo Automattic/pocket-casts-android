@@ -21,4 +21,5 @@ data class DbChapter(
     @ColumnInfo(name = "url") val url: String? = null,
     @ColumnInfo(name = "is_embedded") val isEmbedded: Boolean = false,
     @ColumnInfo(name = "is_generated", defaultValue = "0") val isGenerated: Boolean = false,
+    @ColumnInfo(name = "origin", defaultValue = "0") val origin: ChapterOrigin = ChapterOrigin.Unknown,
 )

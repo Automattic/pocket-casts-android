@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -1697,6 +1698,7 @@ open class PlaybackManager @Inject constructor(
                         imageUrl = chapter.imagePath,
                         url = chapter.url?.toString(),
                         isEmbedded = true,
+                        origin = ChapterOrigin.NativeMedia,
                     )
                 }
                 chapterManager.updateChapters(playbackState.episodeUuid, dbChapters)

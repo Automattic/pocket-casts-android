@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
@@ -180,6 +181,7 @@ class TranscriptManagerImpl @Inject constructor(
                     startTimeMs = startTime * 1000,
                     title = title,
                     isGenerated = true,
+                    origin = ChapterOrigin.Generated,
                 )
             }
             .mapIndexed { index, chapter -> chapter.copy(index = index) }

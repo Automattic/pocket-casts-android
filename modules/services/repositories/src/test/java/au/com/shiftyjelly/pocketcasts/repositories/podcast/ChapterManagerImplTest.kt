@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import java.util.Date
@@ -66,6 +67,28 @@ class ChapterManagerImplTest {
                 selected = true,
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `observe chapter origin`() = runBlocking {
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
+        val dbChapter = DbChapter(
+            index = 0,
+            episodeUuid = "id",
+            startTimeMs = 0,
+            endTimeMs = 1,
+            title = "Title",
+            origin = ChapterOrigin.PodcastIndex,
+        )
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(ChapterOrigin.PodcastIndex, awaitItem().origin)
 
             awaitComplete()
         }

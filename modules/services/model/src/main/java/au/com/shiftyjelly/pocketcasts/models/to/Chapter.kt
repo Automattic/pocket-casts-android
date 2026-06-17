@@ -14,6 +14,7 @@ data class Chapter(
     val imagePath: String? = null,
     val selected: Boolean = true,
     val isGenerated: Boolean = false,
+    val origin: ChapterOrigin = ChapterOrigin.Unknown,
 ) {
 
     val isImagePresent: Boolean
