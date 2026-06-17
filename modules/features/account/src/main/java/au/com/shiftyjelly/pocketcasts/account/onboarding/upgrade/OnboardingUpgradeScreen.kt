@@ -71,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Fold
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.PreselectChaptersAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -205,6 +206,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                         .fillMaxWidth(),
                     plans = state.availableBasePlans,
                     selectedOnboardingPlan = state.selectedPlan,
+                    trialCtaCopyTreatment = state.trialCtaCopyTreatment,
                     onSelectedChange = {
                         onChangeSelectedPlan(it)
                     },
@@ -274,6 +276,7 @@ private fun RegularUpgradeScreen(
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
             selectedOnboardingPlan = state.selectedPlan,
+            trialCtaCopyTreatment = state.trialCtaCopyTreatment,
             onSelectedChange = {
                 onChangeSelectedPlan(it)
             },
@@ -297,6 +300,7 @@ private fun UpgradeFooter(
     upFocusRequester: FocusRequester,
     selfFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
+    trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 ) {
     Column(
         modifier = modifier
@@ -323,7 +327,7 @@ private fun UpgradeFooter(
         }
         Spacer(modifier = Modifier.height(16.dp))
         UpgradeRowButton(
-            primaryText = selectedOnboardingPlan.ctaButtonText(isRenewingSubscription = false),
+            primaryText = selectedOnboardingPlan.ctaButtonText(isRenewingSubscription = false, trialCtaCopyTreatment = trialCtaCopyTreatment),
             backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
             textColor = MaterialTheme.theme.colors.primaryInteractive02,
             fontWeight = FontWeight.W500,

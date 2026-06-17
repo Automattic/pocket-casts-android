@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
@@ -151,6 +152,7 @@ internal fun AccountDetailsPage(
                             NewUpgradeAccountCard(
                                 onClickSubscribe = onAccountUpgradeClick,
                                 recommendedPlan = plan,
+                                trialCtaCopyTreatment = state.trialCtaCopyTreatment,
                             )
                         }
                     }
@@ -188,6 +190,7 @@ private fun NewUpgradeAccountCard(
     recommendedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
+    trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 ) {
     Card(
         modifier = modifier,
@@ -229,7 +232,7 @@ private fun NewUpgradeAccountCard(
                 LocalRippleConfiguration provides RippleConfiguration(NoContentBannerColors.default(MaterialTheme.theme.colors).buttonRipple),
             ) {
                 RowButton(
-                    text = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
+                    text = recommendedPlan.ctaButtonText(isRenewingSubscription = false, trialCtaCopyTreatment = trialCtaCopyTreatment),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                     ),
@@ -248,6 +251,7 @@ internal data class AccountDetailsPageState(
     val headerState: AccountHeaderState,
     val recommendedPlan: OnboardingSubscriptionPlan?,
     val sectionsState: AccountSectionsState,
+    val trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 )
 
 @PreviewOrientation
