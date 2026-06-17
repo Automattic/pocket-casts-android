@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -1062,6 +1063,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             } ?: skipToEndOfLastChapter()
@@ -1078,6 +1080,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             }
@@ -1092,6 +1095,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             }

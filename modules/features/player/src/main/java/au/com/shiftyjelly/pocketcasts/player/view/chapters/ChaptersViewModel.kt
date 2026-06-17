@@ -132,7 +132,7 @@ class ChaptersViewModel @AssistedInject constructor(
             }
             chapterManager.selectChapter(episodeId, chapter.index, select)
             episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
-                trackChapterSelectionToggled(episode, select)
+                trackChapterSelectionToggled(episode, chapter, select)
             }
         }
     }
@@ -157,6 +157,7 @@ class ChaptersViewModel @AssistedInject constructor(
                         episodeUuid = episodeId,
                         podcastUuid = episode.podcastOrSubstituteUuid,
                         chapterTitle = chapter.title,
+                        origin = chapter.origin.toChapterOriginType(),
                     ),
                 )
             }
@@ -198,16 +199,18 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun trackChapterSelectionToggled(episode: BaseEpisode, selected: Boolean) {
+    private fun trackChapterSelectionToggled(episode: BaseEpisode, chapter: Chapter, selected: Boolean) {
         val event = if (selected) {
             DeselectChaptersChapterSelectedEvent(
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = chapter.origin.toChapterOriginType(),
             )
         } else {
             DeselectChaptersChapterDeselectedEvent(
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = chapter.origin.toChapterOriginType(),
             )
         }
         eventHorizon.track(event)
