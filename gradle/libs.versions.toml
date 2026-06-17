@@ -20,7 +20,7 @@
 aboutlibraries = "14.2.1"
 android-gradle-plugin = "9.2.1"
 billing = "9.0.0"
-coil = "3.4.0"
+coil = "3.5.0"
 compose = "2026.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.2.1"
 dependency-analysis = "3.14.1"
