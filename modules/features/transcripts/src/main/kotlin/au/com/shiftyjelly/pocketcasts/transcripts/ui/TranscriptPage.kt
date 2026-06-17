@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -176,7 +177,12 @@ fun TranscriptPage(
     UserScrollDetectionEffect(
         listState = listState,
         onSuppressScroll = { isAutoScrollSuppressed = true },
-        onResumeScroll = { isAutoScrollSuppressed = false },
+        onResumeScroll = { manualScrollDurationMs ->
+            isAutoScrollSuppressed = false
+            if (uiState.isSyncedActive) {
+                viewModel?.trackAutoScrollResumed(manualScrollDurationMs)
+            }
+        },
     )
 
     KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
@@ -275,17 +281,23 @@ private fun HighlightEffect(
         playbackManager.playbackStateFlow
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
-    val isAdInProgress by remember(fingerprintTimingManager) {
-        fingerprintTimingManager.isAdInProgress
-    }.collectAsState()
 
-    if (isPlaying && isSyncedActive && !isAdInProgress) {
+    if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
             var cachedIndex = 0
+            var wasHighlighting = false
+            latestOnHighlightChanged(HighlightState())
             while (true) {
                 withFrameNanos { _ ->
                     val posMs = playbackState?.positionMs ?: return@withFrameNanos
-                    val currentRefTime = fingerprintTimingManager.referenceTime(forPlaybackTimeMs = posMs) ?: return@withFrameNanos
+                    val currentRefTime = fingerprintTimingManager.matchedReferenceTime(forPlaybackTimeMs = posMs)
+                    if (currentRefTime == null) {
+                        if (wasHighlighting) {
+                            latestOnHighlightChanged(HighlightState())
+                            wasHighlighting = false
+                        }
+                        return@withFrameNanos
+                    }
                     val currentRefTimeMs = (currentRefTime * 1000).toLong()
                     val idx = TranscriptCueHelper.findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
                     if (idx != null) {
@@ -297,12 +309,16 @@ private fun HighlightEffect(
                             null
                         }
                         latestOnHighlightChanged(HighlightState(entryIndex = idx, wordIndex = wordIdx))
+                        wasHighlighting = true
+                    } else if (wasHighlighting) {
+                        latestOnHighlightChanged(HighlightState())
+                        wasHighlighting = false
                     }
                 }
             }
         }
-    } else if (!isSyncedActive || isAdInProgress) {
-        LaunchedEffect(isAdInProgress) { latestOnHighlightChanged(HighlightState()) }
+    } else if (!isSyncedActive) {
+        LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
     }
 }
 
@@ -336,24 +352,28 @@ private fun AutoScrollEffect(
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
     onSuppressScroll: () -> Unit,
-    onResumeScroll: () -> Unit,
+    onResumeScroll: (manualScrollDurationMs: Long?) -> Unit,
 ) {
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
         var resumeJob: Job? = null
+        var dragStartMs: Long? = null
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
                     resumeJob?.cancel()
+                    dragStartMs = SystemClock.elapsedRealtime()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                    val manualScrollDurationMs = dragStartMs?.let { SystemClock.elapsedRealtime() - it }
+                    dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {
                         delay(AUTO_SCROLL_BACK_DELAY_MS)
-                        latestOnResumeScroll()
+                        latestOnResumeScroll(manualScrollDurationMs)
                     }
                 }
             }

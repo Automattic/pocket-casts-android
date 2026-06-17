@@ -14,6 +14,10 @@ import com.google.protobuf.stringValue
 import com.pocketcasts.service.api.BookmarkResponse
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUserBookmark
+import com.pocketcasts.service.api.aiSummaryModifiedOrNull
+import com.pocketcasts.service.api.aiSummaryOrNull
+import com.pocketcasts.service.api.aiTitleModifiedOrNull
+import com.pocketcasts.service.api.aiTitleOrNull
 import com.pocketcasts.service.api.createdAtOrNull
 import com.pocketcasts.service.api.isDeletedModifiedOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
@@ -78,6 +82,26 @@ internal class BookmarkSync(
                                 value = modifiedAt
                             }
                         }
+                        localBookmark.aiTitleModified?.let { modifiedAt ->
+                            localBookmark.aiTitle?.let { value ->
+                                aiTitle = stringValue {
+                                    this.value = value
+                                }
+                                aiTitleModified = int64Value {
+                                    this.value = modifiedAt
+                                }
+                            }
+                        }
+                        localBookmark.aiSummaryModified?.let { modifiedAt ->
+                            localBookmark.aiSummary?.let { value ->
+                                aiSummary = stringValue {
+                                    this.value = value
+                                }
+                                aiSummaryModified = int64Value {
+                                    this.value = modifiedAt
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -136,6 +160,18 @@ private fun Bookmark.applyServerBookmark(serverBookmark: SyncUserBookmark) = app
         serverBookmark.isDeletedOrNull?.value?.let { value ->
             deleted = value
             deletedModified = modifiedAt
+        }
+    }
+    serverBookmark.aiTitleModifiedOrNull?.value?.let { modifiedAt ->
+        serverBookmark.aiTitleOrNull?.value?.let { value ->
+            aiTitle = value
+            aiTitleModified = modifiedAt
+        }
+    }
+    serverBookmark.aiSummaryModifiedOrNull?.value?.let { modifiedAt ->
+        serverBookmark.aiSummaryOrNull?.value?.let { value ->
+            aiSummary = value
+            aiSummaryModified = modifiedAt
         }
     }
 }

@@ -4,6 +4,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodePageState
@@ -69,18 +72,22 @@ class EpisodeFragmentViewModelTest {
     @Mock
     lateinit var userManager: UserManager
 
+    @Mock
+    lateinit var paymentClient: PaymentClient
+
     private val eventSink = TestEventSink()
 
     private lateinit var viewModel: EpisodeFragmentViewModel
 
     @Before
-    fun setUp() {
+    fun setUp() = kotlinx.coroutines.test.runTest {
         whenever(playbackManager.playbackStateLive).thenReturn(
             androidx.lifecycle.MutableLiveData(PlaybackState()),
         )
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(SignInState.SignedOut),
         )
+        whenever(paymentClient.loadSubscriptionPlans()).thenReturn(PaymentResult.Failure(PaymentResultCode.Error, "test"))
         viewModel = EpisodeFragmentViewModel(
             episodeManager = episodeManager,
             podcastManager = podcastManager,
@@ -93,6 +100,7 @@ class EpisodeFragmentViewModelTest {
             eventHorizon = EventHorizon(eventSink),
             transcriptManager = transcriptManager,
             userManager = userManager,
+            paymentClient = paymentClient,
         )
     }
 

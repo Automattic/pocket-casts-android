@@ -1,16 +1,28 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.SummaryViewModel.SummaryState
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -25,7 +37,38 @@ class SummaryViewModelTest {
     @Mock
     private lateinit var transcriptManager: TranscriptManager
 
-    private fun createViewModel() = SummaryViewModel(transcriptManager, coroutineRule.testDispatcher)
+    @Mock
+    private lateinit var settings: Settings
+
+    @Mock
+    private lateinit var paymentClient: PaymentClient
+
+    private val cachedSubscription = MutableStateFlow<Subscription?>(
+        Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        ),
+    )
+
+    @Before
+    fun setUp() = runTest {
+        val readSetting = mock<au.com.shiftyjelly.pocketcasts.preferences.ReadSetting<Subscription?>>()
+        whenever(readSetting.flow).thenReturn(cachedSubscription)
+        whenever(readSetting.value).thenAnswer { cachedSubscription.value }
+        whenever(settings.cachedSubscription).thenReturn(readSetting)
+        whenever(paymentClient.loadSubscriptionPlans()).thenReturn(PaymentResult.Failure(PaymentResultCode.Error, "test"))
+    }
+
+    private fun createViewModel() = SummaryViewModel(
+        transcriptManager,
+        settings,
+        paymentClient,
+        coroutineRule.testDispatcher,
+    )
 
     @Test
     fun `initial state is Loading`() {
@@ -35,13 +78,24 @@ class SummaryViewModelTest {
     }
 
     @Test
-    fun `state is Loaded when summary text is available`() = runTest {
+    fun `state is Loaded when summary text is available and user is subscribed`() = runTest {
         whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
         val viewModel = createViewModel()
 
         viewModel.loadSummary("episode-1")
 
         assertEquals(SummaryState.Loaded("Summary text"), viewModel.state.value)
+    }
+
+    @Test
+    fun `state is Upsell when summary text is available but user is not subscribed`() = runTest {
+        cachedSubscription.value = null
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
+        val viewModel = createViewModel()
+
+        viewModel.loadSummary("episode-1")
+
+        assertEquals(SummaryState.Upsell(text = "Summary text", isFreeTrialAvailable = false), viewModel.state.value)
     }
 
     @Test
@@ -55,7 +109,40 @@ class SummaryViewModelTest {
     }
 
     @Test
+    fun `state changes from Upsell to Loaded when user subscribes`() = runTest {
+        cachedSubscription.value = null
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
+        val viewModel = createViewModel()
+
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Upsell(text = "Summary text", isFreeTrialAvailable = false), viewModel.state.value)
+
+        cachedSubscription.value = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        )
+
+        assertEquals(SummaryState.Loaded("Summary text"), viewModel.state.value)
+    }
+
+    @Test
     fun `loading same episode twice does not re-fetch when already loaded`() = runTest {
+        whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
+        val viewModel = createViewModel()
+
+        viewModel.loadSummary("episode-1")
+        viewModel.loadSummary("episode-1")
+
+        verify(transcriptManager).loadSummaryText("episode-1")
+    }
+
+    @Test
+    fun `loading same episode twice does not re-fetch when in upsell state`() = runTest {
+        cachedSubscription.value = null
         whenever(transcriptManager.loadSummaryText("episode-1")).thenReturn("Summary text")
         val viewModel = createViewModel()
 

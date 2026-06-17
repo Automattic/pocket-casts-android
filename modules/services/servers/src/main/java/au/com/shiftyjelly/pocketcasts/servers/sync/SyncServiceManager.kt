@@ -10,10 +10,16 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
@@ -75,6 +81,7 @@ open class SyncServiceManager @Inject constructor(
 
     companion object {
         const val SCOPE_MOBILE = "mobile"
+        const val SCOPE_TV = "tv"
 
         private val userPodcastListRequest = userPodcastListRequest {
             v = Settings.SYNC_API_VERSION.toString()
@@ -109,6 +116,16 @@ open class SyncServiceManager @Inject constructor(
     suspend fun loginToken(refreshToken: RefreshToken): LoginTokenResponse {
         val request = LoginTokenRequest(refreshToken = refreshToken, scope = SCOPE_MOBILE)
         return service.loginToken(request)
+    }
+
+    suspend fun deviceAuthorize(scope: String = SCOPE_TV): DeviceAuthorizeResponse {
+        val request = DeviceAuthorizeRequest(scope = scope)
+        return service.deviceAuthorize(request)
+    }
+
+    suspend fun deviceToken(deviceCode: String, scope: String = SCOPE_TV): DeviceTokenResponse {
+        val request = DeviceTokenRequest(deviceCode = deviceCode, scope = scope)
+        return service.deviceToken(request)
     }
 
     suspend fun forgotPassword(email: String): ForgotPasswordResponse {
@@ -176,6 +193,10 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getBookmarks(token: AccessToken): BookmarksResponse {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {})
+    }
+
+    suspend fun enrichBookmark(request: BookmarkEnrichRequest, token: AccessToken): BookmarkEnrichResponse {
+        return service.enrichBookmark(addBearer(token), request)
     }
 
     suspend fun getEpisodes(request: PodcastsEpisodesRequest, token: AccessToken): EpisodesResponse {

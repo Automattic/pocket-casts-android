@@ -293,7 +293,10 @@ class PlayerContainerFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 summaryViewModel.state.collect { state ->
-                    adapter.updateSummary(addSummary = state is SummaryViewModel.SummaryState.Loaded)
+                    adapter.updateSummary(
+                        addSummary = state is SummaryViewModel.SummaryState.Loaded ||
+                            state is SummaryViewModel.SummaryState.Upsell,
+                    )
                 }
             }
         }

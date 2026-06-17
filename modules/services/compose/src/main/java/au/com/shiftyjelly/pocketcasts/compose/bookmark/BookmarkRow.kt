@@ -118,7 +118,7 @@ fun BookmarkRow(
                     } else {
                         Image(
                             painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
-                            contentDescription = bookmark.title,
+                            contentDescription = bookmark.displayTitle,
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(RoundedCornerShape(8.dp)),
@@ -137,7 +137,7 @@ fun BookmarkRow(
                     TextH70(
                         text = bookmark.episodeTitle,
                         color = colors.bookmarkRow.secondaryText,
-                        maxLines = 2,
+                        maxLines = 1,
                         modifier = Modifier.padding(top = 8.dp),
                     )
                 }
@@ -148,10 +148,12 @@ fun BookmarkRow(
                     ),
                 )
 
+                val displayTitle = bookmark.displayTitle
+
                 TextH40(
-                    text = bookmark.title,
+                    text = displayTitle,
                     color = colors.bookmarkRow.primaryText,
-                    maxLines = 2,
+                    maxLines = 1,
                     lineHeight = 18.sp,
                 )
 

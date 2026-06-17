@@ -128,6 +128,8 @@
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_summary">Episode Summary</string>
+    <string name="summary_upsell_title">AI-Powered Summaries</string>
+    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="description">Description</string>
     <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
@@ -249,6 +251,8 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
+    <string name="tv_sign_in_or_enter_code">or enter the following code</string>
+    <string name="tv_sign_in_go_to_url">going to %1$s</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -2822,4 +2826,19 @@
     <string name="sponsored">Sponsored</string>
     <string name="play_latest_episode">Play latest episode</string>
     <string name="play_this_episode">Play this episode</string>
+
+    <!-- TV Onboarding -->
+    <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
+    <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
+    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_create_free_account">Create free account</string>
+    <string name="tv_onboarding_browse_without_account">Browse without an account</string>
+    <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
+    <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
+    <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
+    <string name="tv_onboarding_welcome_back">Welcome back!</string>
+    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_create_account_title">Create your free account</string>
+    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
+    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

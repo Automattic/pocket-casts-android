@@ -3,6 +3,9 @@
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+*   Bug Fixes
+    *   Fix crash when scrolling to the top of a long Up Next queue
+        ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
 
 8.14
 -----

@@ -23,7 +23,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -66,6 +68,8 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
+    suspend fun deviceAuthorize(): DeviceAuthorizeResponse
+    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String, signInSource: SignInSource.UserInitiated): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken
@@ -124,6 +128,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun upNextSyncProtobuf(request: UpNextSyncRequestProtobuf): UpNextResponse
     suspend fun getBookmarks(): List<Bookmark>
+    suspend fun enrichBookmark(transcriptSnippet: String): BookmarkEnrichResponse
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
 
