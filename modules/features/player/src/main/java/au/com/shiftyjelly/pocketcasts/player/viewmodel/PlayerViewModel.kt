@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -739,14 +740,16 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextChapterClick() {
-        eventHorizon.track(PlayerNextChapterTappedEvent)
+        eventHorizon.track(PlayerNextChapterTappedEvent(origin = currentChapterOrigin()))
         playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun onPreviousChapterClick() {
-        eventHorizon.track(PlayerPreviousChapterTappedEvent)
+        eventHorizon.track(PlayerPreviousChapterTappedEvent(origin = currentChapterOrigin()))
         playbackManager.skipToPreviousSelectedOrLastChapter()
     }
+
+    private fun currentChapterOrigin() = listDataLive.value?.podcastHeader?.chapters?.origin?.toChapterOriginType()
 
     fun onChapterTitleClick(chapter: Chapter) {
         viewModelScope.launch {
