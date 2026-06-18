@@ -115,7 +115,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChat::class,
         EpisodeChatMessage::class,
     ],
-    version = 131,
+    version = 132,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1458,6 +1458,10 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE bookmarks ADD COLUMN ai_summary_modified INTEGER")
         }
 
+        val MIGRATION_131_132 = addMigration(131, 132) { database ->
+            database.execSQL("ALTER TABLE podcast_episodes ADD COLUMN hls_url TEXT")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1878,6 +1882,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_127_128,
                 MIGRATION_129_130,
                 MIGRATION_130_131,
+                MIGRATION_131_132,
             )
         }
 
