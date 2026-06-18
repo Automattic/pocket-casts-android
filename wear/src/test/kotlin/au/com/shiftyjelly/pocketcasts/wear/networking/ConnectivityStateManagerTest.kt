@@ -47,9 +47,9 @@ class ConnectivityStateManagerTest {
             activeNetwork = null,
             networks = emptyList(),
         )
-        val connectivityStateManager = createConnectivityStateManager()
-        testScheduler.runCurrent()
-
+val connectivityStateManager = createConnectivityStateManager()
+assertEquals(true, connectivityStateManager.isConnected.value)
+testScheduler.runCurrent()
         connectivityStateManager.isConnected.test {
             assertEquals(false, awaitItem())
             cancel()
@@ -139,9 +139,9 @@ class ConnectivityStateManagerTest {
 
     @Test
     fun `isConnected changes from false to true when WiFi connects`() = testScope.runTest {
-        val connectivityStateManager = createConnectivityStateManager()
-        testScheduler.runCurrent()
-
+val connectivityStateManager = createConnectivityStateManager()
+assertEquals(true, connectivityStateManager.isConnected.value)
+testScheduler.runCurrent()
         connectivityStateManager.isConnected.test {
             assertEquals(false, awaitItem())
 
