@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+    *   Make sure titles of search results nullable, but don't include such items on results
+        ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
 
 8.14
 -----
