@@ -185,10 +185,8 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
-    // Highlight the current fragment within the sentence (iOS-style partial highlight). When
-    // the entry is current but no fragment resolves (no word timings, before the first
-    // fragment, or invalid offsets) fall back to lighting the whole entry so a current
-    // sentence never goes dark.
+    // Highlight the current word within the sentence, falling back to the whole entry when no
+    // fragment resolves so a current sentence never goes dark.
     val wordIndex = highlightState.wordIndex
     val highlightWord = if (isEntryHighlighted && wordIndex != null && wordTimings.isNotEmpty()) {
         wordTimings[wordIndex.coerceAtMost(wordTimings.lastIndex)]
