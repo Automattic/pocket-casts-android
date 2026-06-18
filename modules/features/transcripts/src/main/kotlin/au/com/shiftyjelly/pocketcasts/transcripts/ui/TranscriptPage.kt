@@ -282,37 +282,33 @@ private fun HighlightEffect(
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
 
+    // Shared between the playing loop and the paused recompute as the cue lookup hint.
+    // A plain holder (not Compose state) so updating it per frame doesn't recompose.
+    val cueIndexHolder = remember(transcript.entries) { intArrayOf(0) }
+
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
-            var cachedIndex = 0
+            cueIndexHolder[0] = 0
             var wasHighlighting = false
             latestOnHighlightChanged(HighlightState())
             while (true) {
                 withFrameNanos { _ ->
                     val posMs = playbackState?.positionMs ?: return@withFrameNanos
-                    val currentRefTime = fingerprintTimingManager.matchedReferenceTime(forPlaybackTimeMs = posMs)
-                    if (currentRefTime == null) {
-                        if (wasHighlighting) {
-                            latestOnHighlightChanged(HighlightState())
-                            wasHighlighting = false
+                    when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
+                        is HighlightOutcome.Show -> {
+                            cueIndexHolder[0] = outcome.entryIndex
+                            latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                            wasHighlighting = true
                         }
-                        return@withFrameNanos
-                    }
-                    val currentRefTimeMs = (currentRefTime * 1000).toLong()
-                    val idx = TranscriptCueHelper.findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
-                    if (idx != null) {
-                        cachedIndex = idx
-                        val entry = transcript.entries[idx]
-                        val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
-                            TranscriptCueHelper.findWordIndex(entry, currentRefTimeMs)
-                        } else {
-                            null
+
+                        HighlightOutcome.Clear -> {
+                            if (wasHighlighting) {
+                                latestOnHighlightChanged(HighlightState())
+                                wasHighlighting = false
+                            }
                         }
-                        latestOnHighlightChanged(HighlightState(entryIndex = idx, wordIndex = wordIdx))
-                        wasHighlighting = true
-                    } else if (wasHighlighting) {
-                        latestOnHighlightChanged(HighlightState())
-                        wasHighlighting = false
+
+                        HighlightOutcome.Keep -> Unit
                     }
                 }
             }
@@ -320,6 +316,23 @@ private fun HighlightEffect(
     } else if (!isSyncedActive) {
         LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
     }
+}
+
+/**
+ * Maps the current playback position to a highlight outcome. Returns [HighlightOutcome.Clear]
+ * when playback is off matched content (ads / unmatched / outside the mapped range), otherwise
+ * delegates the cue decision to [TranscriptCueHelper.resolveHighlight].
+ */
+private fun resolveHighlight(
+    entries: List<TranscriptEntry>,
+    posMs: Int,
+    fingerprintTimingManager: FingerprintTimingManager,
+    cachedIndex: Int,
+): HighlightOutcome {
+    val refTime = fingerprintTimingManager.matchedReferenceTime(forPlaybackTimeMs = posMs)
+        ?: return HighlightOutcome.Clear
+    val refTimeMs = (refTime * 1000).toLong()
+    return TranscriptCueHelper.resolveHighlight(entries, refTimeMs, cachedIndex)
 }
 
 @Composable

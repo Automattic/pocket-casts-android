@@ -3,7 +3,37 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import kotlin.math.abs
 
+internal sealed interface HighlightOutcome {
+    data class Show(val entryIndex: Int, val wordIndex: Int?) : HighlightOutcome
+
+    data object Clear : HighlightOutcome
+
+    data object Keep : HighlightOutcome
+}
+
 internal object TranscriptCueHelper {
+
+    /**
+     * Resolves what the highlight should do for a given reference time. Pure so it can be
+     * shared between the playing frame loop and the paused recompute, and unit tested.
+     */
+    fun resolveHighlight(
+        entries: List<TranscriptEntry>,
+        refTimeMs: Long,
+        cachedIndex: Int,
+    ): HighlightOutcome {
+        val idx = findCueIndex(entries, refTimeMs, cachedIndex)
+        if (idx != null) {
+            val entry = entries[idx]
+            val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
+                findWordIndex(entry, refTimeMs)
+            } else {
+                null
+            }
+            return HighlightOutcome.Show(entryIndex = idx, wordIndex = wordIdx)
+        }
+        return HighlightOutcome.Clear
+    }
 
     fun findCueIndex(
         entries: List<TranscriptEntry>,
