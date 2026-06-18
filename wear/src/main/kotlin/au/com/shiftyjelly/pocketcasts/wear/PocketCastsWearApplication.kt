@@ -101,6 +101,7 @@ class PocketCastsWearApplication :
 
         notificationHelper.setupNotificationChannels()
         appLifecycleObserver.setup()
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(application)
 
         // Apply migrations before the UI starts, so the app never reads pre-migration state.
         VersionMigrationsWorker.performMigrations(
@@ -111,8 +112,6 @@ class PocketCastsWearApplication :
 
         // Defer the expensive playback/storage setup and monitors off the main thread to avoid blocking onCreate (ANRs).
         applicationScope.launch {
-            PlaybackServiceToggle.ensureCorrectServiceEnabled(application)
-
             playbackManager.setup()
             val storageChoice = settings.getStorageChoice()
             if (storageChoice == null) {
