@@ -247,7 +247,7 @@ class SearchFragment : BaseFragment() {
             viewModel.state
                 .scan<SearchUiState, Pair<SearchUiState?, SearchUiState?>>(null to null) { acc, value -> acc.second to value }
                 .drop(1)
-                .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.ImprovedResults }
+                .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.Results }
                 .mapNotNull { (_, next) -> next?.searchTerm }
                 .collect {
                     if (it != searchView.query) {
@@ -342,7 +342,7 @@ class SearchFragment : BaseFragment() {
                 val state by viewModel.state.collectAsState()
                 AppThemeWithBackground(theme.activeTheme) {
                     when (val state = state) {
-                        is SearchUiState.ImprovedResults ->
+                        is SearchUiState.Results ->
                             ImprovedSearchResultsPage(
                                 state = state,
                                 loading = state.isLoading,
@@ -362,7 +362,7 @@ class SearchFragment : BaseFragment() {
                         else -> Spacer(modifier = Modifier.size(0.dp))
                     }
                 }
-                binding.searchInlineResults.isVisible = state is SearchUiState.ImprovedResults && !state.searchTerm.isNullOrBlank()
+                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
             }
         }
     }
