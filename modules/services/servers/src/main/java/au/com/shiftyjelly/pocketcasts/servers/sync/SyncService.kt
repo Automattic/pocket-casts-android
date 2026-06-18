@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -191,9 +189,6 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/bookmark/list")
     suspend fun getBookmarkList(@Header("Authorization") authorization: String, @Body request: BookmarkRequest): BookmarksResponse
-
-    @POST("/user/bookmark/enrich")
-    suspend fun enrichBookmark(@Header("Authorization") authorization: String, @Body request: BookmarkEnrichRequest): BookmarkEnrichResponse
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/podcast_rating/add")

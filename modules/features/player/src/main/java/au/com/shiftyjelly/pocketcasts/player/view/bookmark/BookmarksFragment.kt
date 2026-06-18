@@ -153,6 +153,16 @@ class BookmarksFragment : BaseFragment() {
                                 addFragment(fragment)
                             }
                         },
+                        onBookmarkDetailClick = { data ->
+                            BookmarkDetailFragment.show(
+                                fragmentManager = parentFragmentManager,
+                                bookmark = data.bookmark,
+                                episodeTitle = data.episodeTitle,
+                                podcastUuid = data.podcastUuid,
+                                podcastTitle = data.podcastTitle,
+                                sourceView = sourceView,
+                            )
+                        },
                         onSearchBarClearButtonClick = {
                             bookmarksViewModel.searchBarClearButtonTapped()
                         },

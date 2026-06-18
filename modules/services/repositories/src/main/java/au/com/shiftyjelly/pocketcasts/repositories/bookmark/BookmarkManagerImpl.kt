@@ -11,6 +11,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodc
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.automattic.eventhorizon.BookmarkCreatedEvent
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
@@ -34,6 +37,7 @@ class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val eventHorizon: EventHorizon,
     private val syncManager: SyncManager,
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val transcriptWindowExtractor: TranscriptWindowExtractor,
 ) : BookmarkManager,
     CoroutineScope {
@@ -242,7 +246,7 @@ class BookmarkManagerImpl @Inject constructor(
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
 
-                val response = syncManager.enrichBookmark(transcriptSnippet = snippet)
+                val response = callEnrichApi(snippet)
                 if (response.error != null) {
                     Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
                 }
@@ -264,6 +268,15 @@ class BookmarkManagerImpl @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
             }
+        }
+    }
+
+    private suspend fun callEnrichApi(snippet: String): BookmarkEnrichResponse {
+        return syncManager.getCacheTokenOrLogin { token ->
+            podcastCacheServiceManager.enrichBookmark(
+                authorization = "Bearer ${token.value}",
+                request = BookmarkEnrichRequest(transcriptSnippet = snippet),
+            )
         }
     }
 }

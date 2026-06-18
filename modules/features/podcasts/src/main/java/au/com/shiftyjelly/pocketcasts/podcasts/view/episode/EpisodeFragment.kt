@@ -104,6 +104,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkDetailFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksPage
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersPage
@@ -871,6 +872,16 @@ class EpisodeFragment : BaseFragment() {
                                 },
                                 onShareBookmarkClick = ::onShareBookmarkClick,
                                 onEditBookmarkClick = ::onEditBookmarkClick,
+                                onBookmarkDetailClick = { data ->
+                                    BookmarkDetailFragment.show(
+                                        fragmentManager = parentFragmentManager,
+                                        bookmark = data.bookmark,
+                                        episodeTitle = data.episodeTitle,
+                                        podcastUuid = data.podcastUuid,
+                                        podcastTitle = data.podcastTitle,
+                                        sourceView = SourceView.EPISODE_DETAILS,
+                                    )
+                                },
                                 onUpgradeClick = ::onBookmarksUpgradeClick,
                                 showOptionsDialog = ::showBookmarksOptionsDialog,
                                 openFragment = ::openBookmarkSettingsFragment,
