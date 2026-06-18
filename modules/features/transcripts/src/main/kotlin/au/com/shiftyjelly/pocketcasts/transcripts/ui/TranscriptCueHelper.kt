@@ -31,8 +31,7 @@ internal object TranscriptCueHelper {
             }
             return HighlightOutcome.Show(entryIndex = idx, wordIndex = wordIdx)
         }
-        // No cue contains the time — we're in a gap between sentences. Mirror iOS: keep the
-        // previous highlight rather than clearing, unless playback is before the first cue.
+        // In a gap between cues: hold the previous highlight unless we're before the first cue.
         return if (isBeforeFirstCue(entries, refTimeMs)) HighlightOutcome.Clear else HighlightOutcome.Keep
     }
 
@@ -117,8 +116,7 @@ internal object TranscriptCueHelper {
                 }
             }
         }
-        // Strict containment: no cue's [startTimeMs, endTimeMs] range contains the time.
-        // Mirrors iOS `currentCue()` returning nil so the caller can hold the previous highlight.
+        // No cue's [startTimeMs, endTimeMs] contains the time.
         return null
     }
 
