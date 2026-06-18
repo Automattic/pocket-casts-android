@@ -291,25 +291,32 @@ private fun HighlightEffect(
             cueIndexHolder[0] = 0
             var wasHighlighting = false
             latestOnHighlightChanged(HighlightState())
+            // Drive the highlight from the live player position (like iOS reads currentTime()
+            // each tick) rather than playbackState.positionMs, which the player only refreshes
+            // every ~1s — sampling the stale value at 60Hz makes the highlight lag and jump.
+            val episode = playbackManager.getCurrentEpisode()
             while (true) {
-                withFrameNanos { _ ->
-                    val posMs = playbackState?.positionMs ?: return@withFrameNanos
-                    when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
-                        is HighlightOutcome.Show -> {
-                            cueIndexHolder[0] = outcome.entryIndex
-                            latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
-                            wasHighlighting = true
-                        }
-
-                        HighlightOutcome.Clear -> {
-                            if (wasHighlighting) {
-                                latestOnHighlightChanged(HighlightState())
-                                wasHighlighting = false
-                            }
-                        }
-
-                        HighlightOutcome.Keep -> Unit
+                withFrameNanos { }
+                val posMs = if (episode != null) {
+                    playbackManager.getCurrentTimeMs(episode)
+                } else {
+                    playbackState?.positionMs ?: continue
+                }
+                when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
+                    is HighlightOutcome.Show -> {
+                        cueIndexHolder[0] = outcome.entryIndex
+                        latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                        wasHighlighting = true
                     }
+
+                    HighlightOutcome.Clear -> {
+                        if (wasHighlighting) {
+                            latestOnHighlightChanged(HighlightState())
+                            wasHighlighting = false
+                        }
+                    }
+
+                    HighlightOutcome.Keep -> Unit
                 }
             }
         }
