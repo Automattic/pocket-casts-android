@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 
 internal sealed interface HighlightOutcome {
-    data class Show(val entryIndex: Int, val wordIndex: Int?) : HighlightOutcome
+    data class Show(val entryIndex: Int) : HighlightOutcome
 
     data object Clear : HighlightOutcome
 
@@ -23,13 +23,7 @@ internal object TranscriptCueHelper {
     ): HighlightOutcome {
         val idx = findCueIndex(entries, refTimeMs, cachedIndex)
         if (idx != null) {
-            val entry = entries[idx]
-            val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
-                findWordIndex(entry, refTimeMs)
-            } else {
-                null
-            }
-            return HighlightOutcome.Show(entryIndex = idx, wordIndex = wordIdx)
+            return HighlightOutcome.Show(entryIndex = idx)
         }
         // No cue contains the time — we're in a gap between sentences. Mirror iOS: keep the
         // previous highlight rather than clearing, unless playback is before the first cue.
@@ -143,20 +137,5 @@ internal object TranscriptCueHelper {
             }
         }
         return null
-    }
-
-    fun findWordIndex(
-        entry: TranscriptEntry.Text,
-        refTimeMs: Long,
-    ): Int? {
-        if (entry.words.isEmpty()) return null
-        var lastPassedIndex: Int? = null
-        for ((index, word) in entry.words.withIndex()) {
-            if (word.startTimeMs < 0) continue
-            if (refTimeMs < word.startTimeMs) return lastPassedIndex
-            if (refTimeMs < word.endTimeMs) return index
-            lastPassedIndex = index
-        }
-        return lastPassedIndex
     }
 }
