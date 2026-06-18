@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -172,6 +173,7 @@ private fun TranscriptLine(
 ) {
     val entryText = entry.text()
     val isEntryHighlighted = entryIndex == highlightState.entryIndex
+    val wordTimings = (entry as? TranscriptEntry.Text)?.words.orEmpty()
 
     val searchHighlights = remember(entryIndex, entryText, searchState) {
         val searchTermLength = searchState.searchTerm.length
@@ -183,11 +185,29 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
-    val textColor = if (isEntryHighlighted) theme.highlightText else theme.primaryText
+    // Highlight the current fragment within the sentence (iOS-style partial highlight). When
+    // the entry is current but no fragment resolves (no word timings, before the first
+    // fragment, or invalid offsets) fall back to lighting the whole entry so a current
+    // sentence never goes dark.
+    val wordIndex = highlightState.wordIndex
+    val highlightWord = if (isEntryHighlighted && wordIndex != null && wordTimings.isNotEmpty()) {
+        wordTimings[wordIndex.coerceAtMost(wordTimings.lastIndex)]
+            .takeIf { it.charOffsetStart in 0..<it.charOffsetEnd && it.charOffsetEnd <= entryText.length }
+    } else {
+        null
+    }
+    val textColor = if (isEntryHighlighted && highlightWord == null) theme.highlightText else theme.primaryText
 
     Text(
         text = buildAnnotatedString {
             append(entryText)
+            if (highlightWord != null) {
+                addStyle(
+                    SpanStyle(color = theme.highlightText),
+                    highlightWord.charOffsetStart,
+                    highlightWord.charOffsetEnd,
+                )
+            }
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
                 val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {
