@@ -233,13 +233,13 @@ class TranscriptCueHelperTest {
     }
 
     @Test
-    fun `findCueBinarySearch falls back to closest entry when no exact range match`() {
+    fun `findCueBinarySearch returns null when refTime falls in a gap between cues`() {
         val entries = listOf(
             text(0, 1000),
             text(5000, 6000),
         )
-        // refTime 4500 is in a gap — should find closest entry within threshold
-        assertEquals(1, TranscriptCueHelper.findCueBinarySearch(entries, 4500))
+        // refTime 4500 is in a gap between cues — strict containment returns null
+        assertNull(TranscriptCueHelper.findCueBinarySearch(entries, 4500))
     }
 
     @Test
@@ -249,39 +249,6 @@ class TranscriptCueHelperTest {
             text(1001, 2000),
         )
         assertNull(TranscriptCueHelper.findCueBinarySearch(entries, 100_000))
-    }
-
-    // --- findClosestTimedEntry ---
-
-    @Test
-    fun `findClosestTimedEntry returns closest entry within threshold`() {
-        val entries = listOf(
-            text(0, 1000),
-            text(2000, 3000),
-            text(5000, 6000),
-        )
-        // refTime 4500 is 1500ms from entry[1].end and 500ms from entry[2].start
-        assertEquals(2, TranscriptCueHelper.findClosestTimedEntry(entries, 4500, around = 1))
-    }
-
-    @Test
-    fun `findClosestTimedEntry returns null when all entries beyond threshold`() {
-        val entries = listOf(
-            text(0, 1000),
-        )
-        // refTime 20000 is 19000ms away — well beyond 5000ms threshold
-        assertNull(TranscriptCueHelper.findClosestTimedEntry(entries, 20_000, around = 0))
-    }
-
-    @Test
-    fun `findClosestTimedEntry skips Speaker entries`() {
-        val entries = listOf(
-            speaker(),
-            speaker(),
-            text(1000, 2000),
-            speaker(),
-        )
-        assertEquals(2, TranscriptCueHelper.findClosestTimedEntry(entries, 1500, around = 1))
     }
 
     // --- findNearestTimedEntry ---
@@ -351,14 +318,40 @@ class TranscriptCueHelperTest {
     }
 
     @Test
-    fun `resolveHighlight clears when no cue is near the reference time`() {
+    fun `resolveHighlight keeps the previous highlight in a gap between cues`() {
+        val entries = listOf(
+            text(0, 1000),
+            text(5000, 6000),
+        )
+        // refTime 4500 sits in the gap between the two cues — hold the previous highlight.
+        assertEquals(
+            HighlightOutcome.Keep,
+            TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 4500, cachedIndex = 0),
+        )
+    }
+
+    @Test
+    fun `resolveHighlight keeps the previous highlight after the last cue`() {
         val entries = listOf(
             text(0, 1000),
             text(1001, 2000),
         )
         assertEquals(
-            HighlightOutcome.Clear,
+            HighlightOutcome.Keep,
             TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 100_000, cachedIndex = 0),
+        )
+    }
+
+    @Test
+    fun `resolveHighlight clears before the first cue`() {
+        val entries = listOf(
+            text(1000, 2000),
+            text(2001, 3000),
+        )
+        // refTime 500 is before the first cue starts — nothing to highlight yet.
+        assertEquals(
+            HighlightOutcome.Clear,
+            TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 500, cachedIndex = 0),
         )
     }
 }
