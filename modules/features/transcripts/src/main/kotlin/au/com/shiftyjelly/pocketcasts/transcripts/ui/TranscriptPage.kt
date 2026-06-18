@@ -297,7 +297,7 @@ private fun HighlightEffect(
                     when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
                         is HighlightOutcome.Show -> {
                             cueIndexHolder[0] = outcome.entryIndex
-                            latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                            latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex))
                             wasHighlighting = true
                         }
 
@@ -322,7 +322,7 @@ private fun HighlightEffect(
             when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
                 is HighlightOutcome.Show -> {
                     cueIndexHolder[0] = outcome.entryIndex
-                    latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                    latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex))
                 }
 
                 HighlightOutcome.Clear -> latestOnHighlightChanged(HighlightState())
@@ -425,7 +425,6 @@ private fun KeepScreenOnEffect(keepOn: Boolean) {
 
 internal data class HighlightState(
     val entryIndex: Int? = null,
-    val wordIndex: Int? = null,
 )
 
 private const val AUTO_SCROLL_BACK_DELAY_MS = 5000L

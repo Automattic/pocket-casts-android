@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -173,7 +172,6 @@ private fun TranscriptLine(
 ) {
     val entryText = entry.text()
     val isEntryHighlighted = entryIndex == highlightState.entryIndex
-    val wordTimings = (entry as? TranscriptEntry.Text)?.words.orEmpty()
 
     val searchHighlights = remember(entryIndex, entryText, searchState) {
         val searchTermLength = searchState.searchTerm.length
@@ -185,22 +183,11 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
-    val textColor = if (isEntryHighlighted && wordTimings.isEmpty()) theme.highlightText else theme.primaryText
+    val textColor = if (isEntryHighlighted) theme.highlightText else theme.primaryText
 
     Text(
         text = buildAnnotatedString {
             append(entryText)
-            if (isEntryHighlighted && wordTimings.isNotEmpty() && highlightState.wordIndex != null) {
-                val wordIdx = highlightState.wordIndex.coerceAtMost(wordTimings.lastIndex)
-                val word = wordTimings[wordIdx]
-                if (word.charOffsetStart >= 0 && word.charOffsetEnd <= entryText.length) {
-                    addStyle(
-                        SpanStyle(color = theme.highlightText),
-                        word.charOffsetStart,
-                        word.charOffsetEnd,
-                    )
-                }
-            }
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
                 val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {
