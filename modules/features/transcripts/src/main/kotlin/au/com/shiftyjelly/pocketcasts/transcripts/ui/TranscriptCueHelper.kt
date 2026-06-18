@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
-import kotlin.math.abs
 
 internal sealed interface HighlightOutcome {
     data class Show(val entryIndex: Int, val wordIndex: Int?) : HighlightOutcome
@@ -32,7 +31,17 @@ internal object TranscriptCueHelper {
             }
             return HighlightOutcome.Show(entryIndex = idx, wordIndex = wordIdx)
         }
-        return HighlightOutcome.Clear
+        // No cue contains the time — we're in a gap between sentences. Mirror iOS: keep the
+        // previous highlight rather than clearing, unless playback is before the first cue.
+        return if (isBeforeFirstCue(entries, refTimeMs)) HighlightOutcome.Clear else HighlightOutcome.Keep
+    }
+
+    private fun isBeforeFirstCue(
+        entries: List<TranscriptEntry>,
+        refTimeMs: Long,
+    ): Boolean {
+        val firstCue = entries.firstOrNull { it is TranscriptEntry.Text && it.startTimeMs >= 0 } as? TranscriptEntry.Text
+        return firstCue != null && refTimeMs < firstCue.startTimeMs
     }
 
     fun findCueIndex(
@@ -108,33 +117,9 @@ internal object TranscriptCueHelper {
                 }
             }
         }
-        return findClosestTimedEntry(entries, refTimeMs, lo.coerceIn(0, entries.size - 1))
-    }
-
-    fun findClosestTimedEntry(
-        entries: List<TranscriptEntry>,
-        refTimeMs: Long,
-        around: Int,
-    ): Int? {
-        var bestIndex: Int? = null
-        var bestDistance = Long.MAX_VALUE
-        val scanRadius = 5
-        val start = maxOf(0, around - scanRadius)
-        val end = minOf(entries.size - 1, around + scanRadius)
-        for (i in start..end) {
-            val entry = entries[i]
-            if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
-                val dist = minOf(
-                    abs(refTimeMs - entry.startTimeMs),
-                    abs(refTimeMs - entry.endTimeMs),
-                )
-                if (dist < bestDistance) {
-                    bestDistance = dist
-                    bestIndex = i
-                }
-            }
-        }
-        return if (bestDistance <= NEAREST_CUE_THRESHOLD_MS) bestIndex else null
+        // Strict containment: no cue's [startTimeMs, endTimeMs] range contains the time.
+        // Mirrors iOS `currentCue()` returning nil so the caller can hold the previous highlight.
+        return null
     }
 
     fun findNearestTimedEntry(
@@ -174,6 +159,4 @@ internal object TranscriptCueHelper {
         }
         return lastPassedIndex
     }
-
-    const val NEAREST_CUE_THRESHOLD_MS = 5000L
 }
