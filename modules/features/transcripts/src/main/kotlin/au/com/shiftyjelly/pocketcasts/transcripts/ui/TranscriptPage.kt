@@ -313,7 +313,24 @@ private fun HighlightEffect(
                 }
             }
         }
-    } else if (!isSyncedActive) {
+    } else if (isSyncedActive) {
+        // Paused but synced: there's no frame loop, so recompute once whenever the position
+        // changes. A tap-to-seek while paused moves the position, so the tapped sentence
+        // highlights immediately — matching iOS, which forces one update while paused.
+        LaunchedEffect(transcript.entries, playbackState?.positionMs) {
+            val posMs = playbackState?.positionMs ?: return@LaunchedEffect
+            when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
+                is HighlightOutcome.Show -> {
+                    cueIndexHolder[0] = outcome.entryIndex
+                    latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                }
+
+                HighlightOutcome.Clear -> latestOnHighlightChanged(HighlightState())
+
+                HighlightOutcome.Keep -> Unit
+            }
+        }
+    } else {
         LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
     }
 }
