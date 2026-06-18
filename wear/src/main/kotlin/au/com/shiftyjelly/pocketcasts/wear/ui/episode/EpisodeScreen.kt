@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.parseAsHtml
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Icon
@@ -37,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
-import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ExpandableText
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
@@ -190,11 +188,12 @@ fun EpisodeScreen(
         }
 
         item {
-            if (state.showNotesState is ShowNotesState.Loaded) {
+            val showNotesText = state.showNotesText
+            if (showNotesText != null) {
                 val coroutineScope = rememberCoroutineScope()
                 Column {
                     ExpandableText(
-                        text = state.showNotesState.showNotes.parseAsHtml().toString(),
+                        text = showNotesText,
                         style = MaterialTheme.typography.caption2,
                         textAlign = TextAlign.Center,
                         onClick = { isExpanded ->

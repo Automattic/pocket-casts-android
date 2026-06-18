@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
@@ -30,9 +31,8 @@ import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -70,6 +70,9 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var connectivityLogger: ConnectivityLogger
 
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
@@ -94,39 +97,41 @@ class PocketCastsWearApplication :
     }
 
     private fun setupApp() {
-        runBlocking {
-            notificationHelper.setupNotificationChannels()
-            appLifecycleObserver.setup()
+        val application = this
 
-            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsWearApplication)
+        notificationHelper.setupNotificationChannels()
+        appLifecycleObserver.setup()
 
-            withContext(Dispatchers.Default) {
-                playbackManager.setup()
-                val storageChoice = settings.getStorageChoice()
-                if (storageChoice == null) {
-                    val folder = StorageOptions()
-                        .getFolderLocations(this@PocketCastsWearApplication)
-                        .firstOrNull()
-                    if (folder != null) {
-                        settings.setStorageChoice(folder.filePath, folder.label)
-                    } else {
-                        settings.setStorageCustomFolder(this@PocketCastsWearApplication.filesDir.absolutePath)
-                    }
+        // Apply migrations before the UI starts, so the app never reads pre-migration state.
+        VersionMigrationsWorker.performMigrations(
+            context = application,
+            settings = settings,
+            moshi = moshi,
+        )
+
+        // Defer the expensive playback/storage setup and monitors off the main thread to avoid blocking onCreate (ANRs).
+        applicationScope.launch {
+            PlaybackServiceToggle.ensureCorrectServiceEnabled(application)
+
+            playbackManager.setup()
+            val storageChoice = settings.getStorageChoice()
+            if (storageChoice == null) {
+                val folder = StorageOptions()
+                    .getFolderLocations(application)
+                    .firstOrNull()
+                if (folder != null) {
+                    settings.setStorageChoice(folder.filePath, folder.label)
+                } else {
+                    settings.setStorageCustomFolder(application.filesDir.absolutePath)
                 }
             }
 
-            VersionMigrationsWorker.performMigrations(
-                context = this@PocketCastsWearApplication,
-                settings = settings,
-                moshi = moshi,
-            )
+            userManager.beginMonitoringAccountManager(playbackManager)
+            downloadStatusObserver.monitorDownloadStatus()
+
+            PlaybackStatsSyncWorker.scheduleOneTimeWork(application)
+            PlaybackStatsSyncWorker.schedulePeriodicWork(application)
         }
-
-        userManager.beginMonitoringAccountManager(playbackManager)
-        downloadStatusObserver.monitorDownloadStatus()
-
-        PlaybackStatsSyncWorker.scheduleOneTimeWork(this)
-        PlaybackStatsSyncWorker.schedulePeriodicWork(this)
     }
 
     private fun setupAnalytics() {
