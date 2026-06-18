@@ -315,4 +315,50 @@ class TranscriptCueHelperTest {
         )
         assertNull(TranscriptCueHelper.findNearestTimedEntry(entries, mid = 1, lo = 0, hi = 2))
     }
+
+    // --- resolveHighlight ---
+
+    @Test
+    fun `resolveHighlight shows the cue containing the reference time`() {
+        val entries = listOf(
+            text(0, 1000),
+            text(1001, 2000),
+            text(2001, 3000),
+        )
+        assertEquals(
+            HighlightOutcome.Show(entryIndex = 1, wordIndex = null),
+            TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 1500, cachedIndex = 0),
+        )
+    }
+
+    @Test
+    fun `resolveHighlight includes the word index when the cue has word timings`() {
+        val entries = listOf(
+            TranscriptEntry.Text(
+                "Hello world.",
+                startTimeMs = 0,
+                endTimeMs = 2000,
+                words = listOf(
+                    TranscriptEntry.WordTiming("Hello", 0, 1000, 0, 5),
+                    TranscriptEntry.WordTiming("world.", 1000, 2000, 6, 12),
+                ),
+            ),
+        )
+        assertEquals(
+            HighlightOutcome.Show(entryIndex = 0, wordIndex = 1),
+            TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 1500, cachedIndex = 0),
+        )
+    }
+
+    @Test
+    fun `resolveHighlight clears when no cue is near the reference time`() {
+        val entries = listOf(
+            text(0, 1000),
+            text(1001, 2000),
+        )
+        assertEquals(
+            HighlightOutcome.Clear,
+            TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 100_000, cachedIndex = 0),
+        )
+    }
 }
