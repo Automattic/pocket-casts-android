@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -190,11 +189,10 @@ private fun Header(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 20.dp, top = 4.dp, bottom = 8.dp),
+            .padding(start = 4.dp, end = 20.dp, top = 4.dp, bottom = 8.dp),
     ) {
         IconButton(
             onClick = onClose,
-            modifier = Modifier.offset(x = (-4).dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Close,

@@ -28,7 +28,8 @@ class TranscriptWindowExtractor @Inject constructor(
             }
             val generated = transcripts?.firstOrNull { it.isGenerated } ?: return null
 
-            val body = runCatching { transcriptService.getTranscriptOrThrow(generated.url, CacheControl.FORCE_CACHE) }
+            val body = runCatching { transcriptService.getTranscriptOrThrow(generated.url) }
+                .recoverCatching { transcriptService.getTranscriptOrThrow(generated.url, CacheControl.FORCE_CACHE) }
                 .getOrNull() ?: return null
 
             val vttContent = body.use { it.string() }
