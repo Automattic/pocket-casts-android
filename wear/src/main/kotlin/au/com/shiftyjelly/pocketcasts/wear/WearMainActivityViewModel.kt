@@ -54,7 +54,7 @@ class WearMainActivityViewModel @Inject constructor(
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState = SignInState.SignedOut,
         val syncState: WatchSyncState = WatchSyncState.Syncing,
-        val isConnected: Boolean = false,
+        val isConnected: Boolean = true,
     )
 
     private val _state = MutableStateFlow(State())
@@ -117,7 +117,7 @@ class WearMainActivityViewModel @Inject constructor(
                             onResult = { result -> onLoginFromPhoneResult(result) },
                             onAlreadyLoggedIn = {
                                 LogBuffer.i(TAG, "Already logged in - treating as sync success")
-                                _state.update { it.copy(syncState = WatchSyncState.Success, showLoggingInScreen = true) }
+                                _state.update { it.copy(syncState = WatchSyncState.Success) }
                                 syncJob?.cancel()
                             },
                         )
