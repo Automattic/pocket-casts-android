@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.SystemClock
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -176,8 +178,8 @@ fun TranscriptPage(
         uiState = uiState,
         fingerprintTimingManager = fingerprintTimingManager,
         playbackManager = playbackManager,
-        pendingSeekPositionMs = pendingSeekPositionMs,
-        onConsumePendingSeek = { pendingSeekPositionMs = null },
+        pendingSeek = pendingSeek,
+        onConsumePendingSeek = { pendingSeek = null },
         onHighlightChange = { highlightState = it },
     )
 
@@ -205,6 +207,24 @@ fun TranscriptPage(
     )
 
     KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
+
+    TranscriptMessageEffect(viewModel = viewModel)
+}
+
+@Composable
+private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
+    if (viewModel == null) return
+    val context = LocalContext.current
+    val tapToSeekUnavailableMessage = stringResource(LR.string.transcript_tap_to_seek_streaming_unavailable)
+    LaunchedEffect(viewModel) {
+        viewModel.messages.collect { message ->
+            when (message) {
+                TranscriptMessage.TapToSeekStreamingUnavailable -> {
+                    Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
 
 @Composable
