@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+    *   Wear OS performance improvements
+        ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
 
 8.14
 -----
