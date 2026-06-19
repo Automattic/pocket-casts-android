@@ -132,6 +132,10 @@ internal fun TranscriptsPaywall(
             )
         }
 
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+
         CompositionLocalProvider(
             LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
         ) {

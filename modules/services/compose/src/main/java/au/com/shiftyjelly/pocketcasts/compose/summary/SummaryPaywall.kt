@@ -137,6 +137,8 @@ fun SummaryPaywall(
             modifier = obscureModifier.weight(1f),
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         CompositionLocalProvider(
             LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
         ) {

@@ -32,11 +32,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -47,11 +45,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -280,7 +276,6 @@ class EpisodeFragment : BaseFragment() {
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
     private var tabBarYInComposeView = -1
-    private val tabBarHeightState = mutableIntStateOf(0)
     private val isStickyTabBarVisible = mutableStateOf(false)
 
     private var webView: WebView? = null
@@ -821,7 +816,6 @@ class EpisodeFragment : BaseFragment() {
                                 modifier = Modifier
                                     .onGloballyPositioned { coordinates ->
                                         tabBarYInComposeView = coordinates.positionInRoot().y.toInt()
-                                        tabBarHeightState.intValue = coordinates.size.height
                                     }
                                     .fillMaxWidth()
                                     .background(MaterialTheme.theme.colors.primaryUi01)
@@ -851,44 +845,24 @@ class EpisodeFragment : BaseFragment() {
                                     )
                                 }
                             } else {
-                                // Fit the paywall in the space below the tab bar so the CTA is visible without
-                                // scrolling. Read the tab bar position from the native NestedScrollView, not from
-                                // Compose's positionInWindow which is stale inside a native scroll container.
-                                val density = LocalDensity.current
-                                val navBarInsetPx = WindowInsets.navigationBars.getBottom(density)
-                                val viewportHeightPx = (binding?.scrollableContent?.height ?: 0)
-                                    .takeIf { it > 0 } ?: LocalWindowInfo.current.containerSize.height
-                                val maxBelowTabBarPx = (viewportHeightPx - tabBarHeightState.intValue - navBarInsetPx)
-                                    .coerceAtLeast(0)
-                                val paywallHeightPx = remember { mutableIntStateOf(maxBelowTabBarPx) }
-                                LaunchedEffect(tabBarHeightState.intValue, viewportHeightPx) {
-                                    // Wait a frame so the show-notes webview has hidden and scrollY settled.
-                                    withFrameNanos {}
-                                    val scrollView = binding?.scrollableContent ?: return@LaunchedEffect
-                                    val tabBarHeightPx = tabBarHeightState.intValue
-                                    if (scrollView.height == 0 || tabBarHeightPx == 0 || tabBarYInComposeView < 0) {
-                                        return@LaunchedEffect
-                                    }
-                                    val tabsViewTop = binding?.episodeContentTabs?.top ?: 0
-                                    val maxPx = (scrollView.height - tabBarHeightPx - navBarInsetPx).coerceAtLeast(0)
-                                    val tabBarBottomOnScreenPx =
-                                        tabsViewTop + tabBarYInComposeView + tabBarHeightPx - scrollView.scrollY
-                                    paywallHeightPx.intValue = (scrollView.height - tabBarBottomOnScreenPx - navBarInsetPx)
-                                        .coerceIn(0, maxPx)
-                                }
-                                val availableHeight = with(density) { paywallHeightPx.intValue.toDp() }
                                 SummaryPaywall(
                                     summaryText = summaryText.orEmpty(),
                                     isFreeTrialAvailable = isFreeTrialAvailable,
                                     onClickSubscribe = ::onSummaryUpgradeClick,
                                     contentPadding = PaddingValues(16.dp),
-                                    modifier = Modifier.height(availableHeight),
+                                    modifier = Modifier.height(PaywallContentHeight),
                                 )
                             }
                         }
 
                         if (selectedTab == EpisodeContentTab.BOOKMARKS) {
                             val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                            val bookmarksUiState by bookmarksViewModel.uiState.collectAsState()
+                            val bookmarksHeight = if (bookmarksUiState is BookmarksViewModel.UiState.Upsell) {
+                                PaywallContentHeight
+                            } else {
+                                screenHeight
+                            }
                             BookmarksPage(
                                 episodeUuid = episodeUUID,
                                 sourceView = SourceView.EPISODE_DETAILS,
@@ -921,7 +895,7 @@ class EpisodeFragment : BaseFragment() {
                                 onHeadphoneControlsButtonClick = { bookmarksViewModel.onHeadphoneControlsButtonTapped() },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(screenHeight),
+                                    .height(bookmarksHeight),
                             )
                         }
 
@@ -1014,7 +988,13 @@ class EpisodeFragment : BaseFragment() {
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = screenHeight)
+                                    .then(
+                                        if (transcriptUiState.isPaywallVisible) {
+                                            Modifier.height(PaywallContentHeight)
+                                        } else {
+                                            Modifier.heightIn(max = screenHeight)
+                                        },
+                                    )
                                     .nestedScroll(nestedScrollConnection)
                                     .disableParentInterceptTouchEvent(),
                             )
@@ -1493,6 +1473,8 @@ class EpisodeFragment : BaseFragment() {
         @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
     ) : Parcelable
 }
+
+private val PaywallContentHeight = 360.dp
 
 private val EpisodeContentTab.labelResId: Int
     get() = when (this) {
