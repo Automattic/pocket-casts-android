@@ -435,9 +435,9 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", isGenerated = true, origin = ChapterOrigin.Generated),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", isGenerated = true, origin = ChapterOrigin.Generated),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", isGenerated = true, origin = ChapterOrigin.Generated),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
             ),
         )
     }
@@ -496,7 +496,7 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", isGenerated = true, origin = ChapterOrigin.Generated),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", origin = ChapterOrigin.Generated),
             ),
         )
     }

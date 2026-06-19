@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 133,
-    "identityHash": "d705d4702630b51fdf8c0a1fcc6bee39",
+    "identityHash": "f779e9d268531e8588f6e8477971a899",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1586,7 +1586,7 @@
       },
       {
         "tableName": "episode_chapters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_index` INTEGER NOT NULL, `episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, `is_embedded` INTEGER NOT NULL, `is_generated` INTEGER NOT NULL DEFAULT 0, `origin` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`episode_uuid`, `chapter_index`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_index` INTEGER NOT NULL, `episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, `origin` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`episode_uuid`, `chapter_index`))",
         "fields": [
           {
             "fieldPath": "index",
@@ -1625,19 +1625,6 @@
             "fieldPath": "url",
             "columnName": "url",
             "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "isEmbedded",
-            "columnName": "is_embedded",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isGenerated",
-            "columnName": "is_generated",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
           },
           {
             "fieldPath": "origin",
@@ -2256,7 +2243,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd705d4702630b51fdf8c0a1fcc6bee39')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f779e9d268531e8588f6e8477971a899')"
     ]
   }
 }

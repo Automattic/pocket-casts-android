@@ -1701,7 +1701,6 @@ open class PlaybackManager @Inject constructor(
                         title = chapter.title,
                         imageUrl = chapter.imagePath,
                         url = chapter.url?.toString(),
-                        isEmbedded = true,
                         origin = ChapterOrigin.NativeMedia,
                     )
                 }

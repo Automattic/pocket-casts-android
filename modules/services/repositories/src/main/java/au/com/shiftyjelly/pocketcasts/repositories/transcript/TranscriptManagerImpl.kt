@@ -180,7 +180,6 @@ class TranscriptManagerImpl @Inject constructor(
                     episodeUuid = episodeUuid,
                     startTimeMs = startTime * 1000,
                     title = title,
-                    isGenerated = true,
                     origin = ChapterOrigin.Generated,
                 )
             }

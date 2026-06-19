@@ -123,7 +123,6 @@ class ShowNotesProcessor @AssistedInject constructor(
             title = title,
             imageUrl = image,
             url = url,
-            isEmbedded = false,
             origin = origin,
         )
     } else {

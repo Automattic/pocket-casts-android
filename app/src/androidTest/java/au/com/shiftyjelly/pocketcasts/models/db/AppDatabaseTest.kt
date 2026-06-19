@@ -25,6 +25,7 @@ class AppDatabaseTest {
 
     companion object {
         private const val TEST_DB = "migration-test"
+        private const val MIGRATION_DB = "migration-test-132-133"
     }
 
     @Rule @JvmField
@@ -107,6 +108,51 @@ class AppDatabaseTest {
         assertEquals(51, podcast?.colorVersion)
         assertEquals(100L, podcast?.colorLastDownloaded)
         assertEquals(1, podcast?.syncStatus)
+    }
+
+    @Test
+    fun migrate132To133BackfillsOriginAndDropsLegacyColumns() {
+        migrationTestHelper.createDatabase(MIGRATION_DB, 132).use { db ->
+            db.execSQL(
+                "INSERT INTO episode_chapters (chapter_index, episode_uuid, start_time, is_embedded, is_generated) VALUES " +
+                    "(0, 'episode-1', 0, 1, 0), " + // embedded -> NativeMedia (3)
+                    "(1, 'episode-1', 1000, 0, 1), " + // generated -> Generated (4)
+                    "(2, 'episode-1', 2000, 0, 0)", // neither -> Unknown (0)
+            )
+            // 5000 rows, half embedded, to prove the migration completes at scale
+            db.execSQL(
+                "INSERT INTO episode_chapters (chapter_index, episode_uuid, start_time, is_embedded, is_generated) " +
+                    "WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 5000) " +
+                    "SELECT n, 'bulk-episode', n * 1000, n % 2, 0 FROM seq",
+            )
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB, 133, true, AppDatabase.MIGRATION_132_133)
+
+        assertEquals("All chapters should be preserved", 5003, countRows(db, "episode_chapters"))
+        assertEquals("NativeMedia origin", 2501, countWhere(db, "episode_chapters", "origin = 3"))
+        assertEquals("Generated origin", 1, countWhere(db, "episode_chapters", "origin = 4"))
+        assertEquals("Unknown origin", 2501, countWhere(db, "episode_chapters", "origin = 0"))
+
+        val columns = mutableListOf<String>()
+        db.query("PRAGMA table_info(episode_chapters)").use { cursor ->
+            val nameIndex = cursor.getColumnIndex("name")
+            while (cursor.moveToNext()) {
+                columns.add(cursor.getString(nameIndex))
+            }
+        }
+        assertEquals("origin column should exist", true, columns.contains("origin"))
+        assertEquals("is_embedded column should be dropped", false, columns.contains("is_embedded"))
+        assertEquals("is_generated column should be dropped", false, columns.contains("is_generated"))
+    }
+
+    private fun countWhere(db: SupportSQLiteDatabase?, tableName: String, where: String): Int {
+        return db?.query("SELECT count(*) FROM $tableName WHERE $where").use { cursor ->
+            cursor?.let {
+                it.moveToFirst()
+                return@use it.getInt(0)
+            }
+        } ?: 0
     }
 
     private fun getMigratedRoomDatabase(): AppDatabase {

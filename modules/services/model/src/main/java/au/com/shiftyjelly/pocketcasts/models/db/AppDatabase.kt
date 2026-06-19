@@ -1468,6 +1468,12 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE episode_chapters ADD COLUMN origin INTEGER NOT NULL DEFAULT 0")
             database.execSQL("UPDATE episode_chapters SET origin = 3 WHERE is_embedded = 1")
             database.execSQL("UPDATE episode_chapters SET origin = 4 WHERE is_generated = 1")
+            // Recreate the table to drop the now-redundant is_embedded / is_generated columns
+            database.execSQL("CREATE TABLE `episode_chapters_new` (`chapter_index` INTEGER NOT NULL, `episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, `origin` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`episode_uuid`, `chapter_index`))")
+            database.execSQL("INSERT INTO `episode_chapters_new` (`chapter_index`, `episode_uuid`, `start_time`, `end_time`, `title`, `image_url`, `url`, `origin`) SELECT `chapter_index`, `episode_uuid`, `start_time`, `end_time`, `title`, `image_url`, `url`, `origin` FROM `episode_chapters`")
+            database.execSQL("DROP TABLE `episode_chapters`")
+            database.execSQL("ALTER TABLE `episode_chapters_new` RENAME TO `episode_chapters`")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `chapter_episode_uuid_index` ON `episode_chapters` (`episode_uuid`)")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
