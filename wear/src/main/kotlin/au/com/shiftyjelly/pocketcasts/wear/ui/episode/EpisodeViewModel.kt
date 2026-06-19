@@ -205,10 +205,8 @@ class EpisodeViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Empty)
     }
 
-    private fun parseShowNotes(showNotesState: ShowNotesState): String? = if (showNotesState is ShowNotesState.Loaded) {
-        showNotesState.showNotes.parseAsHtml().toString()
-    } else {
-        null
+    private fun parseShowNotes(showNotesState: ShowNotesState): String? {
+        return (showNotesState as? ShowNotesState.Loaded)?.showNotes?.parseAsHtml()?.toString()
     }
 
     private fun getErrorData(episode: BaseEpisode): State.Loaded.ErrorData? {
