@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 09:56:28+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
+    <string name="tv_create_account_title">Skapa ditt gratis konto</string>
+    <string name="synced_transcripts_whats_new_button_note">Synkroniserade transkriptioner är bara tillgängliga för de senaste avsnitten.</string>
+    <string name="synced_transcripts_whats_new_message">Läs snabbt, missa ingenting. Namnet du svepte förbi, boken de rekommenderade, statistiken du ville ha — tryck på ordet och hoppa tillbaka.</string>
+    <string name="synced_transcripts_whats_new_title">Läs med. Även vid 2x.</string>
+    <string name="settings_beta_features_sort_release_date">Utgivningsdatum (nyaste först)</string>
+    <string name="settings_beta_features_sort_name">Namn: A–Z</string>
+    <string name="settings_beta_features_sort">Betafunktioner</string>
+    <string name="sponsored">Sponsrad</string>
+    <string name="play_this_episode">Spela upp detta avsnitt</string>
+    <string name="play_latest_episode">Spela det senaste avsnittet</string>
+    <string name="tv_row_because_you_liked">Eftersom du gillade Podcast</string>
+    <string name="tv_row_recommendations">Rekommendationer</string>
+    <string name="tv_row_trending_videos">Trendande videoklipp</string>
+    <string name="tv_row_featured">Gjord för TV</string>
+    <string name="home">Hem</string>
+    <string name="tv_tab_your_podcasts">Dina podcasts</string>
+    <string name="blogs_found_go_to_podcast">Gå till podcasten</string>
+    <string name="blogs_found_description">Vi förvandlar de senaste inläggen till podcastavsnitt. Vi tar dig till podcastsidan så snart det första avsnittet är klart, eller så kan du återkomma till podcastsidan när som helst och dra nedåt för att uppdatera.</string>
+    <string name="blogs_found_headline">Högläsning av din blogg</string>
+    <string name="blogs_found_followed_badge">FÖLJD PODCAST</string>
+    <string name="blogs_found_feed_detected">Flöde hittades</string>
     <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
     <string name="description">Beskrivning</string>
     <string name="player_tab_summary">Sammanfattning</string>
