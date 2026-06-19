@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 09:54:48+0000
+Translation-Revision-Date: 2026-06-11 11:56:48+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="synced_transcripts_whats_new_button_note">النصوص المتزامنة متاحة للحلقات الأخيرة فقط.</string>
+    <string name="synced_transcripts_whats_new_message">اقرأ بسرعة، ولا تفوِّت شيئًا. الاسم الذي فاتك، أو الكتاب الذي أوصوا به، أو الحالة التي أردتها — اضغط على الكلمة، وارجع للخلف.</string>
+    <string name="synced_transcripts_whats_new_title">اقرأ النص. حتى بسرعة  2x.</string>
+    <string name="settings_beta_features_sort_release_date">تاريخ الإصدار (الأحدث أولاً)</string>
+    <string name="settings_beta_features_sort_name">الاسم: (من A إلى Z)</string>
+    <string name="settings_beta_features_sort">فرز ميزات الإصدار التجريبي</string>
+    <string name="play_this_episode">تشغيل هذه الحلقة</string>
+    <string name="play_latest_episode">تشغيل أحدث حلقة</string>
+    <string name="sponsored">تحت رعاية</string>
+    <string name="tv_row_because_you_liked">لأنك أعجبت بالبث الصوتي</string>
+    <string name="tv_row_recommendations">التوصيات</string>
+    <string name="tv_row_trending_videos">مقاطع فيديو رائجة</string>
+    <string name="tv_row_featured">مُصمم للتلفزيون</string>
+    <string name="home">الصفحة الرئيسية</string>
+    <string name="tv_tab_your_podcasts">برامج البث الصوتي خاصتك</string>
+    <string name="blogs_found_go_to_podcast">الانتقال إلى البث الصوتي</string>
+    <string name="blogs_found_description">نقوم بتحويل أحدث المقالات إلى حلقات بث صوتي. سننقلك إلى صفحة البث الصوتي بمجرد أن تصبح الحلقة الأولى جاهزة، أو يمكنك العودة إلى صفحة البث الصوتي في أي وقت والتمرير لأسفل لتحديث الصفحة.</string>
+    <string name="blogs_found_headline">قراءة مدونتك بصوت عالٍ</string>
+    <string name="blogs_found_followed_badge">تمت متابعة البث الصوتي</string>
+    <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
     <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
     <string name="description">وصف</string>
     <string name="player_tab_summary">الملخص</string>

@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 09:54:26+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="tv_create_account_subtitle">このコードをスキャンして、スマートフォンで開始できます。わずか1分で完了します。</string>
+    <string name="tv_create_account_title">無料アカウントを作成</string>
+    <string name="synced_transcripts_whats_new_button_note">同期されたトランスクリプトは最近のエピソードでのみ利用可能です。</string>
+    <string name="synced_transcripts_whats_new_message">すばやく読んで、逃さない。 聞き逃した名前、紹介された本、気になった統計情報。文字をタップして、そこまでジャンプ。</string>
+    <string name="synced_transcripts_whats_new_title">併せて読む。 2倍速でも。</string>
+    <string name="settings_beta_features_sort_release_date">リリース日 (新しい順)</string>
+    <string name="settings_beta_features_sort_name">名前 (A～Z)</string>
+    <string name="settings_beta_features_sort">ベータ版の機能を並び替え</string>
+    <string name="sponsored">スポンサー</string>
+    <string name="play_this_episode">このエピソードを再生</string>
+    <string name="play_latest_episode">最新エピソードを再生</string>
+    <string name="tv_row_because_you_liked">ポッドキャストがお気に入りのあなたに</string>
+    <string name="tv_row_recommendations">おすすめ</string>
+    <string name="tv_row_trending_videos">トレンドの動画</string>
+    <string name="tv_row_featured">テレビ向け</string>
+    <string name="home">ホーム</string>
+    <string name="tv_tab_your_podcasts">あなたのポッドキャスト</string>
+    <string name="blogs_found_go_to_podcast">ポッドキャストに移動</string>
+    <string name="blogs_found_description">最新の投稿をポッドキャストエピソードに変換しています。 最初のエピソードの準備が整い次第、ポッドキャストページに移動します。または、いつでもポッドキャストページに戻り、プルダウンして再読み込みできます。</string>
+    <string name="blogs_found_headline">ブログを読み上げる</string>
+    <string name="blogs_found_followed_badge">フォローしているポッドキャスト</string>
+    <string name="blogs_found_feed_detected">見つかったフィード</string>
     <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
     <string name="description">説明</string>
     <string name="player_tab_summary">概要</string>
