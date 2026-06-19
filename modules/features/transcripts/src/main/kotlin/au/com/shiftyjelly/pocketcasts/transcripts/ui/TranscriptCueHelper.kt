@@ -1,9 +1,47 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
-import kotlin.math.abs
+
+internal sealed interface HighlightOutcome {
+    data class Show(val entryIndex: Int, val wordIndex: Int?) : HighlightOutcome
+
+    data object Clear : HighlightOutcome
+
+    data object Keep : HighlightOutcome
+}
 
 internal object TranscriptCueHelper {
+
+    /**
+     * Resolves what the highlight should do for a given reference time. Pure so it can be
+     * shared between the playing frame loop and the paused recompute, and unit tested.
+     */
+    fun resolveHighlight(
+        entries: List<TranscriptEntry>,
+        refTimeMs: Long,
+        cachedIndex: Int,
+    ): HighlightOutcome {
+        val idx = findCueIndex(entries, refTimeMs, cachedIndex)
+        if (idx != null) {
+            val entry = entries[idx]
+            val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
+                findWordIndex(entry, refTimeMs)
+            } else {
+                null
+            }
+            return HighlightOutcome.Show(entryIndex = idx, wordIndex = wordIdx)
+        }
+        // In a gap between cues: hold the previous highlight unless we're before the first cue.
+        return if (isBeforeFirstCue(entries, refTimeMs)) HighlightOutcome.Clear else HighlightOutcome.Keep
+    }
+
+    private fun isBeforeFirstCue(
+        entries: List<TranscriptEntry>,
+        refTimeMs: Long,
+    ): Boolean {
+        val firstCue = entries.firstOrNull { it is TranscriptEntry.Text && it.startTimeMs >= 0 } as? TranscriptEntry.Text
+        return firstCue != null && refTimeMs < firstCue.startTimeMs
+    }
 
     fun findCueIndex(
         entries: List<TranscriptEntry>,
@@ -78,33 +116,8 @@ internal object TranscriptCueHelper {
                 }
             }
         }
-        return findClosestTimedEntry(entries, refTimeMs, lo.coerceIn(0, entries.size - 1))
-    }
-
-    fun findClosestTimedEntry(
-        entries: List<TranscriptEntry>,
-        refTimeMs: Long,
-        around: Int,
-    ): Int? {
-        var bestIndex: Int? = null
-        var bestDistance = Long.MAX_VALUE
-        val scanRadius = 5
-        val start = maxOf(0, around - scanRadius)
-        val end = minOf(entries.size - 1, around + scanRadius)
-        for (i in start..end) {
-            val entry = entries[i]
-            if (entry is TranscriptEntry.Text && entry.startTimeMs >= 0) {
-                val dist = minOf(
-                    abs(refTimeMs - entry.startTimeMs),
-                    abs(refTimeMs - entry.endTimeMs),
-                )
-                if (dist < bestDistance) {
-                    bestDistance = dist
-                    bestIndex = i
-                }
-            }
-        }
-        return if (bestDistance <= NEAREST_CUE_THRESHOLD_MS) bestIndex else null
+        // No cue's [startTimeMs, endTimeMs] contains the time.
+        return null
     }
 
     fun findNearestTimedEntry(
@@ -144,6 +157,4 @@ internal object TranscriptCueHelper {
         }
         return lastPassedIndex
     }
-
-    const val NEAREST_CUE_THRESHOLD_MS = 5000L
 }
