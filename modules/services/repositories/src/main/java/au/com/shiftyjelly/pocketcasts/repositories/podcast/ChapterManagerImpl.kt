@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class ChapterManagerImpl @Inject constructor(
             val firstChapter = window[0].value
             val secondChapter = window.getOrNull(1)?.value
 
-            val newStartTime = if (sequenceIndex == 0 && !firstChapter.isGenerated) Duration.ZERO else firstChapter.startTimeMs.milliseconds
+            val newStartTime = if (sequenceIndex == 0 && firstChapter.origin != ChapterOrigin.Generated) Duration.ZERO else firstChapter.startTimeMs.milliseconds
             val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
             val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
 
@@ -54,7 +55,7 @@ class ChapterManagerImpl @Inject constructor(
                 index = firstChapter.index,
                 uiIndex = -1, // We set any value here as it is updated later in the processing chain
                 selected = firstChapter.index !in episode.deselectedChapters,
-                isGenerated = firstChapter.isGenerated,
+                origin = firstChapter.origin,
             )
         }
         .filter { it.duration > Duration.ZERO }

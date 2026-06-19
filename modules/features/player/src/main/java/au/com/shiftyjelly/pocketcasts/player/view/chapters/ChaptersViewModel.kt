@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -82,7 +83,7 @@ class ChaptersViewModel @AssistedInject constructor(
     val showPlayer = _showPlayer.asSharedFlow()
 
     fun playChapter(chapter: Chapter) {
-        eventHorizon.track(PlayerChapterSelectedEvent)
+        eventHorizon.track(PlayerChapterSelectedEvent(origin = chapter.origin.toChapterOriginType()))
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
             val playbackState = playbackManager.playbackStateFlow.first()
@@ -131,7 +132,7 @@ class ChaptersViewModel @AssistedInject constructor(
             }
             chapterManager.selectChapter(episodeId, chapter.index, select)
             episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
-                trackChapterSelectionToggled(episode, select)
+                trackChapterSelectionToggled(episode, chapter, select)
             }
         }
     }
@@ -156,6 +157,7 @@ class ChaptersViewModel @AssistedInject constructor(
                         episodeUuid = episodeId,
                         podcastUuid = episode.podcastOrSubstituteUuid,
                         chapterTitle = chapter.title,
+                        origin = chapter.origin.toChapterOriginType(),
                     ),
                 )
             }
@@ -197,16 +199,18 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun trackChapterSelectionToggled(episode: BaseEpisode, selected: Boolean) {
+    private fun trackChapterSelectionToggled(episode: BaseEpisode, chapter: Chapter, selected: Boolean) {
         val event = if (selected) {
             DeselectChaptersChapterSelectedEvent(
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = chapter.origin.toChapterOriginType(),
             )
         } else {
             DeselectChaptersChapterDeselectedEvent(
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = chapter.origin.toChapterOriginType(),
             )
         }
         eventHorizon.track(event)
