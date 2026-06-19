@@ -38,7 +38,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 
 @Composable
 fun ImprovedSearchResultsPage(
-    state: SearchUiState.ImprovedResults,
+    state: SearchUiState.Results,
     loading: Boolean,
     bottomInset: Dp,
     onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -102,7 +102,7 @@ fun ImprovedSearchResultsPage(
 
 @Composable
 private fun ImprovedSearchResultsView(
-    state: SearchUiState.SearchOperation.Success<SearchResults.ImprovedResults>,
+    state: SearchUiState.SearchOperation.Success<SearchResults.Results>,
     bottomInset: Dp,
     onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onPodcastClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,

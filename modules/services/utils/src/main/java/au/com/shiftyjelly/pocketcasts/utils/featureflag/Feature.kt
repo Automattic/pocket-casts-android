@@ -170,15 +170,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2025-10-07"),
     ),
-    IMPROVED_SEARCH_RESULTS(
-        key = "search_improvements",
-        title = "Improved search results",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2025-10-10"),
-    ),
     IMPROVE_APP_RATINGS(
         key = "improve_app_ratings",
         title = "Banner prompting for app rating",
@@ -359,6 +350,24 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-27"),
+    ),
+    TRIAL_CTA_COPY_AB_TEST(
+        key = "trial_cta_copy_ab_test",
+        title = "A/B/C test trial CTA button copy",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-11"),
+    ),
+    HLS_STREAMING(
+        key = "hls_streaming",
+        title = "Prefer HLS stream when available",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-06-11"),
     ),
 }
 

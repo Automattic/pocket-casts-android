@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 132,
-    "identityHash": "ee662eee688f375cbacbfdc7ad8f0d85",
+    "version": 133,
+    "identityHash": "d705d4702630b51fdf8c0a1fcc6bee39",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1586,7 +1586,7 @@
       },
       {
         "tableName": "episode_chapters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_index` INTEGER NOT NULL, `episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, `is_embedded` INTEGER NOT NULL, `is_generated` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`episode_uuid`, `chapter_index`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chapter_index` INTEGER NOT NULL, `episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, `is_embedded` INTEGER NOT NULL, `is_generated` INTEGER NOT NULL DEFAULT 0, `origin` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`episode_uuid`, `chapter_index`))",
         "fields": [
           {
             "fieldPath": "index",
@@ -1635,6 +1635,13 @@
           {
             "fieldPath": "isGenerated",
             "columnName": "is_generated",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "origin",
+            "columnName": "origin",
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
@@ -2249,7 +2256,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ee662eee688f375cbacbfdc7ad8f0d85')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd705d4702630b51fdf8c0a1fcc6bee39')"
     ]
   }
 }

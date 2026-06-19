@@ -1,0 +1,24 @@
+package au.com.shiftyjelly.pocketcasts.analytics.experiments
+
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+
+enum class TrialCtaCopyTreatment(val treatmentName: String) {
+    START_30_DAY_TRIAL("start_30_day_trial"),
+    TRY_30_DAYS_FREE("try_30_days_free"),
+}
+
+/**
+ * Resolves the trial CTA copy treatment for the current user.
+ *
+ * Returns `null` (i.e. show the control copy) when either the global [Feature.EXPLAT_EXPERIMENT] flag or the
+ * [Feature.TRIAL_CTA_COPY_AB_TEST] kill-switch is off, when the user is in the control variation, or when the
+ * variation name is unrecognized.
+ */
+fun ExperimentProvider.getTrialCtaCopyTreatment(): TrialCtaCopyTreatment? {
+    if (!FeatureFlag.isEnabled(Feature.TRIAL_CTA_COPY_AB_TEST)) {
+        return null
+    }
+    val treatmentName = (getVariation(Experiment.TrialCtaCopyABTest) as? Variation.Treatment)?.name
+    return TrialCtaCopyTreatment.entries.firstOrNull { it.treatmentName == treatmentName }
+}

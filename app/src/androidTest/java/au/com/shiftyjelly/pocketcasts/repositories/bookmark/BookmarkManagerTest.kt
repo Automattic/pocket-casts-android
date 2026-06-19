@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
@@ -46,6 +47,7 @@ class BookmarkManagerTest {
             appDatabase = appDatabase,
             eventHorizon = EventHorizon(TestEventSink()),
             syncManager = mock<SyncManager>(),
+            podcastCacheServiceManager = mock<PodcastCacheServiceManager>(),
             transcriptWindowExtractor = TranscriptWindowExtractor(
                 transcriptDao = mock<TranscriptDao>(),
                 transcriptService = mock<TranscriptService>(),

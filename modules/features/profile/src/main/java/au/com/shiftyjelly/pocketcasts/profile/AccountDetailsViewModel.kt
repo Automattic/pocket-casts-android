@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.getTrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -43,10 +46,13 @@ class AccountDetailsViewModel @Inject constructor(
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
     private val crashLogging: CrashLogging,
+    experimentProvider: ExperimentProvider,
 ) : ViewModel() {
     internal val deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Empty)
     internal val signInState = userManager.getSignInState()
     internal val marketingOptIn = settings.marketingOptIn.flow
+
+    internal val trialCtaCopyTreatment: TrialCtaCopyTreatment? = experimentProvider.getTrialCtaCopyTreatment()
 
     internal val headerState = signInState.asFlow().map { state ->
         when (state) {
