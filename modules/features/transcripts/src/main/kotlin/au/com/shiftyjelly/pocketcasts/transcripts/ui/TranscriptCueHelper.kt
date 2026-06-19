@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import kotlin.math.abs
 
 internal sealed interface HighlightOutcome {
     data class Show(val entryIndex: Int, val wordIndex: Int?) : HighlightOutcome
@@ -143,6 +144,10 @@ internal object TranscriptCueHelper {
         return null
     }
 
+    fun isSeekSettled(posMs: Int, seekTargetMs: Int): Boolean = abs(posMs - seekTargetMs) <= SEEK_SETTLE_TOLERANCE_MS
+
+    fun hasReachedTappedRow(outcome: HighlightOutcome, tappedIndex: Int): Boolean = outcome is HighlightOutcome.Show && outcome.entryIndex >= tappedIndex
+
     fun findWordIndex(
         entry: TranscriptEntry.Text,
         refTimeMs: Long,
@@ -157,4 +162,6 @@ internal object TranscriptCueHelper {
         }
         return lastPassedIndex
     }
+
+    const val SEEK_SETTLE_TOLERANCE_MS = 1500
 }
