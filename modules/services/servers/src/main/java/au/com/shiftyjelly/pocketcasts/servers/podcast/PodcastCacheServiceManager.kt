@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import io.reactivex.Single
 import retrofit2.Response
 
@@ -21,4 +23,5 @@ interface PodcastCacheServiceManager {
     suspend fun getEpisodeUrl(episode: PodcastEpisode): String?
     suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder>
     suspend fun episodeChat(authorization: String, request: EpisodeChatRequest): EpisodeChatResponse
+    suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse
 }

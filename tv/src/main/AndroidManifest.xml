@@ -41,13 +41,25 @@
             </intent-filter>
         </activity>
 
-        <!-- Disable startup initializers not needed for TV -->
+        <service
+            android:name=".auth.TvAuthenticatorService"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCOUNT_AUTHENTICATOR">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsStartupInitializer"
+                android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>

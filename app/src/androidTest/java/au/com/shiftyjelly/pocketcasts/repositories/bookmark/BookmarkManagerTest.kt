@@ -5,11 +5,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
@@ -25,6 +30,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class BookmarkManagerTest {
     private lateinit var appDatabase: AppDatabase
@@ -40,6 +46,12 @@ class BookmarkManagerTest {
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
             eventHorizon = EventHorizon(TestEventSink()),
+            syncManager = mock<SyncManager>(),
+            podcastCacheServiceManager = mock<PodcastCacheServiceManager>(),
+            transcriptWindowExtractor = TranscriptWindowExtractor(
+                transcriptDao = mock<TranscriptDao>(),
+                transcriptService = mock<TranscriptService>(),
+            ),
         )
         episodeDao = appDatabase.episodeDao()
     }

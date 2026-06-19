@@ -93,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.summary.SummaryPaywall
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -103,6 +104,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkDetailFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksPage
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersPage
@@ -730,6 +732,7 @@ class EpisodeFragment : BaseFragment() {
             val transcript = pageState.transcript as? Transcript.Text
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
             val isPlusUser = pageState.isPlusUser
+            val isFreeTrialAvailable = pageState.isFreeTrialAvailable
             val selectedTab = pageState.selectedContentTab
 
             val showDescription = !isSummaryEnabled ||
@@ -821,22 +824,33 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.SUMMARY && summaryText != null) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                            ) {
-                                Text(
-                                    text = stringResource(LR.string.episode_summary),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(bottom = 16.dp),
-                                )
-                                HtmlText(
-                                    html = markdownToHtml(summaryText.orEmpty()),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    textStyleResId = UR.style.P40,
+                            if (isPlusUser) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                                ) {
+                                    Text(
+                                        text = stringResource(LR.string.episode_summary),
+                                        color = MaterialTheme.theme.colors.primaryText01,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = 16.dp),
+                                    )
+                                    HtmlText(
+                                        html = markdownToHtml(summaryText.orEmpty()),
+                                        color = MaterialTheme.theme.colors.primaryText01,
+                                        textStyleResId = UR.style.P40,
+                                    )
+                                }
+                            } else {
+                                val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                                SummaryPaywall(
+                                    summaryText = summaryText.orEmpty(),
+                                    isFreeTrialAvailable = isFreeTrialAvailable,
+                                    onClickSubscribe = ::onSummaryUpgradeClick,
+                                    contentPadding = PaddingValues(16.dp),
+                                    modifier = Modifier.height(screenHeight),
                                 )
                             }
                         }
@@ -858,6 +872,16 @@ class EpisodeFragment : BaseFragment() {
                                 },
                                 onShareBookmarkClick = ::onShareBookmarkClick,
                                 onEditBookmarkClick = ::onEditBookmarkClick,
+                                onBookmarkDetailClick = { data ->
+                                    BookmarkDetailFragment.show(
+                                        fragmentManager = parentFragmentManager,
+                                        bookmark = data.bookmark,
+                                        episodeTitle = data.episodeTitle,
+                                        podcastUuid = data.podcastUuid,
+                                        podcastTitle = data.podcastTitle,
+                                        sourceView = SourceView.EPISODE_DETAILS,
+                                    )
+                                },
                                 onUpgradeClick = ::onBookmarksUpgradeClick,
                                 showOptionsDialog = ::showBookmarksOptionsDialog,
                                 openFragment = ::openBookmarkSettingsFragment,
@@ -947,7 +971,7 @@ class EpisodeFragment : BaseFragment() {
                                     Row(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
-                                        if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                        if (transcriptUiState.isTextTranscriptLoaded) {
                                             TranscriptShareButton(
                                                 toolbarColors = toolbarColors,
                                                 onClick = transcriptViewModel::shareTranscript,
@@ -1085,7 +1109,7 @@ class EpisodeFragment : BaseFragment() {
                                         Row(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                            if (transcriptUiState.isTextTranscriptLoaded) {
                                                 TranscriptShareButton(
                                                     toolbarColors = toolbarColors,
                                                     onClick = transcriptViewModel::shareTranscript,
@@ -1202,6 +1226,13 @@ class EpisodeFragment : BaseFragment() {
             source = OnboardingUpgradeSource.BOOKMARKS,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun onSummaryUpgradeClick() {
+        OnboardingLauncher.openOnboardingFlow(
+            requireActivity(),
+            OnboardingFlow.Upsell(OnboardingUpgradeSource.AI_SUMMARIES),
+        )
     }
 
     private fun showBookmarksOptionsDialog(selectedValue: Int) {

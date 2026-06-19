@@ -4,3 +4,16 @@
 /.ruby-version @Automattic/apps-infra-tooling
 /.bundle/ @Automattic/apps-infra-tooling
 /.rubocop*.yml @Automattic/apps-infra-tooling
+fastlane/ @Automattic/apps-infra-tooling
+
+# CI and automation
+.buildkite/ @Automattic/apps-infra-tooling
+.github/workflows/ @Automattic/apps-infra-tooling
+.github/dependabot.yml @Automattic/apps-infra-tooling
+Dangerfile* @Automattic/apps-infra-tooling
+
+# Toolchain and environment pins
+.java-version @Automattic/apps-infra-tooling
+
+# Secrets
+.configure-files/     @Automattic/apps-infra-tooling

@@ -133,6 +133,10 @@ message SyncUserBookmark {
   google.protobuf.Int64Value title_modified = 7;
   google.protobuf.BoolValue is_deleted = 8;
   google.protobuf.Int64Value is_deleted_modified = 9;
+  google.protobuf.StringValue ai_title = 10;
+  google.protobuf.Int64Value ai_title_modified = 11;
+  google.protobuf.StringValue ai_summary = 12;
+  google.protobuf.Int64Value ai_summary_modified = 13;
 }
 
 message BookmarkRequest {

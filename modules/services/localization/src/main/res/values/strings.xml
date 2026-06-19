@@ -98,6 +98,8 @@
     <string name="you_might_like">You might like</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
+    <string name="sort_shortest_to_longest">Shortest to longest</string>
+    <string name="sort_longest_to_shortest">Longest to shortest</string>
     <string name="not_selected">Not selected</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
@@ -126,6 +128,8 @@
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_summary">Episode Summary</string>
+    <string name="summary_upsell_title">AI-Powered Summaries</string>
+    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="description">Description</string>
     <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
@@ -247,6 +251,8 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
+    <string name="tv_sign_in_or_enter_code">or enter the following code</string>
+    <string name="tv_sign_in_go_to_url">going to %1$s</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -1302,6 +1308,8 @@
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start Free Trial</string>
+    <string name="profile_start_free_trial_specific_duration">Start your 30-day Free Trial</string>
+    <string name="profile_try_days_for_free">Try 30 days for free</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -2333,6 +2341,7 @@
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
+    <string name="bookmark_play_from">Play from %s</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%d bookmarks</string>
     <string name="bookmarks_singular">1 bookmark</string>
@@ -2818,4 +2827,19 @@
     <string name="sponsored">Sponsored</string>
     <string name="play_latest_episode">Play latest episode</string>
     <string name="play_this_episode">Play this episode</string>
+
+    <!-- TV Onboarding -->
+    <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
+    <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
+    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_create_free_account">Create free account</string>
+    <string name="tv_onboarding_browse_without_account">Browse without an account</string>
+    <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
+    <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
+    <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
+    <string name="tv_onboarding_welcome_back">Welcome back!</string>
+    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_create_account_title">Create your free account</string>
+    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
+    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

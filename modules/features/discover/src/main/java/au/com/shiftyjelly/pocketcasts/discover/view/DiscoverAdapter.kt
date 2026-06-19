@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryAdBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryPillsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
-import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListDeprecatedBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowMostPopularPodcastsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListBinding
@@ -73,24 +72,18 @@ import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature.GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideRow
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.extensions.showRow
 import coil3.asDrawable
 import coil3.imageLoader
-import coil3.load
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
-import coil3.request.transformations
-import coil3.transform.CircleCropTransformation
 import com.automattic.eventhorizon.DiscoverAdCategorySubscribedEvent
 import com.automattic.eventhorizon.DiscoverAdCategoryTappedEvent
 import com.automattic.eventhorizon.DiscoverCollectionListPageChangedEvent
@@ -109,7 +102,6 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
-import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlinx.coroutines.MainScope
@@ -573,7 +565,6 @@ internal class DiscoverAdapter(
 
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
-    class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) :
         NetworkLoadableViewHolder(binding.root),
@@ -721,8 +712,6 @@ internal class DiscoverAdapter(
 
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
 
-            R.layout.row_collection_list_deprecated -> CollectionListDeprecatedViewHolder(RowCollectionListDeprecatedBinding.inflate(inflater, parent, false))
-
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
 
             else -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
@@ -767,17 +756,14 @@ internal class DiscoverAdapter(
                         is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
 
                         is DisplayStyle.CollectionList ->
-                            if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
+                            R.layout.row_collection_list
 
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.EpisodeList) {
                     return when (row.displayStyle) {
                         is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
-
-                        is DisplayStyle.CollectionList ->
-                            if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
-
+                        is DisplayStyle.CollectionList -> R.layout.row_collection_list
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Pills) {
@@ -1053,55 +1039,6 @@ internal class DiscoverAdapter(
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
                             onRestoreInstanceState(holder)
-                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
-                        },
-                    )
-                }
-
-                is CollectionListDeprecatedViewHolder -> {
-                    holder.loadFlowable(
-                        loadPodcastList(row.source, row.authenticated),
-                        onNext = {
-                            it.podcasts.firstOrNull() ?: it.episodes.firstOrNull() ?: return@loadFlowable
-                            val context = holder.itemView.context
-                            holder.binding.lblTitle.text = it.title?.tryToLocalise(resources)
-                            holder.binding.lblBody.text = it.description
-
-                            it.images?.let { images ->
-                                val backgroundUrl = images[0].imageUrl
-                                holder.binding.imgPodcast.load(backgroundUrl) {
-                                    transformations(
-                                        ThemedImageTintTransformation(
-                                            context,
-                                        ),
-                                    )
-                                }
-                            }
-
-                            holder.itemView.setOnClickListener {
-                                listener.onPodcastListClicked(row)
-                            }
-
-                            it.tintColors?.let { tintColors ->
-                                if (tintColors.darkTintColor.isBlank() || tintColors.lightTintColor.isBlank()) {
-                                    return@let
-                                }
-                                val tintColor: Int = if (theme.isDarkTheme) Color.parseColor(tintColors.darkTintColor) else Color.parseColor(tintColors.lightTintColor)
-                                holder.binding.lblSubtitle.setTextColor(tintColor)
-                                holder.binding.imgTint.setBackgroundColor(tintColor)
-                            }
-
-                            holder.binding.highlightImage.showIf(it.collectionImageUrl != null)
-                            it.collectionImageUrl?.let { url ->
-                                holder.binding.highlightImage.load(url) {
-                                    transformations(ThemedImageTintTransformation(context), CircleCropTransformation())
-                                }
-                            }
-
-                            holder.binding.lblSubtitle.text = it.subtitle?.tryToLocalise(resources)?.uppercase(Locale.getDefault())
-
-                            onRestoreInstanceState(holder)
-
                             row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         },
                     )
