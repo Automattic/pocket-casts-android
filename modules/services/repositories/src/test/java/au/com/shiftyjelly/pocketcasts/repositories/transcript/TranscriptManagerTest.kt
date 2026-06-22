@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -434,9 +435,9 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", isGenerated = true),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", isGenerated = true),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", isGenerated = true),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
             ),
         )
     }
@@ -495,7 +496,7 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", isGenerated = true),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", origin = ChapterOrigin.Generated),
             ),
         )
     }

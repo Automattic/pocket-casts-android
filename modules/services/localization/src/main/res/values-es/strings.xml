@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 11:54:58+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Escanea este código para empezar en tu teléfono, solo tardarás un minuto.</string>
+    <string name="tv_create_account_title">Crea tu cuenta gratuita</string>
+    <string name="synced_transcripts_whats_new_button_note">Las transcripciones sincronizadas solo están disponibles para los episodios recientes.</string>
+    <string name="synced_transcripts_whats_new_message">Lee rápido, no te pierdas nada. El nombre que dejaste atrás, el libro que te recomendaron, la estadística que querías: toca la palabra y vuelve atrás.</string>
+    <string name="synced_transcripts_whats_new_title">Sigue la lectura. Incluso al doble de velocidad.</string>
+    <string name="settings_beta_features_sort_release_date">Fecha de lanzamiento (más reciente primero)</string>
+    <string name="settings_beta_features_sort_name">Nombre (A-Z)</string>
+    <string name="settings_beta_features_sort">Ordenar funciones beta</string>
+    <string name="sponsored">Patrocinado</string>
+    <string name="play_this_episode">Reproducir este episodio</string>
+    <string name="play_latest_episode">Reproducir último episodio</string>
+    <string name="tv_row_because_you_liked">Porque te ha gustado el pódcast</string>
+    <string name="tv_row_recommendations">Recomendaciones</string>
+    <string name="tv_row_trending_videos">Vídeos populares</string>
+    <string name="tv_row_featured">Hecho para la TV</string>
+    <string name="home">Inicio</string>
+    <string name="tv_tab_your_podcasts">Tus pódcasts</string>
+    <string name="blogs_found_go_to_podcast">Ir al pódcast</string>
+    <string name="blogs_found_description">Estamos convirtiendo las últimas entradas en episodios de pódcasts. Te llevaremos a la página del pódcast en cuanto esté listo el primer episodio, o vuelve a la página del pódcast en cualquier momento y tira hacia abajo para actualizar.</string>
+    <string name="blogs_found_headline">Leyendo tu blog en voz alta</string>
+    <string name="blogs_found_followed_badge">PÓDCAST SEGUIDO</string>
+    <string name="blogs_found_feed_detected">Feed encontrado</string>
     <string name="chapters_generated_disclaimer">Estos capítulos se generan automáticamente y puede que no sean del todo precisos.</string>
     <string name="description">Descripción</string>
     <string name="player_tab_summary">Resumen</string>

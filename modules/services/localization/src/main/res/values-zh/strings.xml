@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 13:58:47+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>
+    <string name="tv_create_account_title">创建您的免费账户</string>
+    <string name="synced_transcripts_whats_new_button_note">仅提供近期剧集的同步文字转录稿。</string>
+    <string name="synced_transcripts_whats_new_message">快速阅读，不漏看任何内容。 您曾匆匆掠过的名字、他们推荐的书、您想要的统计信息 — 点击词条，即可跳转回原文。</string>
+    <string name="synced_transcripts_whats_new_title">同步阅读。 即使在 2 倍速下也是如此。</string>
+    <string name="settings_beta_features_sort_release_date">发布日期（最新者在前）</string>
+    <string name="settings_beta_features_sort_name">名称 (A–Z)</string>
+    <string name="settings_beta_features_sort">对测试版功能进行排序</string>
+    <string name="sponsored">赞助</string>
+    <string name="play_this_episode">播放此剧集</string>
+    <string name="play_latest_episode">播放最新剧集</string>
+    <string name="tv_row_because_you_liked">因为您喜欢播客</string>
+    <string name="tv_row_recommendations">推荐</string>
+    <string name="tv_row_trending_videos">热门视频</string>
+    <string name="tv_row_featured">专为电视制作</string>
+    <string name="home">主页</string>
+    <string name="tv_tab_your_podcasts">您的播客</string>
+    <string name="blogs_found_go_to_podcast">转至播客</string>
+    <string name="blogs_found_description">我们正在将最新文章制作成播客剧集。 第一集准备好后，我们会直接带您前往播客页面；您也可以随时返回播客页面，并下拉以刷新。</string>
+    <string name="blogs_found_headline">大声朗读您的博客</string>
+    <string name="blogs_found_followed_badge">已关注播客</string>
+    <string name="blogs_found_feed_detected">已找到源</string>
     <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
     <string name="description">描述</string>
     <string name="player_tab_summary">摘要</string>

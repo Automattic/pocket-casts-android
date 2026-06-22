@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-27 12:55:43+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Scanne diesen Code, um auf deinem Mobiltelefon zu beginnen. Es dauert nur eine Minute.</string>
+    <string name="tv_create_account_title">Kostenloses Konto erstellen</string>
+    <string name="synced_transcripts_whats_new_button_note">Synchronisierte Transkripte sind nur für die neuesten Folgen verfügbar.</string>
+    <string name="synced_transcripts_whats_new_message">Lies schnell, verpasse nichts. Der Name, den du überlesen hast, das Buch, das sie empfohlen haben, die Statistik, die du wolltest – tippe auf das Wort und springe zurück.</string>
+    <string name="synced_transcripts_whats_new_title">Lies mit. Sogar bei doppelter Geschwindigkeit.</string>
+    <string name="settings_beta_features_sort_release_date">Veröffentlichungsdatum (neueste zuerst)</string>
+    <string name="settings_beta_features_sort_name">Name (A-Z)</string>
+    <string name="settings_beta_features_sort">Betafunktionen sortieren</string>
+    <string name="sponsored">Gesponsert</string>
+    <string name="play_this_episode">Diese Folge wiedergeben</string>
+    <string name="play_latest_episode">Neueste Folge wiedergeben</string>
+    <string name="tv_row_recommendations">Empfehlungen</string>
+    <string name="tv_row_trending_videos">Angesagte Videos</string>
+    <string name="tv_row_featured">Für den Fernseher gemacht</string>
+    <string name="tv_row_because_you_liked">Weil du folgende Podcasts mit einem „Like“ markiert hast</string>
+    <string name="home">Startseite</string>
+    <string name="tv_tab_your_podcasts">Deine Podcasts</string>
+    <string name="blogs_found_go_to_podcast">Zum Podcast</string>
+    <string name="blogs_found_description">Wir wandeln die neuesten Beiträge in Podcast-Folgen um. Wir leiten dich zur Podcast-Seite weiter, sobald die erste Folge bereitsteht. Du kannst aber auch jederzeit zur Podcast-Seite zurückkehren und sie per Herunterziehen aktualisieren.</string>
+    <string name="blogs_found_headline">Dein Blog wird laut gelesen</string>
+    <string name="blogs_found_followed_badge">PODCAST ABONNIERT</string>
+    <string name="blogs_found_feed_detected">Feed gefunden</string>
     <string name="chapters_generated_disclaimer">Diese Kapitel werden automatisch generiert und sind möglicherweise nicht ganz korrekt.</string>
     <string name="description">Beschreibung</string>
     <string name="player_tab_summary">Zusammenfassung</string>

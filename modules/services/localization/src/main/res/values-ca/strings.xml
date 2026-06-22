@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-04 23:07:38+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
-    <string name="synced_transcripts_whats_new_title">Les transcripcions,\nara al teu ritme.</string>
-    <string name="synced_transcripts_whats_new_message">Cada paraula es ressalta a mesura que es parla. Segueix la transcripció, però si perds el punt,  torna-hi amb un sol toc.</string>
+    <string name="tv_create_account_subtitle">Escaneja aquest codi per començar al teu telèfon, només triga un minut.</string>
+    <string name="tv_create_account_title">Crea el teu compte gratuït</string>
+    <string name="tv_onboarding_sign_in_instructions">Obre la càmera i apunta al codi QR</string>
+    <string name="tv_onboarding_sign_in_title">Inicia sessió amb el telèfon</string>
+    <string name="tv_sign_in_go_to_url">anant a %1$s</string>
+    <string name="tv_sign_in_or_enter_code">o introdueix el codi següent</string>
+    <string name="tv_onboarding_syncing">S\'estan sincronitzant els teus pòdcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Navega sense compte</string>
+    <string name="tv_onboarding_create_free_account">Crea un compte gratuït</string>
+    <string name="tv_onboarding_subtitle">Els teus pòdcasts, a la pantalla gran</string>
+    <string name="tv_onboarding_welcome_tv">Benvingut a Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Benvingut a Pocket Casts</string>
+    <string name="sort_longest_to_shortest">De més llarg a més curt</string>
+    <string name="sort_shortest_to_longest">De més curt a més llarg</string>
+    <string name="synced_transcripts_whats_new_button_note">Les transcripcions sincronitzades només estan disponibles per als episodis recents.</string>
+    <string name="synced_transcripts_whats_new_message">Llegeix ràpid, no et perdis res. El nom que vas passar per alt, el llibre que van recomanar, la dada que volies: toca la paraula i torna enrere.</string>
+    <string name="synced_transcripts_whats_new_title">Llegeix mentre escoltes. Fins i tot a 2x.</string>
+    <string name="settings_beta_features_sort_release_date">Data de publicació (més recent primer)</string>
+    <string name="settings_beta_features_sort_name">Nom (A–Z)</string>
+    <string name="settings_beta_features_sort">Ordena les funcions beta</string>
+    <string name="sponsored">Patrocinat</string>
+    <string name="play_this_episode">Reprodueix aquest episodi</string>
+    <string name="play_latest_episode">Reprodueix l\'últim episodi</string>
+    <string name="tv_row_because_you_liked">Perquè t\'ha agradat el pòdcast</string>
+    <string name="tv_row_recommendations">Recomanacions</string>
+    <string name="tv_row_trending_videos">Vídeos en tendència</string>
+    <string name="tv_row_featured">Fet per a la TV</string>
+    <string name="tv_tab_your_podcasts">Els teus pòdcasts</string>
+    <string name="home">Inici</string>
     <string name="blogs_found_go_to_podcast">Ves al pòdcast</string>
     <string name="blogs_found_description">Estem convertint les darreres entrades en episodis de pòdcast. Et portarem a la pàgina del pòdcast tan aviat com el primer episodi estigui llest, o torna a la pàgina del pòdcast quan vulguis i estira cap avall per actualitzar.</string>
     <string name="blogs_found_headline">Llegim el teu blog en veu alta</string>
@@ -2382,8 +2409,8 @@ Language: ca
         <item quantity="other">segons</item>
     </plurals>
     <plurals name="second_short">
-        <item quantity="one">seg</item>
-        <item quantity="other">segns</item>
+        <item quantity="one">segon</item>
+        <item quantity="other">segons</item>
     </plurals>
     <plurals name="second_with_count">
         <item quantity="one">%1$d segon</item>

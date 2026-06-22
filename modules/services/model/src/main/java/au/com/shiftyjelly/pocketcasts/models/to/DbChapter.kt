@@ -19,6 +19,5 @@ data class DbChapter(
     @ColumnInfo(name = "title") val title: String? = null,
     @ColumnInfo(name = "image_url") val imageUrl: String? = null,
     @ColumnInfo(name = "url") val url: String? = null,
-    @ColumnInfo(name = "is_embedded") val isEmbedded: Boolean = false,
-    @ColumnInfo(name = "is_generated", defaultValue = "0") val isGenerated: Boolean = false,
+    @ColumnInfo(name = "origin", defaultValue = "0") val origin: ChapterOrigin = ChapterOrigin.Unknown,
 )
