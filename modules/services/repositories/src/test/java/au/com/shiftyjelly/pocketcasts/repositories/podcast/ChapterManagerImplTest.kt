@@ -700,8 +700,8 @@ class ChapterManagerImplTest {
     fun `align translates generated chapter times`() {
         val chapters = Chapters(
             listOf(
-                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = true),
-                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated),
+                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated),
             ),
         )
 
@@ -711,8 +711,8 @@ class ChapterManagerImplTest {
         assertEquals(
             Chapters(
                 listOf(
-                    Chapter(title = "A", startTime = 30.seconds, endTime = 40.seconds, index = 0, uiIndex = 1, isGenerated = true),
-                    Chapter(title = "B", startTime = 40.seconds, endTime = 50.seconds, index = 1, uiIndex = 2, isGenerated = true),
+                    Chapter(title = "A", startTime = 30.seconds, endTime = 40.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated),
+                    Chapter(title = "B", startTime = 40.seconds, endTime = 50.seconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated),
                 ),
             ),
             aligned,
@@ -723,8 +723,8 @@ class ChapterManagerImplTest {
     fun `align leaves embedded chapters untouched`() {
         val chapters = Chapters(
             listOf(
-                Chapter(title = "Embedded", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = false),
-                Chapter(title = "Generated", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+                Chapter(title = "Embedded", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Unknown),
+                Chapter(title = "Generated", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated),
             ),
         )
 
@@ -740,7 +740,7 @@ class ChapterManagerImplTest {
     fun `align keeps original time when mapping returns null`() {
         val chapters = Chapters(
             listOf(
-                Chapter(title = "A", startTime = 5.seconds, endTime = 15.seconds, index = 0, uiIndex = 1, isGenerated = true),
+                Chapter(title = "A", startTime = 5.seconds, endTime = 15.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated),
             ),
         )
 
@@ -754,8 +754,8 @@ class ChapterManagerImplTest {
     fun `align drops collapsed chapters and re-derives uiIndex`() {
         val chapters = Chapters(
             listOf(
-                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = true),
-                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, isGenerated = true),
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated),
+                Chapter(title = "B", startTime = 10.seconds, endTime = 20.seconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated),
             ),
         )
 
@@ -772,7 +772,7 @@ class ChapterManagerImplTest {
     fun `align returns chapters unchanged when none are generated`() {
         val chapters = Chapters(
             listOf(
-                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, isGenerated = false),
+                Chapter(title = "A", startTime = 0.seconds, endTime = 10.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Unknown),
             ),
         )
 
