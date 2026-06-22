@@ -12,7 +12,7 @@ gem 'fastlane-plugin-wpmreleasetoolkit', '~> 14.7'
 # gem 'fastlane-plugin-wpmreleasetoolkit', git: 'https://github.com/wordpress-mobile/release-toolkit', branch: ''
 
 # Used in scripts/themes/
-gem 'google-apis-sheets_v4', '~> 0.47'
+gem 'google-apis-sheets_v4', '~> 0.48'
 
 # To avoid errors like:
 #
