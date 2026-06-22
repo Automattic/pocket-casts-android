@@ -50,7 +50,7 @@ class ChapterManagerImpl @Inject constructor(
         ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
 
         // Generated chapter timestamps are in the server reference timeline; align them to the real audio
-        // stream via the fingerprint map. Phone only, to spare resources on automotive/TV/wear.
+        // stream via the fingerprint map. Phone only, to spare resources on automotive/wear.
         if (appPlatform != AppPlatform.Phone) return rawChapters
 
         // -1L primes combine so chapters emit immediately, before sample's first throttled tick.
