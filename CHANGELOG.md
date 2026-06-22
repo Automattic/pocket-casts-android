@@ -6,6 +6,10 @@
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+    *   Improve handling of search results where the podcast title is missing
+        ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
+    *   Wear OS performance improvements
+        ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
 
 8.14
 -----

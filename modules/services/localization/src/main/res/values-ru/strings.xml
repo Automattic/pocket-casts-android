@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 13:54:27+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Отсканируйте этот код, чтобы начать работу с телефона. Это займёт всего минуту.</string>
+    <string name="tv_create_account_title">Создать бесплатную учётную запись</string>
+    <string name="synced_transcripts_whats_new_button_note">Синхронизированные расшифровки доступны только в последних выпусках.</string>
+    <string name="synced_transcripts_whats_new_message">Читайте, чтобы ничего не упустить. Имя, которое вы не расслышали, книга, на которую ссылаются, нужная для статистики цифра — просто нажмите на слово и прослушайте заново.</string>
+    <string name="synced_transcripts_whats_new_title">Слушайте и читайте. Даже в ускоренном режиме.</string>
+    <string name="settings_beta_features_sort_release_date">Дата выпуска (сначала новые)</string>
+    <string name="settings_beta_features_sort">Бета-функции сортировки</string>
+    <string name="settings_beta_features_sort_name">Название (А–Я)</string>
+    <string name="sponsored">Реклама</string>
+    <string name="play_this_episode">Воспроизвести этот выпуск</string>
+    <string name="play_latest_episode">Воспроизвести последний выпуск</string>
+    <string name="tv_row_because_you_liked">Потому что вам понравился подкаст</string>
+    <string name="tv_row_recommendations">Рекомендации</string>
+    <string name="tv_row_trending_videos">Популярные видео</string>
+    <string name="tv_row_featured">Создано для телевидения</string>
+    <string name="home">Главная страница</string>
+    <string name="tv_tab_your_podcasts">Ваши подкасты</string>
+    <string name="blogs_found_go_to_podcast">Перейти к подкасту</string>
+    <string name="blogs_found_description">Превращаем последние записи в выпуски подкастов. Мы перенаправим вас на страницу подкаста, как только будет готов первый выпуск, а ещё в любой момент вы сами можете вернуться на страницу подкаста и потянуть её вниз, чтобы обновить.</string>
+    <string name="blogs_found_headline">Чтение блога вслух</string>
+    <string name="blogs_found_followed_badge">ПОДПИСКИ НА ПОДКАСТ</string>
+    <string name="blogs_found_feed_detected">Лента найдена</string>
     <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
     <string name="description">Описание</string>
     <string name="player_tab_summary">Обзор</string>

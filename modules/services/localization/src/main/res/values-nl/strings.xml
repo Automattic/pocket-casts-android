@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 15:57:00+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
+    <string name="tv_create_account_title">Je gratis account aanmaken</string>
+    <string name="synced_transcripts_whats_new_button_note">Gesynchroniseerde transcripties alleen beschikbaar voor recente afleveringen.</string>
+    <string name="synced_transcripts_whats_new_message">Lees snel, mis niets. De naam die je bent vergeten, het boek dat ze aanraadden, de statistiek die je wilde - tik op het woord, spring terug.</string>
+    <string name="synced_transcripts_whats_new_title">Lees mee. Zelfs bij 2x.</string>
+    <string name="settings_beta_features_sort_release_date">Releasedatum (nieuwste eerst)</string>
+    <string name="settings_beta_features_sort_name">Naam (A-Z)</string>
+    <string name="settings_beta_features_sort">Bèta-functies sorteren</string>
+    <string name="sponsored">Gesponsord</string>
+    <string name="play_this_episode">Deze aflevering afspelen</string>
+    <string name="play_latest_episode">Nieuwste aflevering afspelen</string>
+    <string name="tv_row_because_you_liked">Omdat je Podcast leuk vond</string>
+    <string name="tv_row_recommendations">Aanbevelingen</string>
+    <string name="tv_row_trending_videos">Trending video\'s</string>
+    <string name="tv_row_featured">Gemaakt voor tv</string>
+    <string name="home">Home</string>
+    <string name="tv_tab_your_podcasts">Jouw podcasts</string>
+    <string name="blogs_found_go_to_podcast">Naar podcast</string>
+    <string name="blogs_found_description">We maken podcastafleveringen van de nieuwste berichten. We nemen je mee naar de podcastpagina zodra de eerste aflevering klaar is, of komen op elk moment terug naar de podcastpagina en trekken je terug om te vernieuwen.</string>
+    <string name="blogs_found_headline">Je blog hardop lezen</string>
+    <string name="blogs_found_followed_badge">PODCAST GEVOLGD</string>
+    <string name="blogs_found_feed_detected">Feed gevonden</string>
     <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
     <string name="description">Omschrijving</string>
     <string name="episode_summary">Overzicht aflevering</string>

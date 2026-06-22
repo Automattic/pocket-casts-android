@@ -171,11 +171,17 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    fun seekToTranscriptEntry(entry: TranscriptEntry) {
-        val textEntry = entry as? TranscriptEntry.Text ?: return
-        if (textEntry.startTimeMs < 0) return
+    /**
+     * Seeks playback to the tapped transcript [entry]. Returns the playback position (ms) sought
+     * to, or `null` if the entry is untimed, syncing is inactive, or no mapping is available. The
+     * caller uses the returned position to drive the highlight directly rather than re-deriving it
+     * from the (lossy) playback position.
+     */
+    fun seekToTranscriptEntry(entry: TranscriptEntry): Int? {
+        val textEntry = entry as? TranscriptEntry.Text ?: return null
+        if (textEntry.startTimeMs < 0) return null
         val currentState = _uiState.value
-        if (!currentState.isSyncedActive) return
+        if (!currentState.isSyncedActive) return null
 
         val refTimeSec = textEntry.startTimeMs / 1000.0
         val seekTimeMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec)
@@ -189,7 +195,7 @@ class TranscriptViewModel @AssistedInject constructor(
                     source = source,
                 )
             }
-            return
+            return null
         }
 
         val fromPositionSeconds = currentPlaybackPositionMs / 1000L
@@ -203,6 +209,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 source = source,
             )
         }
+        return seekTimeMs
     }
 
     override fun onCleared() {

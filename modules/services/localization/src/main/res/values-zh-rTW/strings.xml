@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 09:55:13+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="tv_create_account_subtitle">掃描此代碼即可使用手機開始進行，只需一分鐘就能完成。</string>
+    <string name="tv_create_account_title">建立免費帳號</string>
+    <string name="synced_transcripts_whats_new_button_note">僅提供近期單集的同步逐字稿。</string>
+    <string name="synced_transcripts_whats_new_message">快速瀏覽，重點不漏接。 你錯過的名字、他們推薦的書、你有興趣的統計資料：點選關鍵字，跳回相關段落。</string>
+    <string name="synced_transcripts_whats_new_title">跟著閱讀。 2 倍速也沒關係。</string>
+    <string name="settings_beta_features_sort_release_date">發行日期 (最新項目在前)</string>
+    <string name="settings_beta_features_sort_name">名稱 (A–Z)</string>
+    <string name="settings_beta_features_sort">排序測試版功能</string>
+    <string name="sponsored">贊助內容</string>
+    <string name="play_this_episode">播放此單集</string>
+    <string name="play_latest_episode">播放最新單集</string>
+    <string name="tv_row_because_you_liked">因為你喜歡 Podcast</string>
+    <string name="tv_row_recommendations">推薦內容</string>
+    <string name="tv_row_trending_videos">熱門影片</string>
+    <string name="tv_row_featured">專為電視而生</string>
+    <string name="home">首頁</string>
+    <string name="tv_tab_your_podcasts">你的 Podcast</string>
+    <string name="blogs_found_go_to_podcast">前往 Podcast</string>
+    <string name="blogs_found_description">我們正在將最新文章變成 Podcast 單集。 第一集完成後，我們會將你引導至 Podcast 頁面，或歡迎隨時返回 Podcast 頁面，下拉即可重新整理內容。</string>
+    <string name="blogs_found_followed_badge">已追蹤的 PODCAST</string>
+    <string name="blogs_found_feed_detected">找到的摘要</string>
+    <string name="blogs_found_headline">大聲朗讀你的部落格</string>
     <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
     <string name="description">描述</string>
     <string name="player_tab_summary">摘要</string>

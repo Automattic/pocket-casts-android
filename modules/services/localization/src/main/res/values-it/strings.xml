@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-27 17:55:26+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="tv_create_account_subtitle">Scansiona questo codice per iniziare a usare il telefono, ci vuole solo un minuto.</string>
+    <string name="tv_create_account_title">Crea un account gratuito</string>
+    <string name="synced_transcripts_whats_new_button_note">Le trascrizioni sincronizzate sono disponibili solo per gli episodi più recenti.</string>
+    <string name="synced_transcripts_whats_new_message">Leggi velocemente, non perderti nulla. Il nome che ti è sfuggito, il libro che ti hanno consigliato, il dato che cercavi: tocca la parola e torna indietro.</string>
+    <string name="synced_transcripts_whats_new_title">Segui leggendo. Anche a velocità 2x.</string>
+    <string name="settings_beta_features_sort_release_date">Data di pubblicazione (prima la più recente)</string>
+    <string name="settings_beta_features_sort_name">Nome (A-Z)</string>
+    <string name="settings_beta_features_sort">Ordina funzionalità beta</string>
+    <string name="sponsored">Sponsorizzato</string>
+    <string name="tv_row_because_you_liked">Perché ti è piaciuto Podcast</string>
+    <string name="tv_row_recommendations">Consigli</string>
+    <string name="tv_row_trending_videos">Video di tendenza</string>
+    <string name="play_this_episode">Riproduci questo episodio</string>
+    <string name="play_latest_episode">Riproduci l\'ultimo episodio</string>
+    <string name="tv_row_featured">Realizzato per la TV</string>
+    <string name="home">Home</string>
+    <string name="tv_tab_your_podcasts">I tuoi podcast</string>
+    <string name="blogs_found_go_to_podcast">Vai al podcast</string>
+    <string name="blogs_found_description">Stiamo trasformando gli ultimi articoli in episodi di podcast. Ti reindirizzeremo alla pagina del podcast non appena il primo episodio sarà pronto; in alternativa, puoi tornare in qualsiasi momento sulla pagina del podcast e scorrere verso il basso per aggiornarla.</string>
+    <string name="blogs_found_headline">Lettura del blog ad alta voce</string>
+    <string name="blogs_found_followed_badge">PODCAST SEGUITO</string>
+    <string name="blogs_found_feed_detected">Feed trovato</string>
     <string name="chapters_generated_disclaimer">Questi capitoli sono generati automaticamente e potrebbero non essere perfettamente accurati.</string>
     <string name="description">Descrizione</string>
     <string name="player_tab_summary">Riepilogo</string>

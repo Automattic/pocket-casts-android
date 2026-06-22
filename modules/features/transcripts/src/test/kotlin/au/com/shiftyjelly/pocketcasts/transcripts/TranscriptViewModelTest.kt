@@ -33,6 +33,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -319,8 +320,9 @@ class TranscriptViewModelTest {
         awaitSyncedActive()
         drainEvents()
 
-        viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+        val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
 
+        assertEquals(20_000, seekTarget)
         assertEquals(
             SyncedTranscriptsSeekUsedEvent(
                 fromPositionSeconds = 10L,
@@ -345,8 +347,9 @@ class TranscriptViewModelTest {
         awaitSyncedActive()
         drainEvents()
 
-        viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+        val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
 
+        assertNull(seekTarget)
         assertEquals(
             SyncedTranscriptsSeekFailedEvent(
                 reason = "mapping_unavailable",

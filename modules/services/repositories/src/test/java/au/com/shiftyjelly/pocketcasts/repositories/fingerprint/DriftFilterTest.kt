@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.content.Context
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import com.automattic.eventhorizon.EventHorizon
+import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -26,6 +29,8 @@ class DriftFilterTest {
             playbackManager = playbackManager,
             referenceRetriever = mock(FingerprintReferenceRetriever::class.java),
             eventHorizon = mock(EventHorizon::class.java),
+            context = mock(Context::class.java),
+            chapterManager = Lazy { mock(ChapterManager::class.java) },
         )
         manager.debugTrackingEnabled = true
     }

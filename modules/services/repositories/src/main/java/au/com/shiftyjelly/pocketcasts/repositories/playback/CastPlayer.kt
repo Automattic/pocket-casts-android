@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.net.Uri
 import android.text.TextUtils
 import androidx.annotation.OptIn
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -290,7 +291,7 @@ class CastPlayer(
         // need STREAM_TYPE_LIVE, but we don't currently serve live streams.
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
         val contentType = if (episodeLocation.isHlsStream) {
-            "application/x-mpegURL"
+            MimeTypes.APPLICATION_M3U8
         } else {
             episode.fileType
         }

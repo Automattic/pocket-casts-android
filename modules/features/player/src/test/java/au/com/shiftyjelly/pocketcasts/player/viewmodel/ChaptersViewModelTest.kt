@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -20,7 +21,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -77,6 +80,8 @@ class ChaptersViewModelTest {
     )
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
+    private val eventSink = TestEventSink()
+
     private lateinit var chaptersViewModel: ChaptersViewModel
 
     @Before
@@ -94,7 +99,7 @@ class ChaptersViewModelTest {
             playbackManager = playbackManager,
             episodeManager = episodeManager,
             settings = settings,
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             ioDispatcher = testDispatcher,
         )
     }
@@ -241,6 +246,15 @@ class ChaptersViewModelTest {
 
         verify(episodeManager, times(1)).updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
         verifyBlocking(playbackManager, times(1)) { playNowSuspend(episode) }
+    }
+
+    @Test
+    fun `play chapter reports chapter origin`() = runTest {
+        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        chaptersViewModel.playChapter(chapter)
+
+        assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
     }
 
     @Test

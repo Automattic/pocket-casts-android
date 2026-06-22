@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-28 09:59:03+0000
+Translation-Revision-Date: 2026-06-15 18:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="tv_create_account_subtitle">스마트폰에서 시작하려면 이 코드를 스캔하세요. 1분이면 충분합니다.</string>
+    <string name="tv_create_account_title">무료 계정 생성</string>
+    <string name="synced_transcripts_whats_new_button_note">최근 에피소드에만 사용할 수 있는 동기화된 대본.</string>
+    <string name="synced_transcripts_whats_new_message">빠르게 읽으세요. 놓치지 마세요. 스쳐 지나간 이름, 추천한 책, 궁금했던 통계. 단어를 누르고, 바로 돌아가서 살펴보세요.</string>
+    <string name="synced_transcripts_whats_new_title">함께 읽어 보세요. 2배 속도로도 가능합니다.</string>
+    <string name="settings_beta_features_sort_release_date">릴리스 날짜(최신순)</string>
+    <string name="settings_beta_features_sort_name">이름(오름차순)</string>
+    <string name="settings_beta_features_sort">베타 기능 정렬</string>
+    <string name="play_this_episode">이 에피소드 재생</string>
+    <string name="play_latest_episode">최신 에피소드 재생</string>
+    <string name="sponsored">후원</string>
+    <string name="tv_row_because_you_liked">팟캐스트를 좋아하셔서</string>
+    <string name="tv_row_recommendations">추천</string>
+    <string name="tv_row_trending_videos">트렌드 비디오</string>
+    <string name="tv_row_featured">TV용으로 제작됨</string>
+    <string name="home">홈</string>
+    <string name="tv_tab_your_podcasts">내 팟캐스트</string>
+    <string name="blogs_found_go_to_podcast">팟캐스트로 이동</string>
+    <string name="blogs_found_description">최신 글을 팟캐스트 에피소드로 바꿔줍니다. 첫 번째 에피소드가 준비되는 대로 팟캐스트 페이지로 이동시켜 드립니다. 아니면 언제든지 팟캐스트 페이지로 돌아와서 아래로 당겨 새로 고침하세요.</string>
+    <string name="blogs_found_headline">큰 소리로 블로그 읽기</string>
+    <string name="blogs_found_followed_badge">팔로우된 팟캐스트</string>
+    <string name="blogs_found_feed_detected">찾아낸 피드</string>
     <string name="chapters_generated_disclaimer">이러한 챕터는 자동으로 생성되며 완벽히 정확하지 않을 수 있습니다.</string>
     <string name="description">설명</string>
     <string name="player_tab_summary">요약</string>

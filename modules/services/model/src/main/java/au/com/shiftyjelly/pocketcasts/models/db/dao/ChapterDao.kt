@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,13 +35,13 @@ abstract class ChapterDao {
         }
 
         when {
-            newEpisodeChapters.all(Chapter::isEmbedded) -> {
+            newEpisodeChapters.all { it.origin == ChapterOrigin.NativeMedia } -> {
                 deleteForEpisode(episodeUuid)
                 insertAll(newEpisodeChapters)
             }
 
             findEpisodeChapters(episodeUuid).let { currentChapters ->
-                currentChapters.none(Chapter::isEmbedded) && (currentChapters.size <= chapters.size || currentChapters.all { it.isGenerated })
+                currentChapters.none { it.origin == ChapterOrigin.NativeMedia } && (currentChapters.size <= chapters.size || currentChapters.all { it.origin == ChapterOrigin.Generated })
             } -> {
                 deleteForEpisode(episodeUuid)
                 insertAll(newEpisodeChapters)
@@ -53,6 +54,9 @@ abstract class ChapterDao {
 
     @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid")
     abstract suspend fun countForEpisode(episodeUuid: String): Int
+
+    @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid AND is_generated = 1")
+    abstract suspend fun countGeneratedForEpisode(episodeUuid: String): Int
 
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract fun observeRawChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
