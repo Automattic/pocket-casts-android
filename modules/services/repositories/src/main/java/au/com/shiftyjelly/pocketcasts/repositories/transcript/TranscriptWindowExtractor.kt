@@ -2,10 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,6 +21,7 @@ import timber.log.Timber
 class TranscriptWindowExtractor @Inject constructor(
     private val transcriptDao: TranscriptDao,
     private val transcriptService: TranscriptService,
+    private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
 ) {
     suspend fun extractWindow(episodeUuid: String, timeSecs: Int, windowSecs: Int = 30): String? {
         return try {
@@ -33,13 +37,20 @@ class TranscriptWindowExtractor @Inject constructor(
                 .getOrNull() ?: return null
 
             val vttContent = body.use { it.string() }
-            parseVttWindow(vttContent, timeSecs, windowSecs)
+            parseVttWindow(vttContent, referenceCenterSecs(episodeUuid, timeSecs), windowSecs)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.e(e, "Failed to extract transcript window for episode $episodeUuid")
             null
         }
+    }
+
+    // Generated transcripts are in the reference timeline; map the playback-time bookmark onto it.
+    private fun referenceCenterSecs(episodeUuid: String, timeSecs: Int): Int {
+        val manager = fingerprintTimingManager.get()
+        if (manager.activeEpisodeUuid != episodeUuid) return timeSecs
+        return manager.referenceTime(timeSecs * 1000)?.roundToInt() ?: timeSecs
     }
 
     companion object {

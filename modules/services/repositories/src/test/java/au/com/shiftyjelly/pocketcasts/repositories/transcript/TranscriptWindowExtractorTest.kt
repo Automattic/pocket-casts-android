@@ -1,15 +1,82 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import okhttp3.CacheControl
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class TranscriptWindowExtractorTest {
+
+    private val fingerprintTimingManager = mock<FingerprintTimingManager>()
+
+    private fun extractor(vtt: String) = TranscriptWindowExtractor(
+        transcriptDao = mock {
+            on { observeTranscripts(any()) } doReturn flowOf(
+                listOf(Transcript(episodeUuid = "episode-id", url = "url.vtt", type = "text/vtt", isGenerated = true)),
+            )
+        },
+        transcriptService = object : TranscriptService {
+            override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?) = vtt.toResponseBody()
+        },
+        fingerprintTimingManager = { fingerprintTimingManager },
+    )
+
+    @Test
+    fun `map playback time to reference time when mapping is active`() = runTest {
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
+        whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(25.0)
+
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+
+        assertEquals(
+            "Let me start by defining what AI actually means in practice. " +
+                "AI is a broad field that includes machine learning, deep learning, and more. " +
+                "The recent advances have been truly remarkable for the industry.",
+            result,
+        )
+    }
+
+    @Test
+    fun `use playback time when mapping is for another episode`() = runTest {
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("other-episode")
+
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+
+        assertEquals(
+            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice.",
+            result,
+        )
+    }
+
+    @Test
+    fun `use playback time when reference time is unavailable`() = runTest {
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
+        whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(null)
+
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+
+        assertEquals(
+            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice.",
+            result,
+        )
+    }
 
     private val sampleVtt = """
         |WEBVTT
