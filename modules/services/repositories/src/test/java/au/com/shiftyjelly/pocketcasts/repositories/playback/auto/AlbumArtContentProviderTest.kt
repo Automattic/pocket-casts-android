@@ -30,7 +30,7 @@ class AlbumArtContentProviderTest {
         val descriptor = provider.openFile(uri, "r")
 
         assertNotNull(descriptor)
-        descriptor!!.use {
+        descriptor?.use {
             ParcelFileDescriptor.AutoCloseInputStream(it).use { input ->
                 assertArrayEquals(bytes, input.readBytes())
             }
