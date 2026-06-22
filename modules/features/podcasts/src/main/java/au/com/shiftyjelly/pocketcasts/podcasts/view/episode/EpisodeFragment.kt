@@ -911,6 +911,7 @@ class EpisodeFragment : BaseFragment() {
                                     onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
                                     isTogglingChapters = chaptersState.isTogglingChapters,
                                     showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                                    isAligningChapters = chaptersState.isAligningChapters,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = screenHeight),

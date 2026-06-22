@@ -89,8 +89,6 @@ class ChaptersViewModel @AssistedInject constructor(
         uiState.copy(isAligningChapters = isAligning && uiState.hasGeneratedChapters)
     }
 
-    // Generated chapters are re-timed from the fingerprint map (phone only). Surface the brief
-    // pre-alignment window so the unaligned timestamps aren't shown silently.
     private fun aligningFlow(episodeId: String): Flow<Boolean> = if (appPlatform != AppPlatform.Phone || !FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
         flowOf(false)
     } else {
