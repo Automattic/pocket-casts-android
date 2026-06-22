@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
@@ -8,6 +9,10 @@ import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
@@ -15,6 +20,8 @@ import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationStartedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsUnavailableEvent
+import dagger.Lazy
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -48,6 +55,8 @@ class FingerprintTimingManager @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val referenceRetriever: FingerprintReferenceRetriever,
     private val eventHorizon: EventHorizon,
+    @ApplicationContext private val context: Context,
+    private val chapterManager: Lazy<ChapterManager>,
 ) {
 
     sealed interface State {
@@ -73,6 +82,15 @@ class FingerprintTimingManager @Inject constructor(
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
     val mappingSnapshot: List<TimeMappingEntry> get() = snapshotPlaybackToReference
+
+    // Monotonic counter bumped on every snapshot publish, so consumers can react to mapping growth.
+    private val _mappingVersion = MutableStateFlow(0L)
+    val mappingVersion: StateFlow<Long> = _mappingVersion.asStateFlow()
+
+    /** Episode the current mapping belongs to, or null when idle. Safe to read off the UI thread. */
+    @Volatile
+    var activeEpisodeUuid: String? = null
+        private set
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
@@ -122,6 +140,10 @@ class FingerprintTimingManager @Inject constructor(
     // Analytics context for the current preparation.
     private var preparationStartMs: Long = 0
     private var currentIsStreaming: Boolean = false
+
+    // When true, decode the whole stream from the start ignoring the playhead lookahead throttle,
+    // so the full reference<->playback map is available for chapter alignment.
+    private var currentEager: Boolean = false
 
     init {
         observePlaybackForProactivePreparation()
@@ -323,9 +345,24 @@ class FingerprintTimingManager @Inject constructor(
         currentReferenceDuration = 0.0
         currentMatcher?.close()
         currentMatcher = null
+        activeEpisodeUuid = null
         hasReachedActive = false
         preparationStartMs = 0
         currentIsStreaming = false
+        currentEager = false
+    }
+
+    /**
+     * Eager full-stream mapping only makes sense on mobile, for episodes with generated chapters,
+     * and when pulling the whole audio is cheap: a local download, or streaming on an unmetered network.
+     */
+    private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
+        if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
+        return computeEager(
+            hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
+            isDownloaded = isDownloaded,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
     }
 
     private suspend fun prepareForEpisode(
@@ -355,8 +392,10 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         currentEpisodeUuid = episodeUuid
+        activeEpisodeUuid = episodeUuid
         currentAudioFilePath = audioSource
         currentIsStreaming = !isDownloaded
+        currentEager = shouldRunEagerPass(episodeUuid, isDownloaded)
         preparationStartMs = SystemClock.elapsedRealtime()
         eventHorizon.track(
             SyncedTranscriptsPreparationStartedEvent(
@@ -457,9 +496,10 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        // Start streaming fingerprint generation
-        val currentTime = playbackManager.playbackStateFlow.first().positionMs / 1000.0
-        startStream(audioFilePath, matcher, episodeUuid, startPosition = currentTime)
+        // Start streaming fingerprint generation. An eager pass maps the whole timeline from the start;
+        // otherwise we follow the playhead.
+        val startPosition = if (currentEager) 0.0 else playbackManager.playbackStateFlow.first().positionMs / 1000.0
+        startStream(audioFilePath, matcher, episodeUuid, startPosition = startPosition)
     }
 
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
@@ -473,6 +513,11 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private fun processProgress(positionMs: Int) {
+        // The eager pass already decodes the whole stream, so playhead-driven restarts are unnecessary.
+        if (currentEager) {
+            lastProgressPositionMs = positionMs
+            return
+        }
         if (lastProgressPositionMs >= 0) {
             val deltaMs = abs(positionMs - lastProgressPositionMs)
             if (deltaMs > FingerprintConstants.RESTART_DELTA_SECONDS * 1000) {
@@ -680,10 +725,13 @@ class FingerprintTimingManager @Inject constructor(
                             }
                         }
 
-                        val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
-                        val lastKnownPositionMs = lastProgressPositionMs
-                        if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
-                            delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                        // Eager passes decode as fast as possible; throttled passes stay near the playhead.
+                        if (!currentEager) {
+                            val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
+                            val lastKnownPositionMs = lastProgressPositionMs
+                            if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                                delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
+                            }
                         }
                     }
                     codec.releaseOutputBuffer(outputIndex, false)
@@ -868,6 +916,7 @@ class FingerprintTimingManager @Inject constructor(
     private fun publishSnapshot() {
         snapshotPlaybackToReference = mappingPlaybackToReference.toList()
         snapshotReferenceToPlayback = mappingReferenceToPlayback.toList()
+        _mappingVersion.value++
     }
 
     /** Test seam: insert a mapping directly. Must only be called from single-threaded tests. */
@@ -889,6 +938,16 @@ class FingerprintTimingManager @Inject constructor(
 
     companion object {
         private const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
+
+        /**
+         * Core eager-pass gate (assumes the platform check already passed). [isUnmetered] is a supplier so the
+         * network lookup is skipped for downloaded episodes.
+         */
+        internal fun computeEager(
+            hasGeneratedChapters: Boolean,
+            isDownloaded: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
 
         fun interpolate(
             time: Double,
