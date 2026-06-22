@@ -1652,6 +1652,9 @@ open class PlaybackManager @Inject constructor(
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
+            if (episode.hlsUrl != null && episode.isStreamUrlHls && player?.isStreaming == true) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "HLS rendition duration differs from enclosure by $durationDiffSeconds seconds for episode ${episode.uuid}")
+            }
             eventHorizon.track(
                 PlaybackEpisodeDurationChangedEvent(
                     durationChange = durationDiffSeconds.toLong(),
@@ -2728,7 +2731,7 @@ internal fun buildPrefetchRequest(
     val episode = nextEpisode ?: return null
     if (episode.isDownloaded) return null
     if (episode.isDownloading) return null
-    if (episode.isHLS) return null
+    if (episode.isStreamUrlHls) return null
     val url = episode.downloadUrl ?: return null
 
     val networkConstraint = if (warnOnMeteredNetwork) {
