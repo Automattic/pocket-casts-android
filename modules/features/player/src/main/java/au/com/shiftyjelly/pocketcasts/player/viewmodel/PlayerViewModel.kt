@@ -137,6 +137,7 @@ class PlayerViewModel @Inject constructor(
         val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
+
         // A selected stream's content type wins so picking a video/audio stream flips the player surface.
         val isVideo = selectedStream?.contentType?.startsWith("video/", ignoreCase = true) ?: (episode?.isVideo == true)
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
