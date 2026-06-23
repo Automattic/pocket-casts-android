@@ -1,9 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.servers.AlternateEnclosureData
 import au.com.shiftyjelly.pocketcasts.servers.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
@@ -104,7 +105,7 @@ data class EpisodeInfo(
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
-            hlsUrl = alternateEnclosures.toHlsUrl(),
+            hlsUrl = toAlternateEnclosures().firstHlsStreamUrl(),
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,
@@ -119,11 +120,38 @@ data class EpisodeInfo(
             hasGeneratedTranscript = hasGeneratedTranscript == true,
         )
     }
+
+    fun toAlternateEnclosures(): List<EpisodeAlternateEnclosure> = alternateEnclosures.orEmpty().mapIndexed { index, enclosure ->
+        EpisodeAlternateEnclosure(
+            episodeUuid = uuid,
+            position = index,
+            type = enclosure.type,
+            bitrate = enclosure.bitrate,
+            length = enclosure.length,
+            height = enclosure.height,
+            width = enclosure.width,
+            lang = enclosure.lang,
+            title = enclosure.title,
+            codecs = enclosure.codecs,
+            isDefault = enclosure.default == true,
+            sources = enclosure.sources?.mapNotNull { source ->
+                source.uri?.let { AlternateEnclosureSource(uri = it, contentType = source.contentType) }
+            }.orEmpty(),
+        )
+    }
 }
 
 @JsonClass(generateAdapter = true)
 data class AlternateEnclosure(
     @Json(name = "type") val type: String?,
+    @Json(name = "bitrate") val bitrate: Long?,
+    @Json(name = "length") val length: Long?,
+    @Json(name = "height") val height: Int?,
+    @Json(name = "width") val width: Int?,
+    @Json(name = "lang") val lang: String?,
+    @Json(name = "title") val title: String?,
+    @Json(name = "codecs") val codecs: String?,
+    @Json(name = "default") val default: Boolean?,
     @Json(name = "sources") val sources: List<AlternateSource>?,
 )
 
@@ -132,7 +160,3 @@ data class AlternateSource(
     @Json(name = "uri") val uri: String?,
     @Json(name = "content_type") val contentType: String?,
 )
-
-private fun List<AlternateEnclosure>?.toHlsUrl(): String? = this
-    ?.map { enclosure -> AlternateEnclosureData(enclosure.type, enclosure.sources?.mapNotNull(AlternateSource::uri).orEmpty()) }
-    .firstHlsStreamUrl()
