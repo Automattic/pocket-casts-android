@@ -715,11 +715,10 @@ class SyncManagerImpl @Inject constructor(
     }
 
     private fun handleTokenResponse(loginIdentity: LoginIdentity, response: LoginTokenResponse): AuthResultModel {
-        val email = response.email
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully")
         // Store details in android account manager
         syncAccountManager.addAccount(
-            email = email,
+            email = response.email,
             uuid = response.uuid,
             refreshToken = response.refreshToken,
             accessToken = response.accessToken,
