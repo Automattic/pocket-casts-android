@@ -28,4 +28,18 @@ abstract class AlternateEnclosureDao {
             insertAll(enclosures)
         }
     }
+
+    @Insert
+    protected abstract fun insertAllBlocking(enclosures: List<EpisodeAlternateEnclosure>)
+
+    @Query("DELETE FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid")
+    protected abstract fun deleteForEpisodeBlocking(episodeUuid: String)
+
+    @Transaction
+    open fun replaceForEpisodeBlocking(episodeUuid: String, enclosures: List<EpisodeAlternateEnclosure>) {
+        deleteForEpisodeBlocking(episodeUuid)
+        if (enclosures.isNotEmpty()) {
+            insertAllBlocking(enclosures)
+        }
+    }
 }

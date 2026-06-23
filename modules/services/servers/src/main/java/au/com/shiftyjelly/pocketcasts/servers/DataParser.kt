@@ -142,13 +142,14 @@ object DataParser {
         if (uuid == null || publishedAt == null || podcastUuidOrJson == null) {
             return null
         }
+        val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
         return PodcastEpisode(
             downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
             downloadUrl = getString(jsonEpisode, "url"),
-            hlsUrl = parseAlternateEnclosures(jsonEpisode, uuid).firstHlsStreamUrl(),
+            hlsUrl = enclosures.firstHlsStreamUrl(),
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
@@ -156,10 +157,12 @@ object DataParser {
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),
-        )
+        ).apply {
+            alternateEnclosures = enclosures
+        }
     }
 
-    fun parseAlternateEnclosures(jsonEpisode: JSONObject, episodeUuid: String): List<EpisodeAlternateEnclosure> {
+    private fun parseAlternateEnclosures(jsonEpisode: JSONObject, episodeUuid: String): List<EpisodeAlternateEnclosure> {
         val enclosures = jsonEpisode.optJSONArray("alternate_enclosures") ?: return emptyList()
         return (0 until enclosures.length()).mapNotNull { i ->
             val enclosure = enclosures.optJSONObject(i) ?: return@mapNotNull null

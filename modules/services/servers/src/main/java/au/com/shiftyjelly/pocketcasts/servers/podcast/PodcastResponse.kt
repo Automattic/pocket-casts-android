@@ -102,10 +102,11 @@ data class EpisodeInfo(
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
         val publishedDate = published.parseIsoDate() ?: return null
         val episodeTitle = title.orEmpty()
+        val enclosures = toAlternateEnclosures()
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
-            hlsUrl = toAlternateEnclosures().firstHlsStreamUrl(),
+            hlsUrl = enclosures.firstHlsStreamUrl(),
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,
@@ -118,7 +119,9 @@ data class EpisodeInfo(
             type = type,
             slug = slug.orEmpty(),
             hasGeneratedTranscript = hasGeneratedTranscript == true,
-        )
+        ).apply {
+            alternateEnclosures = enclosures
+        }
     }
 
     fun toAlternateEnclosures(): List<EpisodeAlternateEnclosure> = alternateEnclosures.orEmpty().mapIndexed { index, enclosure ->

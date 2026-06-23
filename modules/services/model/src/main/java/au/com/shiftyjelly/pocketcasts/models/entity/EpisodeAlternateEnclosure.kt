@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
@@ -10,6 +11,14 @@ import com.squareup.moshi.JsonClass
 /** A Podcasting 2.0 `<podcast:alternateEnclosure>` as sent by the server, stored verbatim per episode. */
 @Entity(
     tableName = "episode_alternate_enclosures",
+    foreignKeys = [
+        ForeignKey(
+            entity = PodcastEpisode::class,
+            parentColumns = ["uuid"],
+            childColumns = ["episode_uuid"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
     indices = [
         Index(name = "episode_alternate_enclosure_episode_uuid_index", value = ["episode_uuid"]),
     ],

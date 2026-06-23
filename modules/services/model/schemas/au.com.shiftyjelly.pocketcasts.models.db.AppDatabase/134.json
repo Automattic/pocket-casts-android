@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 134,
-    "identityHash": "bfd49576cd9054a4388a4b598d6c2917",
+    "identityHash": "84388c13e7fd65678b5b16a9a3c1c0e2",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -2242,7 +2242,7 @@
       },
       {
         "tableName": "episode_alternate_enclosures",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `episode_uuid` TEXT NOT NULL, `position` INTEGER NOT NULL, `type` TEXT, `bitrate` INTEGER, `length` INTEGER, `height` INTEGER, `width` INTEGER, `lang` TEXT, `title` TEXT, `codecs` TEXT, `is_default` INTEGER NOT NULL, `sources` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `episode_uuid` TEXT NOT NULL, `position` INTEGER NOT NULL, `type` TEXT, `bitrate` INTEGER, `length` INTEGER, `height` INTEGER, `width` INTEGER, `lang` TEXT, `title` TEXT, `codecs` TEXT, `is_default` INTEGER NOT NULL, `sources` TEXT NOT NULL, FOREIGN KEY(`episode_uuid`) REFERENCES `podcast_episodes`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -2331,12 +2331,25 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `episode_alternate_enclosure_episode_uuid_index` ON `${TABLE_NAME}` (`episode_uuid`)"
           }
+        ],
+        "foreignKeys": [
+          {
+            "table": "podcast_episodes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "episode_uuid"
+            ],
+            "referencedColumns": [
+              "uuid"
+            ]
+          }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bfd49576cd9054a4388a4b598d6c2917')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '84388c13e7fd65678b5b16a9a3c1c0e2')"
     ]
   }
 }
