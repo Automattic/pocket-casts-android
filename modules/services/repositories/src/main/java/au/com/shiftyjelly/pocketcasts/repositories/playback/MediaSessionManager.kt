@@ -23,7 +23,6 @@ import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -313,8 +312,14 @@ class MediaSessionManager(
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             onStop = {
                 if (playbackManager.player !is CastPlayer) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                    scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    if (isAutomotive) {
+                        // On Automotive a stop command must fully tear down playback, not just pause
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → stop (automotive)")
+                        playbackManager.stopAsync(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                    } else {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
+                        scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    }
                 }
             },
             onPlay = {
@@ -926,6 +931,9 @@ class MediaSessionManager(
 
         if (playbackState.isPlaying || playbackState.transientLoss) {
             mediaSession?.isActive = true
+        } else if (playbackState.state == PlaybackState.State.STOPPED && Util.isAutomotive(context)) {
+            // On Automotive OS a stopped session must not stay active.
+            mediaSession?.isActive = false
         }
 
         if (playbackState.isEmpty || currentEpisode == null) {
