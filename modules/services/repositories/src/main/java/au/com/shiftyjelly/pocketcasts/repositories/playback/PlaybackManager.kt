@@ -865,16 +865,20 @@ open class PlaybackManager @Inject constructor(
 
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
-            if (!isAudioFocusFailed) {
-                trackPlaybackEvent(sourceView) { source, contentType ->
-                    PlaybackStopEvent(
-                        source = source.analyticsValue,
-                        contentType = contentType,
-                    )
-                }
-            }
-            stop()
+            stopSuspend(isAudioFocusFailed, sourceView)
         }
+    }
+
+    suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        if (!isAudioFocusFailed) {
+            trackPlaybackEvent(sourceView) { source, contentType ->
+                PlaybackStopEvent(
+                    source = source.analyticsValue,
+                    contentType = contentType,
+                )
+            }
+        }
+        stop()
     }
 
     suspend fun stop() {

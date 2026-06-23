@@ -26,7 +26,11 @@ class AutoPlaybackService : PlaybackService() {
 
         // Promote to the Started state so the system reliably delivers onTaskRemoved()
         // even when the car only browses without playing. Does not call startForeground().
-        startService(Intent(this, javaClass))
+        try {
+            startService(Intent(this, javaClass))
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to promote AutoPlaybackService to started state")
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

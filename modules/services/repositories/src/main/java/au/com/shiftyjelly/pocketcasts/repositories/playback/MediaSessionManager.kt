@@ -315,7 +315,7 @@ class MediaSessionManager(
                     if (isAutomotive) {
                         // On Automotive a stop command must fully tear down playback, not just pause
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → stop (automotive)")
-                        playbackManager.stopAsync(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                        scope.launch { commandMutex.withLock { playbackManager.stopSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
                         scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
