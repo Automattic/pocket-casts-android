@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
+import androidx.media3.common.MimeTypes
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -47,14 +48,14 @@ class AlternateEnclosureDaoTest {
         alternateEnclosureDao.replaceForEpisode(
             "episode-1",
             listOf(
-                enclosure(position = 1, type = "application/x-mpegURL", uri = "https://example.com/master.m3u8"),
+                enclosure(position = 1, type = MimeTypes.APPLICATION_M3U8, uri = "https://example.com/master.m3u8"),
                 enclosure(position = 0, type = "video/mp4", uri = "https://example.com/file-1080.mp4"),
             ),
         )
 
         val stored = alternateEnclosureDao.findByEpisodeUuid("episode-1")
         assertEquals(listOf(0, 1), stored.map { it.position })
-        assertEquals(listOf("video/mp4", "application/x-mpegURL"), stored.map { it.type })
+        assertEquals(listOf("video/mp4", MimeTypes.APPLICATION_M3U8), stored.map { it.type })
         assertEquals("https://example.com/master.m3u8", stored[1].sources.single().uri)
     }
 
@@ -63,11 +64,11 @@ class AlternateEnclosureDaoTest {
         episodeDao.insertBlocking(PodcastEpisode(uuid = "episode-1", publishedDate = Date()))
 
         alternateEnclosureDao.replaceForEpisode("episode-1", listOf(enclosure(0, "video/mp4", "https://example.com/a.mp4")))
-        alternateEnclosureDao.replaceForEpisode("episode-1", listOf(enclosure(0, "application/x-mpegURL", "https://example.com/b.m3u8")))
+        alternateEnclosureDao.replaceForEpisode("episode-1", listOf(enclosure(0, MimeTypes.APPLICATION_M3U8, "https://example.com/b.m3u8")))
 
         val stored = alternateEnclosureDao.findByEpisodeUuid("episode-1")
         assertEquals(1, stored.size)
-        assertEquals("application/x-mpegURL", stored.single().type)
+        assertEquals(MimeTypes.APPLICATION_M3U8, stored.single().type)
     }
 
     @Test

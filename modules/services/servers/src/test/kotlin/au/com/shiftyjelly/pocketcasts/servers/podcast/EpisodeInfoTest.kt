@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
+import androidx.media3.common.MimeTypes
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -101,7 +102,7 @@ class EpisodeInfoTest {
         val hls = enclosures[0]
         assertEquals("episode-uuid", hls.episodeUuid)
         assertEquals(0, hls.position)
-        assertEquals("application/x-mpegURL", hls.type)
+        assertEquals(MimeTypes.APPLICATION_M3U8, hls.type)
         assertEquals(0L, hls.length)
         assertEquals("https://example.com/master.m3u8", hls.sources.single().uri)
 

@@ -43,6 +43,9 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    compileOnly(libs.media3.common)
+
+    testCompileOnly(libs.media3.common)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.okHttp.mockwebserver)

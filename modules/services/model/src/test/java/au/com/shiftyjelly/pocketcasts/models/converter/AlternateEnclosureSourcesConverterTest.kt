@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.converter
 
+import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
@@ -11,7 +12,7 @@ class AlternateEnclosureSourcesConverterTest {
     @Test
     fun `round trips sources`() {
         val sources = listOf(
-            AlternateEnclosureSource(uri = "https://example.com/master.m3u8", contentType = "application/x-mpegURL"),
+            AlternateEnclosureSource(uri = "https://example.com/master.m3u8", contentType = MimeTypes.APPLICATION_M3U8),
             AlternateEnclosureSource(uri = "ipfs://QmManifest", contentType = null),
         )
 

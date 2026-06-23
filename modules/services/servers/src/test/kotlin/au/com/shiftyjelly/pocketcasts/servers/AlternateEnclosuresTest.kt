@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
+import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import org.junit.Assert.assertEquals
@@ -11,7 +12,7 @@ class AlternateEnclosuresTest {
     @Test
     fun `selects hls source`() {
         val enclosures = listOf(
-            enclosure("application/x-mpegURL", "https://example.com/master.m3u8"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
         )
         assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
     }
@@ -36,7 +37,7 @@ class AlternateEnclosuresTest {
     fun `ignores non-hls enclosures and keeps hls`() {
         val enclosures = listOf(
             enclosure("video/mp4", "https://example.com/file-1080.mp4"),
-            enclosure("application/x-mpegURL", "https://example.com/master.m3u8"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
         )
         assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
     }
@@ -44,7 +45,7 @@ class AlternateEnclosuresTest {
     @Test
     fun `skips non-http hls sources`() {
         val enclosures = listOf(
-            enclosure("application/x-mpegURL", "ipfs://QmManifest", "https://example.com/master.m3u8"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "ipfs://QmManifest", "https://example.com/master.m3u8"),
         )
         assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
     }
@@ -52,7 +53,7 @@ class AlternateEnclosuresTest {
     @Test
     fun `returns null when hls enclosure has no playable source`() {
         val enclosures = listOf(
-            enclosure("application/x-mpegURL", "ipfs://QmManifest"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "ipfs://QmManifest"),
         )
         assertNull(enclosures.firstHlsStreamUrl())
     }
@@ -60,7 +61,7 @@ class AlternateEnclosuresTest {
     @Test
     fun `returns null when hls enclosure has empty sources`() {
         val enclosures = listOf(
-            enclosure("application/x-mpegURL"),
+            enclosure(MimeTypes.APPLICATION_M3U8),
         )
         assertNull(enclosures.firstHlsStreamUrl())
     }
