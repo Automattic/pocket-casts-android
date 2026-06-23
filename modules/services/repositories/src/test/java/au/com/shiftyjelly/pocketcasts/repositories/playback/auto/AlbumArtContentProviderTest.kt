@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class AlbumArtContentProviderTest {
 
-    private val context = RuntimeEnvironment.getApplication<Context>()
+    private val context: Context = RuntimeEnvironment.getApplication()
     private val provider = Robolectric.buildContentProvider(AlbumArtContentProvider::class.java).create().get()
 
     @Test
