@@ -164,7 +164,7 @@ class AppDatabaseTest {
             "All enclosure columns should exist",
             true,
             columns.containsAll(
-                listOf("_id", "episode_uuid", "position", "type", "bitrate", "length", "height", "width", "lang", "title", "codecs", "is_default", "sources"),
+                listOf("_id", "episode_uuid", "position", "type", "bitrate", "length", "height", "width", "lang", "title", "codecs", "integrity_type", "integrity_value", "is_default", "sources"),
             ),
         )
 

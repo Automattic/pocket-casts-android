@@ -1483,7 +1483,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_133_134 = addMigration(133, 134) { database ->
-            database.execSQL("CREATE TABLE IF NOT EXISTS `episode_alternate_enclosures` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `episode_uuid` TEXT NOT NULL, `position` INTEGER NOT NULL, `type` TEXT, `bitrate` INTEGER, `length` INTEGER, `height` INTEGER, `width` INTEGER, `lang` TEXT, `title` TEXT, `codecs` TEXT, `is_default` INTEGER NOT NULL, `sources` TEXT NOT NULL, FOREIGN KEY(`episode_uuid`) REFERENCES `podcast_episodes`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `episode_alternate_enclosures` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `episode_uuid` TEXT NOT NULL, `position` INTEGER NOT NULL, `type` TEXT, `bitrate` INTEGER, `length` INTEGER, `height` INTEGER, `width` INTEGER, `lang` TEXT, `title` TEXT, `codecs` TEXT, `integrity_type` TEXT, `integrity_value` TEXT, `is_default` INTEGER NOT NULL, `sources` TEXT NOT NULL, FOREIGN KEY(`episode_uuid`) REFERENCES `podcast_episodes`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )")
             database.execSQL("CREATE INDEX IF NOT EXISTS `episode_alternate_enclosure_episode_uuid_index` ON `episode_alternate_enclosures` (`episode_uuid`)")
         }
 

@@ -35,6 +35,8 @@ data class EpisodeAlternateEnclosure(
     @ColumnInfo(name = "lang") val lang: String? = null,
     @ColumnInfo(name = "title") val title: String? = null,
     @ColumnInfo(name = "codecs") val codecs: String? = null,
+    @ColumnInfo(name = "integrity_type") val integrityType: String? = null,
+    @ColumnInfo(name = "integrity_value") val integrityValue: String? = null,
     @ColumnInfo(name = "is_default") val isDefault: Boolean = false,
     @ColumnInfo(name = "sources") val sources: List<AlternateEnclosureSource> = emptyList(),
 )

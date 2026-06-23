@@ -177,6 +177,7 @@ object DataParser {
                     }
                 }
             }
+            val integrity = enclosure.optJSONObject("integrity")
             EpisodeAlternateEnclosure(
                 episodeUuid = episodeUuid,
                 position = i,
@@ -188,6 +189,8 @@ object DataParser {
                 lang = getString(enclosure, "lang"),
                 title = getString(enclosure, "title"),
                 codecs = getString(enclosure, "codecs"),
+                integrityType = integrity?.let { getString(it, "type") },
+                integrityValue = integrity?.let { getString(it, "value") },
                 isDefault = enclosure.optBoolean("default", false),
                 sources = sources,
             )

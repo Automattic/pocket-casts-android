@@ -136,6 +136,8 @@ data class EpisodeInfo(
             lang = enclosure.lang,
             title = enclosure.title,
             codecs = enclosure.codecs,
+            integrityType = enclosure.integrity?.type,
+            integrityValue = enclosure.integrity?.value,
             isDefault = enclosure.default == true,
             sources = enclosure.sources?.mapNotNull { source ->
                 source.uri?.let { AlternateEnclosureSource(uri = it, contentType = source.contentType) }
@@ -154,6 +156,7 @@ data class AlternateEnclosure(
     @Json(name = "lang") val lang: String?,
     @Json(name = "title") val title: String?,
     @Json(name = "codecs") val codecs: String?,
+    @Json(name = "integrity") val integrity: AlternateEnclosureIntegrity?,
     @Json(name = "default") val default: Boolean?,
     @Json(name = "sources") val sources: List<AlternateSource>?,
 )
@@ -162,4 +165,10 @@ data class AlternateEnclosure(
 data class AlternateSource(
     @Json(name = "uri") val uri: String?,
     @Json(name = "content_type") val contentType: String?,
+)
+
+@JsonClass(generateAdapter = true)
+data class AlternateEnclosureIntegrity(
+    @Json(name = "type") val type: String?,
+    @Json(name = "value") val value: String?,
 )
