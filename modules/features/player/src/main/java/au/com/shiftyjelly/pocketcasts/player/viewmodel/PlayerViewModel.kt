@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -116,6 +117,7 @@ class PlayerViewModel @Inject constructor(
         val isPlaying: Boolean = false,
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
+        val selectedStream: SelectedStream? = null,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -135,7 +137,8 @@ class PlayerViewModel @Inject constructor(
         val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
-        val isVideo = episode?.isVideo == true
+        // A selected stream's content type wins so picking a video/audio stream flips the player surface.
+        val isVideo = selectedStream?.contentType?.startsWith("video/", ignoreCase = true) ?: (episode?.isVideo == true)
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
@@ -194,8 +197,13 @@ class PlayerViewModel @Inject constructor(
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
 
-    val listDataRx = Observables.combineLatest(
+    private val upNextAndSelectionObservable = Observables.combineLatest(
         upNextStateObservable,
+        playbackManager.selectedStreams.asObservable(coroutineContext),
+    )
+
+    val listDataRx = Observables.combineLatest(
+        upNextAndSelectionObservable,
         playbackStateObservable,
         settings.skipBackInSecs.flow.asObservable(coroutineContext),
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
@@ -373,7 +381,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextState: UpNextQueue.State,
+        upNextAndSelection: Pair<UpNextQueue.State, Map<String, SelectedStream>>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -383,8 +391,10 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
+        val (upNextState, selectedStreams) = upNextAndSelection
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
+        val selectedStream = episode?.let { selectedStreams[it.uuid] }
 
         this.episode = episode
         this.podcast = podcast
@@ -409,6 +419,7 @@ class PlayerViewModel @Inject constructor(
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
+                selectedStream = selectedStream,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
