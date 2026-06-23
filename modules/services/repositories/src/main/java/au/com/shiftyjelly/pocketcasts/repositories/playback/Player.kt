@@ -31,6 +31,12 @@ sealed interface EpisodeLocation {
 val EpisodeLocation?.isHlsStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isHls == true
 
+/** A media stream the user picked via the player stream selector (runtime-only, not persisted). */
+data class SelectedStream(
+    val uri: String,
+    val contentType: String?,
+)
+
 interface Player {
     var isPip: Boolean
     val isRemote: Boolean

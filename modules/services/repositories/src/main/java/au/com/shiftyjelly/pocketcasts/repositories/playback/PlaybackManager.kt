@@ -254,6 +254,10 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
+    // Runtime-only stream selections (episode uuid -> chosen stream) made via the player stream selector.
+    private val _selectedStreams = MutableStateFlow<Map<String, SelectedStream>>(emptyMap())
+    val selectedStreams = _selectedStreams.asStateFlow()
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -355,6 +359,34 @@ open class PlaybackManager @Inject constructor(
 
     fun isPlaying(): Boolean {
         return playbackStateRelay.blockingFirst().isPlaying
+    }
+
+    /**
+     * Pick which stream to play for an episode. Pass null to clear the selection. When it targets the
+     * current episode the player reloads the new source at the current position.
+     */
+    fun selectStream(episodeUuid: String, stream: SelectedStream?) {
+        _selectedStreams.value = if (stream == null) {
+            _selectedStreams.value - episodeUuid
+        } else {
+            _selectedStreams.value + (episodeUuid to stream)
+        }
+        if (upNextQueue.currentEpisode?.uuid == episodeUuid) {
+            launch(Dispatchers.Default) {
+                val currentEpisode = upNextQueue.currentEpisode ?: return@launch
+                player?.let { player ->
+                    val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
+                    episodeManager.updatePlayedUpToBlocking(currentEpisode, currentTimeSecs, true)
+                }
+                loadCurrentEpisode(isPlaying())
+            }
+        }
+    }
+
+    private fun applyStreamOverride(episode: BaseEpisode) {
+        val selected = _selectedStreams.value[episode.uuid]
+        episode.overrideStreamUrl = selected?.uri
+        episode.overrideStreamContentType = selected?.contentType
     }
 
     fun isStreaming(): Boolean {
@@ -1933,6 +1965,9 @@ open class PlaybackManager @Inject constructor(
                 }
             }
         }
+
+        // Apply any runtime stream selection so streamUrl/isStreamVideo reflect the user's choice.
+        applyStreamOverride(episode)
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
