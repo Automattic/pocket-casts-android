@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.eventhorizon.EventHorizon
@@ -108,7 +110,7 @@ class ShelfSharedViewModel @Inject constructor(
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || FeatureFlag.isEnabled(Feature.STREAM_SELECTOR)) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
         )
@@ -118,6 +120,13 @@ class ShelfSharedViewModel @Inject constructor(
         trackShelfAction(ShelfItem.Effects, source)
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowEffectsOption)
+        }
+    }
+
+    fun onStreamSelectorClick(source: ShelfItemSource) {
+        // No analytics yet (no dedicated ShelfActionType). source kept for a uniform shelf-action signature.
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.ShowStreamSelector)
         }
     }
 
@@ -344,6 +353,7 @@ class ShelfSharedViewModel @Inject constructor(
 
     sealed interface NavigationState {
         data object ShowEffectsOption : NavigationState
+        data object ShowStreamSelector : NavigationState
         data class ShowSleepTimerOptions(val hasChapters: Boolean) : NavigationState
         data class ShowShareDialog(val podcast: Podcast, val episode: PodcastEpisode) : NavigationState
 

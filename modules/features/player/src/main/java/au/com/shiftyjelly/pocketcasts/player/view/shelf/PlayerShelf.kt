@@ -137,6 +137,9 @@ fun PlayerShelf(
         onTranscriptClick = { isTranscriptAvailable: Boolean ->
             shelfSharedViewModel.onTranscriptClick(isTranscriptAvailable, ShelfItemSource.Shelf)
         },
+        onStreamSelectorClick = {
+            shelfSharedViewModel.onStreamSelectorClick(ShelfItemSource.Shelf)
+        },
         onMoreClick = {
             shelfSharedViewModel.onMoreClick()
         },
@@ -168,6 +171,7 @@ private fun PlayerShelfContent(
     onDownloadClick: () -> Unit,
     onAddBookmarkClick: () -> Unit,
     onTranscriptClick: (Boolean) -> Unit,
+    onStreamSelectorClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -251,6 +255,11 @@ private fun PlayerShelfContent(
                 ShelfItem.AddToPlaylist -> AddToPlaylistButton(
                     playerColors = playerColors,
                     onClick = onAddToPlaylistClick,
+                )
+
+                ShelfItem.StreamSelector -> StreamSelectorButton(
+                    playerColors = playerColors,
+                    onClick = onStreamSelectorClick,
                 )
             }
         }
@@ -337,6 +346,20 @@ private fun ShareButton(
         Icon(
             painterResource(id = R.drawable.ic_share_android_32),
             contentDescription = stringResource(LR.string.share_podcast),
+            tint = playerColors.contrast03,
+        )
+    }
+}
+
+@Composable
+private fun StreamSelectorButton(
+    playerColors: PlayerColors,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painterResource(id = IR.drawable.ic_stream_selector),
+            contentDescription = stringResource(LR.string.stream_selector_title),
             tint = playerColors.contrast03,
         )
     }
@@ -510,6 +533,7 @@ private fun PlayerShelfPreview(
             onDownloadClick = {},
             onAddBookmarkClick = {},
             onTranscriptClick = {},
+            onStreamSelectorClick = {},
             onAddToPlaylistClick = {},
             onMoreClick = {},
         )

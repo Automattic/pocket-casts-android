@@ -111,6 +111,15 @@ enum class ShelfItem(
         iconId = { if (it is UserEpisode) IR.drawable.ic_delete else IR.drawable.ic_archive },
         analyticsValue = ShelfActionType.Archive,
     ),
+    StreamSelector(
+        id = "stream_selector",
+        titleId = { LR.string.stream_selector_title },
+        iconId = { IR.drawable.ic_stream_selector },
+        // hlsUrl is set only when the server sent alternate enclosures, a cheap proxy for "has streams to pick".
+        showIf = { it is PodcastEpisode && it.hlsUrl != null },
+        // TODO: add a dedicated ShelfActionType when EventHorizon is bumped; this is inert (never tracked).
+        analyticsValue = ShelfActionType.PlaybackEffects,
+    ),
     ;
 
     // We can safely use the ID as server ID. Keeping it if need to make changes in the future.
