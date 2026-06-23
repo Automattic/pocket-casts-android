@@ -37,7 +37,7 @@ enum class UpNextSortType(
     ) {
         // Episodes without a known duration always sort to the bottom.
         private val comparatorDelegate = compareBy<BaseEpisode> { it.hasNoDuration }
-            .thenBy { it.duration }
+            .thenBy { it.timeRemaining }
             .thenBy { it.addedDate }
 
         override fun compare(o1: BaseEpisode, o2: BaseEpisode): Int {
@@ -50,7 +50,7 @@ enum class UpNextSortType(
     ) {
         // Episodes without a known duration always sort to the bottom.
         private val comparatorDelegate = compareBy<BaseEpisode> { it.hasNoDuration }
-            .thenByDescending { it.duration }
+            .thenByDescending { it.timeRemaining }
             .thenBy { it.addedDate }
 
         override fun compare(o1: BaseEpisode, o2: BaseEpisode): Int {
@@ -61,5 +61,8 @@ enum class UpNextSortType(
 
     private companion object {
         private val BaseEpisode.hasNoDuration get() = duration <= 0
+
+        // Time remaining accounts for how much of the episode has already been played.
+        private val BaseEpisode.timeRemaining get() = if (hasNoDuration) 0.0 else (duration - playedUpTo).coerceAtLeast(0.0)
     }
 }

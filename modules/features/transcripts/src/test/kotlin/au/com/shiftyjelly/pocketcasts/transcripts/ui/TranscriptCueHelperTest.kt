@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TranscriptCueHelperTest {
@@ -353,5 +355,49 @@ class TranscriptCueHelperTest {
             HighlightOutcome.Clear,
             TranscriptCueHelper.resolveHighlight(entries, refTimeMs = 500, cachedIndex = 0),
         )
+    }
+
+    // --- isSeekSettled ---
+
+    @Test
+    fun `isSeekSettled is true at the seek target`() {
+        assertTrue(TranscriptCueHelper.isSeekSettled(posMs = 30_000, seekTargetMs = 30_000))
+    }
+
+    @Test
+    fun `isSeekSettled is true within tolerance on either side`() {
+        assertTrue(TranscriptCueHelper.isSeekSettled(posMs = 31_000, seekTargetMs = 30_000))
+        assertTrue(TranscriptCueHelper.isSeekSettled(posMs = 29_000, seekTargetMs = 30_000))
+    }
+
+    @Test
+    fun `isSeekSettled is false outside tolerance (seek not yet landed)`() {
+        // Forward seek: still at the old, earlier position.
+        assertFalse(TranscriptCueHelper.isSeekSettled(posMs = 10_000, seekTargetMs = 30_000))
+        // Backward seek: still at the old, later position.
+        assertFalse(TranscriptCueHelper.isSeekSettled(posMs = 60_000, seekTargetMs = 30_000))
+    }
+
+    // --- hasReachedTappedRow ---
+
+    @Test
+    fun `hasReachedTappedRow is true when resolved row equals the tapped row`() {
+        assertTrue(TranscriptCueHelper.hasReachedTappedRow(HighlightOutcome.Show(entryIndex = 5, wordIndex = null), tappedIndex = 5))
+    }
+
+    @Test
+    fun `hasReachedTappedRow is true when resolved row is past the tapped row`() {
+        assertTrue(TranscriptCueHelper.hasReachedTappedRow(HighlightOutcome.Show(entryIndex = 6, wordIndex = null), tappedIndex = 5))
+    }
+
+    @Test
+    fun `hasReachedTappedRow is false when resolved row is before the tapped row`() {
+        assertFalse(TranscriptCueHelper.hasReachedTappedRow(HighlightOutcome.Show(entryIndex = 4, wordIndex = null), tappedIndex = 5))
+    }
+
+    @Test
+    fun `hasReachedTappedRow is false for Clear and Keep`() {
+        assertFalse(TranscriptCueHelper.hasReachedTappedRow(HighlightOutcome.Clear, tappedIndex = 5))
+        assertFalse(TranscriptCueHelper.hasReachedTappedRow(HighlightOutcome.Keep, tappedIndex = 5))
     }
 }

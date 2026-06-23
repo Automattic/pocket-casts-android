@@ -39,9 +39,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -61,6 +63,9 @@ class TranscriptViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(UiState.Empty)
     val uiState = _uiState.asStateFlow()
+
+    private val _messages = Channel<TranscriptMessage>(Channel.BUFFERED)
+    val messages = _messages.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -195,6 +200,7 @@ class TranscriptViewModel @AssistedInject constructor(
                     source = source,
                 )
             }
+            notifyTapToSeekUnavailable(currentState.syncedState)
             return null
         }
 
@@ -210,6 +216,17 @@ class TranscriptViewModel @AssistedInject constructor(
             )
         }
         return seekTimeMs
+    }
+
+    // Prompt to download only when it could help, not if already downloaded or sync is unavailable.
+    private fun notifyTapToSeekUnavailable(syncedState: FingerprintTimingManager.State) {
+        if (syncedState is FingerprintTimingManager.State.Unavailable) return
+        val uuid = episodeUuid ?: return
+        viewModelScope.launch {
+            val episode = episodeManager.findByUuid(uuid)
+            if (episode?.isDownloaded == true) return@launch
+            _messages.send(TranscriptMessage.TapToSeekStreamingUnavailable)
+        }
     }
 
     override fun onCleared() {
@@ -426,6 +443,10 @@ class TranscriptViewModel @AssistedInject constructor(
     interface Factory {
         fun create(source: Source): TranscriptViewModel
     }
+}
+
+sealed interface TranscriptMessage {
+    data object TapToSeekStreamingUnavailable : TranscriptMessage
 }
 
 data class UiState(
