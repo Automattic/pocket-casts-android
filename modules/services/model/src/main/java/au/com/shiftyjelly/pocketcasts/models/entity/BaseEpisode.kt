@@ -134,16 +134,29 @@ sealed interface BaseEpisode {
     val isHlsOnly: Boolean
         get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType) || (downloadUrl == null && hlsUrl != null)
 
+    /** A runtime-only stream chosen via the player stream selector; overrides [streamUrl] when set. */
+    var overrideStreamUrl: String?
+
+    /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
+    var overrideStreamContentType: String?
+
     /** The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. */
     val streamUrl: String?
-        get() = if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsUrl ?: downloadUrl else downloadUrl
+        get() = overrideStreamUrl ?: if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsUrl ?: downloadUrl else downloadUrl
 
     /** Whether the URL that streaming will actually use is HLS. */
     val isStreamUrlHls: Boolean
         get() {
             val url = streamUrl ?: return false
+            if (overrideStreamUrl != null) {
+                return isHlsMimeType(overrideStreamContentType) || isHlsUrl(url)
+            }
             return (hlsUrl != null && url == hlsUrl) || isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
+
+    /** Whether the stream that will actually play is video (honors a selected stream's content type). */
+    val isStreamVideo: Boolean
+        get() = overrideStreamContentType?.startsWith("video/") ?: isVideo
 
     val isAudio: Boolean
         get() = !isVideo
