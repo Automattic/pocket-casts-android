@@ -15,6 +15,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import au.com.shiftyjelly.pocketcasts.models.converter.AlternateEnclosureSourcesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveLimitTypeConverter
@@ -36,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
+import au.com.shiftyjelly.pocketcasts.models.db.dao.AlternateEnclosureDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BlazeAdDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
@@ -63,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -115,8 +118,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         PlaybackStatsEvent::class,
         EpisodeChat::class,
         EpisodeChatMessage::class,
+        EpisodeAlternateEnclosure::class,
     ],
-    version = 133,
+    version = 134,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -148,6 +152,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PlaylistEpisodeSortTypeConverter::class,
     InstantConverter::class,
     BlazeAdLocationConverter::class,
+    AlternateEnclosureSourcesConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -172,6 +177,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun blazeAdDao(): BlazeAdDao
     abstract fun playbackStatsDao(): PlaybackStatsDao
     abstract fun episodeChatDao(): EpisodeChatDao
+    abstract fun alternateEnclosureDao(): AlternateEnclosureDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
         listOf(
@@ -1476,6 +1482,11 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `chapter_episode_uuid_index` ON `episode_chapters` (`episode_uuid`)")
         }
 
+        val MIGRATION_133_134 = addMigration(133, 134) { database ->
+            database.execSQL("CREATE TABLE IF NOT EXISTS `episode_alternate_enclosures` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `episode_uuid` TEXT NOT NULL, `position` INTEGER NOT NULL, `type` TEXT, `bitrate` INTEGER, `length` INTEGER, `height` INTEGER, `width` INTEGER, `lang` TEXT, `title` TEXT, `codecs` TEXT, `is_default` INTEGER NOT NULL, `sources` TEXT NOT NULL)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `episode_alternate_enclosure_episode_uuid_index` ON `episode_alternate_enclosures` (`episode_uuid`)")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1898,6 +1909,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_130_131,
                 MIGRATION_131_132,
                 MIGRATION_132_133,
+                MIGRATION_133_134,
             )
         }
 
