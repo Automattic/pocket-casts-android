@@ -139,6 +139,7 @@
     <string name="starred">Starred</string>
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
+    <string name="stream_selector_title">Streams</string>
     <string name="subscribe">Follow</string>
     <string name="subscribe_to">Subscribe to %s</string>
     <string name="upgrade_to">Upgrade to %s</string>
