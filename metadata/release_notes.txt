@@ -1,11 +1,10 @@
-
 *   New Features
-    *   Synced episode transcripts
-        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
-    *   Add the explicit badge to the Discover section
-        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+    *   Up Next sort by duration
+        ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
 *   Bug Fixes
-    *   Fix Profile settings gear being unreachable in landscape
-        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
-    *   Fix missing episode dates and durations in Android Auto and Wear OS
-        ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
+    *   Fix crash when scrolling to the top of a long Up Next queue
+        ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
+    *   Improve handling of search results where the podcast title is missing
+        ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
+    *   Wear OS performance improvements
+        ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
