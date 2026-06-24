@@ -1518,6 +1518,17 @@ open class PlaybackManager @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
                 return
             }
+
+            // Automotive: keep the Now Playing card alive and replayable at the end of playback.
+            if (Util.isAutomotive(application) &&
+                !hadSleepAfterEpisode &&
+                upNextQueue.queueEpisodes.isEmpty() &&
+                !settings.autoPlayNextEpisodeOnEmpty.value
+            ) {
+                pauseFinishedEpisodeForAutomotive(episode)
+                return
+            }
+
             eventHorizon.track(
                 PlayerEpisodeCompletedEvent(
                     podcastUuid = episode.podcastOrSubstituteUuid,
@@ -1587,6 +1598,19 @@ open class PlaybackManager @Inject constructor(
         } else {
             loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
         }
+    }
+
+    private suspend fun pauseFinishedEpisodeForAutomotive(episode: BaseEpisode) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive: episode finished with auto play off, reloading paused to keep Now Playing card")
+
+        // Rewind so the reloaded episode is paused at the start and replays from the beginning.
+        episodeManager.updatePlayedUpToBlocking(episode, 0.0, forceUpdate = true)
+
+        // Release the finished player so the reload rebuilds it paused instead of resuming the ended player.
+        player?.stop()
+
+        // Reload the still-queued episode paused: rebuilds metadata and session state so the card stays alive.
+        loadCurrentEpisode(play = false, sourceView = SourceView.AUTO_PAUSE)
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
