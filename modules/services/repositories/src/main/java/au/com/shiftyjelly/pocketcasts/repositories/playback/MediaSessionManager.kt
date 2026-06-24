@@ -582,6 +582,21 @@ class MediaSessionManager(
 
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
+        if (isAutomotive) {
+            playbackManager.playbackStateRelay
+                .map { it.isStopped || it.isError || it.isEmpty }
+                .distinctUntilChanged()
+                // Skip the BehaviorRelay's initial replay so we don't detach the session that
+                // PlaybackService.onCreate just attached; only react to genuine transitions after startup.
+                .skip(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { inactive -> setMedia3SessionAttached(!inactive) },
+                    onError = { Timber.e(it, "Error observing automotive active state") },
+                )
+                .addTo(disposables)
+        }
+
         val episodeAndState = playbackManager.playbackStateRelay
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
@@ -691,6 +706,25 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun setMedia3SessionAttached(attached: Boolean) {
+        val session = media3Session ?: return
+        val service = media3Service ?: return
+        try {
+            if (attached) {
+                if (!service.sessions.contains(session)) {
+                    service.addSession(session)
+                }
+            } else {
+                if (service.sessions.contains(session)) {
+                    service.removeSession(session)
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to ${if (attached) "add" else "remove"} Media3 session")
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -931,9 +965,6 @@ class MediaSessionManager(
 
         if (playbackState.isPlaying || playbackState.transientLoss) {
             mediaSession?.isActive = true
-        } else if (playbackState.state == PlaybackState.State.STOPPED && Util.isAutomotive(context)) {
-            // On Automotive OS a stopped session must not stay active.
-            mediaSession?.isActive = false
         }
 
         if (playbackState.isEmpty || currentEpisode == null) {
