@@ -23,7 +23,6 @@ import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -313,8 +312,14 @@ class MediaSessionManager(
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             onStop = {
                 if (playbackManager.player !is CastPlayer) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                    scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    if (isAutomotive) {
+                        // On Automotive a stop command must fully tear down playback, not just pause
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → stop (automotive)")
+                        scope.launch { commandMutex.withLock { playbackManager.stopSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    } else {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
+                        scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    }
                 }
             },
             onPlay = {
@@ -577,6 +582,21 @@ class MediaSessionManager(
 
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
+        if (isAutomotive) {
+            playbackManager.playbackStateRelay
+                .map { it.isStopped || it.isError || it.isEmpty }
+                .distinctUntilChanged()
+                // Skip the BehaviorRelay's initial replay so we don't detach the session that
+                // PlaybackService.onCreate just attached; only react to genuine transitions after startup.
+                .skip(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { inactive -> setMedia3SessionAttached(!inactive) },
+                    onError = { Timber.e(it, "Error observing automotive active state") },
+                )
+                .addTo(disposables)
+        }
+
         val episodeAndState = playbackManager.playbackStateRelay
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
@@ -686,6 +706,25 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun setMedia3SessionAttached(attached: Boolean) {
+        val session = media3Session ?: return
+        val service = media3Service ?: return
+        try {
+            if (attached) {
+                if (!service.sessions.contains(session)) {
+                    service.addSession(session)
+                }
+            } else {
+                if (service.sessions.contains(session)) {
+                    service.removeSession(session)
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to ${if (attached) "add" else "remove"} Media3 session")
+        }
     }
 
     @OptIn(UnstableApi::class)
