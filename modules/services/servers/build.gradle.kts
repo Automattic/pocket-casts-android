@@ -43,6 +43,7 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    // compileOnly: we only reference MimeTypes.APPLICATION_M3U8, a const that inlines, so there's no runtime media3 dependency.
     compileOnly(libs.media3.common)
 
     testCompileOnly(libs.media3.common)

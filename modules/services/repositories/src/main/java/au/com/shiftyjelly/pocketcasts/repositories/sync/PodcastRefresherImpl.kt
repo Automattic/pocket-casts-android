@@ -102,9 +102,14 @@ class PodcastRefresherImpl @Inject constructor(
                 )
             }
             // Store alternate enclosures once the episode rows exist (the table has a cascading FK on episode_uuid).
+            // Only rewrite when they actually changed so an unchanged feed doesn't churn delete+insert every refresh.
             persistedEpisodes.forEach { episode ->
-                if (episode.alternateEnclosures.isNotEmpty()) {
-                    alternateEnclosureDao.replaceForEpisode(episode.uuid, episode.alternateEnclosures)
+                val incoming = episode.alternateEnclosures
+                if (incoming.isNotEmpty()) {
+                    val stored = alternateEnclosureDao.findByEpisodeUuid(episode.uuid).map { it.copy(id = 0) }
+                    if (stored != incoming) {
+                        alternateEnclosureDao.replaceForEpisode(episode.uuid, incoming)
+                    }
                 }
             }
 
