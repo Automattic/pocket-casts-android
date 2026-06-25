@@ -123,11 +123,15 @@ class ShelfSharedViewModel @Inject constructor(
         )
     }
 
-    /** Video when the user has selected the HLS stream for this episode, otherwise audio. */
+    /**
+     * Reflects the stream that is actually playing. With HLS streaming on, the HLS stream is the default
+     * even before the user picks anything, so fall back to [BaseEpisode.streamUrl] when there is no explicit choice.
+     */
     private fun BaseEpisode?.streamMode(selectedStreams: Map<String, SelectedStream>): StreamMode {
         val episode = this as? PodcastEpisode ?: return StreamMode.Audio
         val hlsUrl = episode.hlsUrl ?: return StreamMode.Audio
-        return if (selectedStreams[episode.uuid]?.uri == hlsUrl) StreamMode.Video else StreamMode.Audio
+        val effectiveUri = selectedStreams[episode.uuid]?.uri ?: episode.streamUrl
+        return if (effectiveUri == hlsUrl) StreamMode.Video else StreamMode.Audio
     }
 
     fun onEffectsClick(source: ShelfItemSource) {
