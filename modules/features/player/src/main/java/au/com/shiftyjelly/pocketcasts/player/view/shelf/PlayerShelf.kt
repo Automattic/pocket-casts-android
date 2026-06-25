@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerShelfData
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.StreamMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -83,6 +84,7 @@ fun PlayerShelf(
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
         isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
+        streamMode = shelfItemsState.streamMode,
         playerShelfData = playerShelfData,
         playerColors = playerColors,
         onEffectsClick = {
@@ -137,8 +139,8 @@ fun PlayerShelf(
         onTranscriptClick = { isTranscriptAvailable: Boolean ->
             shelfSharedViewModel.onTranscriptClick(isTranscriptAvailable, ShelfItemSource.Shelf)
         },
-        onStreamSelectorClick = {
-            shelfSharedViewModel.onStreamSelectorClick(ShelfItemSource.Shelf)
+        onStreamToggleClick = {
+            shelfSharedViewModel.onStreamToggleClick(ShelfItemSource.Shelf)
         },
         onMoreClick = {
             shelfSharedViewModel.onMoreClick()
@@ -159,6 +161,7 @@ fun PlayerShelf(
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
     isTranscriptAvailable: Boolean,
+    streamMode: StreamMode,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
     onSleepClick: () -> Unit,
@@ -171,7 +174,7 @@ private fun PlayerShelfContent(
     onDownloadClick: () -> Unit,
     onAddBookmarkClick: () -> Unit,
     onTranscriptClick: (Boolean) -> Unit,
-    onStreamSelectorClick: () -> Unit,
+    onStreamToggleClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -257,9 +260,10 @@ private fun PlayerShelfContent(
                     onClick = onAddToPlaylistClick,
                 )
 
-                ShelfItem.StreamSelector -> StreamSelectorButton(
+                ShelfItem.StreamSelector -> StreamToggleButton(
+                    streamMode = streamMode,
                     playerColors = playerColors,
-                    onClick = onStreamSelectorClick,
+                    onClick = onStreamToggleClick,
                 )
             }
         }
@@ -352,14 +356,16 @@ private fun ShareButton(
 }
 
 @Composable
-private fun StreamSelectorButton(
+private fun StreamToggleButton(
+    streamMode: StreamMode,
     playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
+    val isVideo = streamMode == StreamMode.Video
     IconButton(onClick = onClick) {
         Icon(
-            painterResource(id = IR.drawable.ic_stream_selector),
-            contentDescription = stringResource(LR.string.stream_selector_title),
+            painterResource(id = if (isVideo) IR.drawable.ic_video_small_fill else IR.drawable.ic_headphone),
+            contentDescription = stringResource(if (isVideo) LR.string.video else LR.string.audio),
             tint = playerColors.contrast03,
         )
     }
@@ -521,6 +527,7 @@ private fun PlayerShelfPreview(
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
             isTranscriptAvailable = false,
+            streamMode = StreamMode.Audio,
             playerShelfData = PlayerShelfData(),
             onEffectsClick = {},
             onSleepClick = {},
@@ -533,7 +540,7 @@ private fun PlayerShelfPreview(
             onDownloadClick = {},
             onAddBookmarkClick = {},
             onTranscriptClick = {},
-            onStreamSelectorClick = {},
+            onStreamToggleClick = {},
             onAddToPlaylistClick = {},
             onMoreClick = {},
         )

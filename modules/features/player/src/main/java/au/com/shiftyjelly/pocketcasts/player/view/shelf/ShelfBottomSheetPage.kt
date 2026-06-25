@@ -144,7 +144,7 @@ fun ShelfBottomSheetPage(
                         )
                     }
 
-                    ShelfItem.StreamSelector -> shelfSharedViewModel.onStreamSelectorClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.StreamSelector -> shelfSharedViewModel.onStreamToggleClick(ShelfItemSource.OverflowMenu)
                 }
                 if (item != ShelfItem.Cast) onDismiss()
             },

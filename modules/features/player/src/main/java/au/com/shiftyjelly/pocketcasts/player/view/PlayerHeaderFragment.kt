@@ -343,10 +343,6 @@ class PlayerHeaderFragment :
                             EffectsFragment().show(parentFragmentManager, "effects")
                         }
 
-                        NavigationState.ShowStreamSelector -> {
-                            StreamSelectorFragment.show(parentFragmentManager)
-                        }
-
                         is NavigationState.ShowSleepTimerOptions -> {
                             SleepFragment
                                 .newInstance(navigationState.hasChapters)

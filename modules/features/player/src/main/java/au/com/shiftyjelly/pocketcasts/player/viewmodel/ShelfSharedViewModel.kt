@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -13,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -96,6 +98,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNextObservable.asFlow()
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
+        playbackManager.selectedStreams,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -107,13 +110,23 @@ class ShelfSharedViewModel @Inject constructor(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
+        selectedStreams: Map<String, SelectedStream>,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
+        val streamToggleEnabled = FeatureFlag.isEnabled(Feature.STREAM_SELECTOR) && FeatureFlag.isEnabled(Feature.HLS_STREAMING)
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || FeatureFlag.isEnabled(Feature.STREAM_SELECTOR)) },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || streamToggleEnabled) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
+            streamMode = episode.streamMode(selectedStreams),
         )
+    }
+
+    /** Video when the user has selected the HLS stream for this episode, otherwise audio. */
+    private fun BaseEpisode?.streamMode(selectedStreams: Map<String, SelectedStream>): StreamMode {
+        val episode = this as? PodcastEpisode ?: return StreamMode.Audio
+        val hlsUrl = episode.hlsUrl ?: return StreamMode.Audio
+        return if (selectedStreams[episode.uuid]?.uri == hlsUrl) StreamMode.Video else StreamMode.Audio
     }
 
     fun onEffectsClick(source: ShelfItemSource) {
@@ -123,11 +136,17 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun onStreamSelectorClick(source: ShelfItemSource) {
+    fun onStreamToggleClick(source: ShelfItemSource) {
         // No analytics yet (no dedicated ShelfActionType). source kept for a uniform shelf-action signature.
-        viewModelScope.launch {
-            _navigationState.emit(NavigationState.ShowStreamSelector)
+        val episode = uiState.value.episode as? PodcastEpisode ?: return
+        val hlsUrl = episode.hlsUrl ?: return
+        val downloadUrl = episode.downloadUrl?.takeIf { it.isNotBlank() } ?: return
+        val stream = if (uiState.value.streamMode == StreamMode.Video) {
+            SelectedStream(uri = downloadUrl, contentType = episode.fileType)
+        } else {
+            SelectedStream(uri = hlsUrl, contentType = MimeTypes.APPLICATION_M3U8)
         }
+        playbackManager.selectStream(episode.uuid, stream)
     }
 
     fun onSleepClick(source: ShelfItemSource) {
@@ -328,12 +347,16 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val streamMode: StreamMode = StreamMode.Audio,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
     }
+
+    /** Which stream the player stream toggle currently reflects. HLS is treated as video, the progressive file as audio. */
+    enum class StreamMode { Audio, Video }
 
     data class PlayerShelfData(
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,
@@ -353,7 +376,6 @@ class ShelfSharedViewModel @Inject constructor(
 
     sealed interface NavigationState {
         data object ShowEffectsOption : NavigationState
-        data object ShowStreamSelector : NavigationState
         data class ShowSleepTimerOptions(val hasChapters: Boolean) : NavigationState
         data class ShowShareDialog(val podcast: Podcast, val episode: PodcastEpisode) : NavigationState
 

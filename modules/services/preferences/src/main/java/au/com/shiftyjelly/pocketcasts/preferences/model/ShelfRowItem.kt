@@ -115,8 +115,8 @@ enum class ShelfItem(
         id = "stream_selector",
         titleId = { LR.string.stream_selector_title },
         iconId = { IR.drawable.ic_stream_selector },
-        // hlsUrl is set only when the server sent alternate enclosures, a cheap proxy for "has streams to pick".
-        showIf = { it is PodcastEpisode && it.hlsUrl != null },
+        // Show the audio/video toggle only when the episode offers both: a progressive file and an HLS stream.
+        showIf = { it is PodcastEpisode && it.hlsUrl != null && !it.downloadUrl.isNullOrBlank() },
         // TODO: add a dedicated ShelfActionType when EventHorizon is bumped; this is inert (never tracked).
         analyticsValue = ShelfActionType.PlaybackEffects,
     ),
