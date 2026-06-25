@@ -52,14 +52,15 @@ fun ShelfItemRow(
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-    val switchToAudio = playerSource == PlayerSource.Alternative
-    val titleResId = if (item == ShelfItem.StreamSelector) {
-        if (switchToAudio) LR.string.audio else LR.string.stream
+    val showStreamToggleLabel = item == ShelfItem.StreamSelector && !isEditable
+    val switchToPrimary = playerSource == PlayerSource.Alternative
+    val titleResId = if (showStreamToggleLabel) {
+        if (switchToPrimary) LR.string.stream_source_primary else LR.string.stream_source_alternative
     } else {
         item.titleId(episode)
     }
-    val iconResId = if (item == ShelfItem.StreamSelector) {
-        if (switchToAudio) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill
+    val iconResId = if (showStreamToggleLabel) {
+        if (switchToPrimary) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill
     } else {
         item.iconId(episode)
     }

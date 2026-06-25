@@ -361,11 +361,11 @@ private fun StreamToggleButton(
     playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val switchToAudio = playerSource == PlayerSource.Alternative
+    val switchToPrimary = playerSource == PlayerSource.Alternative
     IconButton(onClick = onClick) {
         Icon(
-            painterResource(id = if (switchToAudio) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill),
-            contentDescription = stringResource(if (switchToAudio) LR.string.audio else LR.string.stream),
+            painterResource(id = if (switchToPrimary) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill),
+            contentDescription = stringResource(if (switchToPrimary) LR.string.stream_source_primary else LR.string.stream_source_alternative),
             tint = playerColors.contrast03,
         )
     }
