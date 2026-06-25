@@ -60,6 +60,7 @@ class AutomotiveLinkFragment : Fragment() {
             Text(
                 text = url,
                 fontSize = 32.sp,
+                lineHeight = 40.sp,
                 textAlign = TextAlign.Center,
                 color = Color.White,
             )
