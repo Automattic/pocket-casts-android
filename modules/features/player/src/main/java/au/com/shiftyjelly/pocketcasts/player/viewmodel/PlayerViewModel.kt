@@ -138,12 +138,9 @@ class PlayerViewModel @Inject constructor(
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
 
-        // A selected stream flips the player surface; the HLS stream counts as video, the progressive file as audio.
-        val isVideo = when {
-            selectedStream == null -> episode?.isVideo == true
-            selectedStream.contentType?.startsWith("video/", ignoreCase = true) == true -> true
-            else -> selectedStream.uri == episode?.hlsUrl
-        }
+        // The audio/stream toggle only switches the source; the surface shows video for genuine video content
+        // (a video file, or a stream whose content type is video). HLS audio stays on the audio surface.
+        val isVideo = selectedStream?.contentType?.startsWith("video/", ignoreCase = true) ?: (episode?.isVideo == true)
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
