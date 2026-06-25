@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.StreamMode
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerSource
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -47,19 +47,19 @@ fun ShelfItemRow(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
-    streamMode: StreamMode = StreamMode.Audio,
+    playerSource: PlayerSource = PlayerSource.Primary,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-    // The stream toggle reflects what is currently playing: the progressive file (audio) or the HLS stream.
+    val switchToAudio = playerSource == PlayerSource.Alternative
     val titleResId = if (item == ShelfItem.StreamSelector) {
-        if (streamMode == StreamMode.Video) LR.string.stream else LR.string.audio
+        if (switchToAudio) LR.string.audio else LR.string.stream
     } else {
         item.titleId(episode)
     }
     val iconResId = if (item == ShelfItem.StreamSelector) {
-        if (streamMode == StreamMode.Video) IR.drawable.ic_video_small_fill else IR.drawable.ic_headphone
+        if (switchToAudio) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill
     } else {
         item.iconId(episode)
     }

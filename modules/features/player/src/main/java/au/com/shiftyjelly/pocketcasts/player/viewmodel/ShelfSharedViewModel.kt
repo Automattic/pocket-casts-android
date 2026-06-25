@@ -118,7 +118,7 @@ class ShelfSharedViewModel @Inject constructor(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || streamToggleEnabled) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
-            streamMode = episode.streamMode(selectedStreams),
+            playerSource = episode.playerSource(selectedStreams),
         )
     }
 
@@ -126,11 +126,11 @@ class ShelfSharedViewModel @Inject constructor(
      * Reflects the stream that is actually playing. With HLS streaming on, the HLS stream is the default
      * even before the user picks anything, so fall back to [BaseEpisode.streamUrl] when there is no explicit choice.
      */
-    private fun BaseEpisode?.streamMode(selectedStreams: Map<String, SelectedStream>): StreamMode {
-        val episode = this as? PodcastEpisode ?: return StreamMode.Audio
-        val hlsUrl = episode.hlsUrl ?: return StreamMode.Audio
+    private fun BaseEpisode?.playerSource(selectedStreams: Map<String, SelectedStream>): PlayerSource {
+        val episode = this as? PodcastEpisode ?: return PlayerSource.Primary
+        val hlsUrl = episode.hlsUrl ?: return PlayerSource.Primary
         val effectiveUri = selectedStreams[episode.uuid]?.uri ?: episode.streamUrl
-        return if (effectiveUri == hlsUrl) StreamMode.Video else StreamMode.Audio
+        return if (effectiveUri == hlsUrl) PlayerSource.Alternative else PlayerSource.Primary
     }
 
     fun onEffectsClick(source: ShelfItemSource) {
@@ -145,7 +145,7 @@ class ShelfSharedViewModel @Inject constructor(
         val episode = uiState.value.episode as? PodcastEpisode ?: return
         val hlsUrl = episode.hlsUrl ?: return
         val downloadUrl = episode.downloadUrl?.takeIf { it.isNotBlank() } ?: return
-        val stream = if (uiState.value.streamMode == StreamMode.Video) {
+        val stream = if (uiState.value.playerSource == PlayerSource.Alternative) {
             SelectedStream(uri = downloadUrl, contentType = episode.fileType)
         } else {
             SelectedStream(uri = hlsUrl, contentType = MimeTypes.APPLICATION_M3U8)
@@ -351,7 +351,7 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
-        val streamMode: StreamMode = StreamMode.Audio,
+        val playerSource: PlayerSource = PlayerSource.Primary,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
@@ -359,8 +359,8 @@ class ShelfSharedViewModel @Inject constructor(
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
     }
 
-    /** Which stream the player stream toggle currently reflects. HLS is treated as video, the progressive file as audio. */
-    enum class StreamMode { Audio, Video }
+    /** The source the player is currently playing: [Primary] is the progressive file, [Alternative] is the HLS stream. */
+    enum class PlayerSource { Primary, Alternative }
 
     data class PlayerShelfData(
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,

@@ -73,7 +73,7 @@ fun ShelfBottomSheetPage(
         val uiState by shelfViewModel.uiState.collectAsState()
         MenuShelfItems(
             state = uiState,
-            streamMode = shelfUiState.streamMode,
+            playerSource = shelfUiState.playerSource,
             onClick = { item, enabled ->
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)

@@ -35,8 +35,8 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerShelfData
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.StreamMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -84,7 +84,7 @@ fun PlayerShelf(
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
         isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
-        streamMode = shelfItemsState.streamMode,
+        playerSource = shelfItemsState.playerSource,
         playerShelfData = playerShelfData,
         playerColors = playerColors,
         onEffectsClick = {
@@ -161,7 +161,7 @@ fun PlayerShelf(
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
     isTranscriptAvailable: Boolean,
-    streamMode: StreamMode,
+    playerSource: PlayerSource,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
     onSleepClick: () -> Unit,
@@ -261,7 +261,7 @@ private fun PlayerShelfContent(
                 )
 
                 ShelfItem.StreamSelector -> StreamToggleButton(
-                    streamMode = streamMode,
+                    playerSource = playerSource,
                     playerColors = playerColors,
                     onClick = onStreamToggleClick,
                 )
@@ -357,15 +357,15 @@ private fun ShareButton(
 
 @Composable
 private fun StreamToggleButton(
-    streamMode: StreamMode,
+    playerSource: PlayerSource,
     playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val isVideo = streamMode == StreamMode.Video
+    val switchToAudio = playerSource == PlayerSource.Alternative
     IconButton(onClick = onClick) {
         Icon(
-            painterResource(id = if (isVideo) IR.drawable.ic_video_small_fill else IR.drawable.ic_headphone),
-            contentDescription = stringResource(if (isVideo) LR.string.stream else LR.string.audio),
+            painterResource(id = if (switchToAudio) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill),
+            contentDescription = stringResource(if (switchToAudio) LR.string.audio else LR.string.stream),
             tint = playerColors.contrast03,
         )
     }
@@ -527,7 +527,7 @@ private fun PlayerShelfPreview(
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
             isTranscriptAvailable = false,
-            streamMode = StreamMode.Audio,
+            playerSource = PlayerSource.Primary,
             playerShelfData = PlayerShelfData(),
             onEffectsClick = {},
             onSleepClick = {},
