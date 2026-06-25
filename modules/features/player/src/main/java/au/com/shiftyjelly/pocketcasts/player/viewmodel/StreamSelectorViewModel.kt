@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -82,14 +81,11 @@ class StreamSelectorViewModel @Inject constructor(
     )
 
     private fun streamKind(uri: String, contentType: String?): StreamKind = when {
-        BaseEpisode.isHlsUrl(uri) || isHlsMimeType(contentType) -> StreamKind.Hls
+        BaseEpisode.isHlsUrl(uri) || BaseEpisode.isHlsMimeType(contentType) -> StreamKind.Hls
         contentType?.startsWith("video/", ignoreCase = true) == true -> StreamKind.Video
         contentType?.startsWith("audio/", ignoreCase = true) == true -> StreamKind.Audio
         else -> StreamKind.Other
     }
-
-    private fun isHlsMimeType(type: String?): Boolean = type.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) ||
-        type.equals("application/vnd.apple.mpegurl", ignoreCase = true)
 
     data class UiState(
         val episodeUuid: String? = null,
