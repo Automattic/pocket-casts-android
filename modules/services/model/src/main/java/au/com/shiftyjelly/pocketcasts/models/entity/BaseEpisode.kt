@@ -19,9 +19,17 @@ sealed interface BaseEpisode {
             return path.endsWith(".m3u8", ignoreCase = true)
         }
 
-        private fun isHlsMimeType(type: String?): Boolean {
-            return type.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) ||
-                type.equals("application/vnd.apple.mpegurl", ignoreCase = true)
+        /** The HLS MIME types the server may pass through verbatim; match case-insensitively. */
+        val HLS_MIME_TYPES: Set<String> = setOf(
+            MimeTypes.APPLICATION_M3U8.lowercase(), // application/x-mpegurl
+            "application/vnd.apple.mpegurl",
+            "audio/mpegurl",
+            "application/mpegurl",
+            "audio/x-mpegurl",
+        )
+
+        fun isHlsMimeType(type: String?): Boolean {
+            return type != null && type.lowercase() in HLS_MIME_TYPES
         }
 
         /**
