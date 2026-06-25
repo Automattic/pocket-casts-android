@@ -383,7 +383,8 @@ class BrowseTreeProvider @Inject constructor(
         }
     }
 
-    private suspend fun loadAutomotiveRootChildren(context: Context): List<MediaItem> {
+    @VisibleForTesting
+    internal fun loadAutomotiveRootChildren(context: Context): List<MediaItem> {
         val extrasContentAsList = Bundle().apply {
             putInt(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE, DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
         }
@@ -399,11 +400,8 @@ class BrowseTreeProvider @Inject constructor(
         val discoverItem = buildListMediaItem(context, id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)
         val profileItem = buildListMediaItem(context, id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
 
-        return if (podcastManager.countSubscribed() > 0) {
-            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
-        } else {
-            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
-        }
+        // Keep a fixed order so tabs never reorder between launches as the subscribed podcast count changes.
+        return listOf(podcastsItem, filtersItem, discoverItem, profileItem)
     }
 
     private suspend fun loadFiltersRoot(context: Context): List<MediaItem> {

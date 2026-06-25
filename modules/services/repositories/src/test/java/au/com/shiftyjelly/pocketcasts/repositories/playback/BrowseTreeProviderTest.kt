@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.media3.common.MediaItem
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -28,6 +30,8 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -180,6 +184,30 @@ class BrowseTreeProviderTest {
             AutoMediaId(queueEpisode.uuid, podcastTwo.uuid).toMediaId(),
             result[1].mediaId,
         )
+    }
+
+    @Test
+    fun `loadAutomotiveRootChildren keeps a fixed tab order regardless of subscribed podcast count`() = runTest {
+        // Mock the context so building the media items doesn't depend on cross-module string and drawable resources.
+        val resources = mock<Resources> {
+            on { getResourcePackageName(any()) } doReturn "au.com.shiftyjelly.pocketcasts"
+            on { getResourceTypeName(any()) } doReturn "drawable"
+            on { getResourceEntryName(any()) } doReturn "auto_tab"
+        }
+        val context = mock<Context> {
+            on { getResources() } doReturn resources
+            on { getString(any()) } doReturn "title"
+        }
+        val expectedOrder = listOf(PODCASTS_ROOT, FILTERS_ROOT, DISCOVER_ROOT, PROFILE_ROOT)
+
+        whenever(podcastManager.countSubscribed()).thenReturn(0)
+        val withoutSubscriptions = provider.loadAutomotiveRootChildren(context).map { it.mediaId }
+
+        whenever(podcastManager.countSubscribed()).thenReturn(5)
+        val withSubscriptions = provider.loadAutomotiveRootChildren(context).map { it.mediaId }
+
+        assertEquals(expectedOrder, withoutSubscriptions)
+        assertEquals(expectedOrder, withSubscriptions)
     }
 
     // --- loadSuggestedChildren ---
