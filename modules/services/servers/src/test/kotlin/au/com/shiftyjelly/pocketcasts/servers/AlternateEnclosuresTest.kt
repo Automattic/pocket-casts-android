@@ -34,6 +34,21 @@ class AlternateEnclosuresTest {
     }
 
     @Test
+    fun `matches every documented hls mime type`() {
+        val hlsTypes = listOf(
+            "application/vnd.apple.mpegurl",
+            "audio/mpegurl",
+            "application/x-mpegurl",
+            "application/mpegurl",
+            "audio/x-mpegurl",
+        )
+        hlsTypes.forEach { type ->
+            val enclosures = listOf(enclosure(type, "https://example.com/master.m3u8"))
+            assertEquals(type, "https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
+        }
+    }
+
+    @Test
     fun `ignores non-hls enclosures and keeps hls`() {
         val enclosures = listOf(
             enclosure("video/mp4", "https://example.com/file-1080.mp4"),
