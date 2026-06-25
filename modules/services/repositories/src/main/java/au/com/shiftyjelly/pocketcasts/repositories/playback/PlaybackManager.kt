@@ -122,6 +122,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -366,18 +367,20 @@ open class PlaybackManager @Inject constructor(
      * current episode the player reloads the new source at the current position.
      */
     fun selectStream(episodeUuid: String, stream: SelectedStream?) {
-        _selectedStreams.value = if (stream == null) {
-            _selectedStreams.value - episodeUuid
-        } else {
-            _selectedStreams.value + (episodeUuid to stream)
+        val previous = _selectedStreams.value[episodeUuid]
+        _selectedStreams.update { streams ->
+            if (stream == null) streams - episodeUuid else streams + (episodeUuid to stream)
         }
-        if (upNextQueue.currentEpisode?.uuid == episodeUuid) {
+        if (previous != stream && upNextQueue.currentEpisode?.uuid == episodeUuid) {
             launch(Dispatchers.Default) {
                 val currentEpisode = upNextQueue.currentEpisode ?: return@launch
                 player?.let { player ->
                     val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
                     episodeManager.updatePlayedUpToBlocking(currentEpisode, currentTimeSecs, true)
                 }
+                // Force a fresh player so the new source is prepared; a streaming same-episode reload
+                // would otherwise keep the already-prepared player and never switch streams.
+                forcePlayerSwitch = true
                 loadCurrentEpisode(isPlaying())
             }
         }
