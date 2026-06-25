@@ -75,6 +75,7 @@ class SummaryViewModel @Inject constructor(
     fun loadSummary(episodeUuid: String) {
         if (currentEpisodeUuid == episodeUuid && _state.value is SummaryState.Loaded) return
         if (currentEpisodeUuid == episodeUuid && _state.value is SummaryState.Upsell) return
+        if (currentEpisodeUuid == episodeUuid && loadJob?.isActive == true) return
         currentEpisodeUuid = episodeUuid
         loadedText = null
         loadJob?.cancel()
