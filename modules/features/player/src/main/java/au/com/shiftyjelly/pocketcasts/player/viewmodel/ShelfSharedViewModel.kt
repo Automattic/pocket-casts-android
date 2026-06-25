@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MimeTypes
@@ -151,7 +150,6 @@ class ShelfSharedViewModel @Inject constructor(
         } else {
             SelectedStream(uri = hlsUrl, contentType = MimeTypes.APPLICATION_M3U8)
         }
-        Log.i("StreamToggle", "toggle from ${uiState.value.streamMode} -> ${stream.uri}")
         playbackManager.selectStream(episode.uuid, stream)
     }
 

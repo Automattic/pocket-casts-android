@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -368,7 +367,6 @@ open class PlaybackManager @Inject constructor(
      * current episode the player reloads the new source at the current position.
      */
     fun selectStream(episodeUuid: String, stream: SelectedStream?) {
-        Log.i("StreamToggle", "selectStream uuid=$episodeUuid stream=$stream")
         val previous = _selectedStreams.value[episodeUuid]
         _selectedStreams.update { streams ->
             if (stream == null) streams - episodeUuid else streams + (episodeUuid to stream)
@@ -392,10 +390,6 @@ open class PlaybackManager @Inject constructor(
         val selected = _selectedStreams.value[episode.uuid]
         episode.overrideStreamUrl = selected?.uri
         episode.overrideStreamContentType = selected?.contentType
-        Log.i(
-            "StreamToggle",
-            "Playing ${episode.uuid} streamUrl=${episode.streamUrl} isStreamUrlHls=${episode.isStreamUrlHls} override=${episode.overrideStreamUrl}",
-        )
     }
 
     fun isStreaming(): Boolean {
