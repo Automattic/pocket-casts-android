@@ -48,6 +48,7 @@ internal class Media3LibrarySessionCallback(
     private val packageValidator: PackageValidator?,
     private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
+    private val canSeekProvider: () -> Boolean = { true },
 ) : MediaLibraryService.MediaLibrarySession.Callback {
 
     private val scope: CoroutineScope get() = scopeProvider()
@@ -65,7 +66,7 @@ internal class Media3LibrarySessionCallback(
                 LogBuffer.TAG_PLAYBACK,
                 "Unknown caller connected with transport-only access: ${controller.packageName} uid=${controller.uid}",
             )
-            return MediaSession.ConnectionResult.accept(SessionCommands.EMPTY, TRANSPORT_PLAYER_COMMANDS)
+            return MediaSession.ConnectionResult.accept(SessionCommands.EMPTY, transportPlayerCommands(canSeekProvider()))
         }
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")

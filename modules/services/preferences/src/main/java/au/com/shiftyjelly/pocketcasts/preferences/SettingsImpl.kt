@@ -656,6 +656,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val enableLockScreenScrubbing = UserSetting.BoolPref(
+        sharedPrefKey = "enableLockScreenScrubbing",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val autoDownloadUnmeteredOnly = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadOnlyDownloadOnWifi",
         defaultValue = true,

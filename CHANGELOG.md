@@ -43,6 +43,9 @@
 
 8.12
 -----
+*   New Features 
+    *   Enable scrubbing in notification.
+        ([#5209](https://github.com/Automattic/pocket-casts-android/pull/5209))
 *   Bug Fixes
     *   Restore episode duration after download for feeds without an RSS length attribute
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))

@@ -186,6 +186,10 @@ class MediaSessionManager(
         mediaSession?.setPlaybackState(stateBuilder.build())
     }
 
+    private fun canScrubPlayback(): Boolean {
+        return isAndroidAutoConnected || settings.enableLockScreenScrubbing.value
+    }
+
     private var bookmarkHelper: BookmarkHelper
 
     @OptIn(UnstableApi::class)
@@ -228,6 +232,8 @@ class MediaSessionManager(
         replay = 0,
         extraBufferCapacity = 10,
     )
+
+    private var isAndroidAutoConnected = false
 
     init {
         bookmarkHelper = BookmarkHelper(
@@ -302,7 +308,11 @@ class MediaSessionManager(
         if (scope.coroutineContext[Job]?.isActive != true) {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
-        val seedPlayer = SeedStatePlayer(Looper.getMainLooper())
+        val seedPlayer = SeedStatePlayer(
+            applicationLooper = Looper.getMainLooper(),
+            canSeekProvider = ::canScrubPlayback,
+        )
+
         placeholderPlayer = seedPlayer
         val placeholder = seedPlayer
 
@@ -344,6 +354,7 @@ class MediaSessionManager(
                     true
                 }
             },
+            canSeekProvider = ::canScrubPlayback,
         )
 
         media3Callback = Media3SessionCallback(
@@ -355,6 +366,7 @@ class MediaSessionManager(
             bookmarkHelper = bookmarkHelper,
             scopeProvider = { scope },
             contextProvider = { context },
+            canSeekProvider = ::canScrubPlayback,
             commandMutex = commandMutex,
         )
         media3LibraryCallback = Media3LibrarySessionCallback(
@@ -371,6 +383,7 @@ class MediaSessionManager(
             },
             scopeProvider = { scope },
             contextProvider = { context },
+            canSeekProvider = ::canScrubPlayback,
         )
 
         media3Session = MediaLibraryService.MediaLibrarySession.Builder(service, forwardingPlayer!!, media3LibraryCallback!!)
@@ -456,6 +469,7 @@ class MediaSessionManager(
                 }
             },
             onStop = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+            canSeekProvider = ::canScrubPlayback,
         )
         castStatePlayer = player
         installCastPlayerInternal(player)
@@ -483,6 +497,7 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
+            canSeekProvider = ::canScrubPlayback,
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
@@ -546,6 +561,11 @@ class MediaSessionManager(
                         player.isTransientLoss = state.transientLoss
                         updateMedia3CustomLayout()
                         media3Service?.triggerNotificationUpdate()
+                    }
+                    Util.isAndroidAutoConnectedFlow(context).collect { autoConnected ->
+                        isAndroidAutoConnected = autoConnected
+                        val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
+                        updatePlaybackState(playbackStateCompat)
                     }
                 }
             } catch (e: Exception) {
@@ -1001,14 +1021,20 @@ class MediaSessionManager(
             PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID or
             PlaybackStateCompat.ACTION_PREPARE_FROM_SEARCH
 
+        val scrubbingAction = if (canScrubPlayback()) {
+            PlaybackStateCompat.ACTION_SEEK_TO
+        } else {
+            0L
+        }
+
         if (playbackState.isEmpty) {
             return PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
-                prepareActions
+                prepareActions or
+                scrubbingAction
         } else {
             val actions = PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE or
-                PlaybackStateCompat.ACTION_SEEK_TO or
                 PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
                 PlaybackStateCompat.ACTION_PLAY_PAUSE or
@@ -1016,7 +1042,8 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM or
                 PlaybackStateCompat.ACTION_FAST_FORWARD or
                 PlaybackStateCompat.ACTION_REWIND or
-                prepareActions
+                prepareActions or
+                scrubbingAction
 
             return if (useCustomSkipButtons()) {
                 actions

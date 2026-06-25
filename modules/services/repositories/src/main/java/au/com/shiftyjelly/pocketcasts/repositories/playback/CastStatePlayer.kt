@@ -28,6 +28,7 @@ internal class CastStatePlayer(
     private val onPause: () -> Unit,
     private val onSeekTo: (Long) -> Unit,
     private val onStop: () -> Unit,
+    private val canSeekProvider: () -> Boolean = { true },
 ) : SimpleBasePlayer(applicationLooper) {
 
     private var castPlaying = false
@@ -74,6 +75,11 @@ internal class CastStatePlayer(
                         COMMAND_GET_CURRENT_MEDIA_ITEM,
                         COMMAND_GET_METADATA,
                     )
+                    .apply {
+                        if (canSeekProvider()) {
+                            add(COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
+                        }
+                    }
                     .build(),
             )
             .setPlaylist(listOf(placeholderItem))
@@ -102,6 +108,9 @@ internal class CastStatePlayer(
         positionMs: Long,
         seekCommand: @Player.Command Int,
     ): ListenableFuture<*> {
+        if (!canSeekProvider()) {
+            return Futures.immediateVoidFuture()
+        }
         onSeekTo(positionMs)
         return Futures.immediateVoidFuture()
     }
