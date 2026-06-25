@@ -900,16 +900,20 @@ open class PlaybackManager @Inject constructor(
 
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
-            if (!isAudioFocusFailed) {
-                trackPlaybackEvent(sourceView) { source, contentType ->
-                    PlaybackStopEvent(
-                        source = source.analyticsValue,
-                        contentType = contentType,
-                    )
-                }
-            }
-            stop()
+            stopSuspend(isAudioFocusFailed, sourceView)
         }
+    }
+
+    suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        if (!isAudioFocusFailed) {
+            trackPlaybackEvent(sourceView) { source, contentType ->
+                PlaybackStopEvent(
+                    source = source.analyticsValue,
+                    contentType = contentType,
+                )
+            }
+        }
+        stop()
     }
 
     suspend fun stop() {
@@ -1816,6 +1820,16 @@ open class PlaybackManager @Inject constructor(
         if (player == null || player.isRemote) {
             return
         }
+
+        // On Automotive OS stop playback on a permanent focus loss to deactivate the MediaSession.
+        if (!transientLoss && Util.isAutomotive(application)) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost permanently, stopping playback")
+            focusWasPlaying = null
+            focusManager.giveUpAudioFocus()
+            stopAsync(sourceView = SourceView.AUTO_PAUSE)
+            return
+        }
+
         // if we are playing but can't just reduce the volume then play when focus gained
         val playing = isPlaying()
         if ((playOverNotification == PlayOverNotificationSetting.NEVER) && playing) {
