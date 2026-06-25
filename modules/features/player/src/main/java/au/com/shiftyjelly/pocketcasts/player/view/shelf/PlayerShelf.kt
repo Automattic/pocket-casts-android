@@ -365,7 +365,7 @@ private fun StreamToggleButton(
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = if (isVideo) IR.drawable.ic_video_small_fill else IR.drawable.ic_headphone),
-            contentDescription = stringResource(if (isVideo) LR.string.video else LR.string.audio),
+            contentDescription = stringResource(if (isVideo) LR.string.stream else LR.string.audio),
             tint = playerColors.contrast03,
         )
     }
