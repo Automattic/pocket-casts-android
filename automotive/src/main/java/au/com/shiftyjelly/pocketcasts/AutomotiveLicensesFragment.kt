@@ -15,12 +15,14 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.extensions.openUrl
 import com.mikepenz.aboutlibraries.Libs
-import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
+import com.mikepenz.aboutlibraries.ui.compose.style.LicenseHueResolver
+import com.mikepenz.aboutlibraries.ui.compose.style.m2VariantColors
 import com.mikepenz.aboutlibraries.ui.compose.util.author
+import com.mikepenz.aboutlibraries.ui.compose.variant.LibraryBadges
 import com.mikepenz.aboutlibraries.util.withContext
 
 class AutomotiveLicensesFragment : Fragment() {
@@ -37,21 +39,34 @@ class AutomotiveLicensesFragment : Fragment() {
 
     @Composable
     private fun LicensesPage(modifier: Modifier = Modifier) {
+        val licenseChipColor = MaterialTheme.theme.colors.primaryInteractive01
         LibrariesContainer(
-            showAuthor = true,
-            showVersion = false,
-            showLicenseBadges = false,
+            badges = LibraryBadges(
+                version = false,
+                author = true,
+                license = true,
+            ),
             colors = LibraryDefaults.libraryColors(
                 libraryContentColor = MaterialTheme.theme.colors.primaryText01,
+                dialogContentColor = MaterialTheme.theme.colors.primaryText01,
+            ),
+            variantColors = LibraryDefaults.m2VariantColors(
+                rowBackground = MaterialTheme.theme.colors.primaryUi01,
+                rowExpandedBackground = MaterialTheme.theme.colors.primaryUi02,
+                rowOnBackground = MaterialTheme.theme.colors.primaryText01,
+                rowSubtleContent = MaterialTheme.theme.colors.primaryText02,
+                licenseHueResolver = LicenseHueResolver { licenseChipColor },
             ),
             libraries = produceLibraries { context ->
                 val libs = Libs.Builder().withContext(context).build()
-                // without displaying the artifact id the libraries seem to appear twice
+                // without displaying the artifact id, the libraries seem to appear twice
                 libs.copy(libraries = libs.libraries.distinctBy { "${it.name}##${it.author}" })
             }.value,
-            onLibraryClick = { library: Library ->
-                val website = library.website ?: return@LibrariesContainer
-                openUrl(website)
+            onLibraryClick = { library ->
+                library.website?.let { website ->
+                    openUrl(website)
+                    true
+                } ?: false
             },
             modifier = modifier
                 .fillMaxSize()
