@@ -404,6 +404,10 @@ class PlayerHeaderFragment :
                             }
                         }
 
+                        NavigationState.ShowStreamSelector -> {
+                            StreamSelectorFragment.show(parentFragmentManager)
+                        }
+
                         NavigationState.ShowAddBookmark -> {
                             val bookmarkArguments = viewModel.createBookmarkArguments()
                             if (bookmarkArguments != null) {

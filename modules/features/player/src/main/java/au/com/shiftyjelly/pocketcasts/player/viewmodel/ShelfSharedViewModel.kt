@@ -158,6 +158,11 @@ class ShelfSharedViewModel @Inject constructor(
     fun onStreamToggleClick(source: ShelfItemSource) {
         // No analytics yet (no dedicated ShelfActionType). source kept for a uniform shelf-action signature.
         val episode = uiState.value.episode as? PodcastEpisode ?: return
+        // More than one alternate stream is a choice, not a toggle, so open the selector dialog instead.
+        if (uiState.value.playableAlternateStreamCount > 1) {
+            viewModelScope.launch { _navigationState.emit(NavigationState.ShowStreamSelector) }
+            return
+        }
         val hlsUrl = uiState.value.hlsStreamUrl ?: return
         val downloadUrl = episode.downloadUrl?.takeIf { it.isNotBlank() } ?: return
         val stream = if (uiState.value.playerSource == PlayerSource.Alternative) {
@@ -374,6 +379,10 @@ class ShelfSharedViewModel @Inject constructor(
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+
+        /** Alternate enclosures that expose a streamable http(s) source. */
+        val playableAlternateStreamCount: Int
+            get() = alternateEnclosures.count { enclosure -> enclosure.sources.any { it.uri.startsWith("http", ignoreCase = true) } }
     }
 
     /** The source the player is currently playing: [Primary] is the progressive file, [Alternative] is the HLS stream. */
@@ -419,6 +428,7 @@ class ShelfSharedViewModel @Inject constructor(
         ) : NavigationState
 
         data object ShowMoreActions : NavigationState
+        data object ShowStreamSelector : NavigationState
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
