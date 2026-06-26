@@ -403,11 +403,11 @@ open class PlaybackManager @Inject constructor(
         }
         episode.overrideStreamUrl = null
         episode.overrideStreamContentType = null
-        // Safety net for HLS-only episodes: without a progressive file there is nothing for streamUrl
-        // to fall back to, so resolve the default HLS stream from the alternate enclosures.
-        if (episode.downloadUrl.isNullOrBlank()) {
-            val enclosures = alternateEnclosureManager.findForEpisode(episode.uuid)
-            val hlsUrl = enclosures.firstHlsStreamUrl()
+        // Default to the first HLS alternate enclosure when HLS streaming is on, or whenever the
+        // episode is HLS-only (no progressive file for streamUrl to fall back to).
+        val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
+        if (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank()) {
+            val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
             if (hlsUrl != null) {
                 episode.overrideStreamUrl = hlsUrl
                 episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
@@ -2618,23 +2618,33 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun prefetchNextEpisodeIfNeeded() {
-        val request = buildPrefetchRequest(
-            isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH),
-            isPlayerRemote = player?.isRemote,
-            nextEpisode = upNextQueue.queueEpisodes.firstOrNull(),
-            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
-            appPlatform = Util.getAppPlatform(application),
-        ) ?: return
+        val prefetchEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH)
+        val nextEpisode = upNextQueue.queueEpisodes.firstOrNull()
+        launch {
+            // The next episode isn't run through applyStreamOverride, so resolve its HLS default here
+            // and skip prefetching a progressive file that streaming would bypass.
+            val isHlsDefault = prefetchEnabled &&
+                FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
+                (nextEpisode as? PodcastEpisode)?.let { alternateEnclosureManager.findForEpisode(it.uuid).firstHlsStreamUrl() != null } == true
+            val request = buildPrefetchRequest(
+                isFeatureEnabled = prefetchEnabled,
+                isPlayerRemote = player?.isRemote,
+                nextEpisode = nextEpisode,
+                warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+                appPlatform = Util.getAppPlatform(application),
+                isHlsDefault = isHlsDefault,
+            ) ?: return@launch
 
-        if (request.episodeUuid == lastPrefetchedEpisodeUuid) return
-        lastPrefetchedEpisodeUuid = request.episodeUuid
+            if (request.episodeUuid == lastPrefetchedEpisodeUuid) return@launch
+            lastPrefetchedEpisodeUuid = request.episodeUuid
 
-        PrefetchWorker.prefetchNextEpisode(
-            context = application,
-            episodeUuid = request.episodeUuid,
-            downloadUrl = request.downloadUrl,
-            networkConstraint = request.networkConstraint,
-        )
+            PrefetchWorker.prefetchNextEpisode(
+                context = application,
+                episodeUuid = request.episodeUuid,
+                downloadUrl = request.downloadUrl,
+                networkConstraint = request.networkConstraint,
+            )
+        }
     }
 
     private fun cancelPrefetchNextEpisode() {
@@ -2803,6 +2813,7 @@ internal fun buildPrefetchRequest(
     nextEpisode: BaseEpisode?,
     warnOnMeteredNetwork: Boolean,
     appPlatform: AppPlatform = AppPlatform.Phone,
+    isHlsDefault: Boolean = false,
 ): PrefetchRequest? {
     if (!isFeatureEnabled) return null
     if (appPlatform == AppPlatform.WearOs) return null
@@ -2812,6 +2823,8 @@ internal fun buildPrefetchRequest(
     if (episode.isDownloaded) return null
     if (episode.isDownloading) return null
     if (episode.isStreamUrlHls) return null
+    // The next episode will stream HLS by default, so there is no progressive file worth prefetching.
+    if (isHlsDefault) return null
     val url = episode.downloadUrl ?: return null
 
     val networkConstraint = if (warnOnMeteredNetwork) {

@@ -93,6 +93,18 @@ class AlternateEnclosuresTest {
         assertNull(null.firstHlsStreamUrl())
     }
 
+    @Test
+    fun `defaultHlsStreamUrl returns the first hls when streaming is enabled`() {
+        val enclosures = listOf(enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"))
+        assertEquals("https://example.com/master.m3u8", enclosures.defaultHlsStreamUrl(hlsStreamingEnabled = true))
+    }
+
+    @Test
+    fun `defaultHlsStreamUrl returns null when streaming is disabled`() {
+        val enclosures = listOf(enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"))
+        assertNull(enclosures.defaultHlsStreamUrl(hlsStreamingEnabled = false))
+    }
+
     private fun enclosure(type: String, vararg uris: String) = EpisodeAlternateEnclosure(
         episodeUuid = "episode-uuid",
         position = 0,

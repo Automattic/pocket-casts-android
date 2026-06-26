@@ -11,7 +11,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -32,6 +35,9 @@ class StreamSelectorViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var playbackManager: PlaybackManager
@@ -80,6 +86,24 @@ class StreamSelectorViewModelTest {
             assertEquals(StreamKind.Video, options[2].kind)
             assertEquals(1080, options[2].height)
             assertEquals(StreamKind.Audio, options[3].kind)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `defaults to the first hls stream when hls streaming is enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
+        val viewModel = initViewModel(
+            enclosures = listOf(
+                enclosure("application/x-mpegurl", "https://example.com/master.m3u8"),
+                enclosure("video/mp4", "https://example.com/file-1080.mp4", height = 1080),
+            ),
+        )
+
+        viewModel.uiState.test {
+            val options = awaitNonEmpty().options
+            assertTrue(options.single { it.kind == StreamKind.Hls }.isSelected)
+            assertTrue(options.none { it.uri == "https://example.com/episode.mp3" && it.isSelected })
             cancelAndIgnoreRemainingEvents()
         }
     }

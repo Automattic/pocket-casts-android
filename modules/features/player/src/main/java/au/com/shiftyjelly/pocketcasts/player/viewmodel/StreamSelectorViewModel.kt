@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
+import au.com.shiftyjelly.pocketcasts.models.entity.defaultHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,7 +53,8 @@ class StreamSelectorViewModel @Inject constructor(
         enclosures: List<EpisodeAlternateEnclosure>,
         selectedStreams: Map<String, SelectedStream>,
     ): UiState {
-        val currentUri = selectedStreams[episode.uuid]?.uri ?: episode.streamUrl
+        val defaultUri = enclosures.defaultHlsStreamUrl(FeatureFlag.isEnabled(Feature.HLS_STREAMING)) ?: episode.streamUrl
+        val currentUri = selectedStreams[episode.uuid]?.uri ?: defaultUri
         val options = buildList {
             episode.downloadUrl?.takeIf { it.isNotBlank() }?.let { uri ->
                 add(option(uri, episode.fileType, height = null, bitrate = null, currentUri))

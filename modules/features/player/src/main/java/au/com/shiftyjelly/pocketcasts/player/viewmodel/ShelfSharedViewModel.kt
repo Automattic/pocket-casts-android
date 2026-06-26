@@ -138,13 +138,14 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     /**
-     * Reflects the stream that is actually playing. The HLS stream is opt-in, so without an explicit
-     * choice [BaseEpisode.streamUrl] is the progressive file and the source stays [PlayerSource.Primary].
+     * Reflects the stream that is actually playing. With HLS streaming on, the HLS stream is the
+     * default before the user picks anything, so fall back to it when there is no explicit choice.
      */
     private fun BaseEpisode?.playerSource(selectedStreams: Map<String, SelectedStream>, hlsStreamUrl: String?): PlayerSource {
         val episode = this as? PodcastEpisode ?: return PlayerSource.Primary
         hlsStreamUrl ?: return PlayerSource.Primary
-        val effectiveUri = selectedStreams[episode.uuid]?.uri ?: episode.streamUrl
+        val defaultUri = if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsStreamUrl else episode.streamUrl
+        val effectiveUri = selectedStreams[episode.uuid]?.uri ?: defaultUri
         return if (effectiveUri == hlsStreamUrl) PlayerSource.Alternative else PlayerSource.Primary
     }
 

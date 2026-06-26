@@ -145,9 +145,10 @@ sealed interface BaseEpisode {
     var overrideStreamContentType: String?
 
     /**
-     * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. An HLS
-     * stream is opt-in via [overrideStreamUrl] (the player stream selector); the default is the
-     * progressive [downloadUrl].
+     * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. The
+     * effective stream is injected via [overrideStreamUrl] when one is resolved — the player stream
+     * selector, or the default HLS alternate enclosure when HLS streaming is on — otherwise this
+     * falls back to the progressive [downloadUrl].
      */
     val streamUrl: String?
         get() = overrideStreamUrl ?: downloadUrl
