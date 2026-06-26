@@ -59,6 +59,7 @@ class SubscribeManager @Inject constructor(
     private val uuidsInQueue = HashSet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
+    private val alternateEnclosureDao = appDatabase.alternateEnclosureDao()
 
     data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean, val shouldAutoDownload: Boolean)
 
@@ -250,6 +251,12 @@ class SubscribeManager @Inject constructor(
         return Completable.fromAction {
             podcast.episodes.chunked(250).forEach { episodes ->
                 episodeDao.insertAllBlocking(episodes)
+            }
+            // Store alternate enclosures after the episode rows exist (cascading FK on episode_uuid).
+            podcast.episodes.forEach { episode ->
+                if (episode.alternateEnclosures.isNotEmpty()) {
+                    alternateEnclosureDao.replaceForEpisodeBlocking(episode.uuid, episode.alternateEnclosures)
+                }
             }
         }
             // make sure the podcast has the latest episode uuid

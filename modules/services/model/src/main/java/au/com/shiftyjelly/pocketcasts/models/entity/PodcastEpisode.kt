@@ -123,6 +123,10 @@ data class PodcastEpisode(
     @Ignore
     override var playing: Boolean = false
 
+    /** Parsed from the server response and persisted separately into the episode_alternate_enclosures table. */
+    @Ignore
+    var alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList()
+
     val playedPercentage: Int
         get() {
             return if (isFinished) {
