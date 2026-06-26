@@ -1603,6 +1603,15 @@ open class PlaybackManager @Inject constructor(
     private suspend fun pauseFinishedEpisodeForAutomotive(episode: BaseEpisode) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive: episode finished with auto play off, reloading paused to keep Now Playing card")
 
+        // The player finished the episode, so still record the completion for analytics even though
+        // we keep the episode in the queue and skip the rest of the normal completion handling.
+        eventHorizon.track(
+            PlayerEpisodeCompletedEvent(
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                episodeUuid = episode.uuid,
+            ),
+        )
+
         // Rewind so the reloaded episode is paused at the start and replays from the beginning.
         episodeManager.updatePlayedUpToBlocking(episode, 0.0, forceUpdate = true)
 

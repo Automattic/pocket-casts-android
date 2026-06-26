@@ -1,6 +1,8 @@
 8.16
 -----
-
+*   Bug Fixes
+    *   Keep the Automotive Now Playing card alive and replayable when playback ends with Autoplay next off
+        ([#5480](https://github.com/Automattic/pocket-casts-android/pull/5480))
 
 8.15
 -----
