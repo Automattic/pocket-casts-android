@@ -263,9 +263,10 @@ open class PlaybackManager @Inject constructor(
     private val _selectedStreams = MutableStateFlow<Map<String, SelectedStream>>(emptyMap())
     val selectedStreams = _selectedStreams.asStateFlow()
 
-    // Whether the stream the player actually prepared carries video, discovered at runtime from its tracks.
-    private val _playingStreamHasVideo = MutableStateFlow(false)
-    val playingStreamHasVideo = _playingStreamHasVideo.asStateFlow()
+    // Whether the stream the player prepared carries video. HLS is optimistically Unknown at load so
+    // the video surface is mounted before prepare; the player's tracks then resolve it.
+    private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
+    val streamVideoState = _streamVideoState.asStateFlow()
 
     var player: Player?
         get() = _playerFlow.value
@@ -2006,12 +2007,13 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        // Clear the runtime video signal so a previous stream's video never lingers; the new source's
-        // tracks re-report it once known.
-        _playingStreamHasVideo.value = false
-
         // Apply any runtime stream selection so streamUrl/isStreamVideo reflect the user's choice.
         applyStreamOverride(episode)
+
+        // HLS may turn out to carry video, so start it Unknown — the UI shows the video surface before
+        // the player prepares (ExoPlayer needs the surface up front to render). The tracks resolve it
+        // to HasVideo or AudioOnly. Non-HLS sticks with the episode's own video flag.
+        _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
@@ -2400,18 +2402,32 @@ open class PlaybackManager @Inject constructor(
             Timber.d("Player %s event %s", player, event)
             when (event) {
                 is PlayerEvent.Completion -> onCompletion(event.episodeUUID)
+
                 is PlayerEvent.PlayerPaused -> onPlayerPaused()
+
                 is PlayerEvent.PlayerPlaying -> onPlayerPlaying()
+
                 is PlayerEvent.BufferingStateChanged -> onBufferingStateChanged()
+
                 is PlayerEvent.DurationAvailable -> onDurationAvailable()
+
                 is PlayerEvent.SeekComplete -> onSeekComplete(event.positionMs)
+
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
+
                 is PlayerEvent.PlayerError -> onPlayerError(event)
+
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
+
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
+
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
+
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
-                is PlayerEvent.VideoTrackChanged -> _playingStreamHasVideo.value = event.hasVideo
+
+                is PlayerEvent.VideoTrackChanged -> {
+                    _streamVideoState.value = if (event.hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
+                }
             }
         }
     }

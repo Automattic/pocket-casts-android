@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -118,7 +119,7 @@ class PlayerViewModel @Inject constructor(
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
         val selectedStream: SelectedStream? = null,
-        val streamHasVideo: Boolean = false,
+        val streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -139,11 +140,17 @@ class PlayerViewModel @Inject constructor(
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
 
-        // The surface shows video for genuine video content: a stream the player found to carry video
-        // ([streamHasVideo], e.g. video HLS), a stream whose content type is video, or a video file.
-        // HLS audio stays on the audio surface.
-        val isVideo = streamHasVideo ||
-            (selectedStream?.let { it.contentType?.startsWith("video/", ignoreCase = true) == true } ?: (episode?.isVideo == true))
+        // The surface shows video for genuine video content. An HLS stream is [Unknown] until its tracks
+        // resolve, so show the surface optimistically (it must exist before the player prepares, or
+        // ExoPlayer never renders); [AudioOnly] drops back to artwork. Non-HLS uses the stream/episode type.
+        val isVideo = when (streamVideoState) {
+            StreamVideoState.HasVideo, StreamVideoState.Unknown -> true
+
+            StreamVideoState.AudioOnly -> false
+
+            StreamVideoState.NotVideo ->
+                selectedStream?.let { it.contentType?.startsWith("video/", ignoreCase = true) == true } ?: (episode?.isVideo == true)
+        }
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
@@ -205,7 +212,7 @@ class PlayerViewModel @Inject constructor(
     private val upNextAndSelectionObservable = Observables.combineLatest(
         upNextStateObservable,
         playbackManager.selectedStreams.asObservable(coroutineContext),
-        playbackManager.playingStreamHasVideo.asObservable(coroutineContext),
+        playbackManager.streamVideoState.asObservable(coroutineContext),
     )
 
     val listDataRx = Observables.combineLatest(
@@ -387,7 +394,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextAndSelection: Triple<UpNextQueue.State, Map<String, SelectedStream>, Boolean>,
+        upNextAndSelection: Triple<UpNextQueue.State, Map<String, SelectedStream>, StreamVideoState>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -397,7 +404,7 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
-        val (upNextState, selectedStreams, streamHasVideo) = upNextAndSelection
+        val (upNextState, selectedStreams, streamVideoState) = upNextAndSelection
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
         val selectedStream = episode?.let { selectedStreams[it.uuid] }
@@ -426,7 +433,7 @@ class PlayerViewModel @Inject constructor(
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
                 selectedStream = selectedStream,
-                streamHasVideo = streamHasVideo,
+                streamVideoState = streamVideoState,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,

@@ -37,6 +37,18 @@ data class SelectedStream(
     val contentType: String?,
 )
 
+/**
+ * Whether the stream the player prepared carries video. HLS starts [Unknown] so the UI mounts the
+ * video surface before the player prepares (the surface must exist when ExoPlayer starts decoding);
+ * the player's tracks then resolve it to [HasVideo] or [AudioOnly].
+ */
+enum class StreamVideoState {
+    NotVideo,
+    Unknown,
+    HasVideo,
+    AudioOnly,
+}
+
 interface Player {
     var isPip: Boolean
     val isRemote: Boolean

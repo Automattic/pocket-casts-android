@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlayerHeader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -15,9 +16,21 @@ class PlayerHeaderVideoTest {
 
     @Test
     fun `a stream found to carry video is shown on the video surface`() {
-        val header = PlayerHeader(episode = audioEpisode, streamHasVideo = true)
+        val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.HasVideo)
         assertTrue(header.isVideo)
         assertTrue(header.isVideoVisible())
+    }
+
+    @Test
+    fun `an unresolved hls stream is shown optimistically so the surface is ready`() {
+        val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.Unknown)
+        assertTrue(header.isVideo)
+    }
+
+    @Test
+    fun `a stream resolved to audio-only falls back to artwork`() {
+        val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.AudioOnly)
+        assertFalse(header.isVideo)
     }
 
     @Test
@@ -34,7 +47,6 @@ class PlayerHeaderVideoTest {
         val header = PlayerHeader(
             episode = videoEpisode,
             selectedStream = SelectedStream("https://example.com/audio.mp3", "audio/mpeg"),
-            streamHasVideo = false,
         )
         assertFalse(header.isVideo)
     }
@@ -51,7 +63,7 @@ class PlayerHeaderVideoTest {
 
     @Test
     fun `video is never shown on the surface during remote playback`() {
-        val header = PlayerHeader(episode = audioEpisode, streamHasVideo = true, isPlaybackRemote = true)
+        val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.HasVideo, isPlaybackRemote = true)
         assertTrue(header.isVideo)
         assertFalse(header.isVideoVisible())
     }
