@@ -126,7 +126,9 @@ class ShelfSharedViewModel @Inject constructor(
         val canStreamToggle = streamToggleEnabled &&
             episode is PodcastEpisode &&
             hlsStreamUrl != null &&
-            !episode.downloadUrl.isNullOrBlank()
+            !episode.downloadUrl.isNullOrBlank() &&
+            // A downloaded episode always plays its local file, so the stream toggle can't do anything.
+            !episode.isDownloaded
         return uiState.value.copy(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canStreamToggle) },
             episode = episode,
