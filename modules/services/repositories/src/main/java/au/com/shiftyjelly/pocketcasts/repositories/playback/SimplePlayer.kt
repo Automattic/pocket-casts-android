@@ -225,6 +225,9 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
+                // A stream (e.g. HLS) can turn out to carry video even when the episode metadata says audio,
+                // so report it here and let the UI switch to the video surface.
+                onVideoTrackChanged(tracks.groups.any { it.type == C.TRACK_TYPE_VIDEO && it.isSupported })
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {

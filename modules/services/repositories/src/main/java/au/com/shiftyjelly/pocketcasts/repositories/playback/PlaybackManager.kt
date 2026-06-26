@@ -263,6 +263,10 @@ open class PlaybackManager @Inject constructor(
     private val _selectedStreams = MutableStateFlow<Map<String, SelectedStream>>(emptyMap())
     val selectedStreams = _selectedStreams.asStateFlow()
 
+    // Whether the stream the player actually prepared carries video, discovered at runtime from its tracks.
+    private val _playingStreamHasVideo = MutableStateFlow(false)
+    val playingStreamHasVideo = _playingStreamHasVideo.asStateFlow()
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -2002,6 +2006,10 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        // Clear the runtime video signal so a previous stream's video never lingers; the new source's
+        // tracks re-report it once known.
+        _playingStreamHasVideo.value = false
+
         // Apply any runtime stream selection so streamUrl/isStreamVideo reflect the user's choice.
         applyStreamOverride(episode)
 
@@ -2403,6 +2411,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
+                is PlayerEvent.VideoTrackChanged -> _playingStreamHasVideo.value = event.hasVideo
             }
         }
     }

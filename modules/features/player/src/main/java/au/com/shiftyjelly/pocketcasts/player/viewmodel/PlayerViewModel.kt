@@ -118,6 +118,7 @@ class PlayerViewModel @Inject constructor(
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
         val selectedStream: SelectedStream? = null,
+        val streamHasVideo: Boolean = false,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -138,9 +139,11 @@ class PlayerViewModel @Inject constructor(
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
 
-        // The audio/stream toggle only switches the source; the surface shows video for genuine video content
-        // (a video file, or a stream whose content type is video). HLS audio stays on the audio surface.
-        val isVideo = selectedStream?.contentType?.startsWith("video/", ignoreCase = true) ?: (episode?.isVideo == true)
+        // The surface shows video for genuine video content: a stream the player found to carry video
+        // ([streamHasVideo], e.g. video HLS), a stream whose content type is video, or a video file.
+        // HLS audio stays on the audio surface.
+        val isVideo = streamHasVideo ||
+            (selectedStream?.let { it.contentType?.startsWith("video/", ignoreCase = true) == true } ?: (episode?.isVideo == true))
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
@@ -202,6 +205,7 @@ class PlayerViewModel @Inject constructor(
     private val upNextAndSelectionObservable = Observables.combineLatest(
         upNextStateObservable,
         playbackManager.selectedStreams.asObservable(coroutineContext),
+        playbackManager.playingStreamHasVideo.asObservable(coroutineContext),
     )
 
     val listDataRx = Observables.combineLatest(
@@ -383,7 +387,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextAndSelection: Pair<UpNextQueue.State, Map<String, SelectedStream>>,
+        upNextAndSelection: Triple<UpNextQueue.State, Map<String, SelectedStream>, Boolean>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -393,7 +397,7 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
-        val (upNextState, selectedStreams) = upNextAndSelection
+        val (upNextState, selectedStreams, streamHasVideo) = upNextAndSelection
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
         val selectedStream = episode?.let { selectedStreams[it.uuid] }
@@ -422,6 +426,7 @@ class PlayerViewModel @Inject constructor(
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
                 selectedStream = selectedStream,
+                streamHasVideo = streamHasVideo,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
