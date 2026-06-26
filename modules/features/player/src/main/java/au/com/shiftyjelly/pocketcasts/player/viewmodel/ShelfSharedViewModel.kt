@@ -6,9 +6,11 @@ import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -62,6 +65,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
     private val downloadQueue: DownloadQueue,
+    private val alternateEnclosureManager: AlternateEnclosureManager,
 ) : ViewModel() {
     private val upNextStateObservable: Observable<UpNextQueue.State> =
         playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -99,6 +103,9 @@ class ShelfSharedViewModel @Inject constructor(
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         playbackManager.selectedStreams,
+        shelfUpNextObservable.asFlow()
+            .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
+            .flatMapLatest { episodeUuid -> alternateEnclosureManager.observeForEpisode(episodeUuid) },
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -111,26 +118,34 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         selectedStreams: Map<String, SelectedStream>,
+        alternateEnclosures: List<EpisodeAlternateEnclosure>,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
+        val hlsStreamUrl = alternateEnclosures.firstHlsStreamUrl()
         val streamToggleEnabled = FeatureFlag.isEnabled(Feature.STREAM_SELECTOR) && FeatureFlag.isEnabled(Feature.HLS_STREAMING)
+        val canStreamToggle = streamToggleEnabled &&
+            episode is PodcastEpisode &&
+            hlsStreamUrl != null &&
+            !episode.downloadUrl.isNullOrBlank()
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || streamToggleEnabled) },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canStreamToggle) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
-            playerSource = episode.playerSource(selectedStreams),
+            alternateEnclosures = alternateEnclosures,
+            hlsStreamUrl = hlsStreamUrl,
+            playerSource = episode.playerSource(selectedStreams, hlsStreamUrl),
         )
     }
 
     /**
-     * Reflects the stream that is actually playing. With HLS streaming on, the HLS stream is the default
-     * even before the user picks anything, so fall back to [BaseEpisode.streamUrl] when there is no explicit choice.
+     * Reflects the stream that is actually playing. The HLS stream is opt-in, so without an explicit
+     * choice [BaseEpisode.streamUrl] is the progressive file and the source stays [PlayerSource.Primary].
      */
-    private fun BaseEpisode?.playerSource(selectedStreams: Map<String, SelectedStream>): PlayerSource {
+    private fun BaseEpisode?.playerSource(selectedStreams: Map<String, SelectedStream>, hlsStreamUrl: String?): PlayerSource {
         val episode = this as? PodcastEpisode ?: return PlayerSource.Primary
-        val hlsUrl = episode.hlsUrl ?: return PlayerSource.Primary
+        hlsStreamUrl ?: return PlayerSource.Primary
         val effectiveUri = selectedStreams[episode.uuid]?.uri ?: episode.streamUrl
-        return if (effectiveUri == hlsUrl) PlayerSource.Alternative else PlayerSource.Primary
+        return if (effectiveUri == hlsStreamUrl) PlayerSource.Alternative else PlayerSource.Primary
     }
 
     fun onEffectsClick(source: ShelfItemSource) {
@@ -143,7 +158,7 @@ class ShelfSharedViewModel @Inject constructor(
     fun onStreamToggleClick(source: ShelfItemSource) {
         // No analytics yet (no dedicated ShelfActionType). source kept for a uniform shelf-action signature.
         val episode = uiState.value.episode as? PodcastEpisode ?: return
-        val hlsUrl = episode.hlsUrl ?: return
+        val hlsUrl = uiState.value.hlsStreamUrl ?: return
         val downloadUrl = episode.downloadUrl?.takeIf { it.isNotBlank() } ?: return
         val stream = if (uiState.value.playerSource == PlayerSource.Alternative) {
             SelectedStream(uri = downloadUrl, contentType = episode.fileType)
@@ -351,6 +366,8 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList(),
+        val hlsStreamUrl: String? = null,
         val playerSource: PlayerSource = PlayerSource.Primary,
     ) {
         val playerShelfItems: List<ShelfItem>

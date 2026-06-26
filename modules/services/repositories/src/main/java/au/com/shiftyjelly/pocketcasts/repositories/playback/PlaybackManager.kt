@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
@@ -26,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -51,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotifi
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -163,6 +166,7 @@ open class PlaybackManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
     private val browseTreeProvider: BrowseTreeProvider,
+    private val alternateEnclosureManager: AlternateEnclosureManager,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -386,10 +390,25 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun applyStreamOverride(episode: BaseEpisode) {
+    private suspend fun applyStreamOverride(episode: BaseEpisode) {
         val selected = _selectedStreams.value[episode.uuid]
-        episode.overrideStreamUrl = selected?.uri
-        episode.overrideStreamContentType = selected?.contentType
+        if (selected != null) {
+            episode.overrideStreamUrl = selected.uri
+            episode.overrideStreamContentType = selected.contentType
+            return
+        }
+        episode.overrideStreamUrl = null
+        episode.overrideStreamContentType = null
+        // Safety net for HLS-only episodes: without a progressive file there is nothing for streamUrl
+        // to fall back to, so resolve the default HLS stream from the alternate enclosures.
+        if (episode.downloadUrl.isNullOrBlank()) {
+            val enclosures = alternateEnclosureManager.findForEpisode(episode.uuid)
+            val hlsUrl = enclosures.firstHlsStreamUrl()
+            if (hlsUrl != null) {
+                episode.overrideStreamUrl = hlsUrl
+                episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
+            }
+        }
     }
 
     fun isStreaming(): Boolean {
@@ -1691,7 +1710,7 @@ open class PlaybackManager @Inject constructor(
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
-            if (episode.hlsUrl != null && episode.isStreamUrlHls && player?.isStreaming == true) {
+            if (episode.isStreamUrlHls && player?.isStreaming == true) {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "HLS rendition duration differs from enclosure by $durationDiffSeconds seconds for episode ${episode.uuid}")
             }
             eventHorizon.track(

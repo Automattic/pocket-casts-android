@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import java.util.UUID
 
@@ -57,8 +55,6 @@ sealed interface BaseEpisode {
     var duration: Double
     var downloadUrl: String?
 
-    val hlsUrl: String?
-        get() = null
     var playedUpTo: Double
     var playingStatus: EpisodePlayingStatus
     var addedDate: Date
@@ -138,9 +134,9 @@ sealed interface BaseEpisode {
     val isVideo: Boolean
         get() = fileType?.startsWith("video/") ?: false
 
-    /** The enclosure itself is HLS or missing, so there is no progressive file to download. */
+    /** The enclosure itself is HLS, so there is no progressive file to download. */
     val isHlsOnly: Boolean
-        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType) || (downloadUrl == null && hlsUrl != null)
+        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
 
     /** A runtime-only stream chosen via the player stream selector; overrides [streamUrl] when set. */
     var overrideStreamUrl: String?
@@ -148,9 +144,13 @@ sealed interface BaseEpisode {
     /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
     var overrideStreamContentType: String?
 
-    /** The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. */
+    /**
+     * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. An HLS
+     * stream is opt-in via [overrideStreamUrl] (the player stream selector); the default is the
+     * progressive [downloadUrl].
+     */
     val streamUrl: String?
-        get() = overrideStreamUrl ?: if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsUrl ?: downloadUrl else downloadUrl
+        get() = overrideStreamUrl ?: downloadUrl
 
     /** Whether the URL that streaming will actually use is HLS. */
     val isStreamUrlHls: Boolean
@@ -159,7 +159,7 @@ sealed interface BaseEpisode {
             if (overrideStreamUrl != null) {
                 return isHlsMimeType(overrideStreamContentType) || isHlsUrl(url)
             }
-            return (hlsUrl != null && url == hlsUrl) || isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
+            return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
     /** Whether the stream that will actually play is video (honors a selected stream's content type). */

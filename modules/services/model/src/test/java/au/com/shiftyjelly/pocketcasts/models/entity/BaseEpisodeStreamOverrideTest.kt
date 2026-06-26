@@ -2,27 +2,18 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Rule
 import org.junit.Test
 
 class BaseEpisodeStreamOverrideTest {
 
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
-
     @Test
-    fun `override stream url wins over hls and download url`() {
-        FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
+    fun `override stream url wins over download url`() {
         val episode = createEpisode(
             downloadUrl = "https://example.com/episode.mp3",
-            hlsUrl = "https://example.com/master.m3u8",
         ).apply {
             overrideStreamUrl = "https://example.com/video-1080.mp4"
             overrideStreamContentType = "video/mp4"
@@ -31,13 +22,11 @@ class BaseEpisodeStreamOverrideTest {
     }
 
     @Test
-    fun `override falls back to default resolution when cleared`() {
-        FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
+    fun `stream url defaults to the progressive download when no override is set`() {
         val episode = createEpisode(
             downloadUrl = "https://example.com/episode.mp3",
-            hlsUrl = "https://example.com/master.m3u8",
         )
-        assertEquals("https://example.com/master.m3u8", episode.streamUrl)
+        assertEquals("https://example.com/episode.mp3", episode.streamUrl)
     }
 
     @Test
@@ -81,13 +70,11 @@ class BaseEpisodeStreamOverrideTest {
 
     private fun createEpisode(
         downloadUrl: String? = null,
-        hlsUrl: String? = null,
         fileType: String? = null,
     ): PodcastEpisode = PodcastEpisode(
         uuid = "test-uuid",
         publishedDate = Date(),
         downloadUrl = downloadUrl,
-        hlsUrl = hlsUrl,
         fileType = fileType,
         downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         playingStatus = EpisodePlayingStatus.NOT_PLAYED,

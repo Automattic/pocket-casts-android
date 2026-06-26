@@ -334,6 +334,7 @@ class ShelfSharedViewModelTest {
             userEpisodeManager = userEpisodeManager,
             transcriptManager = mock(),
             downloadQueue = mock(),
+            alternateEnclosureManager = mock(),
         )
     }
 }

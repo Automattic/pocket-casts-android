@@ -115,8 +115,9 @@ enum class ShelfItem(
         id = "stream_selector",
         titleId = { LR.string.stream_selector_title },
         iconId = { IR.drawable.ic_stream_selector },
-        // Show the audio/video toggle only when the episode offers both: a progressive file and an HLS stream.
-        showIf = { it is PodcastEpisode && it.hlsUrl != null && !it.downloadUrl.isNullOrBlank() },
+        // Needs a progressive file to fall back to; the HLS-stream requirement is gated in the view model,
+        // which resolves the alternate enclosures (they aren't carried on the episode entity).
+        showIf = { it is PodcastEpisode && !it.downloadUrl.isNullOrBlank() },
         // TODO: add a dedicated ShelfActionType when EventHorizon is bumped; this is inert (never tracked).
         analyticsValue = ShelfActionType.PlaybackEffects,
     ),

@@ -1,8 +1,6 @@
-package au.com.shiftyjelly.pocketcasts.servers
+package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.media3.common.MimeTypes
-import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
