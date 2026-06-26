@@ -4,6 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -303,6 +305,25 @@ class ShelfSharedViewModelTest {
             assertEquals(NavigationState.ShowMoreActions, awaitItem())
         }
     }
+
+    @Test
+    fun `playableAlternateStreamCount counts only enclosures with an http source`() {
+        val state = ShelfSharedViewModel.UiState(
+            alternateEnclosures = listOf(
+                enclosure("https://example.com/master.m3u8"),
+                enclosure("https://example.com/file-1080.mp4"),
+                enclosure("ipfs://QmManifest"),
+            ),
+        )
+
+        assertEquals(2, state.playableAlternateStreamCount)
+    }
+
+    private fun enclosure(uri: String) = EpisodeAlternateEnclosure(
+        episodeUuid = "uuid",
+        position = 0,
+        sources = listOf(AlternateEnclosureSource(uri = uri)),
+    )
 
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
