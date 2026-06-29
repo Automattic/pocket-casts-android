@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
-import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncError
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
@@ -42,7 +41,6 @@ class WearMainActivityViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
     private val watchSync: WatchSync,
-    private val phoneConnectionMonitor: PhoneConnectionMonitor,
     private val connectivityStateManager: ConnectivityStateManager,
 ) : ViewModel() {
 
@@ -73,24 +71,6 @@ class WearMainActivityViewModel @Inject constructor(
                         _state.update { it.copy(syncState = WatchSyncState.Success) }
                     },
                 )
-            }
-        }
-
-        viewModelScope.launch {
-            phoneConnectionMonitor.isPhoneConnected.collect { connected ->
-                _state.update { state ->
-                    when {
-                        !connected && state.syncState == WatchSyncState.Idle -> {
-                            state.copy(syncState = WatchSyncState.Failed(WatchSyncError.NoPhoneConnection))
-                        }
-
-                        connected && state.syncState == WatchSyncState.Failed(WatchSyncError.NoPhoneConnection) -> {
-                            state.copy(syncState = WatchSyncState.Idle)
-                        }
-
-                        else -> state
-                    }
-                }
             }
         }
 
