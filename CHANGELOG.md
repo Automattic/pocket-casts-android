@@ -1,6 +1,8 @@
 8.16
 -----
-
+*   Bug Fixes
+    *   Improved Automotive sign up screen
+        ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
 
 8.15
 -----
