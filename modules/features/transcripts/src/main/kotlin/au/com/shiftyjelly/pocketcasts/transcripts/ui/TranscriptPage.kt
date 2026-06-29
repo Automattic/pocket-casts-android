@@ -70,6 +70,7 @@ fun TranscriptPage(
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
     showCloseButton: Boolean = true,
+    showPaywallContentPreview: Boolean = true,
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
     onHighlightText: (() -> Unit)? = null,
 ) {
@@ -147,6 +148,7 @@ fun TranscriptPage(
                         onClickSubscribe = onClickSubscribe,
                         theme = theme,
                         contentPadding = paywallPadding,
+                        showContentPreview = showPaywallContentPreview,
                     )
                 }
             }

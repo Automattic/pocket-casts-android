@@ -41,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PlusUpsellBanner
+import au.com.shiftyjelly.pocketcasts.compose.components.PlusUpsellBannerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -60,7 +62,31 @@ internal fun TranscriptsPaywall(
     modifier: Modifier = Modifier,
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
     contentPadding: PaddingValues = PaddingValues(16.dp),
+    showContentPreview: Boolean = true,
 ) {
+    if (!showContentPreview) {
+        PlusUpsellBanner(
+            title = stringResource(LR.string.transcript_generated_paywall_title),
+            body = stringResource(LR.string.transcript_generated_paywall_description),
+            buttonText = if (isFreeTrialAvailable) {
+                stringResource(LR.string.profile_start_free_trial)
+            } else {
+                stringResource(LR.string.onboarding_subscribe_to_plus)
+            },
+            onClickSubscribe = onClickSubscribe,
+            colors = PlusUpsellBannerColors.forColors(
+                primaryText = theme.primaryText,
+                secondaryText = theme.secondaryText,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(theme.background)
+                .clickable(indication = null, interactionSource = null, onClick = {})
+                .then(modifier),
+        )
+        return
+    }
+
     val topPadding = contentPadding.calculateTopPadding()
     val bottomPadding = contentPadding.calculateBottomPadding()
     val startPadding = contentPadding.calculateStartPadding(LocalLayoutDirection.current)

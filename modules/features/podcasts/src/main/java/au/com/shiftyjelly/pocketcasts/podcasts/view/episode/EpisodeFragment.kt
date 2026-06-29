@@ -92,8 +92,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PlusUpsellBanner
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.compose.summary.SummaryPaywall
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -845,12 +845,19 @@ class EpisodeFragment : BaseFragment() {
                                     )
                                 }
                             } else {
-                                SummaryPaywall(
-                                    summaryText = summaryText.orEmpty(),
-                                    isFreeTrialAvailable = isFreeTrialAvailable,
+                                PlusUpsellBanner(
+                                    title = stringResource(LR.string.summary_upsell_title),
+                                    body = stringResource(LR.string.summary_upsell_description),
+                                    buttonText = if (isFreeTrialAvailable) {
+                                        stringResource(LR.string.profile_start_free_trial)
+                                    } else {
+                                        stringResource(LR.string.onboarding_subscribe_to_plus)
+                                    },
                                     onClickSubscribe = ::onSummaryUpgradeClick,
-                                    contentPadding = PaddingValues(16.dp),
-                                    modifier = Modifier.height(PaywallContentHeight),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(PaywallContentHeight)
+                                        .background(MaterialTheme.theme.colors.primaryUi01),
                                 )
                             }
                         }
@@ -936,10 +943,15 @@ class EpisodeFragment : BaseFragment() {
 
                             TranscriptPage(
                                 uiState = transcriptUiState,
-                                toolbarPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+                                toolbarPadding = if (transcriptUiState.isPaywallVisible) {
+                                    PaddingValues(0.dp)
+                                } else {
+                                    PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp)
+                                },
                                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 showCloseButton = false,
+                                showPaywallContentPreview = false,
                                 onClickClose = {},
                                 onClickReload = transcriptViewModel::reloadTranscript,
                                 onUpdateSearchTerm = transcriptViewModel::searchInTranscript,

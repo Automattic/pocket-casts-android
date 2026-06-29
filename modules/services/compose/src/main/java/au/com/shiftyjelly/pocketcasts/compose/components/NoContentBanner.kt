@@ -119,6 +119,7 @@ fun NoContentBanner(
     onPrimaryButtonClick: (() -> Unit)? = null,
     secondaryButtonText: String? = null,
     onSecondaryButtonClick: (() -> Unit)? = null,
+    header: (@Composable () -> Unit)? = null,
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isTablet = Util.isTablet(LocalContext.current)
@@ -133,12 +134,21 @@ fun NoContentBanner(
             .widthIn(max = if (isTablet || isLandscape) 450.dp else 360.dp),
     ) {
         if (isPortraitOrTablet) {
-            Image(
-                painter = painterResource(id = iconResourceId),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(colors.icon),
-            )
+            if (header != null) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.heightIn(min = 32.dp),
+                ) {
+                    header()
+                }
+            } else {
+                Image(
+                    painter = painterResource(id = iconResourceId),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    colorFilter = ColorFilter.tint(colors.icon),
+                )
+            }
         }
 
         TextH30(
