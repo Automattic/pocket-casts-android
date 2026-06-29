@@ -1,5 +1,8 @@
 8.16
 -----
+*   Bug Fixes
+    *   Reduce background playback unexpectedly stopping
+        ([#5491](https://github.com/Automattic/pocket-casts-android/pull/5491))
 
 
 8.15
