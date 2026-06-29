@@ -14,6 +14,8 @@
         ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
     *   Wear OS performance improvements
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
+    *   Fix broken Login with Phone flow on Wear OS
+        ([#5492](https://github.com/Automattic/pocket-casts-android/pull/5492))
 
 8.14
 -----
