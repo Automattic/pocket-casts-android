@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityStateManager
+import au.com.shiftyjelly.pocketcasts.wear.networking.PhoneConnectionMonitor
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncError
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.WatchSyncState
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
@@ -70,11 +71,16 @@ class WearMainActivityViewModelTest {
     private lateinit var watchSync: WatchSync
 
     @Mock
+    private lateinit var phoneConnectionMonitor: PhoneConnectionMonitor
+
+    @Mock
     private lateinit var connectivityStateManager: ConnectivityStateManager
 
     private lateinit var viewModel: WearMainActivityViewModel
 
     private val connectivityFlow = MutableStateFlow(true)
+
+    private val phoneConnectedFlow = MutableStateFlow(true)
 
     private val authData = WatchSyncAuthData(
         refreshToken = RefreshToken("refresh-token"),
@@ -89,6 +95,7 @@ class WearMainActivityViewModelTest {
             Flowable.just(SignInState.SignedOut),
         )
         whenever(tokenBundleRepository.flow).thenReturn(flowOf(null))
+        whenever(phoneConnectionMonitor.isPhoneConnected).thenReturn(phoneConnectedFlow)
         whenever(connectivityStateManager.isConnected).thenReturn(connectivityFlow)
     }
 
@@ -209,6 +216,35 @@ class WearMainActivityViewModelTest {
         verify(userManager).signOut(playbackManager, wasInitiatedByUser = false)
     }
 
+    @Test
+    fun `shows phone not connected warning when no phone is reachable`() = runTest {
+        phoneConnectedFlow.value = false
+
+        viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(
+            WatchSyncState.Failed(WatchSyncError.NoPhoneConnection),
+            viewModel.state.value.syncState,
+        )
+    }
+
+    @Test
+    fun `clears phone not connected warning when phone reconnects`() = runTest {
+        phoneConnectedFlow.value = false
+        viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+        assertEquals(
+            WatchSyncState.Failed(WatchSyncError.NoPhoneConnection),
+            viewModel.state.value.syncState,
+        )
+
+        phoneConnectedFlow.value = true
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
+    }
+
     private fun createViewModel() = WearMainActivityViewModel(
         playbackManager = playbackManager,
         podcastManager = podcastManager,
@@ -217,6 +253,7 @@ class WearMainActivityViewModelTest {
         context = context,
         tokenBundleRepository = tokenBundleRepository,
         watchSync = watchSync,
+        phoneConnectionMonitor = phoneConnectionMonitor,
         connectivityStateManager = connectivityStateManager,
     )
 }
