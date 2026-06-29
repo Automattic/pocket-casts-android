@@ -1572,6 +1572,13 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val showUpNextSortDurationTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_UP_NEXT_SORT_DURATION_TOOLTIP,
+        // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val referralClaimCode = UserSetting.StringPref(
         sharedPrefKey = "referralCode",
         defaultValue = "",

@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun TooltipPopup(
     title: String,
     tipPosition: TipPosition,
+    modifier: Modifier = Modifier,
     body: String? = null,
     @FloatRange(from = 0.0, to = 1.0) maxWidthFraction: Float? = null,
     maxWidth: Dp? = null,
@@ -66,7 +67,9 @@ fun TooltipPopup(
         onDismissRequest = onClickOutside,
     ) {
         Box(
-            modifier = Modifier.padding(elevationPadding),
+            modifier = Modifier
+                .padding(elevationPadding)
+                .then(modifier),
         ) {
             Tooltip(
                 title = title,
