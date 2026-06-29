@@ -80,7 +80,7 @@ class WearMainActivityViewModelTest {
 
     private val connectivityFlow = MutableStateFlow(true)
 
-    private val phoneConnectedFlow = MutableStateFlow(true)
+    private val phoneConnectedFlow = MutableStateFlow<Boolean?>(true)
 
     private val authData = WatchSyncAuthData(
         refreshToken = RefreshToken("refresh-token"),
@@ -221,6 +221,24 @@ class WearMainActivityViewModelTest {
         phoneConnectedFlow.value = false
 
         viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(
+            WatchSyncState.Failed(WatchSyncError.NoPhoneConnection),
+            viewModel.state.value.syncState,
+        )
+    }
+
+    @Test
+    fun `does not flash phone not connected warning while connection is unknown`() = runTest {
+        phoneConnectedFlow.value = null
+
+        viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
+
+        phoneConnectedFlow.value = false
         testScheduler.advanceUntilIdle()
 
         assertEquals(

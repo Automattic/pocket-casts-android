@@ -8,8 +8,6 @@ sealed interface WatchSyncState {
 }
 
 sealed interface WatchSyncError {
-    data object Timeout : WatchSyncError
     data object NoPhoneConnection : WatchSyncError
     data class LoginFailed(val message: String?) : WatchSyncError
-    data class Unknown(val message: String?) : WatchSyncError
 }

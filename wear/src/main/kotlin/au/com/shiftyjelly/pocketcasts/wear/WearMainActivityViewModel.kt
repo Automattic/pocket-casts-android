@@ -80,11 +80,11 @@ class WearMainActivityViewModel @Inject constructor(
             phoneConnectionMonitor.isPhoneConnected.collect { connected ->
                 _state.update { state ->
                     when {
-                        !connected && state.syncState == WatchSyncState.Idle -> {
+                        connected == false && state.syncState == WatchSyncState.Idle -> {
                             state.copy(syncState = WatchSyncState.Failed(WatchSyncError.NoPhoneConnection))
                         }
 
-                        connected && state.syncState == WatchSyncState.Failed(WatchSyncError.NoPhoneConnection) -> {
+                        connected == true && state.syncState == WatchSyncState.Failed(WatchSyncError.NoPhoneConnection) -> {
                             state.copy(syncState = WatchSyncState.Idle)
                         }
 
@@ -114,7 +114,7 @@ class WearMainActivityViewModel @Inject constructor(
 
     fun restartSyncIfNeeded() {
         if (_state.value.syncState is WatchSyncState.Failed) {
-            _state.update { it.copy(syncState = WatchSyncState.Idle) }
+            _state.update { it.copy(syncState = resetSyncState()) }
         }
     }
 
@@ -125,7 +125,17 @@ class WearMainActivityViewModel @Inject constructor(
             return
         }
         lastRetryTime = now
-        _state.update { it.copy(syncState = WatchSyncState.Idle) }
+        _state.update { it.copy(syncState = resetSyncState()) }
+    }
+
+    // The connection collector is edge-triggered, so re-check the current value here to keep
+    // showing the warning if the phone is still unreachable after a manual reset.
+    private fun resetSyncState(): WatchSyncState {
+        return if (phoneConnectionMonitor.isPhoneConnected.value == false) {
+            WatchSyncState.Failed(WatchSyncError.NoPhoneConnection)
+        } else {
+            WatchSyncState.Idle
+        }
     }
 
     private fun onLoginFromPhoneResult(loginResult: LoginResult) {

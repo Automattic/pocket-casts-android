@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.CapabilityInfo
@@ -33,9 +33,11 @@ class PhoneConnectionMonitor @Inject constructor(
 ) {
     private val capabilityInfo = MutableStateFlow<CapabilityInfo?>(null)
 
-    val isPhoneConnected: StateFlow<Boolean> = capabilityInfo
-        .map { info -> !info?.nodes.isNullOrEmpty() }
-        .stateIn(coroutineScope, SharingStarted.Lazily, false)
+    // null means the capability has not been queried yet, so callers can distinguish
+    // "not yet known" from "queried and no phone reachable" and avoid a cold-start flash.
+    val isPhoneConnected: StateFlow<Boolean?> = capabilityInfo
+        .map { info -> info?.nodes?.isNotEmpty() }
+        .stateIn(coroutineScope, SharingStarted.Lazily, null)
 
     private val listener = CapabilityClient.OnCapabilityChangedListener { info ->
         capabilityInfo.value = info
@@ -54,7 +56,7 @@ class PhoneConnectionMonitor @Inject constructor(
 
         Wearable.getCapabilityClient(context).addListener(
             listener,
-            Uri.parse("wear://*/$CAPABILITY_NAME"),
+            "wear://*/$CAPABILITY_NAME".toUri(),
             CapabilityClient.FILTER_REACHABLE,
         )
     }
