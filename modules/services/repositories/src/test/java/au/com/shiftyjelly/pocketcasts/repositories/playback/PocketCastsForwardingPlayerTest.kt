@@ -7,6 +7,7 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -184,6 +185,44 @@ class PocketCastsForwardingPlayerTest {
         val commands = player.availableCommands
 
         assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
+    }
+
+    @Test
+    fun `automotive empty timeline drops transport commands but keeps SET_MEDIA_ITEM`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val commands = PocketCastsForwardingPlayer(player, isAutomotive = true).availableCommands
+
+        assertFalse(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(commands.contains(Player.COMMAND_STOP))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
+    }
+
+    @Test
+    fun `automotive empty timeline reports null current media item`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val forwarding: Player = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertNull(forwarding.currentMediaItem)
+    }
+
+    @Test
+    fun `non-automotive keeps full commands even with empty timeline`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val commands = PocketCastsForwardingPlayer(player, isAutomotive = false).availableCommands
+
+        assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
     }
 
     @Test

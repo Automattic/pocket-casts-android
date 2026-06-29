@@ -344,6 +344,7 @@ class MediaSessionManager(
                     true
                 }
             },
+            isAutomotive = isAutomotive,
         )
 
         media3Callback = Media3SessionCallback(
@@ -435,6 +436,20 @@ class MediaSessionManager(
         Timber.i("Media3 session player swapped")
     }
 
+    @OptIn(UnstableApi::class)
+    @MainThread
+    private fun resetToEmptyState() {
+        val currentPlayer = forwardingPlayer ?: return
+        if (currentPlayer.wrappedPlayer is SeedStatePlayer) return
+        val seed = SeedStatePlayer(Looper.getMainLooper())
+        val swapped = currentPlayer.swapPlayer(seed)
+        swapped.clearMetadata()
+        forwardingPlayer = swapped
+        media3Session?.player = swapped
+        placeholderPlayer?.release()
+        placeholderPlayer = seed
+    }
+
     /**
      * Creates a [CastStatePlayer] and installs it into the Media3 session so that
      * notifications and lock screen controls reflect cast playback state.
@@ -483,6 +498,7 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
+            isAutomotive = isAutomotive,
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
@@ -584,7 +600,7 @@ class MediaSessionManager(
     private fun observeForMedia3Updates() {
         if (isAutomotive) {
             playbackManager.playbackStateRelay
-                .map { it.isStopped || it.isError || it.isEmpty }
+                .map { it.isError }
                 .distinctUntilChanged()
                 // Skip the BehaviorRelay's initial replay so we don't detach the session that
                 // PlaybackService.onCreate just attached; only react to genuine transitions after startup.
@@ -663,7 +679,12 @@ class MediaSessionManager(
                     val player = forwardingPlayer ?: return@subscribeBy
                     val data = dataOpt.get()
                     if (data == null) {
-                        player.clearMetadata()
+                        if (isAutomotive) {
+                            resetToEmptyState()
+                            updateMedia3CustomLayout()
+                        } else {
+                            player.clearMetadata()
+                        }
                         return@subscribeBy
                     }
                     val wrappedUri = if (data.showArtwork) {
