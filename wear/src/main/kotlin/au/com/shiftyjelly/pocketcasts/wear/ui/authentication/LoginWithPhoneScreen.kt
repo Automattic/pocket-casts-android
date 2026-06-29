@@ -41,7 +41,7 @@ fun LoginWithPhoneScreen(
     onRetry: () -> Unit = {},
 ) {
     when (syncState) {
-        null -> LoginWithPhoneInstructionsContent(
+        null, WatchSyncState.Idle -> LoginWithPhoneInstructionsContent(
             onLoginClick = onLoginClick,
             modifier = modifier,
         )
