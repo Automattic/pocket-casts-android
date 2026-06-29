@@ -80,8 +80,9 @@ class UpNextViewModel @Inject constructor(
     }
 
     private fun dismissSortDurationTooltip() {
-        eventHorizon.track(UpNextSortTooltipClosedEvent)
-        if (settings.showUpNextSortDurationTooltip.value) {
+        // Only act while the tooltip is visible, so off-tab interactions don't clear it early or re-emit closed events.
+        if (showSortDurationTooltip.value) {
+            eventHorizon.track(UpNextSortTooltipClosedEvent)
             settings.showUpNextSortDurationTooltip.set(false, updateModifiedAt = false)
         }
     }
