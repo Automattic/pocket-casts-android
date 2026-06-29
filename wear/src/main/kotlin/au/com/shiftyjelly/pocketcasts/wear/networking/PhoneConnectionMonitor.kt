@@ -1,65 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
-import android.content.Context
-import android.net.Uri
-import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.Wearable
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.google.android.horologist.networks.data.NetworkType
+import com.google.android.horologist.networks.status.NetworkRepository
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 /**
- * Monitors whether a paired phone running Pocket Casts is reachable.
+ * Monitors the connection status between the watch and the paired phone.
  *
- * Uses the Wearable [CapabilityClient] with [CapabilityClient.FILTER_REACHABLE] so the
- * phone is detected over any transport (Bluetooth, Wi-Fi or cloud), rather than assuming
- * a Bluetooth connection.
+ * Uses Bluetooth connectivity as an indicator of phone availability since
+ * watch-phone communication typically happens over Bluetooth.
  */
 @Singleton
 class PhoneConnectionMonitor @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @ApplicationScope private val coroutineScope: CoroutineScope,
+    private val networkRepository: NetworkRepository,
 ) {
-    private val capabilityInfo = MutableStateFlow<CapabilityInfo?>(null)
-
-    val isPhoneConnected: StateFlow<Boolean> = capabilityInfo
-        .map { info -> !info?.nodes.isNullOrEmpty() }
-        .stateIn(coroutineScope, SharingStarted.Lazily, false)
-
-    private val listener = CapabilityClient.OnCapabilityChangedListener { info ->
-        capabilityInfo.value = info
-    }
-
-    init {
-        coroutineScope.launch {
-            try {
-                capabilityInfo.value = Wearable.getCapabilityClient(context)
-                    .getCapability(CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE)
-                    .await()
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to query phone capability")
+    fun isPhoneConnected(): Boolean {
+        return try {
+            val networks = networkRepository.networkStatus.value
+            networks.networks.any { networkStatus ->
+                networkStatus.networkInfo.type == NetworkType.BT
             }
+        } catch (e: Exception) {
+            Timber.d("PhoneConnectionMonitor.isPhoneConnected failed: ${e.message}")
+            false
         }
-
-        Wearable.getCapabilityClient(context).addListener(
-            listener,
-            Uri.parse("wear://*/$CAPABILITY_NAME"),
-            CapabilityClient.FILTER_REACHABLE,
-        )
-    }
-
-    companion object {
-        private const val CAPABILITY_NAME = "pocket_casts_wear_listener"
     }
 }
