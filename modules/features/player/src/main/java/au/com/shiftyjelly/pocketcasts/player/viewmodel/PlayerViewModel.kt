@@ -118,6 +118,7 @@ class PlayerViewModel @Inject constructor(
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
         val streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
+        val videoRenderingEnabled: Boolean = true,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -138,7 +139,7 @@ class PlayerViewModel @Inject constructor(
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
 
-        val isVideo = when (streamVideoState) {
+        val isVideo = videoRenderingEnabled && when (streamVideoState) {
             StreamVideoState.HasVideo -> true
             StreamVideoState.Unknown, StreamVideoState.AudioOnly -> false
             StreamVideoState.NotVideo -> episode?.isVideo == true
@@ -203,6 +204,7 @@ class PlayerViewModel @Inject constructor(
 
     private val upNextAndStreamVideoObservable = Observables.combineLatest(
         upNextStateObservable,
+        playbackManager.videoRenderingEnabled.asObservable(coroutineContext),
         playbackManager.streamVideoState.asObservable(coroutineContext),
     )
 
@@ -385,7 +387,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextAndStreamVideo: Pair<UpNextQueue.State, StreamVideoState>,
+        upNextAndStreamVideo: Triple<UpNextQueue.State, Boolean, StreamVideoState>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -395,7 +397,7 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
-        val (upNextState, streamVideoState) = upNextAndStreamVideo
+        val (upNextState, videoRenderingEnabled, streamVideoState) = upNextAndStreamVideo
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -423,6 +425,7 @@ class PlayerViewModel @Inject constructor(
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
                 streamVideoState = streamVideoState,
+                videoRenderingEnabled = videoRenderingEnabled,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
