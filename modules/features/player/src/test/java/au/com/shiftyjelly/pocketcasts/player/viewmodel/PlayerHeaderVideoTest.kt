@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlayerHeader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -34,31 +33,33 @@ class PlayerHeaderVideoTest {
     }
 
     @Test
-    fun `a selected video stream is video even before its tracks are known`() {
-        val header = PlayerHeader(
-            episode = audioEpisode,
-            selectedStream = SelectedStream("https://example.com/video.mp4", "video/mp4"),
-        )
-        assertTrue(header.isVideo)
+    fun `a video file with no stream override is video`() {
+        assertTrue(PlayerHeader(episode = videoEpisode).isVideo)
     }
 
     @Test
-    fun `a selected audio stream over a video episode is not video`() {
+    fun `an audio file with no stream override is not video`() {
+        assertFalse(PlayerHeader(episode = audioEpisode).isVideo)
+    }
+
+    @Test
+    fun `a video stream is hidden when video rendering is disabled`() {
         val header = PlayerHeader(
-            episode = videoEpisode,
-            selectedStream = SelectedStream("https://example.com/audio.mp3", "audio/mpeg"),
+            episode = audioEpisode,
+            streamVideoState = StreamVideoState.HasVideo,
+            videoRenderingEnabled = false,
         )
         assertFalse(header.isVideo)
     }
 
     @Test
-    fun `a video file with no selected stream is video`() {
-        assertTrue(PlayerHeader(episode = videoEpisode).isVideo)
-    }
-
-    @Test
-    fun `an audio file with no selected stream is not video`() {
-        assertFalse(PlayerHeader(episode = audioEpisode).isVideo)
+    fun `an unresolved hls stream is hidden when video rendering is disabled`() {
+        val header = PlayerHeader(
+            episode = audioEpisode,
+            streamVideoState = StreamVideoState.Unknown,
+            videoRenderingEnabled = false,
+        )
+        assertFalse(header.isVideo)
     }
 
     @Test
