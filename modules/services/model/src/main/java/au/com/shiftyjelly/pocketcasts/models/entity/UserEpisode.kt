@@ -68,12 +68,6 @@ data class UserEpisode(
     @Ignore
     var hasBookmark: Boolean = false
 
-    @Ignore
-    override var overrideStreamUrl: String? = null
-
-    @Ignore
-    override var overrideStreamContentType: String? = null
-
     override fun displaySubtitle(podcast: Podcast?): String {
         return Podcast.userPodcast.title
     }
