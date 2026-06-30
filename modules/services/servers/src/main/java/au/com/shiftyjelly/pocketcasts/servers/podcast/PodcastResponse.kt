@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.servers.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -105,6 +106,7 @@ data class EpisodeInfo(
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
+            hlsUrl = enclosures.firstHlsStreamUrl(),
             title = episodeTitle,
             fileType = fileType,
             sizeInBytes = fileSize ?: 0,

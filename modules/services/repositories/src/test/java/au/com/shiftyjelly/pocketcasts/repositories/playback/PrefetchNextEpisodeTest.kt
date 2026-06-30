@@ -3,22 +3,31 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Rule
 import org.junit.Test
 
 class PrefetchNextEpisodeTest {
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private fun createEpisode(
         uuid: String = "episode-uuid",
         downloadUrl: String? = "https://example.com/episode.mp3",
+        hlsUrl: String? = null,
         downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
     ) = PodcastEpisode(
         uuid = uuid,
         publishedDate = Date(),
         downloadUrl = downloadUrl,
+        hlsUrl = hlsUrl,
         downloadStatus = downloadStatus,
     )
 
@@ -110,32 +119,29 @@ class PrefetchNextEpisodeTest {
     }
 
     @Test
-    fun `should not prefetch when the next episode streams hls by default`() {
+    fun `should not prefetch dual URL episode when HLS streaming is enabled`() {
+        FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
             isPlayerRemote = false,
-            nextEpisode = createEpisode(),
+            nextEpisode = createEpisode(hlsUrl = "https://example.com/episode.m3u8"),
             warnOnMeteredNetwork = false,
-            isHlsDefault = true,
         )
 
         assertNull(result)
     }
 
     @Test
-    fun `should not prefetch when a selected stream override is HLS`() {
-        val episode = createEpisode().apply {
-            overrideStreamUrl = "https://example.com/episode.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
-        }
+    fun `should prefetch dual URL episode when HLS streaming is disabled`() {
+        FeatureFlag.setEnabled(Feature.HLS_STREAMING, false)
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
             isPlayerRemote = false,
-            nextEpisode = episode,
+            nextEpisode = createEpisode(hlsUrl = "https://example.com/episode.m3u8"),
             warnOnMeteredNetwork = false,
         )
 
-        assertNull(result)
+        assertEquals("https://example.com/episode.mp3", result?.downloadUrl)
     }
 
     @Test
