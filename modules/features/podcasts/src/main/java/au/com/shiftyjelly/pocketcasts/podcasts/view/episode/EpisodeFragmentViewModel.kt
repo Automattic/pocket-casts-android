@@ -325,7 +325,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _pageState.update { state ->
                     state.withSummary(result)
                 }
-                if (result != null) {
+                if (result != null || !isSummaryEnabled) {
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
