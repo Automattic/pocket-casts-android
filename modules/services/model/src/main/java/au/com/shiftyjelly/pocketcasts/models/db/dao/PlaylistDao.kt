@@ -535,6 +535,7 @@ abstract class PlaylistDao {
           podcast_episode.file_type AS p_file_type,
           podcast_episode.duration AS p_duration,
           podcast_episode.download_url AS p_download_url,
+          podcast_episode.hls_url AS p_hls_url,
           podcast_episode.downloaded_file_path AS p_downloaded_file_path,
           podcast_episode.downloaded_error_details AS p_downloaded_error_details,
           podcast_episode.play_error_details AS p_play_error_details,

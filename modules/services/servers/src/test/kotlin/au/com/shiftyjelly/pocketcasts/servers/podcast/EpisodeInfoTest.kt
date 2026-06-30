@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import androidx.media3.common.MimeTypes
-import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -27,7 +26,7 @@ class EpisodeInfoTest {
 
         val episode = episodeInfo?.toEpisode("podcast-uuid")
         assertEquals("https://example.com/episode.mp3", episode?.downloadUrl)
-        assertEquals("https://example.com/master.m3u8", episode?.alternateEnclosures?.firstHlsStreamUrl())
+        assertEquals("https://example.com/master.m3u8", episode?.hlsUrl)
     }
 
     @Test
@@ -52,7 +51,7 @@ class EpisodeInfoTest {
             """.trimIndent(),
         )
 
-        assertEquals("https://example.com/master.m3u8", episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
+        assertEquals("https://example.com/master.m3u8", episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 
     @Test
@@ -94,8 +93,8 @@ class EpisodeInfoTest {
         )
 
         val episode = episodeInfo!!.toEpisode("podcast-uuid")
-        // The HLS enclosure is selectable for streaming.
-        assertEquals("https://example.com/master.m3u8", episode?.alternateEnclosures?.firstHlsStreamUrl())
+        // The HLS enclosure is selected for the streaming fast-path.
+        assertEquals("https://example.com/master.m3u8", episode?.hlsUrl)
 
         val enclosures = episodeInfo.toAlternateEnclosures()
         assertEquals(2, enclosures.size)
@@ -133,7 +132,7 @@ class EpisodeInfoTest {
         )
 
         assertNull(episodeInfo?.alternateEnclosures)
-        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 
     @Test
@@ -151,6 +150,6 @@ class EpisodeInfoTest {
             """.trimIndent(),
         )
 
-        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
     }
 }
