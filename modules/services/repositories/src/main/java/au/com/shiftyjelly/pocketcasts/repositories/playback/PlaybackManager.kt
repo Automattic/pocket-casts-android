@@ -259,8 +259,8 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // Whether the stream the player prepared carries video. HLS is optimistically Unknown at load so
-    // the video surface is mounted before prepare; the player's tracks then resolve it.
+    // Whether the stream the player prepared carries video. HLS starts Unknown until the player's
+    // tracks resolve it to HasVideo or AudioOnly; the video surface is shown only once HasVideo is known.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
@@ -1983,9 +1983,8 @@ open class PlaybackManager @Inject constructor(
         // Apply any runtime stream selection so streamUrl/isStreamVideo reflect the user's choice.
         applyStreamOverride(episode)
 
-        // HLS may turn out to carry video, so start it Unknown — the UI shows the video surface before
-        // the player prepares (ExoPlayer needs the surface up front to render). The tracks resolve it
-        // to HasVideo or AudioOnly. Non-HLS sticks with the episode's own video flag.
+        // HLS may turn out to carry video, so start it Unknown until the tracks resolve it to HasVideo
+        // or AudioOnly. Non-HLS sticks with the episode's own video flag.
         _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
         _videoRenderingEnabled.value = true
 

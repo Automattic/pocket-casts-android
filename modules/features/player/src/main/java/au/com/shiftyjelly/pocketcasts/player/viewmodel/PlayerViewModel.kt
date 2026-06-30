@@ -140,8 +140,8 @@ class PlayerViewModel @Inject constructor(
         val episodeTitle = episode?.title.orEmpty()
 
         val isVideo = videoRenderingEnabled && when (streamVideoState) {
-            StreamVideoState.HasVideo, StreamVideoState.Unknown -> true
-            StreamVideoState.AudioOnly -> false
+            StreamVideoState.HasVideo -> true
+            StreamVideoState.Unknown, StreamVideoState.AudioOnly -> false
             StreamVideoState.NotVideo -> episode?.isVideo == true
         }
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true

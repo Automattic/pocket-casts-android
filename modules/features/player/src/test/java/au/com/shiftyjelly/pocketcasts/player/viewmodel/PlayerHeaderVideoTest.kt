@@ -21,9 +21,9 @@ class PlayerHeaderVideoTest {
     }
 
     @Test
-    fun `an unresolved hls stream is shown optimistically so the surface is ready`() {
+    fun `an unresolved hls stream stays on artwork until a video track is detected`() {
         val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.Unknown)
-        assertTrue(header.isVideo)
+        assertFalse(header.isVideo)
     }
 
     @Test
@@ -47,16 +47,6 @@ class PlayerHeaderVideoTest {
         val header = PlayerHeader(
             episode = audioEpisode,
             streamVideoState = StreamVideoState.HasVideo,
-            videoRenderingEnabled = false,
-        )
-        assertFalse(header.isVideo)
-    }
-
-    @Test
-    fun `an unresolved hls stream is hidden when video rendering is disabled`() {
-        val header = PlayerHeader(
-            episode = audioEpisode,
-            streamVideoState = StreamVideoState.Unknown,
             videoRenderingEnabled = false,
         )
         assertFalse(header.isVideo)
