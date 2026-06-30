@@ -215,26 +215,33 @@ private val LatinClosingQuotes = listOf("\"", "”", "'", "’")
 // CJK (Japanese / Chinese) sentence terminators: full-width and half-width full stops / marks.
 private val CjkSentenceTerminators = listOf("。", "！", "？", "｡", "．")
 
-// CJK closing brackets / quotes. These end a sentence only when they directly follow a terminator
-// (e.g. 「…です。」), never on their own: bare closers also wrap mid-sentence quoted terms such as
-// これは「AI」について話します。, where the cue must keep accumulating rather than split.
+// CJK closing brackets / quotes. Unlike Latin closers, a bare CJK closer is NOT a sentence end on
+// its own: it also wraps mid-sentence quoted terms (これは「AI」について話します。). It only ends a
+// sentence as part of a terminal combo (「…です。」).
 private val CjkClosingMarks = listOf("」", "』", "）")
-private val CjkTerminalCombos = CjkSentenceTerminators.flatMap { terminator ->
-    CjkClosingMarks.map { closer -> "$terminator$closer" }
+
+private val SentenceTerminators = LatinSentenceTerminators + CjkSentenceTerminators
+private val ClosingMarks = LatinClosingQuotes + CjkClosingMarks
+
+// A sentence can end with a terminator directly followed by a closing quote/bracket. Transcripts mix
+// scripts and quote styles — Japanese speech in ASCII/curly quotes (彼は"はい。") or English in CJK
+// brackets (「OK.」) — so every terminator x closer pair is meaningful and is kept, so the closer
+// stays attached to its sentence rather than being split onto the next line.
+private val TerminalCombos = SentenceTerminators.flatMap { terminator ->
+    ClosingMarks.map { closer -> "$terminator$closer" }
 }
 
 fun String.endsAsSentence(): Boolean {
     return EndOfSentencePunctuation.any { punctuation -> endsWith(punctuation) }
 }
 
-private val EndOfSentencePunctuation = LatinSentenceTerminators + listOf(
+private val EndOfSentencePunctuation = SentenceTerminators + listOf(
     // Interrupted sentences
     "-",
-    // Brackets
+    // Latin brackets / quotation marks end a sentence on their own
     ")", "]", ">", "}",
-    // Quotation marks
     "\"", "”", "'", "’",
-) + CjkSentenceTerminators + CjkTerminalCombos
+) + TerminalCombos
 
 private fun String.findMidSentence(): Pair<Int, String>? {
     // We first search for punctuation followed by quotation marks (e.g., '."') before looking for standalone punctuation.
@@ -247,14 +254,9 @@ private fun String.findMidSentence(): Pair<Int, String>? {
     return findLastAnyOf(MidSentenceQuotationPunctuation) ?: findLastAnyOf(MidSentencePunctuation)
 }
 
-private val MidSentencePunctuation = LatinSentenceTerminators + CjkSentenceTerminators
+private val MidSentencePunctuation = SentenceTerminators
 
-// Pair each terminator with its own script's closing marks (Latin x Latin, CJK x CJK) so a closing
-// quote / bracket stays attached to the sentence instead of being pushed to the next line.
-// Cross-locale pairs (。" or .」) can't occur in real text, so they are intentionally not generated.
-private val MidSentenceQuotationPunctuation =
-    LatinSentenceTerminators.flatMap { terminator -> LatinClosingQuotes.map { quote -> "$terminator$quote" } } +
-        CjkTerminalCombos
+private val MidSentenceQuotationPunctuation = TerminalCombos
 
 // Splits a cue's time range proportionally at a character position, falling back to [endTimeMs]
 // for untimed/degenerate cues.

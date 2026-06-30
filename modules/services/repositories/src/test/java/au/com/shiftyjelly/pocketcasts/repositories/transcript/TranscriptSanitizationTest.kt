@@ -463,6 +463,26 @@ class TranscriptSanitizationTest {
                 output.withoutWords(),
             )
         }
+
+        @Test
+        fun `keep a Latin closing quote attached to a CJK sentence`() {
+            // Japanese speech can be wrapped in ASCII / curly quotes; the closing quote must stay
+            // with the sentence rather than being detached onto the next entry.
+            val input = buildTranscript {
+                text("彼は\"はい。\"それから")
+                text("帰った。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("彼は\"はい。\"")
+                    text("それから帰った。")
+                },
+                output.withoutWords(),
+            )
+        }
     }
 
     @RunWith(Parameterized::class)
@@ -577,6 +597,10 @@ class TranscriptSanitizationTest {
                 arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
                 arrayOf("？」", "fullwidth question mark with corner bracket"),
                 arrayOf("。』", "ideographic full stop with white corner bracket"),
+                // Mixed-script quoting: CJK terminator with Latin quote, and Latin terminator with CJK bracket
+                arrayOf("。\"", "ideographic full stop with double quote"),
+                arrayOf("。”", "ideographic full stop with double styled quote"),
+                arrayOf(".」", "dot with corner bracket"),
             )
         }
     }
