@@ -36,6 +36,7 @@ fun MenuShelfItems(
     selectedBackgroundColor: Color = Color.Black,
     normalBackgroundColor: Color = Color.Transparent,
     includeNavigationBarsPadding: Boolean = true,
+    isVideoEnabled: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val lazyListState = rememberLazyListState()
@@ -62,6 +63,7 @@ fun MenuShelfItems(
                                     item = listItem,
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
+                                    isVideoEnabled = isVideoEnabled,
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
