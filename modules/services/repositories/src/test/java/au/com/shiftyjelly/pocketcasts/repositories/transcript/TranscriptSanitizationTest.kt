@@ -321,6 +321,47 @@ class TranscriptSanitizationTest {
                 output.withoutWords(),
             )
         }
+
+        @Test
+        fun `keep CJK sentences as separate entries`() {
+            // Regression test for PCDROID-639: Japanese (CJK) sentences end with `。`/`！`/`？`,
+            // which were not recognised as sentence terminators, so the whole transcript
+            // collapsed into a single entry and the synced auto-scroll had no per-line anchor.
+            val input = buildTranscript {
+                text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                    text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                    text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence break to next entry`() {
+            val input = buildTranscript {
+                text("最初の文。続きは")
+                text("次の文。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。")
+                    text("続きは 次の文。")
+                },
+                output.withoutWords(),
+            )
+        }
     }
 
     @RunWith(Parameterized::class)
@@ -355,11 +396,17 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
                 arrayOf("-", "hyphen"),
                 arrayOf(")", "parenthesis"),
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("）", "fullwidth parenthesis"),
+                arrayOf("」", "corner bracket"),
+                arrayOf("』", "white corner bracket"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),
@@ -399,6 +446,9 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
                 arrayOf(".\"", "dot double quote"),
                 arrayOf("!\"", "exclamation mark double quote"),
                 arrayOf("?\"", "question mark double quote"),
@@ -415,6 +465,10 @@ class TranscriptSanitizationTest {
                 arrayOf("!’", "exclamation mark with single styled quote"),
                 arrayOf("?’", "question mark with single styled quote"),
                 arrayOf("…’", "ellipsis with single styled quote"),
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
             )
         }
     }
@@ -450,6 +504,9 @@ class TranscriptSanitizationTest {
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("）", "fullwidth parenthesis"),
+                arrayOf("」", "corner bracket"),
+                arrayOf("』", "white corner bracket"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),

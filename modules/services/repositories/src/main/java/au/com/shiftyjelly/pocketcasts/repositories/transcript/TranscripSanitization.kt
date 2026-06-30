@@ -189,10 +189,14 @@ fun String.endsAsSentence(): Boolean {
 private val EndOfSentencePunctuation = listOf(
     // Sentences
     ".", "!", "?", "…",
+    // CJK (Japanese / Chinese) sentence terminators
+    "。", "！", "？",
     // Interrupted sentences
     "-",
     // Brackets
     ")", "]", ">", "}",
+    // CJK closing brackets
+    "）", "」", "』",
     // Quotation marks
     "\"", "”", "'", "’",
 )
@@ -213,10 +217,14 @@ private val MidSentencePunctuation = listOf(
     "!",
     "?",
     "…",
+    // CJK (Japanese / Chinese) sentence terminators
+    "。",
+    "！",
+    "？",
 )
 
 private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
-    val quotationMarks = listOf("\"", "”", "'", "’")
+    val quotationMarks = listOf("\"", "”", "'", "’", "」", "』")
     quotationMarks.map { quotationMark -> "$punctuation$quotationMark" }
 }
 
