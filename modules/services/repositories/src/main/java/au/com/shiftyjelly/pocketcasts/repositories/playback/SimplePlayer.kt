@@ -225,6 +225,10 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
+                // A stream (e.g. HLS) can turn out to carry video even when the episode metadata says audio,
+                // so report it here and let the UI keep or drop the video surface. Match on the presence of
+                // a video track group rather than isSupported, which can be unreliable before a surface exists.
+                onVideoTrackChanged(tracks.containsType(C.TRACK_TYPE_VIDEO))
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -291,6 +295,11 @@ class SimplePlayer(
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 videoWidth = videoSize.width
                 videoHeight = videoSize.height
+
+                // Real video dimensions are definitive proof the stream carries video.
+                if (videoSize.width > 0 && videoSize.height > 0) {
+                    onVideoTrackChanged(true)
+                }
 
                 videoChangedListener?.let {
                     Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
