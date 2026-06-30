@@ -28,6 +28,25 @@ private val AnyWhiteSpace = """\s+""".toRegex()
 private val TwoOrMoreEmptySpaces = """[ \t]{2,}""".toRegex()
 private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 
+// CJK scripts (Han, Hiragana, Katakana, and CJK/fullwidth punctuation) are written without spaces
+// between characters, so joining their fragments with a space would inject visible, grammatically
+// wrong gaps. Only insert a separating space when at least one side of the join is non-CJK (e.g.
+// Latin words, which do need the space).
+private fun needsSpaceBetween(left: Char, right: Char) = !(left.isCjk() && right.isCjk())
+
+private fun Char.isCjk() = when (Character.UnicodeBlock.of(this)) {
+    Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS,
+    Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A,
+    Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS,
+    Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
+    Character.UnicodeBlock.HIRAGANA,
+    Character.UnicodeBlock.KATAKANA,
+    Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
+    -> true
+
+    else -> false
+}
+
 private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     val phraseAccumulator = StringBuilder()
     val wordTimings = mutableListOf<TranscriptEntry.WordTiming>()
@@ -37,7 +56,12 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
 
     fun appendToAccumulator(text: String, startTimeMs: Long, endTimeMs: Long) {
         val trimmedText = text.trim()
-        phraseAccumulator.append(' ').append(trimmedText)
+        if (trimmedText.isNotEmpty()) {
+            if (phraseAccumulator.isNotEmpty() && needsSpaceBetween(phraseAccumulator.last(), trimmedText.first())) {
+                phraseAccumulator.append(' ')
+            }
+            phraseAccumulator.append(trimmedText)
+        }
         if (accumulatedStartTimeMs == -1L || (startTimeMs in 0..<accumulatedStartTimeMs)) {
             accumulatedStartTimeMs = startTimeMs
         }
@@ -182,6 +206,17 @@ private fun TranscriptEntry.isNotEmpty() = when (this) {
     is TranscriptEntry.Text -> value.isNotEmpty()
 }
 
+// CJK (Japanese / Chinese) sentence terminators: full-width and half-width full stops / marks.
+private val CjkSentenceTerminators = listOf("。", "！", "？", "｡", "．")
+
+// CJK closing brackets / quotes. These end a sentence only when they directly follow a terminator
+// (e.g. 「…です。」), never on their own: bare closers also wrap mid-sentence quoted terms such as
+// これは「AI」について話します。, where the cue must keep accumulating rather than split.
+private val CjkClosingMarks = listOf("」", "』", "）")
+private val CjkTerminalCombos = CjkSentenceTerminators.flatMap { terminator ->
+    CjkClosingMarks.map { closer -> "$terminator$closer" }
+}
+
 fun String.endsAsSentence(): Boolean {
     return EndOfSentencePunctuation.any { punctuation -> endsWith(punctuation) }
 }
@@ -189,17 +224,13 @@ fun String.endsAsSentence(): Boolean {
 private val EndOfSentencePunctuation = listOf(
     // Sentences
     ".", "!", "?", "…",
-    // CJK (Japanese / Chinese) sentence terminators
-    "。", "！", "？",
     // Interrupted sentences
     "-",
     // Brackets
     ")", "]", ">", "}",
-    // CJK closing brackets
-    "）", "」", "』",
     // Quotation marks
     "\"", "”", "'", "’",
-)
+) + CjkSentenceTerminators + CjkTerminalCombos
 
 private fun String.findMidSentence(): Pair<Int, String>? {
     // We first search for punctuation followed by quotation marks (e.g., '."') before looking for standalone punctuation.
@@ -217,11 +248,7 @@ private val MidSentencePunctuation = listOf(
     "!",
     "?",
     "…",
-    // CJK (Japanese / Chinese) sentence terminators
-    "。",
-    "！",
-    "？",
-)
+) + CjkSentenceTerminators
 
 private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
     val quotationMarks = listOf("\"", "”", "'", "’", "」", "』")

@@ -357,7 +357,71 @@ class TranscriptSanitizationTest {
             assertEquals(
                 buildTranscript {
                     text("最初の文。")
-                    text("続きは 次の文。")
+                    // No space is inserted between CJK fragments when they are rejoined.
+                    text("続きは次の文。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not insert spaces when joining CJK fragments`() {
+            val input = buildTranscript {
+                text("これは")
+                text("ペンです。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これはペンです。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence preserves timing and word offsets`() {
+            val input = buildTranscript {
+                text("最初の文。続きは", startTimeMs = 0, endTimeMs = 1000)
+                text("次の文。", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。", startTimeMs = 0, endTimeMs = 625)
+                    text("続きは次の文。", startTimeMs = 625, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+
+            val secondEntry = output[1] as TranscriptEntry.Text
+            assertEquals(
+                listOf(
+                    TranscriptEntry.WordTiming("続きは", 625, 1000, 0, 3),
+                    TranscriptEntry.WordTiming("次の文。", 1000, 2000, 3, 7),
+                ),
+                secondEntry.words,
+            )
+        }
+
+        @Test
+        fun `do not treat a bare CJK closing mark as a sentence end`() {
+            // A bare closing 」 wraps a mid-sentence quoted term (これは「AI」について話します。), so a
+            // cue ending right after it must keep accumulating instead of splitting mid-sentence.
+            val input = buildTranscript {
+                text("これは「AI」")
+                text("について話します。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これは「AI」について話します。")
                 },
                 output.withoutWords(),
             )
@@ -399,14 +463,19 @@ class TranscriptSanitizationTest {
                 arrayOf("。", "ideographic full stop"),
                 arrayOf("！", "fullwidth exclamation mark"),
                 arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("．", "fullwidth full stop"),
                 arrayOf("-", "hyphen"),
                 arrayOf(")", "parenthesis"),
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
-                arrayOf("）", "fullwidth parenthesis"),
-                arrayOf("」", "corner bracket"),
-                arrayOf("』", "white corner bracket"),
+                // CJK closers end a sentence only as a terminal combo (terminator + closer)
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
+                arrayOf("。）", "ideographic full stop with fullwidth parenthesis"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),
@@ -449,6 +518,8 @@ class TranscriptSanitizationTest {
                 arrayOf("。", "ideographic full stop"),
                 arrayOf("！", "fullwidth exclamation mark"),
                 arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("．", "fullwidth full stop"),
                 arrayOf(".\"", "dot double quote"),
                 arrayOf("!\"", "exclamation mark double quote"),
                 arrayOf("?\"", "question mark double quote"),
