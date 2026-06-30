@@ -23,6 +23,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,6 +58,7 @@ class WearMainActivityViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private var lastRetryTime: Long = 0L
+    private var loginWatchdogJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -99,6 +101,9 @@ class WearMainActivityViewModel @Inject constructor(
                 .getSignInState()
                 .asFlow()
                 .collect { signInState ->
+                    if (signInState.isSignedInAsPlusOrPatron) {
+                        loginWatchdogJob?.cancel()
+                    }
                     _state.update { it.copy(signInState = signInState) }
                 }
         }
@@ -114,6 +119,7 @@ class WearMainActivityViewModel @Inject constructor(
 
     fun restartSyncIfNeeded() {
         if (_state.value.syncState is WatchSyncState.Failed) {
+            loginWatchdogJob?.cancel()
             _state.update { it.copy(syncState = resetSyncState()) }
         }
     }
@@ -125,6 +131,7 @@ class WearMainActivityViewModel @Inject constructor(
             return
         }
         lastRetryTime = now
+        loginWatchdogJob?.cancel()
         _state.update { it.copy(syncState = resetSyncState()) }
     }
 
@@ -164,6 +171,24 @@ class WearMainActivityViewModel @Inject constructor(
                         LogBuffer.e(TAG, "Failed to refresh podcasts after sign in: ${e.message}")
                     }
                 }
+                startLoginWatchdog()
+            }
+        }
+    }
+
+    private fun startLoginWatchdog() {
+        loginWatchdogJob?.cancel()
+        loginWatchdogJob = viewModelScope.launch {
+            delay(LOGIN_RESOLUTION_TIMEOUT_MS)
+            val current = _state.value
+            if (!current.signInState.isSignedInAsPlusOrPatron && current.syncState == WatchSyncState.Success) {
+                LogBuffer.e(TAG, "Login succeeded but subscription was not confirmed in ${LOGIN_RESOLUTION_TIMEOUT_MS / 1000}s; showing retry")
+                _state.update {
+                    it.copy(
+                        syncState = WatchSyncState.Failed(WatchSyncError.LoginFailed(null)),
+                        showLoggingInScreen = false,
+                    )
+                }
             }
         }
     }
@@ -195,6 +220,7 @@ class WearMainActivityViewModel @Inject constructor(
         private const val REFRESH_START_DELAY = 1000L
         private const val RETRY_DEBOUNCE_MS = 3_000L
         private const val CONNECTIVITY_DEBOUNCE_MS = 2_000L
+        private const val LOGIN_RESOLUTION_TIMEOUT_MS = 20_000L
         private const val TAG = "WearMainActivityViewModel"
     }
 }

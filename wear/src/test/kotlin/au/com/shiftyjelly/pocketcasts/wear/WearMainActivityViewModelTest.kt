@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -117,6 +118,9 @@ class WearMainActivityViewModelTest {
 
     @Test
     fun `successful phone login moves to Success and shows logging in screen`() = runTest {
+        whenever(userManager.getSignInState()).thenReturn(
+            Flowable.just(SignInState.SignedIn("email", Subscription.PlusPreview)),
+        )
         whenever(tokenBundleRepository.flow).thenReturn(flowOf(authData))
         whenever(watchSync.processAuthDataChange(anyOrNull(), any(), any())).thenAnswer { invocation ->
             invocation.getArgument<(LoginResult) -> Unit>(1)(LoginResult.Success(mock<AuthResultModel>()))
@@ -129,6 +133,22 @@ class WearMainActivityViewModelTest {
         val state = viewModel.state.value
         assertEquals(WatchSyncState.Success, state.syncState)
         assertEquals(true, state.showLoggingInScreen)
+    }
+
+    @Test
+    fun `login success surfaces retry when subscription is not confirmed in time`() = runTest {
+        whenever(tokenBundleRepository.flow).thenReturn(flowOf(authData))
+        whenever(watchSync.processAuthDataChange(anyOrNull(), any(), any())).thenAnswer { invocation ->
+            invocation.getArgument<(LoginResult) -> Unit>(1)(LoginResult.Success(mock<AuthResultModel>()))
+            Unit
+        }
+
+        viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals(WatchSyncState.Failed(WatchSyncError.LoginFailed(null)), state.syncState)
+        assertEquals(false, state.showLoggingInScreen)
     }
 
     @Test
