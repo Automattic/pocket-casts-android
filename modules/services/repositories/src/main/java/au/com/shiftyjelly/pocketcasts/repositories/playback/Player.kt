@@ -31,12 +31,6 @@ sealed interface EpisodeLocation {
 val EpisodeLocation?.isHlsStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isHls == true
 
-/** A media stream the user picked via the player stream selector (runtime-only, not persisted). */
-data class SelectedStream(
-    val uri: String,
-    val contentType: String?,
-)
-
 /**
  * Whether the stream the player prepared carries video. HLS starts [Unknown] so the UI mounts the
  * video surface before the player prepares (the surface must exist when ExoPlayer starts decoding);

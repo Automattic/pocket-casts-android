@@ -259,10 +259,6 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // Runtime-only stream selections (episode uuid -> chosen stream) made via the player stream selector.
-    private val _selectedStreams = MutableStateFlow<Map<String, SelectedStream>>(emptyMap())
-    val selectedStreams = _selectedStreams.asStateFlow()
-
     // Whether the stream the player prepared carries video. HLS is optimistically Unknown at load so
     // the video surface is mounted before prepare; the player's tracks then resolve it.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
@@ -374,37 +370,7 @@ open class PlaybackManager @Inject constructor(
         return playbackStateRelay.blockingFirst().isPlaying
     }
 
-    /**
-     * Pick which stream to play for an episode. Pass null to clear the selection. When it targets the
-     * current episode the player reloads the new source at the current position.
-     */
-    fun selectStream(episodeUuid: String, stream: SelectedStream?) {
-        val previous = _selectedStreams.value[episodeUuid]
-        _selectedStreams.update { streams ->
-            if (stream == null) streams - episodeUuid else streams + (episodeUuid to stream)
-        }
-        if (previous != stream && upNextQueue.currentEpisode?.uuid == episodeUuid) {
-            launch(Dispatchers.Default) {
-                val currentEpisode = upNextQueue.currentEpisode ?: return@launch
-                player?.let { player ->
-                    val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
-                    episodeManager.updatePlayedUpToBlocking(currentEpisode, currentTimeSecs, true)
-                }
-                // Force a fresh player so the new source is prepared; a streaming same-episode reload
-                // would otherwise keep the already-prepared player and never switch streams.
-                forcePlayerSwitch = true
-                loadCurrentEpisode(isPlaying())
-            }
-        }
-    }
-
     private suspend fun applyStreamOverride(episode: BaseEpisode) {
-        val selected = _selectedStreams.value[episode.uuid]
-        if (selected != null) {
-            episode.overrideStreamUrl = selected.uri
-            episode.overrideStreamContentType = selected.contentType
-            return
-        }
         episode.overrideStreamUrl = null
         episode.overrideStreamContentType = null
         // Default to the first HLS alternate enclosure when HLS streaming is on, or whenever the
