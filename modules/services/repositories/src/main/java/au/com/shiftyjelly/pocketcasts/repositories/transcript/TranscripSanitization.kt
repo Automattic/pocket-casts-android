@@ -30,17 +30,20 @@ private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 
 // CJK scripts (Han, Hiragana, Katakana, and CJK/fullwidth punctuation) are written without spaces
 // between characters, so joining their fragments with a space would inject visible, grammatically
-// wrong gaps. Only insert a separating space when at least one side of the join is non-CJK (e.g.
-// Latin words, which do need the space).
-private fun needsSpaceBetween(left: Char, right: Char) = !(left.isCjk() && right.isCjk())
+// wrong gaps. A space is only needed when neither side of the join is CJK (e.g. between Latin words);
+// keeping a CJK character on either side space-free also avoids a stray gap before a closing mark
+// (「AI」, never 「AI 」). Boundary code points are inspected so supplementary-plane ideographs
+// (CJK Ext B+, encoded as surrogate pairs) are recognised too.
+private fun needsSpaceBetween(accumulated: CharSequence, next: CharSequence): Boolean {
+    val left = Character.codePointBefore(accumulated, accumulated.length)
+    val right = Character.codePointAt(next, 0)
+    return !(left.isCjk() || right.isCjk())
+}
 
-private fun Char.isCjk() = when (Character.UnicodeBlock.of(this)) {
-    Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS,
-    Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A,
-    Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS,
-    Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
+private fun Int.isCjk() = Character.isIdeographic(this) || when (Character.UnicodeBlock.of(this)) {
     Character.UnicodeBlock.HIRAGANA,
     Character.UnicodeBlock.KATAKANA,
+    Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
     Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
     -> true
 
@@ -57,7 +60,7 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     fun appendToAccumulator(text: String, startTimeMs: Long, endTimeMs: Long) {
         val trimmedText = text.trim()
         if (trimmedText.isNotEmpty()) {
-            if (phraseAccumulator.isNotEmpty() && needsSpaceBetween(phraseAccumulator.last(), trimmedText.first())) {
+            if (phraseAccumulator.isNotEmpty() && needsSpaceBetween(phraseAccumulator, trimmedText)) {
                 phraseAccumulator.append(' ')
             }
             phraseAccumulator.append(trimmedText)
@@ -206,6 +209,9 @@ private fun TranscriptEntry.isNotEmpty() = when (this) {
     is TranscriptEntry.Text -> value.isNotEmpty()
 }
 
+private val LatinSentenceTerminators = listOf(".", "!", "?", "…")
+private val LatinClosingQuotes = listOf("\"", "”", "'", "’")
+
 // CJK (Japanese / Chinese) sentence terminators: full-width and half-width full stops / marks.
 private val CjkSentenceTerminators = listOf("。", "！", "？", "｡", "．")
 
@@ -221,9 +227,7 @@ fun String.endsAsSentence(): Boolean {
     return EndOfSentencePunctuation.any { punctuation -> endsWith(punctuation) }
 }
 
-private val EndOfSentencePunctuation = listOf(
-    // Sentences
-    ".", "!", "?", "…",
+private val EndOfSentencePunctuation = LatinSentenceTerminators + listOf(
     // Interrupted sentences
     "-",
     // Brackets
@@ -243,17 +247,14 @@ private fun String.findMidSentence(): Pair<Int, String>? {
     return findLastAnyOf(MidSentenceQuotationPunctuation) ?: findLastAnyOf(MidSentencePunctuation)
 }
 
-private val MidSentencePunctuation = listOf(
-    ".",
-    "!",
-    "?",
-    "…",
-) + CjkSentenceTerminators
+private val MidSentencePunctuation = LatinSentenceTerminators + CjkSentenceTerminators
 
-private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
-    val quotationMarks = listOf("\"", "”", "'", "’", "」", "』")
-    quotationMarks.map { quotationMark -> "$punctuation$quotationMark" }
-}
+// Pair each terminator with its own script's closing marks (Latin x Latin, CJK x CJK) so a closing
+// quote / bracket stays attached to the sentence instead of being pushed to the next line.
+// Cross-locale pairs (。" or .」) can't occur in real text, so they are intentionally not generated.
+private val MidSentenceQuotationPunctuation =
+    LatinSentenceTerminators.flatMap { terminator -> LatinClosingQuotes.map { quote -> "$terminator$quote" } } +
+        CjkTerminalCombos
 
 // Splits a cue's time range proportionally at a character position, falling back to [endTimeMs]
 // for untimed/degenerate cues.

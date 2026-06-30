@@ -426,6 +426,43 @@ class TranscriptSanitizationTest {
                 output.withoutWords(),
             )
         }
+
+        @Test
+        fun `do not insert a space before a CJK closer after a Latin run`() {
+            // A Latin token can abut a CJK closer across a cue boundary (cue 1 ends 「AI, cue 2
+            // starts 」…); no space should be inserted before the closing bracket.
+            val input = buildTranscript {
+                text("これは「AI")
+                text("」について話します。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これは「AI」について話します。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not insert spaces around supplementary-plane CJK ideographs`() {
+            // 𠀋 is a CJK Extension B ideograph encoded as a surrogate pair; it must still count as CJK.
+            val input = buildTranscript {
+                text("𠀋")
+                text("です。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("𠀋です。")
+                },
+                output.withoutWords(),
+            )
+        }
     }
 
     @RunWith(Parameterized::class)
