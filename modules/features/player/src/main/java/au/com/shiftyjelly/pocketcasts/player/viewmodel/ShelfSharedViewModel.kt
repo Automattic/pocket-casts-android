@@ -2,23 +2,19 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SelectedStream
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -65,7 +61,6 @@ class ShelfSharedViewModel @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
     private val downloadQueue: DownloadQueue,
-    private val alternateEnclosureManager: AlternateEnclosureManager,
 ) : ViewModel() {
     private val upNextStateObservable: Observable<UpNextQueue.State> =
         playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -102,10 +97,8 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNextObservable.asFlow()
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
-        playbackManager.selectedStreams,
-        shelfUpNextObservable.asFlow()
-            .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
-            .flatMapLatest { episodeUuid -> alternateEnclosureManager.observeForEpisode(episodeUuid) },
+        playbackManager.streamVideoState,
+        playbackManager.videoRenderingEnabled,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -117,38 +110,18 @@ class ShelfSharedViewModel @Inject constructor(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
-        selectedStreams: Map<String, SelectedStream>,
-        alternateEnclosures: List<EpisodeAlternateEnclosure>,
+        streamVideoState: StreamVideoState,
+        videoRenderingEnabled: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
-        val hlsStreamUrl = alternateEnclosures.firstHlsStreamUrl()
-        val streamToggleEnabled = FeatureFlag.isEnabled(Feature.STREAM_SELECTOR) && FeatureFlag.isEnabled(Feature.HLS_STREAMING)
-        val canStreamToggle = streamToggleEnabled &&
-            episode is PodcastEpisode &&
-            hlsStreamUrl != null &&
-            !episode.downloadUrl.isNullOrBlank() &&
-            // A downloaded episode always plays its local file, so the stream toggle can't do anything.
-            !episode.isDownloaded
+        val streamHasVideo = streamVideoState == StreamVideoState.HasVideo || streamVideoState == StreamVideoState.Unknown
+        val canToggleVideo = FeatureFlag.isEnabled(Feature.HLS_STREAMING) && episode is PodcastEpisode && streamHasVideo
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canStreamToggle) },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
-            alternateEnclosures = alternateEnclosures,
-            hlsStreamUrl = hlsStreamUrl,
-            playerSource = episode.playerSource(selectedStreams, hlsStreamUrl),
+            isVideoRenderingEnabled = videoRenderingEnabled,
         )
-    }
-
-    /**
-     * Reflects the stream that is actually playing. With HLS streaming on, the HLS stream is the
-     * default before the user picks anything, so fall back to it when there is no explicit choice.
-     */
-    private fun BaseEpisode?.playerSource(selectedStreams: Map<String, SelectedStream>, hlsStreamUrl: String?): PlayerSource {
-        val episode = this as? PodcastEpisode ?: return PlayerSource.Primary
-        hlsStreamUrl ?: return PlayerSource.Primary
-        val defaultUri = if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsStreamUrl else episode.streamUrl
-        val effectiveUri = selectedStreams[episode.uuid]?.uri ?: defaultUri
-        return if (effectiveUri == hlsStreamUrl) PlayerSource.Alternative else PlayerSource.Primary
     }
 
     fun onEffectsClick(source: ShelfItemSource) {
@@ -158,22 +131,8 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun onStreamToggleClick(source: ShelfItemSource) {
-        // No analytics yet (no dedicated ShelfActionType). source kept for a uniform shelf-action signature.
-        val episode = uiState.value.episode as? PodcastEpisode ?: return
-        // More than one alternate stream is a choice, not a toggle, so open the selector dialog instead.
-        if (uiState.value.playableAlternateStreamCount > 1) {
-            viewModelScope.launch { _navigationState.emit(NavigationState.ShowStreamSelector) }
-            return
-        }
-        val hlsUrl = uiState.value.hlsStreamUrl ?: return
-        val downloadUrl = episode.downloadUrl?.takeIf { it.isNotBlank() } ?: return
-        val stream = if (uiState.value.playerSource == PlayerSource.Alternative) {
-            SelectedStream(uri = downloadUrl, contentType = episode.fileType)
-        } else {
-            SelectedStream(uri = hlsUrl, contentType = MimeTypes.APPLICATION_M3U8)
-        }
-        playbackManager.selectStream(episode.uuid, stream)
+    fun onVideoToggleClick(source: ShelfItemSource) {
+        playbackManager.toggleVideoRendering()
     }
 
     fun onSleepClick(source: ShelfItemSource) {
@@ -374,22 +333,13 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
-        val alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList(),
-        val hlsStreamUrl: String? = null,
-        val playerSource: PlayerSource = PlayerSource.Primary,
+        val isVideoRenderingEnabled: Boolean = true,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
-
-        /** Alternate enclosures that expose a streamable http(s) source. */
-        val playableAlternateStreamCount: Int
-            get() = alternateEnclosures.count { enclosure -> enclosure.sources.any { it.uri.startsWith("http", ignoreCase = true) } }
     }
-
-    /** The source the player is currently playing: [Primary] is the progressive file, [Alternative] is the HLS stream. */
-    enum class PlayerSource { Primary, Alternative }
 
     data class PlayerShelfData(
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,
@@ -431,7 +381,6 @@ class ShelfSharedViewModel @Inject constructor(
         ) : NavigationState
 
         data object ShowMoreActions : NavigationState
-        data object ShowStreamSelector : NavigationState
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState

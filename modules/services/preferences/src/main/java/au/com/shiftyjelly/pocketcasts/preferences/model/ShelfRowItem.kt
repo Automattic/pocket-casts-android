@@ -113,13 +113,9 @@ enum class ShelfItem(
     ),
     StreamSelector(
         id = "stream_selector",
-        titleId = { LR.string.stream_selector_title },
-        iconId = { IR.drawable.ic_stream_selector },
-        // Needs a progressive file to fall back to and must not be downloaded (a downloaded episode plays
-        // its local file); the HLS-stream requirement is gated in the view model, which resolves the
-        // alternate enclosures (they aren't carried on the episode entity).
-        showIf = { it is PodcastEpisode && !it.downloadUrl.isNullOrBlank() && !it.isDownloaded },
-        // TODO: add a dedicated ShelfActionType when EventHorizon is bumped; this is inert (never tracked).
+        titleId = { LR.string.player_action_show_video },
+        iconId = { IR.drawable.ic_video_on },
+        showIf = { it is PodcastEpisode },
         analyticsValue = ShelfActionType.PlaybackEffects,
     ),
     ;

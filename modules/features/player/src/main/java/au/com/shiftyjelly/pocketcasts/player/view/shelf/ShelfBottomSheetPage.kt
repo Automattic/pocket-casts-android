@@ -73,7 +73,7 @@ fun ShelfBottomSheetPage(
         val uiState by shelfViewModel.uiState.collectAsState()
         MenuShelfItems(
             state = uiState,
-            playerSource = shelfUiState.playerSource,
+            isVideoEnabled = shelfUiState.isVideoRenderingEnabled,
             onClick = { item, enabled ->
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
@@ -145,7 +145,7 @@ fun ShelfBottomSheetPage(
                         )
                     }
 
-                    ShelfItem.StreamSelector -> shelfSharedViewModel.onStreamToggleClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.StreamSelector -> shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.OverflowMenu)
                 }
                 if (item != ShelfItem.Cast) onDismiss()
             },

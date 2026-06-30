@@ -4,8 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
-import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -24,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -307,23 +306,13 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `playableAlternateStreamCount counts only enclosures with an http source`() {
-        val state = ShelfSharedViewModel.UiState(
-            alternateEnclosures = listOf(
-                enclosure("https://example.com/master.m3u8"),
-                enclosure("https://example.com/file-1080.mp4"),
-                enclosure("ipfs://QmManifest"),
-            ),
-        )
+    fun `when video toggle clicked, then video rendering is toggled`() = runTest {
+        initViewModel()
 
-        assertEquals(2, state.playableAlternateStreamCount)
+        shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
+
+        verify(playbackManager).toggleVideoRendering()
     }
-
-    private fun enclosure(uri: String) = EpisodeAlternateEnclosure(
-        episodeUuid = "uuid",
-        position = 0,
-        sources = listOf(AlternateEnclosureSource(uri = uri)),
-    )
 
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
@@ -344,6 +333,9 @@ class ShelfSharedViewModelTest {
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
+        whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(StreamVideoState.NotVideo))
+        whenever(playbackManager.videoRenderingEnabled).thenReturn(MutableStateFlow(true))
+
         shelfSharedViewModel = ShelfSharedViewModel(
             eventHorizon = EventHorizon(TestEventSink()),
             applicationScope = applicationScope,
@@ -355,7 +347,6 @@ class ShelfSharedViewModelTest {
             userEpisodeManager = userEpisodeManager,
             transcriptManager = mock(),
             downloadQueue = mock(),
-            alternateEnclosureManager = mock(),
         )
     }
 }

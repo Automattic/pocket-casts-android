@@ -140,8 +140,6 @@
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
     <string name="stream_selector_title">Streams</string>
-    <string name="stream_source_alternative">Alternative</string>
-    <string name="stream_source_primary">Primary</string>
     <string name="subscribe">Follow</string>
     <string name="subscribe_to">Subscribe to %s</string>
     <string name="upgrade_to">Upgrade to %s</string>
@@ -389,8 +387,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>

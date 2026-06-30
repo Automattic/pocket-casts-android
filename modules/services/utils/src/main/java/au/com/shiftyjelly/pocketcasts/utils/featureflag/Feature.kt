@@ -369,15 +369,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
     ),
-    STREAM_SELECTOR(
-        key = "stream_selector",
-        title = "Show stream selector on the player",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-06-23"),
-    ),
 }
 
 sealed class FeatureTier {

@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerSource
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -47,20 +46,19 @@ fun ShelfItemRow(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
-    playerSource: PlayerSource = PlayerSource.Primary,
+    isVideoEnabled: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-    val showStreamToggleLabel = item == ShelfItem.StreamSelector && !isEditable
-    val switchToPrimary = playerSource == PlayerSource.Alternative
-    val titleResId = if (showStreamToggleLabel) {
-        if (switchToPrimary) LR.string.stream_source_primary else LR.string.stream_source_alternative
+    val showVideoToggleLabel = item == ShelfItem.StreamSelector && !isEditable
+    val titleResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video
     } else {
         item.titleId(episode)
     }
-    val iconResId = if (showStreamToggleLabel) {
-        if (switchToPrimary) IR.drawable.ic_headphone else IR.drawable.ic_video_small_fill
+    val iconResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) IR.drawable.ic_video_off else IR.drawable.ic_video_on
     } else {
         item.iconId(episode)
     }

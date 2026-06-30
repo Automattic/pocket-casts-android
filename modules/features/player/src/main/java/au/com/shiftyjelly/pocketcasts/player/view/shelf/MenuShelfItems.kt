@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.moreActionsTitle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.shortcutTitle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.UiState
@@ -37,7 +36,7 @@ fun MenuShelfItems(
     selectedBackgroundColor: Color = Color.Black,
     normalBackgroundColor: Color = Color.Transparent,
     includeNavigationBarsPadding: Boolean = true,
-    playerSource: PlayerSource = PlayerSource.Primary,
+    isVideoEnabled: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val lazyListState = rememberLazyListState()
@@ -64,7 +63,7 @@ fun MenuShelfItems(
                                     item = listItem,
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
-                                    playerSource = playerSource,
+                                    isVideoEnabled = isVideoEnabled,
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
