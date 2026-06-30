@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Required by ExoPlayer's wake mode (SimplePlayer) to hold a wake lock
+         during background playback. Declared here, in the module that uses it,
+         so every consumer (app, wear, automotive) gets it without relying on
+         transitive merge from unrelated modules. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application android:usesCleartextTraffic="true">
         <provider
             android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider"
