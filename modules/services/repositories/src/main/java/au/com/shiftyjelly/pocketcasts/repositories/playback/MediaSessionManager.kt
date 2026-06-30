@@ -607,7 +607,7 @@ class MediaSessionManager(
                 .skip(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { inactive -> setMedia3SessionAttached(!inactive) },
+                    onNext = { hasError -> setMedia3SessionAttached(!hasError) },
                     onError = { Timber.e(it, "Error observing automotive active state") },
                 )
                 .addTo(disposables)

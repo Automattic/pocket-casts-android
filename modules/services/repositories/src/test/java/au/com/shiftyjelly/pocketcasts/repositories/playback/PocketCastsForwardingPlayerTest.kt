@@ -275,6 +275,23 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `swapPlayer preserves isAutomotive so swapped-in empty player shows empty state`() {
+        val emptyPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val player = PocketCastsForwardingPlayer(mockPlayer, isAutomotive = true)
+        val swapped: Player = player.swapPlayer(emptyPlayer)
+
+        assertNull(swapped.currentMediaItem)
+        val commands = swapped.availableCommands
+        assertFalse(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(commands.contains(Player.COMMAND_STOP))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
+    }
+
+    @Test
     fun `swapPlayer wraps the new player`() {
         val newWrappedPlayer = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()
