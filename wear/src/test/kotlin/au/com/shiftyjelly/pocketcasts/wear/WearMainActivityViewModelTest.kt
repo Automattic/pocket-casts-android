@@ -22,6 +22,7 @@ import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -35,15 +36,17 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
  * Unit tests for WearMainActivityViewModel.
  *
- * The watch passively listens for the auth token the phone publishes to the data
- * layer: the screen shows the login instructions (Idle) until a token arrives, at
- * which point a login is attempted and the state moves to Success or Failed.
+ * The watch only listens for the auth token the phone publishes to the data layer
+ * once the user opens the Log in with phone screen (restartSyncIfNeeded). Until then
+ * the state stays Idle. Once listening, a login is attempted and the state moves to
+ * Success or Failed.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class WearMainActivityViewModelTest {
@@ -117,6 +120,29 @@ class WearMainActivityViewModelTest {
     }
 
     @Test
+    fun `does not attempt login until the phone login screen is shown`() = runTest {
+        whenever(userManager.getSignInState()).thenReturn(
+            Flowable.just(SignInState.SignedIn("email", Subscription.PlusPreview)),
+        )
+        whenever(tokenBundleRepository.flow).thenReturn(flowOf(authData))
+        whenever(watchSync.processAuthDataChange(anyOrNull(), any(), any())).thenAnswer { invocation ->
+            invocation.getArgument<(LoginResult) -> Unit>(1)(LoginResult.Success(mock<AuthResultModel>()))
+            Unit
+        }
+
+        viewModel = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
+        verify(watchSync, never()).processAuthDataChange(anyOrNull(), any(), any())
+
+        viewModel.restartSyncIfNeeded()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(WatchSyncState.Success, viewModel.state.value.syncState)
+    }
+
+    @Test
     fun `successful phone login moves to Success and shows logging in screen`() = runTest {
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(SignInState.SignedIn("email", Subscription.PlusPreview)),
@@ -128,6 +154,7 @@ class WearMainActivityViewModelTest {
         }
 
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
 
         val state = viewModel.state.value
@@ -144,6 +171,7 @@ class WearMainActivityViewModelTest {
         }
 
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
 
         val state = viewModel.state.value
@@ -160,6 +188,7 @@ class WearMainActivityViewModelTest {
         }
 
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
 
         assertEquals(
@@ -177,9 +206,29 @@ class WearMainActivityViewModelTest {
         }
 
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
 
         assertEquals(WatchSyncState.Success, viewModel.state.value.syncState)
+    }
+
+    @Test
+    fun `restartSyncIfNeeded clears a stale success back to instructions`() = runTest {
+        whenever(tokenBundleRepository.flow).thenReturn(flowOf(authData))
+        whenever(watchSync.processAuthDataChange(anyOrNull(), any(), any())).thenAnswer { invocation ->
+            invocation.getArgument<() -> Unit>(2)()
+            Unit
+        }
+        viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
+        testScheduler.advanceUntilIdle()
+        assertEquals(WatchSyncState.Success, viewModel.state.value.syncState)
+
+        whenever(tokenBundleRepository.flow).thenReturn(emptyFlow())
+        viewModel.restartSyncIfNeeded()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
     }
 
     @Test
@@ -190,13 +239,16 @@ class WearMainActivityViewModelTest {
             Unit
         }
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
         assertEquals(
             WatchSyncState.Failed(WatchSyncError.LoginFailed("Invalid token")),
             viewModel.state.value.syncState,
         )
 
+        whenever(tokenBundleRepository.flow).thenReturn(emptyFlow())
         viewModel.restartSyncIfNeeded()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
     }
@@ -209,9 +261,12 @@ class WearMainActivityViewModelTest {
             Unit
         }
         viewModel = createViewModel()
+        viewModel.restartSyncIfNeeded()
         testScheduler.advanceUntilIdle()
 
+        whenever(tokenBundleRepository.flow).thenReturn(emptyFlow())
         viewModel.retrySync()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(WatchSyncState.Idle, viewModel.state.value.syncState)
     }
