@@ -59,25 +59,9 @@ class WearMainActivityViewModel @Inject constructor(
 
     private var lastRetryTime: Long = 0L
     private var loginWatchdogJob: Job? = null
+    private var tokenSyncJob: Job? = null
 
     init {
-        viewModelScope.launch {
-            tokenBundleRepository.flow.collect { watchSyncAuthData ->
-                LogBuffer.i(TAG, "Received DataLayer emission: ${if (watchSyncAuthData != null) "non-null" else "null"}")
-                if (watchSyncAuthData != null) {
-                    _state.update { it.copy(syncState = WatchSyncState.Syncing) }
-                }
-                watchSync.processAuthDataChange(
-                    data = watchSyncAuthData,
-                    onResult = { result -> onLoginFromPhoneResult(result) },
-                    onAlreadyLoggedIn = {
-                        LogBuffer.i(TAG, "Already logged in - treating as sync success")
-                        _state.update { it.copy(syncState = WatchSyncState.Success) }
-                    },
-                )
-            }
-        }
-
         viewModelScope.launch {
             phoneConnectionMonitor.isPhoneConnected.collect { connected ->
                 _state.update { state ->
@@ -118,10 +102,12 @@ class WearMainActivityViewModel @Inject constructor(
     }
 
     fun restartSyncIfNeeded() {
-        if (_state.value.syncState is WatchSyncState.Failed) {
+        val syncState = _state.value.syncState
+        if (syncState is WatchSyncState.Failed || syncState == WatchSyncState.Success) {
             loginWatchdogJob?.cancel()
             _state.update { it.copy(syncState = resetSyncState()) }
         }
+        startPhoneTokenSync()
     }
 
     fun retrySync() {
@@ -133,6 +119,27 @@ class WearMainActivityViewModel @Inject constructor(
         lastRetryTime = now
         loginWatchdogJob?.cancel()
         _state.update { it.copy(syncState = resetSyncState()) }
+        startPhoneTokenSync()
+    }
+
+    private fun startPhoneTokenSync() {
+        tokenSyncJob?.cancel()
+        tokenSyncJob = viewModelScope.launch {
+            tokenBundleRepository.flow.collect { watchSyncAuthData ->
+                LogBuffer.i(TAG, "Received DataLayer emission: ${if (watchSyncAuthData != null) "non-null" else "null"}")
+                if (watchSyncAuthData != null) {
+                    _state.update { it.copy(syncState = WatchSyncState.Syncing) }
+                }
+                watchSync.processAuthDataChange(
+                    data = watchSyncAuthData,
+                    onResult = { result -> onLoginFromPhoneResult(result) },
+                    onAlreadyLoggedIn = {
+                        LogBuffer.i(TAG, "Already logged in - treating as sync success")
+                        _state.update { it.copy(syncState = WatchSyncState.Success) }
+                    },
+                )
+            }
+        }
     }
 
     // The connection collector is edge-triggered, so re-check the current value here to keep
