@@ -55,7 +55,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblSignIn"
-            app:layout_constraintWidth_max="591dp">
+            app:layout_constraintWidth_max="500dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtEmail"
