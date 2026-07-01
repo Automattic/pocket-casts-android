@@ -103,12 +103,17 @@ data class EpisodeInfo(
         val publishedDate = published.parseIsoDate() ?: return null
         val episodeTitle = title.orEmpty()
         val enclosures = toAlternateEnclosures()
+        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+            enclosures.firstHlsMimeType() ?: fileType
+        } else {
+            fileType
+        }
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
             title = episodeTitle,
-            // No progressive download means an HLS-only episode; use the HLS MIME so isHlsOnly detects it.
-            fileType = if (url.isNullOrBlank()) enclosures.firstHlsMimeType() ?: fileType else fileType,
+            fileType = resolvedFileType,
             sizeInBytes = fileSize ?: 0,
             duration = duration ?: 0.0,
             publishedDate = publishedDate,

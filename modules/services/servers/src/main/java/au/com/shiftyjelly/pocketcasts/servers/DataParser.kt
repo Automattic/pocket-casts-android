@@ -146,6 +146,12 @@ object DataParser {
         val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
         val url = getString(jsonEpisode, "url")
         val fileType = getString(jsonEpisode, "file_type")
+        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+            enclosures.firstHlsMimeType() ?: fileType
+        } else {
+            fileType
+        }
         return PodcastEpisode(
             downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
@@ -155,8 +161,7 @@ object DataParser {
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
-            // No progressive download means an HLS-only episode; use the HLS MIME so isHlsOnly detects it.
-            fileType = if (url.isNullOrBlank()) enclosures.firstHlsMimeType() ?: fileType else fileType,
+            fileType = resolvedFileType,
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),

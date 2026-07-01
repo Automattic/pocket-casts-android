@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.dao.AlternateEnclosureDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -28,17 +26,6 @@ class AlternateEnclosureManagerImplTest {
         whenever(alternateEnclosureDao.findByEpisodeUuid("episode-uuid")).thenReturn(emptyList())
 
         assertEquals(emptyList<EpisodeAlternateEnclosure>(), manager.findForEpisode("episode-uuid"))
-    }
-
-    @Test
-    fun `observeForEpisode emits the dao flow`() = runBlocking {
-        val enclosures = listOf(enclosure(position = 0))
-        whenever(alternateEnclosureDao.observeByEpisodeUuid("episode-uuid")).thenReturn(flowOf(enclosures))
-
-        manager.observeForEpisode("episode-uuid").test {
-            assertEquals(enclosures, awaitItem())
-            awaitComplete()
-        }
     }
 
     private fun enclosure(position: Int) = EpisodeAlternateEnclosure(

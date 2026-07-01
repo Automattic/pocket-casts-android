@@ -147,6 +147,27 @@ class EpisodeInfoTest {
     }
 
     @Test
+    fun `hls-only video episode keeps its video file type`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "",
+              "file_type": "video/mp4",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals("video/mp4", episode?.fileType)
+        assertEquals(true, episode?.isVideo)
+    }
+
+    @Test
     fun `parse episode without alternate enclosures`() {
         val episodeInfo = adapter.fromJson(
             """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","published":"2026-06-11T00:00:00Z"}""",
