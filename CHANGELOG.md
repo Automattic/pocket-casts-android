@@ -1,7 +1,6 @@
 8.16
 -----
 
-
 8.15
 -----
 *   New Features
@@ -14,6 +13,8 @@
         ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
     *   Wear OS performance improvements
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
+    *   Improved Automotive sign up screen
+        ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
 
 8.14
 -----
