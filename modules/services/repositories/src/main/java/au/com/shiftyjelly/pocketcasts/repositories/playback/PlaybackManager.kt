@@ -263,6 +263,9 @@ open class PlaybackManager @Inject constructor(
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
+    private val _videoRenderingEnabled = MutableStateFlow(true)
+    val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -378,6 +381,10 @@ open class PlaybackManager @Inject constructor(
                 episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
             }
         }
+    }
+
+    fun toggleVideoRendering() {
+        _videoRenderingEnabled.value = !_videoRenderingEnabled.value
     }
 
     fun isStreaming(): Boolean {
@@ -1976,6 +1983,7 @@ open class PlaybackManager @Inject constructor(
 
         // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
         _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
+        _videoRenderingEnabled.value = true
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
