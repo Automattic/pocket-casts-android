@@ -2,7 +2,7 @@
 name: cherry-pick-to-release
 description: Cherry-pick a merged pull request's commit(s) from `main` onto the current release branch and open a draft PR.
 disable-model-invocation: true
-allowed-tools: Read, Bash(which gh), Bash(git fetch *), Bash(git branch *), Bash(git branch -r *), Bash(git checkout *), Bash(git switch *), Bash(git cherry-pick *), Bash(git status *), Bash(git log *), Bash(git show *), Bash(git rev-list *), Bash(git push *), Bash(gh pr view *), Bash(gh pr create --repo Automattic/pocket-casts-android *), Bash(gh pr edit --repo Automattic/pocket-casts-android *), Bash(gh pr list --repo Automattic/pocket-casts-android *)
+allowed-tools: Read, Bash(which gh), Bash(git fetch *), Bash(git branch *), Bash(git branch -r *), Bash(git checkout *), Bash(git switch *), Bash(git cherry-pick *), Bash(git status *), Bash(git log *), Bash(git show *), Bash(git rev-list *), Bash(git push *), Bash(grep *), Bash(sed *), Bash(sort *), Bash(tail *), Bash(gh pr view *), Bash(gh pr create --repo Automattic/pocket-casts-android *), Bash(gh pr edit --repo Automattic/pocket-casts-android *), Bash(gh pr list --repo Automattic/pocket-casts-android *)
 ---
 
 # Cherry-pick a PR to the release branch
@@ -49,7 +49,7 @@ The repository squash-merges PRs, so the merge commit is usually a single commit
 git rev-list --parents -n 1 <mergeCommit.oid>
 ```
 
-- **One parent** (squash or rebase merge): cherry-pick the commit directly.
+- **One parent** (squash merge, the repo default): cherry-pick the commit directly.
   ```bash
   git cherry-pick <mergeCommit.oid>
   ```
@@ -58,7 +58,7 @@ git rev-list --parents -n 1 <mergeCommit.oid>
   git cherry-pick -m 1 <mergeCommit.oid>
   ```
 
-If `mergeCommit` is null (rare, e.g. the PR was merged in an unusual way), fall back to the PR's own commits from `gh pr view --json commits` and cherry-pick them in order, oldest first. Tell the user this is what you are doing.
+If `mergeCommit` is null (rare, e.g. the PR was merged in an unusual way), or the PR was rebase-merged (each commit is replayed onto `main`, so `mergeCommit.oid` is only the last of them and cherry-picking it alone would silently drop the earlier commits), fall back to the PR's own commits from `gh pr view --json commits` and cherry-pick them in order, oldest first. Tell the user this is what you are doing.
 
 ### 4. Create the branch off the release branch
 
@@ -95,7 +95,7 @@ gh pr create --repo Automattic/pocket-casts-android --draft \
 
 - Copy the `[Type]` and `[Area]` labels from the source PR onto the new one:
   ```bash
-  gh pr edit <new-pr-number> --repo Automattic/pocket-casts-android --add-label "<label>"
+  gh pr edit --repo Automattic/pocket-casts-android <new-pr-number> --add-label "<label>"
   ```
 - Output the new PR URL.
 
