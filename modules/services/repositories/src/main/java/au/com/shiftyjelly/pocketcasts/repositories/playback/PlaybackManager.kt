@@ -271,6 +271,8 @@ open class PlaybackManager @Inject constructor(
 
     private var currentStreamHlsAvailable = false
 
+    private var lastPlaybackSource: SourceView? = null
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -398,6 +400,11 @@ open class PlaybackManager @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun audioOnlyModeOrNull(): Boolean? {
+        if (getCurrentEpisode()?.isStreamUrlHls != true) return null
+        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
     }
 
     private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
@@ -1392,6 +1399,11 @@ open class PlaybackManager @Inject constructor(
                     PlaybackFailedEvent(
                         episodeUuid = episode?.uuid.orEmpty(),
                         error = errorMessage,
+                        podcastUuid = episode?.podcastOrSubstituteUuid,
+                        source = lastPlaybackSource?.analyticsValue,
+                        contentType = playbackContentTypeFor(episode),
+                        playbackProtocol = if (episode?.isStreamUrlHls == true) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                        hlsErrorDetail = if (episode?.isStreamUrlHls == true) event.error?.errorCodeName else null,
                     ),
                 )
 
@@ -1574,6 +1586,8 @@ open class PlaybackManager @Inject constructor(
                 PlayerEpisodeCompletedEvent(
                     podcastUuid = episode.podcastOrSubstituteUuid,
                     episodeUuid = episode.uuid,
+                    hlsAvailable = currentStreamHlsAvailable,
+                    audioOnlyMode = audioOnlyModeOrNull(),
                 ),
             )
 
@@ -2345,10 +2359,13 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
+        lastPlaybackSource = sourceView
         trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackPlayEvent(
                 source = source.analyticsValue,
                 contentType = contentType,
+                hlsAvailable = currentStreamHlsAvailable,
+                audioOnlyMode = audioOnlyModeOrNull(),
             )
         }
     }
@@ -2476,6 +2493,8 @@ open class PlaybackManager @Inject constructor(
                         PlayerEpisodeCompletedEvent(
                             podcastUuid = episode.podcastOrSubstituteUuid,
                             episodeUuid = episode.uuid,
+                            hlsAvailable = currentStreamHlsAvailable,
+                            audioOnlyMode = audioOnlyModeOrNull(),
                         ),
                     )
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
