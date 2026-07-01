@@ -51,6 +51,11 @@ internal fun VideoBox(
                 videoView.player = player
                 videoView.connectWithDelay()
             },
+            onRelease = { videoView ->
+                // Switching to a non-video stream removes this composable; detach the surface so the
+                // last video frame doesn't linger over the artwork.
+                videoView.releaseSurface()
+            },
             modifier = modifier.aspectRatio(aspectRatio),
         )
     }

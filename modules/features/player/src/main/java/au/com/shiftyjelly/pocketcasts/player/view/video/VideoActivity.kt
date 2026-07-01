@@ -15,14 +15,19 @@ import android.util.Rational
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -92,13 +97,25 @@ class VideoActivity : AppCompatActivity() {
         }
 
         playbackManager.playbackStateLive.observe(this) { playbackState ->
-            val currentEpisode = playbackManager.upNextQueue.currentEpisode
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 updatePictureInPictureActions(playbackState.isPlaying)
             }
-            if (currentEpisode == null || !currentEpisode.isVideo) {
-                finish()
+            finishIfNotVideo()
+        }
+
+        // The playing stream, not the episode's file type, decides whether there is video; an audio
+        // source resolves to AudioOnly, so close and hand back to the audio player.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                playbackManager.streamVideoState.collect { finishIfNotVideo() }
             }
+        }
+    }
+
+    private fun finishIfNotVideo() {
+        val currentEpisode = playbackManager.upNextQueue.currentEpisode
+        if (currentEpisode == null || playbackManager.streamVideoState.value == StreamVideoState.AudioOnly) {
+            finish()
         }
     }
 
