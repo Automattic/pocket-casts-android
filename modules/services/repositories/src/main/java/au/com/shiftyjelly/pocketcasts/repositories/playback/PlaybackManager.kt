@@ -83,6 +83,7 @@ import com.automattic.eventhorizon.PlaybackContentType
 import com.automattic.eventhorizon.PlaybackEpisodeAutoplayedEvent
 import com.automattic.eventhorizon.PlaybackEpisodeDurationChangedEvent
 import com.automattic.eventhorizon.PlaybackFailedEvent
+import com.automattic.eventhorizon.PlaybackHlsToggledEvent
 import com.automattic.eventhorizon.PlaybackPauseEvent
 import com.automattic.eventhorizon.PlaybackPlayEvent
 import com.automattic.eventhorizon.PlaybackSeekEvent
@@ -385,6 +386,15 @@ open class PlaybackManager @Inject constructor(
 
     fun toggleVideoRendering() {
         _videoRenderingEnabled.value = !_videoRenderingEnabled.value
+        getCurrentEpisode()?.let { episode ->
+            eventHorizon.track(
+                PlaybackHlsToggledEvent(
+                    switchedTo = if (_videoRenderingEnabled.value) PlaybackContentType.Video else PlaybackContentType.Audio,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                ),
+            )
+        }
     }
 
     fun isStreaming(): Boolean {
