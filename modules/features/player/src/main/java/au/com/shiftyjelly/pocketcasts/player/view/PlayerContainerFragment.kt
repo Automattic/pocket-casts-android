@@ -211,6 +211,7 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isChaptersTab(position) -> {
+                        chaptersViewModel.trackChaptersShown()
                         PlayerTabType.Chapters
                     }
 

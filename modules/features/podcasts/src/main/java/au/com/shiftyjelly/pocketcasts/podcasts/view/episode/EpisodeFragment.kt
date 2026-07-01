@@ -1177,7 +1177,10 @@ class EpisodeFragment : BaseFragment() {
     ): List<ButtonTab> {
         val tabClickHandlers = mapOf<Int, () -> Unit>(
             LR.string.details to { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) },
-            LR.string.chapters to { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) },
+            LR.string.chapters to {
+                viewModel.selectContentTab(EpisodeContentTab.CHAPTERS)
+                chaptersViewModel.trackChaptersShown()
+            },
             LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
             LR.string.transcript to {
                 if (transcript != null) {

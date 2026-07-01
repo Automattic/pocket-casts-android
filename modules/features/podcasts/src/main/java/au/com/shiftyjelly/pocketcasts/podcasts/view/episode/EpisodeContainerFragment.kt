@@ -242,6 +242,9 @@ class EpisodeContainerFragment :
                     super.onPageSelected(position)
                     btnFav.isVisible = adapter.isDetailsTab(position)
                     btnShare.isVisible = adapter.isDetailsTab(position)
+                    if (adapter.isChaptersTab(position)) {
+                        chaptersViewModel.trackChaptersShown()
+                    }
                     viewModel.onPageSelected(adapter.tabType(position))
                 }
             })
@@ -399,6 +402,8 @@ class EpisodeContainerFragment :
         fun tabType(position: Int) = sections[position].analyticsValue
 
         fun isDetailsTab(position: Int) = sections[position] is Section.Details
+
+        fun isChaptersTab(position: Int) = sections[position] is Section.Chapters
     }
 
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {
