@@ -32,7 +32,6 @@ class UpNextViewModel @Inject constructor(
     private val _isSignedInAsPaidUser = MutableStateFlow(false)
     val isSignedInAsPaidUser: StateFlow<Boolean> get() = _isSignedInAsPaidUser
 
-    // Whether Up Next is the visible foreground, so the tooltip's Compose Popup (its own window) doesn't draw over the player opened above it.
     private val _isUpNextVisible = MutableStateFlow(false)
 
     val showSortDurationTooltip: StateFlow<Boolean> = combine(
@@ -80,7 +79,6 @@ class UpNextViewModel @Inject constructor(
     }
 
     private fun dismissSortDurationTooltip() {
-        // Only act while the tooltip is visible, so off-tab interactions don't clear it early or re-emit closed events.
         if (showSortDurationTooltip.value) {
             eventHorizon.track(UpNextSortTooltipClosedEvent)
             settings.showUpNextSortDurationTooltip.set(false, updateModifiedAt = false)

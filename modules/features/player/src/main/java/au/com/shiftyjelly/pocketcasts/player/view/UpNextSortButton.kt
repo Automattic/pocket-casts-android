@@ -46,7 +46,6 @@ fun UpNextSortButton(
                 tint = MaterialTheme.theme.colors.primaryIcon02,
             )
         }
-        // Fade the tooltip out (keeping it composed until done) when the button scrolls out of view, since the anchored Popup can't follow it.
         var tooltipComposed by remember { mutableStateOf(showTooltip) }
         val tooltipAlpha = remember { Animatable(if (showTooltip) 1f else 0f) }
         LaunchedEffect(showTooltip) {

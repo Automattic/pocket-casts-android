@@ -257,7 +257,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
             }
         }
 
-        // Show the "Sort by Duration" Up Next coachmark to users upgrading into this release, but not to fresh installs.
+        // Show the "Sort by Duration" Up Next tooltip to users upgrading into this release, but not to fresh installs.
         if (previousVersionCode < 9437) {
             settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
         }
