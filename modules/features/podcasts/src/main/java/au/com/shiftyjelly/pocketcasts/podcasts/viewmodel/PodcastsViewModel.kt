@@ -99,7 +99,7 @@ class PodcastsViewModel @AssistedInject constructor(
                 when (sortType) {
                     PodcastsSortType.RECENTLY_PLAYED -> podcastManager.observePodcastsBySortedRecentlyPlayed()
                     else -> podcastManager.observePodcastsSortedByLatestEpisode()
-                }
+                }.map { podcasts -> sortType to podcasts }
             }
 
         val foldersFlow: Flow<List<FolderItem.Folder>> = folderManager.observeFolders()
@@ -124,9 +124,8 @@ class PodcastsViewModel @AssistedInject constructor(
         return combine(
             podcastsFlow,
             foldersFlow,
-            settings.podcastsSortType.flow,
             userManager.getSignInState().asFlow(),
-        ) { podcasts, folders, sortType, signInState ->
+        ) { (sortType, podcasts), folders, signInState ->
             withContext(Dispatchers.Default) {
                 buildUiState(podcasts, folders, sortType, signInState)
             }
@@ -139,6 +138,7 @@ class PodcastsViewModel @AssistedInject constructor(
         sortType: PodcastsSortType,
         signInState: SignInState,
     ) = UiState(
+        sortType = sortType,
         items = when {
             signInState.isNoAccountOrFree -> buildPodcastItems(podcasts, sortType)
 
@@ -319,6 +319,7 @@ class PodcastsViewModel @AssistedInject constructor(
 
     data class UiState(
         val isLoadingItems: Boolean = false,
+        val sortType: PodcastsSortType = PodcastsSortType.default,
         val items: List<FolderItem> = emptyList(),
         val folder: Folder? = null,
         val isSignedInAsPlusOrPatron: Boolean = false,

@@ -24,6 +24,7 @@ class PodcastsOptionsDialog(
     val fragment: Fragment,
     val settings: Settings,
     private val eventHorizon: EventHorizon,
+    private val onSortTypeChanged: (PodcastsSortType) -> Unit,
 ) {
     private var showDialog: OptionsDialog? = null
     private var sortDialog: OptionsDialog? = null
@@ -113,6 +114,9 @@ class PodcastsOptionsDialog(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
                 click = {
+                    if (order.clientId != sortOrder.clientId) {
+                        onSortTypeChanged(order)
+                    }
                     settings.podcastsSortType.set(order, updateModifiedAt = true)
                     trackSortByChanged(order)
                 },
