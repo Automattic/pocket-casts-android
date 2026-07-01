@@ -36,16 +36,11 @@
             android:gravity="center_vertical"
             app:srcCompat="@drawable/shuffle" />
 
-        <ImageButton
-            android:id="@+id/sort"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/sortComposeView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="?attr/actionBarItemBackground"
-            android:contentDescription="@string/player_up_next_sort"
-            android:gravity="center_vertical"
-            app:srcCompat="@drawable/ic_sort"
-            app:tint="?attr/primary_icon_02" />
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
     <androidx.compose.ui.platform.ComposeView

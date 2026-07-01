@@ -63,6 +63,7 @@ fun DeveloperPage(
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
+    onResetUpNextSortTooltip: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
@@ -124,6 +125,9 @@ fun DeveloperPage(
         }
         item {
             ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
+        }
+        item {
+            ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
         }
         item {
             TriggerPlaybackError(onClick = onTriggerPlaybackError)
@@ -365,6 +369,19 @@ private fun ResetPlaylistsOnboarding(
 }
 
 @Composable
+private fun ResetUpNextSortTooltip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset Up Next sort tooltip",
+        secondaryText = "Show the \"Sort by Duration\" tooltip on the Up Next tab again",
+        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun TriggerPlaybackError(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -448,6 +465,7 @@ private fun DeveloperPagePreview() {
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
+        onResetUpNextSortTooltip = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
