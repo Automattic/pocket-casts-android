@@ -127,6 +127,26 @@ class EpisodeInfoTest {
     }
 
     @Test
+    fun `hls-only episode without a progressive url is detected as hls-only`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals(MimeTypes.APPLICATION_M3U8, episode?.fileType)
+        assertEquals(true, episode?.isHlsOnly)
+    }
+
+    @Test
     fun `parse episode without alternate enclosures`() {
         val episodeInfo = adapter.fromJson(
             """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","published":"2026-06-11T00:00:00Z"}""",

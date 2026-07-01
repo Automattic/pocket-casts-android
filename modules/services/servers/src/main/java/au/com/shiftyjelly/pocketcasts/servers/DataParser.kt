@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -143,16 +144,19 @@ object DataParser {
             return null
         }
         val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
+        val url = getString(jsonEpisode, "url")
+        val fileType = getString(jsonEpisode, "file_type")
         return PodcastEpisode(
             downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
-            downloadUrl = getString(jsonEpisode, "url"),
+            downloadUrl = url,
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
-            fileType = getString(jsonEpisode, "file_type"),
+            // No progressive download means an HLS-only episode; use the HLS MIME so isHlsOnly detects it.
+            fileType = if (url.isNullOrBlank()) enclosures.firstHlsMimeType() ?: fileType else fileType,
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),

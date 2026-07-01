@@ -44,30 +44,6 @@ class BaseEpisodeStreamOverrideTest {
         assertFalse(mp4.isStreamUrlHls)
     }
 
-    @Test
-    fun `isStreamVideo true for a video override`() {
-        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mpeg").apply {
-            overrideStreamUrl = "https://example.com/video-1080.mp4"
-            overrideStreamContentType = "video/mp4"
-        }
-        assertTrue(episode.isStreamVideo)
-    }
-
-    @Test
-    fun `isStreamVideo false when an audio stream overrides a video episode`() {
-        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp4", fileType = "video/mp4").apply {
-            overrideStreamUrl = "https://example.com/episode.mp3"
-            overrideStreamContentType = "audio/mpeg"
-        }
-        assertFalse(episode.isStreamVideo)
-    }
-
-    @Test
-    fun `isStreamVideo falls back to episode file type without an override`() {
-        assertTrue(createEpisode(fileType = "video/mp4").isStreamVideo)
-        assertFalse(createEpisode(fileType = "audio/mpeg").isStreamVideo)
-    }
-
     private fun createEpisode(
         downloadUrl: String? = null,
         fileType: String? = null,

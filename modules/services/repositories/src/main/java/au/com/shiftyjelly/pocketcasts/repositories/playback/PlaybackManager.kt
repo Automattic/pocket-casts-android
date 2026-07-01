@@ -107,6 +107,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
@@ -230,8 +231,7 @@ open class PlaybackManager @Inject constructor(
     private var lastPlayedEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
-    @Volatile
-    private var lastPrefetchedEpisodeUuid: String? = null
+    private val lastPrefetchedEpisodeUuid = AtomicReference<String?>(null)
 
     private val resumptionHelper = ResumptionHelper(settings)
 
@@ -311,7 +311,7 @@ open class PlaybackManager @Inject constructor(
                 .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.firstOrNull()?.uuid }
                 .distinctUntilChanged()
                 .collect {
-                    lastPrefetchedEpisodeUuid = null
+                    lastPrefetchedEpisodeUuid.set(null)
                     if (isPlaying()) {
                         prefetchNextEpisodeIfNeeded()
                     }
@@ -2590,8 +2590,7 @@ open class PlaybackManager @Inject constructor(
                 isHlsDefault = isHlsDefault,
             ) ?: return@launch
 
-            if (request.episodeUuid == lastPrefetchedEpisodeUuid) return@launch
-            lastPrefetchedEpisodeUuid = request.episodeUuid
+            if (lastPrefetchedEpisodeUuid.getAndSet(request.episodeUuid) == request.episodeUuid) return@launch
 
             PrefetchWorker.prefetchNextEpisode(
                 context = application,
@@ -2603,7 +2602,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun cancelPrefetchNextEpisode() {
-        lastPrefetchedEpisodeUuid = null
+        lastPrefetchedEpisodeUuid.set(null)
         PrefetchWorker.cancelPrefetch(application)
     }
 

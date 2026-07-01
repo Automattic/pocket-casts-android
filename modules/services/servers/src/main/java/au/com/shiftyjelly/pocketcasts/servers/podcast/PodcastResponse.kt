@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
@@ -106,7 +107,8 @@ data class EpisodeInfo(
             uuid = uuid,
             downloadUrl = url,
             title = episodeTitle,
-            fileType = fileType,
+            // No progressive download means an HLS-only episode; use the HLS MIME so isHlsOnly detects it.
+            fileType = if (url.isNullOrBlank()) enclosures.firstHlsMimeType() ?: fileType else fileType,
             sizeInBytes = fileSize ?: 0,
             duration = duration ?: 0.0,
             publishedDate = publishedDate,

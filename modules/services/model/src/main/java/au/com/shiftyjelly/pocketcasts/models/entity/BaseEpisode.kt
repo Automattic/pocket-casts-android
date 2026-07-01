@@ -161,10 +161,6 @@ sealed interface BaseEpisode {
             return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
-    /** Whether the stream that will actually play is video (honors a resolved stream's content type). */
-    val isStreamVideo: Boolean
-        get() = overrideStreamContentType?.startsWith("video/") ?: isVideo
-
     val isAudio: Boolean
         get() = !isVideo
 

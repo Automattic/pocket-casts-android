@@ -10,11 +10,8 @@ fun List<EpisodeAlternateEnclosure>?.firstHlsStreamUrl(): String? {
         ?.uri
 }
 
-/**
- * The stream to default to when the user hasn't picked one: the first HLS enclosure when HLS
- * streaming is on, else null so the caller falls back to the progressive download.
- */
-fun List<EpisodeAlternateEnclosure>?.defaultHlsStreamUrl(hlsStreamingEnabled: Boolean): String? = if (hlsStreamingEnabled) firstHlsStreamUrl() else null
+/** The first HLS enclosure's MIME type, or null if none. Lets HLS-only episodes be detected synchronously. */
+fun List<EpisodeAlternateEnclosure>?.firstHlsMimeType(): String? = this?.firstOrNull { BaseEpisode.isHlsMimeType(it.type) }?.type
 
 private fun String.isPlayableHttpUri(): Boolean {
     return startsWith("http://", ignoreCase = true) || startsWith("https://", ignoreCase = true)
