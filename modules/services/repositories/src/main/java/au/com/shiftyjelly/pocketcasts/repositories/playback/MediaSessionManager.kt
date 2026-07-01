@@ -70,6 +70,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -689,10 +690,12 @@ class MediaSessionManager(
             )
             .addTo(disposables)
 
-        combine(
+        merge(
             settings.customMediaActionsVisibility.flow,
             settings.mediaControlItems.flow,
-        ) { visibility, items -> visibility to items }
+            settings.upNextShuffle.flow,
+            settings.cachedSubscription.flow,
+        )
             .onEach { withContext(Dispatchers.Main) { updateMedia3CustomLayout() } }
             .catch { Timber.e(it) }
             .launchIn(scope)
@@ -1502,6 +1505,7 @@ internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
 internal const val APP_ACTION_ARCHIVE = "archive"
 internal const val APP_ACTION_PLAY_NEXT = "playNext"
+internal const val APP_ACTION_SHUFFLE = "shuffleUpNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

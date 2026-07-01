@@ -47,6 +47,33 @@ internal class Media3AutomotiveStrategy(
             buildCustomActionButton(mediaControl, currentEpisode)?.let(buttons::add)
         }
 
+        buildShuffleButton(settings, context)?.let(buttons::add)
+
         return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = buttons, overflowButtons = emptyList())
+    }
+
+    /**
+     * Builds the Up Next shuffle toggle button shown in the AAOS player.
+     *
+     * Mirrors the mobile Up Next shuffle control: it is a paid (Plus/Patron) feature, so it is
+     * only shown to subscribers. Shuffle is a persistent mode toggle, so the button is always
+     * present for subscribers regardless of the current queue length. The icon reflects whether
+     * shuffle mode is currently enabled.
+     */
+    private fun buildShuffleButton(
+        settings: Settings,
+        context: Context,
+    ): CommandButton? {
+        val isPaidUser = settings.cachedSubscription.value != null
+        if (!isPaidUser) {
+            return null
+        }
+
+        val iconRes = if (settings.upNextShuffle.value) IR.drawable.shuffle_enabled else IR.drawable.shuffle
+        return CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+            .setSessionCommand(SessionCommand(APP_ACTION_SHUFFLE, Bundle.EMPTY))
+            .setDisplayName(context.getString(LR.string.up_next_shuffle_button_content_description))
+            .setCustomIconResId(iconRes)
+            .build()
     }
 }
