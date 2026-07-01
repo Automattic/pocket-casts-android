@@ -86,9 +86,11 @@ import com.automattic.eventhorizon.PlaybackFailedEvent
 import com.automattic.eventhorizon.PlaybackHlsToggledEvent
 import com.automattic.eventhorizon.PlaybackPauseEvent
 import com.automattic.eventhorizon.PlaybackPlayEvent
+import com.automattic.eventhorizon.PlaybackProtocolType
 import com.automattic.eventhorizon.PlaybackSeekEvent
 import com.automattic.eventhorizon.PlaybackSkipBackEvent
 import com.automattic.eventhorizon.PlaybackSkipForwardEvent
+import com.automattic.eventhorizon.PlaybackSourceResolvedEvent
 import com.automattic.eventhorizon.PlaybackStopEvent
 import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
 import com.automattic.eventhorizon.Trackable
@@ -267,6 +269,8 @@ open class PlaybackManager @Inject constructor(
     private val _videoRenderingEnabled = MutableStateFlow(true)
     val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
 
+    private var currentStreamHlsAvailable = false
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -374,13 +378,12 @@ open class PlaybackManager @Inject constructor(
         episode.overrideStreamUrl = null
         episode.overrideStreamContentType = null
         // Stream the first HLS alternate enclosure when streaming is on, or when the episode is HLS-only.
+        val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
+        currentStreamHlsAvailable = hlsUrl != null
         val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
-        if (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank()) {
-            val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
-            if (hlsUrl != null) {
-                episode.overrideStreamUrl = hlsUrl
-                episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
-            }
+        if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
+            episode.overrideStreamUrl = hlsUrl
+            episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
         }
     }
 
@@ -394,6 +397,15 @@ open class PlaybackManager @Inject constructor(
                     podcastUuid = episode.podcastOrSubstituteUuid,
                 ),
             )
+        }
+    }
+
+    private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
+        return when (_streamVideoState.value) {
+            StreamVideoState.HasVideo -> PlaybackContentType.Video
+            StreamVideoState.AudioOnly -> PlaybackContentType.Audio
+            StreamVideoState.Unknown -> PlaybackContentType.Unknown
+            StreamVideoState.NotVideo -> if (episode?.isVideo == true) PlaybackContentType.Video else PlaybackContentType.Audio
         }
     }
 
@@ -1994,6 +2006,17 @@ open class PlaybackManager @Inject constructor(
         // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
         _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
         _videoRenderingEnabled.value = true
+
+        eventHorizon.track(
+            PlaybackSourceResolvedEvent(
+                playbackProtocol = if (episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                isFallback = false,
+                contentType = playbackContentTypeFor(episode),
+                episodeUuid = episode.uuid,
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                hlsEngine = if (episode.isStreamUrlHls) "exoplayer" else null,
+            ),
+        )
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
