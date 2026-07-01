@@ -115,13 +115,5 @@ Cherry-pick of #<original-number> into `release/<ver>`.
 
 ## Testing Instructions
 
-See the original PR (<original-url>) for full testing steps. In addition:
-
-1. Confirm CI passes on this branch.
-2. Verify the change behaves as described on top of `release/<ver>`.
-
-## Checklist
-
-- [ ] The cherry-pick applied without unresolved conflicts
-- [ ] CI is green on this branch
+See the original PR (<original-url>) for full testing steps. In addition, verify the change behaves as described on top of `release/<ver>`.
 ```
