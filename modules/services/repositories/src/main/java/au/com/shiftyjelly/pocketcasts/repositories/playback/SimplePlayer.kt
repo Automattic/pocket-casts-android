@@ -225,10 +225,7 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
-                // A stream (e.g. HLS) can turn out to carry video even when the episode metadata says audio,
-                // so report it here and let the UI keep or drop the video surface. Match on the presence of
-                // a video track group rather than isSupported, which can be unreliable before a surface exists.
-                onVideoTrackChanged(tracks.containsType(C.TRACK_TYPE_VIDEO))
+                clearVideoIfAudioOnly()
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -240,6 +237,7 @@ class SimplePlayer(
                     Player.STATE_READY -> {
                         onBufferingStateChanged()
                         onDurationAvailable()
+                        clearVideoIfAudioOnly()
                     }
 
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
@@ -288,6 +286,13 @@ class SimplePlayer(
         player.prepare()
 
         prepared = true
+    }
+
+    private fun clearVideoIfAudioOnly() {
+        val player = player ?: return
+        if (player.playbackState == Player.STATE_READY && !player.currentTracks.containsType(C.TRACK_TYPE_VIDEO)) {
+            onVideoTrackChanged(false)
+        }
     }
 
     private fun addVideoListener(player: ExoPlayer) {

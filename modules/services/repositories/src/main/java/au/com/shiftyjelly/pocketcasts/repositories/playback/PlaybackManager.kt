@@ -2364,34 +2364,24 @@ open class PlaybackManager @Inject constructor(
             Timber.d("Player %s event %s", player, event)
             when (event) {
                 is PlayerEvent.Completion -> onCompletion(event.episodeUUID)
-
                 is PlayerEvent.PlayerPaused -> onPlayerPaused()
-
                 is PlayerEvent.PlayerPlaying -> onPlayerPlaying()
-
                 is PlayerEvent.BufferingStateChanged -> onBufferingStateChanged()
-
                 is PlayerEvent.DurationAvailable -> onDurationAvailable()
-
                 is PlayerEvent.SeekComplete -> onSeekComplete(event.positionMs)
-
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
-
                 is PlayerEvent.PlayerError -> onPlayerError(event)
-
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
-
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
-
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
-
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
-
-                is PlayerEvent.VideoTrackChanged -> {
-                    _streamVideoState.value = if (event.hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
-                }
+                is PlayerEvent.VideoTrackChanged -> onVideoTrackChanged(event.hasVideo)
             }
         }
+    }
+
+    private fun onVideoTrackChanged(hasVideo: Boolean) {
+        _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
     }
 
     private suspend fun updateCurrentPositionInDatabase() {
