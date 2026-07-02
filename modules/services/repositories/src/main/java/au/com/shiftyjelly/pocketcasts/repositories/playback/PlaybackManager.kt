@@ -1712,6 +1712,16 @@ open class PlaybackManager @Inject constructor(
                     )
                 }
                 chapterManager.updateChapters(playbackState.episodeUuid, dbChapters)
+
+                val episode = episodeManager.findEpisodeByUuid(playbackState.episodeUuid) as? PodcastEpisode
+                if (episode != null && episode.thumbnailStatus == PodcastEpisode.THUMBNAIL_STATUS_UNKNOWN) {
+                    episode.thumbnailStatus = if (episodeMetadata.embeddedArtworkPath != null) {
+                        PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_AVAILABLE
+                    } else {
+                        PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE
+                    }
+                    episodeManager.update(episode)
+                }
             }
         }
     }
