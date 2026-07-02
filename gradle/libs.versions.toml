@@ -17,7 +17,7 @@
 
 [versions]
 # ignore AboutLibraries versions such as -b02 and stick to the stable versions
-aboutlibraries = "15.0.0"
+aboutlibraries = "15.0.3"
 android-gradle-plugin = "9.2.1"
 billing = "9.1.0"
 coil = "3.5.0"
