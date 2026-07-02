@@ -293,7 +293,9 @@ class PodcastsFragment :
                     folderAdapter?.setFolderItems(uiState.items) {
                         if (shouldScrollToTop) {
                             scrollRecyclerViewToTop()
-                            this@PodcastsFragment.sortTypeToKeepAtTop = null
+                            if (sortTypeToKeepAtTop == pendingSortType) {
+                                sortTypeToKeepAtTop = null
+                            }
                         }
                     }
 
