@@ -186,6 +186,11 @@ allprojects {
             if (requested.name.startsWith("kotlin-stdlib")) {
                 useVersion(libs.versions.kotlin.asProvider().get())
             }
+            // Dagger/Hilt's annotation processor bundles an older kotlin-metadata-jvm that can't
+            // read the @Metadata version emitted by the current Kotlin compiler. Keep it in lockstep.
+            if (requested.group == "org.jetbrains.kotlin" && requested.name == "kotlin-metadata-jvm") {
+                useVersion(libs.versions.kotlin.asProvider().get())
+            }
         }
     }
 }
@@ -198,9 +203,6 @@ subprojects {
             compilerOptions {
                 jvmTarget.set(javaTarget)
                 allWarningsAsErrors.set(true)
-                freeCompilerArgs.addAll(
-                    "-Xannotation-default-target=param-property",
-                )
                 optIn.addAll("kotlin.RequiresOptIn")
             }
         }
