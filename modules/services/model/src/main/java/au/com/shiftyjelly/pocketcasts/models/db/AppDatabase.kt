@@ -120,7 +120,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
     ],
-    version = 135,
+    version = 134,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1487,22 +1487,6 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `episode_alternate_enclosure_episode_uuid_index` ON `episode_alternate_enclosures` (`episode_uuid`)")
         }
 
-        val MIGRATION_134_135 = addMigration(134, 135) { database ->
-            // Recreate podcast_episodes to drop the now-redundant hls_url column; the playable HLS
-            // stream is derived on demand from episode_alternate_enclosures instead.
-            database.execSQL(
-                "CREATE TABLE `podcast_episodes_new` (`uuid` TEXT NOT NULL, `episode_description` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `downloaded_file_path` TEXT, `downloaded_error_details` TEXT, `play_error_details` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `podcast_id` TEXT NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `thumbnail_status` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `duration_modified` INTEGER, `starred_modified` INTEGER, `last_starred_date` INTEGER, `archived` INTEGER NOT NULL, `archived_modified` INTEGER, `season` INTEGER, `number` INTEGER, `type` TEXT, `last_playback_interaction_date` INTEGER, `last_playback_interaction_sync_status` INTEGER NOT NULL, `exclude_from_episode_limit` INTEGER NOT NULL, `download_task_id` TEXT, `last_archive_interaction_date` INTEGER, `image_url` TEXT, `deselected_chapters` TEXT NOT NULL, `deselected_chapters_modified` INTEGER, `slug` TEXT NOT NULL, `has_generated_transcript` INTEGER NOT NULL, `cleanTitle` TEXT, PRIMARY KEY(`uuid`))",
-            )
-            database.execSQL(
-                "INSERT INTO `podcast_episodes_new` (`uuid`, `episode_description`, `published_date`, `title`, `size_in_bytes`, `episode_status`, `file_type`, `duration`, `download_url`, `downloaded_file_path`, `downloaded_error_details`, `play_error_details`, `played_up_to`, `playing_status`, `podcast_id`, `added_date`, `auto_download_status`, `starred`, `thumbnail_status`, `last_download_attempt_date`, `playing_status_modified`, `played_up_to_modified`, `duration_modified`, `starred_modified`, `last_starred_date`, `archived`, `archived_modified`, `season`, `number`, `type`, `last_playback_interaction_date`, `last_playback_interaction_sync_status`, `exclude_from_episode_limit`, `download_task_id`, `last_archive_interaction_date`, `image_url`, `deselected_chapters`, `deselected_chapters_modified`, `slug`, `has_generated_transcript`, `cleanTitle`) SELECT `uuid`, `episode_description`, `published_date`, `title`, `size_in_bytes`, `episode_status`, `file_type`, `duration`, `download_url`, `downloaded_file_path`, `downloaded_error_details`, `play_error_details`, `played_up_to`, `playing_status`, `podcast_id`, `added_date`, `auto_download_status`, `starred`, `thumbnail_status`, `last_download_attempt_date`, `playing_status_modified`, `played_up_to_modified`, `duration_modified`, `starred_modified`, `last_starred_date`, `archived`, `archived_modified`, `season`, `number`, `type`, `last_playback_interaction_date`, `last_playback_interaction_sync_status`, `exclude_from_episode_limit`, `download_task_id`, `last_archive_interaction_date`, `image_url`, `deselected_chapters`, `deselected_chapters_modified`, `slug`, `has_generated_transcript`, `cleanTitle` FROM `podcast_episodes`",
-            )
-            database.execSQL("DROP TABLE `podcast_episodes`")
-            database.execSQL("ALTER TABLE `podcast_episodes_new` RENAME TO `podcast_episodes`")
-            database.execSQL("CREATE INDEX IF NOT EXISTS `episode_last_download_attempt_date` ON `podcast_episodes` (`last_download_attempt_date`)")
-            database.execSQL("CREATE INDEX IF NOT EXISTS `episode_podcast_id` ON `podcast_episodes` (`podcast_id`)")
-            database.execSQL("CREATE INDEX IF NOT EXISTS `episode_published_date` ON `podcast_episodes` (`published_date`)")
-        }
-
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1926,7 +1910,6 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_131_132,
                 MIGRATION_132_133,
                 MIGRATION_133_134,
-                MIGRATION_134_135,
             )
         }
 

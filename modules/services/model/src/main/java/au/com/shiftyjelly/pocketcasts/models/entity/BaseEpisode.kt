@@ -55,6 +55,9 @@ sealed interface BaseEpisode {
     var duration: Double
     var downloadUrl: String?
 
+    val hlsUrl: String?
+        get() = null
+
     var playedUpTo: Double
     var playingStatus: EpisodePlayingStatus
     var addedDate: Date
