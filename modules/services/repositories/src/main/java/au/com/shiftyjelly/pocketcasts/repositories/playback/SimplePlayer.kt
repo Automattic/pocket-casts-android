@@ -207,6 +207,13 @@ class SimplePlayer(
         val player = ExoPlayer.Builder(context, renderer)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
+            // Hold a wake lock for the duration of playback so the system doesn't
+            // suspend the CPU (or drop Wi-Fi) and silently stall/stop playback in
+            // the background. WAKE_MODE_LOCAL takes a partial CPU wake lock for
+            // downloaded files; WAKE_MODE_NETWORK also takes a Wi-Fi lock for
+            // streams. Without this the player defaults to WAKE_MODE_NONE. See
+            // PCDROID-555. The WAKE_LOCK permission is already declared.
+            .setWakeMode(if (isStreaming) C.WAKE_MODE_NETWORK else C.WAKE_MODE_LOCAL)
             .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
