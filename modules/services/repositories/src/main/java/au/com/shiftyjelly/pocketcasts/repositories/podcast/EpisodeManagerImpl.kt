@@ -858,7 +858,7 @@ class EpisodeManagerImpl @Inject constructor(
                 val episodesToRemove = allEpisodes.drop(episodeLimit)
                     .filter { !it.isArchived }
                     .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
-                    .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
+                    .filter { playbackManager == null || !playbackManager.upNextQueue.contains(it.uuid) }
                 if (episodesToRemove.isNotEmpty()) {
                     runBlocking {
                         archiveAllInList(episodesToRemove, playbackManager)
