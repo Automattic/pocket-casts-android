@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
+import com.automattic.eventhorizon.ChaptersShownEvent
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.DeselectChaptersChapterDeselectedEvent
 import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
@@ -142,6 +144,27 @@ class ChaptersViewModel @AssistedInject constructor(
 
     fun scrollToChapter(chapter: Chapter) {
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
+    }
+
+    fun trackChaptersShown(source: ChaptersShownSource) {
+        viewModelScope.launch(ioDispatcher) {
+            val episodeId = when (mode) {
+                is Mode.Episode -> mode.episodeId
+                is Mode.Player -> playbackManager.playbackStateFlow.first().episodeUuid
+            }
+
+            val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
+            val chapters = chapterManager.observerChaptersForEpisode(episodeId).first()
+            if (chapters.isEmpty()) return@launch
+            eventHorizon.track(
+                ChaptersShownEvent(
+                    episodeUuid = episodeId,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    origin = chapters.origin.toChapterOriginType(),
+                    source = source,
+                ),
+            )
+        }
     }
 
     fun trackChapterLinkTap(chapter: Chapter) {

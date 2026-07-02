@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeSummarySourceType
 import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -211,6 +212,9 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isChaptersTab(position) -> {
+                        if (previousPosition != INVALID_TAB_POSITION) {
+                            chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+                        }
                         PlayerTabType.Chapters
                     }
 

@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
+import com.automattic.eventhorizon.ChaptersShownEvent
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
@@ -255,6 +257,36 @@ class ChaptersViewModelTest {
         chaptersViewModel.playChapter(chapter)
 
         assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `chapters shown reports chapters origin and source`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters(
+            listOf(Chapter("1", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)),
+        )
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(
+            ChaptersShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `chapters shown is not reported when there are no chapters`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
