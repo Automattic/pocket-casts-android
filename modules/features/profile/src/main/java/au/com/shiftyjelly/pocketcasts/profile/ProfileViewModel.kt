@@ -75,7 +75,7 @@ class ProfileViewModel @Inject constructor(
                 imageUrl = Gravatar.getUrl(state.email),
                 subscriptionTier = state.subscription?.tier,
                 email = state.email,
-                expiresIn = state.subscription?.expiryDate?.toDurationFromNow(),
+                expiresIn = state.subscription?.takeIf { it.isExpiring }?.expiryDate?.toDurationFromNow(),
                 isShareVisible = isProfileSharingEnabled,
             )
 
