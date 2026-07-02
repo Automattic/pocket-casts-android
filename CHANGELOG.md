@@ -15,6 +15,8 @@
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
     *   Improved Automotive sign up screen
         ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
+    *   Fix broken Login with Phone flow on Wear OS
+        ([#5492](https://github.com/Automattic/pocket-casts-android/pull/5492))
     *   Fix overlapping text issue on Automotive after orientation change
         ([#5477](https://github.com/Automattic/pocket-casts-android/pull/5477))
     *   Fix link screen's text overlap on Automotive
