@@ -1,6 +1,9 @@
 8.16
 -----
 
+*   Bug Fixes
+    *   Keep the Podcasts tab pinned to the top when changing sort order from the top of the list
+        ([#5516](https://github.com/Automattic/pocket-casts-android/pull/5516))
 
 8.15
 -----
