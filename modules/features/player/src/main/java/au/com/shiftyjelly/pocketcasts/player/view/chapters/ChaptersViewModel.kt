@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.DeselectChaptersChapterDeselectedEvent
 import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
@@ -145,7 +146,7 @@ class ChaptersViewModel @AssistedInject constructor(
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
     }
 
-    fun trackChaptersShown() {
+    fun trackChaptersShown(source: ChaptersShownSource) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {
                 is Mode.Episode -> mode.episodeId
@@ -160,6 +161,7 @@ class ChaptersViewModel @AssistedInject constructor(
                     episodeUuid = episodeId,
                     podcastUuid = episode.podcastOrSubstituteUuid,
                     origin = chapters.origin.toChapterOriginType(),
+                    source = source,
                 ),
             )
         }

@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -246,7 +247,7 @@ class EpisodeContainerFragment :
                     btnFav.isVisible = adapter.isDetailsTab(position)
                     btnShare.isVisible = adapter.isDetailsTab(position)
                     if (adapter.isChaptersTab(position) && previousPosition != INVALID_TAB_POSITION) {
-                        chaptersViewModel.trackChaptersShown()
+                        chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
                     }
                     viewModel.onPageSelected(adapter.tabType(position))
                     previousPosition = position

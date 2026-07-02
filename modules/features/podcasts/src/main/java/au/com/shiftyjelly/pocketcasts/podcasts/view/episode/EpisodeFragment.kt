@@ -161,6 +161,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeDetailDismissedEvent
 import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
 import com.automattic.eventhorizon.EpisodeDetailShowNotesLinkTappedEvent
@@ -1179,7 +1180,7 @@ class EpisodeFragment : BaseFragment() {
             LR.string.details to { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) },
             LR.string.chapters to {
                 viewModel.selectContentTab(EpisodeContentTab.CHAPTERS)
-                chaptersViewModel.trackChaptersShown()
+                chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
             },
             LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
             LR.string.transcript to {
