@@ -15,6 +15,13 @@
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
     *   Improved Automotive sign up screen
         ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
+    *   Fix overlapping text issue on Automotive after orientation change
+        ([#5477](https://github.com/Automattic/pocket-casts-android/pull/5477))
+    *   Fix link screen's text overlap on Automotive
+        ([#5475](https://github.com/Automattic/pocket-casts-android/pull/5475))
+*   Updates
+    *   Reset player after playback finished on Automotive
+        ([#5488](https://github.com/Automattic/pocket-casts-android/pull/5488))
 
 8.14
 -----
