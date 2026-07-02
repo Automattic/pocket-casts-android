@@ -312,7 +312,9 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
         }
 
-        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
+        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        if ((isSummaryEnabled || isChaptersEnabled) && lastSummaryEpisodeUuid != episodeUuid) {
             _pageState.update { state ->
                 state.withSummary(null)
             }
@@ -323,11 +325,11 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _pageState.update { state ->
                     state.withSummary(result)
                 }
-                if (result != null) {
+                if (result != null || !isSummaryEnabled) {
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
-        } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+        } else if (!isSummaryEnabled) {
             _pageState.update { state ->
                 state.withSummary(null)
             }

@@ -9,7 +9,10 @@ import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -19,11 +22,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class ChapterManagerImplTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val chapterDao = mock<ChapterDao>()
     private val episodeManager = mock<EpisodeManager>()
 
@@ -779,5 +786,43 @@ class ChapterManagerImplTest {
         val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { it + 30.seconds }
 
         assertEquals(chapters, aligned)
+    }
+
+    @Test
+    fun `observe hides already-saved generated chapters when feature is off`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        val dbChapters = listOf(
+            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
+            DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),
+        )
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            val chapters = awaitItem()
+            assertEquals(listOf("Embedded"), chapters.map { it.title })
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `observe keeps generated chapters when feature is on`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        val dbChapters = listOf(
+            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
+            DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),
+        )
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            val chapters = awaitItem()
+            assertEquals(listOf("Embedded", "Generated"), chapters.map { it.title })
+            awaitComplete()
+        }
     }
 }
