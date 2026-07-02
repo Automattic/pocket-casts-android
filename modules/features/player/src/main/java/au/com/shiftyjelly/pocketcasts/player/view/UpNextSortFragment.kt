@@ -30,7 +30,7 @@ internal class UpNextSortFragment : BaseDialogFragment() {
             fillMaxHeight = false,
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
-            val options = if (FeatureFlag.isEnabled(Feature.UP_NEXT_DURATION)) {
+            val options = if (FeatureFlag.isEnabled(Feature.UP_NEXT_SORT)) {
                 UpNextSortType.entries
             } else {
                 UpNextSortType.entries.filterNot {

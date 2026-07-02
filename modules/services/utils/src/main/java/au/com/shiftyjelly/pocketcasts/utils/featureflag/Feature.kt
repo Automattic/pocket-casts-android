@@ -333,12 +333,12 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
-    UP_NEXT_DURATION(
-        key = "up_next_duration",
-        title = "Up Next Duration",
+    UP_NEXT_SORT(
+        key = "up_next_sort",
+        title = "Up Next sort by duration",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-09"),
     ),
