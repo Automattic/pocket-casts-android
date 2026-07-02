@@ -81,7 +81,7 @@
                 android:inputType="textEmailAddress"
                 android:paddingLeft="16dp"
                 android:textAppearance="@style/TextAppearance.Car.Body2"
-                android:textColor="?attr/primary_text_02" />
+                android:textColor="?attr/primary_text_01" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,7 +108,7 @@
                 android:inputType="textPassword"
                 android:paddingLeft="16dp"
                 android:textAppearance="@style/TextAppearance.Car.Body2"
-                android:textColor="?attr/primary_text_02"
+                android:textColor="?attr/primary_text_01"
                 app:passwordToggleEnabled="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
