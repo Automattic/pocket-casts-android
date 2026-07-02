@@ -278,6 +278,16 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `chapters shown is not reported when there are no chapters`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown()
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `navigate to chapter when tapped on while playing`() = runTest {
         chaptersViewModel.showPlayer.test {
             expectNoEvents()

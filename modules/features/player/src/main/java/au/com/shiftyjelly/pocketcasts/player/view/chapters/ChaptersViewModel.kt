@@ -154,6 +154,7 @@ class ChaptersViewModel @AssistedInject constructor(
 
             val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
             val chapters = chapterManager.observerChaptersForEpisode(episodeId).first()
+            if (chapters.isEmpty()) return@launch
             eventHorizon.track(
                 ChaptersShownEvent(
                     episodeUuid = episodeId,

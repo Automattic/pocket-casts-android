@@ -54,6 +54,7 @@ class EpisodeContainerFragment :
     EpisodeFragment.EpisodeLoadedListener {
     companion object {
         private const val NEW_INSTANCE_ARG = "EpisodeContainerFragmentArg"
+        private const val INVALID_TAB_POSITION = -1
 
         fun newInstance(
             episode: PodcastEpisode,
@@ -233,6 +234,8 @@ class EpisodeContainerFragment :
             }.attach()
 
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                private var previousPosition: Int = INVALID_TAB_POSITION
+
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
                     viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
@@ -242,10 +245,11 @@ class EpisodeContainerFragment :
                     super.onPageSelected(position)
                     btnFav.isVisible = adapter.isDetailsTab(position)
                     btnShare.isVisible = adapter.isDetailsTab(position)
-                    if (adapter.isChaptersTab(position)) {
+                    if (adapter.isChaptersTab(position) && previousPosition != INVALID_TAB_POSITION) {
                         chaptersViewModel.trackChaptersShown()
                     }
                     viewModel.onPageSelected(adapter.tabType(position))
+                    previousPosition = position
                 }
             })
 

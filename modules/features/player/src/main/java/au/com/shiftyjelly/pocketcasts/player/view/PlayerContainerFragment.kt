@@ -211,7 +211,9 @@ class PlayerContainerFragment :
                     }
 
                     adapter.isChaptersTab(position) -> {
-                        chaptersViewModel.trackChaptersShown()
+                        if (previousPosition != INVALID_TAB_POSITION) {
+                            chaptersViewModel.trackChaptersShown()
+                        }
                         PlayerTabType.Chapters
                     }
 
