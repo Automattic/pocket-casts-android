@@ -127,6 +127,12 @@ data class PodcastEpisode(
     @Ignore
     var alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList()
 
+    @Ignore
+    override var overrideStreamUrl: String? = null
+
+    @Ignore
+    override var overrideStreamContentType: String? = null
+
     val playedPercentage: Int
         get() {
             return if (isFinished) {
