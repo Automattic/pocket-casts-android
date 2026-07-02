@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.stats.CalendarHeatMap
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,6 +61,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.StatsDismissedEvent
@@ -190,6 +194,20 @@ private fun StatsPageLoaded(
         item {
             TextP40(state.funnyText)
             Spacer(Modifier.height(24.dp))
+        }
+        if (FeatureFlag.isEnabled(Feature.STATS_HEATMAP)) {
+            item {
+                val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
+                TextC70(stringResource(LR.string.profile_stats_listening_activity))
+                Spacer(Modifier.height(6.dp))
+                CalendarHeatMap(
+                    start = state.heatmapStart,
+                    end = state.heatmapEnd,
+                    heatLevels = state.heatLevels,
+                    modifier = Modifier.semantics { contentDescription = heatmapDescription },
+                )
+                Spacer(Modifier.height(24.dp))
+            }
         }
         item {
             TextC70(stringResource(LR.string.profile_stats_time_saved_by))
