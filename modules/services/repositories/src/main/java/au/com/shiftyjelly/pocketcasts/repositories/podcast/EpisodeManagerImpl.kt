@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -943,6 +944,10 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         return totalPlaytime
+    }
+
+    override suspend fun dailyListenedTime(fromEpochMs: Long): List<DailyListenedTime> {
+        return episodeDao.dailyListenedTime(fromEpochMs)
     }
 
     /**
