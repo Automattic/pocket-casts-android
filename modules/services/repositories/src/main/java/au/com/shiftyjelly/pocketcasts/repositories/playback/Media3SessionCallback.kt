@@ -262,7 +262,7 @@ internal class Media3SessionCallback(
                 try {
                     val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                     when (outputEvent) {
-                        MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                        MediaEvent.SingleTap -> handleMediaButtonSingleTap(isExplicitPlay = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY)
                         MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                         MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                         null -> Unit
@@ -277,8 +277,16 @@ internal class Media3SessionCallback(
         return false
     }
 
-    private fun handleMediaButtonSingleTap() {
-        playbackManager.playPause(sourceView = source)
+    private suspend fun handleMediaButtonSingleTap(isExplicitPlay: Boolean) {
+        // KEYCODE_MEDIA_PLAY is an explicit "play" command (e.g. a car head unit sends it
+        // when resuming, such as after shifting out of reverse), not a play/pause toggle.
+        // Toggling here would pause already-playing audio. Only PLAY_PAUSE / HEADSETHOOK
+        // should toggle. See https://github.com/Automattic/pocket-casts-android/issues/3919
+        if (isExplicitPlay) {
+            playbackManager.playQueueSuspend(sourceView = source)
+        } else {
+            playbackManager.playPause(sourceView = source)
+        }
     }
 
     private fun handleMediaButtonDoubleTap() {
