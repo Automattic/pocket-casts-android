@@ -16,11 +16,16 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -55,10 +60,14 @@ class ChaptersViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val fingerprintTimingManager = mock<FingerprintTimingManager>()
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
@@ -66,6 +75,12 @@ class ChaptersViewModelTest {
             Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0, uiIndex = 1),
             Chapter("2", 101.milliseconds, 200.milliseconds, selected = true, index = 1, uiIndex = 2),
             Chapter("3", 201.milliseconds, 300.milliseconds, selected = true, index = 2, uiIndex = 3),
+        ),
+    )
+
+    private val generatedChapters = Chapters(
+        listOf(
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated),
         ),
     )
 
@@ -81,6 +96,7 @@ class ChaptersViewModelTest {
         giftDays = 0,
     )
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
+    private val fingerprintStateFlow = MutableStateFlow<FingerprintTimingManager.State>(FingerprintTimingManager.State.Idle)
 
     private val eventSink = TestEventSink()
 
@@ -94,6 +110,8 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<Subscription?>>()
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
+        whenever(fingerprintTimingManager.stateFlow).thenReturn(fingerprintStateFlow)
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("id")
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -102,6 +120,8 @@ class ChaptersViewModelTest {
             episodeManager = episodeManager,
             settings = settings,
             eventHorizon = EventHorizon(eventSink),
+            fingerprintTimingManager = fingerprintTimingManager,
+            appPlatform = AppPlatform.Phone,
             ioDispatcher = testDispatcher,
         )
     }
@@ -237,6 +257,8 @@ class ChaptersViewModelTest {
             episodeManager = episodeManager,
             settings = settings,
             eventHorizon = EventHorizon(TestEventSink()),
+            fingerprintTimingManager = fingerprintTimingManager,
+            appPlatform = AppPlatform.Phone,
             ioDispatcher = testDispatcher,
         )
 
@@ -301,4 +323,67 @@ class ChaptersViewModelTest {
             assertEquals(Unit, awaitItem())
         }
     }
+
+    @Test
+    fun `shows aligning indicator while preparing generated chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
+        chaptersFlow.value = generatedChapters
+        fingerprintStateFlow.value = FingerprintTimingManager.State.Preparing
+        val viewModel = createViewModel(AppPlatform.Phone)
+
+        viewModel.uiState.test {
+            assertTrue(awaitItem().isAligningChapters)
+
+            fingerprintStateFlow.value = FingerprintTimingManager.State.Active(coverage = 2)
+            assertFalse(awaitItem().isAligningChapters)
+        }
+    }
+
+    @Test
+    fun `does not show aligning indicator for embedded chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
+        fingerprintStateFlow.value = FingerprintTimingManager.State.Preparing
+        val viewModel = createViewModel(AppPlatform.Phone)
+
+        viewModel.uiState.test {
+            assertFalse(awaitItem().isAligningChapters)
+        }
+    }
+
+    @Test
+    fun `does not show aligning indicator when fingerprinting a different episode`() = runTest {
+        FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
+        chaptersFlow.value = generatedChapters
+        fingerprintStateFlow.value = FingerprintTimingManager.State.Preparing
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("other")
+        val viewModel = createViewModel(AppPlatform.Phone)
+
+        viewModel.uiState.test {
+            assertFalse(awaitItem().isAligningChapters)
+        }
+    }
+
+    @Test
+    fun `does not show aligning indicator on non-phone platforms`() = runTest {
+        FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
+        chaptersFlow.value = generatedChapters
+        fingerprintStateFlow.value = FingerprintTimingManager.State.Preparing
+        val viewModel = createViewModel(AppPlatform.Automotive)
+
+        viewModel.uiState.test {
+            assertFalse(awaitItem().isAligningChapters)
+        }
+    }
+
+    private fun createViewModel(appPlatform: AppPlatform) = ChaptersViewModel(
+        mode = Mode.Episode(episode.uuid),
+        chapterManager = chapterManager,
+        playbackManager = playbackManager,
+        episodeManager = episodeManager,
+        settings = settings,
+        eventHorizon = EventHorizon(eventSink),
+        fingerprintTimingManager = fingerprintTimingManager,
+        appPlatform = appPlatform,
+        ioDispatcher = testDispatcher,
+    )
 }
