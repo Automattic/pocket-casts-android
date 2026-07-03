@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-07-01 16:58:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Download de aflevering om te zoeken</string>
+    <string name="bookmark_play_from">Afspelen van %s</string>
+    <string name="profile_try_days_for_free">Probeer 30 dagen gratis</string>
+    <string name="profile_start_free_trial_specific_duration">Start nu je gratis proefabonnement van 30 dagen</string>
+    <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
+    <string name="summary_upsell_title">AI-samenvattingen</string>
     <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
+    <string name="tv_create_account_come_back">Zodra je je account hebt aangemaakt, kom je terug en meld je je aan</string>
     <string name="tv_create_account_title">Je gratis account aanmaken</string>
+    <string name="tv_onboarding_syncing_subtitle">Je podcasts worden gesynchroniseerd, we melden je snel aan!</string>
+    <string name="tv_onboarding_welcome_back">Welkom terug</string>
+    <string name="tv_onboarding_sign_in_instructions">Open de camera en wijs naar deze QR-code</string>
+    <string name="tv_onboarding_sign_in_title">Aanmelden met je telefoon</string>
+    <string name="tv_sign_in_go_to_url">naar %1$s</string>
+    <string name="tv_sign_in_or_enter_code">of voer de volgende code in</string>
+    <string name="tv_onboarding_syncing">Je podcasts synchroniseren\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bladeren zonder account</string>
+    <string name="tv_onboarding_create_free_account">Een gratis account aanmaken</string>
+    <string name="tv_onboarding_subtitle">Je podcasts, op het grote scherm</string>
+    <string name="tv_onboarding_welcome_tv">Welkom bij Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Welkom bij Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Langste naar kortste</string>
+    <string name="sort_shortest_to_longest">Kortste naar langste</string>
     <string name="synced_transcripts_whats_new_button_note">Gesynchroniseerde transcripties alleen beschikbaar voor recente afleveringen.</string>
     <string name="synced_transcripts_whats_new_message">Lees snel, mis niets. De naam die je bent vergeten, het boek dat ze aanraadden, de statistiek die je wilde - tik op het woord, spring terug.</string>
     <string name="synced_transcripts_whats_new_title">Lees mee. Zelfs bij 2x.</string>

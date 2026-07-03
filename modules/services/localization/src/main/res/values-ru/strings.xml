@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-06-30 18:57:34+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Скачать выпуск, чтобы искать нажатием</string>
+    <string name="bookmark_play_from">Воспроизвести с %s</string>
+    <string name="profile_try_days_for_free">Попробуйте 30 дней бесплатно</string>
+    <string name="profile_start_free_trial_specific_duration">Начните 30-дневный пробный период</string>
+    <string name="summary_upsell_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
+    <string name="summary_upsell_title">Сводки на базе ИИ</string>
     <string name="tv_create_account_subtitle">Отсканируйте этот код, чтобы начать работу с телефона. Это займёт всего минуту.</string>
+    <string name="tv_create_account_come_back">Создав учётную запись, вернитесь и войдите в систему</string>
     <string name="tv_create_account_title">Создать бесплатную учётную запись</string>
+    <string name="tv_onboarding_syncing_subtitle">Ваши подкасты синхронизируются, вход скоро будет выполнен!</string>
+    <string name="tv_onboarding_welcome_back">С возвращением!</string>
+    <string name="tv_onboarding_sign_in_instructions">Откройте камеру и наведите на этот QR-код</string>
+    <string name="tv_onboarding_sign_in_title">Вход с телефона</string>
+    <string name="tv_sign_in_go_to_url">переход к %1$s</string>
+    <string name="tv_sign_in_or_enter_code">или введите следующий код</string>
+    <string name="tv_onboarding_syncing">Синхронизация подкастов\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Просмотр без учётной записи</string>
+    <string name="tv_onboarding_create_free_account">Создать бесплатную учётную запись</string>
+    <string name="tv_onboarding_subtitle">Ваши подкасты на большом экране</string>
+    <string name="tv_onboarding_welcome_tv">Добро пожаловать в Pocket Casts TV!</string>
+    <string name="tv_onboarding_welcome">Добро пожаловать в Pocket Casts!</string>
+    <string name="sort_longest_to_shortest">От длинных к коротким</string>
+    <string name="sort_shortest_to_longest">От коротких к длинным</string>
     <string name="synced_transcripts_whats_new_button_note">Синхронизированные расшифровки доступны только в последних выпусках.</string>
     <string name="synced_transcripts_whats_new_message">Читайте, чтобы ничего не упустить. Имя, которое вы не расслышали, книга, на которую ссылаются, нужная для статистики цифра — просто нажмите на слово и прослушайте заново.</string>
     <string name="synced_transcripts_whats_new_title">Слушайте и читайте. Даже в ускоренном режиме.</string>
