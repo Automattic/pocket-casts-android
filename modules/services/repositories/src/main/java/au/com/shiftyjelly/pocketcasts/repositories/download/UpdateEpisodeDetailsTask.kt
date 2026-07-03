@@ -26,7 +26,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import timber.log.Timber
 
 @HiltWorker
 class UpdateEpisodeDetailsTask @AssistedInject constructor(
@@ -110,17 +109,12 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                             }
                         }
 
-                        val contentLengthHeader = response.header("Content-Length")
-                        if (!contentLengthHeader.isNullOrBlank()) {
-                            try {
-                                val contentLength = java.lang.Long.parseLong(contentLengthHeader)
-                                val sizeInBytes = episode.sizeInBytes
-                                if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
-                                    episodeManager.updateSizeInBytesBlocking(episode, contentLength)
-                                    episode.sizeInBytes = contentLength
-                                }
-                            } catch (nfe: NumberFormatException) {
-                                Timber.i(nfe, "Unable to read content length.")
+                        val contentLength = response.header("Content-Length")?.toLongOrNull()
+                        if (contentLength != null) {
+                            val sizeInBytes = episode.sizeInBytes
+                            if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
+                                episodeManager.updateSizeInBytesBlocking(episode, contentLength)
+                                episode.sizeInBytes = contentLength
                             }
                         }
                     }
