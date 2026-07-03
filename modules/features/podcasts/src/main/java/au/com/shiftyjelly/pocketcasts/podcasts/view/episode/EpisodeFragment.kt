@@ -468,6 +468,7 @@ class EpisodeFragment : BaseFragment() {
                                 LR.string.podcasts_download_download,
                             ),
                         )
+                        binding.btnDownload.isVisible = !state.episode.isHlsOnly
                         val episodeStatus = state.episode.downloadStatus
                         binding.btnDownload.state = when (episodeStatus) {
                             EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(downloadSize)

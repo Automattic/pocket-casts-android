@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -19,7 +20,7 @@ sealed interface BaseEpisode {
         }
 
         private fun isHlsMimeType(type: String?): Boolean {
-            return type.equals("application/x-mpegURL", ignoreCase = true) ||
+            return type.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) ||
                 type.equals("application/vnd.apple.mpegurl", ignoreCase = true)
         }
 
@@ -186,7 +187,7 @@ sealed interface BaseEpisode {
             fileType.equals("audio/x-m4p", ignoreCase = true) -> return ".m4p"
             fileType.equals("audio/ogg", ignoreCase = true) -> return ".ogg"
             fileType.equals("audio/x-ms-wma", ignoreCase = true) -> return ".wma"
-            fileType.equals("application/x-mpegURL", ignoreCase = true) -> return ".m3u8"
+            fileType.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) -> return ".m3u8"
             fileType.equals("application/vnd.apple.mpegurl", ignoreCase = true) -> return ".m3u8"
             else -> return if (fileType.startsWith("video/")) ".mp4" else ".mp3"
         }

@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
@@ -51,6 +53,8 @@ class BookmarkManagerTest {
             transcriptWindowExtractor = TranscriptWindowExtractor(
                 transcriptDao = mock<TranscriptDao>(),
                 transcriptService = mock<TranscriptService>(),
+                fingerprintTimingManager = { mock<FingerprintTimingManager>() },
+                playbackManager = { mock<PlaybackManager>() },
             ),
         )
         episodeDao = appDatabase.episodeDao()

@@ -494,6 +494,8 @@
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
     <string name="player_up_next_sort">Sort Up Next</string>
+    <string name="up_next_sort_duration_tooltip_title">Sort by duration</string>
+    <string name="up_next_sort_duration_tooltip_body">Shortest to longest, or the reverse — fit the episode to the time you\'ve actually got.</string>
 
     <!-- Chapters -->
 

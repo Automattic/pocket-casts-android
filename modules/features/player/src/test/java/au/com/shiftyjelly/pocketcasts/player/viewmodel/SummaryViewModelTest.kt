@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.time.Instant
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -22,6 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -149,6 +151,22 @@ class SummaryViewModelTest {
         viewModel.loadSummary("episode-1")
         viewModel.loadSummary("episode-1")
 
+        verify(transcriptManager).loadSummaryText("episode-1")
+    }
+
+    @Test
+    fun `loading same episode does not re-fetch while a load is still in flight`() = runTest {
+        val gate = CompletableDeferred<String?>()
+        whenever(transcriptManager.loadSummaryText("episode-1")).doSuspendableAnswer { gate.await() }
+        val viewModel = createViewModel()
+
+        viewModel.loadSummary("episode-1")
+        assertEquals(SummaryState.Loading, viewModel.state.value)
+
+        viewModel.loadSummary("episode-1")
+
+        gate.complete("Summary text")
+        assertEquals(SummaryState.Loaded("Summary text"), viewModel.state.value)
         verify(transcriptManager).loadSummaryText("episode-1")
     }
 

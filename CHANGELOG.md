@@ -6,6 +6,9 @@
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+
+8.15
+-----
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
@@ -13,14 +16,14 @@
         ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
     *   Wear OS performance improvements
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
+    *   Improved Automotive sign up screen
+        ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
     *   Fix broken Login with Phone flow on Wear OS
         ([#5492](https://github.com/Automattic/pocket-casts-android/pull/5492))
     *   Fix overlapping text issue on Automotive after orientation change
         ([#5477](https://github.com/Automattic/pocket-casts-android/pull/5477))
     *   Fix link screen's text overlap on Automotive
         ([#5475](https://github.com/Automattic/pocket-casts-android/pull/5475))
-    *   Improved Automotive sign up screen
-        ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
 *   Updates
     *   Reset player after playback finished on Automotive
         ([#5488](https://github.com/Automattic/pocket-casts-android/pull/5488))
