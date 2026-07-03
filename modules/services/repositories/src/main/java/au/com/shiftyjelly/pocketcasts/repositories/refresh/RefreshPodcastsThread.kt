@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.text.TextUtils
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -61,6 +62,7 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.Date
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
@@ -99,9 +101,9 @@ class RefreshPodcastsThread(
     @Volatile
     private var taskHasBeenCancelled = false
 
-    private fun isAllowedToRun(runNow: Boolean = false): Boolean {
-        val now = System.currentTimeMillis()
-        return now > lastRefreshAllowedTime + if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
+    private fun tryAcquireRefreshSlot(runNow: Boolean = false): Boolean {
+        val throttleMs = if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
+        return tryAcquireRefreshSlot(throttleMs = throttleMs, now = System.currentTimeMillis())
     }
 
     fun getEntryPoint(): RefreshPodcastsThreadEntryPoint {
@@ -127,7 +129,7 @@ class RefreshPodcastsThread(
                 return ListenableWorker.Result.retry()
             }
 
-            if (!isAllowedToRun(runNow)) {
+            if (!tryAcquireRefreshSlot(runNow)) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as too soon")
                 try {
                     // sleep for half a second to give the user a feeling of "oh the app is refreshing"
@@ -138,7 +140,6 @@ class RefreshPodcastsThread(
                 dispatchCurrentRefreshedState()
                 return ListenableWorker.Result.success()
             }
-            lastRefreshAllowedTime = System.currentTimeMillis()
 
             refresh()
 
@@ -389,12 +390,30 @@ class RefreshPodcastsThread(
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
 
+        private const val INITIAL_LAST_REFRESH_ALLOWED_TIME_MS = -10000L
         private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
         private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
-        private var lastRefreshAllowedTime: Long = -10000
+        private val lastRefreshAllowedTime = AtomicLong(INITIAL_LAST_REFRESH_ALLOWED_TIME_MS)
 
         fun clearLastRefreshTime() {
-            lastRefreshAllowedTime = -10000
+            lastRefreshAllowedTime.set(INITIAL_LAST_REFRESH_ALLOWED_TIME_MS)
+        }
+
+        private fun tryAcquireRefreshSlot(throttleMs: Long, now: Long): Boolean {
+            while (true) {
+                val lastRefreshTime = lastRefreshAllowedTime.get()
+                if (now <= lastRefreshTime + throttleMs) {
+                    return false
+                }
+                if (lastRefreshAllowedTime.compareAndSet(lastRefreshTime, now)) {
+                    return true
+                }
+            }
+        }
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        internal fun tryAcquireRefreshSlotForTesting(throttleMs: Long, now: Long): Boolean {
+            return tryAcquireRefreshSlot(throttleMs = throttleMs, now = now)
         }
 
         fun updateNotifications(lastSeen: Date?, settings: Settings, podcastManager: PodcastManager, episodeManager: EpisodeManager, notificationHelper: NotificationHelper, context: Context) {
