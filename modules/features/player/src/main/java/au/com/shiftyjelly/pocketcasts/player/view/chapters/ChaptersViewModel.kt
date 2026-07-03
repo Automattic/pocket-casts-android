@@ -34,9 +34,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +54,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel(assistedFactory = ChaptersViewModel.Factory::class)
 class ChaptersViewModel @AssistedInject constructor(
@@ -106,7 +111,7 @@ class ChaptersViewModel @AssistedInject constructor(
     val showPlayer = _showPlayer.asSharedFlow()
 
     fun playChapter(chapter: Chapter) {
-        eventHorizon.track(PlayerChapterSelectedEvent(origin = chapter.origin.toChapterOriginType()))
+        val tapMark = TimeSource.Monotonic.markNow()
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
             val playbackState = playbackManager.playbackStateFlow.first()
@@ -114,26 +119,52 @@ class ChaptersViewModel @AssistedInject constructor(
                 is Mode.Episode -> mode.episodeId
                 is Mode.Player -> playbackState.episodeUuid
             }
+            val episode = episodeManager.findEpisodeByUuid(episodeId)
+            val alreadyInChapter = playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter
 
-            when {
-                playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter -> _showPlayer.emit(Unit)
-
-                playbackState.episodeUuid == episodeId -> {
+            val latencyMs = if (alreadyInChapter) {
+                _showPlayer.emit(Unit)
+                if (playbackState.isPlaying) 0L else null
+            } else {
+                val playbackResumed = async(start = CoroutineStart.UNDISPATCHED) {
+                    withTimeoutOrNull(PLAYBACK_START_TIMEOUT) {
+                        playbackManager.playbackStateFlow.first { it.hasResumedPlayback(episodeId, chapter) }
+                    }
+                }
+                if (playbackState.episodeUuid == episodeId) {
                     playbackManager.skipToChapter(chapter)
                     if (!playbackState.isPlaying) {
                         playbackManager.playNowSuspend(episodeId)
                     }
+                } else {
+                    episode?.let {
+                        it.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
+                        episodeManager.updatePlayedUpToBlocking(it, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
+                        playbackManager.playNowSuspend(it)
+                    }
                 }
-
-                playbackState.episodeUuid != episodeId -> {
-                    val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
-                    episode.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
-                    episodeManager.updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
-                    playbackManager.playNowSuspend(episode)
-                }
+                if (playbackResumed.await() != null) tapMark.elapsedNow().inWholeMilliseconds else null
             }
+
+            eventHorizon.track(
+                PlayerChapterSelectedEvent(
+                    origin = chapter.origin.toChapterOriginType(),
+                    source = when (mode) {
+                        is Mode.Episode -> ChaptersShownSource.EpisodeDetails
+                        is Mode.Player -> ChaptersShownSource.FullscreenPlayer
+                    },
+                    playbackStartLatencyMs = latencyMs,
+                    episodeUuid = episodeId,
+                    podcastUuid = episode?.podcastOrSubstituteUuid,
+                ),
+            )
         }
     }
+
+    private fun PlaybackState.hasResumedPlayback(episodeId: String, chapter: Chapter) = episodeUuid == episodeId &&
+        isPlaying &&
+        positionMs.milliseconds in chapter &&
+        lastChangeFrom in PLAYBACK_RESUMED_CHANGES
 
     private val _showUpsell = MutableSharedFlow<Unit>()
     val showUpsell = _showUpsell.asSharedFlow()
@@ -302,5 +333,13 @@ class ChaptersViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(mode: Mode): ChaptersViewModel
+    }
+
+    companion object {
+        private val PLAYBACK_START_TIMEOUT = 5.seconds
+        private val PLAYBACK_RESUMED_CHANGES = setOf(
+            PlaybackManager.LastChangeFrom.OnPlayerPlaying.value,
+            PlaybackManager.LastChangeFrom.OnSeekComplete.value,
+        )
     }
 }

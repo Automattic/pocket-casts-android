@@ -42,6 +42,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -290,12 +291,37 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `play chapter reports chapter origin`() = runTest {
+    fun `play chapter reports origin source and zero latency when already playing in chapter`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
         val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
 
         chaptersViewModel.playChapter(chapter)
 
-        assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
+        assertEquals(ChapterOriginType.Generated, event.origin)
+        assertEquals(ChaptersShownSource.EpisodeDetails, event.source)
+        assertEquals("id", event.episodeUuid)
+        assertEquals(episode.podcastOrSubstituteUuid, event.podcastUuid)
+        assertEquals(0L, event.playbackStartLatencyMs)
+    }
+
+    @Test
+    fun `play chapter reports latency only once playback resumes at the chapter`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        chaptersViewModel.playChapter(chapter)
+
+        playbackStateFlow.update { it.copy(positionMs = 0, lastChangeFrom = PlaybackManager.LastChangeFrom.OnUserSeeking.value) }
+        assertTrue(eventSink.isEmpty())
+
+        playbackStateFlow.update { it.copy(positionMs = 0, lastChangeFrom = PlaybackManager.LastChangeFrom.OnSeekComplete.value) }
+        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
+        assertEquals(ChaptersShownSource.EpisodeDetails, event.source)
+        assertNotNull(event.playbackStartLatencyMs)
+        assertTrue(event.playbackStartLatencyMs!! >= 0)
     }
 
     @Test
