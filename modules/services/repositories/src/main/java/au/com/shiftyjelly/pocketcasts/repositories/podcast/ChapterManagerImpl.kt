@@ -8,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -48,7 +50,15 @@ class ChapterManagerImpl @Inject constructor(
         val rawChapters = combine(
             episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
             chapterDao.observeChaptersForEpisode(episodeUuid),
-        ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
+        ) { episode, dbChapters ->
+            // Already-saved generated chapters must stay hidden while the feature is off.
+            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                dbChapters
+            } else {
+                dbChapters.filterNot { it.origin == ChapterOrigin.Generated }
+            }
+            Chapters(visibleChapters.fixChapterTimestamps(episode))
+        }
 
         // Generated chapter timestamps are in the server reference timeline; align them to the real audio
         // stream via the fingerprint map. Phone only, to spare resources on automotive/wear.

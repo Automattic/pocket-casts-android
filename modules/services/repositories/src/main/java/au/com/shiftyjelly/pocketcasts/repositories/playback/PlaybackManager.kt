@@ -273,6 +273,7 @@ open class PlaybackManager @Inject constructor(
 
     private var lastPlaybackSource: SourceView? = null
 
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -386,7 +387,7 @@ open class PlaybackManager @Inject constructor(
         if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
             episode.overrideStreamUrl = hlsUrl
             episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
-        }
+
     }
 
     fun toggleVideoRendering() {
@@ -415,6 +416,7 @@ open class PlaybackManager @Inject constructor(
             StreamVideoState.NotVideo -> if (episode?.isVideo == true) PlaybackContentType.Video else PlaybackContentType.Audio
         }
     }
+
 
     fun isStreaming(): Boolean {
         return player?.isStreaming ?: false
@@ -2031,6 +2033,7 @@ open class PlaybackManager @Inject constructor(
                 hlsEngine = if (episode.isStreamUrlHls) "exoplayer" else null,
             ),
         )
+
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
