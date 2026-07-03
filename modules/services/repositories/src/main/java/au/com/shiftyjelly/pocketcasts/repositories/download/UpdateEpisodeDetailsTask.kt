@@ -101,27 +101,27 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 
                 try {
                     val client = withContext(Dispatchers.Default) { httpClient.get() }
-                    val response = client.newCall(request).await()
-
-                    val contentType = response.header("Content-Type")
-                    if (!contentType.isNullOrBlank()) {
-                        if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
-                            episodeManager.updateFileTypeBlocking(episode, contentType)
-                            episode.fileType = contentType
-                        }
-                    }
-
-                    val contentLengthHeader = response.header("Content-Length")
-                    if (!contentLengthHeader.isNullOrBlank()) {
-                        try {
-                            val contentLength = java.lang.Long.parseLong(contentLengthHeader)
-                            val sizeInBytes = episode.sizeInBytes
-                            if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
-                                episodeManager.updateSizeInBytesBlocking(episode, contentLength)
-                                episode.sizeInBytes = contentLength
+                    client.newCall(request).await().use { response ->
+                        val contentType = response.header("Content-Type")
+                        if (!contentType.isNullOrBlank()) {
+                            if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
+                                episodeManager.updateFileTypeBlocking(episode, contentType)
+                                episode.fileType = contentType
                             }
-                        } catch (nfe: NumberFormatException) {
-                            Timber.i(nfe, "Unable to read content length.")
+                        }
+
+                        val contentLengthHeader = response.header("Content-Length")
+                        if (!contentLengthHeader.isNullOrBlank()) {
+                            try {
+                                val contentLength = java.lang.Long.parseLong(contentLengthHeader)
+                                val sizeInBytes = episode.sizeInBytes
+                                if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
+                                    episodeManager.updateSizeInBytesBlocking(episode, contentLength)
+                                    episode.sizeInBytes = contentLength
+                                }
+                            } catch (nfe: NumberFormatException) {
+                                Timber.i(nfe, "Unable to read content length.")
+                            }
                         }
                     }
                 } catch (ioException: IOException) {
