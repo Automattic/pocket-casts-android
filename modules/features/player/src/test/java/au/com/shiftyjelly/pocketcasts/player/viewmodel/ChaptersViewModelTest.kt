@@ -47,6 +47,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -113,6 +114,8 @@ class ChaptersViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSetting)
         whenever(fingerprintTimingManager.stateFlow).thenReturn(fingerprintStateFlow)
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("id")
+        whenever { chapterManager.awaitStreamAlignedChapter(any(), any()) }
+            .thenAnswer { it.getArgument<Chapter>(1) }
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -322,6 +325,18 @@ class ChaptersViewModelTest {
         assertEquals(ChaptersShownSource.EpisodeDetails, event.source)
         assertNotNull(event.playbackStartLatencyMs)
         assertTrue(event.playbackStartLatencyMs!! >= 0)
+    }
+
+    @Test
+    fun `play chapter seeks to the stream-aligned position`() = runTest {
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val tapped = Chapter("gen", 2.seconds, 3.seconds, selected = true, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+        val aligned = tapped.copy(startTime = 30.seconds, endTime = 31.seconds)
+        whenever { chapterManager.awaitStreamAlignedChapter("id", tapped) }.thenReturn(aligned)
+
+        chaptersViewModel.playChapter(tapped)
+
+        verify(playbackManager).skipToChapter(aligned)
     }
 
     @Test

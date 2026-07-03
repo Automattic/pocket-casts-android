@@ -114,13 +114,21 @@ class ChaptersViewModel @AssistedInject constructor(
         val tapMark = TimeSource.Monotonic.markNow()
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
-            val playbackState = playbackManager.playbackStateFlow.first()
+            val stateAtTap = playbackManager.playbackStateFlow.first()
             val episodeId = when (mode) {
                 is Mode.Episode -> mode.episodeId
-                is Mode.Player -> playbackState.episodeUuid
+                is Mode.Player -> stateAtTap.episodeUuid
             }
             val episode = episodeManager.findEpisodeByUuid(episodeId)
-            val alreadyInChapter = playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter
+
+            val target = if (stateAtTap.episodeUuid == episodeId) {
+                chapterManager.awaitStreamAlignedChapter(episodeId, chapter)
+            } else {
+                chapter
+            }
+
+            val playbackState = playbackManager.playbackStateFlow.first()
+            val alreadyInChapter = playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in target
 
             val latencyMs = if (alreadyInChapter) {
                 _showPlayer.emit(Unit)
@@ -128,18 +136,18 @@ class ChaptersViewModel @AssistedInject constructor(
             } else {
                 val playbackResumed = async(start = CoroutineStart.UNDISPATCHED) {
                     withTimeoutOrNull(PLAYBACK_START_TIMEOUT) {
-                        playbackManager.playbackStateFlow.first { it.hasResumedPlayback(episodeId, chapter) }
+                        playbackManager.playbackStateFlow.first { it.hasResumedPlayback(episodeId, target) }
                     }
                 }
                 if (playbackState.episodeUuid == episodeId) {
-                    playbackManager.skipToChapter(chapter)
+                    playbackManager.skipToChapter(target)
                     if (!playbackState.isPlaying) {
                         playbackManager.playNowSuspend(episodeId)
                     }
                 } else {
                     episode?.let {
-                        it.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
-                        episodeManager.updatePlayedUpToBlocking(it, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
+                        it.playedUpToMs = target.startTime.inWholeMilliseconds.toInt()
+                        episodeManager.updatePlayedUpToBlocking(it, target.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
                         playbackManager.playNowSuspend(it)
                     }
                 }

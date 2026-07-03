@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -77,6 +79,34 @@ class ChapterManagerImpl @Inject constructor(
         return combine(rawChapters, mappingTicks) { chapters, _ ->
             alignGeneratedChapters(episodeUuid, chapters)
         }.distinctUntilChanged()
+    }
+
+    override suspend fun awaitStreamAlignedChapter(episodeUuid: String, chapter: Chapter): Chapter {
+        if (!chapter.isGenerated || appPlatform != AppPlatform.Phone) return chapter
+        val manager = fingerprintTimingManager.get()
+        val raw = chapterDao.findChapter(episodeUuid, chapter.index) ?: return chapter
+        val referenceStartSec = raw.startTimeMs / 1000.0
+        val referenceEndSec = (raw.endTimeMs ?: raw.startTimeMs) / 1000.0
+
+        val resolution = combine(manager.stateFlow, manager.mappingVersion) { state, _ -> state }
+            .mapNotNull { state ->
+                when {
+                    manager.activeEpisodeUuid != episodeUuid -> Alignment.GiveUp
+                    state is FingerprintTimingManager.State.Unavailable || state is FingerprintTimingManager.State.Failed -> Alignment.GiveUp
+                    else -> manager.playbackTimeMs(referenceStartSec)?.let { Alignment.Ready(it) }
+                }
+            }
+            .first()
+
+        if (resolution !is Alignment.Ready) return chapter
+        val alignedStart = resolution.startMs.milliseconds
+        val alignedEnd = manager.playbackTimeMs(referenceEndSec)?.milliseconds ?: (alignedStart + (chapter.endTime - chapter.startTime))
+        return chapter.copy(startTime = alignedStart, endTime = alignedEnd)
+    }
+
+    private sealed interface Alignment {
+        data class Ready(val startMs: Int) : Alignment
+        data object GiveUp : Alignment
     }
 
     /**

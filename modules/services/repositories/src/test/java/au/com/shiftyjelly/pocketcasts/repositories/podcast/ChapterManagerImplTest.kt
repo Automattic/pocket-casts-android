@@ -19,11 +19,15 @@ import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -874,8 +878,83 @@ class ChapterManagerImplTest {
         }
     }
 
+    @Test
+    fun `awaitStreamAlignedChapter leaves non-generated chapters unchanged`() = runBlocking {
+        val manager = phoneChapterManager(mock())
+        val tapped = Chapter("A", 5.seconds, 15.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.PodcastIndex)
+
+        assertEquals(tapped, manager.awaitStreamAlignedChapter("id", tapped))
+    }
+
+    @Test
+    fun `awaitStreamAlignedChapter aligns a generated chapter once the map covers it`() = runBlocking {
+        val fingerprint = mock<FingerprintTimingManager>().apply {
+            whenever(stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Active(coverage = 1)))
+            whenever(mappingVersion).thenReturn(MutableStateFlow(1L))
+            whenever(activeEpisodeUuid).thenReturn("id")
+            whenever(playbackTimeMs(5.0)).thenReturn(35_000)
+            whenever(playbackTimeMs(15.0)).thenReturn(45_000)
+        }
+        whenever(chapterDao.findChapter("id", 0)).thenReturn(
+            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 5_000, endTimeMs = 15_000, origin = ChapterOrigin.Generated),
+        )
+        val tapped = Chapter("A", 5.seconds, 15.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        val aligned = phoneChapterManager(fingerprint).awaitStreamAlignedChapter("id", tapped)
+
+        assertEquals(35.seconds, aligned.startTime)
+        assertEquals(45.seconds, aligned.endTime)
+    }
+
+    @Test
+    fun `awaitStreamAlignedChapter gives up when fingerprinting a different episode`() = runBlocking {
+        val fingerprint = mock<FingerprintTimingManager>().apply {
+            whenever(stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Active(coverage = 1)))
+            whenever(mappingVersion).thenReturn(MutableStateFlow(1L))
+            whenever(activeEpisodeUuid).thenReturn("other")
+        }
+        whenever(chapterDao.findChapter("id", 0)).thenReturn(
+            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 5_000, endTimeMs = 15_000, origin = ChapterOrigin.Generated),
+        )
+        val tapped = Chapter("A", 5.seconds, 15.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        assertEquals(tapped, phoneChapterManager(fingerprint).awaitStreamAlignedChapter("id", tapped))
+    }
+
+    @Test
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    fun `awaitStreamAlignedChapter suspends until the map grows to cover the chapter`() = runTest(UnconfinedTestDispatcher()) {
+        val versionFlow = MutableStateFlow(0L)
+        val fingerprint = mock<FingerprintTimingManager>().apply {
+            whenever(stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Preparing))
+            whenever(mappingVersion).thenReturn(versionFlow)
+            whenever(activeEpisodeUuid).thenReturn("id")
+            whenever(playbackTimeMs(5.0)).thenReturn(null, 35_000)
+            whenever(playbackTimeMs(15.0)).thenReturn(45_000)
+        }
+        whenever(chapterDao.findChapter("id", 0)).thenReturn(
+            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 5_000, endTimeMs = 15_000, origin = ChapterOrigin.Generated),
+        )
+        val tapped = Chapter("A", 5.seconds, 15.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        val deferred = async { phoneChapterManager(fingerprint).awaitStreamAlignedChapter("id", tapped) }
+        assertTrue(deferred.isActive)
+
+        versionFlow.value = 1L
+
+        assertEquals(35.seconds, deferred.await().startTime)
+    }
+
     private val generatedChaptersFixture = listOf(
         DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
         DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),
+    )
+
+    private fun phoneChapterManager(fingerprint: FingerprintTimingManager) = ChapterManagerImpl(
+        chapterDao = chapterDao,
+        episodeManager = episodeManager,
+        fingerprintTimingManager = Lazy { fingerprint },
+        appPlatform = AppPlatform.Phone,
+        settings = settings,
     )
 }
