@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.privacy.PrivacyFragment
+import au.com.shiftyjelly.pocketcasts.settings.voice.VoiceControlSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
@@ -94,6 +95,9 @@ fun SettingsFragmentPage(
             }
             item {
                 GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })
+            }
+            item {
+                VoiceControlRow(onClick = { openFragment(VoiceControlSettingsFragment()) })
             }
             item {
                 NotificationRow(onClick = { openFragment(NotificationsSettingsFragment()) })
@@ -195,6 +199,16 @@ private fun GeneralRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_playback),
         icon = painterResource(IR.drawable.ic_profile_settings),
+        modifier = Modifier.rowModifier(onClick),
+    )
+}
+
+@Composable
+private fun VoiceControlRow(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = "Voice Control",
+        secondaryText = "Hands-free playback commands",
+        icon = painterResource(SR.drawable.settings_notifications),
         modifier = Modifier.rowModifier(onClick),
     )
 }

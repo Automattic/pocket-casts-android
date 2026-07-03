@@ -66,6 +66,11 @@ sentry.properties
 # Kotlin
 .kotlin
 
+# C++
+.cxx
+
 developer.properties
 
-.claude/settings.local.json
+# Claude Code local settings
+.claude/
+.functiongemma-model/

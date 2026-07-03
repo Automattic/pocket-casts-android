@@ -76,6 +76,7 @@ dependencies {
 
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.voice)
 
     debugImplementation(libs.compose.ui.tooling)
 

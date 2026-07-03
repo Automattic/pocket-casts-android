@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.VoiceControlAudioRoutePolicy
 import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
 import io.reactivex.Observable
@@ -452,6 +453,9 @@ interface Settings {
     val headphoneControlsNextAction: UserSetting<HeadphoneAction>
     val headphoneControlsPreviousAction: UserSetting<HeadphoneAction>
     val headphoneControlsPlayBookmarkConfirmationSound: UserSetting<Boolean>
+    val voiceControlUserDisabled: UserSetting<Boolean>
+    val voiceControlSetupCompleted: UserSetting<Boolean>
+    val voiceControlAudioRoutePolicy: UserSetting<VoiceControlAudioRoutePolicy>
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long

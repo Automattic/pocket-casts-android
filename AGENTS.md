@@ -235,3 +235,28 @@ The Room database has 122 migration versions. When modifying entities:
 ### Analytics
 
 Use `AnalyticsTracker` service for event tracking. Analytics are integrated with Automattic Tracks.
+
+### Log Monitoring
+
+When monitoring logs on-device via `adb logcat`, **always filter by PID** so only the target app's logs are captured. Both the debug (`.debug` suffix) and production packages may be installed simultaneously. Use a self-healing loop that re-resolves the PID when the app restarts:
+
+```bash
+while true; do
+  PID=$(adb shell "ps -A 2>/dev/null | grep pocketcasts.debug" | awk '{print $2}')
+  if [ -n "$PID" ]; then
+    adb logcat -v time --pid=$PID 2>/dev/null
+  fi
+  sleep 0.5
+done | grep --line-buffered -iE "<keywords>"
+```
+
+**Do not hardcode keywords here.** To build the `<keywords>` pattern, scan both Kotlin and native sources for log output:
+
+- **Kotlin:** Grep `Timber\.[idwe]\(` in the relevant module's `src/main/`. Extract distinctive message prefixes (text before `%` or `$`). Use full prefixes with trailing punctuation to avoid false matches — e.g. `Intent:` not `Intent`, `Executing:` not `Execut`.
+- **JNI/NDK (C++):** Grep `#define LOG_TAG` in `src/main/cpp/` for native log tags. Also include upstream library tags like `whisper.cpp`. Common tags: `OboeCapture`, `NativeVAD`, `WhisperJni`, `EmbeddingJni`, `NativeWakeWord`, `NativeVadProc`, `whisper.cpp`.
+
+Combine both into a grep alternation. **Exclude noisy tags:** use logcat's `OkHttp:S` filter spec to suppress OkHttp at the source, avoiding data payloads that may accidentally match keywords. The full command:
+
+```bash
+adb logcat -v time --pid=$PID OkHttp:S
+```

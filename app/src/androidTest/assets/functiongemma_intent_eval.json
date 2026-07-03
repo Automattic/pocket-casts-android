@@ -1,0 +1,911 @@
+[
+  {
+    "history": [],
+    "transcript": "Regarding the bookmark titled 'Funny Blooper', please rename it to 'Podcast Intro Theme'.",
+    "expected_name": "bookmark",
+    "expected_action": "rename",
+    "expected_params": {
+      "ref": "Funny Blooper",
+      "title": "Podcast Intro Theme"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "How many sections are in this?",
+    "expected_name": "chapter",
+    "expected_action": "query_count",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What gaps do I have?",
+    "expected_name": "cloud_route",
+    "expected_action": "route",
+    "expected_params": {
+      "request": "What gaps do I have?",
+      "tier": "unknown"
+    }
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Rename the bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Cancel, and play something else.",
+    "expected_name": "dialog_control",
+    "expected_action": "new_command",
+    "expected_params": {
+      "value": "Cancel, and play something else."
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Turn off volume boost.",
+    "expected_name": "effects",
+    "expected_action": "set_volume_boost",
+    "expected_params": {
+      "enabled": false
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Hmm, interesting point.",
+    "expected_name": "no_match",
+    "expected_action": "",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, go ahead and unpause it.",
+    "expected_name": "playback",
+    "expected_action": "resume",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Um, how much, how much longer is, uh, this episode going to be?",
+    "expected_name": "playback_query",
+    "expected_action": "time_remaining",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Get rid of everything in this play queue.",
+    "expected_name": "queue",
+    "expected_action": "clear",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could you activate the sleep timer for 60 minutes?",
+    "expected_name": "sleep",
+    "expected_action": "set",
+    "expected_params": {
+      "minutes": 60
+    }
+  },
+  {
+    "history": [],
+    "transcript": "What's the cumulative listening time for this current week?",
+    "expected_name": "stats_query",
+    "expected_action": "listening_time",
+    "expected_params": {
+      "period": "this week"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Tell me the current loudness.",
+    "expected_name": "volume",
+    "expected_action": "query",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could I, uh, rename a bookmark please?",
+    "expected_name": "dialog_control",
+    "expected_action": "begin",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename"
+    }
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Rename the bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Cancel.",
+    "expected_name": "dialog_control",
+    "expected_action": "cancel",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Clear the queue."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:queue{action:<escape>clear</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Yes, that's fine.",
+    "expected_name": "dialog_control",
+    "expected_action": "confirm",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Clear the queue."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:queue{action:<escape>clear</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Yeah, actually, scratch that.",
+    "expected_name": "dialog_control",
+    "expected_action": "deny",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Let me rename a bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "The first one.",
+    "expected_name": "dialog_control",
+    "expected_action": "provide_slot",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename",
+      "slot": "ref",
+      "value": "1"
+    }
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Change the title of a bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "That bookmark from 'Daily Briefing'.",
+    "expected_name": "dialog_control",
+    "expected_action": "provide_slot",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename",
+      "slot": "ref",
+      "value": "That bookmark from 'Daily Briefing'."
+    }
+  },
+  {
+    "history": [],
+    "transcript": "How many chapters are in this episode?",
+    "expected_name": "chapter",
+    "expected_action": "query_count",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, can you turn on the trim silence feature?",
+    "expected_name": "effects",
+    "expected_action": "set_trim_mode",
+    "expected_params": {
+      "mode": "medium"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Queue, oldest first.",
+    "expected_name": "queue",
+    "expected_action": "sort",
+    "expected_params": {
+      "sort_order": "oldest_first"
+    }
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "How do I rename one of my bookmarks?"
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Um, this one.",
+    "expected_name": "dialog_control",
+    "expected_action": "provide_slot",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename",
+      "slot": "ref",
+      "value": "this"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Could you tell me the total amount of space my, uh, podcast files are taking up?",
+    "expected_name": "stats_query",
+    "expected_action": "download_stats",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Wipe out my listening queue, please.",
+    "expected_name": "queue",
+    "expected_action": "clear",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, how many episodes are left for me to catch up on?",
+    "expected_name": "stats_query",
+    "expected_action": "unplayed_total",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Hey, um, can you send the latest episode of 'Stuff You Should Know' to the bottom of the playlist?",
+    "expected_name": "queue",
+    "expected_action": "move_to_bottom",
+    "expected_params": {
+      "episode": "the latest episode of 'Stuff You Should Know'"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Um, could you just append that 'Hidden Brain' episode titled 'The Scarcity Trap' to my queue?",
+    "expected_name": "queue",
+    "expected_action": "add_bottom",
+    "expected_params": {
+      "episode": "that 'Hidden Brain' episode titled 'The Scarcity Trap'"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I'd like to hear the description from the publisher.",
+    "expected_name": "playback_query",
+    "expected_action": "episode_description",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Report my total bookmarks.",
+    "expected_name": "bookmark",
+    "expected_action": "query_count",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Pause at the end of this chapter.",
+    "expected_name": "sleep",
+    "expected_action": "end_of_chapter",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Name of this one?",
+    "expected_name": "playback_query",
+    "expected_action": "episode_title",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What did the show publish as its description?",
+    "expected_name": "playback_query",
+    "expected_action": "episode_description",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Go to 15 minutes.",
+    "expected_name": "playback",
+    "expected_action": "seek_to",
+    "expected_params": {
+      "position_seconds": 900
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I'm wondering, what's the overall length of the episode?",
+    "expected_name": "playback_query",
+    "expected_action": "episode_duration",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Lower the audio five steps.",
+    "expected_name": "volume",
+    "expected_action": "adjust_volume",
+    "expected_params": {
+      "delta": -5
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Make the volume, uh, eighty-five.",
+    "expected_name": "volume",
+    "expected_action": "set_volume",
+    "expected_params": {
+      "volume": 85
+    }
+  },
+  {
+    "history": [],
+    "transcript": "What's the release date for this one?",
+    "expected_name": "playback_query",
+    "expected_action": "publish_date",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, did I, um, already queue up \"My Favorite Murder\"?",
+    "expected_name": "queue",
+    "expected_action": "query_is_queued",
+    "expected_params": {
+      "episode": "\"My Favorite Murder\""
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Top of queue: 'My Favorite Murder'.",
+    "expected_name": "queue",
+    "expected_action": "move_to_top",
+    "expected_params": {
+      "episode": "My Favorite Murder"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Uh, go ahead and, like, open that link for, um, chapter three.",
+    "expected_name": "chapter",
+    "expected_action": "open_link",
+    "expected_params": {
+      "index": 3
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Set the podcast speed to one point two five.",
+    "expected_name": "effects",
+    "expected_action": "set_speed",
+    "expected_params": {
+      "speed": 1.25
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Count the chapters in this episode.",
+    "expected_name": "chapter",
+    "expected_action": "query_count",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Rename the bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Cancel that.",
+    "expected_name": "dialog_control",
+    "expected_action": "cancel",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, actually, let's just switch off the, um, sound boost.",
+    "expected_name": "effects",
+    "expected_action": "set_volume_boost",
+    "expected_params": {
+      "enabled": false
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I need to know the length of this current show.",
+    "expected_name": "playback_query",
+    "expected_action": "episode_duration",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Play the most recent bookmark.",
+    "expected_name": "bookmark",
+    "expected_action": "play",
+    "expected_params": {
+      "ref": "latest"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Count of queued items?",
+    "expected_name": "queue",
+    "expected_action": "query_length",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Go to chapter one now.",
+    "expected_name": "chapter",
+    "expected_action": "by_index",
+    "expected_params": {
+      "index": 1
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Any bookmarks around here?",
+    "expected_name": "bookmark",
+    "expected_action": "query_nearby",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Tell me, uh, when was my most recent listening session?",
+    "expected_name": "stats_query",
+    "expected_action": "time_since_last_listen",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Clear the queue."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:queue{action:<escape>clear</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Yes, confirm.",
+    "expected_name": "dialog_control",
+    "expected_action": "confirm",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could you show me what's coming up after this one?",
+    "expected_name": "queue",
+    "expected_action": "query_next",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Info on the current chapter, please.",
+    "expected_name": "chapter",
+    "expected_action": "query_current",
+    "expected_params": {}
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Clear the queue."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:queue{action:<escape>clear</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Yep, clear that queue for me.",
+    "expected_name": "dialog_control",
+    "expected_action": "confirm",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, can you just, like, stop when this current episode is done?",
+    "expected_name": "sleep",
+    "expected_action": "end_of_episode",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "I need a deeper dive into what was just said.",
+    "expected_name": "cloud_route",
+    "expected_action": "route",
+    "expected_params": {
+      "request": "I need a deeper dive into what was just said.",
+      "tier": "unknown"
+    }
+  },
+  {
+    "history": [
+      {
+        "role": "user",
+        "content": "Rename the bookmark."
+      },
+      {
+        "role": "model",
+        "content": "<start_function_call>call:dialog_control{action:<escape>begin</escape>,target_tool:<escape>bookmark</escape>,target_action:<escape>rename</escape>}<end_function_call>"
+      }
+    ],
+    "transcript": "Actually, play the next episode.",
+    "expected_name": "dialog_control",
+    "expected_action": "new_command",
+    "expected_params": {
+      "value": "Actually, play the next episode."
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Where, where exactly am I in this playback?",
+    "expected_name": "playback_query",
+    "expected_action": "position",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Uh, it's a bit too loud here, can you turn it, um, down a fair bit?",
+    "expected_name": "volume",
+    "expected_action": "adjust_volume",
+    "expected_params": {
+      "delta": -4
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Absolutely.",
+    "expected_name": "no_match",
+    "expected_action": "",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Can you reorder my queue so the most recent episodes are at the top?",
+    "expected_name": "queue",
+    "expected_action": "sort",
+    "expected_params": {
+      "sort_order": "newest_first"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Um, how many, uh, podcasts are available offline?",
+    "expected_name": "stats_query",
+    "expected_action": "download_stats",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "I need, uh, a couple more minutes, please.",
+    "expected_name": "sleep",
+    "expected_action": "add_time",
+    "expected_params": {
+      "minutes": 2
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Could you activate the volume boost feature?",
+    "expected_name": "effects",
+    "expected_action": "set_volume_boost",
+    "expected_params": {
+      "enabled": true
+    }
+  },
+  {
+    "history": [],
+    "transcript": "How does this relate to cap tables?",
+    "expected_name": "cloud_route",
+    "expected_action": "route",
+    "expected_params": {
+      "request": "How does this relate to cap tables?",
+      "tier": "unknown"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Remove the bookmark called \"key quote\".",
+    "expected_name": "bookmark",
+    "expected_action": "delete",
+    "expected_params": {
+      "ref": "key quote"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Please, um, add another 10 minutes to the timer.",
+    "expected_name": "sleep",
+    "expected_action": "add_time",
+    "expected_params": {
+      "minutes": 10
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Could you please put the latest episode of 'Stuff You Should Know' in my queue?",
+    "expected_name": "queue",
+    "expected_action": "add_bottom",
+    "expected_params": {
+      "episode": "the latest episode of 'Stuff You Should Know'"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Tell me about this one, the episode, I mean.",
+    "expected_name": "playback_query",
+    "expected_action": "episode_description",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What's my current position?",
+    "expected_name": "playback_query",
+    "expected_action": "position",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Is there a way to rename a bookmark?",
+    "expected_name": "dialog_control",
+    "expected_action": "begin",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Um, what chapter... what chapter am I currently in?",
+    "expected_name": "chapter",
+    "expected_action": "query_current",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could you tell me, uh, the duration of this one?",
+    "expected_name": "playback_query",
+    "expected_action": "episode_duration",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "I want to, uh, rename one of my saved points.",
+    "expected_name": "dialog_control",
+    "expected_action": "begin",
+    "expected_params": {
+      "target_tool": "bookmark",
+      "target_action": "rename"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "What I want is for the new episode of Stuff You Should Know to be queued up right after this one.",
+    "expected_name": "queue",
+    "expected_action": "add_top",
+    "expected_params": {
+      "episode": "the new episode of Stuff You Should Know"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I'd like to use trim silence at a high level.",
+    "expected_name": "effects",
+    "expected_action": "set_trim_mode",
+    "expected_params": {
+      "mode": "high"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Finished episodes, overall?",
+    "expected_name": "stats_query",
+    "expected_action": "episodes_finished",
+    "expected_params": {
+      "period": "all time"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Next up: 'Lore' episode about haunted lighthouses.",
+    "expected_name": "queue",
+    "expected_action": "add_top",
+    "expected_params": {
+      "episode": "'Lore' episode about haunted lighthouses"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I need to remove the fifth one.",
+    "expected_name": "bookmark",
+    "expected_action": "delete",
+    "expected_params": {
+      "ref": "5"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Uh, can you show me what's coming up on the, um, on the list?",
+    "expected_name": "queue",
+    "expected_action": "query_contents",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could you please set the audio level to forty-five?",
+    "expected_name": "volume",
+    "expected_action": "set_volume",
+    "expected_params": {
+      "volume": 45
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Give me the number of queued episodes.",
+    "expected_name": "queue",
+    "expected_action": "query_length",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What was the point there?",
+    "expected_name": "no_match",
+    "expected_action": "",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Is this available offline?",
+    "expected_name": "playback_query",
+    "expected_action": "download_status",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Could you tell me how many fresh episodes have come out since I last tuned in?",
+    "expected_name": "stats_query",
+    "expected_action": "new_episodes",
+    "expected_params": {
+      "timeframe": "since I last tuned in"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Maybe I should listen to that other show everyone's talking about later.",
+    "expected_name": "no_match",
+    "expected_action": "",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Resume.",
+    "expected_name": "playback",
+    "expected_action": "resume",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Sort the queue, uh, so the newest ones are playing first.",
+    "expected_name": "queue",
+    "expected_action": "sort",
+    "expected_params": {
+      "sort_order": "newest_first"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Can I get a list of my bookmarks?",
+    "expected_name": "bookmark",
+    "expected_action": "query_list",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Make it louder, please.",
+    "expected_name": "volume",
+    "expected_action": "adjust_volume",
+    "expected_params": {
+      "delta": 2
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I wonder why they said that.",
+    "expected_name": "no_match",
+    "expected_action": "",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Play the segment called \"The Discussion.\"",
+    "expected_name": "chapter",
+    "expected_action": "by_title",
+    "expected_params": {
+      "query": "The Discussion"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "Hmm, what's, uh, what's the next part called?",
+    "expected_name": "chapter",
+    "expected_action": "query_next",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What's, uh, what's the next podcast on the list?",
+    "expected_name": "queue",
+    "expected_action": "query_next",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Um, is the, uh, sleep mode engaged right now?",
+    "expected_name": "sleep",
+    "expected_action": "query",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "What are the chapters in this episode?",
+    "expected_name": "chapter",
+    "expected_action": "query_list",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Remaining time?",
+    "expected_name": "playback_query",
+    "expected_action": "time_remaining",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Please queue 'The History of Rock 'n' Roll' last.",
+    "expected_name": "queue",
+    "expected_action": "add_bottom",
+    "expected_params": {
+      "episode": "'The History of Rock 'n' Roll'"
+    }
+  },
+  {
+    "history": [],
+    "transcript": "I want to hear the chapter right before this.",
+    "expected_name": "chapter",
+    "expected_action": "previous",
+    "expected_params": {}
+  },
+  {
+    "history": [],
+    "transcript": "Roughly how long ago was my last listen?",
+    "expected_name": "stats_query",
+    "expected_action": "time_since_last_listen",
+    "expected_params": {}
+  }
+]

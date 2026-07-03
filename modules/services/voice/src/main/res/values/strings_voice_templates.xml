@@ -1,0 +1,18 @@
+<resources>
+    <string-array name="voice_spoken_templates">
+        <item>effects.set_speed|{speed}x speed</item>
+        <item>effects.adjust_speed|{speed}x</item>
+        <item>effects.set_trim_mode|Silence trim {mode}</item>
+        <item>effects.set_volume_boost|Volume boost {on/off}</item>
+        <item>effects.query|Speed {speed}x, trim {mode}, volume boost {on/off}</item>
+        <item>volume.query|Volume {volume} percent</item>
+        <item>sleep.set|Sleep timer set for {minutes} minutes</item>
+        <item>sleep.end_of_episode|Sleep timer set for end of episode</item>
+        <item>sleep.end_of_chapter|Sleep timer set for end of chapter</item>
+        <item>sleep.add_time|{total} minutes remaining</item>
+        <item>sleep.cancel|Sleep timer cancelled</item>
+        <item>sleep.query|Sleep timer {remaining}</item>
+        <item>bookmark.add|Bookmarked at {position}</item>
+        <item>playback.next_episode|Playing {episode title}</item>
+    </string-array>
+</resources>

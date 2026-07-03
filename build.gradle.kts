@@ -158,7 +158,7 @@ spotless {
                 "wear/src/**/*.kt",
             )
         }
-        targetExclude("**/uniffi/**/*.kt")
+        targetExclude("**/uniffi/**/*.kt", "**/.cxx/**")
         ktlint(ktlintVersion)
             .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
             .customRuleSets(listOf(ktlintComposeRules))
