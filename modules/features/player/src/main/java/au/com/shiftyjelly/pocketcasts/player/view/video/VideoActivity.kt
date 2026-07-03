@@ -107,14 +107,18 @@ class VideoActivity : AppCompatActivity() {
         // source resolves to AudioOnly, so close and hand back to the audio player.
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                playbackManager.streamVideoState.collect { finishIfNotVideo() }
+                launch { playbackManager.streamVideoState.collect { finishIfNotVideo() } }
+                launch { playbackManager.videoRenderingEnabled.collect { finishIfNotVideo() } }
             }
         }
     }
 
     private fun finishIfNotVideo() {
         val currentEpisode = playbackManager.upNextQueue.currentEpisode
-        if (currentEpisode == null || playbackManager.streamVideoState.value == StreamVideoState.AudioOnly) {
+        if (currentEpisode == null ||
+            playbackManager.streamVideoState.value == StreamVideoState.AudioOnly ||
+            !playbackManager.videoRenderingEnabled.value
+        ) {
             finish()
         }
     }

@@ -43,6 +43,16 @@ class PlayerHeaderVideoTest {
     }
 
     @Test
+    fun `a video stream is hidden when video rendering is disabled`() {
+        val header = PlayerHeader(
+            episode = audioEpisode,
+            streamVideoState = StreamVideoState.HasVideo,
+            videoRenderingEnabled = false,
+        )
+        assertFalse(header.isVideo)
+    }
+
+    @Test
     fun `video is never shown on the surface during remote playback`() {
         val header = PlayerHeader(episode = audioEpisode, streamVideoState = StreamVideoState.HasVideo, isPlaybackRemote = true)
         assertTrue(header.isVideo)
