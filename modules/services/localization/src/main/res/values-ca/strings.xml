@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-06-23 23:08:09+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Descarrega l\'episodi per moure\'t per la transcripció</string>
+    <string name="bookmark_play_from">Reprodueix des de %s</string>
+    <string name="profile_try_days_for_free">Prova 30 dies gratuïtament</string>
+    <string name="profile_start_free_trial_specific_duration">Comença el teu període de prova gratuït de 30 dies</string>
+    <string name="summary_upsell_description">Subscriu-te a Plus per accedir-hi i a altres funcions Premium com ara els marcadors i les carpetes.</string>
+    <string name="summary_upsell_title">Resums amb IA</string>
     <string name="tv_create_account_subtitle">Escaneja aquest codi per començar al teu telèfon, només triga un minut.</string>
+    <string name="tv_create_account_come_back">Quan hagis creat el teu compte, torna i inicia la sessió</string>
     <string name="tv_create_account_title">Crea el teu compte gratuït</string>
+    <string name="tv_onboarding_syncing_subtitle">Els teus pòdcasts s\'estan sincronitzant, aviat iniciarem la sessió!</string>
+    <string name="tv_onboarding_welcome_back">Benvingut de nou!</string>
     <string name="tv_onboarding_sign_in_instructions">Obre la càmera i apunta al codi QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sessió amb el telèfon</string>
     <string name="tv_sign_in_go_to_url">anant a %1$s</string>
