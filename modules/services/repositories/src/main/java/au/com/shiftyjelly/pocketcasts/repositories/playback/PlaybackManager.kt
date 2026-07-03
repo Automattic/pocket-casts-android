@@ -258,6 +258,11 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
+    // HLS starts Unknown until the player's tracks resolve it to HasVideo or AudioOnly; the video
+    // surface is shown only once HasVideo is known.
+    private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
+    val streamVideoState = _streamVideoState.asStateFlow()
+
     var player: Player?
         get() = _playerFlow.value
         set(value) {
@@ -1969,6 +1974,8 @@ open class PlaybackManager @Inject constructor(
         // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
+        // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
+        _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
             Thread.dumpStack()
@@ -2367,8 +2374,13 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
+                is PlayerEvent.VideoTrackChanged -> onVideoTrackChanged(event.hasVideo)
             }
         }
+    }
+
+    private fun onVideoTrackChanged(hasVideo: Boolean) {
+        _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
     }
 
     private suspend fun updateCurrentPositionInDatabase() {

@@ -34,7 +34,6 @@ data class PodcastEpisode(
     @ColumnInfo(name = "file_type") override var fileType: String? = null,
     @ColumnInfo(name = "duration") override var duration: Double = 0.0,
     @ColumnInfo(name = "download_url") override var downloadUrl: String? = null,
-    @ColumnInfo(name = "hls_url") override var hlsUrl: String? = null,
     @ColumnInfo(name = "downloaded_file_path") override var downloadedFilePath: String? = null,
     @ColumnInfo(name = "downloaded_error_details") override var downloadErrorDetails: String? = null,
     @ColumnInfo(name = "play_error_details") override var playErrorDetails: String? = null,
