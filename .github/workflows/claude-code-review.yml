@@ -26,7 +26,6 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write
-      issues: write
 
     steps:
       - name: Checkout repository
@@ -53,6 +52,6 @@ jobs:
             Provide detailed feedback using inline comments for specific issues.
 
           claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*)"
 
 

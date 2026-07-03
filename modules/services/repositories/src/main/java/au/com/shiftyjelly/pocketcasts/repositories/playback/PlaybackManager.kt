@@ -1976,7 +1976,6 @@ open class PlaybackManager @Inject constructor(
 
         // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
         _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
-
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
             Thread.dumpStack()

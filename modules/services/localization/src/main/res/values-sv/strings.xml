@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-06-30 11:56:50+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Ladda ner avsnittet och tryck för att söka</string>
+    <string name="bookmark_play_from">Spela upp från %s</string>
+    <string name="profile_try_days_for_free">Prova gratis i 30 dagar</string>
+    <string name="profile_start_free_trial_specific_duration">Starta din kostnadsfria 30 dagars provperiod</string>
+    <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
+    <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
     <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
+    <string name="tv_create_account_come_back">Kom tillbaka och logga in när du har skapat ditt konto</string>
     <string name="tv_create_account_title">Skapa ditt gratis konto</string>
+    <string name="tv_onboarding_syncing_subtitle">Dina podcasts synkroniseras, vi loggar in dig snart!</string>
+    <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
+    <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
+    <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
+    <string name="tv_sign_in_go_to_url">går till %1$s</string>
+    <string name="tv_sign_in_or_enter_code">eller ange följande kod</string>
+    <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
+    <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
+    <string name="tv_onboarding_subtitle">Dina podcasts på den stora skärmen</string>
+    <string name="tv_onboarding_welcome_tv">Välkommen till Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Välkommen till Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Längsta till kortaste</string>
+    <string name="sort_shortest_to_longest">Kortaste till längsta</string>
     <string name="synced_transcripts_whats_new_button_note">Synkroniserade transkriptioner är bara tillgängliga för de senaste avsnitten.</string>
     <string name="synced_transcripts_whats_new_message">Läs snabbt, missa ingenting. Namnet du svepte förbi, boken de rekommenderade, statistiken du ville ha — tryck på ordet och hoppa tillbaka.</string>
     <string name="synced_transcripts_whats_new_title">Läs med. Även vid 2x.</string>
