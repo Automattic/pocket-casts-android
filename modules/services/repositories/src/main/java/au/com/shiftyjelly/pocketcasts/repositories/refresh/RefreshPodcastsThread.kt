@@ -62,6 +62,7 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.Date
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -130,7 +131,7 @@ class RefreshPodcastsThread(
             }
 
             if (!tryAcquireRefreshSlot(runNow)) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as too soon")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as too soon or already in progress")
                 try {
                     // sleep for half a second to give the user a feeling of "oh the app is refreshing"
                     Thread.sleep(500)
@@ -141,7 +142,11 @@ class RefreshPodcastsThread(
                 return ListenableWorker.Result.success()
             }
 
-            refresh()
+            try {
+                refresh()
+            } finally {
+                releaseRefreshSlot()
+            }
 
             return ListenableWorker.Result.success()
         } catch (e: Exception) {
@@ -393,6 +398,7 @@ class RefreshPodcastsThread(
         private const val INITIAL_LAST_REFRESH_ALLOWED_TIME_MS = -10000L
         private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
         private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
+        private val refreshInProgress = AtomicBoolean(false)
         private val lastRefreshAllowedTime = AtomicLong(INITIAL_LAST_REFRESH_ALLOWED_TIME_MS)
 
         fun clearLastRefreshTime() {
@@ -400,20 +406,32 @@ class RefreshPodcastsThread(
         }
 
         private fun tryAcquireRefreshSlot(throttleMs: Long, now: Long): Boolean {
-            while (true) {
-                val lastRefreshTime = lastRefreshAllowedTime.get()
-                if (now <= lastRefreshTime + throttleMs) {
-                    return false
-                }
-                if (lastRefreshAllowedTime.compareAndSet(lastRefreshTime, now)) {
-                    return true
-                }
+            if (!refreshInProgress.compareAndSet(false, true)) {
+                return false
             }
+
+            val lastRefreshTime = lastRefreshAllowedTime.get()
+            if (now <= lastRefreshTime + throttleMs) {
+                releaseRefreshSlot()
+                return false
+            }
+
+            lastRefreshAllowedTime.set(now)
+            return true
+        }
+
+        private fun releaseRefreshSlot() {
+            refreshInProgress.set(false)
         }
 
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         internal fun tryAcquireRefreshSlotForTesting(throttleMs: Long, now: Long): Boolean {
             return tryAcquireRefreshSlot(throttleMs = throttleMs, now = now)
+        }
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        internal fun releaseRefreshSlotForTesting() {
+            releaseRefreshSlot()
         }
 
         fun updateNotifications(lastSeen: Date?, settings: Settings, podcastManager: PodcastManager, episodeManager: EpisodeManager, notificationHelper: NotificationHelper, context: Context) {

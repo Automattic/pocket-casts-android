@@ -15,6 +15,7 @@ class RefreshPodcastsThreadTest {
 
     @After
     fun tearDown() {
+        RefreshPodcastsThread.releaseRefreshSlotForTesting()
         RefreshPodcastsThread.clearLastRefreshTime()
     }
 
@@ -28,12 +29,41 @@ class RefreshPodcastsThreadTest {
                 now = 10.minutes.inWholeMilliseconds,
             ),
         )
+        RefreshPodcastsThread.releaseRefreshSlotForTesting()
+
         assertFalse(
             RefreshPodcastsThread.tryAcquireRefreshSlotForTesting(
                 throttleMs = throttleMs,
                 now = 14.minutes.inWholeMilliseconds,
             ),
         )
+        assertTrue(
+            RefreshPodcastsThread.tryAcquireRefreshSlotForTesting(
+                throttleMs = throttleMs,
+                now = 16.minutes.inWholeMilliseconds,
+            ),
+        )
+    }
+
+    @Test
+    fun `refresh slot is blocked while refresh is already in progress`() {
+        val throttleMs = 5.minutes.inWholeMilliseconds
+
+        assertTrue(
+            RefreshPodcastsThread.tryAcquireRefreshSlotForTesting(
+                throttleMs = throttleMs,
+                now = 10.minutes.inWholeMilliseconds,
+            ),
+        )
+        assertFalse(
+            RefreshPodcastsThread.tryAcquireRefreshSlotForTesting(
+                throttleMs = throttleMs,
+                now = 16.minutes.inWholeMilliseconds,
+            ),
+        )
+
+        RefreshPodcastsThread.releaseRefreshSlotForTesting()
+
         assertTrue(
             RefreshPodcastsThread.tryAcquireRefreshSlotForTesting(
                 throttleMs = throttleMs,

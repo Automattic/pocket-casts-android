@@ -73,12 +73,18 @@ class SubscribeManager @Inject constructor(
             .flatMap({ info ->
                 // shouldAutoDownload = true because the user manually subscribed to the podcast,
                 // so we want to automatically download episodes at this moment.
-                addPodcastRxSingle(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload).toObservable()
+                addPodcastRxSingle(podcastUuid = info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload)
+                    .doOnError { throwable ->
+                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast ${info.podcastUuid}")
+                    }
+                    .doFinally {
+                        uuidsInQueue.remove(info.podcastUuid)
+                    }
+                    .toObservable()
             }, true, 5)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
             .subscribeBy(
                 onNext = { podcast ->
-                    uuidsInQueue.remove(podcast.uuid)
                     Timber.i("Subscribed successfully to podcast ${podcast.uuid}")
                     subscriptionChangedRelay.accept(podcast.uuid)
                 },
