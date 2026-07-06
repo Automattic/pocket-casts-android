@@ -136,6 +136,7 @@ import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -178,6 +179,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private const val CAR_CONNECTION_TIMEOUT: Long = 1000
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -1994,13 +1996,13 @@ open class PlaybackManager @Inject constructor(
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) &&
                 // The watch handles these warnings before this is called
-                // Don't block playback while driving as the warning is only shown on the phone
-                !Util.isAndroidAutoConnectedFlow(application).first() &&
                 settings.warnOnMeteredNetwork.value &&
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
-                play
+                play &&
+                // Don't block playback while driving as the warning is only shown on the phone
+                withTimeoutOrNull(CAR_CONNECTION_TIMEOUT) { Util.isAndroidAutoConnectedFlow(application).first() } != true
             ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
