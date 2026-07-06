@@ -418,9 +418,16 @@ class MainActivity :
         }
     }
 
+    private var onNotificationPermissionGranted: () -> Unit = {}
+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) {}
+    ) { granted ->
+        if (granted) {
+            onNotificationPermissionGranted()
+        }
+        onNotificationPermissionGranted = {}
+    }
 
     private val deepLinkFactory = DeepLinkFactory()
 
@@ -453,11 +460,15 @@ class MainActivity :
                 }
 
                 else -> {
+                    onNotificationPermissionGranted = onPermissionGranted
                     notificationPermissionLauncher.launch(
                         Manifest.permission.POST_NOTIFICATIONS,
                     )
                 }
             }
+        } else {
+            // No runtime permission is needed to post notifications on older versions
+            onPermissionGranted()
         }
     }
 
