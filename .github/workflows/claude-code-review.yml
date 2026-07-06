@@ -25,17 +25,35 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      id-token: write
-
+      id-token: write # Required by claude-code-action for GitHub App token exchange.
     steps:
+      - name: Check workflow changes
+        id: workflow-changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_PATH: .github/workflows/claude-code-review.yml
+        run: |
+          set -euo pipefail
+          if gh pr diff "$PR_NUMBER" --repo "$REPOSITORY" --name-only | grep -Fx "$WORKFLOW_PATH"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping Claude review because this PR changes ${WORKFLOW_PATH}; Claude app token validation requires the workflow to match the default branch."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
-        uses: actions/checkout@v7
+        if: steps.workflow-changes.outputs.skip != 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Run Claude Code Review
+        if: steps.workflow-changes.outputs.skip != 'true'
         id: claude-review
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@4d7e1f0cd85743fdc93b1c8040ab54395da024e2 # v1.0.149
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           track_progress: true
@@ -53,5 +71,3 @@ jobs:
 
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*)"
-
-
