@@ -365,7 +365,7 @@ enum class Feature(
         title = "Prefer HLS stream when available",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
     ),
