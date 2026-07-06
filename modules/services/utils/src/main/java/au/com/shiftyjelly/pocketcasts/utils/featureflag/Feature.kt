@@ -369,6 +369,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
     ),
+    STATS_HEATMAP(
+        key = "stats_heatmap",
+        title = "Show listening activity heatmap on Stats",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-07-02"),
+    ),
 }
 
 sealed class FeatureTier {
