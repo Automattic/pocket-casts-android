@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -65,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.HeatmapShownEvent
 import com.automattic.eventhorizon.StatsDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -95,6 +97,7 @@ class StatsFragment : BaseFragment() {
                 },
                 onRetryClick = { viewModel.loadStats() },
                 launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
+                onShowHeatmap = { eventHorizon.track(HeatmapShownEvent) },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
         }
@@ -118,6 +121,7 @@ private fun StatsPage(
     onBackPress: () -> Unit,
     onRetryClick: () -> Unit,
     launchReviewDialog: (AppCompatActivity) -> Unit,
+    onShowHeatmap: () -> Unit,
     bottomInset: Dp,
 ) {
     Column {
@@ -126,7 +130,7 @@ private fun StatsPage(
             onNavigationClick = onBackPress,
         )
         when (state) {
-            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog)
+            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap)
             is StatsViewModel.State.Error -> StatsPageError(onRetryClick)
             is StatsViewModel.State.Loading -> StatsPageLoading()
         }
@@ -170,6 +174,7 @@ private fun StatsPageLoaded(
     state: StatsViewModel.State.Loaded,
     bottomInset: Dp,
     launchReviewDialog: (AppCompatActivity) -> Unit,
+    onShowHeatmap: () -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -197,6 +202,7 @@ private fun StatsPageLoaded(
         }
         if (FeatureFlag.isEnabled(Feature.STATS_HEATMAP)) {
             item {
+                CallOnce { onShowHeatmap() }
                 val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
                 TextC70(stringResource(LR.string.profile_stats_listening_activity))
                 Spacer(Modifier.height(6.dp))
@@ -353,6 +359,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
             onBackPress = { },
             onRetryClick = { },
             launchReviewDialog = { },
+            onShowHeatmap = { },
             bottomInset = 0.dp,
         )
     }
@@ -367,6 +374,7 @@ private fun StatsPageErrorPreview(@PreviewParameter(ThemePreviewParameterProvide
             onBackPress = { },
             onRetryClick = { },
             launchReviewDialog = { },
+            onShowHeatmap = { },
             bottomInset = 0.dp,
         )
     }
