@@ -1,5 +1,8 @@
 8.17
 -----
+*   Bug Fixes
+    *   Fix episodes streaming over mobile data without the 'Warn before using data' prompt when Up Next auto-advances or a downloaded file is missing
+        ([#5533](https://github.com/Automattic/pocket-casts-android/pull/5533))
 
 
 8.16
