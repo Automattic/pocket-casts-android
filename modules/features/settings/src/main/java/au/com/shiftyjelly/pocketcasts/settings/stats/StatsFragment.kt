@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -64,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.HeatmapShownEvent
@@ -71,6 +75,7 @@ import com.automattic.eventhorizon.StatsDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -98,6 +103,7 @@ class StatsFragment : BaseFragment() {
                 onRetryClick = { viewModel.loadStats() },
                 launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
                 onShowHeatmap = { eventHorizon.track(HeatmapShownEvent) },
+                onListeningActivityInfoClick = { showListeningActivityInfoDialog() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
         }
@@ -113,6 +119,15 @@ class StatsFragment : BaseFragment() {
         eventHorizon.track(StatsDismissedEvent)
         return super.onBackPressed()
     }
+
+    private fun showListeningActivityInfoDialog() {
+        ConfirmationDialog()
+            .setTitle(getString(LR.string.profile_stats_listening_activity_info_title))
+            .setSummary(getString(LR.string.profile_stats_listening_activity_info_summary))
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
+            .setOnConfirm {}
+            .show(parentFragmentManager, "listening_activity_info")
+    }
 }
 
 @Composable
@@ -122,6 +137,7 @@ private fun StatsPage(
     onRetryClick: () -> Unit,
     launchReviewDialog: (AppCompatActivity) -> Unit,
     onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
     bottomInset: Dp,
 ) {
     Column {
@@ -130,7 +146,7 @@ private fun StatsPage(
             onNavigationClick = onBackPress,
         )
         when (state) {
-            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap)
+            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap, onListeningActivityInfoClick)
             is StatsViewModel.State.Error -> StatsPageError(onRetryClick)
             is StatsViewModel.State.Loading -> StatsPageLoading()
         }
@@ -175,6 +191,7 @@ private fun StatsPageLoaded(
     bottomInset: Dp,
     launchReviewDialog: (AppCompatActivity) -> Unit,
     onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -204,7 +221,20 @@ private fun StatsPageLoaded(
             item {
                 CallOnce { onShowHeatmap() }
                 val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
-                TextC70(stringResource(LR.string.profile_stats_listening_activity))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextC70(stringResource(LR.string.profile_stats_listening_activity))
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_info),
+                        contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_title),
+                        tint = MaterialTheme.theme.colors.primaryIcon02,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .clip(CircleShape)
+                            .clickable(onClick = onListeningActivityInfoClick)
+                            .padding(4.dp)
+                            .size(16.dp),
+                    )
+                }
                 Spacer(Modifier.height(6.dp))
                 CalendarHeatMap(
                     start = state.heatmapStart,
@@ -360,6 +390,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
             onRetryClick = { },
             launchReviewDialog = { },
             onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }
@@ -375,6 +406,7 @@ private fun StatsPageErrorPreview(@PreviewParameter(ThemePreviewParameterProvide
             onRetryClick = { },
             launchReviewDialog = { },
             onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }

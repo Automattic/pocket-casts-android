@@ -1305,6 +1305,8 @@
     <string name="profile_stats_listened_for">You\'ve listened for</string>
     <string name="profile_stats_listening_activity">Listening Activity</string>
     <string name="profile_stats_listening_activity_content_description">Listening activity heatmap</string>
+    <string name="profile_stats_listening_activity_info_title">Listening activity</string>
+    <string name="profile_stats_listening_activity_info_summary">An estimate of when you\'ve been listening, based on your playback history. If you finish an episode over a few days, it shows on the last day.</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
