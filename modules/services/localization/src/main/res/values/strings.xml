@@ -386,8 +386,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
@@ -2215,16 +2217,12 @@
     <string name="watch_sync_success">Logged in from phone!</string>
 
     <!-- Watch sync errors -->
-    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
     <string name="watch_sync_error_no_connection">Phone not connected</string>
     <string name="watch_sync_error_login_failed">Login failed</string>
-    <string name="watch_sync_error_unknown">Something went wrong</string>
 
     <!-- Watch sync error help text -->
-    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
     <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
-    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
 
     <!-- Watch sync actions -->
     <string name="watch_sync_retry">Try Again</string>

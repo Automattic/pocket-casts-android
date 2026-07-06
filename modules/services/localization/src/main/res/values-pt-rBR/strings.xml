@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-06-29 22:58:14+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Baixe o episódio para tocar e procurar</string>
+    <string name="bookmark_play_from">Reproduzir de %s</string>
+    <string name="profile_try_days_for_free">Experimente gratuitamente por 30 dias</string>
+    <string name="profile_start_free_trial_specific_duration">Inicie o teste gratuito de 30 dias</string>
+    <string name="summary_upsell_description">Assine o Plus para ter acesso a essa e outras funcionalidades premium, como favoritos e pastas.</string>
+    <string name="summary_upsell_title">Resumos com tecnologia de IA</string>
     <string name="tv_create_account_subtitle">Leia este código para começar a ouvir no seu telefone. Leva apenas um minuto.</string>
+    <string name="tv_create_account_come_back">Depois de criar sua conta, volte e faça login</string>
     <string name="tv_create_account_title">Crie uma conta gratuita</string>
+    <string name="tv_onboarding_syncing_subtitle">Seus podcasts estão sendo sincronizados. Conectaremos sua conta em breve.</string>
+    <string name="tv_onboarding_welcome_back">Que bom que você voltou!</string>
+    <string name="tv_onboarding_sign_in_instructions">Abra a câmera e aponte para este código QR</string>
+    <string name="tv_onboarding_sign_in_title">Faça login usando seu telefone</string>
+    <string name="tv_sign_in_go_to_url">acessando %1$s</string>
+    <string name="tv_sign_in_or_enter_code">ou insira o código a seguir</string>
+    <string name="tv_onboarding_syncing">Sincronizando seus podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Navegar sem uma conta</string>
+    <string name="tv_onboarding_create_free_account">Criar conta gratuita</string>
+    <string name="tv_onboarding_subtitle">Seus podcasts agora na TV</string>
+    <string name="tv_onboarding_welcome_tv">Boas-vindas ao Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Boas-vindas ao Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Mais longo para o mais curto</string>
+    <string name="sort_shortest_to_longest">Mais curto para o mais longo</string>
     <string name="synced_transcripts_whats_new_button_note">Transcrições sincronizadas disponíveis apenas para episódios recentes.</string>
     <string name="synced_transcripts_whats_new_message">Leia rápido sem perder nada. Aquele nome que você deixou passar, o livro que indicaram, o dado que você queria conferir — toque na palavra e volte na hora.</string>
     <string name="synced_transcripts_whats_new_title">Leia mais. Mesmo na velocidade 2x.</string>

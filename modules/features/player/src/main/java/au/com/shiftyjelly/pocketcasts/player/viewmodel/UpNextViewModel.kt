@@ -38,7 +38,7 @@ class UpNextViewModel @Inject constructor(
         settings.showUpNextSortDurationTooltip.flow,
         _isUpNextVisible,
     ) { shouldShowTooltip, isUpNextVisible ->
-        shouldShowTooltip && isUpNextVisible && FeatureFlag.isEnabled(Feature.UP_NEXT_DURATION)
+        shouldShowTooltip && isUpNextVisible && FeatureFlag.isEnabled(Feature.UP_NEXT_SORT)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
