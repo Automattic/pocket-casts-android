@@ -439,6 +439,9 @@ class MainActivity :
                     onPermissionGranted()
                 }
 
+                // The user denied notifications, so onPermissionGranted is intentionally dropped.
+                // Callers relying on a notification, such as the data warning, stay halted and the
+                // snackbar points the user at the blocked notification setting.
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
