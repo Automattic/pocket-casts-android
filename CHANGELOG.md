@@ -1,7 +1,8 @@
-8.16
+8.17
 -----
 
-8.15
+
+8.16
 -----
 *   New Features
     *   Up Next sort by duration
