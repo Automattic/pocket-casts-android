@@ -123,6 +123,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -1333,7 +1334,8 @@ open class PlaybackManager @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Downloaded file missing for ${episode.uuid}, clearing download status and retrying via stream")
             downloadQueue.cancel(episode.uuid, SourceView.UNKNOWN).join()
             episodeManager.clearPlaybackErrorBlocking(episode)
-            playNow(episode = episode, forceStream = true, sourceView = SourceView.UNKNOWN)
+            // Don't force the stream so the retry still respects the warn before using data setting
+            playNow(episode = episode, sourceView = SourceView.UNKNOWN)
             return
         }
 
@@ -1992,6 +1994,8 @@ open class PlaybackManager @Inject constructor(
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) &&
                 // The watch handles these warnings before this is called
+                // Don't block playback while driving as the warning is only shown on the phone
+                !Util.isAndroidAutoConnectedFlow(application).first() &&
                 settings.warnOnMeteredNetwork.value &&
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&
@@ -2012,6 +2016,8 @@ open class PlaybackManager @Inject constructor(
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)
                 }
+                // Wait for the user to confirm streaming from the notification before playing
+                return
             } else {
                 val episodeObservable = when (episode) {
                     is PodcastEpisode -> {
