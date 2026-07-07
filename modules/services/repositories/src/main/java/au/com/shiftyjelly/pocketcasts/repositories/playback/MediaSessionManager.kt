@@ -1246,7 +1246,7 @@ class MediaSessionManager(
                             val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
                             when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                                MediaEvent.SingleTap -> handleMediaButtonSingleTap(playOnly = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY)
                                 MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                                 MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                                 null -> Unit
@@ -1281,7 +1281,14 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
 
-        private fun handleMediaButtonSingleTap() {
+        private fun handleMediaButtonSingleTap(playOnly: Boolean = false) {
+            // KEYCODE_MEDIA_PLAY has explicit play semantics. Some head units (wireless
+            // Android Auto in particular) send it redundantly while playback is already
+            // running, so toggling here would pause playback.
+            if (playOnly && playbackManager.isPlaying()) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Ignoring KEYCODE_MEDIA_PLAY because playback is already playing")
+                return
+            }
             playbackManager.playPause(sourceView = source)
         }
 

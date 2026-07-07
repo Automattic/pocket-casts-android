@@ -341,10 +341,33 @@ class Media3SessionCallbackTest {
 
     @Test
     fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
         // Routed through MediaEventQueue — single tap resolves as play/pause
+        verify(playbackManager).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY is ignored while already playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        testScope.advanceUntilIdle()
+
+        // A dedicated play key must never toggle playback into a pause
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY_PAUSE still toggles while playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        testScope.advanceUntilIdle()
+
         verify(playbackManager).playPause(sourceView = any())
     }
 
