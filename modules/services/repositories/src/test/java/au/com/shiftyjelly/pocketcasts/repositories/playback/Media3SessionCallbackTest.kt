@@ -340,24 +340,12 @@ class Media3SessionCallbackTest {
     // --- Headphone action handler tests ---
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
-        whenever(playbackManager.isPlaying()).thenReturn(false)
-
-        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
-        testScope.advanceUntilIdle()
-
-        // Routed through MediaEventQueue — single tap resolves as play/pause
-        verify(playbackManager).playPause(sourceView = any())
-    }
-
-    @Test
-    fun `KEYCODE_MEDIA_PLAY is ignored while already playing`() = runTest {
-        whenever(playbackManager.isPlaying()).thenReturn(true)
-
+    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as play-only single tap`() = runTest {
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
         // A dedicated play key must never toggle playback into a pause
+        verify(playbackManager).playIfNotPlaying(sourceView = any())
         verify(playbackManager, never()).playPause(sourceView = any())
     }
 

@@ -278,14 +278,11 @@ internal class Media3SessionCallback(
     }
 
     private fun handleMediaButtonSingleTap(playOnly: Boolean = false) {
-        // KEYCODE_MEDIA_PLAY has explicit play semantics. Some head units (wireless
-        // Android Auto in particular) send it redundantly while playback is already
-        // running, so toggling here would pause playback.
-        if (playOnly && playbackManager.isPlaying()) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Ignoring KEYCODE_MEDIA_PLAY because playback is already playing")
-            return
+        if (playOnly) {
+            playbackManager.playIfNotPlaying(sourceView = source)
+        } else {
+            playbackManager.playPause(sourceView = source)
         }
-        playbackManager.playPause(sourceView = source)
     }
 
     private fun handleMediaButtonDoubleTap() {
