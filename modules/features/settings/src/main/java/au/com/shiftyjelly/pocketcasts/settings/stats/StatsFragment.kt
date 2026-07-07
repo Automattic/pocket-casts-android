@@ -70,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.HeatmapInfoOpenedEvent
 import com.automattic.eventhorizon.HeatmapShownEvent
 import com.automattic.eventhorizon.StatsDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -121,6 +122,7 @@ class StatsFragment : BaseFragment() {
     }
 
     private fun showListeningActivityInfoDialog() {
+        eventHorizon.track(HeatmapInfoOpenedEvent)
         ConfirmationDialog()
             .setTitle(getString(LR.string.profile_stats_listening_activity_info_title))
             .setSummary(getString(LR.string.profile_stats_listening_activity_info_summary))
