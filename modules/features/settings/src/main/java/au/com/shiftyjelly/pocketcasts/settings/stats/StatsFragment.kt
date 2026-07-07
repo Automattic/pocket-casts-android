@@ -15,12 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -225,19 +225,19 @@ private fun StatsPageLoaded(
                 val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextC70(stringResource(LR.string.profile_stats_listening_activity))
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_info),
-                        contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_help),
-                        tint = MaterialTheme.theme.colors.primaryText01,
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .clip(CircleShape)
-                            .clickable(onClick = onListeningActivityInfoClick)
-                            .padding(4.dp)
-                            .size(16.dp),
-                    )
+                    IconButton(
+                        onClick = onListeningActivityInfoClick,
+                        // Offset counteracts IconButton's built-in padding so the icon sits close to the label while keeping a 48dp touch target
+                        modifier = Modifier.offset(x = (-8).dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_info),
+                            contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_help),
+                            tint = MaterialTheme.theme.colors.primaryText01,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
                 }
-                Spacer(Modifier.height(6.dp))
                 CalendarHeatMap(
                     start = state.heatmapStart,
                     end = state.heatmapEnd,
