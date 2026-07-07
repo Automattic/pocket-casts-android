@@ -226,7 +226,7 @@ private fun StatsPageLoaded(
                     Icon(
                         painter = painterResource(IR.drawable.ic_info),
                         contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_title),
-                        tint = MaterialTheme.theme.colors.primaryIcon02,
+                        tint = MaterialTheme.theme.colors.primaryText01,
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .clip(CircleShape)
