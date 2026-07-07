@@ -1,5 +1,8 @@
 8.17
 -----
+*   Bug Fixes
+    *   Fix playback repeatedly pausing on wireless Android Auto
+        ([#5535](https://github.com/Automattic/pocket-casts-android/pull/5535))
 
 
 8.16
