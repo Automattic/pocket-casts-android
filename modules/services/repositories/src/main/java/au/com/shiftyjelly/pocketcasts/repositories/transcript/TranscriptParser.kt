@@ -152,10 +152,12 @@ internal class JsonParser(
             firstSegment?.speaker != null && firstSegment.body != null -> {
                 segments.flatMap(::toEntries)
             }
+
             // Flightcast style: prefer the embedded WEBVTT document when present.
             vtt != null && vtt.contains("WEBVTT") -> {
                 vttParser.parse(Buffer().writeUtf8(vtt)).getOrThrow()
             }
+
             // Fallback: segments carrying plain text (Flightcast) or body-only entries.
             else -> segments.flatMap(::toEntries)
         }
