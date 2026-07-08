@@ -1,0 +1,155 @@
+name: Self-Approve Eligibility
+
+# Tells a self-approver whether their PR is safe to merge without a human review.
+#
+# Two stages:
+#   1. A deterministic precheck of the objective facts (author allowlisted, CI
+#      green, AI review completed, AI comment threads resolved). Cheap and
+#      certain; no model call. If a fact is not met it posts the reason and stops.
+#   2. Only when every fact passes, Claude applies the judgment gates (critical
+#      areas, low risk) defined in the prompt below against the diff and writes
+#      the verdict comment.
+#
+# Security: every trigger runs in base-repo context. The job checks out only the
+# base branch (trusted). Claude reads the PR diff as text via `gh` but never
+# checks out or executes the PR's code, and it only posts a comment (it does not
+# label, approve, or merge), so this is not exposed to pull_request_target
+# script injection or privileged escalation.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows: ["Claude Code Review"]
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: read
+  statuses: read
+  id-token: write # Required by claude-code-action for GitHub App token exchange.
+
+concurrency:
+  group: self-approve-${{ github.event.issue.number || github.event.pull_request.number || github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    if: >-
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request != '' && contains(github.event.comment.body, '/self-approve'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out base branch (trusted)
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Precheck objective facts
+        id: precheck
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          SELF_APPROVERS: geekygecko sztomek
+        with:
+          script: |
+            const gates = require(`${process.env.GITHUB_WORKSPACE}/.github/self-approve/gates.js`)
+            const event = context.eventName
+
+            let prNumber
+            if (event === 'issue_comment') {
+              const commenter = context.payload.comment.user.login
+              if (!gates.SELF_APPROVERS.includes(commenter)) {
+                core.info(`Ignoring /self-approve from non-approver @${commenter}.`)
+                return
+              }
+              prNumber = context.payload.issue.number
+            } else if (event === 'pull_request_target') {
+              prNumber = context.payload.pull_request.number
+            } else if (event === 'workflow_run') {
+              const run = context.payload.workflow_run
+              prNumber = run.pull_requests?.[0]?.number
+              if (!prNumber) {
+                const { data } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  ...context.repo,
+                  commit_sha: run.head_sha,
+                })
+                prNumber = data.find((pr) => pr.state === 'open')?.number
+              }
+              if (!prNumber) {
+                core.info('No open PR associated with this workflow_run; skipping.')
+                return
+              }
+            }
+
+            const result = await gates.checkFacts({ github, context, prNumber })
+            core.setOutput('pr_number', String(prNumber))
+
+            if (result.blocked) {
+              core.info(`PR #${prNumber}: ${result.blocked}.`)
+              return
+            }
+            if (!result.allowlisted) {
+              // Only respond to an explicit command; stay silent on others' PRs.
+              if (event === 'issue_comment') {
+                await gates.upsertComment({
+                  github, context, prNumber,
+                  body: `${gates.COMMENT_MARKER}\n\nPR author @${result.author} is not in the self-approver allowlist, so this PR cannot be self-approved.`,
+                })
+              } else {
+                core.info(`PR #${prNumber} author @${result.author} is not a self-approver; skipping.`)
+              }
+              return
+            }
+            if (!result.factsPassed) {
+              await gates.upsertComment({ github, context, prNumber, body: gates.renderFactsPendingComment(result) })
+              core.setOutput('proceed', 'false')
+              core.notice(`PR #${prNumber}: prerequisites not yet met.`)
+              return
+            }
+
+            core.setOutput('proceed', 'true')
+            core.notice(`PR #${prNumber}: prerequisites met, running the risk assessment.`)
+
+      - name: Assess risk
+        if: steps.precheck.outputs.proceed == 'true'
+        uses: anthropics/claude-code-action@4d7e1f0cd85743fdc93b1c8040ab54395da024e2 # v1.0.149
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Assess whether pull request #${{ steps.precheck.outputs.pr_number }} in ${{ github.repository }} is eligible for self-approval.
+
+            The objective prerequisites (author is an approved self-approver, CI is green, the AI review completed, and all AI review comments are resolved) have ALREADY been verified and passed. Do not re-check them.
+
+            Your job is the judgment call only. Read the diff with `gh pr diff ${{ steps.precheck.outputs.pr_number }}` and apply these two gates. Self-approval is for small, safe changes; these gates decide whether a second pair of eyes is still needed.
+
+            Gate A — No critical areas touched. The change must not touch these areas, matched as path substrings. They are where a subtle bug reaches every user or corrupts data, so a human review is always required. A test-only change (paths under `src/test/` or `src/androidTest/`) inside one of these areas does not count as touching it.
+            - Playback engine: `modules/services/repositories/**/playback/`, `modules/services/repositories/**/chromecast/`, and `modules/features/player/`.
+            - Database: anything in `modules/services/model/` (entities, DAOs, and especially Room migrations).
+            - Sync and refresh: `modules/services/repositories/**/sync/`, `modules/services/repositories/**/refresh/`, and `modules/services/servers/`.
+            - Payments and subscriptions: `modules/services/payment/`, `modules/services/repositories/**/payment/`, `modules/services/repositories/**/subscription/`.
+            - Auth and account: sign-in, sign-up, or token handling in `modules/features/account/`.
+            - Episode downloads: `modules/services/repositories/**/download/`.
+
+            Gate B — Low risk. A judgment call; make it honestly rather than mechanically. Any of these signals push the PR toward human review:
+            - Large surface: more than roughly 300 changed lines or 15 files.
+            - `AndroidManifest.xml` changes, new permissions, ProGuard/R8 rule changes, or release build configuration.
+            - `FeatureFlag` changes that alter behaviour: a new or removed flag, or a changed `defaultValue` or remote-config gating, since these control rollout. Pure metadata edits (a flag's display title, say) are fine.
+            - Base branch is not `main`.
+            - Anything you read in the diff that you would not be confident shipping without another opinion.
+            Small, well-tested changes pass: string tweaks, UI polish in non-critical features, docs, test additions, lint fixes, analytics events, refactors contained to one non-critical module.
+
+            Then post exactly one sticky comment on the PR. Find an existing issue comment whose body contains the marker `<!-- self-approve-eval -->` and update it in place; if none exists, create one. The comment MUST:
+            - Begin with the line `<!-- self-approve-eval -->`.
+            - Show the two gates with a clear verdict for each.
+            - If the change touches a critical area or is not low risk: state that it is NOT eligible for self-approval and needs a human reviewer, and explain why in one or two sentences.
+            - If it is clean: state that it IS eligible, then tell the author to (1) add the `[Review] Self Approved` label to record the self-review, and (2) merge it themselves using "Merge without waiting for requirements to be met". Add that adding the label means vouching for this low-risk judgment, which the automation cannot make for them.
+
+            Do NOT add labels, submit reviews, approve, or merge. Read and post the single comment only.
+          claude_args: |
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api repos/Automattic/pocket-casts-android/issues/*)"
