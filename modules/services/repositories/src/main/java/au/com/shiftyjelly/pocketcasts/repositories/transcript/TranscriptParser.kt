@@ -153,9 +153,13 @@ internal class JsonParser(
                 segments.flatMap(::toEntries)
             }
 
-            // Flightcast style: prefer the embedded WEBVTT document when present.
+            // Flightcast style: prefer the embedded WEBVTT document when present,
+            // but fall back to the segments if it is missing or fails to parse.
             vtt != null && vtt.contains("WEBVTT") -> {
-                vttParser.parse(Buffer().writeUtf8(vtt)).getOrThrow()
+                vttParser.parse(Buffer().writeUtf8(vtt))
+                    .getOrNull()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?: segments.flatMap(::toEntries)
             }
 
             // Fallback: segments carrying plain text (Flightcast) or body-only entries.

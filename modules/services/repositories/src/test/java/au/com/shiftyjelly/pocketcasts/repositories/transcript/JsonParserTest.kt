@@ -122,6 +122,28 @@ class JsonParserTest {
     }
 
     @Test
+    fun `parse flightcast json falls back to text segments when embedded vtt is malformed`() {
+        val subtitles = """
+            |{
+            |  "segments": [
+            |    { "start": 0.0, "end": 1.0, "text": "Fallback segment text" }
+            |  ],
+            |  "vtt": "WEBVTT\n\nthis is not a valid cue"
+            |}
+        """.trimMargin()
+        val source = Buffer().writeUtf8(subtitles)
+
+        val entries = parser.parse(source).getOrThrow()
+
+        assertEquals(
+            listOf(
+                TranscriptEntry.Text("Fallback segment text", startTimeMs = 0, endTimeMs = 1000),
+            ),
+            entries,
+        )
+    }
+
+    @Test
     fun `parse podcast index json prefers speaker and body over embedded vtt`() {
         val subtitles = """
             |{
