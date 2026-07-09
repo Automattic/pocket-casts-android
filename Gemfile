@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'danger-dangermattic', '~> 1.3.0'
+gem 'danger-dangermattic', '~> 1.4.0'
 gem 'fastlane', '~> 2.237'
 gem 'fastlane-plugin-firebase_app_distribution', '~> 1.0'
 
