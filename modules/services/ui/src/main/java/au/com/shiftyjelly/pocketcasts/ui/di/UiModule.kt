@@ -47,6 +47,9 @@ class UiModule {
     }
 
     private companion object {
+        // Shared by all images the app loads, not just podcast covers. Roughly enough for a few
+        // hundred podcasts at three artwork sizes each (~200KB per image), and matching the
+        // ceiling Coil would apply on a device with plenty of free space.
         const val ARTWORK_DISK_CACHE_SIZE_BYTES = 250L * 1024 * 1024
     }
 }
