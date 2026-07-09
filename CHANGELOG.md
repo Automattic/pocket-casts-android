@@ -3,6 +3,9 @@
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+*   Bug Fixes
+    *   Fix episode artwork on the filters page not updating after embedded artwork is extracted during playback
+        ([#5548](https://github.com/Automattic/pocket-casts-android/pull/5548))
 
 8.16
 -----
