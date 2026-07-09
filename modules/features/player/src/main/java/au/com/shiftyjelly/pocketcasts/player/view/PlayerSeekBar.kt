@@ -25,6 +25,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val view = inflater.inflate(R.layout.view_playback_seek_bar, this)
     private var seeking = false
+    private var touchSeeking = false
     private var currentTime = Duration.ZERO
     private var duration = Duration.ZERO
     private var chapters = Chapters()
@@ -106,12 +107,15 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
         seekBar.secondaryProgress = 0
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
+                touchSeeking = false
                 changeListener?.onSeekPositionChangeStop(currentTime) {
                     seeking = false
                 }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
+                touchSeeking = true
+                removeCallbacks(commitNonTouchSeek)
                 changeListener?.onSeekPositionChangeStart()
                 seeking = true
             }
@@ -123,8 +127,35 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
                 updateTextViews()
 
                 changeListener?.onSeekPositionChanging(currentTime)
+
+                if (!touchSeeking) {
+                    onNonTouchSeek()
+                }
             }
         })
+    }
+
+    // TalkBack seek actions and keyboard arrows change the progress without touch tracking events,
+    // so the seek has to be committed here or the next playback position update reverts it.
+    // Consecutive changes are debounced into a single seek.
+    private fun onNonTouchSeek() {
+        if (!seeking) {
+            seeking = true
+            changeListener?.onSeekPositionChangeStart()
+        }
+        removeCallbacks(commitNonTouchSeek)
+        postDelayed(commitNonTouchSeek, NON_TOUCH_SEEK_COMMIT_DELAY_MS)
+    }
+
+    private val commitNonTouchSeek = Runnable {
+        changeListener?.onSeekPositionChangeStop(currentTime) {
+            seeking = false
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        removeCallbacks(commitNonTouchSeek)
+        super.onDetachedFromWindow()
     }
 
     private fun updateTextViews() {
@@ -161,5 +192,9 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
         fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit)
         fun onSeekPositionChanging(progress: Duration)
         fun onSeekPositionChangeStart()
+    }
+
+    private companion object {
+        const val NON_TOUCH_SEEK_COMMIT_DELAY_MS = 750L
     }
 }
