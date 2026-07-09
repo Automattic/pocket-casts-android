@@ -1740,6 +1740,18 @@ open class PlaybackManager @Inject constructor(
                     )
                 }
                 chapterManager.updateChapters(playbackState.episodeUuid, dbChapters)
+
+                val thumbnailStatus = resolveThumbnailStatus(
+                    embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
+                    useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                )
+                if (thumbnailStatus != null) {
+                    val episode = episodeManager.findEpisodeByUuid(playbackState.episodeUuid) as? PodcastEpisode
+                    if (episode != null && episode.thumbnailStatus == PodcastEpisode.THUMBNAIL_STATUS_UNKNOWN) {
+                        episode.thumbnailStatus = thumbnailStatus
+                        episodeManager.update(episode)
+                    }
+                }
             }
         }
     }
@@ -2810,4 +2822,20 @@ internal fun buildPrefetchRequest(
         downloadUrl = url,
         networkConstraint = networkConstraint,
     )
+}
+
+/**
+ * Resolves the [PodcastEpisode.thumbnailStatus] to store after reading a file's metadata.
+ *
+ * Returns `null` when artwork extraction wasn't attempted (episode artwork disabled),
+ * so the status stays [PodcastEpisode.THUMBNAIL_STATUS_UNKNOWN] and can be re-evaluated
+ * if the user enables the setting later.
+ */
+internal fun resolveThumbnailStatus(
+    embeddedArtworkPath: String?,
+    useEpisodeArtwork: Boolean,
+): Int? = when {
+    !useEpisodeArtwork -> null
+    embeddedArtworkPath != null -> PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_AVAILABLE
+    else -> PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE
 }
