@@ -1,5 +1,8 @@
 8.17
 -----
+*   Bug Fixes
+    *   Fix seeking with TalkBack on the full screen player
+        ([#5547](https://github.com/Automattic/pocket-casts-android/pull/5547))
 
 
 8.16
