@@ -115,9 +115,9 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
                 touchSeeking = true
+                // A touch drag takes over any in-flight non-touch seek session.
                 removeCallbacks(commitNonTouchSeek)
-                changeListener?.onSeekPositionChangeStart()
-                seeking = true
+                beginSeekIfNeeded()
             }
 
             override fun onProgressChanged(seekBar: SeekBar, progressSecs: Int, fromUser: Boolean) {
@@ -126,25 +126,32 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
                 currentTime = progressSecs.seconds
                 updateTextViews()
 
+                // TalkBack seek actions and keyboard arrows change the progress without touch
+                // tracking callbacks, so begin the seek session here (before dispatching the
+                // changing callback) and debounce committing it, or the next playback position
+                // update would revert the bar.
+                if (!touchSeeking) {
+                    beginSeekIfNeeded()
+                }
+
                 changeListener?.onSeekPositionChanging(currentTime)
 
                 if (!touchSeeking) {
-                    onNonTouchSeek()
+                    removeCallbacks(commitNonTouchSeek)
+                    postDelayed(commitNonTouchSeek, NON_TOUCH_SEEK_COMMIT_DELAY_MS)
                 }
             }
         })
     }
 
-    // TalkBack seek actions and keyboard arrows change the progress without touch tracking events,
-    // so the seek has to be committed here or the next playback position update reverts it.
-    // Consecutive changes are debounced into a single seek.
-    private fun onNonTouchSeek() {
+    // Dispatches a single onSeekPositionChangeStart per seek session, whether the session was
+    // started by a touch drag or a non-touch (TalkBack / keyboard) progress change, so start and
+    // stop callbacks stay paired.
+    private fun beginSeekIfNeeded() {
         if (!seeking) {
             seeking = true
             changeListener?.onSeekPositionChangeStart()
         }
-        removeCallbacks(commitNonTouchSeek)
-        postDelayed(commitNonTouchSeek, NON_TOUCH_SEEK_COMMIT_DELAY_MS)
     }
 
     private val commitNonTouchSeek = Runnable {
@@ -155,6 +162,10 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
 
     override fun onDetachedFromWindow() {
         removeCallbacks(commitNonTouchSeek)
+        // Reset the seek state so a reused instance isn't stuck ignoring position updates if the
+        // view detaches mid non-touch seek.
+        seeking = false
+        touchSeeking = false
         super.onDetachedFromWindow()
     }
 
