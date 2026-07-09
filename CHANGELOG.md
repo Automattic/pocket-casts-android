@@ -3,6 +3,9 @@
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+*   Bug Fixes
+    *   Keep podcast artwork available offline by caching it more reliably
+        ([#5549](https://github.com/Automattic/pocket-casts-android/pull/5549))
 
 8.16
 -----
