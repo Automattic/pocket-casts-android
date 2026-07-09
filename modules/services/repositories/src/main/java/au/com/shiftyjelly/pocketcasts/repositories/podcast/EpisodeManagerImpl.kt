@@ -965,6 +965,10 @@ class EpisodeManagerImpl @Inject constructor(
         return@withContext newDownloadUrl ?: episode.downloadUrl
     }
 
+    override suspend fun updateThumbnailStatusIfUnknown(episodeUuid: String, thumbnailStatus: Int) = withContext(ioDispatcher) {
+        episodeDao.updateThumbnailStatusIfUnknown(thumbnailStatus, episodeUuid)
+    }
+
     override suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>> = flow {
         var offset = 0
         while (true) {

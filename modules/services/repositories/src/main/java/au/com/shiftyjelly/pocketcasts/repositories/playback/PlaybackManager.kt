@@ -1743,14 +1743,10 @@ open class PlaybackManager @Inject constructor(
 
                 val thumbnailStatus = resolveThumbnailStatus(
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
-                    useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    artworkExtractionAttempted = episodeMetadata.artworkExtractionAttempted,
                 )
                 if (thumbnailStatus != null) {
-                    val episode = episodeManager.findEpisodeByUuid(playbackState.episodeUuid) as? PodcastEpisode
-                    if (episode != null && episode.thumbnailStatus == PodcastEpisode.THUMBNAIL_STATUS_UNKNOWN) {
-                        episode.thumbnailStatus = thumbnailStatus
-                        episodeManager.update(episode)
-                    }
+                    episodeManager.updateThumbnailStatusIfUnknown(playbackState.episodeUuid, thumbnailStatus)
                 }
             }
         }
@@ -2833,9 +2829,9 @@ internal fun buildPrefetchRequest(
  */
 internal fun resolveThumbnailStatus(
     embeddedArtworkPath: String?,
-    useEpisodeArtwork: Boolean,
+    artworkExtractionAttempted: Boolean,
 ): Int? = when {
-    !useEpisodeArtwork -> null
+    !artworkExtractionAttempted -> null
     embeddedArtworkPath != null -> PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_AVAILABLE
     else -> PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE
 }

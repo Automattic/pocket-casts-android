@@ -9,15 +9,15 @@ class ResolveThumbnailStatusTest {
 
     @Test
     fun `returns null when episode artwork is disabled`() {
-        assertNull(resolveThumbnailStatus(embeddedArtworkPath = null, useEpisodeArtwork = false))
-        assertNull(resolveThumbnailStatus(embeddedArtworkPath = "/cache/artwork.jpg", useEpisodeArtwork = false))
+        assertNull(resolveThumbnailStatus(embeddedArtworkPath = null, artworkExtractionAttempted = false))
+        assertNull(resolveThumbnailStatus(embeddedArtworkPath = "/cache/artwork.jpg", artworkExtractionAttempted = false))
     }
 
     @Test
     fun `returns available when artwork was extracted`() {
         assertEquals(
             PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_AVAILABLE,
-            resolveThumbnailStatus(embeddedArtworkPath = "/cache/artwork.jpg", useEpisodeArtwork = true),
+            resolveThumbnailStatus(embeddedArtworkPath = "/cache/artwork.jpg", artworkExtractionAttempted = true),
         )
     }
 
@@ -25,7 +25,7 @@ class ResolveThumbnailStatusTest {
     fun `returns not available when extraction was attempted but found no artwork`() {
         assertEquals(
             PodcastEpisode.THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE,
-            resolveThumbnailStatus(embeddedArtworkPath = null, useEpisodeArtwork = true),
+            resolveThumbnailStatus(embeddedArtworkPath = null, artworkExtractionAttempted = true),
         )
     }
 }

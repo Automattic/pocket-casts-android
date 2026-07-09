@@ -132,5 +132,7 @@ interface EpisodeManager {
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 
+    suspend fun updateThumbnailStatusIfUnknown(episodeUuid: String, thumbnailStatus: Int)
+
     suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>>
 }
