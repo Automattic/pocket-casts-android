@@ -38,8 +38,15 @@ class UiModule {
             .diskCache {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("ImageCache"))
+                    // Coil's default size is 2% of the free disk space with a 10MB floor, which on
+                    // devices low on storage evicts artwork almost immediately.
+                    .maxSizeBytes(ARTWORK_DISK_CACHE_SIZE_BYTES)
                     .build()
             }
             .build()
+    }
+
+    private companion object {
+        const val ARTWORK_DISK_CACHE_SIZE_BYTES = 250L * 1024 * 1024
     }
 }
