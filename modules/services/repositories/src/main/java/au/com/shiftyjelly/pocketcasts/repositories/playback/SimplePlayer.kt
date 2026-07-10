@@ -139,6 +139,7 @@ class SimplePlayer(
                 player?.seekTo(positionMs.toLong())
                 super.onSeekComplete(positionMs)
             } catch (e: IllegalArgumentException) {
+                // Media3 can throw from the Player.PositionInfo constructor while ExoPlayer updates its internal playback state during seekTo.
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
             }
         }
