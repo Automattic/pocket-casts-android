@@ -1,15 +1,14 @@
 8.17
 -----
-*   Bug Fixes
-    *   Fix a crash that could occur when seeking during playback
-        ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
 *   Bug Fixes
     *   Fix leaked network connections when refreshing episode details
         ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
-
+    *   Fix a crash that could occur when seeking during playback
+        ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
+ 
 8.16
 -----
 *   New Features
