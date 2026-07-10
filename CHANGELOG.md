@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix leaked network connections when refreshing episode details
         ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
+    *   Fix listening history sync occasionally reverting an episode's playback progress
+        ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
 
 8.16
 -----
