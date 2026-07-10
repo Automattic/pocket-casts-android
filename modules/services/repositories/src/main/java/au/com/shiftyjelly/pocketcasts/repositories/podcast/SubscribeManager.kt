@@ -36,6 +36,7 @@ import io.reactivex.functions.Function4
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.rx2.rxCompletable
@@ -56,7 +57,7 @@ class SubscribeManager @Inject constructor(
     private val subscribeRelay: PublishRelay<PodcastSubscribe> by lazy { setupSubscribeRelay() }
     val subscriptionChangedRelay: PublishRelay<String> = PublishRelay.create()
 
-    private val uuidsInQueue = HashSet<String>()
+    private val uuidsInQueue = ConcurrentHashMap.newKeySet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
     private val alternateEnclosureDao = appDatabase.alternateEnclosureDao()
@@ -148,7 +149,7 @@ class SubscribeManager @Inject constructor(
     }
 
     fun getSubscribingPodcastUuids(): Set<String> {
-        return uuidsInQueue
+        return uuidsInQueue.toSet()
     }
 
     private fun subscribeToExistingOrServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
