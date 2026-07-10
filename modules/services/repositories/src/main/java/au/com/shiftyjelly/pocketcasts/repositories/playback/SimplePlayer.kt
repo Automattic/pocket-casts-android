@@ -135,8 +135,12 @@ class SimplePlayer(
         if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            player?.seekTo(positionMs.toLong())
-            super.onSeekComplete(positionMs)
+            try {
+                player?.seekTo(positionMs.toLong())
+                super.onSeekComplete(positionMs)
+            } catch (e: IllegalArgumentException) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
+            }
         }
     }
 
