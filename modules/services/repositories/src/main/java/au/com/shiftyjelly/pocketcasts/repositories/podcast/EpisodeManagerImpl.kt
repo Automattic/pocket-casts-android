@@ -300,7 +300,11 @@ class EpisodeManagerImpl @Inject constructor(
 
         // We don't have a playback interaction date for user episodes, just episodes
         if (episode is PodcastEpisode) {
-            episodeDao.updatePlaybackInteractionDate(episode.uuid, System.currentTimeMillis())
+            episodeDao.updatePlaybackInteraction(
+                uuid = episode.uuid,
+                interactionDate = System.currentTimeMillis(),
+                syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_NOT_SYNCED,
+            )
         }
     }
 
