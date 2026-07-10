@@ -3,6 +3,9 @@
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+*   Bug Fixes
+    *   Fix Automotive crash when using Google Assistant voice commands to control playback
+        ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
 
 8.16
 -----
