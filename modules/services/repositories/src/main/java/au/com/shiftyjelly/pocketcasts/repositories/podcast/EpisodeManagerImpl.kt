@@ -304,6 +304,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long) {
+        episodeDao.updatePlaybackInteraction(episodeUuid, interactionDate, syncStatus)
+    }
+
     override fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus) {
         if (episode == null) {
             return

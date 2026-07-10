@@ -497,6 +497,9 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :modified, last_playback_interaction_sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updatePlaybackInteractionDate(uuid: String, modified: Long)
 
+    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :interactionDate, last_playback_interaction_sync_status = :syncStatus WHERE uuid = :uuid")
+    abstract suspend fun updatePlaybackInteraction(uuid: String, interactionDate: Long, syncStatus: Long)
+
     @Query("UPDATE podcast_episodes SET duration = :duration, duration_modified = :modified WHERE uuid = :uuid")
     abstract fun updateDurationBlocking(duration: Double, modified: Long, uuid: String)
 
