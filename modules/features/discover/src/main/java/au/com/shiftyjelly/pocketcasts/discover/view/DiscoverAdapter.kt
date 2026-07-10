@@ -379,6 +379,7 @@ internal class DiscoverAdapter(
             super.onRestoreInstanceState(state)
             recyclerView?.post {
                 val position = scrollingLayoutManager.findFirstVisibleItemPosition()
+                if (position == RecyclerView.NO_POSITION) return@post
                 binding.pageIndicatorView.position = position
                 recyclerView.scrollToPosition(position)
                 trackSponsoredListImpression(position)
@@ -386,6 +387,7 @@ internal class DiscoverAdapter(
         }
 
         private fun trackPageChanged(position: Int) {
+            if (position == RecyclerView.NO_POSITION) return
             eventHorizon.track(
                 DiscoverFeaturedPageChangedEvent(
                     currentPage = position.toLong(),
@@ -395,7 +397,8 @@ internal class DiscoverAdapter(
         }
 
         private fun trackSponsoredListImpression(position: Int) {
-            val discoverPodcast = adapter.currentList[position] as? DiscoverPodcast
+            if (position == RecyclerView.NO_POSITION) return
+            val discoverPodcast = adapter.currentList.getOrNull(position) as? DiscoverPodcast
             discoverPodcast?.listId?.let { listId ->
                 if (listIdImpressionTracked.contains(listId)) return
                 eventHorizon.track(
