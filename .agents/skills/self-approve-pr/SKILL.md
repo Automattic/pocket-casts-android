@@ -1,17 +1,17 @@
 ---
 name: self-approve-pr
-description: Check whether a Pocket Casts Android pull request qualifies for self-approval and, if it does, label it "[Review] Self Approved" and squash-merge it. Use this whenever the user asks if they can self-approve, self-review, or merge their own PR without a human reviewer, or asks to "self-approve this PR". Pass a PR number as an argument, or run it from a branch with an open PR. Pass "check" to report the verdict without labelling or merging.
+description: Check whether a Pocket Casts Android pull request qualifies for self-approval and, if it does, label it "[Review] Self Approved". Use this whenever the user asks if they can self-approve, self-review, or merge their own PR without a human reviewer, or asks to "self-approve this PR". Pass a PR number as an argument, or run it from a branch with an open PR. Pass "check" to report the verdict without labelling.
 allowed-tools: Read, Bash(gh pr view *), Bash(gh pr checks *), Bash(gh pr diff *), Bash(gh api user *), Bash(gh api orgs/Automattic/teams/pocket-casts-android/*), Bash(gh api repos/Automattic/pocket-casts-android/*), Bash(git diff *), Bash(git log *)
 ---
 
 # Self-Approve a Pull Request
 
-Decide whether a PR can be self-approved by its author or needs a human reviewer. Self-approval is a trust mechanism for small, safe changes made by engineers who own this platform; every gate below exists to keep that trust cheap to extend. If all gates pass, apply the self-approved label and squash-merge. If any gate fails, stop and explain which gate failed and what to do instead.
+Decide whether a PR can be self-approved by its author or needs a human reviewer. Self-approval is a trust mechanism for small, safe changes made by engineers who own this platform; every gate below exists to keep that trust cheap to extend. If all gates pass, apply the self-approved label; the author then merges the PR themselves from the GitHub UI. If any gate fails, stop and explain which gate failed and what to do instead.
 
 ## Identify the PR
 
 - Arguments are `[check] [pr-number]` in either order. If a PR number was given, use it. Otherwise find the PR for the current branch with `gh pr view --json number`. If there is no PR, stop and suggest the `create-pr` skill.
-- If the argument `check` was given, run every gate and report the verdict, but do not label or merge.
+- If the argument `check` was given, run every gate and report the verdict, but do not label.
 - All `gh` commands assume the checkout's remote; pass `--repo Automattic/pocket-casts-android` explicitly to be safe.
 - Fetch the basics once: `gh pr view <num> --json number,title,author,baseRefName,isDraft,state,additions,deletions,files,labels`.
 - The PR must be open and not a draft. A draft is not ready for any review, self or otherwise.
@@ -78,11 +78,10 @@ Small, well-tested changes pass: string tweaks, UI polish in non-critical featur
 
 Present a short table of the five gates with PASS/FAIL and reasons, then the verdict.
 
-**If any gate failed**: say the PR needs a human reviewer (or another action, e.g. wait for CI, reply to a thread) and stop. Do not label or merge.
+**If any gate failed**: say the PR needs a human reviewer (or another action, e.g. wait for CI, reply to a thread) and stop. Do not label.
 
 **If all gates passed and `check` mode is off**:
 
-1. Confirm with the user before acting: "All gates passed. Label and squash-merge PR #<num>?"
+1. Confirm with the user before acting: "All gates passed. Label PR #<num> as self-approved?"
 2. Apply the label: `gh pr edit <num> --add-label "[Review] Self Approved"`.
-3. Merge with `gh pr merge <num> --squash`. The repository only allows squash merges.
-4. Confirm the merge succeeded and report the merged commit.
+3. Do not merge. Branch protection blocks the merge without an approving review, so it cannot be done from the CLI. Tell the user to merge it themselves in the GitHub UI: press **"Merge without waiting for requirements to be met (bypass rules)"**, then the **"Squash and merge"** button. The repository only allows squash merges.
