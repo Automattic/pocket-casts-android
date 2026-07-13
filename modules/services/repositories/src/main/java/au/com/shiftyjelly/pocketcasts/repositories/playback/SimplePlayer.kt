@@ -189,6 +189,12 @@ class SimplePlayer(
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
 
+        if (settings.audioOnly.value && episodeLocation.isHlsStream) {
+            trackSelector.parameters = trackSelector.buildUponParameters()
+                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true)
+                .build()
+        }
+
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
         val backBufferMillis = if (isStreaming) backBufferTimeMillis else DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS
