@@ -3,6 +3,8 @@
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 
 8.16
 -----
