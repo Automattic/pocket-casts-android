@@ -1,15 +1,20 @@
 8.17
 -----
+*   New Features
+    *   Add support for Flightcast transcripts
+        ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
 *   Bug Fixes
     *   Fix episodes streaming over mobile data without the 'Warn before using data' prompt when Up Next auto-advances or a downloaded file is missing
         ([#5533](https://github.com/Automattic/pocket-casts-android/pull/5533))
-
 
 8.16
 -----
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+*   Bug Fixes
+    *   Fix leaked network connections when refreshing episode details
+        ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
 
 8.15
 -----
