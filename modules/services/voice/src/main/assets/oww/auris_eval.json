@@ -1,13 +1,13 @@
 {
-  "aut": 0.0023145643711717906,
-  "fpph": 1.4296754250386399,
-  "recall": 0.918,
-  "accuracy": 0.9586028679374893,
+  "aut": 0.0025020603174603175,
+  "fpph": 2.2285714285714286,
+  "recall": 0.9518666666666666,
+  "accuracy": 0.9753142857142857,
   "threshold": 0.5,
-  "optimal_threshold": 0.8300000000000001,
-  "optimal_recall": 0.8472,
-  "optimal_fpph": 0.1545595054095827,
+  "optimal_threshold": 0.923,
+  "optimal_recall": 0.9035,
+  "optimal_fpph": 0.343,
   "n_positive": 15000,
-  "n_negative": 46584,
-  "validation_hours": 25.88
+  "n_negative": 21000,
+  "validation_hours": 11.67
 }
