@@ -1095,6 +1095,8 @@ open class PlaybackManager @Inject constructor(
 
         flushPendingContentTypeEvents()
 
+        mediaSessionManager.isSwitchingPlayer = false
+
         cancelPrefetchNextEpisode()
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
@@ -1509,6 +1511,7 @@ open class PlaybackManager @Inject constructor(
 
     @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
+        mediaSessionManager.isSwitchingPlayer = false
         settings.recordErrorSession()
         val episode = getCurrentEpisode()
 
@@ -1681,6 +1684,7 @@ open class PlaybackManager @Inject constructor(
 
     fun onPlayerPlaying() {
         Timber.i("PlaybackService onPlayerPlaying")
+        mediaSessionManager.isSwitchingPlayer = false
         val episode = getCurrentEpisode() ?: return
 
         playbackStateRelay.blockingFirst().let { playbackState ->
@@ -1700,6 +1704,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun onPlayerPaused() {
+        mediaSessionManager.isSwitchingPlayer = false
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PAUSED, lastChangeFrom = LastChangeFrom.OnPlayerPaused.value))
@@ -2516,6 +2521,14 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        // Android 17: reach the foreground service before requesting audio focus, otherwise focus is denied.
+        if (FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK) && !Util.isAutomotive(application) && player?.isRemote != true) {
+            val foreground = mediaSessionManager.ensureForegroundServiceStarted(application)
+            if (!foreground) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service not ready before playback, proceeding with fallback")
+            }
+        }
+
         val hasAudioFocus = focusManager.tryToGetAudioFocus()
         if (!hasAudioFocus) {
             return
@@ -2600,6 +2613,9 @@ open class PlaybackManager @Inject constructor(
     private suspend fun resetPlayer() {
         if (resettingPlayer) return
         resettingPlayer = true
+        if (FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK)) {
+            mediaSessionManager.isSwitchingPlayer = true
+        }
 
         withContext(Dispatchers.Main) {
             player?.stop()
@@ -2611,7 +2627,10 @@ open class PlaybackManager @Inject constructor(
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
                 // Start the service early so it's ready when we install the player later.
                 // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
-                mediaSessionManager.startServiceIfNeeded(application)
+                // When the flag is on, play() starts the foreground service via the gate instead.
+                if (!FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK)) {
+                    mediaSessionManager.startServiceIfNeeded(application)
+                }
                 Timber.i("Creating media player of type SimplePlayer.")
             }
         }
