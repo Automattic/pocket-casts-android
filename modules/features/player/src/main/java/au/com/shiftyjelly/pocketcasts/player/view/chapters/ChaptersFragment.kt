@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.delay
@@ -71,6 +72,7 @@ class ChaptersFragment : BaseFragment() {
                     showSubscriptionIcon = state.showSubscriptionIcon,
                     onChapterClick = viewModel::playChapter,
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                    onHideGeneratedChaptersClick = ::hideGeneratedChapters,
                     onSelectionChange = viewModel::selectChapter,
                     onUrlClick = ::openChapterUrl,
                     modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
@@ -113,6 +115,14 @@ class ChaptersFragment : BaseFragment() {
         } catch (_: Throwable) {
             UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, chapter.url.toString()), null)
         }
+    }
+
+    private fun hideGeneratedChapters() {
+        viewModel.setGeneratedChaptersVisible(false)
+        val anchor = parentFragment?.view ?: view ?: return
+        Snackbar.make(anchor, getString(LR.string.chapters_generated_hidden), Snackbar.LENGTH_LONG)
+            .setAction(LR.string.undo) { viewModel.setGeneratedChaptersVisible(true) }
+            .show()
     }
 
     private fun showPlayer() {

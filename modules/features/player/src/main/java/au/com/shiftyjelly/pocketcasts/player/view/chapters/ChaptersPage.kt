@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -34,6 +37,7 @@ fun ChaptersPage(
     onChapterClick: (Chapter) -> Unit,
     onUrlClick: (Chapter) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
+    onHideGeneratedChaptersClick: () -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
@@ -64,13 +68,22 @@ fun ChaptersPage(
         }
         if (hasGeneratedChapters) {
             item {
-                TextP50(
-                    text = stringResource(LR.string.chapters_generated_disclaimer),
-                    color = LocalChaptersTheme.current.headerTitle,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                )
+                Column {
+                    TextP50(
+                        text = stringResource(LR.string.chapters_generated_disclaimer),
+                        color = LocalChaptersTheme.current.headerTitle,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                    )
+                    TextH50(
+                        text = stringResource(LR.string.chapters_hide_generated),
+                        color = LocalChaptersTheme.current.headerToggle,
+                        modifier = Modifier
+                            .clickable(onClick = onHideGeneratedChaptersClick)
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                    )
+                }
             }
         }
         itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->

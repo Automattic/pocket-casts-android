@@ -127,6 +127,10 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
+    fun setGeneratedChaptersVisible(visible: Boolean) {
+        settings.showGeneratedChapters.set(visible, updateModifiedAt = true)
+    }
+
     fun selectChapter(select: Boolean, chapter: Chapter) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {

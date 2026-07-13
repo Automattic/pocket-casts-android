@@ -909,6 +909,7 @@ class EpisodeFragment : BaseFragment() {
                                     onChapterClick = chaptersViewModel::playChapter,
                                     onUrlClick = {},
                                     onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
+                                    onHideGeneratedChaptersClick = ::hideGeneratedChapters,
                                     isTogglingChapters = chaptersState.isTogglingChapters,
                                     showSubscriptionIcon = chaptersState.showSubscriptionIcon,
                                     modifier = Modifier
@@ -1054,6 +1055,14 @@ class EpisodeFragment : BaseFragment() {
         }
 
         setupStickyTabBar()
+    }
+
+    private fun hideGeneratedChapters() {
+        chaptersViewModel.setGeneratedChaptersVisible(false)
+        Snackbar
+            .make(requireNotNull(listener).snackBarView(), LR.string.chapters_generated_hidden, Snackbar.LENGTH_LONG)
+            .setAction(LR.string.undo) { chaptersViewModel.setGeneratedChaptersVisible(true) }
+            .show()
     }
 
     private fun setupStickyTabBar() {

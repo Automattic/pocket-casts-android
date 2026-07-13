@@ -139,6 +139,15 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `setGeneratedChaptersVisible updates the setting`() {
+        chaptersViewModel.setGeneratedChaptersVisible(false)
+        verify(showGeneratedChaptersSetting).set(false, updateModifiedAt = true)
+
+        chaptersViewModel.setGeneratedChaptersVisible(true)
+        verify(showGeneratedChaptersSetting).set(true, updateModifiedAt = true)
+    }
+
+    @Test
     fun `free user cant skip chapters`() = runTest {
         subscriptionFlow.value = null
 
