@@ -1,5 +1,8 @@
 8.17
 -----
+*   Bug Fixes
+    *   Fix leaked network connections when refreshing episode details
+        ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
 
 
 8.16
