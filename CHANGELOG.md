@@ -8,7 +8,7 @@
         ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
     *   Fix a crash that could occur when seeking during playback
         ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
- 
+
 8.16
 -----
 *   New Features
