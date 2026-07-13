@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -11,6 +12,7 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.core.app.ServiceCompat
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -109,6 +111,35 @@ open class LegacyPlaybackService :
         sleepTimerHandler = SleepTimerHandler(sleepTimer, playbackManager, { applicationContext }, this).also { it.observe() }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Action-only: once started via startForegroundService the FGS contract must be honoured even if the flag flips off.
+        if (intent?.action == MediaSessionManager.ACTION_START_PLAYBACK_FOREGROUND) {
+            startForegroundEarly()
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun startForegroundEarly() {
+        if (isForeground || Util.isAutomotive(this)) return
+        val mediaSession = playbackManager.mediaSessionManager.mediaSession ?: return
+        try {
+            val notification = notificationDrawer.buildPreparingNotification(mediaSession.sessionToken)
+            ServiceCompat.startForeground(this, Settings.NotificationId.PLAYING.value, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            isForeground = true
+            notificationManager.enteredForeground(notification)
+            playbackManager.mediaSessionManager.setServiceForeground(true)
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground early (preparing)")
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "startForeground early failed: $e")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                val currentValue = settings.getTimesToShowBatteryWarning()
+                settings.setTimesToShowBatteryWarning(2 + currentValue)
+                eventHorizon.track(com.automattic.eventhorizon.PlaybackForegroundServiceErrorEvent)
+            }
+            stopSelf()
+        }
+    }
+
     override fun onTaskRemoved(rootIntent: Intent?) {
         if (Util.isAutomotive(this)) return
         @Suppress("SENSELESS_COMPARISON") // mediaSession becomes nullable in the Media3 integration PR
@@ -124,6 +155,7 @@ open class LegacyPlaybackService :
     override fun onDestroy() {
         super.onDestroy()
         isForeground = false
+        playbackManager.mediaSessionManager.setServiceForeground(false)
 
         disposables.clear()
         sleepTimerHandler?.dispose()
@@ -262,6 +294,7 @@ open class LegacyPlaybackService :
                             startForeground(Settings.NotificationId.PLAYING.value, notification)
                             isForeground = true
                             notificationManager.enteredForeground(notification)
+                            playbackManager.mediaSessionManager.setServiceForeground(true)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
@@ -283,7 +316,7 @@ open class LegacyPlaybackService :
                     val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause.value
                     if (removeNotification || isForegroundService) {
                         val isTransientLoss = playbackManager.playbackStateRelay.blockingFirst().transientLoss
-                        if (isTransientLoss) {
+                        if (isTransientLoss || playbackManager.mediaSessionManager.isSwitchingPlayer) {
                             return
                         }
 
@@ -296,6 +329,7 @@ open class LegacyPlaybackService :
 
                         stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
                         isForeground = false
+                        playbackManager.mediaSessionManager.setServiceForeground(false)
                         if (removeNotification) {
                             notificationManager.cancel(Settings.NotificationId.PLAYING.value)
                         }

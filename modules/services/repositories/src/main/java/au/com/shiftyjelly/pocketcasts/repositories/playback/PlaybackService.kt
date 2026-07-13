@@ -2,14 +2,18 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.OptIn
+import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaStyleNotificationHelper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -23,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
 const val PODCASTS_ROOT = "__PODCASTS__"
@@ -101,12 +106,16 @@ open class PlaybackService :
         // AAOS handles media UI entirely — skip app-managed notification removal
         // to avoid killing the foreground service.
         val isTransientLoss = (session.player as? PocketCastsForwardingPlayer)?.isTransientLoss == true
-        if (!Util.isAutomotive(this) && !startInForegroundRequired && settings.hideNotificationOnPause.value && !isTransientLoss) {
+        // Media3 demotes the service itself when foreground isn't required, so pass requireForeground through super.
+        val requireForeground = startInForegroundRequired || playbackManager.mediaSessionManager.isSwitchingPlayer
+        if (!Util.isAutomotive(this) && !requireForeground && settings.hideNotificationOnPause.value && !isTransientLoss) {
             stopForeground(STOP_FOREGROUND_REMOVE)
+            playbackManager.mediaSessionManager.setServiceForeground(false)
             return
         }
         try {
-            super.onUpdateNotification(session, startInForegroundRequired)
+            super.onUpdateNotification(session, requireForeground)
+            playbackManager.mediaSessionManager.setServiceForeground(requireForeground)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "onUpdateNotification failed: $e")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
@@ -119,6 +128,10 @@ open class PlaybackService :
 
     @OptIn(UnstableApi::class)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Action-only: once started via startForegroundService the FGS contract must be honoured even if the flag flips off.
+        if (intent?.action == MediaSessionManager.ACTION_START_PLAYBACK_FOREGROUND) {
+            startForegroundEarly()
+        }
         // MediaLibraryService doesn't automatically route ACTION_MEDIA_BUTTON intents
         // sent via PendingIntent.getService (e.g., from PiP controls) to the session callback.
         // Forward them so onMediaButtonEvent is invoked.
@@ -144,6 +157,37 @@ open class PlaybackService :
     }
 
     @OptIn(UnstableApi::class)
+    private fun startForegroundEarly() {
+        if (Util.isAutomotive(this)) return
+        val session = playbackManager.mediaSessionManager.getMedia3Session()
+        try {
+            val title = playbackManager.getCurrentEpisode()?.title ?: getString(LR.string.loading)
+            val builder = NotificationCompat.Builder(this, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK.id)
+                .setContentTitle(title)
+                .setSmallIcon(IR.drawable.notification)
+                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            if (session != null) {
+                builder.setStyle(MediaStyleNotificationHelper.MediaStyle(session))
+            }
+            ServiceCompat.startForeground(this, Settings.NotificationId.PLAYING.value, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            playbackManager.mediaSessionManager.setServiceForeground(true)
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground early (preparing, media3)")
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "startForeground early failed (media3): $e")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                val currentValue = settings.getTimesToShowBatteryWarning()
+                settings.setTimesToShowBatteryWarning(2 + currentValue)
+                eventHorizon.track(PlaybackForegroundServiceErrorEvent)
+            }
+            if (session?.connectedControllers.isNullOrEmpty()) {
+                stopSelf()
+            }
+        }
+    }
+
+    @OptIn(UnstableApi::class)
     override fun onTaskRemoved(rootIntent: Intent?) {
         if (Util.isAutomotive(this)) return
         val player = playbackManager.mediaSessionManager.getMedia3Session()?.player
@@ -157,6 +201,7 @@ open class PlaybackService :
 
     override fun onDestroy() {
         super.onDestroy()
+        playbackManager.mediaSessionManager.setServiceForeground(false)
         playbackManager.mediaSessionManager.release()
 
         sleepTimerHandler?.dispose()
