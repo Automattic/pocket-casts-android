@@ -86,6 +86,7 @@ class CacheWorker @AssistedInject constructor(
             context: Context,
             url: String,
             episodeUuid: String,
+            networkConstraint: NetworkType,
             onCachingComplete: (String) -> Unit,
         ) {
             val inputData = Data.Builder()
@@ -94,7 +95,7 @@ class CacheWorker @AssistedInject constructor(
                 .build()
 
             val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiredNetworkType(networkConstraint)
                 .build()
 
             val cacheWorkRequest = OneTimeWorkRequest.Builder(CacheWorker::class.java)
