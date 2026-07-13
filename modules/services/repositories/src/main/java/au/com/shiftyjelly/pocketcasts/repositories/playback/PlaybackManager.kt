@@ -180,6 +180,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -2021,6 +2022,8 @@ open class PlaybackManager @Inject constructor(
         _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
         _videoRenderingEnabled.value = true
 
+        lastPlaybackSource = sourceView
+
         eventHorizon.track(
             PlaybackSourceResolvedEvent(
                 playbackProtocol = if (episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
@@ -2028,7 +2031,7 @@ open class PlaybackManager @Inject constructor(
                 contentType = playbackContentTypeFor(episode),
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
-                hlsEngine = if (episode.isStreamUrlHls) "exoplayer" else null,
+                hlsEngine = if (episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
             ),
         )
 
