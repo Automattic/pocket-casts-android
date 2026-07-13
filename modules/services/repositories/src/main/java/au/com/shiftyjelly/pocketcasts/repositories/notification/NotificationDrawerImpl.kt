@@ -90,6 +90,25 @@ class NotificationDrawerImpl @Inject constructor(
             .build()
     }
 
+    override fun buildPreparingNotification(
+        sessionToken: MediaSessionCompat.Token,
+    ): Notification {
+        val mediaStyle = MediaStyle()
+            .setMediaSession(sessionToken)
+            .setShowCancelButton(true)
+            .setCancelButtonIntent(stopPendingIntent)
+
+        return notificationHelper.playbackChannelBuilder()
+            .setContentTitle(context.getString(LR.string.loading))
+            .setDeleteIntent(stopPendingIntent)
+            .setOnlyAlertOnce(true)
+            .setShowWhen(false)
+            .setSmallIcon(IR.drawable.notification)
+            .setStyle(mediaStyle)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .build()
+    }
+
     private fun loadArtwork(episode: BaseEpisode, useEpisodeArtwork: Boolean): Bitmap? {
         val request = imageRequestFactory.create(episode, useEpisodeArtwork)
         return when (val result = context.imageLoader.executeBlocking(request)) {
