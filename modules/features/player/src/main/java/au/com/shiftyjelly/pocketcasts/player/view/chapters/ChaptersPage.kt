@@ -78,7 +78,7 @@ fun ChaptersPage(
                     )
                     TextH50(
                         text = stringResource(LR.string.chapters_hide_generated),
-                        color = LocalChaptersTheme.current.headerToggle,
+                        color = LocalChaptersTheme.current.interactive,
                         modifier = Modifier
                             .clickable(onClick = onHideGeneratedChaptersClick)
                             .padding(horizontal = 20.dp, vertical = 8.dp),
