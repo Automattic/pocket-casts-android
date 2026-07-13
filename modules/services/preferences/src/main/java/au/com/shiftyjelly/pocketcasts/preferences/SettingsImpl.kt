@@ -187,6 +187,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val audioOnly = UserSetting.BoolPref(
+        sharedPrefKey = "audioOnly",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val liveAnalyticsUrl = UserSetting.StringPref(
         sharedPrefKey = "liveAnalyticsUrl",
         defaultValue = "",
