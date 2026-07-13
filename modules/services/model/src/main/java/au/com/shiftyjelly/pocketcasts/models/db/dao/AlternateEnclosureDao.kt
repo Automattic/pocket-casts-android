@@ -5,11 +5,15 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class AlternateEnclosureDao {
     @Query("SELECT * FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid ORDER BY position ASC")
     abstract suspend fun findByEpisodeUuid(episodeUuid: String): List<EpisodeAlternateEnclosure>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid AND type IN (:hlsMimeTypes))")
+    abstract fun hasHlsEnclosure(episodeUuid: String, hlsMimeTypes: Set<String>): Flow<Boolean>
 
     @Insert
     protected abstract suspend fun insertAll(enclosures: List<EpisodeAlternateEnclosure>)

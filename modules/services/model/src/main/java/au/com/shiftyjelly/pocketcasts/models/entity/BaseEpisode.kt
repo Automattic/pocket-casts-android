@@ -164,6 +164,8 @@ sealed interface BaseEpisode {
     val isAudio: Boolean
         get() = !isVideo
 
+    fun showsVideoIcon(hasHlsAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasHlsAlternateEnclosure
+
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid
 
