@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -29,6 +30,7 @@ class ChapterManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
+    private val settings: Settings,
 ) : ChapterManager {
     override suspend fun updateChapters(
         episodeUuid: String,
@@ -51,8 +53,8 @@ class ChapterManagerImpl @Inject constructor(
             episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
             chapterDao.observeChaptersForEpisode(episodeUuid),
         ) { episode, dbChapters ->
-            // Already-saved generated chapters must stay hidden while the feature is off.
-            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+            // Already-saved generated chapters must stay hidden while the feature is off or the user opts out.
+            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) && settings.showGeneratedChapters.value) {
                 dbChapters
             } else {
                 dbChapters.filterNot { it.origin == ChapterOrigin.Generated }
