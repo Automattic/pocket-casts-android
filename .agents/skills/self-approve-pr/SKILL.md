@@ -1,7 +1,7 @@
 ---
 name: self-approve-pr
 description: Check whether a Pocket Casts Android pull request qualifies for self-approval and, if it does, label it "[Review] Self Approved". Use this whenever the user asks if they can self-approve, self-review, or merge their own PR without a human reviewer, or asks to "self-approve this PR". Pass a PR number as an argument, or run it from a branch with an open PR. Pass "check" to report the verdict without labelling.
-allowed-tools: Read, Bash(gh pr view *), Bash(gh pr checks *), Bash(gh pr diff *), Bash(gh api user *), Bash(gh api orgs/Automattic/teams/pocket-casts-android/*), Bash(gh api repos/Automattic/pocket-casts-android/*), Bash(git diff *), Bash(git log *)
+allowed-tools: Read, Bash(gh pr view *), Bash(gh pr checks *), Bash(gh pr diff *), Bash(gh pr edit * --add-label *), Bash(gh api user *), Bash(gh api orgs/Automattic/teams/pocket-casts-android/*), Bash(gh api repos/Automattic/pocket-casts-android/*), Bash(gh api graphql *), Bash(git diff *), Bash(git log *)
 ---
 
 # Self-Approve a Pull Request
@@ -12,7 +12,7 @@ Decide whether a PR can be self-approved by its author or needs a human reviewer
 
 - Arguments are `[check] [pr-number]` in either order. If a PR number was given, use it. Otherwise find the PR for the current branch with `gh pr view --json number`. If there is no PR, stop and suggest the `create-pr` skill.
 - If the argument `check` was given, run every gate and report the verdict, but do not label.
-- All `gh` commands assume the checkout's remote; pass `--repo Automattic/pocket-casts-android` explicitly to be safe.
+- All `gh` commands run against the current checkout's repository, which is `Automattic/pocket-casts-android`, so the examples below omit `--repo`. Add `--repo Automattic/pocket-casts-android` only if you ever run them from outside the checkout.
 - Fetch the basics once: `gh pr view <num> --json number,title,author,baseRefName,isDraft,state,additions,deletions,files,labels`.
 - The PR must be open and not a draft. A draft is not ready for any review, self or otherwise.
 
