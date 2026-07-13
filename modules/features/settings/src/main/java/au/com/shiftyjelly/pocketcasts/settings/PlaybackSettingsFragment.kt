@@ -361,6 +361,15 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_AUDIO_ONLY -> {
+                            AudioOnly(
+                                saved = settings.audioOnly.flow.collectAsState().value,
+                                onSave = { isAudioOnlyEnabled ->
+                                    settings.audioOnly.set(isAudioOnlyEnabled, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
                             Column {
                                 Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
@@ -559,6 +568,15 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun AudioOnly(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_audio_only),
+        secondaryText = stringResource(LR.string.settings_audio_only_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_playback_resumption),
         secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
@@ -678,6 +696,7 @@ private enum class SettingsItems {
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
+    SETTINGS_AUDIO_ONLY,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
