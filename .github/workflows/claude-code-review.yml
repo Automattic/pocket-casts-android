@@ -41,7 +41,9 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 1
-          persist-credentials: false
+          # Credentials must persist so claude-code-action can `git fetch` the
+          # PR branch; the job's token is read-only for contents anyway.
+          persist-credentials: true
 
       - name: Run Claude Code Review
         if: steps.workflow-changes.outputs.skip != 'true'
