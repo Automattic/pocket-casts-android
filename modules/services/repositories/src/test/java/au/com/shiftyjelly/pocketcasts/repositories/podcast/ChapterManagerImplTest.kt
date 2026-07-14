@@ -787,6 +787,20 @@ class ChapterManagerImplTest {
     }
 
     @Test
+    fun `align keeps the reference start time on translated generated chapters`() {
+        val chapters = Chapters(
+            listOf(
+                Chapter(title = "A", startTime = 10.seconds, endTime = 20.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated, referenceStartTime = 10.seconds),
+            ),
+        )
+
+        val aligned = ChapterManagerImpl.alignGeneratedChapters(chapters) { it + 30.seconds }
+
+        assertEquals(40.seconds, aligned[0].startTime)
+        assertEquals(10.seconds, aligned[0].referenceStartTime)
+    }
+
+    @Test
     fun `align returns chapters unchanged when none are generated`() {
         val chapters = Chapters(
             listOf(
