@@ -48,6 +48,7 @@ class SimplePlayer(
     private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.SECONDS.toMillis(50).toInt()
 
     private var player: ExoPlayer? = null
+    private var trackSelector: DefaultTrackSelector? = null
 
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
@@ -188,12 +189,8 @@ class SimplePlayer(
     @OptIn(UnstableApi::class)
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
-
-        if (settings.audioOnly.value && episodeLocation.isHlsStream) {
-            trackSelector.parameters = trackSelector.buildUponParameters()
-                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true)
-                .build()
-        }
+        this.trackSelector = trackSelector
+        applyAudioOnly()
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
@@ -299,6 +296,18 @@ class SimplePlayer(
         if (player.playbackState == Player.STATE_READY) {
             onVideoTrackChanged(player.currentTracks.isTypeSelected(C.TRACK_TYPE_VIDEO))
         }
+    }
+
+    override fun updateAudioOnly() {
+        applyAudioOnly()
+    }
+
+    private fun applyAudioOnly() {
+        val trackSelector = trackSelector ?: return
+        val disableVideo = settings.audioOnly.value && episodeLocation.isHlsStream
+        trackSelector.parameters = trackSelector.buildUponParameters()
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, disableVideo)
+            .build()
     }
 
     private fun addVideoListener(player: ExoPlayer) {

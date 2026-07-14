@@ -324,6 +324,12 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
         }
+
+        launch {
+            settings.audioOnly.flow.collect {
+                player?.updateAudioOnly()
+            }
+        }
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
