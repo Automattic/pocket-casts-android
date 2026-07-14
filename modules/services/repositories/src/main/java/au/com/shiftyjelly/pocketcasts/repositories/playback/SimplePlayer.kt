@@ -231,7 +231,7 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
-                clearVideoIfAudioOnly()
+                updateVideoState()
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -243,7 +243,7 @@ class SimplePlayer(
                     Player.STATE_READY -> {
                         onBufferingStateChanged()
                         onDurationAvailable()
-                        clearVideoIfAudioOnly()
+                        updateVideoState()
                     }
 
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
@@ -294,10 +294,10 @@ class SimplePlayer(
         prepared = true
     }
 
-    private fun clearVideoIfAudioOnly() {
+    private fun updateVideoState() {
         val player = player ?: return
-        if (player.playbackState == Player.STATE_READY && !player.currentTracks.containsType(C.TRACK_TYPE_VIDEO)) {
-            onVideoTrackChanged(false)
+        if (player.playbackState == Player.STATE_READY) {
+            onVideoTrackChanged(player.currentTracks.isTypeSelected(C.TRACK_TYPE_VIDEO))
         }
     }
 
