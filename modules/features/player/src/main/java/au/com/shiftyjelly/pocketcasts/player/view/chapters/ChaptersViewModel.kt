@@ -120,9 +120,12 @@ class ChaptersViewModel @AssistedInject constructor(
                 is Mode.Player -> stateAtTap.episodeUuid
             }
             val episode = episodeManager.findEpisodeByUuid(episodeId)
+            val tappedCurrentEpisode = stateAtTap.episodeUuid == episodeId
 
-            val target = if (stateAtTap.episodeUuid == episodeId) {
-                chapterManager.awaitStreamAlignedChapter(episodeId, chapter)
+            val target = if (tappedCurrentEpisode) {
+                withTimeoutOrNull(CHAPTER_ALIGNMENT_TIMEOUT) {
+                    chapterManager.awaitStreamAlignedChapter(episodeId, chapter)
+                } ?: chapter
             } else {
                 chapter
             }
@@ -144,7 +147,9 @@ class ChaptersViewModel @AssistedInject constructor(
                     if (!playbackState.isPlaying) {
                         playbackManager.playNowSuspend(episodeId)
                     }
-                } else {
+                } else if (!tappedCurrentEpisode) {
+                    // Only switch episodes when the tap targeted a different episode to begin with. A seek within
+                    // the tapped episode must never yank playback back if the user has since moved to another one.
                     episode?.let {
                         it.playedUpToMs = target.startTime.inWholeMilliseconds.toInt()
                         episodeManager.updatePlayedUpToBlocking(it, target.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
@@ -345,6 +350,7 @@ class ChaptersViewModel @AssistedInject constructor(
 
     companion object {
         private val PLAYBACK_START_TIMEOUT = 5.seconds
+        private val CHAPTER_ALIGNMENT_TIMEOUT = 10.seconds
         private val PLAYBACK_RESUMED_CHANGES = setOf(
             PlaybackManager.LastChangeFrom.OnPlayerPlaying.value,
             PlaybackManager.LastChangeFrom.OnSeekComplete.value,

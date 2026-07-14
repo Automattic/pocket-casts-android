@@ -340,6 +340,23 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `does not switch back to the tapped episode when playback moves away during alignment`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val tapped = Chapter("gen", 2.seconds, 3.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+        // The user switches to another episode while we are still waiting for the chapters to align.
+        whenever { chapterManager.awaitStreamAlignedChapter("id", tapped) }.thenAnswer {
+            playbackStateFlow.value = PlaybackState(episodeUuid = "other", state = PlaybackState.State.PLAYING)
+            tapped
+        }
+
+        chaptersViewModel.playChapter(tapped)
+
+        verify(playbackManager, never()).skipToChapter(any<Chapter>())
+        verify(episodeManager, never()).updatePlayedUpToBlocking(any<BaseEpisode>(), any<Double>(), any<Boolean>())
+    }
+
+    @Test
     fun `chapters shown reports chapters origin and source`() = runTest {
         whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
         chaptersFlow.value = Chapters(
