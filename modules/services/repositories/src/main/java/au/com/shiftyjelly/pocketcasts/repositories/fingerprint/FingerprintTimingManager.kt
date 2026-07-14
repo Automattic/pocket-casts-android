@@ -110,10 +110,9 @@ class FingerprintTimingManager @Inject constructor(
     private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
 
-    // Mapping state: writers build new lists under mutex, then atomically publish via @Volatile.
+    // Mapping state: writers mutate the accumulator under mutex, then atomically publish via @Volatile.
     // Readers access the snapshot without locking, safe for use from the UI thread.
-    private var mappingPlaybackToReference = mutableListOf<TimeMappingEntry>()
-    private var mappingReferenceToPlayback = mutableListOf<TimeMappingEntry>()
+    private val mapping = MappingAccumulator()
 
     @Volatile
     private var snapshotPlaybackToReference: List<TimeMappingEntry> = emptyList()
@@ -146,10 +145,6 @@ class FingerprintTimingManager @Inject constructor(
 
     @Volatile
     private var generation = 0L
-
-    // Drift filter state
-    private var filterLastTrusted: TimeMappingEntry? = null
-    private var filterCandidatePool = mutableListOf<TimeMappingEntry>()
 
     @VisibleForTesting
     internal var debugTrackingEnabled = false
@@ -435,8 +430,7 @@ class FingerprintTimingManager @Inject constructor(
         pendingRestartJob?.cancel()
         pendingRestartJob = null
         unregisterUnmeteredRetry()
-        mappingPlaybackToReference.clear()
-        mappingReferenceToPlayback.clear()
+        mapping.reset()
         debugRejections.clear()
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
@@ -444,8 +438,6 @@ class FingerprintTimingManager @Inject constructor(
         lastStreamStartTimeMs = 0L
         activeDecodeStartSec = 0.0
         activeDecodeFrontierSec = 0.0
-        filterLastTrusted = null
-        filterCandidatePool.clear()
         currentEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
@@ -638,10 +630,9 @@ class FingerprintTimingManager @Inject constructor(
             currentMatcher = matcher
             _stateFlow.value = State.Preparing
             if (cached != null) {
-                mappingPlaybackToReference = cached.entries.toMutableList()
-                mappingReferenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
+                mapping.replaceAll(cached.entries)
                 publishSnapshot()
-                filterLastTrusted = cached.entries.lastOrNull()
+                mapping.lastTrusted = cached.entries.lastOrNull()
                 markActive(cached.entries.size)
                 Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid (${cached.entries.size} entries)")
                 return
@@ -669,13 +660,13 @@ class FingerprintTimingManager @Inject constructor(
 
     private fun processProgress(positionMs: Int) {
         val positionSec = positionMs / 1000.0
-        val mappedRunEndSec = mappedRunEnd(positionSec, mappingPlaybackToReference)
+        val mappedRunEndSec = mappedRunEnd(positionSec, mapping.playbackToReference)
         val decision = decideOnProgress(
             positionSec = positionSec,
             lastPositionSec = if (lastProgressPositionMs >= 0) lastProgressPositionMs / 1000.0 else null,
             isEager = currentEager,
             mappedRunEndSec = mappedRunEndSec,
-            hasAnyMapping = mappingPlaybackToReference.isNotEmpty(),
+            hasAnyMapping = mapping.playbackToReference.isNotEmpty(),
             isDecodeActive = generationJob?.isActive == true,
             isCoveredByActiveDecode = isCoveredByActiveDecode(positionSec),
             isRunEndCoveredByActiveDecode = mappedRunEndSec != null && isCoveredByActiveDecode(mappedRunEndSec),
@@ -723,7 +714,7 @@ class FingerprintTimingManager @Inject constructor(
             mutex.withLock {
                 if (gen != generation) return@withLock
                 val settledSec = lastProgressPositionMs / 1000.0
-                if (mappedRunEnd(settledSec, mappingPlaybackToReference) != null || isCoveredByActiveDecode(settledSec)) return@withLock
+                if (mappedRunEnd(settledSec, mapping.playbackToReference) != null || isCoveredByActiveDecode(settledSec)) return@withLock
                 Timber.d("FingerprintTimingManager: playback jumped — restarting")
                 restartFromPlayhead()
             }
@@ -747,8 +738,7 @@ class FingerprintTimingManager @Inject constructor(
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
-        filterLastTrusted = null
-        filterCandidatePool.clear()
+        mapping.resetFilter()
         startStream(audioPath, matcher, uuid, startPosition = lastProgressPositionMs / 1000.0)
     }
 
@@ -1071,7 +1061,7 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         publishSnapshot()
-        val coverage = mappingPlaybackToReference.size
+        val coverage = mapping.playbackToReference.size
         if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
             markActive(coverage)
         }
@@ -1095,64 +1085,12 @@ class FingerprintTimingManager @Inject constructor(
         candidate: TimeMappingEntry,
         isDebug: Boolean = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG),
     ): Int {
-        val trusted = filterLastTrusted
-        if (trusted != null && isInTrend(candidate, trusted)) {
-            flushPoolAsRejected(isDebug)
-            insertMapping(candidate)
-            filterLastTrusted = candidate
-            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-            return 1
+        val inserted = mapping.consider(candidate) { rejected ->
+            if (isDebug) recordDebugRejection(rejected.playbackTime, rejected.score)
+            Timber.d("FingerprintTimingManager: drift filter rejected candidate at playback ${rejected.playbackTime}s")
         }
-
-        filterCandidatePool.add(candidate)
-        val n = FingerprintConstants.DRIFT_BOOTSTRAP_COUNT
-
-        if (filterCandidatePool.size < n) return 0
-
-        val recent = filterCandidatePool.takeLast(n)
-        if (formsConsistentSequence(recent)) {
-            val keepStart = filterCandidatePool.size - n
-            for (i in 0 until keepStart) {
-                if (isDebug) recordDebugRejection(filterCandidatePool[i].playbackTime, filterCandidatePool[i].score)
-                Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${filterCandidatePool[i].playbackTime}s")
-            }
-            for (entry in recent) {
-                insertMapping(entry)
-            }
-            filterLastTrusted = recent.last()
-            filterCandidatePool.clear()
-            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-            return n
-        }
-
-        val evicted = filterCandidatePool.removeAt(0)
-        if (isDebug) recordDebugRejection(evicted.playbackTime, evicted.score)
-        Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${evicted.playbackTime}s")
         if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-        return 0
-    }
-
-    private fun flushPoolAsRejected(isDebug: Boolean) {
-        if (isDebug) {
-            for (candidate in filterCandidatePool) {
-                recordDebugRejection(candidate.playbackTime, candidate.score)
-            }
-        }
-        filterCandidatePool.clear()
-    }
-
-    private fun isInTrend(candidate: TimeMappingEntry, anchor: TimeMappingEntry): Boolean {
-        val deltaPlayback = candidate.playbackTime - anchor.playbackTime
-        val deltaReference = candidate.referenceTime - anchor.referenceTime
-        return abs(deltaReference - deltaPlayback) <= FingerprintConstants.DRIFT_TOLERANCE_SECONDS
-    }
-
-    private fun formsConsistentSequence(entries: List<TimeMappingEntry>): Boolean {
-        if (entries.size < 2) return true
-        for (i in 1 until entries.size) {
-            if (!isInTrend(entries[i], entries[i - 1])) return false
-        }
-        return true
+        return inserted
     }
 
     private fun recordDebugRejection(playbackTime: Double, score: Float?) {
@@ -1163,17 +1101,13 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     internal fun insertMapping(entry: TimeMappingEntry) {
-        val pbIdx = mappingPlaybackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
-        mappingPlaybackToReference.add(pbIdx, entry)
-
-        val refIdx = mappingReferenceToPlayback.sortedInsertionIndex { it.referenceTime < entry.referenceTime }
-        mappingReferenceToPlayback.add(refIdx, entry)
+        mapping.insert(entry)
     }
 
     /** Publish an immutable snapshot of the mapping lists for lock-free reads. */
     private fun publishSnapshot() {
-        snapshotPlaybackToReference = mappingPlaybackToReference.toList()
-        snapshotReferenceToPlayback = mappingReferenceToPlayback.toList()
+        snapshotPlaybackToReference = mapping.playbackToReference.toList()
+        snapshotReferenceToPlayback = mapping.referenceToPlayback.toList()
         _mappingVersion.value++
     }
 
@@ -1361,18 +1295,4 @@ class FingerprintTimingManager @Inject constructor(
             return max(0.0, floor(time / stride) * stride)
         }
     }
-}
-
-private inline fun <T> MutableList<T>.sortedInsertionIndex(crossinline predicate: (T) -> Boolean): Int {
-    var lo = 0
-    var hi = size
-    while (lo < hi) {
-        val mid = (lo + hi) / 2
-        if (predicate(this[mid])) {
-            lo = mid + 1
-        } else {
-            hi = mid
-        }
-    }
-    return lo
 }
