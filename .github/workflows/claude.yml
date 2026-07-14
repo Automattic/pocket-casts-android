@@ -1,3 +1,8 @@
+# Runs Claude on demand with a @claude mention.
+#
+# This workflow is shared between the Android, iOS, and Web Player repos.
+# If you edit it here, please apply the same change to the other two.
+
 name: Claude Code
 
 on:

@@ -3,6 +3,8 @@
 *   New Features
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+    *   Stats Heatmap
+        ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
