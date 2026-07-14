@@ -18,7 +18,6 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
-import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -121,18 +120,11 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             .takeIf { episodeLocation.shouldUseCache() }
 
         if (cacheFactory != null) {
-            // Caching downloads the entire episode, so respect the user's data warning
-            // preference and wait for an unmetered network, matching buildPrefetchRequest.
-            val networkConstraint = if (settings.warnOnMeteredNetwork.value) {
-                NetworkType.UNMETERED
-            } else {
-                NetworkType.CONNECTED
-            }
             CacheWorker.startCachingEntireEpisode(
                 context = context,
                 url = episodeUri,
                 episodeUuid = episodeLocation.episode.uuid,
-                networkConstraint = networkConstraint,
+                networkConstraint = cacheNetworkConstraint(settings.warnOnMeteredNetwork.value),
                 onCachingComplete = onCachingComplete,
             )
         }

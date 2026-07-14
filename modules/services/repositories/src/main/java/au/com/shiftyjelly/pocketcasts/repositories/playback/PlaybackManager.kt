@@ -2799,15 +2799,17 @@ internal fun buildPrefetchRequest(
     if (isHlsDefault) return null
     val url = episode.downloadUrl ?: return null
 
-    val networkConstraint = if (warnOnMeteredNetwork) {
-        NetworkType.UNMETERED
-    } else {
-        NetworkType.CONNECTED
-    }
-
     return PrefetchRequest(
         episodeUuid = episode.uuid,
         downloadUrl = url,
-        networkConstraint = networkConstraint,
+        networkConstraint = cacheNetworkConstraint(warnOnMeteredNetwork),
     )
+}
+
+// Cache transfers download episode data in the background, so wait for an unmetered
+// network when the user has asked to be warned before using mobile data.
+internal fun cacheNetworkConstraint(warnOnMeteredNetwork: Boolean): NetworkType = if (warnOnMeteredNetwork) {
+    NetworkType.UNMETERED
+} else {
+    NetworkType.CONNECTED
 }
