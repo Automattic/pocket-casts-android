@@ -1985,8 +1985,12 @@ open class PlaybackManager @Inject constructor(
         // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
-        // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
-        _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
+        // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
+        _streamVideoState.value = when {
+            !episode.isStreamUrlHls -> StreamVideoState.NotVideo
+            settings.audioOnly.value -> StreamVideoState.AudioOnly
+            else -> StreamVideoState.Unknown
+        }
         _videoRenderingEnabled.value = true
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
