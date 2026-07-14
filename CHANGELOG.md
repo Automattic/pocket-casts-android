@@ -1,6 +1,8 @@
 8.17
 -----
 *   New Features
+    *   Add Audio only playback setting
+        ([#5572](https://github.com/Automattic/pocket-casts-android/pull/5572))
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap

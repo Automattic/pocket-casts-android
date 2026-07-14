@@ -48,6 +48,8 @@ class SimplePlayer(
     private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.SECONDS.toMillis(50).toInt()
 
     private var player: ExoPlayer? = null
+
+    @UnstableApi
     private var trackSelector: DefaultTrackSelector? = null
 
     private var renderersFactory: ShiftyRenderersFactory? = null
@@ -302,6 +304,7 @@ class SimplePlayer(
         applyAudioOnly()
     }
 
+    @OptIn(UnstableApi::class)
     private fun applyAudioOnly() {
         val trackSelector = trackSelector ?: return
         val disableVideo = settings.audioOnly.value && episodeLocation.isHlsStream
