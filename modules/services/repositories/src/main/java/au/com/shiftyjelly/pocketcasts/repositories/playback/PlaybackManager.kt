@@ -374,6 +374,7 @@ open class PlaybackManager @Inject constructor(
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
+                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
             ),
         )
         return autoPlayEpisode
