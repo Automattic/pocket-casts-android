@@ -9,4 +9,8 @@ interface NotificationDrawer {
         sessionToken: MediaSessionCompat.Token,
         useEpisodeArtwork: Boolean,
     ): Notification
+
+    fun buildPreparingNotification(
+        sessionToken: MediaSessionCompat.Token,
+    ): Notification
 }

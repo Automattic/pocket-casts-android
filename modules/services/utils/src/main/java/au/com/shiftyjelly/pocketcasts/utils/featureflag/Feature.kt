@@ -198,6 +198,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-03-04"),
     ),
+    FOREGROUND_BEFORE_PLAYBACK(
+        key = "foreground_before_playback",
+        title = "Foreground service before playback (Android 17 audio hardening)",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-07-13"),
+    ),
     NEXT_EPISODE_PREFETCH(
         key = "next_episode_prefetch",
         title = "Next Episode Prefetch",
