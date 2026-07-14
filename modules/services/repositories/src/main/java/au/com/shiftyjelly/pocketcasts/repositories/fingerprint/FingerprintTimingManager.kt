@@ -277,6 +277,31 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     /**
+     * Playback time for [referenceTime] when the active mapping is dense around it, so a full
+     * on-demand resolve is unnecessary. Null when the mapping is missing, sparse, or another episode's.
+     */
+    fun densePlaybackTime(episodeUuid: String, referenceTime: Duration): Duration? {
+        if (activeEpisodeUuid != episodeUuid) return null
+        val entries = snapshotReferenceToPlayback
+        val referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS)
+        var lo = 0
+        var hi = entries.size
+        while (lo < hi) {
+            val mid = (lo + hi) / 2
+            if (entries[mid].referenceTime <= referenceTimeSec) lo = mid + 1 else hi = mid
+        }
+        if (hi - 1 < 0 || hi >= entries.size) return null
+        if (entries[hi].referenceTime - entries[hi - 1].referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+        val playback = interpolate(
+            time = referenceTimeSec,
+            entries = entries,
+            keySelector = { it.referenceTime },
+            valueSelector = { it.playbackTime },
+        ) ?: return null
+        return playback.seconds
+    }
+
+    /**
      * One-shot bounded resolve of a generated chapter's reference time to the playback timeline.
      * Decodes only a small search window around the expected location, matches into a scratch
      * accumulator, and never touches the continuous mapping or the public state.

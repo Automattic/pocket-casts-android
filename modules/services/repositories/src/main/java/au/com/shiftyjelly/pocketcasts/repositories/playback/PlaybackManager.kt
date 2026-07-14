@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -96,6 +97,7 @@ import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
 import com.automattic.eventhorizon.Trackable
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -170,6 +172,7 @@ open class PlaybackManager @Inject constructor(
     private val autoPlaySelector: AutoPlaySelector,
     private val browseTreeProvider: BrowseTreeProvider,
     private val alternateEnclosureManager: AlternateEnclosureManager,
+    private val generatedChapterSeeker: Lazy<GeneratedChapterSeeker>,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -1129,7 +1132,7 @@ open class PlaybackManager @Inject constructor(
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode = episode)
             playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
-                seekToTimeMsInternal(chapter.startTime)
+                seekToChapterStart(episode, chapter)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
@@ -1146,7 +1149,7 @@ open class PlaybackManager @Inject constructor(
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode)
             playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
-                seekToTimeMsInternal(chapter.startTime)
+                seekToChapterStart(episode, chapter)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
@@ -1176,7 +1179,7 @@ open class PlaybackManager @Inject constructor(
     fun skipToChapter(chapter: Chapter) {
         launch {
             if (chapter.selected) {
-                seekToTimeMsInternal(chapter.startTime)
+                seekToChapterStart(getCurrentEpisode(), chapter)
             } else {
                 skipToNextSelectedOrLastChapter()
             }
@@ -1187,11 +1190,22 @@ open class PlaybackManager @Inject constructor(
         launch {
             val chapter = playbackStateRelay.blockingFirst().chapters.firstOrNull { it.index == index } ?: return@launch
             if (chapter.selected) {
-                seekToTimeMsInternal(chapter.startTime)
+                seekToChapterStart(getCurrentEpisode(), chapter)
             } else {
                 skipToNextSelectedOrLastChapter()
             }
         }
+    }
+
+    /**
+     * Generated chapter timestamps live on the reference timeline; resolve the real stream position
+     * through the fingerprint map before seeking. Falls back to the chapter's own start time.
+     */
+    private suspend fun seekToChapterStart(episode: BaseEpisode?, chapter: Chapter) {
+        val resolved = episode?.let { generatedChapterSeeker.get().resolveSeekTime(it, chapter) }
+        // Resolving can take seconds; drop the seek if the episode changed meanwhile.
+        if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return
+        seekToTimeMsInternal(resolved ?: chapter.startTime)
     }
 
     fun clearUpNextAsync() {
