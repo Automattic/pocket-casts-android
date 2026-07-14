@@ -64,6 +64,7 @@ import com.automattic.eventhorizon.SettingsGeneralAutoplayToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralIntelligentPlaybackToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralKeepScreenAwakeToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralOpenPlayerAutomaticallyToggledEvent
@@ -312,6 +313,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 GeneratedChapters(
                                     saved = settings.showGeneratedChapters.flow.collectAsState().value,
                                     onSave = { isGeneratedChaptersEnabled ->
+                                        eventHorizon.track(
+                                            SettingsGeneralGeneratedChaptersToggledEvent(
+                                                enabled = isGeneratedChaptersEnabled,
+                                            ),
+                                        )
                                         settings.showGeneratedChapters.set(isGeneratedChaptersEnabled, updateModifiedAt = true)
                                     },
                                 )
