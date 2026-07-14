@@ -8,8 +8,8 @@ import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.IllegalFormatException
 import java.util.Locale
 import timber.log.Timber
@@ -28,10 +28,8 @@ object LogBuffer {
     private const val LOG_FILE_NAME = "debug.log"
     private const val LOG_BACKUP_FILE_NAME = "debug.log.1"
 
-    // SimpleDateFormat is not thread-safe and addLog can run on many threads, so give each thread its own instance
-    private val LOG_FILE_DATE_FORMAT = object : ThreadLocal<SimpleDateFormat>() {
-        override fun initialValue() = SimpleDateFormat("dd/M HH:mm:ss.SSS", Locale.US)
-    }
+    private val LOG_FILE_DATE_FORMAT: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("dd/M HH:mm:ss.SSS", Locale.US)
     private const val FILE_MAX_SIZE_BYTES = (200 * 1024).toLong()
 
     private var logPath: String? = null
@@ -161,7 +159,7 @@ object LogBuffer {
             else -> prefix = ""
         }
 
-        prefix += LOG_FILE_DATE_FORMAT.get()?.format(Date()).orEmpty()
+        prefix += LOG_FILE_DATE_FORMAT.format(LocalDateTime.now())
 
         add("$prefix $logMessage")
     }
