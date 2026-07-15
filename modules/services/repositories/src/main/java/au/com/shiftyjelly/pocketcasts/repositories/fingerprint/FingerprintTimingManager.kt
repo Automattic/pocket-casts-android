@@ -63,8 +63,8 @@ class FingerprintTimingManager @Inject constructor(
         data object Idle : State
         data object Preparing : State
         data class Active(val coverage: Int) : State
-        data class Failed(val error: Throwable) : State
-        data object Unavailable : State
+        data class Failed(val error: Throwable, val episodeUuid: String?) : State
+        data class Unavailable(val episodeUuid: String?) : State
     }
 
     data class TimeMappingEntry(
@@ -225,7 +225,7 @@ class FingerprintTimingManager @Inject constructor(
         isStreaming: Boolean? = null,
         episodeUuid: String? = currentEpisodeUuid,
     ) {
-        _stateFlow.value = State.Unavailable
+        _stateFlow.value = State.Unavailable(episodeUuid)
         eventHorizon.track(
             SyncedTranscriptsUnavailableEvent(
                 reason = reason,
@@ -236,7 +236,7 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private fun markFailed(error: Throwable, stage: String) {
-        _stateFlow.value = State.Failed(error)
+        _stateFlow.value = State.Failed(error, currentEpisodeUuid)
         if (hasTrackedFailure) return
         hasTrackedFailure = true
         eventHorizon.track(
