@@ -208,7 +208,12 @@ class FingerprintTimingManager @Inject constructor(
             val gen: Long
             mutex.withLock {
                 // Already prepared for this episode — reuse existing state.
-                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) return@launch
+                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) {
+                    if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                        currentTrigger = trigger
+                    }
+                    return@launch
+                }
                 resetState()
                 generation++
                 gen = generation
@@ -240,6 +245,21 @@ class FingerprintTimingManager @Inject constructor(
             }
         }
         Timber.d("FingerprintTimingManager: stopped")
+    }
+
+    fun onTranscriptShown(episodeUuid: String) {
+        if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+        prepareForCurrentEpisode(PrepareTrigger.TRANSCRIPT_VIEW)
+    }
+
+    fun onTranscriptDismissed(episodeUuid: String) {
+        scope.launch {
+            mutex.withLock {
+                if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                    currentTrigger = PrepareTrigger.PLAYBACK
+                }
+            }
+        }
     }
 
     /** Must be called under [mutex]. */
