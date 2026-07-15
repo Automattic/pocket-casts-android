@@ -397,7 +397,6 @@ internal class DiscoverAdapter(
         }
 
         private fun trackSponsoredListImpression(position: Int) {
-            if (position == RecyclerView.NO_POSITION) return
             val discoverPodcast = adapter.currentList.getOrNull(position) as? DiscoverPodcast
             discoverPodcast?.listId?.let { listId ->
                 if (listIdImpressionTracked.contains(listId)) return
