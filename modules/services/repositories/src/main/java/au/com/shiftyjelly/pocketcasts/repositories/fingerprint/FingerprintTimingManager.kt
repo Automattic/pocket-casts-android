@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -137,6 +139,9 @@ class FingerprintTimingManager @Inject constructor(
     private var activeDecodeFrontierSec = 0.0
 
     @Volatile
+    private var unmeteredRetryCallback: ConnectivityManager.NetworkCallback? = null
+
+    @Volatile
     private var generation = 0L
 
     // Drift filter state
@@ -235,6 +240,48 @@ class FingerprintTimingManager @Inject constructor(
             }
         }
         Timber.d("FingerprintTimingManager: stopped")
+    }
+
+    /** Must be called under [mutex]. */
+    private fun registerUnmeteredRetry(episodeUuid: String) {
+        if (unmeteredRetryCallback != null) return
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(network: android.net.Network, networkCapabilities: NetworkCapabilities) {
+                if (!networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)) return
+                if (!Network.isUnmeteredConnection(context)) return
+                if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+                val self = this
+                scope.launch {
+                    val shouldRetry = mutex.withLock {
+                        if (unmeteredRetryCallback !== self) return@withLock false
+                        unregisterUnmeteredRetry()
+                        true
+                    }
+                    if (shouldRetry) {
+                        Timber.d("FingerprintTimingManager: unmetered network available — retrying preparation")
+                        prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+                    }
+                }
+            }
+        }
+        unmeteredRetryCallback = callback
+        runCatching {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.registerDefaultNetworkCallback(callback)
+        }.onFailure {
+            unmeteredRetryCallback = null
+            Timber.w(it, "FingerprintTimingManager: failed to register network callback")
+        }
+    }
+
+    /** Must be called under [mutex]. */
+    private fun unregisterUnmeteredRetry() {
+        val callback = unmeteredRetryCallback ?: return
+        unmeteredRetryCallback = null
+        runCatching {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.unregisterNetworkCallback(callback)
+        }
     }
 
     private fun elapsedPreparationMs(): Long = if (preparationStartMs == 0L) 0L else SystemClock.elapsedRealtime() - preparationStartMs
@@ -359,6 +406,7 @@ class FingerprintTimingManager @Inject constructor(
         progressObserverJob = null
         pendingRestartJob?.cancel()
         pendingRestartJob = null
+        unregisterUnmeteredRetry()
         mappingPlaybackToReference.clear()
         mappingReferenceToPlayback.clear()
         debugRejections.clear()
@@ -438,6 +486,7 @@ class FingerprintTimingManager @Inject constructor(
             mutex.withLock {
                 if (gen != generation) return
                 markUnavailable(reason = "metered_network", isStreaming = true, episodeUuid = episodeUuid)
+                registerUnmeteredRetry(episodeUuid)
             }
             Timber.d("FingerprintTimingManager: skipping remote fingerprinting on metered network")
             return
