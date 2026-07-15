@@ -22,18 +22,6 @@ object FingerprintConstants {
     /** Interval between windowed fingerprints during live matching, in milliseconds. */
     const val WINDOW_INTERVAL_MS = 1000
 
-    /** Seconds of decoded PCM read per chunk during fingerprint generation. */
-    const val STREAM_CHUNK_SECONDS = 5.0
-
-    /** Seconds between polls when waiting for the streaming buffer to grow. */
-    const val BUFFER_GROW_POLL_CADENCE_SECONDS = 1.0
-
-    /** Give up the streaming grow-loop after this many consecutive seconds without new bytes. */
-    const val BUFFER_GROW_MAX_STALL_SECONDS = 60.0
-
-    /** Trailing audio the grow-loop refuses to read to avoid partial frame noise. */
-    const val BUFFER_GROW_TRAILING_MARGIN_SECONDS = 1.0
-
     /** Minimum number of mapping entries before transitioning to Active. */
     const val MINIMUM_COVERAGE_FOR_ACTIVE = 2
 
