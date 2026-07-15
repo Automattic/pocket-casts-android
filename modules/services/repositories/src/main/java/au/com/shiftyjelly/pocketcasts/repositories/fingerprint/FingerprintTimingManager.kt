@@ -7,6 +7,7 @@ import android.media.MediaFormat
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -57,7 +58,15 @@ class FingerprintTimingManager @Inject constructor(
     private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     private val chapterManager: Lazy<ChapterManager>,
+    private val settings: Settings,
 ) {
+
+    /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
+    enum class PrepareTrigger {
+        PLAYBACK,
+        TRANSCRIPT_VIEW,
+        BOOKMARK,
+    }
 
     sealed interface State {
         data object Idle : State
@@ -138,6 +147,8 @@ class FingerprintTimingManager @Inject constructor(
     internal var debugTrackingEnabled = false
 
     // Context for current preparation
+    private var currentTrigger = PrepareTrigger.PLAYBACK
+
     @Volatile
     private var currentEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
@@ -170,13 +181,13 @@ class FingerprintTimingManager @Inject constructor(
                 val uuid = state.episodeUuid
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
-                    prepareForCurrentEpisode()
+                    prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
                 }
             }
         }
     }
 
-    fun prepareForCurrentEpisode() {
+    fun prepareForCurrentEpisode(trigger: PrepareTrigger) {
         val episode = playbackManager.getCurrentEpisode() ?: run {
             // No episode is currently loaded, so there is no episode UUID to attribute this to.
             markUnavailable(reason = "no_episode", episodeUuid = null)
@@ -200,7 +211,7 @@ class FingerprintTimingManager @Inject constructor(
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startPlaybackProgressObserver(episodeUuid)
-            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
+            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration, trigger)
         }
     }
 
@@ -373,6 +384,7 @@ class FingerprintTimingManager @Inject constructor(
         preparationStartMs = 0
         currentIsStreaming = false
         currentEager = false
+        currentTrigger = PrepareTrigger.PLAYBACK
     }
 
     /**
@@ -395,6 +407,7 @@ class FingerprintTimingManager @Inject constructor(
         audioSource: String?,
         isDownloaded: Boolean,
         durationSec: Double,
+        trigger: PrepareTrigger,
     ) {
         if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
             markUnavailable(reason = "feature_disabled", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
@@ -415,9 +428,25 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        val blocked = shouldBlockRemoteFingerprinting(
+            isDownloaded = isDownloaded,
+            trigger = trigger,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+        if (blocked) {
+            mutex.withLock {
+                if (gen != generation) return
+                markUnavailable(reason = "metered_network", isStreaming = true, episodeUuid = episodeUuid)
+            }
+            Timber.d("FingerprintTimingManager: skipping remote fingerprinting on metered network")
+            return
+        }
+
         val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
         mutex.withLock {
             if (gen != generation) return
+            currentTrigger = trigger
             currentEpisodeUuid = episodeUuid
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
@@ -602,8 +631,20 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
+    private fun canStreamOnCurrentNetwork(): Boolean = !currentIsStreaming ||
+        !shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = currentTrigger,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+
     /** Must be called under [mutex]. */
     private fun restartFromPlayhead() {
+        if (!canStreamOnCurrentNetwork()) {
+            Timber.d("FingerprintTimingManager: skipping stream restart on metered network")
+            return
+        }
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
@@ -614,6 +655,10 @@ class FingerprintTimingManager @Inject constructor(
 
     /** Must be called under [mutex]. Continues an existing run, so the drift filter's trusted anchor is kept. */
     private fun restartFromRunEnd(runEndSec: Double) {
+        if (!canStreamOnCurrentNetwork()) {
+            Timber.d("FingerprintTimingManager: skipping stream restart on metered network")
+            return
+        }
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
@@ -1037,6 +1082,18 @@ class FingerprintTimingManager @Inject constructor(
             isDownloaded: Boolean,
             isUnmetered: () -> Boolean,
         ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
+
+        /** [isUnmetered] is a supplier so the network lookup is skipped for downloaded episodes. */
+        internal fun shouldBlockRemoteFingerprinting(
+            isDownloaded: Boolean,
+            trigger: PrepareTrigger,
+            warnOnMeteredNetwork: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean {
+            if (isDownloaded) return false
+            if (isUnmetered()) return false
+            return trigger != PrepareTrigger.TRANSCRIPT_VIEW || warnOnMeteredNetwork
+        }
 
         /** Decides how a playback-progress tick affects the fingerprint stream. */
         internal fun decideOnProgress(

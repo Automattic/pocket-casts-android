@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -31,6 +32,7 @@ class DriftFilterTest {
             eventHorizon = mock(EventHorizon::class.java),
             context = mock(Context::class.java),
             chapterManager = Lazy { mock(ChapterManager::class.java) },
+            settings = mock(Settings::class.java),
         )
         manager.debugTrackingEnabled = true
     }

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.PrepareTrigger
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.ProgressDecision
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import org.junit.Assert.assertEquals
@@ -159,6 +160,87 @@ class FingerprintTimingManagerTest {
             },
         )
         assertFalse(queriedNetwork)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting never blocks downloaded episodes`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = true,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting does not query network for downloaded episodes`() {
+        var queriedNetwork = false
+        FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = true,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = {
+                queriedNetwork = true
+                true
+            },
+        )
+        assertFalse(queriedNetwork)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting never blocks on unmetered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { true },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks playback trigger on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks bookmark trigger on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.BOOKMARK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting allows transcript view on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.TRANSCRIPT_VIEW,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks transcript view when user warns on data use`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.TRANSCRIPT_VIEW,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
     }
 
     @Test
