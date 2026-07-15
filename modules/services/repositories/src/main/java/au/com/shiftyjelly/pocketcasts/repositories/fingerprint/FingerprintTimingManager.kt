@@ -93,6 +93,7 @@ class FingerprintTimingManager @Inject constructor(
         private set
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
 
     // Mapping state: writers build new lists under mutex, then atomically publish via @Volatile.
@@ -566,7 +567,7 @@ class FingerprintTimingManager @Inject constructor(
         generationJob?.cancel()
         lastStreamStartTimeMs = System.currentTimeMillis()
         val aligned = alignToWindowGrid(startPosition)
-        generationJob = scope.launch {
+        generationJob = scope.launch(decodeDispatcher) {
             try {
                 streamFingerprint(audioFilePath, matcher, episodeUuid, startingAt = aligned)
                 persistMappingCacheIfFull()
