@@ -661,10 +661,17 @@ class FingerprintTimingManager @Inject constructor(
             hasPendingRestart = pendingRestartJob?.isActive == true,
             hasStreamStarted = lastStreamStartTimeMs != 0L,
             msSinceStreamStart = SystemClock.elapsedRealtime() - lastStreamStartTimeMs,
+            isStreaming = currentIsStreaming,
         )
         lastProgressPositionMs = positionMs
         when (decision) {
             ProgressDecision.None -> Unit
+
+            ProgressDecision.CancelDecode -> {
+                Timber.d("FingerprintTimingManager: playback within mapped range — cancelling decode")
+                generationJob?.cancel()
+                generationJob = null
+            }
 
             ProgressDecision.ScheduleDebouncedRestart -> {
                 Timber.d("FingerprintTimingManager: playback jumped — scheduling restart")
@@ -1148,6 +1155,7 @@ class FingerprintTimingManager @Inject constructor(
 
     internal sealed interface ProgressDecision {
         data object None : ProgressDecision
+        data object CancelDecode : ProgressDecision
         data object ScheduleDebouncedRestart : ProgressDecision
         data object RestartOutsideRange : ProgressDecision
         data class RestartFromRunEnd(val runEndSec: Double) : ProgressDecision
@@ -1190,11 +1198,15 @@ class FingerprintTimingManager @Inject constructor(
             hasPendingRestart: Boolean,
             hasStreamStarted: Boolean,
             msSinceStreamStart: Long,
+            isStreaming: Boolean,
         ): ProgressDecision {
             if (isEager) return ProgressDecision.None
             val isJump = lastPositionSec != null && abs(positionSec - lastPositionSec) > FingerprintConstants.RESTART_DELTA_SECONDS
             if (isJump) {
-                if (mappedRunEndSec != null) return ProgressDecision.None
+                if (mappedRunEndSec != null) {
+                    val mappedFarAhead = mappedRunEndSec >= positionSec + FingerprintConstants.LOOKAHEAD_SECONDS
+                    return if (isStreaming && isDecodeActive && mappedFarAhead) ProgressDecision.CancelDecode else ProgressDecision.None
+                }
                 if (isCoveredByActiveDecode) return ProgressDecision.None
                 return ProgressDecision.ScheduleDebouncedRestart
             }

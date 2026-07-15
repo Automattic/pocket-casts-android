@@ -268,6 +268,42 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `decideOnProgress jump within run cancels decode when streaming and mapped far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = true,
+            isStreaming = true,
+        )
+        assertEquals(ProgressDecision.CancelDecode, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run keeps decode for local files`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = true,
+            isStreaming = false,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run without active decode does not cancel`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = false,
+            isStreaming = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
     fun `decideOnProgress jump outside mapped range schedules debounced restart`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0)
         assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
@@ -417,6 +453,7 @@ class FingerprintTimingManagerTest {
             mappedRunEndSec = 130.0,
             isDecodeActive = true,
             isRunEndCoveredByActiveDecode = false,
+            isStreaming = true,
         )
         assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
     }
@@ -533,6 +570,7 @@ class FingerprintTimingManagerTest {
         hasPendingRestart: Boolean = false,
         hasStreamStarted: Boolean = hasAnyMapping || isDecodeActive,
         msSinceStreamStart: Long = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+        isStreaming: Boolean = false,
     ): ProgressDecision = FingerprintTimingManager.decideOnProgress(
         positionSec = positionSec,
         lastPositionSec = lastPositionSec,
@@ -546,6 +584,7 @@ class FingerprintTimingManagerTest {
         hasPendingRestart = hasPendingRestart,
         hasStreamStarted = hasStreamStarted,
         msSinceStreamStart = msSinceStreamStart,
+        isStreaming = isStreaming,
     )
 
     @Test
