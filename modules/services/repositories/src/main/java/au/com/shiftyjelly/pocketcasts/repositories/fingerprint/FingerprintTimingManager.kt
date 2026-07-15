@@ -121,6 +121,12 @@ class FingerprintTimingManager @Inject constructor(
     private var lastStreamStartTimeMs = 0L
 
     @Volatile
+    private var activeDecodeStartSec = 0.0
+
+    @Volatile
+    private var activeDecodeFrontierSec = 0.0
+
+    @Volatile
     private var generation = 0L
 
     // Drift filter state
@@ -344,6 +350,9 @@ class FingerprintTimingManager @Inject constructor(
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
         lastProgressPositionMs = -1
+        lastStreamStartTimeMs = 0L
+        activeDecodeStartSec = 0.0
+        activeDecodeFrontierSec = 0.0
         filterLastTrusted = null
         filterCandidatePool.clear()
         currentEpisodeUuid = null
@@ -532,59 +541,53 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private fun processProgress(positionMs: Int) {
-        // The eager pass already decodes the whole stream, so playhead-driven restarts are unnecessary.
-        if (currentEager) {
-            lastProgressPositionMs = positionMs
-            return
-        }
-        if (lastProgressPositionMs >= 0) {
-            val deltaMs = abs(positionMs - lastProgressPositionMs)
-            if (deltaMs > FingerprintConstants.RESTART_DELTA_SECONDS * 1000) {
-                Timber.d("FingerprintTimingManager: playback jumped ${deltaMs}ms — restarting")
-                val matcher = currentMatcher
-                val audioPath = currentAudioFilePath
-                val uuid = currentEpisodeUuid
-                if (matcher != null && audioPath != null && uuid != null) {
-                    filterLastTrusted = null
-                    filterCandidatePool.clear()
-                    startStream(audioPath, matcher, uuid, startPosition = positionMs / 1000.0)
-                }
-                lastProgressPositionMs = positionMs
-                return
-            }
-        }
+        val positionSec = positionMs / 1000.0
+        val mappedRunEndSec = mappedRunEnd(positionSec, mappingPlaybackToReference)
+        val decision = decideOnProgress(
+            positionSec = positionSec,
+            lastPositionSec = if (lastProgressPositionMs >= 0) lastProgressPositionMs / 1000.0 else null,
+            isEager = currentEager,
+            mappedRunEndSec = mappedRunEndSec,
+            hasAnyMapping = mappingPlaybackToReference.isNotEmpty(),
+            isDecodeActive = generationJob?.isActive == true,
+            isCoveredByActiveDecode = isCoveredByActiveDecode(positionSec),
+            hasStreamStarted = lastStreamStartTimeMs != 0L,
+            msSinceStreamStart = SystemClock.elapsedRealtime() - lastStreamStartTimeMs,
+        )
         lastProgressPositionMs = positionMs
+        when (decision) {
+            ProgressDecision.None -> Unit
 
-        if (!isWithinMappedRange(positionMs / 1000.0) && mappingPlaybackToReference.isNotEmpty()) {
-            // Give the stream time to bootstrap before restarting again.
-            if (System.currentTimeMillis() - lastStreamStartTimeMs < STREAM_BOOTSTRAP_COOLDOWN_MS) return
-
-            Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
-            val matcher = currentMatcher
-            val audioPath = currentAudioFilePath
-            val uuid = currentEpisodeUuid
-            if (matcher != null && audioPath != null && uuid != null) {
-                filterLastTrusted = null
-                filterCandidatePool.clear()
-                startStream(audioPath, matcher, uuid, startPosition = positionMs / 1000.0)
+            ProgressDecision.RestartOutsideRange -> {
+                Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
+                restartFromPlayhead()
             }
         }
     }
 
-    private fun isWithinMappedRange(playbackTimeSec: Double): Boolean {
-        val entries = mappingPlaybackToReference
-        val first = entries.firstOrNull() ?: return false
-        val last = entries.lastOrNull() ?: return false
-        val margin = FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS
-        return playbackTimeSec >= first.playbackTime - margin &&
-            playbackTimeSec <= last.playbackTime + margin
+    /** Must be called under [mutex]. */
+    private fun restartFromPlayhead() {
+        val matcher = currentMatcher ?: return
+        val audioPath = currentAudioFilePath ?: return
+        val uuid = currentEpisodeUuid ?: return
+        filterLastTrusted = null
+        filterCandidatePool.clear()
+        startStream(audioPath, matcher, uuid, startPosition = lastProgressPositionMs / 1000.0)
+    }
+
+    private fun isCoveredByActiveDecode(positionSec: Double): Boolean {
+        if (generationJob?.isActive != true) return false
+        return positionSec >= activeDecodeStartSec &&
+            positionSec <= activeDecodeFrontierSec + FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS
     }
 
     /** Must be called under [mutex]. */
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
-        lastStreamStartTimeMs = System.currentTimeMillis()
+        lastStreamStartTimeMs = SystemClock.elapsedRealtime()
         val aligned = alignToWindowGrid(startPosition)
+        activeDecodeStartSec = aligned
+        activeDecodeFrontierSec = aligned
         // Superseded decode jobs re-check this token before touching shared state.
         val gen = generation
         generationJob = scope.launch(decodeDispatcher) {
@@ -757,9 +760,13 @@ class FingerprintTimingManager @Inject constructor(
                             }
                         }
 
+                        val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
+                        if (gen == generation) {
+                            activeDecodeFrontierSec = decodedSeconds
+                        }
+
                         // Eager passes decode as fast as possible; throttled passes stay near the playhead.
                         if (!currentEager) {
-                            val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
                             val lastKnownPositionMs = lastProgressPositionMs
                             if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
                                 delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
@@ -968,9 +975,12 @@ class FingerprintTimingManager @Inject constructor(
         debugRejectionsSnapshot = debugRejections.toList()
     }
 
-    companion object {
-        private const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
+    internal sealed interface ProgressDecision {
+        data object None : ProgressDecision
+        data object RestartOutsideRange : ProgressDecision
+    }
 
+    companion object {
         /**
          * Core eager-pass gate (assumes the platform check already passed). [isUnmetered] is a supplier so the
          * network lookup is skipped for downloaded episodes.
@@ -980,6 +990,64 @@ class FingerprintTimingManager @Inject constructor(
             isDownloaded: Boolean,
             isUnmetered: () -> Boolean,
         ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
+
+        /** Decides how a playback-progress tick affects the fingerprint stream. */
+        internal fun decideOnProgress(
+            positionSec: Double,
+            lastPositionSec: Double?,
+            isEager: Boolean,
+            mappedRunEndSec: Double?,
+            hasAnyMapping: Boolean,
+            isDecodeActive: Boolean,
+            isCoveredByActiveDecode: Boolean,
+            hasStreamStarted: Boolean,
+            msSinceStreamStart: Long,
+        ): ProgressDecision {
+            if (isEager) return ProgressDecision.None
+            val isJump = lastPositionSec != null && abs(positionSec - lastPositionSec) > FingerprintConstants.RESTART_DELTA_SECONDS
+            if (isJump) {
+                if (mappedRunEndSec != null) return ProgressDecision.None
+                if (isCoveredByActiveDecode) return ProgressDecision.None
+                return ProgressDecision.RestartOutsideRange
+            }
+            if (mappedRunEndSec != null) return ProgressDecision.None
+            val canRecoverWithoutMapping = !isDecodeActive && hasStreamStarted
+            if (!isCoveredByActiveDecode && (hasAnyMapping || canRecoverWithoutMapping) &&
+                msSinceStreamStart >= FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS
+            ) {
+                return ProgressDecision.RestartOutsideRange
+            }
+            return ProgressDecision.None
+        }
+
+        /**
+         * End of the contiguous mapped run containing [positionSec], or null when outside a run.
+         * Asymmetric: no slack past a mid-list run end, the margin's grace past the final anchor.
+         */
+        internal fun mappedRunEnd(positionSec: Double, entries: List<TimeMappingEntry>): Double? {
+            if (entries.isEmpty()) return null
+            val margin = FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS
+            var lo = 0
+            var hi = entries.size
+            while (lo < hi) {
+                val mid = (lo + hi) / 2
+                if (entries[mid].playbackTime <= positionSec) lo = mid + 1 else hi = mid
+            }
+            val prev = entries.getOrNull(lo - 1)
+            val next = entries.getOrNull(lo)
+            val inRun = when {
+                prev != null && next != null -> next.playbackTime - prev.playbackTime <= margin
+                prev != null -> positionSec - prev.playbackTime <= margin
+                else -> next != null && next.playbackTime - positionSec <= margin
+            }
+            if (!inRun) return null
+            if (next == null) return prev!!.playbackTime
+            var i = lo
+            while (i + 1 < entries.size && entries[i + 1].playbackTime - entries[i].playbackTime <= margin) {
+                i++
+            }
+            return entries[i].playbackTime
+        }
 
         fun interpolate(
             time: Double,

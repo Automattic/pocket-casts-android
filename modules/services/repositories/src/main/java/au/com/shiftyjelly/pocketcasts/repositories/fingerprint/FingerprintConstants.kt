@@ -7,6 +7,9 @@ object FingerprintConstants {
     /** Slack window around the already-mapped range before playback is considered "outside". */
     const val PLAYBACK_RANGE_MARGIN_SECONDS = 30.0
 
+    /** Minimum time between stream restarts while playback sits outside the mapped range. */
+    const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
+
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
