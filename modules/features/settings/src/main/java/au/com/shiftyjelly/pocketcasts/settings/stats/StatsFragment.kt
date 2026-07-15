@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -64,13 +67,16 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.HeatmapInfoOpenedEvent
 import com.automattic.eventhorizon.HeatmapShownEvent
 import com.automattic.eventhorizon.StatsDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -98,6 +104,7 @@ class StatsFragment : BaseFragment() {
                 onRetryClick = { viewModel.loadStats() },
                 launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
                 onShowHeatmap = { eventHorizon.track(HeatmapShownEvent) },
+                onListeningActivityInfoClick = { showListeningActivityInfoDialog() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
         }
@@ -113,6 +120,16 @@ class StatsFragment : BaseFragment() {
         eventHorizon.track(StatsDismissedEvent)
         return super.onBackPressed()
     }
+
+    private fun showListeningActivityInfoDialog() {
+        eventHorizon.track(HeatmapInfoOpenedEvent)
+        ConfirmationDialog()
+            .setTitle(getString(LR.string.profile_stats_listening_activity_info_title))
+            .setSummary(getString(LR.string.profile_stats_listening_activity_info_summary))
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
+            .setOnConfirm {}
+            .show(parentFragmentManager, "listening_activity_info")
+    }
 }
 
 @Composable
@@ -122,6 +139,7 @@ private fun StatsPage(
     onRetryClick: () -> Unit,
     launchReviewDialog: (AppCompatActivity) -> Unit,
     onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
     bottomInset: Dp,
 ) {
     Column {
@@ -130,7 +148,7 @@ private fun StatsPage(
             onNavigationClick = onBackPress,
         )
         when (state) {
-            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap)
+            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap, onListeningActivityInfoClick)
             is StatsViewModel.State.Error -> StatsPageError(onRetryClick)
             is StatsViewModel.State.Loading -> StatsPageLoading()
         }
@@ -175,6 +193,7 @@ private fun StatsPageLoaded(
     bottomInset: Dp,
     launchReviewDialog: (AppCompatActivity) -> Unit,
     onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -204,8 +223,21 @@ private fun StatsPageLoaded(
             item {
                 CallOnce { onShowHeatmap() }
                 val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
-                TextC70(stringResource(LR.string.profile_stats_listening_activity))
-                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextC70(stringResource(LR.string.profile_stats_listening_activity))
+                    IconButton(
+                        onClick = onListeningActivityInfoClick,
+                        // Offset counteracts IconButton's built-in padding so the icon sits close to the label while keeping a 48dp touch target
+                        modifier = Modifier.offset(x = (-8).dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_info),
+                            contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_help),
+                            tint = MaterialTheme.theme.colors.primaryText01,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
                 CalendarHeatMap(
                     start = state.heatmapStart,
                     end = state.heatmapEnd,
@@ -360,6 +392,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
             onRetryClick = { },
             launchReviewDialog = { },
             onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }
@@ -375,6 +408,7 @@ private fun StatsPageErrorPreview(@PreviewParameter(ThemePreviewParameterProvide
             onRetryClick = { },
             launchReviewDialog = { },
             onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }

@@ -1,13 +1,26 @@
+# Automatically posts a Claude code review on every pull request.
+#
+# This workflow is shared between the Android, iOS, and Web Player repos.
+# If you edit it here, please apply the same change to the other two.
+
 name: Claude Code Review
 
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
 
+# Cancel an in-progress review when a newer commit is pushed to the same PR.
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   claude-review:
-    # Only run for PRs from the same repository.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Skip draft pushes and cross-repo/dependabot PRs. Drafts still review on open/reopen/ready.
+    if: >-
+      !(github.event.pull_request.draft == true && github.event.action == 'synchronize') &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
 
     runs-on: ubuntu-latest
     permissions:

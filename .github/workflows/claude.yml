@@ -1,3 +1,8 @@
+# Runs Claude on demand with a @claude mention.
+#
+# This workflow is shared between the Android, iOS, and Web Player repos.
+# If you edit it here, please apply the same change to the other two.
+
 name: Claude Code
 
 on:
@@ -29,7 +34,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Downgrade to `read` if Claude should not push commits/branches
+      contents: read
       pull-requests: write
       issues: write
       actions: read # Required for Claude to read CI results on PRs
