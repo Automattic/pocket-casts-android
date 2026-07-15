@@ -831,7 +831,7 @@ class FingerprintTimingManager @Inject constructor(
             )
 
             try {
-                decodeAndFingerprint(gen, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+                decodeAndFingerprint(gen, isRemoteUrl, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
 
                 // Flush remaining windows
                 val tail = streamer.flush()
@@ -853,6 +853,7 @@ class FingerprintTimingManager @Inject constructor(
 
     private suspend fun decodeAndFingerprint(
         gen: Long,
+        isRemoteUrl: Boolean,
         extractor: MediaExtractor,
         codec: MediaCodec,
         streamer: StreamingWindowedFingerprinter,
@@ -865,6 +866,7 @@ class FingerprintTimingManager @Inject constructor(
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
         val timeoutUs = FingerprintConstants.CODEC_TIMEOUT_US
+        var lastNetworkCheckMs = SystemClock.elapsedRealtime()
         // Default to 16-bit (safest assumption). Updated when the codec
         // reports its actual format via INFO_OUTPUT_FORMAT_CHANGED.
         var isOutputFloat = false
@@ -872,6 +874,16 @@ class FingerprintTimingManager @Inject constructor(
         while (true) {
             currentCoroutineContext().ensureActive()
             if (gen != generation) throw CancellationException("Fingerprint stream superseded")
+
+            val now = SystemClock.elapsedRealtime()
+            if (isRemoteUrl && now - lastNetworkCheckMs >= FingerprintConstants.METERED_RECHECK_INTERVAL_MS) {
+                lastNetworkCheckMs = now
+                val allowed = mutex.withLock { gen != generation || canStreamOnCurrentNetwork() }
+                if (!allowed) {
+                    Timber.d("FingerprintTimingManager: network no longer permits streaming — stopping fingerprint stream")
+                    throw CancellationException("Fingerprint stream stopped on metered network")
+                }
+            }
 
             // Feed input
             if (!inputDone) {
