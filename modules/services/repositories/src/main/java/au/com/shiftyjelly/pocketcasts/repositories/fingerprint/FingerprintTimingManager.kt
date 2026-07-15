@@ -114,6 +114,7 @@ class FingerprintTimingManager @Inject constructor(
     var debugRejectionsSnapshot: List<DebugRejection> = emptyList()
         private set
 
+    @Volatile
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
     private var progressObserverJob: Job? = null
@@ -130,6 +131,7 @@ class FingerprintTimingManager @Inject constructor(
     internal var debugTrackingEnabled = false
 
     // Context for current preparation
+    @Volatile
     private var currentEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
     private var currentReferenceData: ByteArray? = null
@@ -137,6 +139,7 @@ class FingerprintTimingManager @Inject constructor(
     private var currentReferenceDuration: Double = 0.0
     private var currentMatcher: CheckpointMatcher? = null
     private var hasReachedActive = false
+    private var hasTrackedFailure = false
 
     // Analytics context for the current preparation.
     private var preparationStartMs: Long = 0
@@ -144,6 +147,7 @@ class FingerprintTimingManager @Inject constructor(
 
     // When true, decode the whole stream from the start ignoring the playhead lookahead throttle,
     // so the full reference<->playback map is available for chapter alignment.
+    @Volatile
     private var currentEager: Boolean = false
 
     init {
@@ -188,7 +192,7 @@ class FingerprintTimingManager @Inject constructor(
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startPlaybackProgressObserver(episodeUuid)
-            prepareForEpisode(episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
+            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
         }
     }
 
@@ -233,6 +237,8 @@ class FingerprintTimingManager @Inject constructor(
 
     private fun markFailed(error: Throwable, stage: String) {
         _stateFlow.value = State.Failed(error)
+        if (hasTrackedFailure) return
+        hasTrackedFailure = true
         eventHorizon.track(
             SyncedTranscriptsPreparationFailedEvent(
                 errorCode = 0,
@@ -349,6 +355,7 @@ class FingerprintTimingManager @Inject constructor(
         currentMatcher = null
         activeEpisodeUuid = null
         hasReachedActive = false
+        hasTrackedFailure = false
         preparationStartMs = 0
         currentIsStreaming = false
         currentEager = false
@@ -368,6 +375,7 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private suspend fun prepareForEpisode(
+        gen: Long,
         episodeUuid: String,
         podcastUuid: String,
         audioSource: String?,
@@ -393,29 +401,31 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        currentEpisodeUuid = episodeUuid
-        activeEpisodeUuid = episodeUuid
-        currentAudioFilePath = audioSource
-        currentIsStreaming = !isDownloaded
-        currentEager = shouldRunEagerPass(episodeUuid, isDownloaded)
-        preparationStartMs = SystemClock.elapsedRealtime()
+        val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
+        mutex.withLock {
+            if (gen != generation) return
+            currentEpisodeUuid = episodeUuid
+            activeEpisodeUuid = episodeUuid
+            currentAudioFilePath = audioSource
+            currentIsStreaming = !isDownloaded
+            currentEager = eager
+            preparationStartMs = SystemClock.elapsedRealtime()
+        }
         eventHorizon.track(
             SyncedTranscriptsPreparationStartedEvent(
                 episodeDurationSeconds = durationSec.toLong(),
-                isStreaming = currentIsStreaming,
+                isStreaming = !isDownloaded,
                 episodeUuid = episodeUuid,
             ),
         )
 
         // Try loading cached reference from disk (only for downloaded episodes)
-        if (isDownloaded) {
-            val referenceData = referenceRetriever.loadReferenceData(audioSource)
-            if (referenceData != null) {
-                val reference = ReferenceFingerprint.decode(referenceData)
-                if (reference != null) {
-                    configureForReference(reference, referenceData, audioSource, episodeUuid)
-                    return
-                }
+        val cachedData = if (isDownloaded) referenceRetriever.loadReferenceData(audioSource) else null
+        if (cachedData != null) {
+            val reference = ReferenceFingerprint.decode(cachedData)
+            if (reference != null) {
+                configureForReference(gen, reference, cachedData, audioSource, episodeUuid)
+                return
             }
         }
 
@@ -425,16 +435,17 @@ class FingerprintTimingManager @Inject constructor(
 
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
         val referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        if (gen != generation) return
 
         if (referenceData == null) {
-            markUnavailable(reason = "no_reference", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
+            markUnavailable(reason = "no_reference", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no reference available for $episodeUuid")
             return
         }
 
         val reference = ReferenceFingerprint.decode(referenceData)
         if (reference == null) {
-            markUnavailable(reason = "reference_decode_failed", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
+            markUnavailable(reason = "reference_decode_failed", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: failed to decode reference for $episodeUuid")
             return
         }
@@ -442,10 +453,11 @@ class FingerprintTimingManager @Inject constructor(
         if (isDownloaded) {
             referenceRetriever.saveReferenceData(referenceData, audioSource)
         }
-        configureForReference(reference, referenceData, audioSource, episodeUuid)
+        configureForReference(gen, reference, referenceData, audioSource, episodeUuid)
     }
 
     private suspend fun configureForReference(
+        gen: Long,
         reference: ReferenceFingerprint,
         referenceData: ByteArray,
         audioFilePath: String,
@@ -457,13 +469,6 @@ class FingerprintTimingManager @Inject constructor(
             Timber.d("FingerprintTimingManager: no usable checkpoints for $episodeUuid")
             return
         }
-
-        val refPath = FingerprintReferenceRetriever.referencePath(audioFilePath)
-        currentReferenceData = referenceData
-        currentReferenceFilePath = refPath
-        currentReferenceDuration = reference.totalDuration
-
-        _stateFlow.value = State.Preparing
 
         Timber.d(
             "FingerprintTimingManager: reference for $episodeUuid — " +
@@ -480,28 +485,40 @@ class FingerprintTimingManager @Inject constructor(
                 reference.checkpointDurationSeconds,
             )
         }
-        currentMatcher = matcher
 
         // Try loading mapping cache (only for local files)
+        val refPath = FingerprintReferenceRetriever.referencePath(audioFilePath)
         val isLocalFile = !audioFilePath.startsWith("http://") && !audioFilePath.startsWith("https://")
         val cached = if (isLocalFile) FingerprintMappingCache.load(audioFilePath, refPath, referenceData) else null
-        if (cached != null) {
-            mutex.withLock {
+
+        mutex.withLock {
+            if (gen != generation) {
+                matcher.close()
+                return
+            }
+            currentReferenceData = referenceData
+            currentReferenceFilePath = refPath
+            currentReferenceDuration = reference.totalDuration
+            currentMatcher = matcher
+            _stateFlow.value = State.Preparing
+            if (cached != null) {
                 mappingPlaybackToReference = cached.entries.toMutableList()
                 mappingReferenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
                 publishSnapshot()
                 filterLastTrusted = cached.entries.lastOrNull()
+                markActive(cached.entries.size)
+                Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid (${cached.entries.size} entries)")
+                return
             }
-            val coverage = cached.entries.size
-            markActive(coverage)
-            Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid ($coverage entries)")
-            return
         }
 
         // Start streaming fingerprint generation. An eager pass maps the whole timeline from the start;
         // otherwise we follow the playhead.
         val startPosition = if (currentEager) 0.0 else playbackManager.playbackStateFlow.first().positionMs / 1000.0
-        startStream(audioFilePath, matcher, episodeUuid, startPosition = startPosition)
+        mutex.withLock {
+            if (gen != generation) return
+            startStream(audioFilePath, matcher, episodeUuid, startPosition = startPosition)
+        }
     }
 
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
@@ -563,19 +580,24 @@ class FingerprintTimingManager @Inject constructor(
             playbackTimeSec <= last.playbackTime + margin
     }
 
+    /** Must be called under [mutex]. */
     private fun startStream(audioFilePath: String, matcher: CheckpointMatcher, episodeUuid: String, startPosition: Double) {
         generationJob?.cancel()
         lastStreamStartTimeMs = System.currentTimeMillis()
         val aligned = alignToWindowGrid(startPosition)
+        // Superseded decode jobs re-check this token before touching shared state.
+        val gen = generation
         generationJob = scope.launch(decodeDispatcher) {
             try {
-                streamFingerprint(audioFilePath, matcher, episodeUuid, startingAt = aligned)
-                persistMappingCacheIfFull()
+                streamFingerprint(gen, audioFilePath, matcher, episodeUuid, startingAt = aligned)
+                if (gen == generation) {
+                    persistMappingCacheIfFull()
+                }
             } catch (_: CancellationException) {
                 Timber.d("FingerprintTimingManager: streaming fingerprint cancelled")
             } catch (e: Exception) {
                 Timber.w(e, "FingerprintTimingManager: streaming fingerprint failed")
-                if (state !is State.Active) {
+                if (gen == generation && state !is State.Active) {
                     markFailed(e, stage = "fingerprint_stream")
                 }
             }
@@ -583,6 +605,7 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private suspend fun streamFingerprint(
+        gen: Long,
         audioFilePath: String,
         matcher: CheckpointMatcher,
         episodeUuid: String,
@@ -591,6 +614,7 @@ class FingerprintTimingManager @Inject constructor(
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         if (!isRemoteUrl && !File(audioFilePath).exists()) {
             Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
+            if (gen != generation) return
             markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
             return
         }
@@ -601,6 +625,7 @@ class FingerprintTimingManager @Inject constructor(
         } catch (e: Exception) {
             extractor.release()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
+            if (gen != generation) return
             markFailed(e, stage = "audio_open")
             return
         }
@@ -611,8 +636,9 @@ class FingerprintTimingManager @Inject constructor(
         }
         if (audioTrackIndex == null) {
             extractor.release()
-            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
             Timber.w("FingerprintTimingManager: no audio track found")
+            if (gen != generation) return
+            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
             return
         }
 
@@ -643,12 +669,13 @@ class FingerprintTimingManager @Inject constructor(
             )
 
             try {
-                decodeAndFingerprint(extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+                decodeAndFingerprint(gen, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
 
                 // Flush remaining windows
                 val tail = streamer.flush()
                 if (tail.isNotEmpty()) {
                     mutex.withLock {
+                        if (gen != generation) throw CancellationException("Fingerprint stream superseded")
                         processMatches(tail, matcher, startingAt)
                     }
                 }
@@ -663,6 +690,7 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     private suspend fun decodeAndFingerprint(
+        gen: Long,
         extractor: MediaExtractor,
         codec: MediaCodec,
         streamer: StreamingWindowedFingerprinter,
@@ -681,6 +709,7 @@ class FingerprintTimingManager @Inject constructor(
 
         while (true) {
             currentCoroutineContext().ensureActive()
+            if (gen != generation) throw CancellationException("Fingerprint stream superseded")
 
             // Feed input
             if (!inputDone) {
@@ -722,6 +751,7 @@ class FingerprintTimingManager @Inject constructor(
                             val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
                             if (windows.isNotEmpty()) {
                                 mutex.withLock {
+                                    if (gen != generation) throw CancellationException("Fingerprint stream superseded")
                                     processMatches(windows, matcher, startOffset)
                                 }
                             }
