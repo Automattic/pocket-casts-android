@@ -186,20 +186,20 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
-    fun `decideOnProgress jump outside mapped range restarts`() {
+    fun `decideOnProgress jump outside mapped range schedules debounced restart`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0)
-        assertEquals(ProgressDecision.RestartOutsideRange, decision)
+        assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
     }
 
     @Test
-    fun `decideOnProgress jump into mapping gap restarts`() {
+    fun `decideOnProgress jump into mapping gap schedules debounced restart`() {
         val decision = decideOnProgress(
             positionSec = 300.0,
             lastPositionSec = 50.0,
             mappedRunEndSec = null,
             hasAnyMapping = true,
         )
-        assertEquals(ProgressDecision.RestartOutsideRange, decision)
+        assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
     }
 
     @Test
@@ -210,6 +210,17 @@ class FingerprintTimingManagerTest {
             hasAnyMapping = true,
             isDecodeActive = true,
             isCoveredByActiveDecode = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress pending restart suppresses outside range restart`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            hasPendingRestart = true,
         )
         assertEquals(ProgressDecision.None, decision)
     }
@@ -369,6 +380,7 @@ class FingerprintTimingManagerTest {
         hasAnyMapping: Boolean = mappedRunEndSec != null,
         isDecodeActive: Boolean = false,
         isCoveredByActiveDecode: Boolean = false,
+        hasPendingRestart: Boolean = false,
         hasStreamStarted: Boolean = hasAnyMapping || isDecodeActive,
         msSinceStreamStart: Long = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
     ): ProgressDecision = FingerprintTimingManager.decideOnProgress(
@@ -379,6 +391,7 @@ class FingerprintTimingManagerTest {
         hasAnyMapping = hasAnyMapping,
         isDecodeActive = isDecodeActive,
         isCoveredByActiveDecode = isCoveredByActiveDecode,
+        hasPendingRestart = hasPendingRestart,
         hasStreamStarted = hasStreamStarted,
         msSinceStreamStart = msSinceStreamStart,
     )

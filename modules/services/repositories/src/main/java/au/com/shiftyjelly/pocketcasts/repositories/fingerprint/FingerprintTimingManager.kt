@@ -118,6 +118,7 @@ class FingerprintTimingManager @Inject constructor(
     private var lastProgressPositionMs = -1
     private var generationJob: Job? = null
     private var progressObserverJob: Job? = null
+    private var pendingRestartJob: Job? = null
     private var lastStreamStartTimeMs = 0L
 
     @Volatile
@@ -344,6 +345,8 @@ class FingerprintTimingManager @Inject constructor(
         generationJob = null
         progressObserverJob?.cancel()
         progressObserverJob = null
+        pendingRestartJob?.cancel()
+        pendingRestartJob = null
         mappingPlaybackToReference.clear()
         mappingReferenceToPlayback.clear()
         debugRejections.clear()
@@ -551,6 +554,7 @@ class FingerprintTimingManager @Inject constructor(
             hasAnyMapping = mappingPlaybackToReference.isNotEmpty(),
             isDecodeActive = generationJob?.isActive == true,
             isCoveredByActiveDecode = isCoveredByActiveDecode(positionSec),
+            hasPendingRestart = pendingRestartJob?.isActive == true,
             hasStreamStarted = lastStreamStartTimeMs != 0L,
             msSinceStreamStart = SystemClock.elapsedRealtime() - lastStreamStartTimeMs,
         )
@@ -558,8 +562,30 @@ class FingerprintTimingManager @Inject constructor(
         when (decision) {
             ProgressDecision.None -> Unit
 
+            ProgressDecision.ScheduleDebouncedRestart -> {
+                Timber.d("FingerprintTimingManager: playback jumped — scheduling restart")
+                schedulePendingRestart()
+            }
+
             ProgressDecision.RestartOutsideRange -> {
                 Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
+                restartFromPlayhead()
+            }
+        }
+    }
+
+    /** Must be called under [mutex]. */
+    private fun schedulePendingRestart() {
+        pendingRestartJob?.cancel()
+        val gen = generation
+        pendingRestartJob = scope.launch {
+            delay(FingerprintConstants.RESTART_DEBOUNCE_MS)
+            playbackManager.playbackStateFlow.first { it.isPlaying }
+            mutex.withLock {
+                if (gen != generation) return@withLock
+                val settledSec = lastProgressPositionMs / 1000.0
+                if (mappedRunEnd(settledSec, mappingPlaybackToReference) != null || isCoveredByActiveDecode(settledSec)) return@withLock
+                Timber.d("FingerprintTimingManager: playback jumped — restarting")
                 restartFromPlayhead()
             }
         }
@@ -977,6 +1003,7 @@ class FingerprintTimingManager @Inject constructor(
 
     internal sealed interface ProgressDecision {
         data object None : ProgressDecision
+        data object ScheduleDebouncedRestart : ProgressDecision
         data object RestartOutsideRange : ProgressDecision
     }
 
@@ -1000,6 +1027,7 @@ class FingerprintTimingManager @Inject constructor(
             hasAnyMapping: Boolean,
             isDecodeActive: Boolean,
             isCoveredByActiveDecode: Boolean,
+            hasPendingRestart: Boolean,
             hasStreamStarted: Boolean,
             msSinceStreamStart: Long,
         ): ProgressDecision {
@@ -1008,8 +1036,9 @@ class FingerprintTimingManager @Inject constructor(
             if (isJump) {
                 if (mappedRunEndSec != null) return ProgressDecision.None
                 if (isCoveredByActiveDecode) return ProgressDecision.None
-                return ProgressDecision.RestartOutsideRange
+                return ProgressDecision.ScheduleDebouncedRestart
             }
+            if (hasPendingRestart) return ProgressDecision.None
             if (mappedRunEndSec != null) return ProgressDecision.None
             val canRecoverWithoutMapping = !isDecodeActive && hasStreamStarted
             if (!isCoveredByActiveDecode && (hasAnyMapping || canRecoverWithoutMapping) &&

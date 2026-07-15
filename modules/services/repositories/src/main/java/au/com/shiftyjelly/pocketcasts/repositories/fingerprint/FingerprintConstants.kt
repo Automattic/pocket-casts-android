@@ -10,6 +10,9 @@ object FingerprintConstants {
     /** Minimum time between stream restarts while playback sits outside the mapped range. */
     const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
 
+    /** Position must be stable for this long before a seek restarts the stream; coalesces rapid multi-tap skips. */
+    const val RESTART_DEBOUNCE_MS = 1_500L
+
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
