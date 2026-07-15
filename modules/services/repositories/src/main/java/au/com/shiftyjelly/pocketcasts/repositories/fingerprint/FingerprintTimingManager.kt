@@ -141,6 +141,7 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var currentEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
+    private var currentDurationSec: Double = 0.0
     private var currentReferenceData: ByteArray? = null
     private var currentReferenceFilePath: String? = null
     private var currentReferenceDuration: Double = 0.0
@@ -360,6 +361,7 @@ class FingerprintTimingManager @Inject constructor(
         filterCandidatePool.clear()
         currentEpisodeUuid = null
         currentAudioFilePath = null
+        currentDurationSec = 0.0
         currentReferenceData = null
         currentReferenceFilePath = null
         currentReferenceDuration = 0.0
@@ -419,6 +421,7 @@ class FingerprintTimingManager @Inject constructor(
             currentEpisodeUuid = episodeUuid
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
+            currentDurationSec = durationSec
             currentIsStreaming = !isDownloaded
             currentEager = eager
             preparationStartMs = SystemClock.elapsedRealtime()
@@ -554,6 +557,9 @@ class FingerprintTimingManager @Inject constructor(
             hasAnyMapping = mappingPlaybackToReference.isNotEmpty(),
             isDecodeActive = generationJob?.isActive == true,
             isCoveredByActiveDecode = isCoveredByActiveDecode(positionSec),
+            isRunEndCoveredByActiveDecode = mappedRunEndSec != null && isCoveredByActiveDecode(mappedRunEndSec),
+            isRunEndNearEpisodeEnd = mappedRunEndSec != null &&
+                mappedRunEndSec >= currentDurationSec - FingerprintConstants.PLAYBACK_RANGE_MARGIN_SECONDS,
             hasPendingRestart = pendingRestartJob?.isActive == true,
             hasStreamStarted = lastStreamStartTimeMs != 0L,
             msSinceStreamStart = SystemClock.elapsedRealtime() - lastStreamStartTimeMs,
@@ -570,6 +576,11 @@ class FingerprintTimingManager @Inject constructor(
             ProgressDecision.RestartOutsideRange -> {
                 Timber.d("FingerprintTimingManager: playback outside mapped range — restarting")
                 restartFromPlayhead()
+            }
+
+            is ProgressDecision.RestartFromRunEnd -> {
+                Timber.d("FingerprintTimingManager: mapping about to run out — resuming decode from run end")
+                restartFromRunEnd(decision.runEndSec)
             }
         }
     }
@@ -599,6 +610,14 @@ class FingerprintTimingManager @Inject constructor(
         filterLastTrusted = null
         filterCandidatePool.clear()
         startStream(audioPath, matcher, uuid, startPosition = lastProgressPositionMs / 1000.0)
+    }
+
+    /** Must be called under [mutex]. Continues an existing run, so the drift filter's trusted anchor is kept. */
+    private fun restartFromRunEnd(runEndSec: Double) {
+        val matcher = currentMatcher ?: return
+        val audioPath = currentAudioFilePath ?: return
+        val uuid = currentEpisodeUuid ?: return
+        startStream(audioPath, matcher, uuid, startPosition = runEndSec)
     }
 
     private fun isCoveredByActiveDecode(positionSec: Double): Boolean {
@@ -1005,6 +1024,7 @@ class FingerprintTimingManager @Inject constructor(
         data object None : ProgressDecision
         data object ScheduleDebouncedRestart : ProgressDecision
         data object RestartOutsideRange : ProgressDecision
+        data class RestartFromRunEnd(val runEndSec: Double) : ProgressDecision
     }
 
     companion object {
@@ -1027,6 +1047,8 @@ class FingerprintTimingManager @Inject constructor(
             hasAnyMapping: Boolean,
             isDecodeActive: Boolean,
             isCoveredByActiveDecode: Boolean,
+            isRunEndCoveredByActiveDecode: Boolean,
+            isRunEndNearEpisodeEnd: Boolean,
             hasPendingRestart: Boolean,
             hasStreamStarted: Boolean,
             msSinceStreamStart: Long,
@@ -1039,7 +1061,15 @@ class FingerprintTimingManager @Inject constructor(
                 return ProgressDecision.ScheduleDebouncedRestart
             }
             if (hasPendingRestart) return ProgressDecision.None
-            if (mappedRunEndSec != null) return ProgressDecision.None
+            if (mappedRunEndSec != null) {
+                val approachingRunEnd = mappedRunEndSec - positionSec < FingerprintConstants.LOOKAHEAD_SECONDS
+                if (approachingRunEnd && !isRunEndCoveredByActiveDecode && !isRunEndNearEpisodeEnd &&
+                    msSinceStreamStart >= FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS
+                ) {
+                    return ProgressDecision.RestartFromRunEnd(mappedRunEndSec)
+                }
+                return ProgressDecision.None
+            }
             val canRecoverWithoutMapping = !isDecodeActive && hasStreamStarted
             if (!isCoveredByActiveDecode && (hasAnyMapping || canRecoverWithoutMapping) &&
                 msSinceStreamStart >= FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS

@@ -274,6 +274,72 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `decideOnProgress resumes from run end when the mapping is about to run out`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+        )
+        assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume while the run end is far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 100.0 + FingerprintConstants.LOOKAHEAD_SECONDS,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume when a decode already covers the run end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isRunEndCoveredByActiveDecode = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume when the run end is near the episode end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isRunEndNearEpisodeEnd = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress run end resume respects bootstrap cooldown`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS - 1,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress relocates a decode replaying mapped audio to the run end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isRunEndCoveredByActiveDecode = false,
+        )
+        assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
+    }
+
+    @Test
     fun `decideOnProgress empty mapping does not restart before the stream ever ran`() {
         val decision = decideOnProgress(
             positionSec = 100.0,
@@ -380,6 +446,8 @@ class FingerprintTimingManagerTest {
         hasAnyMapping: Boolean = mappedRunEndSec != null,
         isDecodeActive: Boolean = false,
         isCoveredByActiveDecode: Boolean = false,
+        isRunEndCoveredByActiveDecode: Boolean = false,
+        isRunEndNearEpisodeEnd: Boolean = false,
         hasPendingRestart: Boolean = false,
         hasStreamStarted: Boolean = hasAnyMapping || isDecodeActive,
         msSinceStreamStart: Long = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
@@ -391,6 +459,8 @@ class FingerprintTimingManagerTest {
         hasAnyMapping = hasAnyMapping,
         isDecodeActive = isDecodeActive,
         isCoveredByActiveDecode = isCoveredByActiveDecode,
+        isRunEndCoveredByActiveDecode = isRunEndCoveredByActiveDecode,
+        isRunEndNearEpisodeEnd = isRunEndNearEpisodeEnd,
         hasPendingRestart = hasPendingRestart,
         hasStreamStarted = hasStreamStarted,
         msSinceStreamStart = msSinceStreamStart,
