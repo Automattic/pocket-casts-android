@@ -483,6 +483,12 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        if (Util.getAppPlatform(context) != AppPlatform.Phone) {
+            markUnavailable(reason = "unsupported_platform", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: unsupported platform")
+            return
+        }
+
         if (durationSec <= 0) {
             markUnavailable(reason = "invalid_duration", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: invalid duration for $episodeUuid")
