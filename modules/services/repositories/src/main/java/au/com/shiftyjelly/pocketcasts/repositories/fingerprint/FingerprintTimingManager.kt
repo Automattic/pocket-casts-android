@@ -946,7 +946,8 @@ class FingerprintTimingManager @Inject constructor(
                         // Eager passes decode as fast as possible; throttled passes stay near the playhead.
                         if (!currentEager) {
                             val lastKnownPositionMs = lastProgressPositionMs
-                            if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                            val playheadSec = if (lastKnownPositionMs >= 0) lastKnownPositionMs / 1000.0 else startOffset
+                            if (decodedSeconds - playheadSec > FingerprintConstants.LOOKAHEAD_SECONDS) {
                                 delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
                             }
                         }
