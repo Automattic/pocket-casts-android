@@ -532,8 +532,12 @@ class FingerprintTimingManager @Inject constructor(
             ),
         )
 
-        // Try loading cached reference from disk (only for downloaded episodes)
-        val cachedData = if (isDownloaded) referenceRetriever.loadReferenceData(audioSource) else null
+        // Try loading cached reference from disk
+        val cachedData = if (isDownloaded) {
+            referenceRetriever.loadReferenceData(audioSource)
+        } else {
+            referenceRetriever.loadCachedReference(episodeUuid)
+        }
         if (cachedData != null) {
             val reference = ReferenceFingerprint.decode(cachedData)
             if (reference != null) {
@@ -565,6 +569,8 @@ class FingerprintTimingManager @Inject constructor(
 
         if (isDownloaded) {
             referenceRetriever.saveReferenceData(referenceData, audioSource)
+        } else {
+            referenceRetriever.saveCachedReference(episodeUuid, referenceData)
         }
         configureForReference(gen, reference, referenceData, audioSource, episodeUuid)
     }
