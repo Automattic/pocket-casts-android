@@ -52,9 +52,10 @@ class ChapterManagerImpl @Inject constructor(
         val rawChapters = combine(
             episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
             chapterDao.observeChaptersForEpisode(episodeUuid),
-        ) { episode, dbChapters ->
+            settings.showGeneratedChapters.flow,
+        ) { episode, dbChapters, showGeneratedChapters ->
             // Already-saved generated chapters must stay hidden while the feature is off or the user opts out.
-            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) && settings.showGeneratedChapters.value) {
+            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) && showGeneratedChapters) {
                 dbChapters
             } else {
                 dbChapters.filterNot { it.origin == ChapterOrigin.Generated }

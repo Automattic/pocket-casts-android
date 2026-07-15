@@ -81,8 +81,6 @@ class ChaptersViewModelTest {
         giftDays = 0,
     )
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
-    private val showGeneratedChaptersFlow = MutableStateFlow(true)
-    private val showGeneratedChaptersSetting = mock<UserSetting<Boolean>>()
 
     private val eventSink = TestEventSink()
 
@@ -96,8 +94,6 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<Subscription?>>()
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
-        whenever(showGeneratedChaptersSetting.flow).thenReturn(showGeneratedChaptersFlow)
-        whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChaptersSetting)
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -118,22 +114,18 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `hiding generated chapters removes them and undo restores them`() = runTest {
+    fun `generated chapters appearing and disappearing are reflected in the ui state`() = runTest {
         val embedded = Chapter("Embedded", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.PodcastIndex)
         val generated = Chapter("Generated", 101.milliseconds, 200.milliseconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated)
-        whenever(chapterManager.observerChaptersForEpisode("id")).thenAnswer {
-            MutableStateFlow(
-                if (showGeneratedChaptersFlow.value) Chapters(listOf(embedded, generated)) else Chapters(listOf(embedded)),
-            )
-        }
+        chaptersFlow.value = Chapters(listOf(embedded, generated))
 
         chaptersViewModel.uiState.test {
             assertTrue(awaitItem().hasGeneratedChapters)
 
-            showGeneratedChaptersFlow.value = false
+            chaptersFlow.value = Chapters(listOf(embedded))
             assertFalse(awaitItem().hasGeneratedChapters)
 
-            showGeneratedChaptersFlow.value = true
+            chaptersFlow.value = Chapters(listOf(embedded, generated))
             assertTrue(awaitItem().hasGeneratedChapters)
         }
     }

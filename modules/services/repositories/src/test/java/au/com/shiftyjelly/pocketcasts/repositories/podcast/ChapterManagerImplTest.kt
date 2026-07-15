@@ -36,8 +36,9 @@ class ChapterManagerImplTest {
 
     private val chapterDao = mock<ChapterDao>()
     private val episodeManager = mock<EpisodeManager>()
+    private val showGeneratedChaptersFlow = MutableStateFlow(true)
     private val showGeneratedChaptersSetting = mock<UserSetting<Boolean>> {
-        on { value } doReturn true
+        on { flow } doReturn showGeneratedChaptersFlow
     }
     private val settings = mock<Settings> {
         on { showGeneratedChapters } doReturn showGeneratedChaptersSetting
@@ -62,7 +63,7 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             assertEquals(Chapters(emptyList()), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -95,7 +96,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -117,7 +118,7 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             assertEquals(ChapterOrigin.PodcastIndex, awaitItem().origin)
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -180,7 +181,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -213,7 +214,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -246,7 +247,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -279,7 +280,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -312,7 +313,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expected)), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -390,7 +391,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -453,7 +454,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -501,7 +502,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -584,7 +585,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -632,7 +633,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -709,7 +710,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(expected), awaitItem())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -813,7 +814,7 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val chapters = awaitItem()
             assertEquals(listOf("Embedded"), chapters.map { it.title })
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -832,27 +833,49 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val chapters = awaitItem()
             assertEquals(listOf("Embedded", "Generated"), chapters.map { it.title })
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `observe hides generated chapters when feature is on but the setting is off`() = runBlocking {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        whenever(showGeneratedChaptersSetting.value).thenReturn(false)
+        showGeneratedChaptersFlow.value = false
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
-        val dbChapters = listOf(
-            DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
-            DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),
-        )
 
-        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
-            val chapters = awaitItem()
-            assertEquals(listOf("Embedded"), chapters.map { it.title })
-            awaitComplete()
+            assertEquals(listOf("Embedded"), awaitItem().map { it.title })
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `observe re-emits when the generated chapters setting is toggled`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
+
+            showGeneratedChaptersFlow.value = false
+            assertEquals(listOf("Embedded"), awaitItem().map { it.title })
+
+            showGeneratedChaptersFlow.value = true
+            assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private val generatedChaptersFixture = listOf(
+        DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
+        DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),
+    )
 }

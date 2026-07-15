@@ -70,11 +70,10 @@ class ChaptersViewModel @AssistedInject constructor(
                 .flatMapLatest(::createUiStateFlow)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun createUiStateFlow(episodeId: String) = combine(
         playbackManager.playbackStateFlow,
         episodeManager.findEpisodeByUuidFlow(episodeId),
-        settings.showGeneratedChapters.flow.flatMapLatest { chapterManager.observerChaptersForEpisode(episodeId) },
+        chapterManager.observerChaptersForEpisode(episodeId),
         settings.cachedSubscription.flow,
         isTogglingChapters,
         ::createUiState,
