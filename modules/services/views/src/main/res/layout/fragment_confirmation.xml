@@ -19,8 +19,10 @@
         android:id="@+id/imgIcon"
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginTop="8dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
     <TextView
         android:id="@+id/lblTitle"
         android:layout_width="wrap_content"
@@ -40,7 +42,7 @@
         android:gravity="center" />
     <View
         android:layout_width="match_parent"
-        android:layout_height="16dp" />
+        android:layout_height="24dp" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSecondary"
         android:layout_width="match_parent"
