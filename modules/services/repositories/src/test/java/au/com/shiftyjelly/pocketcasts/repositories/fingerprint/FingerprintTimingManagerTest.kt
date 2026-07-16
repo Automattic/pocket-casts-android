@@ -304,6 +304,18 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `decideOnProgress jump within run keeps decode when the run end is not far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isStreaming = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
     fun `decideOnProgress jump outside mapped range schedules debounced restart`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0)
         assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
