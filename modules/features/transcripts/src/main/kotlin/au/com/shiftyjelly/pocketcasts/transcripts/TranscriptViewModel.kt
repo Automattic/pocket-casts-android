@@ -418,7 +418,7 @@ class TranscriptViewModel @AssistedInject constructor(
         FingerprintTimingManager.State.Preparing -> "preparing"
         is FingerprintTimingManager.State.Active -> "active"
         is FingerprintTimingManager.State.Failed -> "failed"
-        FingerprintTimingManager.State.Unavailable -> "unavailable"
+        is FingerprintTimingManager.State.Unavailable -> "unavailable"
     }
 
     private suspend fun updateEpisodeMetadata(episodeUuid: String) {
