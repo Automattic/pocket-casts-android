@@ -418,9 +418,16 @@ class MainActivity :
         }
     }
 
+    private var onNotificationPermissionGranted: () -> Unit = {}
+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) {}
+    ) { granted ->
+        if (granted) {
+            onNotificationPermissionGranted()
+        }
+        onNotificationPermissionGranted = {}
+    }
 
     private val deepLinkFactory = DeepLinkFactory()
 
@@ -432,6 +439,9 @@ class MainActivity :
                     onPermissionGranted()
                 }
 
+                // The user denied notifications, so onPermissionGranted is intentionally dropped.
+                // Callers relying on a notification, such as the data warning, stay halted and the
+                // snackbar points the user at the blocked notification setting.
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
@@ -453,11 +463,15 @@ class MainActivity :
                 }
 
                 else -> {
+                    onNotificationPermissionGranted = onPermissionGranted
                     notificationPermissionLauncher.launch(
                         Manifest.permission.POST_NOTIFICATIONS,
                     )
                 }
             }
+        } else {
+            // No runtime permission is needed to post notifications on older versions
+            onPermissionGranted()
         }
     }
 

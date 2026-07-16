@@ -126,6 +126,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -138,6 +139,7 @@ import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -180,6 +182,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private val CAR_CONNECTION_TIMEOUT: Duration = 1000.milliseconds
         private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
     }
 
@@ -1365,7 +1368,8 @@ open class PlaybackManager @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Downloaded file missing for ${episode.uuid}, clearing download status and retrying via stream")
             downloadQueue.cancel(episode.uuid, SourceView.UNKNOWN).join()
             episodeManager.clearPlaybackErrorBlocking(episode)
-            playNow(episode = episode, forceStream = true, sourceView = SourceView.UNKNOWN)
+            // Don't force the stream so the retry still respects the warn before using data setting
+            playNow(episode = episode, sourceView = SourceView.UNKNOWN)
             return
         }
 
@@ -2049,7 +2053,9 @@ open class PlaybackManager @Inject constructor(
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
-                play
+                play &&
+                // Don't block playback while driving as the warning is only shown on the phone
+                withTimeoutOrNull(CAR_CONNECTION_TIMEOUT) { Util.isAndroidAutoConnectedFlow(application).firstOrNull() } != true
             ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
@@ -2065,6 +2071,8 @@ open class PlaybackManager @Inject constructor(
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)
                 }
+                // Wait for the user to confirm streaming from the notification before playing
+                return
             } else {
                 val episodeObservable = when (episode) {
                     is PodcastEpisode -> {
