@@ -1549,6 +1549,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
+    <string name="settings_generated_chapters">Generated chapters</string>
+    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>

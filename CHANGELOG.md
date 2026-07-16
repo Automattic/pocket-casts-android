@@ -5,6 +5,8 @@
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 *   Bug Fixes
     *   Fix episodes streaming over mobile data without the 'Warn before using data' prompt when Up Next auto-advances or a downloaded file is missing
         ([#5533](https://github.com/Automattic/pocket-casts-android/pull/5533))
