@@ -6,9 +6,9 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
@@ -209,7 +209,7 @@ class FingerprintTimingManager @Inject constructor(
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
         // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
         val sharedCacheKey = episodeUuid.takeIf {
-            !episode.isDownloaded && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
         }
 
         scope.launch {
@@ -811,11 +811,12 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        val cacheKey = currentSharedCacheKey?.takeIf { isRemoteUrl }
+        val factory = dataSourceFactory.get()
+        // Only follow the player's on-disk cache when it actually exists; otherwise read the URL directly.
+        val cacheKey = currentSharedCacheKey?.takeIf { isRemoteUrl && factory.isCacheAvailable }
         val extractor = MediaExtractor()
         val cacheSource = if (cacheKey != null) {
-            val factory = dataSourceFactory.get()
-            CacheBackedMediaDataSource(factory.blockingCacheFactory, Uri.parse(audioFilePath), cacheKey) { position, length ->
+            CacheBackedMediaDataSource(factory.blockingCacheFactory, audioFilePath.toUri(), cacheKey, isActive = { gen == generation }) { position, length ->
                 factory.cachedLengthAt(cacheKey, position, length)
             }
         } else {

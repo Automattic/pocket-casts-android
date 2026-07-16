@@ -13,6 +13,7 @@ internal class CacheBackedMediaDataSource(
     private val dataSourceFactory: DataSource.Factory,
     private val uri: Uri,
     private val cacheKey: String,
+    private val isActive: () -> Boolean = { true },
     private val cachedLengthAt: (position: Long, length: Long) -> Long,
 ) : MediaDataSource() {
     private var dataSource: DataSource? = null
@@ -29,7 +30,7 @@ internal class CacheBackedMediaDataSource(
     override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int {
         if (size == 0) return 0
         var waited = 0L
-        while (cachedLengthAt(position, size.toLong()) <= 0L && waited < FOLLOW_TIMEOUT_MS) {
+        while (cachedLengthAt(position, size.toLong()) <= 0L && waited < FOLLOW_TIMEOUT_MS && isActive()) {
             Thread.sleep(POLL_MS)
             waited += POLL_MS
         }
