@@ -12,7 +12,10 @@ import kotlin.time.Duration.Companion.microseconds
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
-class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) : AudioProcessorChain {
+class ShiftyAudioProcessorChain(
+    private val customAudio: ShiftyCustomAudio,
+    fingerprintTapProcessor: AudioProcessor? = null,
+) : AudioProcessorChain {
     private val lowProcessor = ShiftyTrimSilenceProcessor(
         416000.microseconds,
         291000.microseconds,
@@ -34,7 +37,10 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) : Au
     )
     private val sonicAudioProcessor = SonicAudioProcessor()
 
-    private val audioProcessors = arrayOf(lowProcessor, mediumProcessor, highProcessor, sonicAudioProcessor)
+    private val trimProcessors = arrayOf(lowProcessor, mediumProcessor, highProcessor)
+    private val audioProcessors = listOfNotNull(fingerprintTapProcessor).toTypedArray() +
+        trimProcessors +
+        arrayOf<AudioProcessor>(sonicAudioProcessor)
     private var trimMode = TrimMode.OFF
     override fun getAudioProcessors(): Array<AudioProcessor> {
         return audioProcessors
@@ -53,8 +59,7 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) : Au
             (audioProcessor as? ShiftyTrimSilenceProcessor)?.enabled = false
         }
         if (trimMode != TrimMode.OFF) {
-            val index = trimMode.ordinal - 1
-            (audioProcessors[index] as ShiftyTrimSilenceProcessor).enabled = true
+            trimProcessors[trimMode.ordinal - 1].enabled = true
         }
         return trimMode != TrimMode.OFF
     }

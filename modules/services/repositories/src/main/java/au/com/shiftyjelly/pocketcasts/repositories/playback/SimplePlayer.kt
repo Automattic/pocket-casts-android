@@ -22,9 +22,13 @@ import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListene
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintPcmTap
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +41,7 @@ class SimplePlayer(
     private val playbackStatsCollector: PlaybackStatsCollector,
     private val context: Context,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
+    private val fingerprintPcmTap: FingerprintPcmTap? = null,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
@@ -337,11 +342,15 @@ class SimplePlayer(
 
     private fun createRenderersFactory(): ShiftyRenderersFactory {
         val playbackEffects: PlaybackEffects? = this.playbackEffects
-        return if (playbackEffects == null) {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = false)
-        } else {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = playbackEffects.isVolumeBoosted)
-        }
+        return ShiftyRenderersFactory(
+            context = context,
+            statsManager = statsManager,
+            boostVolume = playbackEffects?.isVolumeBoosted ?: false,
+            fingerprintPcmTap = fingerprintPcmTap,
+            fingerprintTapEnabled = {
+                FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && Util.getAppPlatform(context) == AppPlatform.Phone
+            },
+        )
     }
 
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
