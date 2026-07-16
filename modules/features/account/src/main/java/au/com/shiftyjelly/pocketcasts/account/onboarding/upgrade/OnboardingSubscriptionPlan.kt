@@ -147,21 +147,19 @@ data class OnboardingSubscriptionPlan private constructor(
             }
         }
 
+    private val trialDurationText
+        @Composable get(): String {
+            val discountedPhase = requireNotNull(discountedPricingPhase)
+            val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            return discountedPhase.schedule.period.toText(recurringPeriods)
+        }
+
     val offerBadgeText
         @Composable get() = when (key.offer) {
             SubscriptionOffer.IntroOffer -> stringResource(LR.string.half_price_first_year)
-
-            SubscriptionOffer.Trial -> {
-                val discountedPhase = requireNotNull(discountedPricingPhase)
-                val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
-
-                stringResource(LR.string.plus_trial_duration_free_trial, discountedPhase.schedule.period.toText(recurringPeriods))
-            }
-
+            SubscriptionOffer.Trial -> stringResource(LR.string.plus_trial_duration_free_trial, trialDurationText)
             SubscriptionOffer.Referral -> null
-
             SubscriptionOffer.Winback -> null
-
             null -> null
         }
 
@@ -184,7 +182,7 @@ data class OnboardingSubscriptionPlan private constructor(
         stringResource(LR.string.renew_your_subscription)
     } else {
         when (key.offer) {
-            SubscriptionOffer.Trial -> stringResource(LR.string.profile_try_days_for_free)
+            SubscriptionOffer.Trial -> stringResource(LR.string.profile_try_duration_for_free, trialDurationText)
 
             SubscriptionOffer.IntroOffer,
             SubscriptionOffer.Referral,

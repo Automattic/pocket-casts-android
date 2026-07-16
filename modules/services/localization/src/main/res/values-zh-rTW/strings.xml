@@ -8,7 +8,6 @@ Language: zh_TW
 <resources>
     <string name="transcript_tap_to_seek_streaming_unavailable">下載單集即可點選並搜尋</string>
     <string name="bookmark_play_from">透過「%s」播放</string>
-    <string name="profile_try_days_for_free">免費試用 30 天</string>
     <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
     <string name="summary_upsell_title">AI 摘要</string>
     <string name="tv_create_account_subtitle">掃描此代碼即可使用手機開始進行，只需一分鐘就能完成。</string>
