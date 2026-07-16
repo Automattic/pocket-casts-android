@@ -10,6 +10,7 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.ContentMetadata
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.okhttp.OkHttpDataSource
@@ -66,6 +67,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         .setUpstreamDataSourceFactory(defaultFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or CacheDataSource.FLAG_BLOCK_ON_CACHE)
         .let { if (cache != null) it.setCache(cache) else it }
+
+    fun isEpisodeFullyCached(cacheKey: String): Boolean {
+        val cache = cache ?: return false
+        val length = ContentMetadata.getContentLength(cache.getContentMetadata(cacheKey))
+        return length > 0 && cache.getCachedBytes(cacheKey, 0, length) >= length
+    }
 
     val isCacheAvailable get() = cache != null
 
