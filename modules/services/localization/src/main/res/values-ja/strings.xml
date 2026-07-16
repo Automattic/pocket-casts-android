@@ -9,7 +9,6 @@ Language: ja_JP
     <string name="transcript_tap_to_seek_streaming_unavailable">エピソードをダウンロードし、タップして検索</string>
     <string name="bookmark_play_from">%s から再生</string>
     <string name="profile_try_days_for_free">30日間無料でお試し</string>
-    <string name="profile_start_free_trial_specific_duration">30日間無料お試しを開始する</string>
     <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
     <string name="summary_upsell_title">AI を活用した概要</string>
     <string name="tv_create_account_subtitle">このコードをスキャンして、スマートフォンで開始できます。わずか1分で完了します。</string>

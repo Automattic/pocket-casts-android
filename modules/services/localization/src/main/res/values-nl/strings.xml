@@ -9,7 +9,6 @@ Language: nl
     <string name="transcript_tap_to_seek_streaming_unavailable">Download de aflevering om te zoeken</string>
     <string name="bookmark_play_from">Afspelen van %s</string>
     <string name="profile_try_days_for_free">Probeer 30 dagen gratis</string>
-    <string name="profile_start_free_trial_specific_duration">Start nu je gratis proefabonnement van 30 dagen</string>
     <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
     <string name="summary_upsell_title">AI-samenvattingen</string>
     <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>

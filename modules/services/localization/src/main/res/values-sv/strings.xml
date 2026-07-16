@@ -9,7 +9,6 @@ Language: sv_SE
     <string name="transcript_tap_to_seek_streaming_unavailable">Ladda ner avsnittet och tryck för att söka</string>
     <string name="bookmark_play_from">Spela upp från %s</string>
     <string name="profile_try_days_for_free">Prova gratis i 30 dagar</string>
-    <string name="profile_start_free_trial_specific_duration">Starta din kostnadsfria 30 dagars provperiod</string>
     <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
     <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
     <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>

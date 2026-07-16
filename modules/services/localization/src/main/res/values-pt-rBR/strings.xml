@@ -9,7 +9,6 @@ Language: pt_BR
     <string name="transcript_tap_to_seek_streaming_unavailable">Baixe o episódio para tocar e procurar</string>
     <string name="bookmark_play_from">Reproduzir de %s</string>
     <string name="profile_try_days_for_free">Experimente gratuitamente por 30 dias</string>
-    <string name="profile_start_free_trial_specific_duration">Inicie o teste gratuito de 30 dias</string>
     <string name="summary_upsell_description">Assine o Plus para ter acesso a essa e outras funcionalidades premium, como favoritos e pastas.</string>
     <string name="summary_upsell_title">Resumos com tecnologia de IA</string>
     <string name="tv_create_account_subtitle">Leia este código para começar a ouvir no seu telefone. Leva apenas um minuto.</string>

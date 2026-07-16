@@ -9,7 +9,6 @@ Language: ko_KR
     <string name="transcript_tap_to_seek_streaming_unavailable">눌러서 검색하려면 에피소드를 다운로드하세요</string>
     <string name="bookmark_play_from">%s에서 재생</string>
     <string name="profile_try_days_for_free">30일 무료 체험</string>
-    <string name="profile_start_free_trial_specific_duration">30일 무료 평가판 시작</string>
     <string name="summary_upsell_description">Plus를 구독하여 북마크, 폴더와 같은 기타 프리미엄 기능을 이용하세요.</string>
     <string name="summary_upsell_title">AI 기반 요약</string>
     <string name="tv_create_account_subtitle">스마트폰에서 시작하려면 이 코드를 스캔하세요. 1분이면 충분합니다.</string>
