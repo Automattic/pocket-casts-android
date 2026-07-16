@@ -112,7 +112,7 @@ fun TranscriptPage(
                     .fillMaxWidth(),
             ) {
                 val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
-                    if (uiState.isSyncedActive && viewModel != null) {
+                    if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && uiState.isTapToSeekAvailable && viewModel != null) {
                         { entry, index ->
                             val seekTarget = viewModel.seekToTranscriptEntry(entry)
                             if (seekTarget != null) {

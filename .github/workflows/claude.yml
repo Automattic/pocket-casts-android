@@ -1,3 +1,8 @@
+# Runs Claude on demand with a @claude mention.
+#
+# This workflow is shared between the Android, iOS, and Web Player repos.
+# If you edit it here, please apply the same change to the other two.
+
 name: Claude Code
 
 on:
@@ -29,7 +34,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Downgrade to `read` if Claude should not push commits/branches
+      contents: read
       pull-requests: write
       issues: write
       actions: read # Required for Claude to read CI results on PRs
@@ -76,7 +81,7 @@ jobs:
       - name: Run Claude Code
         if: steps.pr-origin.outputs.is_internal == 'true'
         id: claude
-        uses: anthropics/claude-code-action@4d7e1f0cd85743fdc93b1c8040ab54395da024e2 # v1.0.149
+        uses: anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342 # v1.0.171
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
