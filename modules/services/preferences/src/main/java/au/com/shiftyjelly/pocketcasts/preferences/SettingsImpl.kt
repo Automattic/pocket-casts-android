@@ -662,6 +662,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val showGeneratedChapters: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "showGeneratedChapters",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val autoDownloadUnmeteredOnly = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadOnlyDownloadOnWifi",
         defaultValue = true,

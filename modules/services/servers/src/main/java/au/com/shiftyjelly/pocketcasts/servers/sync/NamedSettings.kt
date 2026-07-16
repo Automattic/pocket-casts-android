@@ -13,6 +13,7 @@ data class NamedSettingsSettings(
     @Json(name = "liveAnalyticsUrl") val liveAnalyticsUrl: String? = null,
     @Json(name = "listeningTimeStats") val listeningTimeStats: Boolean? = null,
     @Json(name = "audioOnly") val audioOnly: Boolean? = null,
+    @Json(name = "disableAiChapters") val disableAiChapters: Boolean? = null,
 )
 
 @JsonClass(generateAdapter = true)

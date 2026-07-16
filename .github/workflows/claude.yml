@@ -34,7 +34,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Downgrade to `read` if Claude should not push commits/branches
+      contents: read
       pull-requests: write
       issues: write
       actions: read # Required for Claude to read CI results on PRs

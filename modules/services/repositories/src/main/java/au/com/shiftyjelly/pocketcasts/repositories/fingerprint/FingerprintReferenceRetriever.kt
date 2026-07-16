@@ -106,7 +106,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         null
     }
 
-    fun saveReferenceData(data: ByteArray, audioFilePath: String) {
+    suspend fun saveReferenceData(data: ByteArray, audioFilePath: String) = withContext(Dispatchers.IO) {
         val path = referencePath(audioFilePath)
         try {
             File(path).writeBytes(data)
@@ -116,10 +116,10 @@ class FingerprintReferenceRetriever @Inject constructor(
         }
     }
 
-    fun loadReferenceData(audioFilePath: String): ByteArray? {
+    suspend fun loadReferenceData(audioFilePath: String): ByteArray? = withContext(Dispatchers.IO) {
         val path = referencePath(audioFilePath)
         val file = File(path)
-        return if (file.exists()) file.readBytes() else null
+        if (file.exists()) file.readBytes() else null
     }
 
     companion object {
