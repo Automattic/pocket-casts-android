@@ -57,6 +57,7 @@ import com.automattic.eventhorizon.RowActionType
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralAudioOnlyToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoSleepTimerRestartToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoplayToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingApplyToExistingEvent
@@ -365,6 +366,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                             AudioOnly(
                                 saved = settings.audioOnly.flow.collectAsState().value,
                                 onSave = { isAudioOnlyEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralAudioOnlyToggledEvent(
+                                            enabled = isAudioOnlyEnabled,
+                                        ),
+                                    )
                                     settings.audioOnly.set(isAudioOnlyEnabled, updateModifiedAt = true)
                                 },
                             )
