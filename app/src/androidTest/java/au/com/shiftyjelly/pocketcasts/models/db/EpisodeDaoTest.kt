@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import com.squareup.moshi.Moshi
@@ -20,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -209,5 +211,35 @@ class EpisodeDaoTest {
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(emptyList<PodcastEpisode>(), result)
+    }
+
+    @Test
+    fun dailyListenedTimeGroupsPlaybackByDay() = runTest {
+        val dayOne = Instant.parse("2024-06-15T12:00:00Z").toEpochMilli()
+        val dayTwo = Instant.parse("2024-06-17T12:00:00Z").toEpochMilli()
+        val beforeRange = Instant.parse("2024-06-10T12:00:00Z").toEpochMilli()
+        val episodes = listOf(
+            PodcastEpisode(uuid = "1", publishedDate = Date(), lastPlaybackInteraction = dayOne, playedUpTo = 100.0),
+            PodcastEpisode(uuid = "2", publishedDate = Date(), lastPlaybackInteraction = dayOne, playedUpTo = 50.0),
+            PodcastEpisode(uuid = "3", publishedDate = Date(), lastPlaybackInteraction = dayTwo, playedUpTo = 30.0),
+            PodcastEpisode(uuid = "4", publishedDate = Date(), lastPlaybackInteraction = beforeRange, playedUpTo = 999.0),
+        )
+        episodeDao.insertAllBlocking(episodes)
+
+        val result = episodeDao.dailyListenedTime(fromEpochMs = Instant.parse("2024-06-14T00:00:00Z").toEpochMilli())
+
+        assertEquals(2, result.size)
+        assertEquals(150.0, result[0].totalPlayedSeconds, 0.001)
+        assertEquals(30.0, result[1].totalPlayedSeconds, 0.001)
+        assertTrue(result[0].listenDate < result[1].listenDate)
+    }
+
+    @Test
+    fun dailyListenedTimeIsEmptyWithoutPlayback() = runTest {
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "1", publishedDate = Date(), lastPlaybackInteraction = null))
+
+        val result = episodeDao.dailyListenedTime(fromEpochMs = 0)
+
+        assertEquals(emptyList<DailyListenedTime>(), result)
     }
 }

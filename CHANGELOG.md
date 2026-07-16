@@ -1,15 +1,30 @@
-8.16
+8.18
 -----
 *   Bug Fixes
     *   Fix Japanese (CJK) synced transcript scrolling back to the top instead of following along
         ([#5494](https://github.com/Automattic/pocket-casts-android/pull/5494))
 
+8.17
+-----
+*   New Features
+    *   Add support for Flightcast transcripts
+        ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+    *   Stats Heatmap
+        ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 
-8.15
+8.16
 -----
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+*   Bug Fixes
+    *   Fix leaked network connections when refreshing episode details
+        ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
+
+8.15
+-----
 *   Bug Fixes
     *   Fix crash when scrolling to the top of a long Up Next queue
         ([#5320](https://github.com/Automattic/pocket-casts-android/pull/5320))
@@ -17,6 +32,17 @@
         ([#5451](https://github.com/Automattic/pocket-casts-android/pull/5451))
     *   Wear OS performance improvements
         ([#5446](https://github.com/Automattic/pocket-casts-android/pull/5446))
+    *   Improved Automotive sign up screen
+        ([#5487](https://github.com/Automattic/pocket-casts-android/pull/5487))
+    *   Fix broken Login with Phone flow on Wear OS
+        ([#5492](https://github.com/Automattic/pocket-casts-android/pull/5492))
+    *   Fix overlapping text issue on Automotive after orientation change
+        ([#5477](https://github.com/Automattic/pocket-casts-android/pull/5477))
+    *   Fix link screen's text overlap on Automotive
+        ([#5475](https://github.com/Automattic/pocket-casts-android/pull/5475))
+*   Updates
+    *   Reset player after playback finished on Automotive
+        ([#5488](https://github.com/Automattic/pocket-casts-android/pull/5488))
 
 8.14
 -----

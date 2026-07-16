@@ -386,8 +386,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
@@ -494,6 +496,8 @@
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
     <string name="player_up_next_sort">Sort Up Next</string>
+    <string name="up_next_sort_duration_tooltip_title">Sort by duration</string>
+    <string name="up_next_sort_duration_tooltip_body">Shortest to longest, or the reverse — fit the episode to the time you\'ve actually got.</string>
 
     <!-- Chapters -->
 
@@ -1299,6 +1303,11 @@
     </plurals>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
+    <string name="profile_stats_listening_activity">Listening Activity</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
+    <string name="profile_stats_listening_activity_content_description">Listening activity heatmap</string>
+    <string name="profile_stats_listening_activity_info_title">Listening activity</string>
+    <string name="profile_stats_listening_activity_info_summary">An estimate of when you\'ve been listening, based on your playback history. If you finish an episode over a few days, it shows on the last day.</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
@@ -1540,6 +1549,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
+    <string name="settings_generated_chapters">Generated chapters</string>
+    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -2211,16 +2222,12 @@
     <string name="watch_sync_success">Logged in from phone!</string>
 
     <!-- Watch sync errors -->
-    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
     <string name="watch_sync_error_no_connection">Phone not connected</string>
     <string name="watch_sync_error_login_failed">Login failed</string>
-    <string name="watch_sync_error_unknown">Something went wrong</string>
 
     <!-- Watch sync error help text -->
-    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
     <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
-    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
 
     <!-- Watch sync actions -->
     <string name="watch_sync_retry">Try Again</string>

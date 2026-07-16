@@ -333,12 +333,12 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
-    UP_NEXT_DURATION(
-        key = "up_next_duration",
-        title = "Up Next Duration",
+    UP_NEXT_SORT(
+        key = "up_next_sort",
+        title = "Up Next sort by duration",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-09"),
     ),
@@ -365,9 +365,18 @@ enum class Feature(
         title = "Prefer HLS stream when available",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
+    ),
+    STATS_HEATMAP(
+        key = "stats_heatmap",
+        title = "Show listening activity heatmap on Stats",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-07-02"),
     ),
 }
 

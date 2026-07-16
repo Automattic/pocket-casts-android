@@ -31,7 +31,7 @@ fun Context.isLandscape() = resources.configuration.orientation == Configuration
 fun Context.isAppForeground(): Boolean {
     val activityManager =
         this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val runningProcesses = activityManager.runningAppProcesses
+    val runningProcesses = activityManager.runningAppProcesses.orEmpty()
     var isInForeground = false
     for (processInfo in runningProcesses) {
         if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&

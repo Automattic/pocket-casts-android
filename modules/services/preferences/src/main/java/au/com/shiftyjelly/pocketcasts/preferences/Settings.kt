@@ -129,6 +129,8 @@ interface Settings {
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
+
+        const val SHOW_UP_NEXT_SORT_DURATION_TOOLTIP = "show_up_next_sort_duration_tooltip"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -385,6 +387,7 @@ interface Settings {
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
+    val showGeneratedChapters: UserSetting<Boolean>
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
@@ -590,6 +593,8 @@ interface Settings {
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
     val showReferralsTooltip: UserSetting<Boolean>
+
+    val showUpNextSortDurationTooltip: UserSetting<Boolean>
 
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)

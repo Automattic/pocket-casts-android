@@ -225,6 +225,7 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
+                clearVideoIfAudioOnly()
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -236,6 +237,7 @@ class SimplePlayer(
                     Player.STATE_READY -> {
                         onBufferingStateChanged()
                         onDurationAvailable()
+                        clearVideoIfAudioOnly()
                     }
 
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
@@ -286,11 +288,23 @@ class SimplePlayer(
         prepared = true
     }
 
+    private fun clearVideoIfAudioOnly() {
+        val player = player ?: return
+        if (player.playbackState == Player.STATE_READY && !player.currentTracks.containsType(C.TRACK_TYPE_VIDEO)) {
+            onVideoTrackChanged(false)
+        }
+    }
+
     private fun addVideoListener(player: ExoPlayer) {
         player.addListener(object : Player.Listener {
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 videoWidth = videoSize.width
                 videoHeight = videoSize.height
+
+                // Real video dimensions are definitive proof the stream carries video.
+                if (videoSize.width > 0 && videoSize.height > 0) {
+                    onVideoTrackChanged(true)
+                }
 
                 videoChangedListener?.let {
                     Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }

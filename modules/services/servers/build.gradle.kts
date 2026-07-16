@@ -49,6 +49,8 @@ dependencies {
     testCompileOnly(libs.media3.common)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
     testImplementation(libs.okHttp.mockwebserver)
     testImplementation(projects.modules.services.sharedtest)
 }
