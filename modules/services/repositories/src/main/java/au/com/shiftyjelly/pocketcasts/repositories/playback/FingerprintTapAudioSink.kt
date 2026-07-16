@@ -14,8 +14,16 @@ internal class FingerprintTapAudioSink(
     private val tap: FingerprintPcmTap,
 ) : ForwardingAudioSink(sink) {
 
+    // Buffer timestamps arrive in renderer time; the renderer reports this offset back to media time.
+    private var outputStreamOffsetUs = 0L
+
+    override fun setOutputStreamOffsetUs(outputStreamOffsetUs: Long) {
+        this.outputStreamOffsetUs = outputStreamOffsetUs
+        super.setOutputStreamOffsetUs(outputStreamOffsetUs)
+    }
+
     override fun handleBuffer(buffer: ByteBuffer, presentationTimeUs: Long, encodedAccessUnitCount: Int): Boolean {
-        tap.onSinkBuffer(presentationTimeUs)
+        tap.onSinkBuffer(presentationTimeUs - outputStreamOffsetUs)
         return super.handleBuffer(buffer, presentationTimeUs, encodedAccessUnitCount)
     }
 
