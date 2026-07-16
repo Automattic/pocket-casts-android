@@ -5,6 +5,8 @@
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 
 8.16
 -----
