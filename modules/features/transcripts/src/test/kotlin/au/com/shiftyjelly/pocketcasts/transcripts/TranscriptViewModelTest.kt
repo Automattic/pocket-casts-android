@@ -6,12 +6,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -39,8 +41,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import timber.log.Timber
 
@@ -61,6 +66,7 @@ class TranscriptViewModelTest {
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackStateFlow
     }
+    private val episodeManager = mock<EpisodeManager>()
 
     lateinit var viewModel: TranscriptViewModel
 
@@ -68,7 +74,7 @@ class TranscriptViewModelTest {
     fun setUp() {
         viewModel = TranscriptViewModel(
             transcriptManager = transcriptManager,
-            episodeManager = mock(),
+            episodeManager = episodeManager,
             userManager = mock {
                 on { getSignInState() } doReturn signInStateFlow.asFlowable()
             },
@@ -310,14 +316,12 @@ class TranscriptViewModelTest {
 
     @Test
     fun `track synced transcript seek used event`() = runTest {
-        val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
+        setUpTapToSeek()
         whenever(fingerprintTimingManager.state).thenReturn(FingerprintTimingManager.State.Active(coverage = 1))
         whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(20_000)
-        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
-        playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
 
-        awaitSyncedActive()
+        awaitTapToSeekAvailable()
         drainEvents()
 
         val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
@@ -336,13 +340,122 @@ class TranscriptViewModelTest {
     }
 
     @Test
-    fun `track synced transcript seek failed event`() = runTest {
-        val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
-        whenever(fingerprintTimingManager.state).thenReturn(FingerprintTimingManager.State.Active(coverage = 1))
-        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(null)
-        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+    fun `track synced transcript seek failed event when preparing`() = runTest {
+        setUpTapToSeek()
+        syncedStateFlow.value = FingerprintTimingManager.State.Preparing
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        viewModel.messages.test {
+            val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+            assertNull(seekTarget)
+            assertEquals(
+                SyncedTranscriptsSeekFailedEvent(
+                    reason = "mapping_unavailable",
+                    syncedState = "preparing",
+                    source = TranscriptSourceType.Player,
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                ),
+                eventSink.pollEvent(),
+            )
+            assertEquals(TranscriptMessage.TapToSeekStreamingUnavailable, awaitItem())
+            verify(playbackManager, never()).seekToTimeMs(any(), anyOrNull())
+        }
+    }
+
+    @Test
+    fun `track synced transcript seek failed event when failed`() = runTest {
+        setUpTapToSeek()
+        syncedStateFlow.value = FingerprintTimingManager.State.Failed(RuntimeException("no match"))
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        viewModel.messages.test {
+            val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+            assertNull(seekTarget)
+            assertEquals(
+                SyncedTranscriptsSeekFailedEvent(
+                    reason = "mapping_unavailable",
+                    syncedState = "failed",
+                    source = TranscriptSourceType.Player,
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                ),
+                eventSink.pollEvent(),
+            )
+            assertEquals(TranscriptMessage.TapToSeekStreamingUnavailable, awaitItem())
+        }
+    }
+
+    @Test
+    fun `track synced transcript seek failed event without message when unavailable`() = runTest {
+        setUpTapToSeek()
+        syncedStateFlow.value = FingerprintTimingManager.State.Unavailable
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        viewModel.messages.test {
+            val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+            assertNull(seekTarget)
+            assertEquals(
+                SyncedTranscriptsSeekFailedEvent(
+                    reason = "mapping_unavailable",
+                    syncedState = "unavailable",
+                    source = TranscriptSourceType.Player,
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                ),
+                eventSink.pollEvent(),
+            )
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `track synced transcript seek failed event without message when episode is downloaded`() = runTest {
+        setUpTapToSeek()
+        val episode = PodcastEpisode(
+            uuid = "episode-uuid",
+            publishedDate = Date(),
+            podcastUuid = "podcast-uuid",
+            downloadStatus = EpisodeDownloadStatus.Downloaded,
+        )
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(episode)
+        syncedStateFlow.value = FingerprintTimingManager.State.Preparing
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        viewModel.messages.test {
+            val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+            assertNull(seekTarget)
+            assertEquals(
+                SyncedTranscriptsSeekFailedEvent(
+                    reason = "mapping_unavailable",
+                    syncedState = "preparing",
+                    source = TranscriptSourceType.Player,
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = "podcast-uuid",
+                ),
+                eventSink.pollEvent(),
+            )
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `do not track seek events for non generated transcript`() = runTest {
+        setUpTapToSeek()
+        transcriptManager.avaiableTranscript = Transcript.TextPreview
         syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
-        playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
 
         awaitSyncedActive()
         drainEvents()
@@ -350,16 +463,51 @@ class TranscriptViewModelTest {
         val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
 
         assertNull(seekTarget)
-        assertEquals(
-            SyncedTranscriptsSeekFailedEvent(
-                reason = "mapping_unavailable",
-                syncedState = "active",
-                source = TranscriptSourceType.Player,
-                episodeUuid = "episode-uuid",
-                podcastUuid = AnalyticsTracker.INVALID_OR_NULL_VALUE,
-            ),
-            eventSink.pollEvent(),
-        )
+        assertTrue(eventSink.isEmpty())
+        verify(playbackManager, never()).seekToTimeMs(any(), anyOrNull())
+    }
+
+    @Test
+    fun `do not track seek events when transcript episode is not playing`() = runTest {
+        setUpTapToSeek()
+        playbackStateFlow.value = PlaybackState(episodeUuid = "other-uuid", positionMs = 10_000)
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+        awaitUiState { it.transcriptState is TranscriptState.Loaded && it.playingEpisodeUuid == "other-uuid" }
+        drainEvents()
+
+        val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+        assertNull(seekTarget)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `do not track seek events when paywall is visible`() = runTest {
+        setUpTapToSeek()
+        signInStateFlow.value = SignInState.SignedOut
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+        awaitSyncedActive()
+        drainEvents()
+
+        val seekTarget = viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = 30_000))
+
+        assertNull(seekTarget)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `do not track seek events for untimed entries`() = runTest {
+        setUpTapToSeek()
+        syncedStateFlow.value = FingerprintTimingManager.State.Preparing
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        assertNull(viewModel.seekToTranscriptEntry(TranscriptEntry.Speaker("Speaker")))
+        assertNull(viewModel.seekToTranscriptEntry(TranscriptEntry.Text("Line", startTimeMs = -1)))
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -379,11 +527,22 @@ class TranscriptViewModelTest {
         )
     }
 
-    private suspend fun awaitSyncedActive() {
+    private fun setUpTapToSeek() {
+        transcriptManager.avaiableTranscript = Transcript.TextPreview.copy(isGenerated = true)
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
+    }
+
+    private suspend fun awaitSyncedActive() = awaitUiState { it.isSyncedActive }
+
+    private suspend fun awaitTapToSeekAvailable() = awaitUiState { it.isTapToSeekAvailable && it.syncedState == syncedStateFlow.value }
+
+    private suspend fun awaitUiState(predicate: (UiState) -> Boolean) {
         viewModel.uiState.test {
             viewModel.loadTranscript("episode-uuid")
             var state = awaitItem()
-            while (!state.isSyncedActive) {
+            while (!predicate(state)) {
                 state = awaitItem()
             }
             cancelAndIgnoreRemainingEvents()
