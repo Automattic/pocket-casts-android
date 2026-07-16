@@ -13,14 +13,23 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.utils.Util.isAutomotive
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 object Util {
     private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
     private var appPlatform: AppPlatform? = null
 
-    fun isAndroidAutoConnectedFlow(context: Context) = CarConnection(context).type
-        .map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
-        .asFlow()
+    // CarConnection's constructor creates an AsyncQueryHandler, which needs a Looper, so build it on the main thread.
+    fun isAndroidAutoConnectedFlow(context: Context): Flow<Boolean> = flow {
+        val connectionType = withContext(Dispatchers.Main) {
+            CarConnection(context).type.map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
+        }
+        emitAll(connectionType.asFlow())
+    }
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager

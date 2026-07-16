@@ -126,7 +126,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -182,7 +182,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
-        private const val CAR_CONNECTION_TIMEOUT: Long = 1000
+        private val CAR_CONNECTION_TIMEOUT: Duration = 1000.milliseconds
         private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
     }
 
@@ -2055,7 +2055,7 @@ open class PlaybackManager @Inject constructor(
                 !forceStream &&
                 play &&
                 // Don't block playback while driving as the warning is only shown on the phone
-                withTimeoutOrNull(CAR_CONNECTION_TIMEOUT) { Util.isAndroidAutoConnectedFlow(application).first() } != true
+                withTimeoutOrNull(CAR_CONNECTION_TIMEOUT) { Util.isAndroidAutoConnectedFlow(application).firstOrNull() } != true
             ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
