@@ -28,23 +28,27 @@ private val AnyWhiteSpace = """\s+""".toRegex()
 private val TwoOrMoreEmptySpaces = """[ \t]{2,}""".toRegex()
 private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 
-// CJK scripts (Han, Hiragana, Katakana, and CJK/fullwidth punctuation) are written without spaces
-// between characters, so joining their fragments with a space would inject visible, grammatically
-// wrong gaps. A space is only needed when neither side of the join is CJK (e.g. between Latin words);
-// keeping a CJK character on either side space-free also avoids a stray gap before a closing mark
-// (「AI」, never 「AI 」). Boundary code points are inspected so supplementary-plane ideographs
-// (CJK Ext B+, encoded as surrogate pairs) are recognised too.
+// Space-less scripts (CJK, Thai, Lao, Khmer, Burmese) are written without spaces between words,
+// so joining their fragments with a space would inject visible, grammatically wrong gaps. A space
+// is only needed when neither side of the join is a space-less script (e.g. between Latin words);
+// keeping a space-less character on either side space-free also avoids a stray gap before a
+// closing mark (「AI」, never 「AI 」). Boundary code points are inspected so supplementary-plane
+// ideographs (CJK Ext B+, encoded as surrogate pairs) are recognised too.
 private fun needsSpaceBetween(accumulated: CharSequence, next: CharSequence): Boolean {
     val left = Character.codePointBefore(accumulated, accumulated.length)
     val right = Character.codePointAt(next, 0)
-    return !(left.isCjk() || right.isCjk())
+    return !(left.isSpacelessScript() || right.isSpacelessScript())
 }
 
-private fun Int.isCjk() = Character.isIdeographic(this) || when (Character.UnicodeBlock.of(this)) {
+private fun Int.isSpacelessScript() = Character.isIdeographic(this) || when (Character.UnicodeBlock.of(this)) {
     Character.UnicodeBlock.HIRAGANA,
     Character.UnicodeBlock.KATAKANA,
     Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
     Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
+    Character.UnicodeBlock.THAI,
+    Character.UnicodeBlock.LAO,
+    Character.UnicodeBlock.KHMER,
+    Character.UnicodeBlock.MYANMAR,
     -> true
 
     else -> false
@@ -84,8 +88,7 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
         }
     }
 
-    fun buildFullSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry {
-        appendToAccumulator(text, startTimeMs, endTimeMs)
+    fun flushAccumulatedPhrase(): TranscriptEntry.Text {
         val sentences = phraseAccumulator.toString()
         phraseAccumulator.clear()
         val resultStartTimeMs = accumulatedStartTimeMs
@@ -100,6 +103,11 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
             endTimeMs = resultEndTimeMs,
             words = resultWords,
         )
+    }
+
+    fun buildFullSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry {
+        appendToAccumulator(text, startTimeMs, endTimeMs)
+        return flushAccumulatedPhrase()
     }
 
     fun buildMidSentence(text: String, startTimeMs: Long, endTimeMs: Long): TranscriptEntry? {
@@ -124,27 +132,33 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
         }
     }
 
-    mapNotNullTo(entries) { entry ->
+    forEach { entry ->
         when (entry) {
-            is TranscriptEntry.Speaker -> entry
+            is TranscriptEntry.Speaker -> entries += entry
 
             is TranscriptEntry.Text -> {
+                // Scripts with no sentence-final punctuation (Thai most notably) and unpunctuated
+                // auto-generated captions never match a terminator, which would collapse the whole
+                // transcript into a single entry with no per-line auto-scroll anchor. Cap the
+                // accumulator: once it outgrows a sentence-sized length, flush at the cue boundary
+                // so every transcript still yields multiple scrollable entries.
+                if (phraseAccumulator.length >= MAX_ACCUMULATED_PHRASE_LENGTH) {
+                    entries += flushAccumulatedPhrase()
+                }
                 val text = entry.value
-                if (text.endsAsSentence()) {
+                val sentence = if (text.endsAsSentence()) {
                     buildFullSentence(text, entry.startTimeMs, entry.endTimeMs)
                 } else {
                     buildMidSentence(text, entry.startTimeMs, entry.endTimeMs)
+                }
+                if (sentence != null) {
+                    entries += sentence
                 }
             }
         }
     }
     if (phraseAccumulator.isNotEmpty()) {
-        entries += TranscriptEntry.Text(
-            phraseAccumulator.toString(),
-            startTimeMs = accumulatedStartTimeMs,
-            endTimeMs = accumulatedEndTimeMs,
-            words = if (wordTimings.size > 1) wordTimings.toList() else emptyList(),
-        )
+        entries += flushAccumulatedPhrase()
     }
     return entries
 }
@@ -220,7 +234,17 @@ private val CjkSentenceTerminators = listOf("。", "！", "？", "｡", "．")
 // sentence as part of a terminal combo (「…です。」).
 private val CjkClosingMarks = listOf("」", "』", "）")
 
-private val SentenceTerminators = LatinSentenceTerminators + CjkSentenceTerminators
+// Sentence terminators for other scripts with their own sentence-final punctuation: Arabic (؟),
+// Urdu (۔), Devanagari (। ॥ — Hindi, Marathi, Nepali), Burmese (။), Khmer (។ ៕), Ethiopic (።),
+// and Armenian (։). Scripts with NO sentence-final punctuation (Thai) are handled by the
+// accumulator cap in joinSplitSentences instead.
+private val OtherScriptSentenceTerminators = listOf("؟", "۔", "।", "॥", "။", "។", "៕", "።", "։")
+
+// Accumulator cap for transcripts no terminator list can segment (see joinSplitSentences).
+// Sized above a typical sentence so punctuated text flushes on terminators long before hitting it.
+private const val MAX_ACCUMULATED_PHRASE_LENGTH = 160
+
+private val SentenceTerminators = LatinSentenceTerminators + CjkSentenceTerminators + OtherScriptSentenceTerminators
 private val ClosingMarks = LatinClosingQuotes + CjkClosingMarks
 
 // A sentence can end with a terminator directly followed by a closing quote/bracket. Transcripts mix

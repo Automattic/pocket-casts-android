@@ -465,6 +465,110 @@ class TranscriptSanitizationTest {
         }
 
         @Test
+        fun `keep Devanagari sentences as separate entries`() {
+            // Hindi (and other Devanagari scripts) end sentences with the danda `।`; without it in
+            // the terminator list the transcript collapses into a single entry with no
+            // auto-scroll anchor — the same failure as PCDROID-639 for CJK.
+            val input = buildTranscript {
+                text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                    text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `insert spaces when joining Devanagari fragments`() {
+            // Devanagari scripts use spaces between words, unlike CJK/Thai.
+            val input = buildTranscript {
+                text("यह एक")
+                text("कलम है।")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("यह एक कलम है।")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not insert spaces when joining Thai fragments`() {
+            // Thai is written without spaces between words.
+            val input = buildTranscript {
+                text("สวัสดี")
+                text("ครับ")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("สวัสดีครับ")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `flush Thai transcript at cue boundaries`() {
+            // Thai has no sentence-final punctuation, so no terminator list can ever segment it.
+            // The accumulator cap flushes at cue boundaries instead, so the transcript still
+            // yields multiple entries for the synced auto-scroll to anchor on.
+            val cue = "ก".repeat(80)
+            val input = buildTranscript {
+                text(cue, startTimeMs = 0, endTimeMs = 1000)
+                text(cue, startTimeMs = 1000, endTimeMs = 2000)
+                text(cue, startTimeMs = 2000, endTimeMs = 3000)
+                text(cue, startTimeMs = 3000, endTimeMs = 4000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("ก".repeat(160), startTimeMs = 0, endTimeMs = 2000)
+                    text("ก".repeat(160), startTimeMs = 2000, endTimeMs = 4000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `flush unpunctuated captions at cue boundaries`() {
+            // Auto-generated captions without any punctuation must not collapse into a single
+            // entry either; spaces are still inserted between the joined Latin fragments.
+            val cue = "a".repeat(80)
+            val input = buildTranscript {
+                text(cue, startTimeMs = 0, endTimeMs = 1000)
+                text(cue, startTimeMs = 1000, endTimeMs = 2000)
+                text(cue, startTimeMs = 2000, endTimeMs = 3000)
+                text(cue, startTimeMs = 3000, endTimeMs = 4000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 2000)
+                    text("$cue $cue", startTimeMs = 2000, endTimeMs = 4000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
         fun `keep a Latin closing quote attached to a CJK sentence`() {
             // Japanese speech can be wrapped in ASCII / curly quotes; the closing quote must stay
             // with the sentence rather than being detached onto the next entry.
@@ -522,6 +626,15 @@ class TranscriptSanitizationTest {
                 arrayOf("？", "fullwidth question mark"),
                 arrayOf("｡", "halfwidth ideographic full stop"),
                 arrayOf("．", "fullwidth full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf("-", "hyphen"),
                 arrayOf(")", "parenthesis"),
                 arrayOf("]", "square bracket"),
@@ -577,6 +690,15 @@ class TranscriptSanitizationTest {
                 arrayOf("？", "fullwidth question mark"),
                 arrayOf("｡", "halfwidth ideographic full stop"),
                 arrayOf("．", "fullwidth full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf(".\"", "dot double quote"),
                 arrayOf("!\"", "exclamation mark double quote"),
                 arrayOf("?\"", "question mark double quote"),
