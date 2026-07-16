@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.ProgressDecision
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -159,6 +160,311 @@ class FingerprintTimingManagerTest {
         )
         assertFalse(queriedNetwork)
     }
+
+    @Test
+    fun `decideOnProgress ignores ticks in eager mode`() {
+        val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0, isEager = true)
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress small delta does nothing`() {
+        val decision = decideOnProgress(positionSec = 15.0, lastPositionSec = 10.0)
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress first tick is never a jump`() {
+        val decision = decideOnProgress(positionSec = 500.0, lastPositionSec = null)
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within mapped run does not restart`() {
+        val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0, mappedRunEndSec = 120.0)
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump outside mapped range schedules debounced restart`() {
+        val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0)
+        assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump into mapping gap schedules debounced restart`() {
+        val decision = decideOnProgress(
+            positionSec = 300.0,
+            lastPositionSec = 50.0,
+            mappedRunEndSec = null,
+            hasAnyMapping = true,
+        )
+        assertEquals(ProgressDecision.ScheduleDebouncedRestart, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump covered by active decode does not restart`() {
+        val decision = decideOnProgress(
+            positionSec = 300.0,
+            lastPositionSec = 50.0,
+            hasAnyMapping = true,
+            isDecodeActive = true,
+            isCoveredByActiveDecode = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress pending restart suppresses outside range restart`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            hasPendingRestart = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress outside mapped range respects bootstrap cooldown`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS - 1,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress outside mapped range restarts after cooldown`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+        )
+        assertEquals(ProgressDecision.RestartOutsideRange, decision)
+    }
+
+    @Test
+    fun `decideOnProgress outside range covered by active decode does not restart`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            isDecodeActive = true,
+            isCoveredByActiveDecode = true,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress outside range with decode elsewhere still restarts`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasAnyMapping = true,
+            isDecodeActive = true,
+            isCoveredByActiveDecode = false,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+        )
+        assertEquals(ProgressDecision.RestartOutsideRange, decision)
+    }
+
+    @Test
+    fun `decideOnProgress resumes from run end when the mapping is about to run out`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+        )
+        assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume while the run end is far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 100.0 + FingerprintConstants.LOOKAHEAD_SECONDS,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume when a decode already covers the run end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isRunEndCoveredByActiveDecode = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress does not resume when the run end is near the episode end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isRunEndNearEpisodeEnd = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress run end resume respects bootstrap cooldown`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            msSinceStreamStart = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS - 1,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress relocates a decode replaying mapped audio to the run end`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isRunEndCoveredByActiveDecode = false,
+        )
+        assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
+    }
+
+    @Test
+    fun `decideOnProgress empty mapping does not restart before the stream ever ran`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress empty mapping does not restart while the decode is running`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            isDecodeActive = true,
+            isCoveredByActiveDecode = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress empty mapping restarts after the stream died without producing one`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 99.0,
+            hasStreamStarted = true,
+        )
+        assertEquals(ProgressDecision.RestartOutsideRange, decision)
+    }
+
+    @Test
+    fun `mappedRunEnd empty mapping returns null`() {
+        assertNull(FingerprintTimingManager.mappedRunEnd(50.0, emptyList()))
+    }
+
+    @Test
+    fun `mappedRunEnd inside contiguous run returns run end`() {
+        assertEquals(100.0, FingerprintTimingManager.mappedRunEnd(35.0, entriesAt(0.0, 100.0, step = 10.0))!!, 0.0)
+    }
+
+    @Test
+    fun `mappedRunEnd on exact anchor returns run end`() {
+        assertEquals(100.0, FingerprintTimingManager.mappedRunEnd(40.0, entriesAt(0.0, 100.0, step = 10.0))!!, 0.0)
+    }
+
+    @Test
+    fun `mappedRunEnd in gap between islands returns null`() {
+        val entries = entriesAt(0.0, 100.0, step = 10.0) + entriesAt(500.0, 600.0, step = 10.0)
+        assertNull(FingerprintTimingManager.mappedRunEnd(300.0, entries))
+    }
+
+    @Test
+    fun `mappedRunEnd exactly on a mid-list island end gets no slack`() {
+        val entries = entriesAt(0.0, 100.0, step = 10.0) + entriesAt(500.0, 600.0, step = 10.0)
+        assertNull(FingerprintTimingManager.mappedRunEnd(100.0, entries))
+    }
+
+    @Test
+    fun `mappedRunEnd just past island end with far next island returns null`() {
+        val entries = entriesAt(0.0, 100.0, step = 10.0) + entriesAt(500.0, 600.0, step = 10.0)
+        assertNull(FingerprintTimingManager.mappedRunEnd(110.0, entries))
+    }
+
+    @Test
+    fun `mappedRunEnd inside first island stops at gap`() {
+        val entries = entriesAt(0.0, 100.0, step = 10.0) + entriesAt(500.0, 600.0, step = 10.0)
+        assertEquals(100.0, FingerprintTimingManager.mappedRunEnd(50.0, entries)!!, 0.0)
+    }
+
+    @Test
+    fun `mappedRunEnd within margin after last entry returns last entry`() {
+        assertEquals(100.0, FingerprintTimingManager.mappedRunEnd(120.0, entriesAt(0.0, 100.0, step = 10.0))!!, 0.0)
+    }
+
+    @Test
+    fun `mappedRunEnd beyond margin after last entry returns null`() {
+        assertNull(FingerprintTimingManager.mappedRunEnd(131.0, entriesAt(0.0, 100.0, step = 10.0)))
+    }
+
+    @Test
+    fun `mappedRunEnd within margin before first entry returns run end`() {
+        assertEquals(200.0, FingerprintTimingManager.mappedRunEnd(80.0, entriesAt(100.0, 200.0, step = 10.0))!!, 0.0)
+    }
+
+    @Test
+    fun `mappedRunEnd beyond margin before first entry returns null`() {
+        assertNull(FingerprintTimingManager.mappedRunEnd(60.0, entriesAt(100.0, 200.0, step = 10.0)))
+    }
+
+    private fun entriesAt(from: Double, to: Double, step: Double): List<TimeMappingEntry> {
+        val entries = mutableListOf<TimeMappingEntry>()
+        var time = from
+        while (time <= to) {
+            entries.add(TimeMappingEntry(playbackTime = time, referenceTime = time))
+            time += step
+        }
+        return entries
+    }
+
+    private fun decideOnProgress(
+        positionSec: Double,
+        lastPositionSec: Double?,
+        isEager: Boolean = false,
+        mappedRunEndSec: Double? = null,
+        hasAnyMapping: Boolean = mappedRunEndSec != null,
+        isDecodeActive: Boolean = false,
+        isCoveredByActiveDecode: Boolean = false,
+        isRunEndCoveredByActiveDecode: Boolean = false,
+        isRunEndNearEpisodeEnd: Boolean = false,
+        hasPendingRestart: Boolean = false,
+        hasStreamStarted: Boolean = hasAnyMapping || isDecodeActive,
+        msSinceStreamStart: Long = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+    ): ProgressDecision = FingerprintTimingManager.decideOnProgress(
+        positionSec = positionSec,
+        lastPositionSec = lastPositionSec,
+        isEager = isEager,
+        mappedRunEndSec = mappedRunEndSec,
+        hasAnyMapping = hasAnyMapping,
+        isDecodeActive = isDecodeActive,
+        isCoveredByActiveDecode = isCoveredByActiveDecode,
+        isRunEndCoveredByActiveDecode = isRunEndCoveredByActiveDecode,
+        isRunEndNearEpisodeEnd = isRunEndNearEpisodeEnd,
+        hasPendingRestart = hasPendingRestart,
+        hasStreamStarted = hasStreamStarted,
+        msSinceStreamStart = msSinceStreamStart,
+    )
 
     @Test
     fun `alignToWindowGrid aligns to stride boundary`() {
