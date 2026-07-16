@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
 import okio.Buffer
@@ -62,7 +63,16 @@ class TranscriptWindowExtractor @Inject constructor(
 
         manager.prepareForCurrentEpisode()
         val ref = withTimeoutOrNull(COVERAGE_TIMEOUT) {
-            manager.mappingVersion.map { refNow() }.filter { it != null }.first()
+            merge(
+                manager.mappingVersion.map { refNow() }.filter { it != null },
+                // Bail only on this episode's terminal states; the conflated flow can hold a stale one.
+                manager.stateFlow
+                    .filter {
+                        (it is FingerprintTimingManager.State.Unavailable && it.episodeUuid == episodeUuid) ||
+                            (it is FingerprintTimingManager.State.Failed && it.episodeUuid == episodeUuid)
+                    }
+                    .map { null },
+            ).first()
         }
         return ref ?: timeSecs
     }
