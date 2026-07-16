@@ -6,11 +6,13 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -61,6 +63,7 @@ class FingerprintTimingManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val chapterManager: Lazy<ChapterManager>,
     private val settings: Settings,
+    private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
 ) {
 
     /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
@@ -157,6 +160,7 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var currentEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
+    private var currentSharedCacheKey: String? = null
     private var currentDurationSec: Double = 0.0
     private var currentReferenceData: ByteArray? = null
     private var currentReferenceFilePath: String? = null
@@ -203,6 +207,10 @@ class FingerprintTimingManager @Inject constructor(
         val podcastUuid = episode.podcastOrSubstituteUuid
         // Fingerprint the progressive enclosure, not the HLS rendition; timings may drift if the renditions differ.
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
+        // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
+        val sharedCacheKey = episodeUuid.takeIf {
+            !episode.isDownloaded && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+        }
 
         scope.launch {
             val gen: Long
@@ -221,7 +229,7 @@ class FingerprintTimingManager @Inject constructor(
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startPlaybackProgressObserver(episodeUuid)
-            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration, trigger)
+            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, sharedCacheKey, episode.isDownloaded, episode.duration, trigger)
         }
     }
 
@@ -440,6 +448,7 @@ class FingerprintTimingManager @Inject constructor(
         filterCandidatePool.clear()
         currentEpisodeUuid = null
         currentAudioFilePath = null
+        currentSharedCacheKey = null
         currentDurationSec = 0.0
         currentReferenceData = null
         currentReferenceFilePath = null
@@ -473,6 +482,7 @@ class FingerprintTimingManager @Inject constructor(
         episodeUuid: String,
         podcastUuid: String,
         audioSource: String?,
+        sharedCacheKey: String?,
         isDownloaded: Boolean,
         durationSec: Double,
         trigger: PrepareTrigger,
@@ -525,6 +535,7 @@ class FingerprintTimingManager @Inject constructor(
             currentEpisodeUuid = episodeUuid
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
+            currentSharedCacheKey = sharedCacheKey
             currentDurationSec = durationSec
             currentIsStreaming = !isDownloaded
             currentEager = eager
@@ -800,11 +811,25 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        val cacheKey = currentSharedCacheKey?.takeIf { isRemoteUrl }
         val extractor = MediaExtractor()
+        val cacheSource = if (cacheKey != null) {
+            val factory = dataSourceFactory.get()
+            CacheBackedMediaDataSource(factory.blockingCacheFactory, Uri.parse(audioFilePath), cacheKey) { position, length ->
+                factory.cachedLengthAt(cacheKey, position, length)
+            }
+        } else {
+            null
+        }
         try {
-            extractor.setDataSource(audioFilePath)
+            if (cacheSource != null) {
+                extractor.setDataSource(cacheSource)
+            } else {
+                extractor.setDataSource(audioFilePath)
+            }
         } catch (e: Exception) {
             extractor.release()
+            cacheSource?.close()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
             if (gen != generation) return
             markFailed(e, stage = "audio_open")
@@ -817,6 +842,7 @@ class FingerprintTimingManager @Inject constructor(
         }
         if (audioTrackIndex == null) {
             extractor.release()
+            cacheSource?.close()
             Timber.w("FingerprintTimingManager: no audio track found")
             if (gen != generation) return
             markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
@@ -867,6 +893,7 @@ class FingerprintTimingManager @Inject constructor(
             runCatching { codec.stop() }
             codec.release()
             extractor.release()
+            cacheSource?.close()
         }
     }
 
