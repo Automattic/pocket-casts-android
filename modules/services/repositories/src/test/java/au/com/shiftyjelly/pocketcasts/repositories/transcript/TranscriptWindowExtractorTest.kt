@@ -102,7 +102,7 @@ class TranscriptWindowExtractorTest {
             referenceSecs = 25.0
             mappingVersion.value++
             null
-        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode()
+        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
 
         val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
 
@@ -127,7 +127,7 @@ class TranscriptWindowExtractorTest {
             referenceSecs = 25.0
             mappingVersion.value++
             null
-        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode()
+        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
 
         val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
 

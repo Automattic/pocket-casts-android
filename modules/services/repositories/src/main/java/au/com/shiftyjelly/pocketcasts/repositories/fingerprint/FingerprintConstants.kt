@@ -13,6 +13,9 @@ object FingerprintConstants {
     /** Position must be stable for this long before a seek restarts the stream; coalesces rapid multi-tap skips. */
     const val RESTART_DEBOUNCE_MS = 1_500L
 
+    /** How often a running remote decode re-checks that the network still permits streaming. */
+    const val METERED_RECHECK_INTERVAL_MS = 5_000L
+
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
