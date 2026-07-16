@@ -1,14 +1,14 @@
 8.13
 -----
-
+*   Bug Fixes
+    *   Hide the "Plus expires in X days" label and expiring avatar ring for auto-renewing subscribers
+        ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
 
 8.12
 -----
 *   Bug Fixes
     *   Restore episode duration after download for feeds without an RSS length attribute
         ([#5258](https://github.com/Automattic/pocket-casts-android/pull/5258))
-    *   Hide the "Plus expires in X days" label on the profile for auto-renewing subscribers
-        ([#5263](https://github.com/Automattic/pocket-casts-android/pull/5263))
 
 8.11
 -----

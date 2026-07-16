@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.eventhorizon.BlogsShownEvent
 import com.automattic.eventhorizon.DownloadsShownEvent
 import com.automattic.eventhorizon.EndOfYearProfileCardShownEvent
@@ -75,7 +74,7 @@ class ProfileViewModel @Inject constructor(
                 imageUrl = Gravatar.getUrl(state.email),
                 subscriptionTier = state.subscription?.tier,
                 email = state.email,
-                expiresIn = state.subscription?.takeIf { it.isExpiring }?.expiryDate?.toDurationFromNow(),
+                expiresIn = state.subscription?.expiresIn,
                 isShareVisible = isProfileSharingEnabled,
             )
 

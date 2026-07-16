@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMod
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -67,7 +68,7 @@ internal fun AccountHeader(
             UserAvatar(
                 imageUrl = state.imageUrl,
                 subscriptionTier = state.subscription.tier,
-                borderCompletion = state.subscription.expiresIn?.let { it / 30.days }?.toFloat() ?: 1f,
+                borderCompletion = (state.subscription as? SubscriptionHeaderState.PaidCancel)?.expiresIn?.let { it / Subscription.EXPIRING_WINDOW }?.toFloat() ?: 1f,
                 config = config.avatarConfig,
                 showBadge = false,
             )
