@@ -4,10 +4,15 @@ import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -57,7 +62,16 @@ class FingerprintTimingManager @Inject constructor(
     private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
     private val chapterManager: Lazy<ChapterManager>,
+    private val settings: Settings,
+    private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
 ) {
+
+    /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
+    enum class PrepareTrigger {
+        PLAYBACK,
+        TRANSCRIPT_VIEW,
+        BOOKMARK,
+    }
 
     sealed interface State {
         data object Idle : State
@@ -128,6 +142,9 @@ class FingerprintTimingManager @Inject constructor(
     private var activeDecodeFrontierSec = 0.0
 
     @Volatile
+    private var unmeteredRetryCallback: ConnectivityManager.NetworkCallback? = null
+
+    @Volatile
     private var generation = 0L
 
     // Drift filter state
@@ -138,9 +155,12 @@ class FingerprintTimingManager @Inject constructor(
     internal var debugTrackingEnabled = false
 
     // Context for current preparation
+    private var currentTrigger = PrepareTrigger.PLAYBACK
+
     @Volatile
     private var currentEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
+    private var currentSharedCacheKey: String? = null
     private var currentDurationSec: Double = 0.0
     private var currentReferenceData: ByteArray? = null
     private var currentReferenceFilePath: String? = null
@@ -170,13 +190,13 @@ class FingerprintTimingManager @Inject constructor(
                 val uuid = state.episodeUuid
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
-                    prepareForCurrentEpisode()
+                    prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
                 }
             }
         }
     }
 
-    fun prepareForCurrentEpisode() {
+    fun prepareForCurrentEpisode(trigger: PrepareTrigger) {
         val episode = playbackManager.getCurrentEpisode() ?: run {
             // No episode is currently loaded, so there is no episode UUID to attribute this to.
             markUnavailable(reason = "no_episode", episodeUuid = null)
@@ -187,12 +207,21 @@ class FingerprintTimingManager @Inject constructor(
         val podcastUuid = episode.podcastOrSubstituteUuid
         // Fingerprint the progressive enclosure, not the HLS rendition; timings may drift if the renditions differ.
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
+        // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
+        val sharedCacheKey = episodeUuid.takeIf {
+            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+        }
 
         scope.launch {
             val gen: Long
             mutex.withLock {
                 // Already prepared for this episode — reuse existing state.
-                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) return@launch
+                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) {
+                    if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                        currentTrigger = trigger
+                    }
+                    return@launch
+                }
                 resetState()
                 generation++
                 gen = generation
@@ -200,7 +229,7 @@ class FingerprintTimingManager @Inject constructor(
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startPlaybackProgressObserver(episodeUuid)
-            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, episode.isDownloaded, episode.duration)
+            prepareForEpisode(gen, episodeUuid, podcastUuid, audioSource, sharedCacheKey, episode.isDownloaded, episode.duration, trigger)
         }
     }
 
@@ -224,6 +253,63 @@ class FingerprintTimingManager @Inject constructor(
             }
         }
         Timber.d("FingerprintTimingManager: stopped")
+    }
+
+    fun onTranscriptShown(episodeUuid: String) {
+        if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+        prepareForCurrentEpisode(PrepareTrigger.TRANSCRIPT_VIEW)
+    }
+
+    fun onTranscriptDismissed(episodeUuid: String) {
+        scope.launch {
+            mutex.withLock {
+                if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                    currentTrigger = PrepareTrigger.PLAYBACK
+                }
+            }
+        }
+    }
+
+    /** Must be called under [mutex]. */
+    private fun registerUnmeteredRetry(episodeUuid: String) {
+        if (unmeteredRetryCallback != null) return
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(network: android.net.Network, networkCapabilities: NetworkCapabilities) {
+                if (!networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)) return
+                if (!Network.isUnmeteredConnection(context)) return
+                if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+                val self = this
+                scope.launch {
+                    val shouldRetry = mutex.withLock {
+                        if (unmeteredRetryCallback !== self) return@withLock false
+                        unregisterUnmeteredRetry()
+                        true
+                    }
+                    if (shouldRetry) {
+                        Timber.d("FingerprintTimingManager: unmetered network available — retrying preparation")
+                        prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+                    }
+                }
+            }
+        }
+        unmeteredRetryCallback = callback
+        runCatching {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.registerDefaultNetworkCallback(callback)
+        }.onFailure {
+            unmeteredRetryCallback = null
+            Timber.w(it, "FingerprintTimingManager: failed to register network callback")
+        }
+    }
+
+    /** Must be called under [mutex]. */
+    private fun unregisterUnmeteredRetry() {
+        val callback = unmeteredRetryCallback ?: return
+        unmeteredRetryCallback = null
+        runCatching {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.unregisterNetworkCallback(callback)
+        }
     }
 
     private fun elapsedPreparationMs(): Long = if (preparationStartMs == 0L) 0L else SystemClock.elapsedRealtime() - preparationStartMs
@@ -348,6 +434,7 @@ class FingerprintTimingManager @Inject constructor(
         progressObserverJob = null
         pendingRestartJob?.cancel()
         pendingRestartJob = null
+        unregisterUnmeteredRetry()
         mappingPlaybackToReference.clear()
         mappingReferenceToPlayback.clear()
         debugRejections.clear()
@@ -361,6 +448,7 @@ class FingerprintTimingManager @Inject constructor(
         filterCandidatePool.clear()
         currentEpisodeUuid = null
         currentAudioFilePath = null
+        currentSharedCacheKey = null
         currentDurationSec = 0.0
         currentReferenceData = null
         currentReferenceFilePath = null
@@ -373,6 +461,7 @@ class FingerprintTimingManager @Inject constructor(
         preparationStartMs = 0
         currentIsStreaming = false
         currentEager = false
+        currentTrigger = PrepareTrigger.PLAYBACK
     }
 
     /**
@@ -393,12 +482,20 @@ class FingerprintTimingManager @Inject constructor(
         episodeUuid: String,
         podcastUuid: String,
         audioSource: String?,
+        sharedCacheKey: String?,
         isDownloaded: Boolean,
         durationSec: Double,
+        trigger: PrepareTrigger,
     ) {
         if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
             markUnavailable(reason = "feature_disabled", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: feature disabled")
+            return
+        }
+
+        if (Util.getAppPlatform(context) != AppPlatform.Phone) {
+            markUnavailable(reason = "unsupported_platform", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: unsupported platform")
             return
         }
 
@@ -415,12 +512,30 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        val blocked = shouldBlockRemoteFingerprinting(
+            isDownloaded = isDownloaded,
+            trigger = trigger,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+        if (blocked) {
+            mutex.withLock {
+                if (gen != generation) return
+                markUnavailable(reason = "metered_network", isStreaming = true, episodeUuid = episodeUuid)
+                registerUnmeteredRetry(episodeUuid)
+            }
+            Timber.d("FingerprintTimingManager: skipping remote fingerprinting on metered network")
+            return
+        }
+
         val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
         mutex.withLock {
             if (gen != generation) return
+            currentTrigger = trigger
             currentEpisodeUuid = episodeUuid
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
+            currentSharedCacheKey = sharedCacheKey
             currentDurationSec = durationSec
             currentIsStreaming = !isDownloaded
             currentEager = eager
@@ -434,8 +549,12 @@ class FingerprintTimingManager @Inject constructor(
             ),
         )
 
-        // Try loading cached reference from disk (only for downloaded episodes)
-        val cachedData = if (isDownloaded) referenceRetriever.loadReferenceData(audioSource) else null
+        // Try loading cached reference from disk
+        val cachedData = if (isDownloaded) {
+            referenceRetriever.loadReferenceData(audioSource)
+        } else {
+            referenceRetriever.loadCachedReference(episodeUuid)
+        }
         if (cachedData != null) {
             val reference = ReferenceFingerprint.decode(cachedData)
             if (reference != null) {
@@ -467,6 +586,8 @@ class FingerprintTimingManager @Inject constructor(
 
         if (isDownloaded) {
             referenceRetriever.saveReferenceData(referenceData, audioSource)
+        } else {
+            referenceRetriever.saveCachedReference(episodeUuid, referenceData)
         }
         configureForReference(gen, reference, referenceData, audioSource, episodeUuid)
     }
@@ -563,10 +684,17 @@ class FingerprintTimingManager @Inject constructor(
             hasPendingRestart = pendingRestartJob?.isActive == true,
             hasStreamStarted = lastStreamStartTimeMs != 0L,
             msSinceStreamStart = SystemClock.elapsedRealtime() - lastStreamStartTimeMs,
+            isStreaming = currentIsStreaming,
         )
         lastProgressPositionMs = positionMs
         when (decision) {
             ProgressDecision.None -> Unit
+
+            ProgressDecision.CancelDecode -> {
+                Timber.d("FingerprintTimingManager: playback within mapped range — cancelling decode")
+                generationJob?.cancel()
+                generationJob = null
+            }
 
             ProgressDecision.ScheduleDebouncedRestart -> {
                 Timber.d("FingerprintTimingManager: playback jumped — scheduling restart")
@@ -602,8 +730,20 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
+    private fun canStreamOnCurrentNetwork(): Boolean = !currentIsStreaming ||
+        !shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = currentTrigger,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+
     /** Must be called under [mutex]. */
     private fun restartFromPlayhead() {
+        if (!canStreamOnCurrentNetwork()) {
+            Timber.d("FingerprintTimingManager: skipping stream restart on metered network")
+            return
+        }
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
@@ -614,6 +754,10 @@ class FingerprintTimingManager @Inject constructor(
 
     /** Must be called under [mutex]. Continues an existing run, so the drift filter's trusted anchor is kept. */
     private fun restartFromRunEnd(runEndSec: Double) {
+        if (!canStreamOnCurrentNetwork()) {
+            Timber.d("FingerprintTimingManager: skipping stream restart on metered network")
+            return
+        }
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
@@ -667,11 +811,26 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        val factory = dataSourceFactory.get()
+        // Only follow the player's on-disk cache when it actually exists; otherwise read the URL directly.
+        val cacheKey = currentSharedCacheKey?.takeIf { isRemoteUrl && factory.isCacheAvailable }
         val extractor = MediaExtractor()
+        val cacheSource = if (cacheKey != null) {
+            CacheBackedMediaDataSource(factory.blockingCacheFactory, audioFilePath.toUri(), cacheKey, isActive = { gen == generation }) { position, length ->
+                factory.cachedLengthAt(cacheKey, position, length)
+            }
+        } else {
+            null
+        }
         try {
-            extractor.setDataSource(audioFilePath)
+            if (cacheSource != null) {
+                extractor.setDataSource(cacheSource)
+            } else {
+                extractor.setDataSource(audioFilePath)
+            }
         } catch (e: Exception) {
             extractor.release()
+            cacheSource?.close()
             Timber.w(e, "FingerprintTimingManager: failed to open audio file")
             if (gen != generation) return
             markFailed(e, stage = "audio_open")
@@ -684,6 +843,7 @@ class FingerprintTimingManager @Inject constructor(
         }
         if (audioTrackIndex == null) {
             extractor.release()
+            cacheSource?.close()
             Timber.w("FingerprintTimingManager: no audio track found")
             if (gen != generation) return
             markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
@@ -717,7 +877,7 @@ class FingerprintTimingManager @Inject constructor(
             )
 
             try {
-                decodeAndFingerprint(gen, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+                decodeAndFingerprint(gen, isRemoteUrl, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
 
                 // Flush remaining windows
                 val tail = streamer.flush()
@@ -734,11 +894,13 @@ class FingerprintTimingManager @Inject constructor(
             runCatching { codec.stop() }
             codec.release()
             extractor.release()
+            cacheSource?.close()
         }
     }
 
     private suspend fun decodeAndFingerprint(
         gen: Long,
+        isRemoteUrl: Boolean,
         extractor: MediaExtractor,
         codec: MediaCodec,
         streamer: StreamingWindowedFingerprinter,
@@ -751,6 +913,7 @@ class FingerprintTimingManager @Inject constructor(
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
         val timeoutUs = FingerprintConstants.CODEC_TIMEOUT_US
+        var lastNetworkCheckMs = SystemClock.elapsedRealtime()
         // Default to 16-bit (safest assumption). Updated when the codec
         // reports its actual format via INFO_OUTPUT_FORMAT_CHANGED.
         var isOutputFloat = false
@@ -758,6 +921,16 @@ class FingerprintTimingManager @Inject constructor(
         while (true) {
             currentCoroutineContext().ensureActive()
             if (gen != generation) throw CancellationException("Fingerprint stream superseded")
+
+            val now = SystemClock.elapsedRealtime()
+            if (isRemoteUrl && now - lastNetworkCheckMs >= FingerprintConstants.METERED_RECHECK_INTERVAL_MS) {
+                lastNetworkCheckMs = now
+                val allowed = mutex.withLock { gen != generation || canStreamOnCurrentNetwork() }
+                if (!allowed) {
+                    Timber.d("FingerprintTimingManager: network no longer permits streaming — stopping fingerprint stream")
+                    throw CancellationException("Fingerprint stream stopped on metered network")
+                }
+            }
 
             // Feed input
             if (!inputDone) {
@@ -813,7 +986,8 @@ class FingerprintTimingManager @Inject constructor(
                         // Eager passes decode as fast as possible; throttled passes stay near the playhead.
                         if (!currentEager) {
                             val lastKnownPositionMs = lastProgressPositionMs
-                            if (lastKnownPositionMs >= 0 && decodedSeconds - lastKnownPositionMs / 1000.0 > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                            val playheadSec = if (lastKnownPositionMs >= 0) lastKnownPositionMs / 1000.0 else startOffset
+                            if (decodedSeconds - playheadSec > FingerprintConstants.LOOKAHEAD_SECONDS) {
                                 delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
                             }
                         }
@@ -1022,6 +1196,7 @@ class FingerprintTimingManager @Inject constructor(
 
     internal sealed interface ProgressDecision {
         data object None : ProgressDecision
+        data object CancelDecode : ProgressDecision
         data object ScheduleDebouncedRestart : ProgressDecision
         data object RestartOutsideRange : ProgressDecision
         data class RestartFromRunEnd(val runEndSec: Double) : ProgressDecision
@@ -1038,6 +1213,18 @@ class FingerprintTimingManager @Inject constructor(
             isUnmetered: () -> Boolean,
         ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
 
+        /** [isUnmetered] is a supplier so the network lookup is skipped for downloaded episodes. */
+        internal fun shouldBlockRemoteFingerprinting(
+            isDownloaded: Boolean,
+            trigger: PrepareTrigger,
+            warnOnMeteredNetwork: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean {
+            if (isDownloaded) return false
+            if (isUnmetered()) return false
+            return trigger != PrepareTrigger.TRANSCRIPT_VIEW || warnOnMeteredNetwork
+        }
+
         /** Decides how a playback-progress tick affects the fingerprint stream. */
         internal fun decideOnProgress(
             positionSec: Double,
@@ -1052,11 +1239,15 @@ class FingerprintTimingManager @Inject constructor(
             hasPendingRestart: Boolean,
             hasStreamStarted: Boolean,
             msSinceStreamStart: Long,
+            isStreaming: Boolean,
         ): ProgressDecision {
             if (isEager) return ProgressDecision.None
             val isJump = lastPositionSec != null && abs(positionSec - lastPositionSec) > FingerprintConstants.RESTART_DELTA_SECONDS
             if (isJump) {
-                if (mappedRunEndSec != null) return ProgressDecision.None
+                if (mappedRunEndSec != null) {
+                    val mappedFarAhead = mappedRunEndSec >= positionSec + FingerprintConstants.LOOKAHEAD_SECONDS
+                    return if (isStreaming && isDecodeActive && mappedFarAhead) ProgressDecision.CancelDecode else ProgressDecision.None
+                }
                 if (isCoveredByActiveDecode) return ProgressDecision.None
                 return ProgressDecision.ScheduleDebouncedRestart
             }

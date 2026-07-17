@@ -8,8 +8,6 @@ Language: ar
 <resources>
     <string name="transcript_tap_to_seek_streaming_unavailable">قم بتنزيل الحلقة لتمكين ميزة Tap to Seek</string>
     <string name="bookmark_play_from">تشغيل من %s</string>
-    <string name="profile_try_days_for_free">استمتع بتجربة مجّانية لمدة 30 يومًا</string>
-    <string name="profile_start_free_trial_specific_duration">ابدأ تجربتك المجّانية لمدة 30 يومًا</string>
     <string name="summary_upsell_description">اشترك في خطة Plus للحصول على حق الوصول إليها وإلى الميزات الأخرى للخطة المميزة، مثل: الإشارات المرجعية والمجلدات.</string>
     <string name="summary_upsell_title">ملخصات مدعومة بالذكاء الاصطناعي</string>
     <string name="tv_create_account_come_back">بمجرد أن يتم إنشاء حسابك، يمكنك الرجوع وتسجيل الدخول</string>

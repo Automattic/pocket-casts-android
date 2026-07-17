@@ -72,18 +72,22 @@ class HistoryManager @Inject constructor(
                 val podcastUuid = change.podcast
                 if (episode != null) {
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
-                        episode.lastPlaybackInteraction = interactionDate
-                        episode.lastPlaybackInteractionSyncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED
-                        episodeManager.updateBlocking(episode)
+                        episodeManager.updatePlaybackInteraction(
+                            episodeUuid = episodeUuid,
+                            interactionDate = interactionDate,
+                            syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED,
+                        )
                     }
                 } else if (podcastUuid != null) {
                     Timber.i("Listening history episode no longer exists. Episode: $episodeUuid podcast: $podcastUuid")
                 }
             } else if (change.action == ACTION_DELETE) {
                 if (episode != null) {
-                    episode.lastPlaybackInteraction = 0
-                    episode.lastPlaybackInteractionSyncStatus = 1
-                    episodeManager.updateBlocking(episode)
+                    episodeManager.updatePlaybackInteraction(
+                        episodeUuid = episodeUuid,
+                        interactionDate = 0,
+                        syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED,
+                    )
                 }
             }
         }

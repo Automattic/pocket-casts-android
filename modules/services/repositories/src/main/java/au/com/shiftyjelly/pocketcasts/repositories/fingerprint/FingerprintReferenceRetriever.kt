@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -26,6 +28,7 @@ import timber.log.Timber
 @Singleton
 class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
+    @ApplicationContext private val context: Context,
 ) {
     private val inFlightRequests = mutableMapOf<String, Deferred<ByteArray?>>()
     private val requestMutex = Mutex()
@@ -122,8 +125,38 @@ class FingerprintReferenceRetriever @Inject constructor(
         if (file.exists()) file.readBytes() else null
     }
 
+    suspend fun loadCachedReference(episodeUuid: String): ByteArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            val file = cachedReferenceFile(episodeUuid)
+            if (!file.exists()) return@runCatching null
+            file.setLastModified(System.currentTimeMillis())
+            file.readBytes()
+        }.getOrNull()
+    }
+
+    suspend fun saveCachedReference(episodeUuid: String, data: ByteArray) = withContext(Dispatchers.IO) {
+        runCatching {
+            val file = cachedReferenceFile(episodeUuid)
+            file.parentFile?.mkdirs()
+            file.writeBytes(data)
+            pruneCachedReferences()
+        }.onFailure { Timber.w(it, "FingerprintReferenceRetriever: failed to cache reference for $episodeUuid") }
+        Unit
+    }
+
+    private fun cachedReferenceFile(episodeUuid: String) = File(File(context.cacheDir, CACHE_DIR_NAME), "$episodeUuid.ref.fp.json")
+
+    private fun pruneCachedReferences() {
+        val files = File(context.cacheDir, CACHE_DIR_NAME).listFiles() ?: return
+        files.sortedByDescending { it.lastModified() }
+            .drop(REFERENCE_CACHE_MAX_FILES)
+            .forEach { it.delete() }
+    }
+
     companion object {
         private const val MAX_RETRIES = 3
+        private const val CACHE_DIR_NAME = "episode_fingerprints"
+        private const val REFERENCE_CACHE_MAX_FILES = 20
 
         fun referencePath(audioFilePath: String): String {
             val dotIndex = audioFilePath.lastIndexOf('.')

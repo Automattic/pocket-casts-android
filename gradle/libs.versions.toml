@@ -23,12 +23,12 @@ billing = "9.1.0"
 coil = "3.5.0"
 compose = "2026.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.2.1"
-dependency-analysis = "3.16.0"
-firebase = "34.15.0"
+dependency-analysis = "3.17.0"
+firebase = "34.16.0"
 fragment = "1.8.9"
 glance = "1.1.1"
 google-services = "4.5.0"
-hilt = "2.60"
+hilt = "2.60.1"
 hilt-compiler = "1.4.0"
 horologist = "0.8.3-alpha"
 java = "17"
@@ -328,5 +328,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:8.7.0"
+spotless = "com.diffplug.spotless:8.8.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

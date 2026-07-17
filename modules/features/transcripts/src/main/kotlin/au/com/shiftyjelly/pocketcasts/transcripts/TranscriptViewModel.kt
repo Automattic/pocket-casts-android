@@ -144,7 +144,7 @@ class TranscriptViewModel @AssistedInject constructor(
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
                 val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
                 if (currentPlayingUuid == episodeUuid) {
-                    fingerprintTimingManager.prepareForCurrentEpisode()
+                    fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
                     _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
                     observeSyncedState()
                 }
