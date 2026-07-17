@@ -89,6 +89,19 @@ class CacheWorker @AssistedInject constructor(
             networkConstraint: NetworkType,
             onCachingComplete: (String) -> Unit,
         ) {
+            val cacheWorkRequest = buildCacheWorkRequest(url, episodeUuid, networkConstraint)
+
+            observeWorkerInfo(context, cacheWorkRequest, episodeUuid, onCachingComplete)
+
+            // Enqueue unique caching work by replacing any existing work with the same tag
+            WorkManager.getInstance(context).enqueueUniqueWork(CACHE_WORKER_TAG, ExistingWorkPolicy.REPLACE, cacheWorkRequest)
+        }
+
+        internal fun buildCacheWorkRequest(
+            url: String,
+            episodeUuid: String,
+            networkConstraint: NetworkType,
+        ): OneTimeWorkRequest {
             val inputData = Data.Builder()
                 .putString(URL_KEY, url)
                 .putString(EPISODE_UUID_KEY, episodeUuid)
@@ -98,15 +111,10 @@ class CacheWorker @AssistedInject constructor(
                 .setRequiredNetworkType(networkConstraint)
                 .build()
 
-            val cacheWorkRequest = OneTimeWorkRequest.Builder(CacheWorker::class.java)
+            return OneTimeWorkRequest.Builder(CacheWorker::class.java)
                 .addTag(CACHE_WORKER_TAG)
                 .setConstraints(constraints)
                 .setInputData(inputData).build()
-
-            observeWorkerInfo(context, cacheWorkRequest, episodeUuid, onCachingComplete)
-
-            // Enqueue unique caching work by replacing any existing work with the same tag
-            WorkManager.getInstance(context).enqueueUniqueWork(CACHE_WORKER_TAG, ExistingWorkPolicy.REPLACE, cacheWorkRequest)
         }
 
         private fun observeWorkerInfo(
