@@ -112,7 +112,7 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         }
 
         val callerSignature = callerPackageInfo.signature
-        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.first {
+        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.firstOrNull {
             it.signature == callerSignature
         } != null
 
