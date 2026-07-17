@@ -181,11 +181,7 @@ platform :android do
         milestone: new_version
       )
     rescue StandardError => e
-      UI.error <<~MESSAGE
-        Error moving PRs to next milestone or freezing the current `#{new_version}` milestone: #{e.message}.
-        Please manually check that the PRs which were targeting milestone `#{new_version}` have been moved to the next one
-        and that the milestone `#{new_version}` that just entered code-freeze had the "❄️" marker added to its title.
-      MESSAGE
+      report_milestone_error(error_title: "Error moving PRs to the next milestone or freezing the `#{new_version}` milestone: #{e.message}")
     end
   end
 
@@ -330,7 +326,7 @@ platform :android do
     begin
       close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
     rescue StandardError => e
-      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close: #{e}")
+      report_milestone_error(error_title: "Error closing the milestone `#{release_version_current}` for the hotfix: #{e.message}")
     end
   end
 
@@ -453,15 +449,7 @@ platform :android do
       set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
       close_milestone(repository: GITHUB_REPO, milestone: version)
     rescue StandardError => e
-      error_message = <<-MESSAGE
-        Error closing milestone `#{version}`: #{e.message}
-
-        - If this is not the first time you are running the release task (e.g. retrying because it failed on first attempt), the milestone might have already been closed and this error is expected.
-        - Otherwise if this is the first you are running the release task for this version, please investigate the error.
-      MESSAGE
-
-      UI.error(error_message)
-      buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci?
+      report_milestone_error(error_title: "Error closing the milestone `#{version}`: #{e.message}")
     end
 
     push_to_git_remote(tags: false)
@@ -989,5 +977,19 @@ platform :android do
     buildkite_annotate(style: 'error', context: 'error-checking-branch', message: error_message) if is_ci
 
     UI.user_error!(error_message)
+  end
+
+  # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
+  # clarifying that the error is expected when the release task is not being run for the first time.
+  def report_milestone_error(error_title:)
+    error_message = <<-MESSAGE
+      #{error_title}
+
+      - If this is not the first time you are running the release task (e.g. retrying because it failed on first attempt), the milestone might have already been closed and this error is expected.
+      - Otherwise if this is the first you are running the release task for this version, please investigate the error.
+    MESSAGE
+
+    UI.error(error_message)
+    buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci?
   end
 end
