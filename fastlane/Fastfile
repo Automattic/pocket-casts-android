@@ -449,7 +449,7 @@ platform :android do
       set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
       close_milestone(repository: GITHUB_REPO, milestone: version)
     rescue StandardError => e
-      report_milestone_error(error_title: "Error closing the milestone `#{version}`: #{e.message}")
+      report_milestone_error(error_title: "Error unfreezing or closing the milestone `#{version}`: #{e.message}")
     end
 
     push_to_git_remote(tags: false)
@@ -982,7 +982,7 @@ platform :android do
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
   # clarifying that the error is expected when the release task is not being run for the first time.
   def report_milestone_error(error_title:)
-    error_message = <<-MESSAGE
+    error_message = <<~MESSAGE
       #{error_title}
 
       - If this is not the first time you are running the release task (e.g. retrying because it failed on first attempt), the milestone might have already been closed and this error is expected.
