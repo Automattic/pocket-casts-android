@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTiming
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -30,6 +31,8 @@ class ChapterManagerImpl @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
 ) : ChapterManager {
+    private var unalignedLogEpisodeUuid: String? = null
+
     override suspend fun updateChapters(
         episodeUuid: String,
         chapters: List<DbChapter>,
@@ -80,6 +83,10 @@ class ChapterManagerImpl @Inject constructor(
     private fun alignGeneratedChapters(episodeUuid: String, chapters: Chapters): Chapters {
         val manager = fingerprintTimingManager.get()
         if (manager.activeEpisodeUuid != episodeUuid || manager.mappingSnapshot.isEmpty()) {
+            if (chapters.hasGeneratedChapters && unalignedLogEpisodeUuid != episodeUuid) {
+                unalignedLogEpisodeUuid = episodeUuid
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Generated chapters for $episodeUuid are unaligned: no fingerprint mapping available")
+            }
             return chapters
         }
         return alignGeneratedChapters(chapters) { reference ->
