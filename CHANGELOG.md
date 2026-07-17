@@ -10,6 +10,8 @@
 *   Bug Fixes
     *   Reduce the chance of episode playback progress reverting during listening history sync
         ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
+    *   Fix a crash that could occur when seeking during playback
+        ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
 
 8.16
 -----
