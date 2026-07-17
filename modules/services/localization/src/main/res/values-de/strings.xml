@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-01 10:54:33+0000
+Translation-Revision-Date: 2026-07-09 09:56:12+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Heatmap der Höraktivität</string>
+    <string name="profile_stats_listening_activity">Höraktivität</string>
+    <string name="player_action_show_video">Video anzeigen</string>
+    <string name="player_action_hide_video">Video ausblenden</string>
+    <string name="up_next_sort_duration_tooltip_body">Kurz nach lang, oder umgekehrt – passe die Folge an deine verfügbare Zeit an.</string>
+    <string name="up_next_sort_duration_tooltip_title">Nach Dauer sortieren</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Lade die Folge herunter, um zum Suchen zu tippen</string>
     <string name="bookmark_play_from">Abspielen von %s</string>
     <string name="summary_upsell_description">Werde Plus-Abonnent, um Zugriff auf das Transkript und andere Premium-Funktionen wie Lesezeichen und Ordner zu erhalten.</string>
@@ -127,14 +133,10 @@ Language: de
     <string name="watch_synced_successfully">Watch erfolgreich synchronisiert</string>
     <string name="watch_sync_waiting_for_phone">Auf Synchronisierung des Mobiltelefons warten …</string>
     <string name="watch_sync_retry">Erneut versuchen</string>
-    <string name="watch_sync_error_unknown_help">Versuche es erneut oder melde dich manuell an</string>
     <string name="watch_sync_error_login_failed_help">Versuche, dich manuell anzumelden</string>
     <string name="watch_sync_error_no_connection_help">Bluetooth-Verbindung zu deinem Mobiltelefon überprüfen</string>
-    <string name="watch_sync_error_timeout_help">Stelle sicher, dass sich dein Mobiltelefon in der Nähe befindet und über Bluetooth verbunden ist</string>
-    <string name="watch_sync_error_unknown">Es ist ein Fehler aufgetreten</string>
     <string name="watch_sync_error_login_failed">Anmeldung fehlgeschlagen</string>
     <string name="watch_sync_error_no_connection">Mobiltelefon nicht verbunden</string>
-    <string name="watch_sync_error_timeout">Verbindung zum Mobiltelefon fehlgeschlagen</string>
     <string name="watch_sync_success">Über das Mobiltelefon angemeldet!</string>
     <string name="watch_sync_syncing">Mobiltelefon wird synchronisiert… </string>
     <string name="error_download_generic_failure">Die Folge konnte nicht heruntergeladen werden. %1$s</string>

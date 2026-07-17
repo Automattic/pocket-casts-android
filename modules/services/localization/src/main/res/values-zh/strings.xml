@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-30 11:56:13+0000
+Translation-Revision-Date: 2026-07-09 15:55:32+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">收听活动热图</string>
+    <string name="profile_stats_listening_activity">收听活动</string>
+    <string name="player_action_show_video">显示视频</string>
+    <string name="player_action_hide_video">隐藏视频</string>
+    <string name="up_next_sort_duration_tooltip_body">从最短到最长，或者反过来 — 根据您实际拥有的时间来安排剧集。</string>
+    <string name="up_next_sort_duration_tooltip_title">按时长排序</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">下载该剧集后，即可通过点击跳转播放位置</string>
     <string name="bookmark_play_from">从 %s 播放</string>
     <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
@@ -127,14 +133,10 @@ Language: zh_CN
     <string name="watch_synced_successfully">手表同步成功</string>
     <string name="watch_sync_waiting_for_phone">正在等待手机同步…</string>
     <string name="watch_sync_retry">重试</string>
-    <string name="watch_sync_error_unknown_help">重试或手动登录</string>
     <string name="watch_sync_error_login_failed_help">尝试手动登录</string>
     <string name="watch_sync_error_no_connection_help">检查与您手机的蓝牙连接</string>
-    <string name="watch_sync_error_timeout_help">确保您的手机在附近并已通过蓝牙连接</string>
-    <string name="watch_sync_error_unknown">出错了</string>
     <string name="watch_sync_error_login_failed">登录失败</string>
     <string name="watch_sync_error_no_connection">手机未连接</string>
-    <string name="watch_sync_error_timeout">无法连接到手机</string>
     <string name="watch_sync_success">已从手机登录！</string>
     <string name="watch_sync_syncing">正在与手机同步…</string>
     <string name="error_download_generic_failure">下载剧集失败。 %1$s</string>
