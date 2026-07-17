@@ -100,7 +100,6 @@ class AccountDetailsFragment : BaseFragment() {
             headerState = accountViewModel.headerState.collectAsState().value,
             recommendedPlan = accountViewModel.recommendedPlanState.collectAsState().value,
             sectionsState = accountViewModel.sectionsState.collectAsState().value,
-            trialCtaCopyTreatment = accountViewModel.trialCtaCopyTreatment,
         )
 
         AccountDetailsPage(
