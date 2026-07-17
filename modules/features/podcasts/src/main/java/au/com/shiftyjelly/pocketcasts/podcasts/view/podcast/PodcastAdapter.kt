@@ -417,7 +417,7 @@ class PodcastAdapter(
             isMultiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
-            streamByDefault = settings.streamingMode.value,
+            streamByDefault = settings.streamingMode.value || castConnected,
             tint = tintColor,
             animateMultiSelection = animateMultiSelection,
         )

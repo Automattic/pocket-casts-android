@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chromecast
 
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.StateFlow
 
 interface CastManager {
 
-    val isConnectedObservable: Observable<Boolean>
+    val isConnectedFlow: StateFlow<Boolean>
 
     suspend fun isAvailable(): Boolean
     suspend fun isConnected(): Boolean
