@@ -122,12 +122,20 @@ class ChaptersViewModel @AssistedInject constructor(
             val episode = episodeManager.findEpisodeByUuid(episodeId)
             val tappedCurrentEpisode = stateAtTap.episodeUuid == episodeId
 
+            val alignsFingerprint = tappedCurrentEpisode && chapter.isGenerated
+            val alignMark = TimeSource.Monotonic.markNow()
             val target = if (tappedCurrentEpisode) {
                 withTimeoutOrNull(CHAPTER_ALIGNMENT_TIMEOUT) {
                     chapterManager.awaitStreamAlignedChapter(episodeId, chapter)
                 } ?: chapter
             } else {
                 chapter
+            }
+            val alignmentWaitMs = if (alignsFingerprint) alignMark.elapsedNow().inWholeMilliseconds else 0L
+            val fingerprintCalculationTimeMs = if (alignsFingerprint && fingerprintTimingManager.activeEpisodeUuid == episodeId) {
+                fingerprintTimingManager.preparationDurationMs
+            } else {
+                null
             }
 
             val playbackState = playbackManager.playbackStateFlow.first()
@@ -156,7 +164,11 @@ class ChaptersViewModel @AssistedInject constructor(
                         playbackManager.playNowSuspend(it)
                     }
                 }
-                if (playbackResumed.await() != null) tapMark.elapsedNow().inWholeMilliseconds else null
+                if (playbackResumed.await() != null) {
+                    (tapMark.elapsedNow().inWholeMilliseconds - alignmentWaitMs).coerceAtLeast(0L)
+                } else {
+                    null
+                }
             }
 
             eventHorizon.track(
@@ -167,6 +179,7 @@ class ChaptersViewModel @AssistedInject constructor(
                         is Mode.Player -> ChaptersShownSource.FullscreenPlayer
                     },
                     playbackStartLatencyMs = latencyMs,
+                    fingerprintCalculationTimeMs = fingerprintCalculationTimeMs,
                     episodeUuid = episodeId,
                     podcastUuid = episode?.podcastOrSubstituteUuid,
                 ),

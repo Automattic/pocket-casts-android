@@ -106,6 +106,11 @@ class FingerprintTimingManager @Inject constructor(
     var activeEpisodeUuid: String? = null
         private set
 
+    /** Time taken to prepare the fingerprint mapping to Active for the current episode, or null until reached. Safe to read off the UI thread. */
+    @Volatile
+    var preparationDurationMs: Long? = null
+        private set
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
@@ -348,6 +353,7 @@ class FingerprintTimingManager @Inject constructor(
         _stateFlow.value = State.Active(coverage)
         if (!hasReachedActive) {
             hasReachedActive = true
+            preparationDurationMs = elapsedPreparationMs()
             Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
             eventHorizon.track(
                 SyncedTranscriptsPreparationCompletedEvent(
@@ -459,6 +465,7 @@ class FingerprintTimingManager @Inject constructor(
         hasReachedActive = false
         hasTrackedFailure = false
         preparationStartMs = 0
+        preparationDurationMs = null
         currentIsStreaming = false
         currentEager = false
         currentTrigger = PrepareTrigger.PLAYBACK
