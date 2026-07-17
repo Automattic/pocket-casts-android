@@ -34,7 +34,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Downgrade to `read` if Claude should not push commits/branches
+      contents: read
       pull-requests: write
       issues: write
       actions: read # Required for Claude to read CI results on PRs
@@ -81,7 +81,7 @@ jobs:
       - name: Run Claude Code
         if: steps.pr-origin.outputs.is_internal == 'true'
         id: claude
-        uses: anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342 # v1.0.171
+        uses: anthropics/claude-code-action@12531344451323133b0493233c759991ac61da12 # v1.0.174
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
