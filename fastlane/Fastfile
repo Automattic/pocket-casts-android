@@ -449,8 +449,20 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
-    close_milestone(repository: GITHUB_REPO, milestone: version)
+    begin
+      set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
+      close_milestone(repository: GITHUB_REPO, milestone: version)
+    rescue StandardError => e
+      error_message = <<-MESSAGE
+        Error closing milestone `#{version}`: #{e.message}
+
+        - If this is not the first time you are running the release task (e.g. retrying because it failed on first attempt), the milestone might have already been closed and this error is expected.
+        - Otherwise if this is the first you are running the release task for this version, please investigate the error.
+      MESSAGE
+
+      UI.error(error_message)
+      buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci?
+    end
 
     push_to_git_remote(tags: false)
     trigger_release_build(branch_to_build: "release/#{version}")
