@@ -75,6 +75,19 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+
+    val syncableEpisodeUuid = uiState.transcriptEpisodeUuid.takeIf { uiState.isTextTranscriptLoaded }
+    DisposableEffect(fingerprintTimingManager, syncableEpisodeUuid) {
+        if (syncableEpisodeUuid != null) {
+            fingerprintTimingManager?.onTranscriptShown(syncableEpisodeUuid)
+        }
+        onDispose {
+            if (syncableEpisodeUuid != null) {
+                fingerprintTimingManager?.onTranscriptDismissed(syncableEpisodeUuid)
+            }
+        }
+    }
+
     var highlightState by remember { mutableStateOf(HighlightState()) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }

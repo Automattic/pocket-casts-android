@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.patronPurple
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -148,21 +147,19 @@ data class OnboardingSubscriptionPlan private constructor(
             }
         }
 
+    private val trialDurationText
+        @Composable get(): String {
+            val discountedPhase = requireNotNull(discountedPricingPhase)
+            val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            return discountedPhase.schedule.period.toText(recurringPeriods)
+        }
+
     val offerBadgeText
         @Composable get() = when (key.offer) {
             SubscriptionOffer.IntroOffer -> stringResource(LR.string.half_price_first_year)
-
-            SubscriptionOffer.Trial -> {
-                val discountedPhase = requireNotNull(discountedPricingPhase)
-                val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
-
-                stringResource(LR.string.plus_trial_duration_free_trial, discountedPhase.schedule.period.toText(recurringPeriods))
-            }
-
+            SubscriptionOffer.Trial -> stringResource(LR.string.plus_trial_duration_free_trial, trialDurationText)
             SubscriptionOffer.Referral -> null
-
             SubscriptionOffer.Winback -> null
-
             null -> null
         }
 
@@ -181,23 +178,11 @@ data class OnboardingSubscriptionPlan private constructor(
     @Composable
     fun ctaButtonText(
         isRenewingSubscription: Boolean,
-        trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
     ) = if (isRenewingSubscription) {
         stringResource(LR.string.renew_your_subscription)
     } else {
         when (key.offer) {
-            SubscriptionOffer.Trial -> when (val treatment = trialCtaCopyTreatment) {
-                null -> stringResource(LR.string.profile_start_free_trial)
-
-                else -> {
-                    stringResource(
-                        when (treatment) {
-                            TrialCtaCopyTreatment.START_30_DAY_TRIAL -> LR.string.profile_start_free_trial_specific_duration
-                            TrialCtaCopyTreatment.TRY_30_DAYS_FREE -> LR.string.profile_try_days_for_free
-                        },
-                    )
-                }
-            }
+            SubscriptionOffer.Trial -> stringResource(LR.string.profile_try_duration_for_free, trialDurationText)
 
             SubscriptionOffer.IntroOffer,
             SubscriptionOffer.Referral,

@@ -61,7 +61,7 @@ class TranscriptWindowExtractor @Inject constructor(
         refNow()?.let { return it }
         if (playbackManager.get().getCurrentEpisode()?.uuid != episodeUuid) return timeSecs
 
-        manager.prepareForCurrentEpisode()
+        manager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
         val ref = withTimeoutOrNull(COVERAGE_TIMEOUT) {
             merge(
                 manager.mappingVersion.map { refNow() }.filter { it != null },

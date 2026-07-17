@@ -8,6 +8,8 @@
     *   Add settings to hide generated chapters
         ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 *   Bug Fixes
+    *   Reduce the chance of episode playback progress reverting during listening history sync
+        ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
     *   Fix Automotive crash when using Google Assistant voice commands to control playback
         ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
 

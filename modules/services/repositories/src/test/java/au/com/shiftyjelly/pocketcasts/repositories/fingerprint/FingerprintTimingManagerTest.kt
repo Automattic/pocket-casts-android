@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.PrepareTrigger
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.ProgressDecision
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import org.junit.Assert.assertEquals
@@ -162,6 +163,87 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `shouldBlockRemoteFingerprinting never blocks downloaded episodes`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = true,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting does not query network for downloaded episodes`() {
+        var queriedNetwork = false
+        FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = true,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = {
+                queriedNetwork = true
+                true
+            },
+        )
+        assertFalse(queriedNetwork)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting never blocks on unmetered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { true },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks playback trigger on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.PLAYBACK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks bookmark trigger on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.BOOKMARK,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting allows transcript view on metered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.TRANSCRIPT_VIEW,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockRemoteFingerprinting blocks transcript view when user warns on data use`() {
+        val blocked = FingerprintTimingManager.shouldBlockRemoteFingerprinting(
+            isDownloaded = false,
+            trigger = PrepareTrigger.TRANSCRIPT_VIEW,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
     fun `decideOnProgress ignores ticks in eager mode`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0, isEager = true)
         assertEquals(ProgressDecision.None, decision)
@@ -182,6 +264,54 @@ class FingerprintTimingManagerTest {
     @Test
     fun `decideOnProgress jump within mapped run does not restart`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0, mappedRunEndSec = 120.0)
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run cancels decode when streaming and mapped far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = true,
+            isStreaming = true,
+        )
+        assertEquals(ProgressDecision.CancelDecode, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run keeps decode for local files`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = true,
+            isStreaming = false,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run without active decode does not cancel`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 200.0,
+            isDecodeActive = false,
+            isStreaming = true,
+        )
+        assertEquals(ProgressDecision.None, decision)
+    }
+
+    @Test
+    fun `decideOnProgress jump within run keeps decode when the run end is not far ahead`() {
+        val decision = decideOnProgress(
+            positionSec = 100.0,
+            lastPositionSec = 10.0,
+            mappedRunEndSec = 130.0,
+            isDecodeActive = true,
+            isStreaming = true,
+        )
         assertEquals(ProgressDecision.None, decision)
     }
 
@@ -335,6 +465,7 @@ class FingerprintTimingManagerTest {
             mappedRunEndSec = 130.0,
             isDecodeActive = true,
             isRunEndCoveredByActiveDecode = false,
+            isStreaming = true,
         )
         assertEquals(ProgressDecision.RestartFromRunEnd(130.0), decision)
     }
@@ -451,6 +582,7 @@ class FingerprintTimingManagerTest {
         hasPendingRestart: Boolean = false,
         hasStreamStarted: Boolean = hasAnyMapping || isDecodeActive,
         msSinceStreamStart: Long = FingerprintConstants.STREAM_BOOTSTRAP_COOLDOWN_MS,
+        isStreaming: Boolean = false,
     ): ProgressDecision = FingerprintTimingManager.decideOnProgress(
         positionSec = positionSec,
         lastPositionSec = lastPositionSec,
@@ -464,6 +596,7 @@ class FingerprintTimingManagerTest {
         hasPendingRestart = hasPendingRestart,
         hasStreamStarted = hasStreamStarted,
         msSinceStreamStart = msSinceStreamStart,
+        isStreaming = isStreaming,
     )
 
     @Test

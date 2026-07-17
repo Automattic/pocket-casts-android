@@ -8,8 +8,6 @@ Language: ru
 <resources>
     <string name="transcript_tap_to_seek_streaming_unavailable">Скачать выпуск, чтобы искать нажатием</string>
     <string name="bookmark_play_from">Воспроизвести с %s</string>
-    <string name="profile_try_days_for_free">Попробуйте 30 дней бесплатно</string>
-    <string name="profile_start_free_trial_specific_duration">Начните 30-дневный пробный период</string>
     <string name="summary_upsell_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
     <string name="summary_upsell_title">Сводки на базе ИИ</string>
     <string name="tv_create_account_subtitle">Отсканируйте этот код, чтобы начать работу с телефона. Это займёт всего минуту.</string>

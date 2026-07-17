@@ -8,8 +8,6 @@ Language: de
 <resources>
     <string name="transcript_tap_to_seek_streaming_unavailable">Lade die Folge herunter, um zum Suchen zu tippen</string>
     <string name="bookmark_play_from">Abspielen von %s</string>
-    <string name="profile_try_days_for_free">30 Tage kostenlos testen</string>
-    <string name="profile_start_free_trial_specific_duration">Kostenlosen 30-tägigen Testzeitraum starten</string>
     <string name="summary_upsell_description">Werde Plus-Abonnent, um Zugriff auf das Transkript und andere Premium-Funktionen wie Lesezeichen und Ordner zu erhalten.</string>
     <string name="summary_upsell_title">KI-gestützte Zusammenfassungen</string>
     <string name="tv_create_account_subtitle">Scanne diesen Code, um auf deinem Mobiltelefon zu beginnen. Es dauert nur eine Minute.</string>
