@@ -400,10 +400,10 @@ platform :android do
         api_token: ENV.fetch('GITHUB_TOKEN')
       )
 
-      buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci?
+      buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci
     else
       UI.important('No translations were downloaded, so no PR was created')
-      buildkite_annotate(context: 'translations-pr-url', message: 'No translations were downloaded, so no PR was created') if is_ci?
+      buildkite_annotate(context: 'translations-pr-url', message: 'No translations were downloaded, so no PR was created') if is_ci
       Fastlane::Helper::GitHelper.checkout_and_pull(base_branch)
       Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(pr_branch)
     end
@@ -508,7 +508,7 @@ platform :android do
         RELEASE_VERSION: release_version_current
       }
     }
-    if is_ci?
+    if is_ci
       buildkite_pipeline_upload(**pipeline_args)
     else
       buildkite_trigger_build(
@@ -990,6 +990,6 @@ platform :android do
     MESSAGE
 
     UI.error(error_message)
-    buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci?
+    buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci
   end
 end
