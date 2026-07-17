@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -493,8 +494,8 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET playing_status = :playingStatus, playing_status_modified = :modified WHERE uuid = :uuid")
     abstract fun updatePlayingStatusBlocking(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :modified, last_playback_interaction_sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updatePlaybackInteractionDate(uuid: String, modified: Long)
+    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :interactionDate, last_playback_interaction_sync_status = :syncStatus WHERE uuid = :uuid")
+    abstract suspend fun updatePlaybackInteraction(uuid: String, interactionDate: Long, syncStatus: Long)
 
     @Query("UPDATE podcast_episodes SET duration = :duration, duration_modified = :modified WHERE uuid = :uuid")
     abstract fun updateDurationBlocking(duration: Double, modified: Long, uuid: String)
@@ -741,4 +742,19 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun clearDownloadsWithoutTaskId(statuses: Collection<EpisodeDownloadStatus>)
+
+    @Query(
+        """
+        SELECT
+          date(last_playback_interaction_date / 1000, 'unixepoch', 'localtime') AS listen_date,
+          SUM(played_up_to) AS total_played_seconds
+        FROM podcast_episodes
+        WHERE
+          last_playback_interaction_date IS NOT NULL
+          AND last_playback_interaction_date >= :fromEpochMs
+        GROUP BY listen_date
+        ORDER BY listen_date ASC
+        """,
+    )
+    abstract suspend fun dailyListenedTime(fromEpochMs: Long): List<DailyListenedTime>
 }

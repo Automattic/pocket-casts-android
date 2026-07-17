@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -299,8 +300,16 @@ class EpisodeManagerImpl @Inject constructor(
 
         // We don't have a playback interaction date for user episodes, just episodes
         if (episode is PodcastEpisode) {
-            episodeDao.updatePlaybackInteractionDate(episode.uuid, System.currentTimeMillis())
+            episodeDao.updatePlaybackInteraction(
+                uuid = episode.uuid,
+                interactionDate = System.currentTimeMillis(),
+                syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_NOT_SYNCED,
+            )
         }
+    }
+
+    override suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long) {
+        episodeDao.updatePlaybackInteraction(episodeUuid, interactionDate, syncStatus)
     }
 
     override fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus) {
@@ -943,6 +952,10 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         return totalPlaytime
+    }
+
+    override suspend fun dailyListenedTime(fromEpochMs: Long): List<DailyListenedTime> {
+        return episodeDao.dailyListenedTime(fromEpochMs)
     }
 
     /**

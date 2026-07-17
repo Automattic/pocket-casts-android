@@ -114,6 +114,30 @@ class BaseEpisodeHlsDetectionTest {
         assertTrue(episode.isStreamUrlHls)
     }
 
+    @Test
+    fun `video episode shows the video icon`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp4", fileType = "video/mp4")
+        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+    }
+
+    @Test
+    fun `HLS only episode shows the video icon`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.m3u8")
+        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+    }
+
+    @Test
+    fun `episode with an HLS alternate enclosure shows the video icon`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3")
+        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = true))
+    }
+
+    @Test
+    fun `plain audio episode does not show the video icon`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mpeg")
+        assertFalse(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+    }
+
     private fun createEpisode(
         downloadUrl: String? = null,
         fileType: String? = null,

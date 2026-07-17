@@ -178,18 +178,22 @@ class TranscriptViewModel @AssistedInject constructor(
 
     /**
      * Seeks playback to the tapped transcript [entry]. Returns the playback position (ms) sought
-     * to, or `null` if the entry is untimed, syncing is inactive, or no mapping is available. The
-     * caller uses the returned position to drive the highlight directly rather than re-deriving it
-     * from the (lossy) playback position.
+     * to, or `null` if the entry is untimed, tap-to-seek is unavailable, or no mapping is
+     * available (which tracks a seek failure). The caller uses the returned position to drive the
+     * highlight directly rather than re-deriving it from the (lossy) playback position.
      */
     fun seekToTranscriptEntry(entry: TranscriptEntry): Int? {
         val textEntry = entry as? TranscriptEntry.Text ?: return null
         if (textEntry.startTimeMs < 0) return null
         val currentState = _uiState.value
-        if (!currentState.isSyncedActive) return null
+        if (!currentState.isTapToSeekAvailable) return null
 
         val refTimeSec = textEntry.startTimeMs / 1000.0
-        val seekTimeMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec)
+        val seekTimeMs = if (currentState.isSyncedActive) {
+            fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec)
+        } else {
+            null
+        }
         if (seekTimeMs == null) {
             track { source, podcastUuid, episodeUuid ->
                 SyncedTranscriptsSeekFailedEvent(
@@ -464,6 +468,13 @@ data class UiState(
     val transcriptEpisodeUuid get() = (transcriptState as? TranscriptState.Loaded)?.transcript?.episodeUuid
 
     val isSyncedActive get() = syncedState is FingerprintTimingManager.State.Active &&
+        transcriptEpisodeUuid != null &&
+        transcriptEpisodeUuid == playingEpisodeUuid
+
+    val isGeneratedTextTranscript get() = ((transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text)?.isGenerated == true
+
+    val isTapToSeekAvailable get() = isGeneratedTextTranscript &&
+        !isPaywallVisible &&
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
 
