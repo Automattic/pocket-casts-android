@@ -112,9 +112,9 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         }
 
         val callerSignature = callerPackageInfo.signature
-        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.first {
+        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.any {
             it.signature == callerSignature
-        } != null
+        } == true
 
         val isCallerKnown = when {
             // If it's our own app making the call, allow it.

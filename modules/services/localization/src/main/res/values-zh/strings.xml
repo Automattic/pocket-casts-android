@@ -8,8 +8,6 @@ Language: zh_CN
 <resources>
     <string name="transcript_tap_to_seek_streaming_unavailable">下载该剧集后，即可通过点击跳转播放位置</string>
     <string name="bookmark_play_from">从 %s 播放</string>
-    <string name="profile_try_days_for_free">免费试用 30 天</string>
-    <string name="profile_start_free_trial_specific_duration">开始 30 天免费试用</string>
     <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
     <string name="summary_upsell_title">AI 驱动的摘要</string>
     <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>

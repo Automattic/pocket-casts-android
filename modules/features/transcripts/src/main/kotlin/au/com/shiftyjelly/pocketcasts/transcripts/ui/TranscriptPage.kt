@@ -75,6 +75,19 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+
+    val syncableEpisodeUuid = uiState.transcriptEpisodeUuid.takeIf { uiState.isTextTranscriptLoaded }
+    DisposableEffect(fingerprintTimingManager, syncableEpisodeUuid) {
+        if (syncableEpisodeUuid != null) {
+            fingerprintTimingManager?.onTranscriptShown(syncableEpisodeUuid)
+        }
+        onDispose {
+            if (syncableEpisodeUuid != null) {
+                fingerprintTimingManager?.onTranscriptDismissed(syncableEpisodeUuid)
+            }
+        }
+    }
+
     var highlightState by remember { mutableStateOf(HighlightState()) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
@@ -112,7 +125,7 @@ fun TranscriptPage(
                     .fillMaxWidth(),
             ) {
                 val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
-                    if (uiState.isSyncedActive && viewModel != null) {
+                    if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && uiState.isTapToSeekAvailable && viewModel != null) {
                         { entry, index ->
                             val seekTarget = viewModel.seekToTranscriptEntry(entry)
                             if (seekTarget != null) {

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -21,7 +20,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -167,85 +165,6 @@ class OnboardingUpgradeFeaturesViewModelTest {
             val updatedState = awaitItem() as? OnboardingUpgradeFeaturesState.Loaded
             assertEquals(BillingCycle.Monthly, updatedState?.selectedBillingCycle)
             assertTrue("Should still have installment flag after billing cycle change", updatedState?.shouldUseInstallmentPlans ?: false)
-        }
-    }
-
-    @Test
-    fun `given trial cta flag off, when subscriptions load, then trialCtaCopyTreatment is null even with treatment variation`() = runTest {
-        FeatureFlag.setEnabled(Feature.TRIAL_CTA_COPY_AB_TEST, false)
-        whenever(experimentProvider.getVariation(Experiment.TrialCtaCopyABTest))
-            .thenReturn(Variation.Treatment(TrialCtaCopyTreatment.START_30_DAY_TRIAL.treatmentName))
-
-        val viewModel = createViewModel()
-
-        viewModel.state.test {
-            val first = awaitItem()
-            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
-                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
-            assertNull("Treatment should be null when the kill-switch flag is off", state.trialCtaCopyTreatment)
-        }
-    }
-
-    @Test
-    fun `given trial cta flag on and control variation, when subscriptions load, then trialCtaCopyTreatment is null`() = runTest {
-        FeatureFlag.setEnabled(Feature.TRIAL_CTA_COPY_AB_TEST, true)
-        whenever(experimentProvider.getVariation(Experiment.TrialCtaCopyABTest)).thenReturn(Variation.Control)
-
-        val viewModel = createViewModel()
-
-        viewModel.state.test {
-            val first = awaitItem()
-            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
-                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
-            assertNull("Control variation should map to null (control copy)", state.trialCtaCopyTreatment)
-        }
-    }
-
-    @Test
-    fun `given trial cta flag on and start treatment, when subscriptions load, then trialCtaCopyTreatment is START_30_DAY_TRIAL`() = runTest {
-        FeatureFlag.setEnabled(Feature.TRIAL_CTA_COPY_AB_TEST, true)
-        whenever(experimentProvider.getVariation(Experiment.TrialCtaCopyABTest))
-            .thenReturn(Variation.Treatment(TrialCtaCopyTreatment.START_30_DAY_TRIAL.treatmentName))
-
-        val viewModel = createViewModel()
-
-        viewModel.state.test {
-            val first = awaitItem()
-            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
-                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
-            assertEquals(TrialCtaCopyTreatment.START_30_DAY_TRIAL, state.trialCtaCopyTreatment)
-        }
-    }
-
-    @Test
-    fun `given trial cta flag on and try treatment, when subscriptions load, then trialCtaCopyTreatment is TRY_30_DAYS_FREE`() = runTest {
-        FeatureFlag.setEnabled(Feature.TRIAL_CTA_COPY_AB_TEST, true)
-        whenever(experimentProvider.getVariation(Experiment.TrialCtaCopyABTest))
-            .thenReturn(Variation.Treatment(TrialCtaCopyTreatment.TRY_30_DAYS_FREE.treatmentName))
-
-        val viewModel = createViewModel()
-
-        viewModel.state.test {
-            val first = awaitItem()
-            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
-                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
-            assertEquals(TrialCtaCopyTreatment.TRY_30_DAYS_FREE, state.trialCtaCopyTreatment)
-        }
-    }
-
-    @Test
-    fun `given trial cta flag on and unknown treatment name, when subscriptions load, then trialCtaCopyTreatment is null`() = runTest {
-        FeatureFlag.setEnabled(Feature.TRIAL_CTA_COPY_AB_TEST, true)
-        whenever(experimentProvider.getVariation(Experiment.TrialCtaCopyABTest))
-            .thenReturn(Variation.Treatment("some_unknown_treatment"))
-
-        val viewModel = createViewModel()
-
-        viewModel.state.test {
-            val first = awaitItem()
-            val state = (first as? OnboardingUpgradeFeaturesState.Loaded)
-                ?: (awaitItem() as OnboardingUpgradeFeaturesState.Loaded)
-            assertNull("Unrecognized treatment name should fall back to null (control copy)", state.trialCtaCopyTreatment)
         }
     }
 
