@@ -5,8 +5,6 @@
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
-    *   Add settings to hide generated chapters
-        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 *   Bug Fixes
     *   Reduce the chance of episode playback progress reverting during listening history sync
         ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
@@ -20,6 +18,8 @@
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
 *   Bug Fixes
     *   Fix leaked network connections when refreshing episode details
         ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
