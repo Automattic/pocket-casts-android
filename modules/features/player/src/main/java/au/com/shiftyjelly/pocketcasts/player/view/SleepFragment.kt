@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -33,16 +34,14 @@ import com.automattic.eventhorizon.PlayerSleepTimerSettingsTappedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -56,7 +55,7 @@ class SleepFragment : BaseDialogFragment() {
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentSleepBinding? = null
-    private var disposable: Disposable? = null
+    private var timerJob: Job? = null
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
@@ -64,19 +63,18 @@ class SleepFragment : BaseDialogFragment() {
         super.onResume()
 
         // refresh the sleep time every second
-        disposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { Timber.e(it) },
-                onNext = { viewModel.updateSleepTimer() },
-            )
+        timerJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (isActive) {
+                viewModel.updateSleepTimer()
+                delay(1.seconds)
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
 
-        disposable?.dispose()
+        timerJob?.cancel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
