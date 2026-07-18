@@ -369,6 +369,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-07-02"),
     ),
+    INTERRUPTION_REWIND(
+        key = "interruption_rewind",
+        title = "Rewind after audio interruptions like calls and navigation",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-07-19"),
+    ),
 }
 
 sealed class FeatureTier {
