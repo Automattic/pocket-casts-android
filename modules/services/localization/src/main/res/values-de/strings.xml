@@ -1642,7 +1642,6 @@ Language: de
     <string name="settings_theme_electricity">Elektrizität</string>
     <string name="settings_theme_radioactivity">Radioaktivität</string>
     <string name="settings_use_android_light_dark_mode">Android Light Mode/Dark Mode verwenden</string>
-    <string name="settings_app_icon_updated_message">Es kann ein paar Minuten dauern, bis dieses neue Icon angezeigt wird. Du siehst dann in deiner App-Ansicht zwei Icons – das ist normal. Ziehe einfach das neue auf deinen Startbildschirm und schon ist alles erledigt!</string>
     <string name="settings_theme_classic">Klassisch</string>
     <string name="settings_app_icon_red_velvet">Roter Samt</string>
     <string name="settings_app_icon_round_dark">Rund dunkel</string>

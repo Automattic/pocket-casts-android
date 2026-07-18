@@ -1671,7 +1671,6 @@ Language: sv_SE
     <string name="settings_auto_archive_inactive">Arkivera inaktiva avsnitt</string>
     <string name="settings_auto_archive_episode_limit">Avsnittsgräns</string>
     <string name="settings_apply_group_by">Vill du ändra så att alla dina befintliga podcasts grupperas som %s?</string>
-    <string name="settings_app_icon_updated_message">Det kan ta ett par minuter innan den nya ikonen visas. Du kommer att se två ikoner på skärmen i alla dina appar. Detta är normalt. Dra den nya ikonen till din startskärm. Sedan är du klar!</string>
     <string name="settings_app_icon_updated">Ikon uppdaterad</string>
     <string name="settings_app_icon_title">Rubrik</string>
     <string name="settings_app_icon_image">ikonbild</string>

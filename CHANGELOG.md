@@ -9,7 +9,7 @@
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
 *   Bug Fixes
     *   Avoid showing duplicate launcher icons when using a custom app icon
-        ([#1252](https://github.com/Automattic/pocket-casts-android/issues/1252))
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
     *   Reduce the chance of episode playback progress reverting during listening history sync
         ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
     *   Fix a crash that could occur when seeking during playback

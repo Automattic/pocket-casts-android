@@ -1683,7 +1683,6 @@ Language: pt_BR
     <string name="settings_apply_group_by">Você gostaria de agrupar todos os seus podcasts existentes por %s?</string>
     <string name="settings_apply_archived_show">Você gostaria de exibir os arquivados em todos os seus podcasts?</string>
     <string name="settings_apply_archived_hide">Você gostaria de ocultar os arquivados em todos os seus podcasts?</string>
-    <string name="settings_app_icon_updated_message">Este novo ícone pode demorar um pouco para aparecer. Você verá dois ícones na sua tela de aplicativos. Isso é normal. Arraste o novo para a tela principal e pronto!</string>
     <string name="settings_app_icon_updated">Ícone atualizado</string>
     <string name="settings_app_icon_title">Título</string>
     <string name="settings_app_icon_image">imagem do ícone</string>

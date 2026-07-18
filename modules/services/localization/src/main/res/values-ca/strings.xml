@@ -1670,7 +1670,6 @@ Language: ca
     <string name="settings_auto_download_podcasts">Descarrega pòdcasts automàticament</string>
     <string name="settings_auto_download_clear_errors">Esborra tots els errors de descàrrega</string>
     <string name="settings_auto_archive_inactive">Arxiva els episodis inactius</string>
-    <string name="settings_app_icon_updated_message">És possible que la icona nova trigui un parell de minuts a aparèixer i veuràs dues icones a la pantalla on es mostren les teves aplicacions. És normal. Arrossega la nova a la pantalla d\'inici i estarà tot llest!</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Actualitza a Pocket Casts Plus</string>
     <string name="discover">Descobreix</string>
     <string name="settings_status_service_discover">Descobreix i cerca</string>

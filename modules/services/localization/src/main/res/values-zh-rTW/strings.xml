@@ -1683,7 +1683,6 @@ Language: zh_TW
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="settings_theme_dark_contrast">深色對比</string>
     <string name="settings_theme_light_contrast">淺色對比</string>
-    <string name="settings_app_icon_updated_message">這個新圖示可能需要幾分鐘才會出現，所有應用程式畫面將顯示兩個圖示；這是正常的。將新圖示拖曳到主畫面，這樣就大功告成了！</string>
     <string name="settings_status_service_ad_blocker_help_plural">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
     <string name="settings_status_service_ad_blocker_help_singular">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
     <string name="error_chartable_streaming">串流失敗。製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等 篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
