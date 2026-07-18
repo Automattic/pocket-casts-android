@@ -90,10 +90,9 @@ class SubscribeManager @Inject constructor(
      * Subscribe to a podcast on a background queue.
      */
     fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean) {
-        if (uuidsInQueue.contains(podcastUuid)) {
+        if (!uuidsInQueue.add(podcastUuid)) {
             return
         }
-        uuidsInQueue.add(podcastUuid)
         subscribeRelay.accept(PodcastSubscribe(podcastUuid, sync, shouldAutoDownload))
     }
 
