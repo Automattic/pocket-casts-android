@@ -381,4 +381,4 @@ DEPENDENCIES
   openssl (~> 4.0)
 
 BUNDLED WITH
-   2.6.8
+  4.0.16
