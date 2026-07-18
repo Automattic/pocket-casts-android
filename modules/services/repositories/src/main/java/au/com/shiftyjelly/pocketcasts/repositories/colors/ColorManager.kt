@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.colors
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 import javax.inject.Inject
@@ -13,25 +13,13 @@ import timber.log.Timber
 
 @Singleton
 class ColorManager @Inject constructor(
-    private val staticServiceManager: StaticServiceManagerImpl,
+    private val staticServiceManager: StaticServiceManager,
     private val podcastManager: PodcastManager,
 ) {
 
     companion object {
-        const val DEFAULT_BACKGROUND_COLOR = 0xFF3D3D3D.toInt()
-
         // the amount of time to leave between color refresh attempts. This is quite low (30 min) because we write out defaults for shows that are missing artwork, so this should always be present
         private const val MIN_TIME_BETWEEN_REFRESH_ATTEMPTS = (30 * 60 * 1000).toLong()
-
-        fun getBackgroundColor(podcast: Podcast?): Int = colorOrDefault(podcast?.backgroundColor, DEFAULT_BACKGROUND_COLOR)
-
-        private fun colorOrDefault(color: Int?, defaultColor: Int): Int {
-            return if (color == null || color == 0) {
-                defaultColor
-            } else {
-                color
-            }
-        }
     }
 
     fun downloadColors(podcastUuid: String): Single<Optional<ArtworkColors>> {
