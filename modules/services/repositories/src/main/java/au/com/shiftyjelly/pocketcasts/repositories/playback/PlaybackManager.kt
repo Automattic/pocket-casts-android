@@ -226,6 +226,7 @@ open class PlaybackManager @Inject constructor(
     private var resettingPlayer = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
+    private var pauseDueToInterruption = false
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
     private var bufferUpdateTimerDisposable: Disposable? = null
@@ -892,13 +893,25 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun pause(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    fun pause(
+        transientLoss: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+        dueToInterruption: Boolean = false,
+    ) {
         launch {
-            pauseSuspend(transientLoss, sourceView)
+            pauseSuspend(transientLoss, sourceView, dueToInterruption)
         }
     }
 
-    suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    suspend fun pauseSuspend(
+        transientLoss: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+        dueToInterruption: Boolean = false,
+    ) {
+        // remembered until the player reports the pause so onPlayerPaused can tell the
+        // resumption helper whether this pause came from an audio interruption
+        pauseDueToInterruption = dueToInterruption
+
         if (!transientLoss) {
             focusManager.giveUpAudioFocus()
             playbackStateRelay.blockingFirst().let { playbackState ->
@@ -1525,13 +1538,18 @@ open class PlaybackManager @Inject constructor(
 
         val episode = getCurrentEpisode()
 
+        // consume the interruption marker so pauses that reach this callback without going
+        // through pauseSuspend (sleep timer, cast receiver, error paths) can't reuse a stale value
+        val dueToInterruption = pauseDueToInterruption
+        pauseDueToInterruption = false
+
         player?.let {
             val positionMs = it.getCurrentPositionMs()
             if (positionMs > 0) {
                 updateCurrentPositionInDatabase()
 
                 episode?.let { episode ->
-                    resumptionHelper.paused(episode, positionMs)
+                    resumptionHelper.paused(episode, positionMs, dueToInterruption = dueToInterruption)
                 }
             }
         }
@@ -1868,7 +1886,7 @@ open class PlaybackManager @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while playing")
             focusWasPlaying = Date()
 
-            pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE)
+            pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE, dueToInterruption = true)
         } else {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost not playing")
             focusWasPlaying = null

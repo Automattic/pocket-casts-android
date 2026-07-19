@@ -1601,6 +1601,9 @@
     <string name="settings_other_media_actions">Other media actions</string>
     <string name="settings_playback_resumption">Intelligent playback resumption</string>
     <string name="settings_playback_resumption_summary">If on, Pocket Casts will go back a little in episodes you resume so you can catch up more comfortably.</string>
+    <string name="settings_interruption_rewind">Rewind after interruptions</string>
+    <string name="settings_interruption_rewind_summary">Go back %1$d seconds when playback is interrupted by calls, alarms, navigation and other audio.</string>
+    <string name="settings_interruption_rewind_summary_off">Don\'t go back when playback is interrupted by calls, alarms, navigation and other audio.</string>
     <string name="settings_podcast_artwork">Podcast Artwork</string>
     <string name="settings_podcast_custom">Custom for this podcast</string>
     <string name="settings_podcast_episode_grouping">Podcast episode grouping</string>

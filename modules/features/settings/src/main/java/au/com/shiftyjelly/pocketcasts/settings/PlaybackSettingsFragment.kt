@@ -338,6 +338,20 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_INTERRUPTION_REWIND -> {
+                            if (FeatureFlag.isEnabled(Feature.INTERRUPTION_REWIND)) {
+                                InterruptionRewind(
+                                    saved = settings.interruptionRewindSeconds.flow.collectAsState().value,
+                                    onSave = { seconds ->
+                                        // TODO: track a SettingsGeneralInterruptionRewindChangedEvent once it is
+                                        // available in the Event Horizon library, it can't be added from this repo
+                                        // updateModifiedAt is false because this setting is device-local, not synced
+                                        settings.interruptionRewindSeconds.set(seconds, updateModifiedAt = false)
+                                    },
+                                )
+                            }
+                        }
+
                         SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE -> {
                             PlayUpNextOnTap(
                                 saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
@@ -596,6 +610,30 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun InterruptionRewind(
+        saved: Int,
+        onSave: (Int) -> Unit,
+    ) = SettingRadioDialogRow(
+        primaryText = stringResource(LR.string.settings_interruption_rewind),
+        secondaryText = if (saved > 0) {
+            stringResource(LR.string.settings_interruption_rewind_summary, saved)
+        } else {
+            stringResource(LR.string.settings_interruption_rewind_summary_off)
+        },
+        options = listOf(0, 5, 10, 15, 30, 60),
+        savedOption = saved,
+        optionToLocalisedString = { seconds ->
+            if (seconds > 0) {
+                getString(LR.string.seconds_plural, seconds)
+            } else {
+                getString(LR.string.off)
+            }
+        },
+        onSave = onSave,
+        indent = false,
+    )
+
+    @Composable
     private fun PlayUpNextOnTap(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_up_next_tap),
         secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
@@ -704,6 +742,7 @@ private enum class SettingsItems {
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
     SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_INTELLIGENT_PLAYBACK,
+    SETTINGS_INTERRUPTION_REWIND,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,

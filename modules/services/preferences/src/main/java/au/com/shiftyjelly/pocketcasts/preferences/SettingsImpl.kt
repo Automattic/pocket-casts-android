@@ -949,9 +949,23 @@ class SettingsImpl @Inject constructor(
         return if (lastPausedAt != 0) lastPausedAt else null
     }
 
+    override fun setLastPauseWasInterruption(wasInterruption: Boolean) {
+        setBoolean("last_pause_was_interruption", wasInterruption)
+    }
+
+    override fun getLastPauseWasInterruption(): Boolean {
+        return getBoolean("last_pause_was_interruption", defaultValue = false)
+    }
+
     override val intelligentPlaybackResumption = UserSetting.BoolPref(
         sharedPrefKey = Settings.INTELLIGENT_PLAYBACK_RESUMPTION,
         defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val interruptionRewindSeconds = UserSetting.IntPref(
+        sharedPrefKey = Settings.INTERRUPTION_REWIND_SECONDS,
+        defaultValue = Settings.DEFAULT_INTERRUPTION_REWIND_SECONDS,
         sharedPrefs = sharedPreferences,
     )
 

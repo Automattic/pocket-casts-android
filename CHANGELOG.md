@@ -1,6 +1,8 @@
 8.17
 -----
 *   New Features
+    *   Add an optional "Rewind after interruptions" setting that jumps back a little when playback resumes after calls, alarms, navigation and other audio
+        ([#5611](https://github.com/Automattic/pocket-casts-android/pull/5611))
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap

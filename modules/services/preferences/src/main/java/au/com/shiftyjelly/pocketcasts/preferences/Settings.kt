@@ -99,6 +99,8 @@ interface Settings {
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
+        const val INTERRUPTION_REWIND_SECONDS = "interruptionRewindSeconds"
+        const val DEFAULT_INTERRUPTION_REWIND_SECONDS = 5
         const val UP_NEXT_BADGE_MAX_COUNT = 999
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
@@ -510,7 +512,15 @@ interface Settings {
     fun getLastPausedUUID(): String?
     fun setLastPausedAt(pausedAt: Int)
     fun getLastPausedAt(): Int?
+    fun setLastPauseWasInterruption(wasInterruption: Boolean)
+    fun getLastPauseWasInterruption(): Boolean
     val intelligentPlaybackResumption: UserSetting<Boolean>
+
+    /**
+     * How many seconds to rewind when playback resumes after an audio interruption, 0 means off.
+     * Stored on device only, not synced.
+     */
+    val interruptionRewindSeconds: UserSetting<Int>
     val autoAddUpNextLimit: UserSetting<Int>
     val autoAddUpNextLimitBehaviour: UserSetting<AutoAddUpNextLimitBehaviour>
     fun getMaxUpNextEpisodes(): Int
