@@ -275,6 +275,25 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `densePlaybackSec drops the trailing grace when the live edge is unmatched`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 134.0, referenceTime = 104.0),
+        )
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 110.0, entries = entries, allowTrailingGrace = false))
+        val bracketed = FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 102.0, entries = entries, allowTrailingGrace = false)
+        assertEquals(132.0, bracketed!!, 0.001)
+    }
+
+    @Test
+    fun `isLiveEdgeUnmatched tolerates isolated missed matches`() {
+        assertFalse(FingerprintTimingManager.isLiveEdgeUnmatched(frontierSec = 102.0, lastAnchorPlaybackSec = 100.0))
+        assertTrue(FingerprintTimingManager.isLiveEdgeUnmatched(frontierSec = 103.5, lastAnchorPlaybackSec = 100.0))
+        assertFalse(FingerprintTimingManager.isLiveEdgeUnmatched(frontierSec = Double.NaN, lastAnchorPlaybackSec = 100.0))
+        assertFalse(FingerprintTimingManager.isLiveEdgeUnmatched(frontierSec = 103.5, lastAnchorPlaybackSec = null))
+    }
+
+    @Test
     fun `densePlaybackSec returns null when reference gap is too wide`() {
         val entries = listOf(
             TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),

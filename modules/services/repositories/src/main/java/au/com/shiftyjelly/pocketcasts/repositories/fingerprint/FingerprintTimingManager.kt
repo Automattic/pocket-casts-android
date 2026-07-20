@@ -144,6 +144,11 @@ class FingerprintTimingManager @Inject constructor(
     private var generationJob: Job? = null
     private var downloadObserverJob: Job? = null
 
+    // Playback time of the newest window the tap has completed (matched or not) in the current
+    // stream; NaN until the first window. Lets the grace gates tell "pending" from "unmatched".
+    @Volatile
+    private var tapFrontierSec = Double.NaN
+
     @Volatile
     private var generation = 0L
 
@@ -302,9 +307,16 @@ class FingerprintTimingManager @Inject constructor(
      */
     fun densePlaybackTime(episodeUuid: String, referenceTime: Duration): Duration? {
         if (activeEpisodeUuid != episodeUuid) return null
-        val playback = densePlaybackSec(referenceTime.toDouble(DurationUnit.SECONDS), snapshotReferenceToPlayback) ?: return null
+        val playback = densePlaybackSec(
+            referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
+            entries = snapshotReferenceToPlayback,
+            allowTrailingGrace = !isLiveEdgeUnmatched(),
+        ) ?: return null
         return playback.seconds
     }
+
+    /** True when completed tap windows have passed the newest anchor without matching, so the live edge is an ad. */
+    private fun isLiveEdgeUnmatched(): Boolean = isLiveEdgeUnmatched(tapFrontierSec, snapshotPlaybackToReference.lastOrNull()?.playbackTime)
 
     /**
      * One-shot bounded resolve of a generated chapter's reference time to the playback timeline.
@@ -595,7 +607,7 @@ class FingerprintTimingManager @Inject constructor(
     fun matchedReferenceTime(forPlaybackTimeMs: Int): Double? {
         val playbackTimeSec = forPlaybackTimeMs / 1000.0
         val entries = snapshotPlaybackToReference
-        if (!isWithinMatchedContent(playbackTimeSec, entries)) {
+        if (!isWithinMatchedContent(playbackTimeSec, entries, allowTrailingGrace = !isLiveEdgeUnmatched())) {
             if (lastMatchedContentResult) {
                 lastMatchedContentResult = false
                 logMatchedContentTransition(playbackTimeSec, entries, matched = false)
@@ -645,6 +657,7 @@ class FingerprintTimingManager @Inject constructor(
         debugRejections.clear()
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
+        tapFrontierSec = Double.NaN
         currentEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
@@ -896,9 +909,11 @@ class FingerprintTimingManager @Inject constructor(
                         streamStartSec = chunk.positionSec
                         sampleRate = chunk.sampleRate
                         channelCount = chunk.channelCount
+                        tapFrontierSec = Double.NaN
                     }
                     val windows = streamer.pushSamplesF32(chunkToFloatSamples(chunk), chunk.channelCount.toUShort())
                     if (windows.isNotEmpty()) {
+                        tapFrontierSec = streamStartSec + windows.last().timestampMs.toDouble() / 1000.0
                         mutex.withLock {
                             if (gen != generation) throw CancellationException("Fingerprint tap superseded")
                             processMatches(windows, matcher, streamStartSec)
@@ -1471,7 +1486,7 @@ class FingerprintTimingManager @Inject constructor(
          * last anchor a trailing grace of [FingerprintConstants.TAP_TRAILING_GRACE_SECONDS] is
          * allowed, since the tap-built map always lags the playhead by a window length.
          */
-        internal fun densePlaybackSec(referenceTimeSec: Double, entries: List<TimeMappingEntry>): Double? {
+        internal fun densePlaybackSec(referenceTimeSec: Double, entries: List<TimeMappingEntry>, allowTrailingGrace: Boolean = true): Double? {
             if (entries.isEmpty()) return null
             var lo = 0
             var hi = entries.size
@@ -1481,6 +1496,7 @@ class FingerprintTimingManager @Inject constructor(
             }
             if (hi == 0) return null
             if (hi >= entries.size) {
+                if (!allowTrailingGrace) return null
                 if (referenceTimeSec - entries[entries.size - 1].referenceTime > FingerprintConstants.TAP_TRAILING_GRACE_SECONDS) return null
             } else {
                 val prev = entries[hi - 1]
@@ -1501,7 +1517,7 @@ class FingerprintTimingManager @Inject constructor(
          * apart, or trails the newest anchor within [FingerprintConstants.TAP_TRAILING_GRACE_SECONDS] — the
          * tap-built map always lags the playhead by a window length.
          */
-        fun isWithinMatchedContent(playbackTime: Double, entries: List<TimeMappingEntry>): Boolean {
+        fun isWithinMatchedContent(playbackTime: Double, entries: List<TimeMappingEntry>, allowTrailingGrace: Boolean = true): Boolean {
             if (entries.isEmpty()) return false
             var lo = 0
             var hi = entries.size
@@ -1514,10 +1530,17 @@ class FingerprintTimingManager @Inject constructor(
                 }
             }
             if (hi >= entries.size) {
-                return playbackTime - entries[entries.size - 1].playbackTime <= FingerprintConstants.TAP_TRAILING_GRACE_SECONDS
+                return allowTrailingGrace &&
+                    playbackTime - entries[entries.size - 1].playbackTime <= FingerprintConstants.TAP_TRAILING_GRACE_SECONDS
             }
             if (hi == 0) return false
             return (entries[hi].playbackTime - entries[hi - 1].playbackTime) <= FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS
+        }
+
+        /** True once the tap's completed-window frontier has outrun the newest anchor by more than the odd missed match. */
+        internal fun isLiveEdgeUnmatched(frontierSec: Double, lastAnchorPlaybackSec: Double?): Boolean {
+            if (frontierSec.isNaN() || lastAnchorPlaybackSec == null) return false
+            return frontierSec - lastAnchorPlaybackSec > FingerprintConstants.TAP_UNMATCHED_EDGE_SECONDS
         }
 
         fun alignToWindowGrid(time: Double): Double {

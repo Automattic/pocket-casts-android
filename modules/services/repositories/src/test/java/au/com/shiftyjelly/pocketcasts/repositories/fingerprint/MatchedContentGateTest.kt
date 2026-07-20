@@ -46,6 +46,18 @@ class MatchedContentGateTest {
     }
 
     @Test
+    fun `not matched within trailing grace when the live edge is unmatched`() {
+        val entries = listOf(entry(18.0), entry(20.0))
+        assertFalse(FingerprintTimingManager.isWithinMatchedContent(31.0, entries, allowTrailingGrace = false))
+    }
+
+    @Test
+    fun `interior anchors still match when the trailing grace is dropped`() {
+        val entries = listOf(entry(18.0), entry(20.0))
+        assertTrue(FingerprintTimingManager.isWithinMatchedContent(19.0, entries, allowTrailingGrace = false))
+    }
+
+    @Test
     fun `not matched before first anchor`() {
         val entries = listOf(entry(18.0), entry(20.0))
         assertFalse(FingerprintTimingManager.isWithinMatchedContent(5.0, entries))
