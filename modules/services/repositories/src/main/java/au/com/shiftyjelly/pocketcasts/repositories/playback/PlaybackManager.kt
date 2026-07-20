@@ -1080,6 +1080,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun seekToTimeMsSuspend(positionMs: Int, seekComplete: (() -> Unit)? = null) {
+        cancelPendingChapterSeek()
         seekToTimeMsInternal(positionMs)
         seekComplete?.invoke()
     }
@@ -1091,6 +1092,7 @@ open class PlaybackManager @Inject constructor(
         }
         launch {
             if (getCurrentEpisode()?.uuid == episodeUuid) {
+                cancelPendingChapterSeek()
                 seekToTimeMsInternal(positionMs)
                 seekComplete?.invoke()
             }
@@ -1153,6 +1155,7 @@ open class PlaybackManager @Inject constructor(
     ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
+        cancelPendingChapterSeek()
         val episode = getCurrentEpisode() ?: return
         val jumpAmountMs = jumpAmountSeconds * 1000
 
@@ -1187,6 +1190,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun skipBackwardSuspend(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 
+        cancelPendingChapterSeek()
         val episode = getCurrentEpisode() ?: return
 
         val jumpAmountMs = jumpAmountSeconds * 1000
@@ -1207,8 +1211,9 @@ open class PlaybackManager @Inject constructor(
     fun skipToNextSelectedOrLastChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
-            val currentTimeMs = getCurrentTimeMs(episode = episode)
-            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
+            // Base the jump on an in-flight chapter resolve so rapid taps advance instead of re-targeting it.
+            val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode = episode).milliseconds
+            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(baseTime)?.let { chapter ->
                 seekToChapterStart(episode, chapter)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
@@ -1224,8 +1229,8 @@ open class PlaybackManager @Inject constructor(
     fun skipToPreviousSelectedOrLastChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
-            val currentTimeMs = getCurrentTimeMs(episode)
-            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
+            val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode).milliseconds
+            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(baseTime)?.let { chapter ->
                 seekToChapterStart(episode, chapter)
                 trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
                     PlaybackChapterSkippedEvent(
@@ -1274,15 +1279,29 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    @Volatile
+    private var pendingChapterSeek: Chapter? = null
+
     /**
      * Generated chapter timestamps live on the reference timeline; resolve the real stream position
      * through the fingerprint map before seeking. Falls back to the chapter's own start time.
      */
     private suspend fun seekToChapterStart(episode: BaseEpisode?, chapter: Chapter) {
-        val resolved = episode?.let { generatedChapterSeeker.get().resolveSeekTime(it, chapter) }
-        // Resolving can take seconds; drop the seek if the episode changed meanwhile.
-        if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return
-        seekToTimeMsInternal(resolved ?: chapter.startTime)
+        pendingChapterSeek = chapter
+        try {
+            val resolved = episode?.let { generatedChapterSeeker.get().resolveSeekTime(it, chapter) }
+            // Resolving can take seconds; drop the seek if the episode changed meanwhile.
+            if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return
+            seekToTimeMsInternal(resolved ?: chapter.startTime)
+        } finally {
+            // A superseding tap has already installed its own chapter; only the owner clears it.
+            if (pendingChapterSeek === chapter) pendingChapterSeek = null
+        }
+    }
+
+    private fun cancelPendingChapterSeek() {
+        pendingChapterSeek = null
+        generatedChapterSeeker.get().cancelActiveResolve()
     }
 
     fun clearUpNextAsync() {
