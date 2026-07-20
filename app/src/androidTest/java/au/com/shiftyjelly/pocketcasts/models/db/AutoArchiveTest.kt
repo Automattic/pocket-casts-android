@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
@@ -104,6 +105,9 @@ class AutoArchiveTest {
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
         val settings = mock<Settings> {
             on { autoDownloadUpNext } doReturn UserSetting.Mock(false, mock())
+            // playLast reads these when the queue already has a current episode
+            on { trackingAutoPlaySource } doReturn UserSetting.Mock<AutoPlaySource>(AutoPlaySource.Predefined.None, mock())
+            on { lastAutoPlaySource } doReturn UserSetting.Mock<AutoPlaySource>(AutoPlaySource.Predefined.None, mock())
         }
         val context = mock<Context>()
         val syncManager = mock<SyncManager>()
