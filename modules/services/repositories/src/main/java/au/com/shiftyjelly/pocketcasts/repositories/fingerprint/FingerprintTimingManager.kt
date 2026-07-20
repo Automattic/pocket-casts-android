@@ -400,11 +400,32 @@ class FingerprintTimingManager @Inject constructor(
             valueSelector = { it.playbackTime },
         ) ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
 
+        mergeResolvedAnchors(episodeUuid, acc.playbackToReference)
+
         // The ad offset is non-negative, so the true position is never before the reference time.
         return ChapterSeekResult.Resolved(
             playbackTime = max(referenceTimeSec, playback).seconds,
             usedPrior = usedPrior,
         )
+    }
+
+    /** Resolved anchors passed the same drift filter, so folding them in only densifies the map. */
+    private suspend fun mergeResolvedAnchors(episodeUuid: String, anchors: List<TimeMappingEntry>) {
+        val tolerance = FingerprintConstants.WINDOW_INTERVAL_MS / 2000.0
+        mutex.withLock {
+            if (currentEpisodeUuid != episodeUuid) return
+            var inserted = 0
+            for (anchor in anchors) {
+                if (!mapping.hasAnchorNear(anchor.playbackTime, tolerance)) {
+                    mapping.insert(anchor)
+                    inserted++
+                }
+            }
+            if (inserted > 0) {
+                publishSnapshot()
+                Timber.d("FingerprintTimingManager: merged $inserted resolved anchors into the mapping")
+            }
+        }
     }
 
     private suspend fun loadOrFetchReferenceData(
