@@ -338,7 +338,7 @@ class FingerprintTimingManager @Inject constructor(
      * Decodes only a small search window around the expected location, matches into a scratch
      * accumulator, and never touches the continuous mapping or the public state.
      */
-    suspend fun resolveChapterPlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
+    suspend fun resolvePlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)

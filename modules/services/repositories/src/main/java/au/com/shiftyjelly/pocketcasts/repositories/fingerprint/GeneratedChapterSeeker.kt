@@ -86,7 +86,7 @@ class GeneratedChapterSeeker @Inject constructor(
             _resolvingChapter.value = resolving
         }
         try {
-            return when (val result = manager.resolveChapterPlaybackTime(episode, referenceTime)) {
+            return when (val result = manager.resolvePlaybackTime(episode, referenceTime)) {
                 is ChapterSeekResult.Resolved -> {
                     val playbackTime = ceil(result.playbackTime.toDouble(DurationUnit.SECONDS)).seconds
                     mutex.withLock {
