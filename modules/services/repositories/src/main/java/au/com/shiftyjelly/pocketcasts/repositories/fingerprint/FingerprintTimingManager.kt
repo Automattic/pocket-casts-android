@@ -328,7 +328,8 @@ class FingerprintTimingManager @Inject constructor(
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
-        return withContext(Dispatchers.Default) {
+        // Resolves block on codec dequeues and network reads, so keep them off the Default pool.
+        return withContext(Dispatchers.IO) {
             performResolve(
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
