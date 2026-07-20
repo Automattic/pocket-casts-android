@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -39,6 +40,23 @@ class MappingAccumulatorTest {
         assertEquals(3, main.playbackToReference.size)
         assertEquals(bootstrap, main.playbackToReference)
         assertEquals(bootstrap.last(), main.lastTrusted)
+    }
+
+    @Test
+    fun `hasAnchorNear finds neighbours within tolerance on both sides`() {
+        val acc = MappingAccumulator()
+        acc.insert(TimeMappingEntry(playbackTime = 10.0, referenceTime = 5.0))
+
+        assertTrue(acc.hasAnchorNear(10.0, toleranceSec = 0.5))
+        assertTrue(acc.hasAnchorNear(10.4, toleranceSec = 0.5))
+        assertTrue(acc.hasAnchorNear(9.6, toleranceSec = 0.5))
+        assertFalse(acc.hasAnchorNear(11.0, toleranceSec = 0.5))
+        assertFalse(acc.hasAnchorNear(8.9, toleranceSec = 0.5))
+    }
+
+    @Test
+    fun `hasAnchorNear is false on empty accumulator`() {
+        assertFalse(MappingAccumulator().hasAnchorNear(10.0, toleranceSec = 0.5))
     }
 
     @Test

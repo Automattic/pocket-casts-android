@@ -22,6 +22,14 @@ internal class MappingAccumulator {
         referenceToPlayback.add(refIdx, entry)
     }
 
+    fun hasAnchorNear(playbackTime: Double, toleranceSec: Double): Boolean {
+        val idx = playbackToReference.sortedInsertionIndex { it.playbackTime < playbackTime }
+        val prev = playbackToReference.getOrNull(idx - 1)
+        val next = playbackToReference.getOrNull(idx)
+        return (prev != null && playbackTime - prev.playbackTime <= toleranceSec) ||
+            (next != null && next.playbackTime - playbackTime <= toleranceSec)
+    }
+
     fun replaceAll(entries: List<TimeMappingEntry>) {
         playbackToReference.clear()
         playbackToReference += entries.sortedBy { it.playbackTime }
