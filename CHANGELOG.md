@@ -10,6 +10,8 @@
     *   HLS support
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
 *   Bug Fixes
+    *   Fix episodes being cached over mobile data when Warn before using data is enabled
+        ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
     *   Reduce the chance of episode playback progress reverting during listening history sync
         ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
     *   Fix a crash that could occur when seeking during playback
