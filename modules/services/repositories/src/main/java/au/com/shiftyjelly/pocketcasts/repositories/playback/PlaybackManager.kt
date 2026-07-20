@@ -333,6 +333,12 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
         }
+
+        launch {
+            settings.audioOnly.flow.collect {
+                player?.updateAudioOnly()
+            }
+        }
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
@@ -368,6 +374,7 @@ open class PlaybackManager @Inject constructor(
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
+                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
             ),
         )
         return autoPlayEpisode
@@ -2018,8 +2025,12 @@ open class PlaybackManager @Inject constructor(
         // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
-        // HLS may carry video, so start it Unknown until the tracks resolve it. Non-HLS keeps its own flag.
-        _streamVideoState.value = if (episode.isStreamUrlHls) StreamVideoState.Unknown else StreamVideoState.NotVideo
+        // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
+        _streamVideoState.value = when {
+            !episode.isStreamUrlHls -> StreamVideoState.NotVideo
+            settings.audioOnly.value -> StreamVideoState.AudioOnly
+            else -> StreamVideoState.Unknown
+        }
         _videoRenderingEnabled.value = true
 
         lastPlaybackSource = sourceView

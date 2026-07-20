@@ -59,6 +59,7 @@ interface Player {
     suspend fun pause()
     suspend fun stop()
     suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects)
+    fun updateAudioOnly() {}
     suspend fun seekToTimeMs(positionMs: Int)
     suspend fun isPlaying(): Boolean
     suspend fun isBuffering(): Boolean

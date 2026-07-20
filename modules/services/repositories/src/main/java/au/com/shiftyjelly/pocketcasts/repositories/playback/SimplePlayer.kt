@@ -49,6 +49,9 @@ class SimplePlayer(
 
     private var player: ExoPlayer? = null
 
+    @UnstableApi
+    private var trackSelector: DefaultTrackSelector? = null
+
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
@@ -192,6 +195,8 @@ class SimplePlayer(
     @OptIn(UnstableApi::class)
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
+        this.trackSelector = trackSelector
+        applyAudioOnly()
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
@@ -229,7 +234,7 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
-                clearVideoIfAudioOnly()
+                updateVideoState()
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -241,7 +246,7 @@ class SimplePlayer(
                     Player.STATE_READY -> {
                         onBufferingStateChanged()
                         onDurationAvailable()
-                        clearVideoIfAudioOnly()
+                        updateVideoState()
                     }
 
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
@@ -292,11 +297,24 @@ class SimplePlayer(
         prepared = true
     }
 
-    private fun clearVideoIfAudioOnly() {
+    private fun updateVideoState() {
         val player = player ?: return
-        if (player.playbackState == Player.STATE_READY && !player.currentTracks.containsType(C.TRACK_TYPE_VIDEO)) {
-            onVideoTrackChanged(false)
+        if (player.playbackState == Player.STATE_READY) {
+            onVideoTrackChanged(player.currentTracks.isTypeSelected(C.TRACK_TYPE_VIDEO))
         }
+    }
+
+    override fun updateAudioOnly() {
+        applyAudioOnly()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun applyAudioOnly() {
+        val trackSelector = trackSelector ?: return
+        val disableVideo = settings.audioOnly.value && episodeLocation.isHlsStream
+        trackSelector.parameters = trackSelector.buildUponParameters()
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, disableVideo)
+            .build()
     }
 
     private fun addVideoListener(player: ExoPlayer) {

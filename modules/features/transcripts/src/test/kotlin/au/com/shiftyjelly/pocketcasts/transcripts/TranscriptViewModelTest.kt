@@ -369,7 +369,10 @@ class TranscriptViewModelTest {
     @Test
     fun `track synced transcript seek failed event when failed`() = runTest {
         setUpTapToSeek()
-        syncedStateFlow.value = FingerprintTimingManager.State.Failed(RuntimeException("no match"), episodeUuid = "episode-uuid")
+        syncedStateFlow.value = FingerprintTimingManager.State.Failed(
+            RuntimeException("no match"),
+            episodeUuid = "episode-uuid",
+        )
 
         awaitTapToSeekAvailable()
         drainEvents()
