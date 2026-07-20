@@ -1,21 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 object FingerprintConstants {
-    /** If consecutive playback-progress updates differ by more than this, treat it as a seek/skip. */
-    const val RESTART_DELTA_SECONDS = 10.0
-
-    /** Slack window around the already-mapped range before playback is considered "outside". */
-    const val PLAYBACK_RANGE_MARGIN_SECONDS = 30.0
-
-    /** Minimum time between stream restarts while playback sits outside the mapped range. */
-    const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
-
-    /** Position must be stable for this long before a seek restarts the stream; coalesces rapid multi-tap skips. */
-    const val RESTART_DEBOUNCE_MS = 1_500L
-
-    /** How often a running remote decode re-checks that the network still permits streaming. */
-    const val METERED_RECHECK_INTERVAL_MS = 5_000L
-
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
@@ -40,11 +25,8 @@ object FingerprintConstants {
     /** Minimum score gap between top-1 and top-2 matcher candidates. */
     const val DRIFT_SCORE_DOMINANCE_GAP = 0.05f
 
-    /** Distance ahead of current playback within which fingerprinting runs at full speed. */
-    const val LOOKAHEAD_SECONDS = 60.0
-
-    /** Sleep between chunks when fingerprinting ahead of the lookahead window. */
-    const val OUTSIDE_LOOKAHEAD_SLEEP_SECONDS = 0.5
+    /** Position drift between consecutive tap chunks beyond which the window stream restarts. */
+    const val TAP_CONTINUITY_TOLERANCE_SECONDS = 0.25
 
     /** Minimum fraction of reference timeline a cached mapping must cover. */
     const val FULL_COVERAGE_THRESHOLD = 0.95
@@ -81,7 +63,4 @@ object FingerprintConstants {
 
     /** How often a yielded continuous decode re-checks for on-demand resolves in flight. */
     const val RESOLVE_YIELD_POLL_MS = 250L
-
-    /** Release a parked throttled decode after playback has been idle this long. */
-    const val PARKED_DECODE_RELEASE_MS = 120_000L
 }
