@@ -81,4 +81,7 @@ object FingerprintConstants {
 
     /** How often a yielded continuous decode re-checks for on-demand resolves in flight. */
     const val RESOLVE_YIELD_POLL_MS = 250L
+
+    /** Release a parked throttled decode after playback has been idle this long. */
+    const val PARKED_DECODE_RELEASE_MS = 120_000L
 }

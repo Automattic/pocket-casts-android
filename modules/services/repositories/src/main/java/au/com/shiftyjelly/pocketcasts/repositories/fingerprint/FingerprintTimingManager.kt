@@ -180,7 +180,12 @@ class FingerprintTimingManager @Inject constructor(
 
     // Analytics context for the current preparation.
     private var preparationStartMs: Long = 0
+
+    @Volatile
     private var currentIsStreaming: Boolean = false
+
+    @Volatile
+    private var lastProgressAtMs = 0L
 
     // When true, decode the whole stream from the start ignoring the playhead lookahead throttle,
     // so the full reference<->playback map is available for chapter alignment.
@@ -200,6 +205,9 @@ class FingerprintTimingManager @Inject constructor(
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
                     prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+                } else if (lastEpisodeUuid != null && (state.isEmpty || state.isStopped)) {
+                    lastEpisodeUuid = null
+                    stop()
                 }
             }
         }
@@ -224,8 +232,10 @@ class FingerprintTimingManager @Inject constructor(
         scope.launch {
             val gen: Long
             mutex.withLock {
-                // Already prepared for this episode — reuse existing state.
-                if (currentEpisodeUuid == episodeUuid && state !is State.Idle) {
+                // Already prepared for this episode — reuse existing state. A failed preparation may
+                // retry when the user opens the transcript, since the failure could be transient.
+                val retryableFailure = trigger == PrepareTrigger.TRANSCRIPT_VIEW && state is State.Failed
+                if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
                     if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
                         currentTrigger = trigger
                     }
@@ -247,9 +257,28 @@ class FingerprintTimingManager @Inject constructor(
         progressObserverJob = scope.launch {
             playbackManager.playbackStateFlow.collect { state ->
                 if (state.episodeUuid == episodeUuid && state.isPlaying) {
+                    maybeAdoptDownloadedCopy(episodeUuid)
                     onPlaybackProgress(state.positionMs, state.episodeUuid)
                 }
             }
+        }
+    }
+
+    /** A finished download supersedes streaming: local decode is cheaper and unlocks the eager pass. */
+    private fun maybeAdoptDownloadedCopy(episodeUuid: String) {
+        if (!currentIsStreaming) return
+        val episode = playbackManager.getCurrentEpisode() ?: return
+        if (episode.uuid != episodeUuid || !episode.isDownloaded) return
+        scope.launch {
+            val trigger = currentTrigger
+            mutex.withLock {
+                if (currentEpisodeUuid != episodeUuid || !currentIsStreaming) return@launch
+                generation++
+                resetState()
+                _stateFlow.value = State.Idle
+            }
+            Timber.d("FingerprintTimingManager: episode finished downloading — switching to local file")
+            prepareForCurrentEpisode(trigger)
         }
     }
 
@@ -441,6 +470,10 @@ class FingerprintTimingManager @Inject constructor(
     ): ByteArray? {
         if (isDownloaded) {
             referenceRetriever.loadReferenceData(audioSource)?.let { return it }
+            referenceRetriever.loadCachedReference(episodeUuid)?.let {
+                referenceRetriever.saveReferenceData(it, audioSource)
+                return it
+            }
         } else {
             referenceRetriever.loadCachedReference(episodeUuid)?.let { return it }
         }
@@ -683,6 +716,7 @@ class FingerprintTimingManager @Inject constructor(
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
         lastProgressPositionMs = -1
+        lastProgressAtMs = 0L
         lastStreamStartTimeMs = 0L
         activeDecodeStartSec = 0.0
         activeDecodeFrontierSec = 0.0
@@ -789,9 +823,11 @@ class FingerprintTimingManager @Inject constructor(
             ),
         )
 
-        // Try loading cached reference from disk
+        // Try loading cached reference from disk. A reference cached while streaming is still valid
+        // after a download; adopt it into the sidecar instead of refetching.
         val cachedData = if (isDownloaded) {
             referenceRetriever.loadReferenceData(audioSource)
+                ?: referenceRetriever.loadCachedReference(episodeUuid)?.also { referenceRetriever.saveReferenceData(it, audioSource) }
         } else {
             referenceRetriever.loadCachedReference(episodeUuid)
         }
@@ -889,6 +925,7 @@ class FingerprintTimingManager @Inject constructor(
     private fun onPlaybackProgress(positionMs: Int, episodeUuid: String?) {
         if (episodeUuid != currentEpisodeUuid) return
 
+        lastProgressAtMs = SystemClock.elapsedRealtime()
         scope.launch {
             mutex.withLock {
                 processProgress(positionMs)
@@ -1287,6 +1324,13 @@ class FingerprintTimingManager @Inject constructor(
                             val lastKnownPositionMs = lastProgressPositionMs
                             val playheadSec = if (lastKnownPositionMs >= 0) lastKnownPositionMs / 1000.0 else startOffset
                             if (decodedSeconds - playheadSec > FingerprintConstants.LOOKAHEAD_SECONDS) {
+                                // Playback has been paused for a while; release the codec and network
+                                // stream. The progress observer restarts the decode on resume.
+                                val progressAt = lastProgressAtMs
+                                if (progressAt > 0 && SystemClock.elapsedRealtime() - progressAt > FingerprintConstants.PARKED_DECODE_RELEASE_MS) {
+                                    Timber.d("FingerprintTimingManager: playback idle — releasing parked decode")
+                                    break
+                                }
                                 delay((FingerprintConstants.OUTSIDE_LOOKAHEAD_SLEEP_SECONDS * 1000).toLong())
                             }
                         }
