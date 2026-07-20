@@ -1,3 +1,9 @@
+8.18
+-----
+*   Bug Fixes
+    *   Don't auto-archive episodes queued in Up Next when a podcast is over its episode limit
+        ([#5342](https://github.com/Automattic/pocket-casts-android/pull/5342))
+
 8.17
 -----
 *   New Features
@@ -10,8 +16,6 @@
     *   HLS support
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
 *   Bug Fixes
-    *   Don't auto-archive episodes queued in Up Next when a podcast is over its episode limit
-        ([#5342](https://github.com/Automattic/pocket-casts-android/pull/5342))
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
     *   Reduce the chance of episode playback progress reverting during listening history sync
