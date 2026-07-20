@@ -1343,6 +1343,13 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
+    // The uniffi binding wants List<Float>; a FloatArray view keeps samples unboxed until the
+    // FFI boundary instead of materialising an ArrayList of boxed floats per decoded buffer.
+    private class FloatArrayList(private val values: FloatArray) : AbstractList<Float>() {
+        override val size get() = values.size
+        override fun get(index: Int): Float = values[index]
+    }
+
     private fun extractFloatSamples(
         buffer: ByteBuffer,
         info: MediaCodec.BufferInfo,
@@ -1361,17 +1368,19 @@ class FingerprintTimingManager @Inject constructor(
                 if (floatCount == 0) return emptyList()
                 val result = FloatArray(floatCount)
                 floatBuffer.get(result)
-                result.toList()
+                FloatArrayList(result)
             } else {
                 // 16-bit PCM: convert to normalized float [-1.0, 1.0]
                 val shortBuffer = buffer.asShortBuffer()
                 val shortCount = shortBuffer.remaining()
                 if (shortCount == 0) return emptyList()
+                val shorts = ShortArray(shortCount)
+                shortBuffer.get(shorts)
                 val result = FloatArray(shortCount)
                 for (i in 0 until shortCount) {
-                    result[i] = shortBuffer.get() / 32768f
+                    result[i] = shorts[i] / 32768f
                 }
-                result.toList()
+                FloatArrayList(result)
             }
         } finally {
             buffer.order(byteOrder)
@@ -1385,14 +1394,17 @@ class FingerprintTimingManager @Inject constructor(
     ) {
         val isDebug = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
 
+        val sizeBefore = mapping.playbackToReference.size
         matchWindows(windows, matcher, startOffset, mapping) { rejected ->
             if (isDebug) recordDebugRejection(rejected.playbackTime, rejected.score)
         }
 
-        publishSnapshot()
         val coverage = mapping.playbackToReference.size
-        if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
-            markActive(coverage)
+        if (coverage != sizeBefore) {
+            publishSnapshot()
+            if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
+                markActive(coverage)
+            }
         }
         if (isDebug) {
             debugRejectionsSnapshot = debugRejections.toList()
