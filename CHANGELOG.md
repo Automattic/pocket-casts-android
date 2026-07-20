@@ -1,3 +1,9 @@
+8.18
+-----
+*   Bug Fixes
+    *   Fix synced transcripts scrolling back to the top instead of following along for Japanese (CJK), Thai, Hindi, Arabic, and other non-Latin transcripts
+        ([#5494](https://github.com/Automattic/pocket-casts-android/pull/5494))
+
 8.17
 -----
 *   New Features
