@@ -31,8 +31,14 @@ class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
     @ApplicationContext private val context: Context,
 ) {
+    sealed interface FetchResult {
+        class Success(val data: ByteArray) : FetchResult
+        data object NotFound : FetchResult
+        data object Error : FetchResult
+    }
+
     private val fetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val inFlightRequests = mutableMapOf<String, Deferred<ByteArray?>>()
+    private val inFlightRequests = mutableMapOf<String, Deferred<FetchResult>>()
     private val requestMutex = Mutex()
 
     // The shared fetch runs in the retriever's own scope, so cancelling one awaiting caller
@@ -41,7 +47,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? {
+    ): FetchResult {
         val key = "$podcastUuid/$episodeUuid"
 
         val deferred = requestMutex.withLock {
@@ -65,7 +71,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? = withContext(Dispatchers.IO) {
+    ): FetchResult = withContext(Dispatchers.IO) {
         val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
@@ -83,7 +89,7 @@ class FingerprintReferenceRetriever @Inject constructor(
 
                     if (statusCode == 404 || statusCode == 403) {
                         Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
-                        return@withContext null
+                        return@withContext FetchResult.NotFound
                     }
 
                     if (statusCode != 200) {
@@ -92,25 +98,25 @@ class FingerprintReferenceRetriever @Inject constructor(
                             continue
                         }
                         Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                        return@withContext null
+                        return@withContext FetchResult.Error
                     }
 
                     val body = response.body.bytes()
                     val jsonData = decompressGzipIfNeeded(body)
 
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                    return@withContext jsonData
+                    return@withContext FetchResult.Success(jsonData)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
-                if (attempt == MAX_RETRIES - 1) return@withContext null
+                if (attempt == MAX_RETRIES - 1) return@withContext FetchResult.Error
             }
         }
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
-        null
+        FetchResult.Error
     }
 
     suspend fun saveReferenceData(data: ByteArray, audioFilePath: String) = withContext(Dispatchers.IO) {

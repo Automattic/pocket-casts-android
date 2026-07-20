@@ -29,6 +29,7 @@ import com.automattic.eventhorizon.SyncedTranscriptsUnavailableEvent
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.atomic.AtomicInteger
@@ -465,7 +466,8 @@ class FingerprintTimingManager @Inject constructor(
             referenceRetriever.loadCachedReference(episodeUuid)?.let { return it }
         }
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
-        val data = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid) ?: return null
+        val fetched = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        val data = (fetched as? FingerprintReferenceRetriever.FetchResult.Success)?.data ?: return null
         if (isDownloaded) {
             referenceRetriever.saveReferenceData(data, audioSource)
         } else {
@@ -832,13 +834,25 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: fetching reference from server for $episodeUuid")
 
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
-        val referenceData = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        val fetchResult = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
         if (gen != generation) return
 
-        if (referenceData == null) {
-            markUnavailable(reason = "no_reference", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
-            Timber.d("FingerprintTimingManager: no reference available for $episodeUuid")
-            return
+        val referenceData = when (fetchResult) {
+            is FingerprintReferenceRetriever.FetchResult.Success -> fetchResult.data
+
+            is FingerprintReferenceRetriever.FetchResult.NotFound -> {
+                markUnavailable(reason = "no_reference", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+                Timber.d("FingerprintTimingManager: no reference available for $episodeUuid")
+                return
+            }
+
+            // A transient fetch failure marks Failed rather than Unavailable, so reopening the
+            // transcript can retry it.
+            is FingerprintReferenceRetriever.FetchResult.Error -> {
+                markFailed(IOException("reference fetch failed"), stage = "reference_fetch")
+                Timber.d("FingerprintTimingManager: reference fetch failed for $episodeUuid")
+                return
+            }
         }
 
         val reference = ReferenceFingerprint.decode(referenceData)
