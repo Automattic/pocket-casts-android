@@ -296,7 +296,9 @@ class FingerprintTimingManager @Inject constructor(
 
     /**
      * Playback time for [referenceTime] when the active mapping is dense around it, so a full
-     * on-demand resolve is unnecessary. Null when the mapping is missing, sparse, or another episode's.
+     * on-demand resolve is unnecessary. Null when the mapping is missing, sparse, or another
+     * episode's. Allows the same trailing grace past the last anchor as [isWithinMatchedContent],
+     * since the tap-built map lags the playhead by a window length.
      */
     fun densePlaybackTime(episodeUuid: String, referenceTime: Duration): Duration? {
         if (activeEpisodeUuid != episodeUuid) return null
@@ -1465,20 +1467,27 @@ class FingerprintTimingManager @Inject constructor(
         /**
          * Interpolated playback time when the mapping is dense around [referenceTimeSec], in both
          * timelines: anchors bracketing an ad boundary sit close in reference time but far apart in
-         * playback time, and interpolating across the boundary would land inside the ad.
+         * playback time, and interpolating across the boundary would land inside the ad. Past the
+         * last anchor a trailing grace of [FingerprintConstants.TAP_TRAILING_GRACE_SECONDS] is
+         * allowed, since the tap-built map always lags the playhead by a window length.
          */
         internal fun densePlaybackSec(referenceTimeSec: Double, entries: List<TimeMappingEntry>): Double? {
+            if (entries.isEmpty()) return null
             var lo = 0
             var hi = entries.size
             while (lo < hi) {
                 val mid = (lo + hi) / 2
                 if (entries[mid].referenceTime <= referenceTimeSec) lo = mid + 1 else hi = mid
             }
-            if (hi - 1 < 0 || hi >= entries.size) return null
-            val prev = entries[hi - 1]
-            val next = entries[hi]
-            if (next.referenceTime - prev.referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
-            if (next.playbackTime - prev.playbackTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+            if (hi == 0) return null
+            if (hi >= entries.size) {
+                if (referenceTimeSec - entries[entries.size - 1].referenceTime > FingerprintConstants.TAP_TRAILING_GRACE_SECONDS) return null
+            } else {
+                val prev = entries[hi - 1]
+                val next = entries[hi]
+                if (next.referenceTime - prev.referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+                if (next.playbackTime - prev.playbackTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+            }
             return interpolate(
                 time = referenceTimeSec,
                 entries = entries,
@@ -1487,8 +1496,13 @@ class FingerprintTimingManager @Inject constructor(
             )
         }
 
-        /** True when [playbackTime] is bracketed by two anchors ≤ [FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS] apart. */
+        /**
+         * True when [playbackTime] is bracketed by two anchors ≤ [FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS]
+         * apart, or trails the newest anchor within [FingerprintConstants.TAP_TRAILING_GRACE_SECONDS] — the
+         * tap-built map always lags the playhead by a window length.
+         */
         fun isWithinMatchedContent(playbackTime: Double, entries: List<TimeMappingEntry>): Boolean {
+            if (entries.isEmpty()) return false
             var lo = 0
             var hi = entries.size
             while (lo < hi) {
@@ -1499,7 +1513,10 @@ class FingerprintTimingManager @Inject constructor(
                     hi = mid
                 }
             }
-            if (hi - 1 < 0 || hi >= entries.size) return false
+            if (hi >= entries.size) {
+                return playbackTime - entries[entries.size - 1].playbackTime <= FingerprintConstants.TAP_TRAILING_GRACE_SECONDS
+            }
+            if (hi == 0) return false
             return (entries[hi].playbackTime - entries[hi - 1].playbackTime) <= FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS
         }
 
