@@ -39,6 +39,8 @@ class GeneratedChapterSeeker @Inject constructor(
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
     private val mutex = Mutex()
+
+    @Volatile
     private var activeCaller: Job? = null
 
     // Session cache of resolved chapter starts for the most recent episode.
@@ -53,6 +55,11 @@ class GeneratedChapterSeeker @Inject constructor(
         episodeUuid.distinctUntilChanged(),
     ) { resolving, uuid ->
         resolving?.takeIf { it.episodeUuid == uuid }?.chapterIndex
+    }
+
+    /** Called when the user seeks by other means, so a stale chapter resolve can't yank playback later. */
+    fun cancelActiveResolve() {
+        activeCaller?.cancel()
     }
 
     suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {

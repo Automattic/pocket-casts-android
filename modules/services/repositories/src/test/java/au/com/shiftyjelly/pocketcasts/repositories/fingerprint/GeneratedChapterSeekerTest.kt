@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -176,6 +177,29 @@ class GeneratedChapterSeekerTest {
         secondTap.cancelAndJoin()
 
         assertNull(seeker.resolvingChapter.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `cancelActiveResolve cancels the in-flight caller and clears its state`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+        }
+        val seeker = seeker()
+        val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        runCurrent()
+        assertEquals(GeneratedChapterSeeker.ResolvingChapter("episode-uuid", 2), seeker.resolvingChapter.value)
+
+        seeker.cancelActiveResolve()
+        job.join()
+
+        assertTrue(job.isCancelled)
+        assertNull(seeker.resolvingChapter.value)
+    }
+
+    @Test
+    fun `cancelActiveResolve without an in-flight caller is a no-op`() {
+        seeker().cancelActiveResolve()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
