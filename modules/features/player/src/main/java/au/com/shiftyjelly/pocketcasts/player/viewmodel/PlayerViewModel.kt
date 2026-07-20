@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -81,6 +82,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -97,6 +99,7 @@ class PlayerViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val downloadQueue: DownloadQueue,
+    private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
@@ -335,6 +338,10 @@ class PlayerViewModel @Inject constructor(
         }
     val playbackNotice = playbackNoticeManager.playbackNotice
         .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)
+
+    val resolvingChapterIndex = generatedChapterSeeker
+        .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val playerFlow = playbackManager.playerFlow
 
