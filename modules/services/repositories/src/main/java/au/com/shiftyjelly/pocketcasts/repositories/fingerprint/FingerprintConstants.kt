@@ -41,6 +41,13 @@ object FingerprintConstants {
      */
     const val TAP_TRAILING_GRACE_SECONDS = 12.0
 
+    /**
+     * Drop the trailing grace once completed tap windows reach this far past the newest anchor
+     * without matching — the live edge is provably unmatched (an ad), not merely pending. Wide
+     * enough that a couple of isolated missed matches never trip it.
+     */
+    const val TAP_UNMATCHED_EDGE_SECONDS = 3.0
+
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 4
 
