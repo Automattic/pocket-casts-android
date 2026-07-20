@@ -659,4 +659,27 @@ class FingerprintTimingManagerTest {
         assertEquals(600.0, window.startSec, 0.001)
         assertEquals(600.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
     }
+
+    @Test
+    fun `isResolveTargetCovered requires minimum anchors`() {
+        val acc = MappingAccumulator()
+        acc.insert(TimeMappingEntry(playbackTime = 650.0, referenceTime = 620.0))
+        assertFalse(FingerprintTimingManager.isResolveTargetCovered(acc, targetReferenceSec = 600.0))
+    }
+
+    @Test
+    fun `isResolveTargetCovered requires reference past target with margin`() {
+        val acc = MappingAccumulator()
+        acc.insert(TimeMappingEntry(playbackTime = 620.0, referenceTime = 590.0))
+        acc.insert(TimeMappingEntry(playbackTime = 632.0, referenceTime = 602.0))
+        assertFalse(FingerprintTimingManager.isResolveTargetCovered(acc, targetReferenceSec = 600.0))
+    }
+
+    @Test
+    fun `isResolveTargetCovered stops once anchors bracket the target`() {
+        val acc = MappingAccumulator()
+        acc.insert(TimeMappingEntry(playbackTime = 620.0, referenceTime = 590.0))
+        acc.insert(TimeMappingEntry(playbackTime = 636.0, referenceTime = 606.0))
+        assertTrue(FingerprintTimingManager.isResolveTargetCovered(acc, targetReferenceSec = 600.0))
+    }
 }

@@ -311,15 +311,13 @@ class FingerprintTimingManager @Inject constructor(
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
         return withContext(Dispatchers.Default) {
-            withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
-                performResolve(
-                    episodeUuid = episode.uuid,
-                    podcastUuid = episode.podcastOrSubstituteUuid,
-                    audioSource = audioSource,
-                    isDownloaded = episode.isDownloaded,
-                    referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
-                )
-            } ?: ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
+            performResolve(
+                episodeUuid = episode.uuid,
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                audioSource = audioSource,
+                isDownloaded = episode.isDownloaded,
+                referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
+            )
         }
     }
 
@@ -354,8 +352,11 @@ class FingerprintTimingManager @Inject constructor(
         }
         val usedPrior = estimatedPlayback != null
 
+        // The fetch and the decode get separate budgets, so a slow reference download can't eat the decode time.
         val referenceData = warmReferenceData
-            ?: loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
+            ?: withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+                loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
+            }
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
 
         val reference = ReferenceFingerprint.decode(referenceData)
@@ -365,15 +366,18 @@ class FingerprintTimingManager @Inject constructor(
 
         val window = searchWindow(referenceTimeSec, estimatedPlayback)
         val acc = MappingAccumulator()
-        try {
+        val timedOut = try {
             matcher.use {
-                streamFingerprintBounded(
-                    audioFilePath = audioSource,
-                    matcher = it,
-                    startingAt = alignToWindowGrid(window.startSec),
-                    endingAt = window.endSec,
-                    acc = acc,
-                )
+                withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+                    streamFingerprintBounded(
+                        audioFilePath = audioSource,
+                        matcher = it,
+                        startingAt = alignToWindowGrid(window.startSec),
+                        endingAt = window.endSec,
+                        targetReferenceSec = referenceTimeSec,
+                        acc = acc,
+                    )
+                } == null
             }
         } catch (e: CancellationException) {
             throw e
@@ -382,8 +386,11 @@ class FingerprintTimingManager @Inject constructor(
             return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_AUDIO_UNAVAILABLE)
         }
 
+        // A timed-out decode may still have committed usable anchors; interpolate from what we have.
         if (acc.playbackToReference.size < FingerprintConstants.ON_DEMAND_MIN_ANCHORS) {
-            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
+            return ChapterSeekResult.Unresolved(
+                if (timedOut) ChapterSeekResult.REASON_TIMEOUT else ChapterSeekResult.REASON_NO_MATCH,
+            )
         }
         val playback = interpolate(
             time = referenceTimeSec,
@@ -439,6 +446,7 @@ class FingerprintTimingManager @Inject constructor(
         matcher: CheckpointMatcher,
         startingAt: Double,
         endingAt: Double,
+        targetReferenceSec: Double,
         acc: MappingAccumulator,
     ) {
         // Capture the current generation so the decode aborts if the episode changes mid-resolve.
@@ -463,6 +471,7 @@ class FingerprintTimingManager @Inject constructor(
                     endingAt = endingAt,
                     throttleToPlayhead = false,
                     trackFrontier = false,
+                    stopWhen = { isResolveTargetCovered(acc, targetReferenceSec) },
                 ) { windows ->
                     matchWindows(windows, matcher, startingAt, acc)
                 }
@@ -1142,12 +1151,14 @@ class FingerprintTimingManager @Inject constructor(
         endingAt: Double?,
         throttleToPlayhead: Boolean,
         trackFrontier: Boolean,
+        stopWhen: (() -> Boolean)? = null,
         onWindows: suspend (List<WindowedFingerprint>) -> Unit,
     ) {
         val extractor = stream.extractor
         val codec = stream.codec
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
+        var stopRequested = false
         val timeoutUs = FingerprintConstants.CODEC_TIMEOUT_US
         var lastNetworkCheckMs = SystemClock.elapsedRealtime()
         // Default to 16-bit (safest assumption). Updated when the codec
@@ -1208,6 +1219,9 @@ class FingerprintTimingManager @Inject constructor(
                             val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
                             if (windows.isNotEmpty()) {
                                 onWindows(windows)
+                                if (stopWhen?.invoke() == true) {
+                                    stopRequested = true
+                                }
                             }
                         }
 
@@ -1226,7 +1240,7 @@ class FingerprintTimingManager @Inject constructor(
                         }
                     }
                     codec.releaseOutputBuffer(outputIndex, false)
-                    if (isEos) break
+                    if (isEos || stopRequested) break
                     if (endingAt != null && startOffset + streamer.durationMs().toDouble() / 1000.0 >= endingAt) break
                 }
             }
@@ -1547,6 +1561,13 @@ class FingerprintTimingManager @Inject constructor(
             val startSec = max(referenceTimeSec, estimatedPlaybackSec - FingerprintConstants.ON_DEMAND_BACKWARD_MAX_SECONDS)
             val endSec = max(estimatedPlaybackSec, startSec) + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS
             return SearchWindow(startSec, endSec)
+        }
+
+        /** True once a bounded resolve has committed anchors past the target, so further decoding adds nothing. */
+        internal fun isResolveTargetCovered(acc: MappingAccumulator, targetReferenceSec: Double): Boolean {
+            if (acc.playbackToReference.size < FingerprintConstants.ON_DEMAND_MIN_ANCHORS) return false
+            val lastReference = acc.referenceToPlayback.last().referenceTime
+            return lastReference >= targetReferenceSec + FingerprintConstants.ON_DEMAND_EARLY_EXIT_MARGIN_SECONDS
         }
 
         /** True when [playbackTime] is bracketed by two anchors ≤ [FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS] apart. */
