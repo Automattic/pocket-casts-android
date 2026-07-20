@@ -314,22 +314,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     fun densePlaybackTime(episodeUuid: String, referenceTime: Duration): Duration? {
         if (activeEpisodeUuid != episodeUuid) return null
-        val entries = snapshotReferenceToPlayback
-        val referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS)
-        var lo = 0
-        var hi = entries.size
-        while (lo < hi) {
-            val mid = (lo + hi) / 2
-            if (entries[mid].referenceTime <= referenceTimeSec) lo = mid + 1 else hi = mid
-        }
-        if (hi - 1 < 0 || hi >= entries.size) return null
-        if (entries[hi].referenceTime - entries[hi - 1].referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
-        val playback = interpolate(
-            time = referenceTimeSec,
-            entries = entries,
-            keySelector = { it.referenceTime },
-            valueSelector = { it.playbackTime },
-        ) ?: return null
+        val playback = densePlaybackSec(referenceTime.toDouble(DurationUnit.SECONDS), snapshotReferenceToPlayback) ?: return null
         return playback.seconds
     }
 
@@ -1676,6 +1661,31 @@ class FingerprintTimingManager @Inject constructor(
             if (acc.playbackToReference.size < FingerprintConstants.ON_DEMAND_MIN_ANCHORS) return false
             val lastReference = acc.referenceToPlayback.last().referenceTime
             return lastReference >= targetReferenceSec + FingerprintConstants.ON_DEMAND_EARLY_EXIT_MARGIN_SECONDS
+        }
+
+        /**
+         * Interpolated playback time when the mapping is dense around [referenceTimeSec], in both
+         * timelines: anchors bracketing an ad boundary sit close in reference time but far apart in
+         * playback time, and interpolating across the boundary would land inside the ad.
+         */
+        internal fun densePlaybackSec(referenceTimeSec: Double, entries: List<TimeMappingEntry>): Double? {
+            var lo = 0
+            var hi = entries.size
+            while (lo < hi) {
+                val mid = (lo + hi) / 2
+                if (entries[mid].referenceTime <= referenceTimeSec) lo = mid + 1 else hi = mid
+            }
+            if (hi - 1 < 0 || hi >= entries.size) return null
+            val prev = entries[hi - 1]
+            val next = entries[hi]
+            if (next.referenceTime - prev.referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+            if (next.playbackTime - prev.playbackTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+            return interpolate(
+                time = referenceTimeSec,
+                entries = entries,
+                keySelector = { it.referenceTime },
+                valueSelector = { it.playbackTime },
+            )
         }
 
         /** True when [playbackTime] is bracketed by two anchors ≤ [FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS] apart. */

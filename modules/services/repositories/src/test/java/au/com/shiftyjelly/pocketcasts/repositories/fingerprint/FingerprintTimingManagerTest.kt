@@ -682,4 +682,42 @@ class FingerprintTimingManagerTest {
         acc.insert(TimeMappingEntry(playbackTime = 636.0, referenceTime = 606.0))
         assertTrue(FingerprintTimingManager.isResolveTargetCovered(acc, targetReferenceSec = 600.0))
     }
+
+    @Test
+    fun `densePlaybackSec interpolates between close anchors`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 134.0, referenceTime = 104.0),
+        )
+        val result = FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 102.0, entries = entries)
+        assertEquals(132.0, result!!, 0.001)
+    }
+
+    @Test
+    fun `densePlaybackSec returns null outside the mapped range`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 134.0, referenceTime = 104.0),
+        )
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 99.0, entries = entries))
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 105.0, entries = entries))
+    }
+
+    @Test
+    fun `densePlaybackSec returns null when reference gap is too wide`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 150.0, referenceTime = 120.0),
+        )
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 110.0, entries = entries))
+    }
+
+    @Test
+    fun `densePlaybackSec returns null when playback gap spans an ad boundary`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 190.0, referenceTime = 104.0),
+        )
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 102.0, entries = entries))
+    }
 }
