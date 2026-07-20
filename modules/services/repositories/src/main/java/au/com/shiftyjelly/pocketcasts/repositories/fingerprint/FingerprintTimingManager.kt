@@ -150,6 +150,9 @@ class FingerprintTimingManager @Inject constructor(
     private var tapFrontierSec = Double.NaN
 
     @Volatile
+    private var catchUpJob: Job? = null
+
+    @Volatile
     private var generation = 0L
 
     @VisibleForTesting
@@ -498,12 +501,13 @@ class FingerprintTimingManager @Inject constructor(
         targetReferenceSec: Double,
         acc: MappingAccumulator,
         cacheKey: String?,
+        followPlayerCache: Boolean = false,
     ) {
         // Capture the current generation so the decode aborts if the episode changes mid-resolve.
         val gen = generation
         val callerJob = currentCoroutineContext().job
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
-        openAudioStream(gen, audioFilePath, startingAt, cacheKey, followPlayerCache = false, isCallerActive = { callerJob.isActive }).use { stream ->
+        openAudioStream(gen, audioFilePath, startingAt, cacheKey, followPlayerCache = followPlayerCache, isCallerActive = { callerJob.isActive }).use { stream ->
             stream.start()
 
             val streamer = StreamingWindowedFingerprinter(
@@ -658,6 +662,8 @@ class FingerprintTimingManager @Inject constructor(
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
         tapFrontierSec = Double.NaN
+        catchUpJob?.cancel()
+        catchUpJob = null
         currentEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
@@ -917,6 +923,7 @@ class FingerprintTimingManager @Inject constructor(
                         sampleRate = chunk.sampleRate
                         channelCount = chunk.channelCount
                         tapFrontierSec = Double.NaN
+                        maybeStartCatchUpResolve(gen, chunk.positionSec)
                     }
                     val windows = streamer.pushSamplesF32(chunkToFloatSamples(chunk), chunk.channelCount.toUShort())
                     if (windows.isNotEmpty()) {
@@ -937,6 +944,77 @@ class FingerprintTimingManager @Inject constructor(
                 }
             } finally {
                 streamer?.close()
+            }
+        }
+    }
+
+    /**
+     * One-shot faster-than-realtime decode of the first [FingerprintConstants.TAP_CATCH_UP_SECONDS]
+     * after a tap stream (re)start, so anchors reach the new playhead ~a second after a seek instead
+     * of a full window later. Reads through the player cache, which is buffering this exact region.
+     */
+    private fun maybeStartCatchUpResolve(gen: Long, startSec: Double) {
+        if (currentEager) return
+        if (isWithinMatchedContent(startSec, snapshotPlaybackToReference)) return
+        catchUpJob?.cancel()
+        catchUpJob = scope.launch(Dispatchers.IO) {
+            try {
+                var reference: ReferenceFingerprint? = null
+                var audioSource: String? = null
+                var episodeUuid: String? = null
+                var cacheKey: String? = null
+                var isStreaming = false
+                mutex.withLock {
+                    if (gen != generation) return@launch
+                    reference = currentReference
+                    audioSource = currentAudioFilePath
+                    episodeUuid = currentEpisodeUuid
+                    cacheKey = currentSharedCacheKey
+                    isStreaming = currentIsStreaming
+                }
+                val ref = reference ?: return@launch
+                val audio = audioSource ?: return@launch
+                val uuid = episodeUuid ?: return@launch
+                val blocked = shouldBlockOnDemandResolve(
+                    isDownloaded = !isStreaming,
+                    warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+                    isUnmetered = { Network.isUnmeteredConnection(context) },
+                )
+                if (blocked) return@launch
+                val matcher = buildMatcher(ref) ?: return@launch
+                val acc = MappingAccumulator()
+                activeResolves.incrementAndGet()
+                try {
+                    matcher.use {
+                        withTimeoutOrNull(FingerprintConstants.ON_DEMAND_DECODE_TIMEOUT_MS) {
+                            streamFingerprintBounded(
+                                audioFilePath = audio,
+                                matcher = it,
+                                startingAt = alignToWindowGrid(startSec),
+                                endingAt = startSec + FingerprintConstants.TAP_CATCH_UP_SECONDS,
+                                targetReferenceSec = Double.MAX_VALUE,
+                                acc = acc,
+                                cacheKey = cacheKey,
+                                // The player is buffering this exact region; follow its cache
+                                // instead of racing it with a duplicate fetch.
+                                followPlayerCache = true,
+                            )
+                        }
+                    }
+                } finally {
+                    activeResolves.decrementAndGet()
+                }
+                if (acc.playbackToReference.isNotEmpty()) {
+                    mergeResolvedAnchors(uuid, acc.playbackToReference)
+                    Timber.d(
+                        "FingerprintTimingManager: catch-up mapped %d anchors at %.1fs",
+                        acc.playbackToReference.size,
+                        startSec,
+                    )
+                }
+            } catch (_: CancellationException) {
+            } catch (e: Exception) {
+                Timber.d(e, "FingerprintTimingManager: catch-up decode failed")
             }
         }
     }

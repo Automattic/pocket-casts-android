@@ -48,6 +48,13 @@ object FingerprintConstants {
      */
     const val TAP_UNMATCHED_EDGE_SECONDS = 3.0
 
+    /**
+     * Audio decoded in one shot when a tap stream starts in unmapped territory. The tap only sees
+     * audio in realtime, so its first window lands [WINDOW_DURATION_MS] after a seek; a faster-than-
+     * realtime decode of this span puts anchors at the new playhead within ~a second instead.
+     */
+    const val TAP_CATCH_UP_SECONDS = 12.0
+
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 4
 
