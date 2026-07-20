@@ -864,10 +864,15 @@ class EpisodeManagerImpl @Inject constructor(
         if (episodeLimit != null) {
             val allEpisodes = episodeDao.findByPodcastOrderPublishedDateDescBlocking(podcast.uuid).filter { !it.excludeFromEpisodeLimit }
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
+                val upNextEpisodeUuids = playbackManager
+                    ?.upNextQueue
+                    ?.allEpisodes
+                    ?.mapTo(mutableSetOf()) { it.uuid }
+                    .orEmpty()
                 val episodesToRemove = allEpisodes.drop(episodeLimit)
                     .filter { !it.isArchived }
                     .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
-                    .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
+                    .filter { it.uuid !in upNextEpisodeUuids }
                 if (episodesToRemove.isNotEmpty()) {
                     runBlocking {
                         archiveAllInList(episodesToRemove, playbackManager)
