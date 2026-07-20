@@ -173,7 +173,7 @@ class FingerprintTimingManager @Inject constructor(
     private var currentDurationSec: Double = 0.0
     private var currentReferenceData: ByteArray? = null
     private var currentReferenceFilePath: String? = null
-    private var currentReferenceDuration: Double = 0.0
+    private var currentReference: ReferenceFingerprint? = null
     private var currentMatcher: CheckpointMatcher? = null
     private var hasReachedActive = false
     private var hasTrackedFailure = false
@@ -355,11 +355,11 @@ class FingerprintTimingManager @Inject constructor(
             return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK)
         }
         var estimatedPlayback: Double? = null
-        var warmReferenceData: ByteArray? = null
+        var warmReference: ReferenceFingerprint? = null
         var sharedCacheKey: String? = null
         mutex.withLock {
             if (currentEpisodeUuid == episodeUuid) {
-                warmReferenceData = currentReferenceData
+                warmReference = currentReference
                 sharedCacheKey = currentSharedCacheKey
                 estimatedPlayback = interpolate(
                     time = referenceTimeSec,
@@ -372,14 +372,13 @@ class FingerprintTimingManager @Inject constructor(
         val usedPrior = estimatedPlayback != null
 
         // The fetch and the decode get separate budgets, so a slow reference download can't eat the decode time.
-        val referenceData = warmReferenceData
-            ?: withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+        val reference = warmReference ?: run {
+            val referenceData = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
                 loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
-            }
-            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
-
-        val reference = ReferenceFingerprint.decode(referenceData)
-            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+            } ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+            ReferenceFingerprint.decode(referenceData)
+                ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+        }
         val matcher = buildMatcher(reference)
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
 
@@ -715,7 +714,7 @@ class FingerprintTimingManager @Inject constructor(
         currentDurationSec = 0.0
         currentReferenceData = null
         currentReferenceFilePath = null
-        currentReferenceDuration = 0.0
+        currentReference = null
         currentMatcher?.close()
         currentMatcher = null
         activeEpisodeUuid = null
@@ -889,7 +888,7 @@ class FingerprintTimingManager @Inject constructor(
             }
             currentReferenceData = referenceData
             currentReferenceFilePath = refPath
-            currentReferenceDuration = reference.totalDuration
+            currentReference = reference
             currentMatcher = matcher
             _stateFlow.value = State.Preparing
             if (cached != null) {
@@ -1448,7 +1447,7 @@ class FingerprintTimingManager @Inject constructor(
         if (audioPath.startsWith("http://") || audioPath.startsWith("https://")) return
         val refPath = currentReferenceFilePath ?: return
         val refData = currentReferenceData ?: return
-        val refDuration = currentReferenceDuration
+        val refDuration = currentReference?.totalDuration ?: return
 
         val entries = snapshotPlaybackToReference
         FingerprintMappingCache.save(entries, audioPath, refPath, refData, refDuration)
