@@ -656,14 +656,14 @@ class FingerprintTimingManager @Inject constructor(
 
     /**
      * Eager full-stream mapping only makes sense on mobile, for episodes with generated chapters,
-     * and when pulling the whole audio is cheap: a local download, or streaming on an unmetered network.
+     * and only for local downloads. Streaming episodes fall back to the throttled follow-the-playhead
+     * pass plus the bounded on-demand resolver, so we never pull a whole file over the network to map it.
      */
     private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
         return computeEager(
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
-            isUnmetered = { Network.isUnmeteredConnection(context) },
         )
     }
 
@@ -1387,8 +1387,7 @@ class FingerprintTimingManager @Inject constructor(
         internal fun computeEager(
             hasGeneratedChapters: Boolean,
             isDownloaded: Boolean,
-            isUnmetered: () -> Boolean,
-        ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
+        ): Boolean = hasGeneratedChapters && isDownloaded
 
         /** [isUnmetered] is a supplier so the network lookup is skipped for downloaded episodes. */
         internal fun shouldBlockRemoteFingerprinting(

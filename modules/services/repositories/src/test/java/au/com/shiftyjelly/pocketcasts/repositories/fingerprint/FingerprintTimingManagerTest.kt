@@ -113,27 +113,17 @@ class FingerprintTimingManagerTest {
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = true,
             isDownloaded = true,
-            isUnmetered = { false },
         )
         assertTrue(eager)
     }
 
     @Test
-    fun `computeEager runs for streaming episode on unmetered network`() {
+    fun `computeEager skips streaming episode`() {
+        // Streaming episodes never eager-decode the whole file; they use the throttled pass plus
+        // the bounded on-demand resolver, regardless of network, to avoid pulling the whole file.
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = true,
             isDownloaded = false,
-            isUnmetered = { true },
-        )
-        assertTrue(eager)
-    }
-
-    @Test
-    fun `computeEager skips streaming episode on metered network`() {
-        val eager = FingerprintTimingManager.computeEager(
-            hasGeneratedChapters = true,
-            isDownloaded = false,
-            isUnmetered = { false },
         )
         assertFalse(eager)
     }
@@ -143,23 +133,8 @@ class FingerprintTimingManagerTest {
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = false,
             isDownloaded = true,
-            isUnmetered = { true },
         )
         assertFalse(eager)
-    }
-
-    @Test
-    fun `computeEager does not query network for downloaded episode`() {
-        var queriedNetwork = false
-        FingerprintTimingManager.computeEager(
-            hasGeneratedChapters = true,
-            isDownloaded = true,
-            isUnmetered = {
-                queriedNetwork = true
-                true
-            },
-        )
-        assertFalse(queriedNetwork)
     }
 
     @Test
