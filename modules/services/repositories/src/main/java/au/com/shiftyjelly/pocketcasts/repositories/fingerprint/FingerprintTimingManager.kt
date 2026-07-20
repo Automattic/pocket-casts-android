@@ -501,7 +501,7 @@ class FingerprintTimingManager @Inject constructor(
         val gen = generation
         val callerJob = currentCoroutineContext().job
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
-        openAudioStream(gen, audioFilePath, startingAt, cacheKey, isCallerActive = { callerJob.isActive }).use { stream ->
+        openAudioStream(gen, audioFilePath, startingAt, cacheKey, followPlayerCache = false, isCallerActive = { callerJob.isActive }).use { stream ->
             stream.start()
 
             val streamer = StreamingWindowedFingerprinter(
@@ -1081,6 +1081,7 @@ class FingerprintTimingManager @Inject constructor(
         audioFilePath: String,
         startingAt: Double,
         sharedCacheKey: String?,
+        followPlayerCache: Boolean = true,
         isCallerActive: () -> Boolean = { true },
     ): AudioStream {
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
@@ -1095,12 +1096,21 @@ class FingerprintTimingManager @Inject constructor(
         val isActive = { gen == generation && isCallerActive() }
         val extractor = MediaExtractor()
         val cacheSource = when {
-            cacheKey != null -> StreamingMediaDataSource(
+            cacheKey != null && followPlayerCache -> StreamingMediaDataSource(
                 dataSourceFactory = factory.blockingCacheFactory,
                 uri = audioFilePath.toUri(),
                 cacheKey = cacheKey,
                 isActive = isActive,
                 cachedLengthAt = { position, length -> factory.cachedLengthAt(cacheKey, position, length) },
+            )
+
+            // Bounded resolves target regions the player may not have cached yet; read through
+            // the cache instead of waiting for the player to fill it.
+            cacheKey != null -> StreamingMediaDataSource(
+                dataSourceFactory = factory.cacheFactory,
+                uri = audioFilePath.toUri(),
+                cacheKey = cacheKey,
+                isActive = isActive,
             )
 
             isRemoteUrl -> StreamingMediaDataSource(
