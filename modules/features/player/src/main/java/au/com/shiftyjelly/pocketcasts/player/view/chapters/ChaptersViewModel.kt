@@ -61,12 +61,9 @@ class ChaptersViewModel @AssistedInject constructor(
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
 
-    val resolvingChapterIndex = combine(
-        generatedChapterSeeker.resolvingChapter,
-        playbackManager.playbackStateFlow.map { it.episodeUuid }.distinctUntilChanged(),
-    ) { resolving, episodeUuid ->
-        resolving?.takeIf { it.episodeUuid == episodeUuid }?.chapterIndex
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    val resolvingChapterIndex = generatedChapterSeeker
+        .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun Mode.uiStateFlow() = when (this) {

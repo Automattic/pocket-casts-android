@@ -42,6 +42,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -62,7 +63,7 @@ class ChaptersViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
-        on { resolvingChapter } doReturn MutableStateFlow(null)
+        on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())

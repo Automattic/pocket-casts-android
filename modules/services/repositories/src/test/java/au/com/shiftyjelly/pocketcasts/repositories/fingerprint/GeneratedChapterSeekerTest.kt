@@ -10,6 +10,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -18,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -149,5 +157,23 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker.resolvingChapter.value)
         verify(timingManager).densePlaybackTime("episode-uuid", 100.seconds)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `resolving chapter index follows the current episode`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+        }
+        val seeker = seeker()
+        val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        runCurrent()
+
+        assertEquals(2, seeker.resolvingChapterIndex(flowOf("episode-uuid")).first())
+        assertNull(seeker.resolvingChapterIndex(flowOf("other-uuid")).first())
+
+        job.cancelAndJoin()
+
+        assertNull(seeker.resolvingChapterIndex(flowOf("episode-uuid")).first())
     }
 }

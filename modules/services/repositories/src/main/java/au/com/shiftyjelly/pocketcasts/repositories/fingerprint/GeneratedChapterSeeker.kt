@@ -14,9 +14,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -42,6 +45,13 @@ class GeneratedChapterSeeker @Inject constructor(
 
     private val _resolvingChapter = MutableStateFlow<ResolvingChapter?>(null)
     val resolvingChapter: StateFlow<ResolvingChapter?> = _resolvingChapter.asStateFlow()
+
+    fun resolvingChapterIndex(episodeUuid: Flow<String?>): Flow<Int?> = combine(
+        resolvingChapter,
+        episodeUuid.distinctUntilChanged(),
+    ) { resolving, uuid ->
+        resolving?.takeIf { it.episodeUuid == uuid }?.chapterIndex
+    }
 
     suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {
         if (!isEnabled(chapter)) return null
