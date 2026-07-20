@@ -448,6 +448,10 @@ class FingerprintTimingManager @Inject constructor(
             }
             if (inserted > 0) {
                 publishSnapshot()
+                val coverage = mapping.playbackToReference.size
+                if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
+                    markActive(coverage)
+                }
                 Timber.d("FingerprintTimingManager: merged $inserted resolved anchors into the mapping")
             }
         }
