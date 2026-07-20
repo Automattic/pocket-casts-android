@@ -724,6 +724,13 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
+        if (playbackManager.isPlaybackRemote()) {
+            // The player decodes remotely, so there is no local PCM to fingerprint.
+            markUnavailable(reason = "remote_playback", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: remote playback")
+            return
+        }
+
         val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
         mutex.withLock {
             if (gen != generation) return
