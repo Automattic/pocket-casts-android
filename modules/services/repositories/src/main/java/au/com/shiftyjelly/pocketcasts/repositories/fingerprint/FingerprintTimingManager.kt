@@ -356,9 +356,11 @@ class FingerprintTimingManager @Inject constructor(
         }
         var estimatedPlayback: Double? = null
         var warmReferenceData: ByteArray? = null
+        var sharedCacheKey: String? = null
         mutex.withLock {
             if (currentEpisodeUuid == episodeUuid) {
                 warmReferenceData = currentReferenceData
+                sharedCacheKey = currentSharedCacheKey
                 estimatedPlayback = interpolate(
                     time = referenceTimeSec,
                     entries = snapshotReferenceToPlayback,
@@ -394,6 +396,7 @@ class FingerprintTimingManager @Inject constructor(
                         endingAt = window.endSec,
                         targetReferenceSec = referenceTimeSec,
                         acc = acc,
+                        cacheKey = sharedCacheKey,
                     )
                 } == null
             }
@@ -493,12 +496,13 @@ class FingerprintTimingManager @Inject constructor(
         endingAt: Double,
         targetReferenceSec: Double,
         acc: MappingAccumulator,
+        cacheKey: String?,
     ) {
         // Capture the current generation so the decode aborts if the episode changes mid-resolve.
         val gen = generation
         val callerJob = currentCoroutineContext().job
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
-        openAudioStream(gen, audioFilePath, startingAt, isCallerActive = { callerJob.isActive }).use { stream ->
+        openAudioStream(gen, audioFilePath, startingAt, cacheKey, isCallerActive = { callerJob.isActive }).use { stream ->
             stream.start()
 
             val streamer = StreamingWindowedFingerprinter(
@@ -1073,7 +1077,13 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
-    private fun openAudioStream(gen: Long, audioFilePath: String, startingAt: Double, isCallerActive: () -> Boolean = { true }): AudioStream {
+    private fun openAudioStream(
+        gen: Long,
+        audioFilePath: String,
+        startingAt: Double,
+        sharedCacheKey: String?,
+        isCallerActive: () -> Boolean = { true },
+    ): AudioStream {
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         if (!isRemoteUrl && !File(audioFilePath).exists()) {
             throw AudioUnavailableException("audio file not found at $audioFilePath")
@@ -1082,7 +1092,7 @@ class FingerprintTimingManager @Inject constructor(
         val factory = dataSourceFactory.get()
         // Only follow the player's on-disk cache when it actually exists; otherwise read the URL
         // through the app's HTTP stack so requests carry the player's headers and connection pool.
-        val cacheKey = currentSharedCacheKey?.takeIf { isRemoteUrl && factory.isCacheAvailable }
+        val cacheKey = sharedCacheKey?.takeIf { isRemoteUrl && factory.isCacheAvailable }
         val isActive = { gen == generation && isCallerActive() }
         val extractor = MediaExtractor()
         val cacheSource = when {
@@ -1153,7 +1163,7 @@ class FingerprintTimingManager @Inject constructor(
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         val callerJob = currentCoroutineContext().job
         val stream = try {
-            openAudioStream(gen, audioFilePath, startingAt, isCallerActive = { callerJob.isActive })
+            openAudioStream(gen, audioFilePath, startingAt, currentSharedCacheKey, isCallerActive = { callerJob.isActive })
         } catch (e: AudioUnavailableException) {
             Timber.w("FingerprintTimingManager: ${e.message}")
             markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
