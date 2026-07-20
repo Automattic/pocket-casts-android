@@ -329,46 +329,6 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `play chapter reports the fingerprint preparation duration for generated chapters`() = runTest {
-        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
-        whenever(fingerprintTimingManager.preparationDurationMs).thenReturn(4200L)
-        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
-        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
-
-        chaptersViewModel.playChapter(chapter)
-
-        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
-        assertEquals(4200L, event.fingerprintCalculationTimeMs)
-    }
-
-    @Test
-    fun `play chapter does not report fingerprint calculation time for embedded chapters`() = runTest {
-        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
-        whenever(fingerprintTimingManager.preparationDurationMs).thenReturn(4200L)
-        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
-        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.PodcastIndex)
-
-        chaptersViewModel.playChapter(chapter)
-
-        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
-        assertNull(event.fingerprintCalculationTimeMs)
-    }
-
-    @Test
-    fun `play chapter omits fingerprint calculation time when a different episode was fingerprinted`() = runTest {
-        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
-        whenever(fingerprintTimingManager.preparationDurationMs).thenReturn(4200L)
-        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("other")
-        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
-        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
-
-        chaptersViewModel.playChapter(chapter)
-
-        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
-        assertNull(event.fingerprintCalculationTimeMs)
-    }
-
-    @Test
     fun `play chapter seeks to the stream-aligned position`() = runTest {
         playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
         val tapped = Chapter("gen", 2.seconds, 3.seconds, selected = true, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)

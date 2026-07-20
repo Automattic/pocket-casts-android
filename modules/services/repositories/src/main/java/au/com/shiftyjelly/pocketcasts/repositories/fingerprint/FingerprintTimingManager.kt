@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerChapterFingerprintCalculatedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationStartedEvent
@@ -106,11 +107,6 @@ class FingerprintTimingManager @Inject constructor(
     var activeEpisodeUuid: String? = null
         private set
 
-    /** Time taken to prepare the fingerprint mapping to Active for the current episode, or null until reached. Safe to read off the UI thread. */
-    @Volatile
-    var preparationDurationMs: Long? = null
-        private set
-
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
@@ -177,6 +173,8 @@ class FingerprintTimingManager @Inject constructor(
     // Analytics context for the current preparation.
     private var preparationStartMs: Long = 0
     private var currentIsStreaming: Boolean = false
+    private var currentPodcastUuid: String? = null
+    private var currentHasGeneratedChapters: Boolean = false
 
     // When true, decode the whole stream from the start ignoring the playhead lookahead throttle,
     // so the full reference<->playback map is available for chapter alignment.
@@ -353,15 +351,25 @@ class FingerprintTimingManager @Inject constructor(
         _stateFlow.value = State.Active(coverage)
         if (!hasReachedActive) {
             hasReachedActive = true
-            preparationDurationMs = elapsedPreparationMs()
+            val durationMs = elapsedPreparationMs()
             Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
             eventHorizon.track(
                 SyncedTranscriptsPreparationCompletedEvent(
-                    durationMs = elapsedPreparationMs(),
+                    durationMs = durationMs,
                     isStreaming = currentIsStreaming,
                     episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                 ),
             )
+            if (currentHasGeneratedChapters) {
+                eventHorizon.track(
+                    PlayerChapterFingerprintCalculatedEvent(
+                        durationMs = durationMs,
+                        isStreaming = currentIsStreaming,
+                        episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                        podcastUuid = currentPodcastUuid,
+                    ),
+                )
+            }
         }
     }
 
@@ -465,23 +473,11 @@ class FingerprintTimingManager @Inject constructor(
         hasReachedActive = false
         hasTrackedFailure = false
         preparationStartMs = 0
-        preparationDurationMs = null
         currentIsStreaming = false
+        currentPodcastUuid = null
+        currentHasGeneratedChapters = false
         currentEager = false
         currentTrigger = PrepareTrigger.PLAYBACK
-    }
-
-    /**
-     * Eager full-stream mapping only makes sense on mobile, for episodes with generated chapters,
-     * and when pulling the whole audio is cheap: a local download, or streaming on an unmetered network.
-     */
-    private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
-        if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
-        return computeEager(
-            hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
-            isDownloaded = isDownloaded,
-            isUnmetered = { Network.isUnmeteredConnection(context) },
-        )
     }
 
     private suspend fun prepareForEpisode(
@@ -535,11 +531,18 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
+        val hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid)
+        val eager = computeEager(
+            hasGeneratedChapters = hasGeneratedChapters,
+            isDownloaded = isDownloaded,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
         mutex.withLock {
             if (gen != generation) return
             currentTrigger = trigger
             currentEpisodeUuid = episodeUuid
+            currentPodcastUuid = podcastUuid
+            currentHasGeneratedChapters = hasGeneratedChapters
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
             currentSharedCacheKey = sharedCacheKey

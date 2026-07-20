@@ -132,11 +132,6 @@ class ChaptersViewModel @AssistedInject constructor(
                 chapter
             }
             val alignmentWaitMs = if (alignsFingerprint) alignMark.elapsedNow().inWholeMilliseconds else 0L
-            val fingerprintCalculationTimeMs = if (alignsFingerprint && fingerprintTimingManager.activeEpisodeUuid == episodeId) {
-                fingerprintTimingManager.preparationDurationMs
-            } else {
-                null
-            }
 
             val playbackState = playbackManager.playbackStateFlow.first()
             val alreadyInChapter = playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in target
@@ -179,7 +174,6 @@ class ChaptersViewModel @AssistedInject constructor(
                         is Mode.Player -> ChaptersShownSource.FullscreenPlayer
                     },
                     playbackStartLatencyMs = latencyMs,
-                    fingerprintCalculationTimeMs = fingerprintCalculationTimeMs,
                     episodeUuid = episodeId,
                     podcastUuid = episode?.podcastOrSubstituteUuid,
                 ),
