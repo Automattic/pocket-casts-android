@@ -126,7 +126,7 @@ private fun Content(
         ) {
             if (state.isChaptersPresent) {
                 ChapterPreviousButton(
-                    enabled = !state.isFirstChapter && !isResolvingPrevious,
+                    enabled = !state.isFirstChapter,
                     alpha = if (state.isFirstChapter) 0.5f else 1f,
                     isResolving = isResolvingPrevious,
                     iconTint = playerColors.contrast01,
@@ -206,7 +206,7 @@ private fun Content(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     ChapterNextButtonWithChapterProgressCircle(
-                        enabled = !state.isLastChapter && !isResolvingNext,
+                        enabled = !state.isLastChapter,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
                         progress = state.chapterProgress,
                         isResolving = isResolvingNext,
