@@ -330,6 +330,15 @@ class FingerprintTimingManager @Inject constructor(
         isDownloaded: Boolean,
         referenceTimeSec: Double,
     ): ChapterSeekResult {
+        val blocked = shouldBlockOnDemandResolve(
+            isDownloaded = isDownloaded,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+        if (blocked) {
+            Timber.d("FingerprintTimingManager: skipping on-demand resolve on metered network")
+            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK)
+        }
         var estimatedPlayback: Double? = null
         var warmReferenceData: ByteArray? = null
         mutex.withLock {
@@ -398,11 +407,15 @@ class FingerprintTimingManager @Inject constructor(
     ): ByteArray? {
         if (isDownloaded) {
             referenceRetriever.loadReferenceData(audioSource)?.let { return it }
+        } else {
+            referenceRetriever.loadCachedReference(episodeUuid)?.let { return it }
         }
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
         val data = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid) ?: return null
         if (isDownloaded) {
             referenceRetriever.saveReferenceData(data, audioSource)
+        } else {
+            referenceRetriever.saveCachedReference(episodeUuid, data)
         }
         return data
     }
@@ -1380,14 +1393,18 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     companion object {
-        /**
-         * Core eager-pass gate (assumes the platform check already passed). [isUnmetered] is a supplier so the
-         * network lookup is skipped for downloaded episodes.
-         */
+        /** Core eager-pass gate (assumes the platform check already passed). */
         internal fun computeEager(
             hasGeneratedChapters: Boolean,
             isDownloaded: Boolean,
         ): Boolean = hasGeneratedChapters && isDownloaded
+
+        /** A chapter tap is user-initiated, so metered data is allowed unless the user asked to be warned. */
+        internal fun shouldBlockOnDemandResolve(
+            isDownloaded: Boolean,
+            warnOnMeteredNetwork: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean = !isDownloaded && warnOnMeteredNetwork && !isUnmetered()
 
         /** [isUnmetered] is a supplier so the network lookup is skipped for downloaded episodes. */
         internal fun shouldBlockRemoteFingerprinting(

@@ -13,6 +13,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
@@ -70,13 +72,12 @@ class GeneratedChapterSeeker @Inject constructor(
 
         // Last tap wins: a new resolve cancels the previous caller, so a superseded tap never seeks.
         val myJob = currentCoroutineContext().job
+        val resolving = ResolvingChapter(episode.uuid, chapter.index)
         mutex.withLock {
             activeCaller?.takeIf { it !== myJob }?.cancel()
             activeCaller = myJob
+            _resolvingChapter.value = resolving
         }
-
-        val resolving = ResolvingChapter(episode.uuid, chapter.index)
-        _resolvingChapter.value = resolving
         try {
             return when (val result = manager.resolveChapterPlaybackTime(episode, referenceTime)) {
                 is ChapterSeekResult.Resolved -> {
@@ -94,8 +95,15 @@ class GeneratedChapterSeeker @Inject constructor(
                 }
             }
         } finally {
-            _resolvingChapter.compareAndSet(resolving, null)
-            mutex.withLock { if (activeCaller === myJob) activeCaller = null }
+            // The resolving state is only cleared by its owner, so a superseded tap can't wipe the new tap's spinner.
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    if (activeCaller === myJob) {
+                        activeCaller = null
+                        _resolvingChapter.value = null
+                    }
+                }
+            }
         }
     }
 

@@ -161,6 +161,25 @@ class GeneratedChapterSeekerTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
+    fun `superseded tap does not clear the new tap's resolving state`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+        }
+        val seeker = seeker()
+        launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        runCurrent()
+        val secondTap = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        runCurrent()
+
+        assertEquals(GeneratedChapterSeeker.ResolvingChapter("episode-uuid", 2), seeker.resolvingChapter.value)
+
+        secondTap.cancelAndJoin()
+
+        assertNull(seeker.resolvingChapter.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
     fun `resolving chapter index follows the current episode`() = runTest {
         timingManager = mock {
             on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }

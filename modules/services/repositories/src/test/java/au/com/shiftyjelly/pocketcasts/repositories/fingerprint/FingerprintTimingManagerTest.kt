@@ -219,6 +219,46 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `shouldBlockOnDemandResolve never blocks downloaded episodes`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = true,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { error("network should not be queried") },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve allows streaming on metered network by default`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve blocks streaming on metered network when user warns on data use`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve never blocks on unmetered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { true },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
     fun `decideOnProgress ignores ticks in eager mode`() {
         val decision = decideOnProgress(positionSec = 100.0, lastPositionSec = 10.0, isEager = true)
         assertEquals(ProgressDecision.None, decision)
