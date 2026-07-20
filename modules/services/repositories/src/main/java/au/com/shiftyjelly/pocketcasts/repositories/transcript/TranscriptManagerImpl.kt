@@ -2,11 +2,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,10 +36,13 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
+    private val chapterManager: ChapterManager,
+    private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
@@ -131,6 +140,62 @@ class TranscriptManagerImpl @Inject constructor(
                 }
             }
             .getOrNull()
+    }
+
+    override suspend fun loadSummaryText(episodeUuid: String): String? {
+        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+        if (!isChaptersEnabled && !isSummaryEnabled) return null
+
+        return try {
+            val generatedTranscript = loadLocalTranscripts(episodeUuid)
+                .firstOrNull { it.isGenerated } ?: return null
+
+            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
+            val response = transcriptService.getTranscriptOrThrow(metaUrl)
+            response.use { body ->
+                val meta = metaAdapter.fromJson(body.source()) ?: return@use null
+
+                if (isChaptersEnabled) {
+                    saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+                }
+
+                if (isSummaryEnabled) {
+                    meta.summary?.takeIf { it.isNotBlank() }
+                } else {
+                    null
+                }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
+            null
+        }
+    }
+
+    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
+        if (chapters.isNullOrEmpty()) return
+
+        if (chapterManager.hasChapters(episodeUuid)) return
+
+        val dbChapters = chapters
+            .mapNotNull { chapter ->
+                val title = chapter.title?.trim()?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                val startTime = chapter.startTime?.takeIf { it >= 0 } ?: return@mapNotNull null
+                DbChapter(
+                    index = 0,
+                    episodeUuid = episodeUuid,
+                    startTimeMs = startTime * 1000,
+                    title = title,
+                    origin = ChapterOrigin.Generated,
+                )
+            }
+            .mapIndexed { index, chapter -> chapter.copy(index = index) }
+        if (dbChapters.isNotEmpty()) {
+            chapterManager.updateChapters(episodeUuid, dbChapters)
+            Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+        }
     }
 
     override fun resetInvalidTranscripts(

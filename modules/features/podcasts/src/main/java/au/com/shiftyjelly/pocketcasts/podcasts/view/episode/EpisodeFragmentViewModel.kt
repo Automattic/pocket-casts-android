@@ -13,6 +13,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
@@ -26,11 +31,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeSummarySourceType
+import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EpisodeUnarchivedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,6 +63,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -71,6 +81,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val eventHorizon: EventHorizon,
     private val transcriptManager: TranscriptManager,
     private val userManager: UserManager,
+    private val paymentClient: PaymentClient,
 ) : ViewModel(),
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -93,17 +104,102 @@ class EpisodeFragmentViewModel @Inject constructor(
     private var autoDispatchPlay = false
 
     private var loadTranscriptJob: Job? = null
-    private val _transcript = MutableStateFlow<Transcript?>(null)
-    val transcript = _transcript.asStateFlow()
+    private var loadSummaryJob: Job? = null
+    private var lastSummaryEpisodeUuid: String? = null
 
-    private val _isPlusUser = MutableStateFlow(false)
-    val isPlusUser = _isPlusUser.asStateFlow()
+    enum class EpisodeContentTab { DESCRIPTION, SUMMARY, BOOKMARKS, CHAPTERS, TRANSCRIPT }
+
+    data class EpisodePageState(
+        val transcript: Transcript? = null,
+        val isPlusUser: Boolean = false,
+        val isFreeTrialAvailable: Boolean = false,
+        val summary: String? = null,
+        val selectedContentTab: EpisodeContentTab = EpisodeContentTab.DESCRIPTION,
+        val episodePublishedDate: Date? = null,
+        val episodeDurationMs: Long? = null,
+    ) {
+        internal fun selectContentTab(tab: EpisodeContentTab): EpisodePageState {
+            val contentTab = when (tab) {
+                EpisodeContentTab.DESCRIPTION -> EpisodeContentTab.DESCRIPTION
+
+                EpisodeContentTab.SUMMARY -> if (summary == null) {
+                    EpisodeContentTab.DESCRIPTION
+                } else {
+                    EpisodeContentTab.SUMMARY
+                }
+
+                EpisodeContentTab.BOOKMARKS -> EpisodeContentTab.BOOKMARKS
+
+                EpisodeContentTab.CHAPTERS -> EpisodeContentTab.CHAPTERS
+
+                EpisodeContentTab.TRANSCRIPT -> EpisodeContentTab.TRANSCRIPT
+            }
+            return copy(selectedContentTab = contentTab)
+        }
+
+        internal fun withTranscript(transcript: Transcript?): EpisodePageState {
+            val contentTab = if (transcript == null && selectedContentTab == EpisodeContentTab.TRANSCRIPT) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                transcript = transcript,
+                selectedContentTab = contentTab,
+            )
+        }
+
+        internal fun withSummary(summary: String?): EpisodePageState {
+            val contentTab = if (summary == null && selectedContentTab == EpisodeContentTab.SUMMARY) {
+                EpisodeContentTab.DESCRIPTION
+            } else {
+                selectedContentTab
+            }
+            return copy(
+                summary = summary,
+                selectedContentTab = contentTab,
+            )
+        }
+    }
+
+    private val _pageState = MutableStateFlow(EpisodePageState())
+    val pageState = _pageState.asStateFlow()
 
     init {
         viewModelScope.launch {
             userManager.getSignInState().asFlow().collect { signInState ->
-                _isPlusUser.value = signInState.isSignedInAsPlusOrPatron
+                _pageState.update { state ->
+                    state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
+                }
             }
+        }
+        viewModelScope.launch {
+            val plans = paymentClient.loadSubscriptionPlans().getOrNull()
+            val hasTrial = plans?.findOfferPlan(
+                SubscriptionTier.Plus,
+                BillingCycle.Monthly,
+                SubscriptionOffer.Trial,
+            ) != null
+            _pageState.update { state ->
+                state.copy(isFreeTrialAvailable = hasTrial)
+            }
+        }
+    }
+
+    fun selectContentTab(tab: EpisodeContentTab) {
+        _pageState.update { state ->
+            state.selectContentTab(tab)
+        }
+        if (tab == EpisodeContentTab.SUMMARY) {
+            val episodeUuid = episode?.uuid ?: return
+            val podcastUuid = podcast?.uuid ?: return
+            eventHorizon.track(
+                EpisodeSummaryTappedEvent(
+                    source = EpisodeSummarySourceType.EpisodeDetails,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
         }
     }
 
@@ -173,6 +269,21 @@ class EpisodeFragmentViewModel @Inject constructor(
                     }
                     episode = it.episode
                     podcast = it.podcast
+                    _pageState.update { state ->
+                        val episodePublishedDate = it.episode.publishedDate
+                        val episodeDurationMs = it.episode.durationMs.toLong()
+                        if (
+                            state.episodePublishedDate == episodePublishedDate &&
+                            state.episodeDurationMs == episodeDurationMs
+                        ) {
+                            state
+                        } else {
+                            state.copy(
+                                episodePublishedDate = episodePublishedDate,
+                                episodeDurationMs = episodeDurationMs,
+                            )
+                        }
+                    }
                 }
             }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
@@ -190,11 +301,37 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
             .distinctUntilChanged()
 
-        if (transcript.value?.episodeUuid != episodeUuid) {
+        if (pageState.value.transcript?.episodeUuid != episodeUuid) {
             val oldJob = loadTranscriptJob
             loadTranscriptJob = launch {
                 oldJob?.cancelAndJoin()
-                _transcript.value = transcriptManager.loadTranscript(episodeUuid)
+                val transcript = transcriptManager.loadTranscript(episodeUuid)
+                _pageState.update { state ->
+                    state.withTranscript(transcript)
+                }
+            }
+        }
+
+        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        if ((isSummaryEnabled || isChaptersEnabled) && lastSummaryEpisodeUuid != episodeUuid) {
+            _pageState.update { state ->
+                state.withSummary(null)
+            }
+            val oldSummaryJob = loadSummaryJob
+            loadSummaryJob = launch {
+                oldSummaryJob?.cancelAndJoin()
+                val result = transcriptManager.loadSummaryText(episodeUuid)
+                _pageState.update { state ->
+                    state.withSummary(result)
+                }
+                if (result != null || !isSummaryEnabled) {
+                    lastSummaryEpisodeUuid = episodeUuid
+                }
+            }
+        } else if (!isSummaryEnabled) {
+            _pageState.update { state ->
+                state.withSummary(null)
             }
         }
     }

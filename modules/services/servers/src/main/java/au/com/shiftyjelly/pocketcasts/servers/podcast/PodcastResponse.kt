@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
@@ -87,6 +90,7 @@ data class EpisodeInfo(
     @Json(name = "number") val number: Long?,
     @Json(name = "type") val type: String?,
     @Json(name = "url") val url: String,
+    @Json(name = "alternate_enclosures") val alternateEnclosures: List<AlternateEnclosure>?,
     @Json(name = "file_type") val fileType: String?,
     @Json(name = "file_size") val fileSize: Long?,
     @Json(name = "duration") val duration: Double?,
@@ -98,11 +102,18 @@ data class EpisodeInfo(
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
         val publishedDate = published.parseIsoDate() ?: return null
         val episodeTitle = title.orEmpty()
+        val enclosures = toAlternateEnclosures()
+        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+            enclosures.firstHlsMimeType() ?: fileType
+        } else {
+            fileType
+        }
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
             title = episodeTitle,
-            fileType = fileType,
+            fileType = resolvedFileType,
             sizeInBytes = fileSize ?: 0,
             duration = duration ?: 0.0,
             publishedDate = publishedDate,
@@ -113,6 +124,56 @@ data class EpisodeInfo(
             type = type,
             slug = slug.orEmpty(),
             hasGeneratedTranscript = hasGeneratedTranscript == true,
+        ).apply {
+            alternateEnclosures = enclosures
+        }
+    }
+
+    fun toAlternateEnclosures(): List<EpisodeAlternateEnclosure> = alternateEnclosures.orEmpty().mapIndexed { index, enclosure ->
+        EpisodeAlternateEnclosure(
+            episodeUuid = uuid,
+            position = index,
+            type = enclosure.type,
+            bitrate = enclosure.bitrate,
+            length = enclosure.length,
+            height = enclosure.height,
+            width = enclosure.width,
+            lang = enclosure.lang,
+            title = enclosure.title,
+            codecs = enclosure.codecs,
+            integrityType = enclosure.integrity?.type,
+            integrityValue = enclosure.integrity?.value,
+            isDefault = enclosure.default == true,
+            sources = enclosure.sources?.mapNotNull { source ->
+                source.uri?.let { AlternateEnclosureSource(uri = it, contentType = source.contentType) }
+            }.orEmpty(),
         )
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class AlternateEnclosure(
+    @Json(name = "type") val type: String?,
+    @Json(name = "bitrate") val bitrate: Long?,
+    @Json(name = "length") val length: Long?,
+    @Json(name = "height") val height: Int?,
+    @Json(name = "width") val width: Int?,
+    @Json(name = "lang") val lang: String?,
+    @Json(name = "title") val title: String?,
+    @Json(name = "codecs") val codecs: String?,
+    @Json(name = "integrity") val integrity: AlternateEnclosureIntegrity?,
+    @Json(name = "default") val default: Boolean?,
+    @Json(name = "sources") val sources: List<AlternateSource>?,
+)
+
+@JsonClass(generateAdapter = true)
+data class AlternateSource(
+    @Json(name = "uri") val uri: String?,
+    @Json(name = "content_type") val contentType: String?,
+)
+
+@JsonClass(generateAdapter = true)
+data class AlternateEnclosureIntegrity(
+    @Json(name = "type") val type: String?,
+    @Json(name = "value") val value: String?,
+)

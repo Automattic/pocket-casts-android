@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
+import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
@@ -22,6 +23,21 @@ class AutoPlaybackService : PlaybackService() {
         RefreshPodcastsTask.runNow(this, applicationScope)
 
         Timber.d("Auto playback service created")
+
+        // Promote to the Started state so the system reliably delivers onTaskRemoved()
+        // even when the car only browses without playing. Does not call startForeground().
+        try {
+            startService(Intent(this, javaClass))
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to promote AutoPlaybackService to started state")
+        }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        // OEM automotive requirement: fully terminate on removal from recents.
+        stopMedia()
+        stopSelf()
+        super.onTaskRemoved(rootIntent)
     }
 
     override fun onDestroy() {
@@ -29,5 +45,9 @@ class AutoPlaybackService : PlaybackService() {
         Timber.d("Auto playback service destroyed")
 
         playbackManager.pause(transientLoss = false, sourceView = SourceView.AUTO_PAUSE)
+    }
+
+    private fun stopMedia() {
+        playbackManager.stopAsync(sourceView = SourceView.AUTO_PAUSE)
     }
 }

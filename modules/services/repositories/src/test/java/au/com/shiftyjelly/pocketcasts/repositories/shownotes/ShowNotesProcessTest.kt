@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -159,7 +160,7 @@ class ShowNotesProcessTest {
                 url = "Url 2",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id-1", expected1)
+        verify(chapterManager).updateChapters("episode-id-1", expected1.map { it.copy(origin = ChapterOrigin.ShowNotes) })
 
         val expected2 = listOf(
             DbChapter(
@@ -168,7 +169,7 @@ class ShowNotesProcessTest {
                 startTimeMs = 15500,
             ),
         )
-        verify(chapterManager).updateChapters("episode-id-2", expected2)
+        verify(chapterManager).updateChapters("episode-id-2", expected2.map { it.copy(origin = ChapterOrigin.ShowNotes) })
     }
 
     @Test
@@ -271,7 +272,7 @@ class ShowNotesProcessTest {
                 url = "Url 2",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.PodcastIndex) })
     }
 
     @Test
@@ -330,7 +331,7 @@ class ShowNotesProcessTest {
                 url = "Url 2",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.PodcastIndex) })
     }
 
     @Test
@@ -384,7 +385,7 @@ class ShowNotesProcessTest {
                 title = "Title 2",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.ShowNotes) })
     }
 
     @Test
@@ -438,7 +439,7 @@ class ShowNotesProcessTest {
                 title = "Title 3",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.PodcastIndex) })
     }
 
     @Test
@@ -636,7 +637,7 @@ class ShowNotesProcessTest {
                 title = "Title 3",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.ShowNotes) })
     }
 
     @Test
@@ -692,6 +693,6 @@ class ShowNotesProcessTest {
                 title = "Title 3",
             ),
         )
-        verify(chapterManager).updateChapters("episode-id", expected)
+        verify(chapterManager).updateChapters("episode-id", expected.map { it.copy(origin = ChapterOrigin.PodcastIndex) })
     }
 }

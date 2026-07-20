@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
@@ -26,10 +27,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -49,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotifi
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -78,11 +83,14 @@ import com.automattic.eventhorizon.PlaybackContentType
 import com.automattic.eventhorizon.PlaybackEpisodeAutoplayedEvent
 import com.automattic.eventhorizon.PlaybackEpisodeDurationChangedEvent
 import com.automattic.eventhorizon.PlaybackFailedEvent
+import com.automattic.eventhorizon.PlaybackHlsToggledEvent
 import com.automattic.eventhorizon.PlaybackPauseEvent
 import com.automattic.eventhorizon.PlaybackPlayEvent
+import com.automattic.eventhorizon.PlaybackProtocolType
 import com.automattic.eventhorizon.PlaybackSeekEvent
 import com.automattic.eventhorizon.PlaybackSkipBackEvent
 import com.automattic.eventhorizon.PlaybackSkipForwardEvent
+import com.automattic.eventhorizon.PlaybackSourceResolvedEvent
 import com.automattic.eventhorizon.PlaybackStopEvent
 import com.automattic.eventhorizon.PlayerEpisodeCompletedEvent
 import com.automattic.eventhorizon.Trackable
@@ -102,6 +110,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
@@ -160,6 +169,7 @@ open class PlaybackManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
     private val browseTreeProvider: BrowseTreeProvider,
+    private val alternateEnclosureManager: AlternateEnclosureManager,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -170,6 +180,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -224,8 +235,7 @@ open class PlaybackManager @Inject constructor(
     private var lastPlayedEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
-    @Volatile
-    private var lastPrefetchedEpisodeUuid: String? = null
+    private val lastPrefetchedEpisodeUuid = AtomicReference<String?>(null)
 
     private val resumptionHelper = ResumptionHelper(settings)
 
@@ -251,6 +261,18 @@ open class PlaybackManager @Inject constructor(
 
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
+
+    // HLS starts Unknown until the player's tracks resolve it to HasVideo or AudioOnly; the video
+    // surface is shown only once HasVideo is known.
+    private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
+    val streamVideoState = _streamVideoState.asStateFlow()
+
+    private val _videoRenderingEnabled = MutableStateFlow(true)
+    val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
+
+    private var currentStreamHlsAvailable = false
+
+    private var lastPlaybackSource: SourceView? = null
 
     var player: Player?
         get() = _playerFlow.value
@@ -305,11 +327,17 @@ open class PlaybackManager @Inject constructor(
                 .map { state -> (state as? UpNextQueue.State.Loaded)?.queue?.firstOrNull()?.uuid }
                 .distinctUntilChanged()
                 .collect {
-                    lastPrefetchedEpisodeUuid = null
+                    lastPrefetchedEpisodeUuid.set(null)
                     if (isPlaying()) {
                         prefetchNextEpisodeIfNeeded()
                     }
                 }
+        }
+
+        launch {
+            settings.audioOnly.flow.collect {
+                player?.updateAudioOnly()
+            }
         }
     }
 
@@ -346,6 +374,7 @@ open class PlaybackManager @Inject constructor(
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
+                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
             ),
         )
         return autoPlayEpisode
@@ -353,6 +382,46 @@ open class PlaybackManager @Inject constructor(
 
     fun isPlaying(): Boolean {
         return playbackStateRelay.blockingFirst().isPlaying
+    }
+
+    private suspend fun applyStreamOverride(episode: BaseEpisode) {
+        episode.overrideStreamUrl = null
+        episode.overrideStreamContentType = null
+        // Stream the first HLS alternate enclosure when streaming is on, or when the episode is HLS-only.
+        val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
+        currentStreamHlsAvailable = hlsUrl != null
+        val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
+        if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
+            episode.overrideStreamUrl = hlsUrl
+            episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
+        }
+    }
+
+    fun toggleVideoRendering() {
+        _videoRenderingEnabled.value = !_videoRenderingEnabled.value
+        getCurrentEpisode()?.let { episode ->
+            eventHorizon.track(
+                PlaybackHlsToggledEvent(
+                    switchedTo = if (_videoRenderingEnabled.value) PlaybackContentType.Video else PlaybackContentType.Audio,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                ),
+            )
+        }
+    }
+
+    private fun audioOnlyModeOrNull(): Boolean? {
+        if (getCurrentEpisode()?.isStreamUrlHls != true) return null
+        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
+    }
+
+    private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
+        return when (_streamVideoState.value) {
+            StreamVideoState.HasVideo -> PlaybackContentType.Video
+            StreamVideoState.AudioOnly -> PlaybackContentType.Audio
+            StreamVideoState.Unknown -> PlaybackContentType.Unknown
+            StreamVideoState.NotVideo -> if (episode?.isVideo == true) PlaybackContentType.Video else PlaybackContentType.Audio
+        }
     }
 
     fun isStreaming(): Boolean {
@@ -863,16 +932,20 @@ open class PlaybackManager @Inject constructor(
 
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
-            if (!isAudioFocusFailed) {
-                trackPlaybackEvent(sourceView) { source, contentType ->
-                    PlaybackStopEvent(
-                        source = source.analyticsValue,
-                        contentType = contentType,
-                    )
-                }
-            }
-            stop()
+            stopSuspend(isAudioFocusFailed, sourceView)
         }
+    }
+
+    suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        if (!isAudioFocusFailed) {
+            trackPlaybackEvent(sourceView) { source, contentType ->
+                PlaybackStopEvent(
+                    source = source.analyticsValue,
+                    contentType = contentType,
+                )
+            }
+        }
+        stop()
     }
 
     suspend fun stop() {
@@ -1061,6 +1134,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             } ?: skipToEndOfLastChapter()
@@ -1077,6 +1151,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             }
@@ -1091,6 +1166,7 @@ open class PlaybackManager @Inject constructor(
                     PlaybackChapterSkippedEvent(
                         source = source.analyticsValue,
                         contentType = contentType,
+                        origin = chapter.origin.toChapterOriginType(),
                     )
                 }
             }
@@ -1331,6 +1407,11 @@ open class PlaybackManager @Inject constructor(
                     PlaybackFailedEvent(
                         episodeUuid = episode?.uuid.orEmpty(),
                         error = errorMessage,
+                        podcastUuid = episode?.podcastOrSubstituteUuid,
+                        source = lastPlaybackSource?.analyticsValue,
+                        contentType = playbackContentTypeFor(episode),
+                        playbackProtocol = if (episode?.isStreamUrlHls == true) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                        hlsErrorDetail = if (episode?.isStreamUrlHls == true) event.error?.errorCodeName else null,
                     ),
                 )
 
@@ -1513,6 +1594,8 @@ open class PlaybackManager @Inject constructor(
                 PlayerEpisodeCompletedEvent(
                     podcastUuid = episode.podcastOrSubstituteUuid,
                     episodeUuid = episode.uuid,
+                    hlsAvailable = currentStreamHlsAvailable,
+                    audioOnlyMode = audioOnlyModeOrNull(),
                 ),
             )
 
@@ -1647,6 +1730,9 @@ open class PlaybackManager @Inject constructor(
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
+            if (episode.isStreamUrlHls && player?.isStreaming == true) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "HLS rendition duration differs from enclosure by $durationDiffSeconds seconds for episode ${episode.uuid}")
+            }
             eventHorizon.track(
                 PlaybackEpisodeDurationChangedEvent(
                     durationChange = durationDiffSeconds.toLong(),
@@ -1696,7 +1782,7 @@ open class PlaybackManager @Inject constructor(
                         title = chapter.title,
                         imageUrl = chapter.imagePath,
                         url = chapter.url?.toString(),
-                        isEmbedded = true,
+                        origin = ChapterOrigin.NativeMedia,
                     )
                 }
                 chapterManager.updateChapters(playbackState.episodeUuid, dbChapters)
@@ -1773,6 +1859,16 @@ open class PlaybackManager @Inject constructor(
         if (player == null || player.isRemote) {
             return
         }
+
+        // On Automotive OS stop playback on a permanent focus loss to deactivate the MediaSession.
+        if (!transientLoss && Util.isAutomotive(application)) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost permanently, stopping playback")
+            focusWasPlaying = null
+            focusManager.giveUpAudioFocus()
+            stopAsync(sourceView = SourceView.AUTO_PAUSE)
+            return
+        }
+
         // if we are playing but can't just reduce the volume then play when focus gained
         val playing = isPlaying()
         if ((playOverNotification == PlayOverNotificationSetting.NEVER) && playing) {
@@ -1925,6 +2021,30 @@ open class PlaybackManager @Inject constructor(
                 }
             }
         }
+
+        // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
+        applyStreamOverride(episode)
+
+        // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
+        _streamVideoState.value = when {
+            !episode.isStreamUrlHls -> StreamVideoState.NotVideo
+            settings.audioOnly.value -> StreamVideoState.AudioOnly
+            else -> StreamVideoState.Unknown
+        }
+        _videoRenderingEnabled.value = true
+
+        lastPlaybackSource = sourceView
+
+        eventHorizon.track(
+            PlaybackSourceResolvedEvent(
+                playbackProtocol = if (episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                isFallback = false,
+                contentType = playbackContentTypeFor(episode),
+                episodeUuid = episode.uuid,
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                hlsEngine = if (episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
+            ),
+        )
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
@@ -2253,10 +2373,13 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
+        lastPlaybackSource = sourceView
         trackPlaybackEvent(sourceView) { source, contentType ->
             PlaybackPlayEvent(
                 source = source.analyticsValue,
                 contentType = contentType,
+                hlsAvailable = currentStreamHlsAvailable,
+                audioOnlyMode = audioOnlyModeOrNull(),
             )
         }
     }
@@ -2324,8 +2447,13 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
+                is PlayerEvent.VideoTrackChanged -> onVideoTrackChanged(event.hasVideo)
             }
         }
+    }
+
+    private fun onVideoTrackChanged(hasVideo: Boolean) {
+        _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
     }
 
     private suspend fun updateCurrentPositionInDatabase() {
@@ -2379,6 +2507,8 @@ open class PlaybackManager @Inject constructor(
                         PlayerEpisodeCompletedEvent(
                             podcastUuid = episode.podcastOrSubstituteUuid,
                             episodeUuid = episode.uuid,
+                            hlsAvailable = currentStreamHlsAvailable,
+                            audioOnlyMode = audioOnlyModeOrNull(),
                         ),
                     )
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
@@ -2530,27 +2660,36 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun prefetchNextEpisodeIfNeeded() {
-        val request = buildPrefetchRequest(
-            isFeatureEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH),
-            isPlayerRemote = player?.isRemote,
-            nextEpisode = upNextQueue.queueEpisodes.firstOrNull(),
-            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
-            appPlatform = Util.getAppPlatform(application),
-        ) ?: return
+        val prefetchEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH)
+        val nextEpisode = upNextQueue.queueEpisodes.firstOrNull()
+        launch {
+            // The next episode isn't run through applyStreamOverride, so resolve its HLS default here
+            // and skip prefetching a progressive file that streaming would bypass.
+            val isHlsDefault = prefetchEnabled &&
+                FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
+                (nextEpisode as? PodcastEpisode)?.let { alternateEnclosureManager.findForEpisode(it.uuid).firstHlsStreamUrl() != null } == true
+            val request = buildPrefetchRequest(
+                isFeatureEnabled = prefetchEnabled,
+                isPlayerRemote = player?.isRemote,
+                nextEpisode = nextEpisode,
+                warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+                appPlatform = Util.getAppPlatform(application),
+                isHlsDefault = isHlsDefault,
+            ) ?: return@launch
 
-        if (request.episodeUuid == lastPrefetchedEpisodeUuid) return
-        lastPrefetchedEpisodeUuid = request.episodeUuid
+            if (lastPrefetchedEpisodeUuid.getAndSet(request.episodeUuid) == request.episodeUuid) return@launch
 
-        PrefetchWorker.prefetchNextEpisode(
-            context = application,
-            episodeUuid = request.episodeUuid,
-            downloadUrl = request.downloadUrl,
-            networkConstraint = request.networkConstraint,
-        )
+            PrefetchWorker.prefetchNextEpisode(
+                context = application,
+                episodeUuid = request.episodeUuid,
+                downloadUrl = request.downloadUrl,
+                networkConstraint = request.networkConstraint,
+            )
+        }
     }
 
     private fun cancelPrefetchNextEpisode() {
-        lastPrefetchedEpisodeUuid = null
+        lastPrefetchedEpisodeUuid.set(null)
         PrefetchWorker.cancelPrefetch(application)
     }
 
@@ -2715,6 +2854,7 @@ internal fun buildPrefetchRequest(
     nextEpisode: BaseEpisode?,
     warnOnMeteredNetwork: Boolean,
     appPlatform: AppPlatform = AppPlatform.Phone,
+    isHlsDefault: Boolean = false,
 ): PrefetchRequest? {
     if (!isFeatureEnabled) return null
     if (appPlatform == AppPlatform.WearOs) return null
@@ -2723,18 +2863,22 @@ internal fun buildPrefetchRequest(
     val episode = nextEpisode ?: return null
     if (episode.isDownloaded) return null
     if (episode.isDownloading) return null
-    if (episode.isHLS) return null
+    if (episode.isStreamUrlHls) return null
+    // The next episode will stream HLS by default, so there is no progressive file worth prefetching.
+    if (isHlsDefault) return null
     val url = episode.downloadUrl ?: return null
-
-    val networkConstraint = if (warnOnMeteredNetwork) {
-        NetworkType.UNMETERED
-    } else {
-        NetworkType.CONNECTED
-    }
 
     return PrefetchRequest(
         episodeUuid = episode.uuid,
         downloadUrl = url,
-        networkConstraint = networkConstraint,
+        networkConstraint = cacheNetworkConstraint(warnOnMeteredNetwork),
     )
+}
+
+// Cache transfers download episode data in the background, so wait for an unmetered
+// network when the user has asked to be warned before using mobile data.
+internal fun cacheNetworkConstraint(warnOnMeteredNetwork: Boolean): NetworkType = if (warnOnMeteredNetwork) {
+    NetworkType.UNMETERED
+} else {
+    NetworkType.CONNECTED
 }

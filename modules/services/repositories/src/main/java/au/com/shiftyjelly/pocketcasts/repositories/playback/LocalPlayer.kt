@@ -169,6 +169,10 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         onPlayerEvent(this, PlayerEvent.EpisodeChanged(episodeUuid))
     }
 
+    protected fun onVideoTrackChanged(hasVideo: Boolean) {
+        onPlayerEvent(this, PlayerEvent.VideoTrackChanged(hasVideo))
+    }
+
     override suspend fun seekToTimeMs(positionMs: Int) {
         withContext(Dispatchers.Main) {
             if (positionMs < 0) {

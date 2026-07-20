@@ -13,7 +13,11 @@ data class Chapter(
     val url: HttpUrl? = null,
     val imagePath: String? = null,
     val selected: Boolean = true,
+    val origin: ChapterOrigin = ChapterOrigin.Unknown,
 ) {
+
+    val isGenerated: Boolean
+        get() = origin == ChapterOrigin.Generated
 
     val isImagePresent: Boolean
         get() = !imagePath.isNullOrBlank()

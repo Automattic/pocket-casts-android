@@ -1,11 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-15 09:54:19+0000
+Translation-Revision-Date: 2026-07-09 15:55:32+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">收听活动热图</string>
+    <string name="profile_stats_listening_activity">收听活动</string>
+    <string name="player_action_show_video">显示视频</string>
+    <string name="player_action_hide_video">隐藏视频</string>
+    <string name="up_next_sort_duration_tooltip_body">从最短到最长，或者反过来 — 根据您实际拥有的时间来安排剧集。</string>
+    <string name="up_next_sort_duration_tooltip_title">按时长排序</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">下载该剧集后，即可通过点击跳转播放位置</string>
+    <string name="bookmark_play_from">从 %s 播放</string>
+    <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
+    <string name="summary_upsell_title">AI 驱动的摘要</string>
+    <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>
+    <string name="tv_create_account_come_back">创建账户后，请返回并登录</string>
+    <string name="tv_create_account_title">创建您的免费账户</string>
+    <string name="tv_onboarding_syncing_subtitle">您的播客正在同步，我们很快就会为您登录！</string>
+    <string name="tv_onboarding_welcome_back">欢迎回来！</string>
+    <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
+    <string name="tv_onboarding_sign_in_title">使用手机登录</string>
+    <string name="tv_sign_in_go_to_url">转至 %1$s</string>
+    <string name="tv_sign_in_or_enter_code">或输入以下代码</string>
+    <string name="tv_onboarding_syncing">正在同步您的播客\u2026</string>
+    <string name="tv_onboarding_browse_without_account">无需账户即可浏览</string>
+    <string name="tv_onboarding_create_free_account">创建免费账户</string>
+    <string name="tv_onboarding_subtitle">您的播客，大屏呈现</string>
+    <string name="tv_onboarding_welcome_tv">欢迎使用 Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">欢迎使用 Pocket Casts</string>
+    <string name="sort_longest_to_shortest">最长到最短</string>
+    <string name="sort_shortest_to_longest">最短到最长</string>
+    <string name="synced_transcripts_whats_new_button_note">仅提供近期剧集的同步文字转录稿。</string>
+    <string name="synced_transcripts_whats_new_message">快速阅读，不漏看任何内容。 您曾匆匆掠过的名字、他们推荐的书、您想要的统计信息 — 点击词条，即可跳转回原文。</string>
+    <string name="synced_transcripts_whats_new_title">同步阅读。 即使在 2 倍速下也是如此。</string>
+    <string name="settings_beta_features_sort_release_date">发布日期（最新者在前）</string>
+    <string name="settings_beta_features_sort_name">名称 (A–Z)</string>
+    <string name="settings_beta_features_sort">对测试版功能进行排序</string>
+    <string name="sponsored">赞助</string>
+    <string name="play_this_episode">播放此剧集</string>
+    <string name="play_latest_episode">播放最新剧集</string>
+    <string name="tv_row_because_you_liked">因为您喜欢播客</string>
+    <string name="tv_row_recommendations">推荐</string>
+    <string name="tv_row_trending_videos">热门视频</string>
+    <string name="tv_row_featured">专为电视制作</string>
+    <string name="home">主页</string>
+    <string name="tv_tab_your_podcasts">您的播客</string>
+    <string name="blogs_found_go_to_podcast">转至播客</string>
+    <string name="blogs_found_description">我们正在将最新文章制作成播客剧集。 第一集准备好后，我们会直接带您前往播客页面；您也可以随时返回播客页面，并下拉以刷新。</string>
+    <string name="blogs_found_headline">大声朗读您的博客</string>
+    <string name="blogs_found_followed_badge">已关注播客</string>
+    <string name="blogs_found_feed_detected">已找到源</string>
+    <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
+    <string name="description">描述</string>
+    <string name="player_tab_summary">摘要</string>
+    <string name="summary">摘要</string>
+    <string name="episode_summary">剧集摘要</string>
+    <string name="chat_stop_quote">结束引用</string>
+    <string name="chat_play_quote">播放引用</string>
+    <string name="chat_tap_to_retry">轻点以重试</string>
+    <string name="chat_error_network">无法连接到该服务器。 请检查您的连接。</string>
+    <string name="chat_error_server">出错了。 请重试。</string>
+    <string name="chat_clear">清除聊天记录</string>
+    <string name="chat_send">发送</string>
+    <string name="chat_input_hint">就此剧集进行提问…</string>
+    <string name="chat_preview_user_2">是否提到了任何实用建议？</string>
+    <string name="chat_preview_ai_2">此剧集深入探讨了习惯养成的科学原理，由此分析了日常的微小习惯如何随着时间的推移带来巨大改变。</string>
+    <string name="chat_preview_user_1">此剧集的主要话题是什么？</string>
+    <string name="chat_preview_ai_1">您好！ 我将带您深入了解此剧集。 就所讨论的话题、关键要点或具体片段向我进行提问。</string>
+    <string name="chat_thinking">思考</string>
+    <string name="chat_episode_assistant">剧集助手</string>
+    <string name="chat_context_label_with_duration">参与关于此剧集的讨论 · %1$s</string>
+    <string name="chat_context_label">参与关于此剧集的讨论</string>
+    <string name="chat_paywall_title">参与关于此剧集的讨论</string>
+    <string name="episode_chat">参与剧集讨论</string>
+    <string name="blogs_experiment_banner_body">博客是我们正在尝试推出的功能。 它可能会保留下来，也可能被优化调整，甚至悄然下架。</string>
+    <string name="blogs_experiment_banner_lead">这只是一项试用版功能。</string>
     <string name="onboarding_blogs_upsell_sample_label">博客 · 4 月 24 日</string>
     <string name="onboarding_blogs_upsell_sample_title">我们重新设计播放器的原因</string>
     <string name="onboarding_blogs_title">博客：用心聆听\n您所阅读的内容。</string>
@@ -61,14 +133,10 @@ Language: zh_CN
     <string name="watch_synced_successfully">手表同步成功</string>
     <string name="watch_sync_waiting_for_phone">正在等待手机同步…</string>
     <string name="watch_sync_retry">重试</string>
-    <string name="watch_sync_error_unknown_help">重试或手动登录</string>
     <string name="watch_sync_error_login_failed_help">尝试手动登录</string>
     <string name="watch_sync_error_no_connection_help">检查与您手机的蓝牙连接</string>
-    <string name="watch_sync_error_timeout_help">确保您的手机在附近并已通过蓝牙连接</string>
-    <string name="watch_sync_error_unknown">出错了</string>
     <string name="watch_sync_error_login_failed">登录失败</string>
     <string name="watch_sync_error_no_connection">手机未连接</string>
-    <string name="watch_sync_error_timeout">无法连接到手机</string>
     <string name="watch_sync_success">已从手机登录！</string>
     <string name="watch_sync_syncing">正在与手机同步…</string>
     <string name="error_download_generic_failure">下载剧集失败。 %1$s</string>
@@ -543,8 +611,6 @@ Language: zh_CN
     <string name="player_sleep_custom_plus">增加自定义时长</string>
     <string name="player_sleep_custom_minus">减少自定义时长</string>
     <string name="plus_subscription_finished">订阅完成</string>
-    <string name="shuffle_whats_new_title">推出随机播放功能</string>
-    <string name="shuffle_whats_new_message">无需更改队列顺序，即可轻松播放随机剧集。</string>
     <string name="chapter_time_remaining_content_description">本章还剩 %s</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
     <string name="referrals_share_text">您好！\n\n这是一张 %1$s 的 Pocket Casts Plus 访客通行证，Pocket Casts Plus 是我最喜欢的播客播放器。 它拥有您在别处享受不到的独特功能，如书签、文件夹等。 我想您也会喜欢！</string>

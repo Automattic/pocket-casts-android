@@ -25,6 +25,7 @@ class PodcastRefresherImpl @Inject constructor(
     private val crashLogging: CrashLogging,
 ) : PodcastRefresher {
     private val playlistDao = appDatabase.playlistDao()
+    private val alternateEnclosureDao = appDatabase.alternateEnclosureDao()
 
     override suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager) {
         try {
@@ -41,6 +42,8 @@ class PodcastRefresherImpl @Inject constructor(
             val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(existingPodcast)
             val mostRecentEpisode = existingEpisodes.firstOrNull()
             val insertEpisodes = mutableListOf<PodcastEpisode>()
+            // Episodes that end up persisted (updated or inserted) whose alternate enclosures we should store.
+            val persistedEpisodes = mutableListOf<PodcastEpisode>()
             updatedPodcast.episodes.map { newEpisode ->
                 val existingEpisode = existingEpisodes.find { it.uuid == newEpisode.uuid }
                 if (existingEpisode != null) {
@@ -64,6 +67,7 @@ class PodcastRefresherImpl @Inject constructor(
                     if (originalEpisode != existingEpisode) {
                         episodeManager.update(existingEpisode)
                     }
+                    persistedEpisodes.add(newEpisode)
                 } else {
                     // don't add anything newer than the latest episode so it runs through the refresh logic (auto download, auto add to Up Next etc
                     if (!existingPodcast.isSubscribed || (mostRecentEpisode != null && newEpisode.publishedDate.before(mostRecentEpisode.publishedDate))) {
@@ -85,6 +89,7 @@ class PodcastRefresherImpl @Inject constructor(
                         newEpisode.addedDate = existingPodcast.addedDate ?: Date()
                         existingPodcast.addEpisode(newEpisode)
                         insertEpisodes.add(newEpisode)
+                        persistedEpisodes.add(newEpisode)
                     }
                 }
             }
@@ -94,6 +99,17 @@ class PodcastRefresherImpl @Inject constructor(
                     podcastUuid = existingPodcast.uuid,
                     downloadMetaData = false,
                 )
+            }
+            // Store alternate enclosures once the episode rows exist (the table has a cascading FK on episode_uuid).
+            // Only rewrite when they actually changed so an unchanged feed doesn't churn delete+insert every refresh.
+            persistedEpisodes.forEach { episode ->
+                val incoming = episode.alternateEnclosures
+                if (incoming.isNotEmpty()) {
+                    val stored = alternateEnclosureDao.findByEpisodeUuid(episode.uuid).map { it.copy(id = 0) }
+                    if (stored != incoming) {
+                        alternateEnclosureDao.replaceForEpisode(episode.uuid, incoming)
+                    }
+                }
             }
 
             val twoWeeksAgo = Calendar.getInstance()

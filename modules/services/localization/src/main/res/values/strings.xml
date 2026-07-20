@@ -98,6 +98,8 @@
     <string name="you_might_like">You might like</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
+    <string name="sort_shortest_to_longest">Shortest to longest</string>
+    <string name="sort_longest_to_shortest">Longest to shortest</string>
     <string name="not_selected">Not selected</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
@@ -125,6 +127,11 @@
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
+    <string name="episode_summary">Episode Summary</string>
+    <string name="summary_upsell_title">AI-Powered Summaries</string>
+    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
+    <string name="description">Description</string>
+    <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -139,6 +146,7 @@
     <string name="get_pocket_casts_plus">Get Pocket Casts Plus</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unfollow</string>
+    <string name="home">Home</string>
     <string name="up_next">Up Next</string>
     <string name="learn_more">Learn more.</string>
     <string name="today">Today</string>
@@ -238,6 +246,13 @@
     <string name="ad_report_confirmation">You reported this ad.</string>
     <string name="add_episodes">Add episodes</string>
     <string name="your_podcasts">Your podcasts</string>
+    <string name="tv_tab_your_podcasts">Your Podcasts</string>
+    <string name="tv_row_featured">Made for TV</string>
+    <string name="tv_row_trending_videos">Trending Videos</string>
+    <string name="tv_row_recommendations">Recommendations</string>
+    <string name="tv_row_because_you_liked">Because you liked Podcast</string>
+    <string name="tv_sign_in_or_enter_code">or enter the following code</string>
+    <string name="tv_sign_in_go_to_url">going to %1$s</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -371,8 +386,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
@@ -434,6 +451,7 @@
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
+    <string name="player_tab_summary">Summary</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_time_saved_no_hour">Congrats! You\'re saving time and getting through more podcasts.</string>
@@ -478,6 +496,8 @@
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
     <string name="player_up_next_sort">Sort Up Next</string>
+    <string name="up_next_sort_duration_tooltip_title">Sort by duration</string>
+    <string name="up_next_sort_duration_tooltip_body">Shortest to longest, or the reverse — fit the episode to the time you\'ve actually got.</string>
 
     <!-- Chapters -->
 
@@ -491,6 +511,7 @@
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
+    <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
     <plurals name="chapter">
@@ -1282,6 +1303,11 @@
     </plurals>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
+    <string name="profile_stats_listening_activity">Listening Activity</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
+    <string name="profile_stats_listening_activity_content_description">Listening activity heatmap</string>
+    <string name="profile_stats_listening_activity_info_title">Listening activity</string>
+    <string name="profile_stats_listening_activity_info_summary">An estimate of when you\'ve been listening, based on your playback history. If you finish an episode over a few days, it shows on the last day.</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
@@ -1291,6 +1317,7 @@
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start Free Trial</string>
+    <string name="profile_try_duration_for_free">Try %1$s for free</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -1395,6 +1422,8 @@
     <string name="settings_apply_group_by">Would you like to change all your existing podcasts to be grouped by %s?</string>
     <string name="settings_apply_to_existing">Apply to existing</string>
     <string name="settings_apply_to_existing_podcasts">Apply to existing podcasts?</string>
+    <string name="settings_audio_only">Audio only</string>
+    <string name="settings_audio_only_summary">If on, episodes with video will play as audio only, saving data.</string>
     <string name="settings_auto_archive_episode_limit">Episode limit</string>
     <string name="settings_auto_archive_episode_limit_summary">For shows that release hourly or daily episodes, setting an episode limit can help keep only the most recent ones, while archiving any that are older.</string>
     <string name="settings_auto_archive_inactive">Archive inactive episodes</string>
@@ -1458,6 +1487,9 @@
     <string name="settings_auto_play">Auto play</string>
     <string name="settings_auto_play_summary">When there\'s nothing left to play, automatically pick an episode for me</string>
     <string name="settings_beta_features">Beta features</string>
+    <string name="settings_beta_features_sort">Sort beta features</string>
+    <string name="settings_beta_features_sort_name">Name (A–Z)</string>
+    <string name="settings_beta_features_sort_release_date">Release date (newest first)</string>
     <string name="settings_battery">Battery</string>
     <string name="settings_battery_settings">Battery settings</string>
     <string name="settings_battery_learn_more">Learn more</string>
@@ -1518,6 +1550,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
+    <string name="settings_generated_chapters">Generated chapters</string>
+    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -2189,16 +2223,12 @@
     <string name="watch_sync_success">Logged in from phone!</string>
 
     <!-- Watch sync errors -->
-    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
     <string name="watch_sync_error_no_connection">Phone not connected</string>
     <string name="watch_sync_error_login_failed">Login failed</string>
-    <string name="watch_sync_error_unknown">Something went wrong</string>
 
     <!-- Watch sync error help text -->
-    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
     <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
-    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
 
     <!-- Watch sync actions -->
     <string name="watch_sync_retry">Try Again</string>
@@ -2319,6 +2349,7 @@
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
+    <string name="bookmark_play_from">Play from %s</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%d bookmarks</string>
     <string name="bookmarks_singular">1 bookmark</string>
@@ -2361,6 +2392,7 @@
     <string name="transcript_generated_paywall_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Download the episode to tap to seek</string>
 
     <!-- Chat -->
     <string name="chat_paywall_title">Chat with this episode</string>
@@ -2516,8 +2548,9 @@
     <string name="share_end_minutes">Clip end minutes</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
-    <string name="shuffle_whats_new_title">Introducing Shuffle</string>
-    <string name="shuffle_whats_new_message">Easily play a random episode without changing the order of your queue.</string>
+    <string name="synced_transcripts_whats_new_title">Read along. Even at&#160;2x.</string>
+    <string name="synced_transcripts_whats_new_message">Read fast, miss nothing. The name you blew past, the book they recommended, the stat you wanted — tap the word, jump&#160;back.</string>
+    <string name="synced_transcripts_whats_new_button_note">Synced transcripts available for recent episodes only.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
@@ -2795,4 +2828,27 @@
     <string name="blogs_error_no_internet">Check your internet connection and try again.</string>
     <string name="blogs_error_no_feeds_found">We couldn\'t find any feeds at that URL. Please check the URL and try again.</string>
     <string name="blogs_error_generic">Something went wrong. Please try again.</string>
+    <string name="blogs_found_feed_detected">Feed found</string>
+    <string name="blogs_found_followed_badge">PODCAST FOLLOWED</string>
+    <string name="blogs_found_headline">Reading your blog out loud</string>
+    <string name="blogs_found_description">We\'re turning the latest posts into podcast episodes. We\'ll take you to the podcast page as soon as the first episode is ready, or come back to the podcast page anytime and pull down to refresh.</string>
+    <string name="blogs_found_go_to_podcast">Go to podcast</string>
+    <string name="sponsored">Sponsored</string>
+    <string name="play_latest_episode">Play latest episode</string>
+    <string name="play_this_episode">Play this episode</string>
+
+    <!-- TV Onboarding -->
+    <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
+    <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
+    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_create_free_account">Create free account</string>
+    <string name="tv_onboarding_browse_without_account">Browse without an account</string>
+    <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
+    <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
+    <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
+    <string name="tv_onboarding_welcome_back">Welcome back!</string>
+    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_create_account_title">Create your free account</string>
+    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
+    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

@@ -295,7 +295,13 @@ class UpNextFragment :
                     )
                 }
             },
-            onSortClick = ::showSortDialog,
+            showSortTooltip = upNextViewModel.showSortDurationTooltip,
+            onSortClick = {
+                upNextViewModel.onSortClick()
+                showSortDialog()
+            },
+            onSortTooltipShown = upNextViewModel::onSortTooltipShown,
+            onSortTooltipTapped = upNextViewModel::onSortTooltipTapped,
         )
         adapter.theme = overrideTheme
     }
@@ -357,6 +363,14 @@ class UpNextFragment :
 
         val recyclerView = binding.recyclerView
         recyclerView.adapter = adapter
+        // Dismiss the sort tooltip on scroll, since its anchor button can leave the viewport.
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    upNextViewModel.onUpNextScrolled()
+                }
+            }
+        })
         playerViewModel.upNextLive.observe(viewLifecycleOwner) {
             if (userRearrangingFrom == null) {
                 adapter.submitList(it)
@@ -425,6 +439,21 @@ class UpNextFragment :
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect {
                     binding.recyclerView.updatePadding(bottom = it)
+                }
+            }
+        }
+
+        // The sort tooltip is only shown on the Up Next tab, not the mini or full-screen player.
+        if (requiredArgs.source == UpNextSource.UP_NEXT_TAB) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    try {
+                        settings.playerOrUpNextBottomSheetState.collect { state ->
+                            upNextViewModel.setUpNextVisible(state == BottomSheetBehavior.STATE_COLLAPSED)
+                        }
+                    } finally {
+                        upNextViewModel.setUpNextVisible(false)
+                    }
                 }
             }
         }

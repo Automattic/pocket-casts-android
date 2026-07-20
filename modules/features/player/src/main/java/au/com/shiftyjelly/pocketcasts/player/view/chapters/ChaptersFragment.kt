@@ -65,6 +65,7 @@ class ChaptersFragment : BaseFragment() {
                     lazyListState = lazyListState,
                     chapters = state.chapters,
                     showHeader = state.showHeader,
+                    hasGeneratedChapters = state.hasGeneratedChapters,
                     totalChaptersCount = state.chaptersCount,
                     isTogglingChapters = state.isTogglingChapters,
                     showSubscriptionIcon = state.showSubscriptionIcon,
