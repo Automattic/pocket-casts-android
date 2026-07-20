@@ -124,8 +124,11 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -1205,6 +1208,11 @@ open class PlaybackManager @Inject constructor(
     @Volatile
     private var pendingChapterSeek: Chapter? = null
 
+    private val _userSeeks = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    /** Emits on every user-initiated seek or skip, so pending resolve-driven seeks can stand down. */
+    val userSeeks = _userSeeks.asSharedFlow()
+
     /**
      * Generated chapter timestamps live on the reference timeline; resolve the real stream position
      * through the fingerprint map before seeking. Falls back to the chapter's own start time.
@@ -1225,6 +1233,7 @@ open class PlaybackManager @Inject constructor(
     private fun cancelPendingChapterSeek() {
         pendingChapterSeek = null
         generatedChapterSeeker.get().cancelActiveResolve()
+        _userSeeks.tryEmit(Unit)
     }
 
     fun clearUpNextAsync() {

@@ -86,6 +86,9 @@ class TranscriptViewModel @AssistedInject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            playbackManager.userSeeks.collect { activeTapResolve?.cancel() }
+        }
         observePlaybackState()
     }
 
