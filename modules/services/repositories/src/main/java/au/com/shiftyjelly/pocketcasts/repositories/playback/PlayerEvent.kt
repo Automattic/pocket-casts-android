@@ -18,4 +18,7 @@ sealed class PlayerEvent {
     class EpisodeChanged(val episodeUuid: String) : PlayerEvent()
     data class CachingComplete(val episodeUuid: String) : PlayerEvent()
     data class CachingReset(val episodeUuid: String) : PlayerEvent()
+
+    /** Emitted once the player knows whether the prepared stream contains a playable video track. */
+    data class VideoTrackChanged(val hasVideo: Boolean) : PlayerEvent()
 }

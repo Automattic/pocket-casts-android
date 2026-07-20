@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -124,8 +125,11 @@ interface EpisodeManager {
     fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
     fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
+    suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
     suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double
+
+    suspend fun dailyListenedTime(fromEpochMs: Long): List<DailyListenedTime>
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 

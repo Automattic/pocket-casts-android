@@ -1,11 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-15 09:54:48+0000
+Translation-Revision-Date: 2026-07-09 15:56:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">청취 활동 히트맵</string>
+    <string name="profile_stats_listening_activity">청취 활동</string>
+    <string name="player_action_hide_video">비디오 숨기기</string>
+    <string name="player_action_show_video">비디오 표시</string>
+    <string name="up_next_sort_duration_tooltip_body">짧은 순 또는 긴 순으로 정렬해 실제로 들을 수 있는 시간에 맞는 에피소드를 찾아보세요.</string>
+    <string name="up_next_sort_duration_tooltip_title">재생 시간순 정렬</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">눌러서 검색하려면 에피소드를 다운로드하세요</string>
+    <string name="bookmark_play_from">%s에서 재생</string>
+    <string name="summary_upsell_description">Plus를 구독하여 북마크, 폴더와 같은 기타 프리미엄 기능을 이용하세요.</string>
+    <string name="summary_upsell_title">AI 기반 요약</string>
+    <string name="tv_create_account_subtitle">스마트폰에서 시작하려면 이 코드를 스캔하세요. 1분이면 충분합니다.</string>
+    <string name="tv_create_account_come_back">계정 생성 후 돌아와서 로그인</string>
+    <string name="tv_create_account_title">무료 계정 생성</string>
+    <string name="tv_onboarding_syncing_subtitle">팟캐스트 동기화 중이며, 곧 로그인됩니다!</string>
+    <string name="tv_onboarding_welcome_back">다시 오신 것을 환영합니다!</string>
+    <string name="tv_onboarding_sign_in_instructions">카메라를 열어 이 QR 코드에 맞추기</string>
+    <string name="tv_onboarding_sign_in_title">스마트폰으로 로그인</string>
+    <string name="tv_sign_in_go_to_url">%1$s(으)로 이동 중</string>
+    <string name="tv_sign_in_or_enter_code">또는 다음 코드 입력</string>
+    <string name="tv_onboarding_syncing">팟캐스트 동기화 중\u2026</string>
+    <string name="tv_onboarding_browse_without_account">계정 없이 둘러보기</string>
+    <string name="tv_onboarding_create_free_account">무료 계정 생성</string>
+    <string name="tv_onboarding_subtitle">큰 화면의 회원님 팟캐스트</string>
+    <string name="tv_onboarding_welcome_tv">Pocket Casts TV 시작</string>
+    <string name="tv_onboarding_welcome">Pocket Casts 시작</string>
+    <string name="sort_longest_to_shortest">길이 내림차순</string>
+    <string name="sort_shortest_to_longest">길이 오름차순</string>
+    <string name="synced_transcripts_whats_new_button_note">최근 에피소드에만 사용할 수 있는 동기화된 대본.</string>
+    <string name="synced_transcripts_whats_new_message">빠르게 읽으세요. 놓치지 마세요. 스쳐 지나간 이름, 추천한 책, 궁금했던 통계. 단어를 누르고, 바로 돌아가서 살펴보세요.</string>
+    <string name="synced_transcripts_whats_new_title">함께 읽어 보세요. 2배 속도로도 가능합니다.</string>
+    <string name="settings_beta_features_sort_release_date">릴리스 날짜(최신순)</string>
+    <string name="settings_beta_features_sort_name">이름(오름차순)</string>
+    <string name="settings_beta_features_sort">베타 기능 정렬</string>
+    <string name="play_this_episode">이 에피소드 재생</string>
+    <string name="play_latest_episode">최신 에피소드 재생</string>
+    <string name="sponsored">후원</string>
+    <string name="tv_row_because_you_liked">팟캐스트를 좋아하셔서</string>
+    <string name="tv_row_recommendations">추천</string>
+    <string name="tv_row_trending_videos">트렌드 비디오</string>
+    <string name="tv_row_featured">TV용으로 제작됨</string>
+    <string name="home">홈</string>
+    <string name="tv_tab_your_podcasts">내 팟캐스트</string>
+    <string name="blogs_found_go_to_podcast">팟캐스트로 이동</string>
+    <string name="blogs_found_description">최신 글을 팟캐스트 에피소드로 바꿔줍니다. 첫 번째 에피소드가 준비되는 대로 팟캐스트 페이지로 이동시켜 드립니다. 아니면 언제든지 팟캐스트 페이지로 돌아와서 아래로 당겨 새로 고침하세요.</string>
+    <string name="blogs_found_headline">큰 소리로 블로그 읽기</string>
+    <string name="blogs_found_followed_badge">팔로우된 팟캐스트</string>
+    <string name="blogs_found_feed_detected">찾아낸 피드</string>
+    <string name="chapters_generated_disclaimer">이러한 챕터는 자동으로 생성되며 완벽히 정확하지 않을 수 있습니다.</string>
+    <string name="description">설명</string>
+    <string name="player_tab_summary">요약</string>
+    <string name="summary">요약</string>
+    <string name="episode_summary">에피소드 요약</string>
+    <string name="chat_stop_quote">인용 중지</string>
+    <string name="chat_play_quote">인용 재생</string>
+    <string name="chat_tap_to_retry">눌러서 다시 시도</string>
+    <string name="chat_error_network">서버에 연결할 수 없습니다. 연결을 확인하세요.</string>
+    <string name="chat_error_server">문제가 발생했습니다. 다시 시도해 주세요.</string>
+    <string name="chat_clear">채팅 지우기</string>
+    <string name="chat_send">보내기</string>
+    <string name="chat_input_hint">이 에피소드에 대해 물어보기…</string>
+    <string name="chat_preview_user_2">유용한 팁이 언급되었나요?</string>
+    <string name="chat_preview_ai_2">이 에피소드에서는 습관 형성의 과학을 파고들며 일상적인 작은 습관이 시간이 지남에 따라 어떻게 큰 변화로 이어지는지 탐구합니다.</string>
+    <string name="chat_preview_user_1">이 에피소드의 기본 주제는 무엇이었나요?</string>
+    <string name="chat_preview_ai_1">안녕하세요! 이 에피소드 탐색을 도와드리겠습니다. 논의된 주제, 핵심 내용 또는 특정 순간에 대해 무엇이든 물어보세요.</string>
+    <string name="chat_thinking">생각 중</string>
+    <string name="chat_episode_assistant">에피소드 도우미</string>
+    <string name="chat_context_label_with_duration">이 에피소드로 채팅 중 · %1$s</string>
+    <string name="chat_context_label">이 에피소드로 채팅 중</string>
+    <string name="chat_paywall_title">이 에피소드로 채팅</string>
+    <string name="episode_chat">에피소드로 채팅</string>
+    <string name="blogs_experiment_banner_body">블로그는 저희가 시도 중인 것 중 하나입니다. 계속 유지될 수도 있고, 개편될 수도 있고, 조용히 사라질 수도 있습니다.</string>
+    <string name="blogs_experiment_banner_lead">하나의 실험입니다.</string>
     <string name="onboarding_blogs_upsell_sample_label">블로그 · 4월 24일</string>
     <string name="onboarding_blogs_upsell_sample_title">플레이어를 새롭게 디자인한 이유</string>
     <string name="onboarding_blogs_title">블로그: 읽은 내용을\n음성으로 듣기.</string>
@@ -61,14 +133,10 @@ Language: ko_KR
     <string name="watch_synced_successfully">시계 동기화됨</string>
     <string name="watch_sync_waiting_for_phone">스마트폰 동기화 대기 중…</string>
     <string name="watch_sync_retry">다시 시도</string>
-    <string name="watch_sync_error_unknown_help">다시 시도하거나 수동으로 로그인</string>
     <string name="watch_sync_error_login_failed_help">수동으로 로그인 시도</string>
     <string name="watch_sync_error_no_connection_help">스마트폰의 블루투스 연결 확인</string>
-    <string name="watch_sync_error_timeout_help">스마트폰이 근처에 있고 블루투스로 연결되었는지 확인</string>
-    <string name="watch_sync_error_unknown">문제가 발생했음</string>
     <string name="watch_sync_error_login_failed">로그인 실패</string>
     <string name="watch_sync_error_no_connection">스마트폰 연결 안 됨</string>
-    <string name="watch_sync_error_timeout">스마트폰에 연결할 수 없음</string>
     <string name="watch_sync_success">스마트폰에서 로그인했습니다!</string>
     <string name="watch_sync_syncing">스마트폰과 동기화 중…</string>
     <string name="error_download_generic_failure">에피소드를 다운로드하지 못했습니다. %1$s</string>
@@ -543,8 +611,6 @@ Language: ko_KR
     <string name="player_sleep_custom_plus">사용자 정의 지속시간 늘리기</string>
     <string name="player_sleep_custom_minus">사용자 정의 지속시간 줄이기</string>
     <string name="plus_subscription_finished">구독 종료됨</string>
-    <string name="shuffle_whats_new_message">대기열 순서를 바꾸지 않고도 에피소드를 랜덤으로 쉽게 재생할 수 있습니다.</string>
-    <string name="shuffle_whats_new_title">셔플 기능 소개</string>
     <string name="chapter_time_remaining_content_description">챕터에서 %s 남음</string>
     <string name="chapter_count_summary">%1$d/%2$d</string>
     <string name="referrals_share_text">안녕하세요.\n\n제가 가장 좋아하는 팟캐스트 플레이어인 %1$s Pocket Casts Plus 비회원 패스를 확인해 보세요. 북마크, 폴더 등 다른 곳에서는 찾아볼 수 없는 특별한 기능이 가득합니다. 마음에 드실 거예요!</string>

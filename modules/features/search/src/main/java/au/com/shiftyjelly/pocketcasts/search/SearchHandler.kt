@@ -215,13 +215,20 @@ class SearchHandler @Inject constructor(
                 author = folderItem.podcast.author,
                 title = folderItem.title,
                 isSubscribed = true,
+                isExplicit = folderItem.podcast.explicit == true,
             )
 
             is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
                 uuid = folderItem.uuid,
                 title = folderItem.title,
                 podcasts = folderItem.podcasts.map {
-                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                    SearchAutoCompleteItem.Podcast(
+                        uuid = it.uuid,
+                        title = it.title,
+                        author = it.author,
+                        isSubscribed = true,
+                        isExplicit = it.explicit == true,
+                    )
                 },
                 color = folderItem.folder.color,
             )
@@ -341,7 +348,7 @@ class SearchHandler @Inject constructor(
     val searchResults = searchFlowable.asFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
+    val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.Results>> = combine(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         combine(
             searchQuery.asFlow().map { it is Query.SearchResults },
@@ -354,7 +361,7 @@ class SearchHandler @Inject constructor(
             if (!isResultsQuery) {
                 emptyFlow()
             } else if (query.isBlank()) {
-                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
+                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
@@ -369,16 +376,23 @@ class SearchHandler @Inject constructor(
                                 source = source.analyticsValue,
                             ),
                         )
-                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
                         val localResults = localPodcasts.map {
                             when (it) {
                                 is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
-                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = true, title = it.podcast.title, author = it.podcast.author)
+
+                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(
+                                    uuid = it.uuid,
+                                    isFollowed = true,
+                                    title = it.podcast.title,
+                                    author = it.podcast.author,
+                                    isExplicit = it.podcast.explicit == true,
+                                )
                             }
                         }
                         if (localResults.isNotEmpty()) {
-                            emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
+                            emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
                         val apiResults = try {
                             eventHorizon.track(
@@ -401,10 +415,10 @@ class SearchHandler @Inject constructor(
                             }
                         }
                         val combinedResults = (localResults + apiResults).distinctBy { it::class to it.uuid }
-                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                     }
                 }.catch {
-                    emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
+                    emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.Results>)
                 }
             }
         }

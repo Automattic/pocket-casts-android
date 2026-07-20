@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -33,13 +32,10 @@ import au.com.shiftyjelly.pocketcasts.transcripts.ui.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeTranscriptShownEvent
-import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
-import com.automattic.eventhorizon.TranscriptShownEvent
+import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -99,6 +95,9 @@ class TranscriptFragment : BaseDialogFragment() {
 
             TranscriptPage(
                 uiState = uiState,
+                viewModel = viewModel,
+                fingerprintTimingManager = viewModel.fingerprintTimingManager,
+                playbackManager = viewModel.playbackManager,
                 toolbarPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 transcriptPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 16.dp),
@@ -126,20 +125,9 @@ class TranscriptFragment : BaseDialogFragment() {
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS),
                     )
                 },
-                onShowTranscript = { transcript ->
+                onHighlightText = {
                     viewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptShownEvent(
-                            type = transcript.type.analyticsValue,
-                            showAsWebpage = transcript is Transcript.Web,
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
-                            source = source,
-                        )
-                    }
-                },
-                onShowTranscriptPaywall = {
-                    viewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptGeneratedPaywallShownEvent(
+                        TranscriptTextHighlightedEvent(
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,
                             source = source,
@@ -150,7 +138,7 @@ class TranscriptFragment : BaseDialogFragment() {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        if (uiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                        if (uiState.isTextTranscriptLoaded) {
                             TranscriptShareButton(
                                 toolbarColors = toolbarColors,
                                 onClick = viewModel::shareTranscript,

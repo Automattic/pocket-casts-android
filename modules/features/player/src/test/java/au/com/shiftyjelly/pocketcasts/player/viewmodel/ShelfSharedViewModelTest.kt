@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -304,6 +305,15 @@ class ShelfSharedViewModelTest {
         }
     }
 
+    @Test
+    fun `when video toggle clicked, then video rendering is toggled`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
+
+        verify(playbackManager).toggleVideoRendering()
+    }
+
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
     ) {
@@ -322,6 +332,9 @@ class ShelfSharedViewModelTest {
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
+
+        whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(StreamVideoState.NotVideo))
+        whenever(playbackManager.videoRenderingEnabled).thenReturn(MutableStateFlow(true))
 
         shelfSharedViewModel = ShelfSharedViewModel(
             eventHorizon = EventHorizon(TestEventSink()),

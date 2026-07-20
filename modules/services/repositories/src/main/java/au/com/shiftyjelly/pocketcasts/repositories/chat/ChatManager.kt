@@ -15,9 +15,8 @@ interface ChatManager {
 
     suspend fun sendMessage(
         episodeUuid: String,
-        message: String,
+        message: ChatMessage.User,
         allMessages: List<ChatMessage>,
-        isRetry: Boolean = false,
     )
 
     suspend fun clearMessages(

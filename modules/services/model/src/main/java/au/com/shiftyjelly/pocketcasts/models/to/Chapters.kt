@@ -5,6 +5,12 @@ import kotlin.time.Duration
 data class Chapters(
     private val items: List<Chapter> = emptyList(),
 ) : List<Chapter> by items {
+    val hasGeneratedChapters: Boolean
+        get() = any { it.isGenerated }
+
+    val origin: ChapterOrigin
+        get() = firstOrNull()?.origin ?: ChapterOrigin.Unknown
+
     private val selectedItems: List<Chapter>
         get() = filter { it.selected }
 

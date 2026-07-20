@@ -1,11 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 11:58:34+0000
+Translation-Revision-Date: 2026-07-09 11:58:11+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Carte des activités d’écoute</string>
+    <string name="profile_stats_listening_activity">Activité d’écoute</string>
+    <string name="player_action_show_video">Afficher la vidéo</string>
+    <string name="player_action_hide_video">Masquer la vidéo</string>
+    <string name="up_next_sort_duration_tooltip_body">Du plus court au plus long, ou l’inverse, ajustez l’épisode au temps dont vous disposez réellement.</string>
+    <string name="up_next_sort_duration_tooltip_title">Trier par durée</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Téléchargez l’épisode afin de pouvoir appuyer pour chercher</string>
+    <string name="bookmark_play_from">Lire à partir de %s</string>
+    <string name="summary_upsell_description">Abonnez-vous à Plus pour y avoir accès ainsi qu’à d’autres fonctionnalités Premium comme les signets et les dossiers.</string>
+    <string name="summary_upsell_title">Résumés alimentés par l’IA</string>
+    <string name="tv_create_account_subtitle">Scannez ce code pour commencer sur votre téléphone, cela ne prend qu’une minute.</string>
+    <string name="tv_create_account_come_back">Une fois votre compte créé, revenez et connectez-vous</string>
+    <string name="tv_create_account_title">Créer votre compte gratuit</string>
+    <string name="tv_onboarding_syncing_subtitle">Vos podcasts sont en cours de synchronisation, nous vous connecterons bientôt !</string>
+    <string name="tv_onboarding_welcome_back">Bon retour !</string>
+    <string name="tv_onboarding_sign_in_instructions">Ouvrez votre appareil photo et pointez votre appareil sur ce code QR</string>
+    <string name="tv_onboarding_sign_in_title">Se connecter avec votre téléphone</string>
+    <string name="tv_sign_in_go_to_url">accédez à %1$s</string>
+    <string name="tv_sign_in_or_enter_code">ou saisissez le code suivant</string>
+    <string name="tv_onboarding_syncing">Synchronisation de vos podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Parcourir sans compte</string>
+    <string name="tv_onboarding_create_free_account">Créer un compte gratuit</string>
+    <string name="tv_onboarding_subtitle">Vos podcasts, sur grand écran</string>
+    <string name="tv_onboarding_welcome_tv">Bienvenue sur Pocket Casts TV !</string>
+    <string name="tv_onboarding_welcome">Bienvenue sur Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Du plus long au plus court</string>
+    <string name="sort_shortest_to_longest">Du plus court au plus long</string>
+    <string name="synced_transcripts_whats_new_button_note">Transcriptions synchronisées disponibles uniquement pour les épisodes récents.</string>
+    <string name="synced_transcripts_whats_new_message">Lisez vite, ne ratez rien. Le nom que vous avez oublié, le livre qui a été recommandé, le chiffre que vous vouliez noter : appuyez simplement sur un mot pour revenir en arrière.</string>
+    <string name="synced_transcripts_whats_new_title">Lisez en même temps. Même en vitesse doublée.</string>
+    <string name="settings_beta_features_sort_release_date">Date de sortie (du plus récent au plus ancien)</string>
+    <string name="settings_beta_features_sort_name">Nom (A-Z)</string>
+    <string name="settings_beta_features_sort">Fonctionnalités bêta de tri</string>
+    <string name="sponsored">Sponsorisé</string>
+    <string name="play_this_episode">Lire cet épisode</string>
+    <string name="play_latest_episode">Lire le dernier épisode</string>
+    <string name="tv_row_because_you_liked">Parce que vous avez aimé Podcast</string>
+    <string name="tv_row_recommendations">Recommandations</string>
+    <string name="tv_row_trending_videos">Vidéos à la une</string>
+    <string name="tv_row_featured">Conçu pour la télévision</string>
+    <string name="home">Accueil</string>
+    <string name="tv_tab_your_podcasts">Vos podcasts</string>
+    <string name="blogs_found_go_to_podcast">Accéder au podcast</string>
+    <string name="blogs_found_description">Nous transformons les derniers articles en épisodes de podcast. Nous vous emmènerons sur la page du podcast dès que le premier épisode sera prêt. Autrement, revenez sur la page du podcast à tout moment et faites glisser vers le bas pour actualiser.</string>
+    <string name="blogs_found_headline">Lire votre blog à haute voix</string>
+    <string name="blogs_found_followed_badge">PODCAST SUIVI</string>
+    <string name="blogs_found_feed_detected">Flux trouvé</string>
+    <string name="chapters_generated_disclaimer">Ces chapitres sont générés automatiquement et peuvent ne pas être parfaitement exacts.</string>
+    <string name="description">Description</string>
+    <string name="player_tab_summary">Résumé</string>
+    <string name="summary">Résumé</string>
+    <string name="episode_summary">Résumé de l’épisode</string>
+    <string name="chat_stop_quote">Arrêter la citation</string>
+    <string name="chat_play_quote">Lire la citation</string>
+    <string name="chat_tap_to_retry">Appuyer pour réessayer</string>
+    <string name="chat_error_network">Impossible d’atteindre le serveur. Vérifiez votre connexion.</string>
+    <string name="chat_error_server">Un problème est survenu. Veuillez réessayer.</string>
+    <string name="chat_clear">Effacer la discussion</string>
+    <string name="chat_send">Envoyer</string>
+    <string name="chat_input_hint">Poser une question sur cet épisode…</string>
+    <string name="chat_preview_user_2">Des conseils pratiques ont-ils été mentionnés ?</string>
+    <string name="chat_preview_ai_2">Cet épisode se penche sur les mécanismes scientifiques qui sous-tendent la formation des habitudes, en expliquant comment de petits gestes quotidiens peuvent, au fil du temps, déboucher sur de grands changements.</string>
+    <string name="chat_preview_user_1">Quel était le thème principal de cet épisode ?</string>
+    <string name="chat_preview_ai_1">Bonjour ! Je suis là pour vous aider à découvrir cet épisode. N’hésitez pas à me poser toutes vos questions sur les sujets abordés, les points clés à retenir ou des moments précis.</string>
+    <string name="chat_thinking">EN COURS DE RÉFLEXION</string>
+    <string name="chat_episode_assistant">ASSISTANT ÉPISODE</string>
+    <string name="chat_context_label_with_duration">Discussion sur cet épisode · %1$s</string>
+    <string name="chat_context_label">Discussion sur cet épisode</string>
+    <string name="chat_paywall_title">Discuter de cet épisode ·</string>
+    <string name="episode_chat">Discuter de l’épisode ·</string>
+    <string name="blogs_experiment_banner_body">Nous sommes en train de tester les blogs. Ça pourrait rester, être retravaillé ou disparaître discrètement.</string>
+    <string name="blogs_experiment_banner_lead">Il s’agit d’une expérience.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · Avr 24</string>
     <string name="onboarding_blogs_upsell_sample_title">Pourquoi nous avons repensé le lecteur</string>
     <string name="onboarding_blogs_title">Blogs : écouter\nce que vous lisez.</string>
@@ -61,14 +133,10 @@ Language: fr
     <string name="watch_synced_successfully">La montre a bien été synchronisée</string>
     <string name="watch_sync_waiting_for_phone">En attente de la synchronisation du téléphone…</string>
     <string name="watch_sync_retry">Réessayer</string>
-    <string name="watch_sync_error_unknown_help">Réessayer ou se connecter manuellement</string>
     <string name="watch_sync_error_login_failed_help">Essayez de vous connecter manuellement</string>
     <string name="watch_sync_error_no_connection_help">Vérifier la connexion Bluetooth à votre téléphone</string>
-    <string name="watch_sync_error_timeout_help">Vérifiez que votre téléphone se trouve à proximité et qu’il est connecté via Bluetooth</string>
-    <string name="watch_sync_error_unknown">Un problème est survenu</string>
     <string name="watch_sync_error_login_failed">La connexion a échoué</string>
     <string name="watch_sync_error_no_connection">Téléphone non connecté</string>
-    <string name="watch_sync_error_timeout">Échec de la connexion au téléphone</string>
     <string name="watch_sync_success">Connecté depuis le téléphone !</string>
     <string name="watch_sync_syncing">Synchronisation avec le téléphone…</string>
     <string name="error_download_generic_failure">Échec du téléchargement de l’épisode. %1$s</string>
@@ -543,8 +611,6 @@ Language: fr
     <string name="player_sleep_custom_plus">Augmenter la durée personnalisée</string>
     <string name="player_sleep_custom_minus">Réduire la durée personnalisée</string>
     <string name="plus_subscription_finished">Abonnement terminé</string>
-    <string name="shuffle_whats_new_message">Écoutez facilement un épisode aléatoire sans changer l’ordre dans votre file d’attente.</string>
-    <string name="shuffle_whats_new_title">Présentation de la lecture aléatoire</string>
     <string name="chapter_time_remaining_content_description">Il reste %s dans le chapitre</string>
     <string name="chapter_count_summary">%1$d sur %2$d</string>
     <string name="referrals_share_text">Bonjour !\n\nVoici un passe invité %1$s pour Pocket Casts Plus, mon lecteur de podcast préféré. Il regorge de fonctionnalités uniques, comme les signets, les dossiers et d’autres fonctionnalités que tu ne trouveras nulle part ailleurs. Je pense que tu l’aimeras aussi !</string>

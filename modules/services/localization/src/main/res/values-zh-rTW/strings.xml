@@ -1,11 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-14 09:57:44+0000
+Translation-Revision-Date: 2026-07-09 11:57:51+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">聆聽活動熱圖</string>
+    <string name="profile_stats_listening_activity">聆聽活動</string>
+    <string name="player_action_show_video">顯示影片</string>
+    <string name="player_action_hide_video">隱藏影片</string>
+    <string name="up_next_sort_duration_tooltip_body">從最短排序到最長 (或相反)，找出符合實際有空時間的單集。</string>
+    <string name="up_next_sort_duration_tooltip_title">依長度排序</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">下載單集即可點選並搜尋</string>
+    <string name="bookmark_play_from">透過「%s」播放</string>
+    <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
+    <string name="summary_upsell_title">AI 摘要</string>
+    <string name="tv_create_account_subtitle">掃描此代碼即可使用手機開始進行，只需一分鐘就能完成。</string>
+    <string name="tv_create_account_come_back">建立帳號後，請返回並登入</string>
+    <string name="tv_create_account_title">建立免費帳號</string>
+    <string name="tv_onboarding_syncing_subtitle">正在同步你的 Podcast，稍後即可登入！</string>
+    <string name="tv_onboarding_welcome_back">歡迎回來！</string>
+    <string name="tv_onboarding_sign_in_instructions">開啟相機並對準此 QR 碼</string>
+    <string name="tv_onboarding_sign_in_title">使用手機登入</string>
+    <string name="tv_sign_in_go_to_url">前往 %1$s</string>
+    <string name="tv_sign_in_or_enter_code">或輸入以下代碼</string>
+    <string name="tv_onboarding_syncing">正在同步處理你的 Podcast\u2026</string>
+    <string name="tv_onboarding_browse_without_account">在未登入帳號的狀態下瀏覽</string>
+    <string name="tv_onboarding_create_free_account">建立免費帳號</string>
+    <string name="tv_onboarding_subtitle">將 Podcast 投到大螢幕上</string>
+    <string name="tv_onboarding_welcome_tv">歡迎使用 Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">歡迎使用 Pocket Casts</string>
+    <string name="sort_longest_to_shortest">長到短</string>
+    <string name="sort_shortest_to_longest">短到長</string>
+    <string name="synced_transcripts_whats_new_button_note">僅提供近期單集的同步逐字稿。</string>
+    <string name="synced_transcripts_whats_new_message">快速瀏覽，重點不漏接。 你錯過的名字、他們推薦的書、你有興趣的統計資料：點選關鍵字，跳回相關段落。</string>
+    <string name="synced_transcripts_whats_new_title">跟著閱讀。 2 倍速也沒關係。</string>
+    <string name="settings_beta_features_sort_release_date">發行日期 (最新項目在前)</string>
+    <string name="settings_beta_features_sort_name">名稱 (A–Z)</string>
+    <string name="settings_beta_features_sort">排序測試版功能</string>
+    <string name="sponsored">贊助內容</string>
+    <string name="play_this_episode">播放此單集</string>
+    <string name="play_latest_episode">播放最新單集</string>
+    <string name="tv_row_because_you_liked">因為你喜歡 Podcast</string>
+    <string name="tv_row_recommendations">推薦內容</string>
+    <string name="tv_row_trending_videos">熱門影片</string>
+    <string name="tv_row_featured">專為電視而生</string>
+    <string name="home">首頁</string>
+    <string name="tv_tab_your_podcasts">你的 Podcast</string>
+    <string name="blogs_found_go_to_podcast">前往 Podcast</string>
+    <string name="blogs_found_description">我們正在將最新文章變成 Podcast 單集。 第一集完成後，我們會將你引導至 Podcast 頁面，或歡迎隨時返回 Podcast 頁面，下拉即可重新整理內容。</string>
+    <string name="blogs_found_followed_badge">已追蹤的 PODCAST</string>
+    <string name="blogs_found_feed_detected">找到的摘要</string>
+    <string name="blogs_found_headline">大聲朗讀你的部落格</string>
+    <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
+    <string name="description">描述</string>
+    <string name="player_tab_summary">摘要</string>
+    <string name="summary">摘要</string>
+    <string name="episode_summary">單集摘要</string>
+    <string name="chat_stop_quote">停止引文</string>
+    <string name="chat_play_quote">播放引文</string>
+    <string name="chat_tap_to_retry">點選以重試</string>
+    <string name="chat_error_network">無法連結至伺服器。 請檢查你的連線。</string>
+    <string name="chat_error_server">發生錯誤。 請再試一次。</string>
+    <string name="chat_clear">清除對話</string>
+    <string name="chat_send">傳送</string>
+    <string name="chat_input_hint">詢問本集的相關資訊…</string>
+    <string name="chat_preview_user_2">是否有提及任何實用的秘訣？</string>
+    <string name="chat_preview_ai_2">本集深入探討習慣形成的科學，探索微小的日常慣例如何隨時間產生巨大變化。</string>
+    <string name="chat_preview_user_1">本集的主題是什麼？</string>
+    <string name="chat_preview_ai_1">你好！ 我可以協助你探索本集。 你可以詢問討論主題、要點或特定時刻的任何相關資訊。</string>
+    <string name="chat_thinking">正在思考</string>
+    <string name="chat_episode_assistant">單集助理</string>
+    <string name="chat_context_label_with_duration">正在與此單集對話 · %1$s</string>
+    <string name="chat_context_label">正在與此單集對話</string>
+    <string name="chat_paywall_title">與此單集對話</string>
+    <string name="episode_chat">與單集對話</string>
+    <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
+    <string name="blogs_experiment_banner_lead">目前仍為實驗階段。</string>
     <string name="onboarding_blogs_upsell_sample_label">部落格· 4 月 24 日</string>
     <string name="onboarding_blogs_upsell_sample_title">我們重新設計播放器的原因</string>
     <string name="onboarding_blogs_title">部落格：聆聽\n閱讀的內容。</string>
@@ -61,14 +133,10 @@ Language: zh_TW
     <string name="watch_synced_successfully">已成功同步觀看</string>
     <string name="watch_sync_waiting_for_phone">正等待手機同步…</string>
     <string name="watch_sync_retry">再試一次</string>
-    <string name="watch_sync_error_unknown_help">再試一次，或手動登入</string>
     <string name="watch_sync_error_login_failed_help">嘗試手動登入</string>
     <string name="watch_sync_error_no_connection_help">檢查與手機的藍牙連線</string>
-    <string name="watch_sync_error_timeout_help">確認手機在身邊，且已透過藍牙連線</string>
-    <string name="watch_sync_error_unknown">發生錯誤</string>
     <string name="watch_sync_error_login_failed">登入失敗</string>
     <string name="watch_sync_error_no_connection">手機未連線</string>
-    <string name="watch_sync_error_timeout">無法連線至手機</string>
     <string name="watch_sync_success">已從手機登入！</string>
     <string name="watch_sync_syncing">正與手機同步…</string>
     <string name="error_download_generic_failure">無法下載本集。 %1$s</string>
@@ -543,8 +611,6 @@ Language: zh_TW
     <string name="player_sleep_custom_plus">增加自訂長度</string>
     <string name="player_sleep_custom_minus">減少自訂長度</string>
     <string name="plus_subscription_finished">完成訂閱</string>
-    <string name="shuffle_whats_new_message">隨機播放節目很簡單，而且不會改變佇列的排序。</string>
-    <string name="shuffle_whats_new_title">隆重介紹隨機播放</string>
     <string name="chapter_time_remaining_content_description">本章剩餘 %s</string>
     <string name="chapter_count_summary">第 %1$d 章，共 %2$d 章</string>
     <string name="referrals_share_text">你好！\n\n在此送上 Pocket Casts Plus 的 %1$s訪客體驗券，這是我最愛的 Podcast 播放器。 Pocket Casts Plus 提供書籤、資料夾等其他播放器找不到的獨特功能。 我相信你也會愛上這個工具！</string>

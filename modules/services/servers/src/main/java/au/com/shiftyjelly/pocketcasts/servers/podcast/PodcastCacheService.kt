@@ -4,6 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
@@ -12,6 +14,7 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -127,6 +130,15 @@ interface PodcastCacheService {
         @Body request: CombinedSearchRequest,
     ): CombinedSearchResponse
 
-    @POST("/mobile/episode/chat")
-    suspend fun episodeChat(@Body request: EpisodeChatRequest): EpisodeChatResponse
+    @POST("mobile/episode/chat")
+    suspend fun episodeChat(
+        @Header("Authorization") authorization: String,
+        @Body request: EpisodeChatRequest,
+    ): EpisodeChatResponse
+
+    @POST("/mobile/bookmark/enrich")
+    suspend fun enrichBookmark(
+        @Header("Authorization") authorization: String,
+        @Body request: BookmarkEnrichRequest,
+    ): BookmarkEnrichResponse
 }

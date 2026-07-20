@@ -11,7 +11,7 @@ object MediaItemCompatConverter {
         val descBuilder = MediaDescriptionCompat.Builder()
             .setMediaId(item.mediaId)
             .setTitle(metadata.title)
-            .setSubtitle(metadata.artist)
+            .setSubtitle(metadata.subtitle)
             .setDescription(metadata.description)
             .setIconUri(metadata.artworkUri)
         metadata.extras?.let { descBuilder.setExtras(it) }

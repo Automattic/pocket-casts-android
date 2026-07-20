@@ -11,6 +11,7 @@ sealed interface EpisodeLocation {
     data class Stream(
         override val episode: BaseEpisode,
         override val uri: String?,
+        val isHls: Boolean,
     ) : EpisodeLocation
 
     data class Downloaded(
@@ -22,9 +23,23 @@ sealed interface EpisodeLocation {
         fun create(episode: BaseEpisode) = if (episode.isDownloaded) {
             EpisodeLocation.Downloaded(episode, episode.downloadedFilePath)
         } else {
-            EpisodeLocation.Stream(episode, episode.downloadUrl)
+            EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
         }
     }
+}
+
+val EpisodeLocation?.isHlsStream: Boolean
+    get() = (this as? EpisodeLocation.Stream)?.isHls == true
+
+/**
+ * Whether the stream the player prepared carries video. HLS starts [Unknown] until the player's tracks
+ * resolve it to [HasVideo] or [AudioOnly]; the video surface is shown only once it reaches [HasVideo].
+ */
+enum class StreamVideoState {
+    NotVideo,
+    Unknown,
+    HasVideo,
+    AudioOnly,
 }
 
 interface Player {
@@ -44,6 +59,7 @@ interface Player {
     suspend fun pause()
     suspend fun stop()
     suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects)
+    fun updateAudioOnly() {}
     suspend fun seekToTimeMs(positionMs: Int)
     suspend fun isPlaying(): Boolean
     suspend fun isBuffering(): Boolean

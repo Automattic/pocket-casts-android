@@ -3,14 +3,22 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UpNextSortEvent
+import com.automattic.eventhorizon.UpNextSortTooltipClosedEvent
+import com.automattic.eventhorizon.UpNextSortTooltipShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 
@@ -19,9 +27,19 @@ class UpNextViewModel @Inject constructor(
     private val userManager: UserManager,
     private val upNextQueue: UpNextQueue,
     private val eventHorizon: EventHorizon,
+    private val settings: Settings,
 ) : ViewModel() {
     private val _isSignedInAsPaidUser = MutableStateFlow(false)
     val isSignedInAsPaidUser: StateFlow<Boolean> get() = _isSignedInAsPaidUser
+
+    private val _isUpNextVisible = MutableStateFlow(false)
+
+    val showSortDurationTooltip: StateFlow<Boolean> = combine(
+        settings.showUpNextSortDurationTooltip.flow,
+        _isUpNextVisible,
+    ) { shouldShowTooltip, isUpNextVisible ->
+        shouldShowTooltip && isUpNextVisible && FeatureFlag.isEnabled(Feature.UP_NEXT_SORT)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
         viewModelScope.launch {
@@ -38,5 +56,32 @@ class UpNextViewModel @Inject constructor(
             ),
         )
         upNextQueue.sortUpNext(sortType)
+    }
+
+    fun setUpNextVisible(visible: Boolean) {
+        _isUpNextVisible.value = visible
+    }
+
+    fun onSortClick() {
+        dismissSortDurationTooltip()
+    }
+
+    fun onUpNextScrolled() {
+        dismissSortDurationTooltip()
+    }
+
+    fun onSortTooltipShown() {
+        eventHorizon.track(UpNextSortTooltipShownEvent)
+    }
+
+    fun onSortTooltipTapped() {
+        dismissSortDurationTooltip()
+    }
+
+    private fun dismissSortDurationTooltip() {
+        if (showSortDurationTooltip.value) {
+            eventHorizon.track(UpNextSortTooltipClosedEvent)
+            settings.showUpNextSortDurationTooltip.set(false, updateModifiedAt = false)
+        }
     }
 }

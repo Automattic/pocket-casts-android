@@ -1,11 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-05-13 10:55:26+0000
+Translation-Revision-Date: 2026-07-14 13:58:33+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="profile_stats_listening_activity">Lyssningsaktivitet</string>
+    <string name="profile_stats_listening_activity_content_description">Färgdiagram över lyssningsaktivitet</string>
+    <string name="player_action_show_video">Visa videoklipp</string>
+    <string name="player_action_hide_video">Dölj videoklipp</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortaste till längsta, eller tvärtom – passa in avsnittet på den tid du faktiskt har.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sortera efter varaktighet</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Ladda ner avsnittet och tryck för att söka</string>
+    <string name="bookmark_play_from">Spela upp från %s</string>
+    <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
+    <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
+    <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
+    <string name="tv_create_account_come_back">Kom tillbaka och logga in när du har skapat ditt konto</string>
+    <string name="tv_create_account_title">Skapa ditt gratis konto</string>
+    <string name="tv_onboarding_syncing_subtitle">Dina podcasts synkroniseras, vi loggar in dig snart!</string>
+    <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
+    <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
+    <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
+    <string name="tv_sign_in_go_to_url">går till %1$s</string>
+    <string name="tv_sign_in_or_enter_code">eller ange följande kod</string>
+    <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
+    <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
+    <string name="tv_onboarding_subtitle">Dina podcasts på den stora skärmen</string>
+    <string name="tv_onboarding_welcome_tv">Välkommen till Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Välkommen till Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Längsta till kortaste</string>
+    <string name="sort_shortest_to_longest">Kortaste till längsta</string>
+    <string name="synced_transcripts_whats_new_button_note">Synkroniserade transkriptioner är bara tillgängliga för de senaste avsnitten.</string>
+    <string name="synced_transcripts_whats_new_message">Läs snabbt, missa ingenting. Namnet du svepte förbi, boken de rekommenderade, statistiken du ville ha — tryck på ordet och hoppa tillbaka.</string>
+    <string name="synced_transcripts_whats_new_title">Läs med. Även vid 2x.</string>
+    <string name="settings_beta_features_sort_release_date">Utgivningsdatum (nyaste först)</string>
+    <string name="settings_beta_features_sort_name">Namn: A–Z</string>
+    <string name="settings_beta_features_sort">Betafunktioner</string>
+    <string name="sponsored">Sponsrad</string>
+    <string name="play_this_episode">Spela upp detta avsnitt</string>
+    <string name="play_latest_episode">Spela det senaste avsnittet</string>
+    <string name="tv_row_because_you_liked">Eftersom du gillade Podcast</string>
+    <string name="tv_row_recommendations">Rekommendationer</string>
+    <string name="tv_row_trending_videos">Trendande videoklipp</string>
+    <string name="tv_row_featured">Gjord för TV</string>
+    <string name="home">Hem</string>
+    <string name="tv_tab_your_podcasts">Dina podcasts</string>
+    <string name="blogs_found_go_to_podcast">Gå till podcasten</string>
+    <string name="blogs_found_description">Vi förvandlar de senaste inläggen till podcastavsnitt. Vi tar dig till podcastsidan så snart det första avsnittet är klart, eller så kan du återkomma till podcastsidan när som helst och dra nedåt för att uppdatera.</string>
+    <string name="blogs_found_headline">Högläsning av din blogg</string>
+    <string name="blogs_found_followed_badge">FÖLJD PODCAST</string>
+    <string name="blogs_found_feed_detected">Flöde hittades</string>
+    <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
+    <string name="description">Beskrivning</string>
+    <string name="player_tab_summary">Sammanfattning</string>
+    <string name="summary">Sammanfattning</string>
+    <string name="episode_summary">Avsnittssammanfattning</string>
+    <string name="chat_stop_quote">Stoppa citat</string>
+    <string name="chat_play_quote">Spela upp citat</string>
+    <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
+    <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>
+    <string name="chat_error_server">Något gick fel. Försök igen.</string>
+    <string name="chat_clear">Rensa chatt</string>
+    <string name="chat_send">Skicka</string>
+    <string name="chat_input_hint">Fråga om detta avsnitt …</string>
+    <string name="chat_preview_user_2">Nämndes några praktiska tips?</string>
+    <string name="chat_preview_ai_2">Detta avsnitt dyker in i vetenskapen om vanebildning och utforskar hur små dagliga rutiner kan leda till stora förändringar över tid.</string>
+    <string name="chat_preview_user_1">Vilket var huvudämnet för detta avsnitt?</string>
+    <string name="chat_preview_ai_1">Hej! Jag är här för att hjälpa dig att utforska detta avsnitt. Fråga mig vad som helst om de ämnen som diskuteras, viktiga saker att ta med sig eller specifika ögonblick.</string>
+    <string name="chat_thinking">TÄNKER</string>
+    <string name="chat_episode_assistant">AVSNITTSASSISTENT</string>
+    <string name="chat_context_label_with_duration">Chattar med detta avsnitt · %1$s</string>
+    <string name="chat_context_label">Chattar med detta avsnitt</string>
+    <string name="chat_paywall_title">Chatta med detta avsnitt</string>
+    <string name="episode_chat">Chatta med avsnitt</string>
+    <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>
+    <string name="blogs_experiment_banner_lead">Detta är ett experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blogg · 24 apr</string>
     <string name="onboarding_blogs_upsell_sample_title">Varför vi designade om spelaren</string>
     <string name="onboarding_blogs_title">Bloggar: lyssna på\nvad du läser.</string>
@@ -58,16 +130,12 @@ Language: sv_SE
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
     <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
     <string name="watch_sync_retry">Försök igen</string>
-    <string name="watch_sync_error_unknown_help">Försök igen eller logga in manuellt</string>
     <string name="watch_sync_error_login_failed_help">Försök logga in manuellt</string>
-    <string name="watch_sync_error_unknown">Något gick fel</string>
     <string name="watch_sync_error_login_failed">Inloggning misslyckades</string>
     <string name="watch_sync_error_no_connection">Telefon inte ansluten</string>
-    <string name="watch_sync_error_timeout">Kunde inte ansluta till telefon</string>
     <string name="watch_sync_success">Inloggad från telefon!</string>
     <string name="watch_sync_syncing">Synkroniserar med telefon …</string>
     <string name="error_download_generic_failure">Misslyckades att ladda ner avsnittet. %1$s</string>
-    <string name="watch_sync_error_timeout_help">Se till att din telefon är i närheten och ansluten via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Kontrollera Bluetooth-anslutning till din telefon</string>
     <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
     <string name="watch_synced_successfully">Klockan har synkroniserats</string>
@@ -85,6 +153,7 @@ Language: sv_SE
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
     <string name="podcasts_add_episode">Lägg till</string>
     <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
+    <string name="add_to_up_next_top">Spela upp nästa i Nästa</string>
     <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
     <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
     <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>
@@ -542,8 +611,6 @@ Language: sv_SE
     <string name="player_sleep_custom_plus">Öka anpassad varaktighet</string>
     <string name="player_sleep_custom_minus">Minska anpassad varaktighet</string>
     <string name="plus_subscription_finished">Prenumerationen har löpt ut</string>
-    <string name="shuffle_whats_new_message">Spela enkelt upp ett slumpmässigt avsnitt utan att ändra ordningen på din kö.</string>
-    <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
     <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
     <string name="chapter_count_summary">%1$d av %2$d</string>
     <string name="referrals_share_text">Hej!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
