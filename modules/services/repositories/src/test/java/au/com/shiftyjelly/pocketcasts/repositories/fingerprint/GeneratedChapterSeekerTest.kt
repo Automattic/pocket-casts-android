@@ -70,7 +70,7 @@ class GeneratedChapterSeekerTest {
         val chapter = generatedChapter.copy(origin = ChapterOrigin.ShowNotes)
 
         assertNull(seeker().resolveSeekTime(episode, chapter))
-        verifyBlocking(timingManager, never()) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
@@ -78,13 +78,13 @@ class GeneratedChapterSeekerTest {
         FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, false)
 
         assertNull(seeker().resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, never()) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `returns null on non-phone platforms`() = runTest {
         assertNull(seeker(AppPlatform.Automotive).resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, never()) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
@@ -92,7 +92,7 @@ class GeneratedChapterSeekerTest {
         val chapter = generatedChapter.copy(referenceStartTime = null)
 
         assertNull(seeker().resolveSeekTime(episode, chapter))
-        verifyBlocking(timingManager, never()) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
@@ -102,52 +102,52 @@ class GeneratedChapterSeekerTest {
         }
 
         assertEquals(131.5.seconds, seeker().resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, never()) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `resolves and caches the rounded-up playback time`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), eq(100.seconds)) } doReturn
+            on { resolvePlaybackTime(any(), eq(100.seconds)) } doReturn
                 ChapterSeekResult.Resolved(playbackTime = 130.2.seconds, usedPrior = false)
         }
         val seeker = seeker()
 
         assertEquals(131.seconds, seeker.resolveSeekTime(episode, generatedChapter))
         assertEquals(131.seconds, seeker.resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `retries when unresolved for a transient reason`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
         }
         val seeker = seeker()
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `does not retry a chapter that failed with no match`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
         }
         val seeker = seeker()
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `no match failure does not block other chapters`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
         }
         val seeker = seeker()
@@ -155,13 +155,13 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(episode, otherChapter))
-        verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `missing reference blocks further resolves for the episode`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
         }
         val seeker = seeker()
@@ -169,27 +169,27 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(episode, otherChapter))
-        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `dense mapping still serves a chapter that previously failed`() = runTest {
         timingManager = mock {
             on { densePlaybackTime(any(), any()) } doReturnConsecutively listOf(null, 131.5.seconds)
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
         }
         val seeker = seeker()
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertEquals(131.5.seconds, seeker.resolveSeekTime(episode, generatedChapter))
-        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `negative results are dropped when the episode changes`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
         }
         val seeker = seeker()
@@ -197,13 +197,13 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(otherEpisode, generatedChapter))
-        verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `cache is dropped when the episode changes`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Resolved(playbackTime = 130.0.seconds, usedPrior = true)
         }
         val seeker = seeker()
@@ -213,13 +213,13 @@ class GeneratedChapterSeekerTest {
         seeker.resolveSeekTime(otherEpisode, generatedChapter)
         seeker.resolveSeekTime(episode, generatedChapter)
 
-        verifyBlocking(timingManager, times(3)) { resolveChapterPlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, times(3)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `clears resolving state after a resolve`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+            on { resolvePlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Resolved(playbackTime = 130.0.seconds, usedPrior = false)
         }
         val seeker = seeker()
@@ -234,7 +234,7 @@ class GeneratedChapterSeekerTest {
     @Test
     fun `superseded tap does not clear the new tap's resolving state`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+            on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
         launch { seeker.resolveSeekTime(episode, generatedChapter) }
@@ -253,7 +253,7 @@ class GeneratedChapterSeekerTest {
     @Test
     fun `cancelActiveResolve cancels the in-flight caller and clears its state`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+            on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
         val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
@@ -276,7 +276,7 @@ class GeneratedChapterSeekerTest {
     @Test
     fun `resolving chapter index follows the current episode`() = runTest {
         timingManager = mock {
-            on { resolveChapterPlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
+            on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
         val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
