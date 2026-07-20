@@ -261,7 +261,17 @@ class FingerprintTimingManagerTest {
             TimeMappingEntry(playbackTime = 134.0, referenceTime = 104.0),
         )
         assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 99.0, entries = entries))
-        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 105.0, entries = entries))
+        assertNull(FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 104.0 + FingerprintConstants.TAP_TRAILING_GRACE_SECONDS + 1.0, entries = entries))
+    }
+
+    @Test
+    fun `densePlaybackSec extrapolates within the trailing grace past the last anchor`() {
+        val entries = listOf(
+            TimeMappingEntry(playbackTime = 130.0, referenceTime = 100.0),
+            TimeMappingEntry(playbackTime = 134.0, referenceTime = 104.0),
+        )
+        val result = FingerprintTimingManager.densePlaybackSec(referenceTimeSec = 110.0, entries = entries)
+        assertEquals(140.0, result!!, 0.001)
     }
 
     @Test

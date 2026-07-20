@@ -34,9 +34,15 @@ class MatchedContentGateTest {
     }
 
     @Test
-    fun `not matched past last anchor`() {
+    fun `matched within trailing grace past last anchor`() {
         val entries = listOf(entry(18.0), entry(20.0))
-        assertFalse(FingerprintTimingManager.isWithinMatchedContent(25.0, entries))
+        assertTrue(FingerprintTimingManager.isWithinMatchedContent(31.0, entries))
+    }
+
+    @Test
+    fun `not matched beyond trailing grace past last anchor`() {
+        val entries = listOf(entry(18.0), entry(20.0))
+        assertFalse(FingerprintTimingManager.isWithinMatchedContent(32.1, entries))
     }
 
     @Test
@@ -75,9 +81,10 @@ class MatchedContentGateTest {
     }
 
     @Test
-    fun `single anchor is not matched without bracketing pair`() {
+    fun `single anchor matches within the trailing grace`() {
         val entries = listOf(entry(20.0))
-        assertFalse(FingerprintTimingManager.isWithinMatchedContent(20.0, entries))
+        assertTrue(FingerprintTimingManager.isWithinMatchedContent(20.0, entries))
+        assertFalse(FingerprintTimingManager.isWithinMatchedContent(32.1, entries))
     }
 
     @Test

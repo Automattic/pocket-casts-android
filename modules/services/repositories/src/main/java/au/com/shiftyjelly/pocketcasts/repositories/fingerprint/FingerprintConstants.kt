@@ -34,6 +34,13 @@ object FingerprintConstants {
     /** Max gap between bracketing anchors to consider playback on matched content. */
     const val HIGHLIGHT_MAX_GAP_SECONDS = 8.0
 
+    /**
+     * Grace past the newest anchor before the live edge counts as unmatched. The tap-built map lags
+     * the playhead by a full window plus stride and sink-buffer variance, so this must exceed
+     * [WINDOW_DURATION_MS] + [WINDOW_INTERVAL_MS] with headroom for the odd missed match.
+     */
+    const val TAP_TRAILING_GRACE_SECONDS = 12.0
+
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 4
 
