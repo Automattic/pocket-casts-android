@@ -147,6 +147,21 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
+    fun `cache is dropped when the audio source changes`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Resolved(playbackTime = 130.0.seconds, usedPrior = true)
+        }
+        val seeker = seeker()
+        val downloadedEpisode = episode.copy(downloadedFilePath = "/audio.mp3")
+
+        seeker.resolveSeekTime(episode, generatedChapter)
+        seeker.resolveSeekTime(downloadedEpisode, generatedChapter)
+
+        verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
     fun `clears resolving state after a resolve`() = runTest {
         timingManager = mock {
             on { resolvePlaybackTime(any(), any()) } doReturn
