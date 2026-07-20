@@ -35,6 +35,7 @@ class DriftFilterTest {
             chapterManager = Lazy { mock(ChapterManager::class.java) },
             settings = mock(Settings::class.java),
             dataSourceFactory = Lazy { mock(ExoPlayerDataSourceFactory::class.java) },
+            pcmTap = FingerprintPcmTap(),
         )
         manager.debugTrackingEnabled = true
     }
