@@ -10,7 +10,7 @@
     *   HLS support
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
     *   Resolve generated chapter seeks through on-demand audio fingerprinting
-        ([#5577](https://github.com/Automattic/pocket-casts-android/pull/5577))
+        ([#5613](https://github.com/Automattic/pocket-casts-android/pull/5613))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
