@@ -182,6 +182,10 @@ class DeveloperViewModel
         settings.showPlaylistsOnboarding.set(true, updateModifiedAt = false)
     }
 
+    fun resetUpNextSortTooltip() {
+        settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
+    }
+
     fun resetNotificationsPrompt() {
         settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
     }

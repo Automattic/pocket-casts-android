@@ -46,10 +46,22 @@ fun ShelfItemRow(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
+    isVideoEnabled: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
+    val showVideoToggleLabel = item == ShelfItem.StreamSelector && !isEditable
+    val titleResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video
+    } else {
+        item.titleId(episode)
+    }
+    val iconResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) IR.drawable.ic_video_off else IR.drawable.ic_video_on
+    } else {
+        item.iconId(episode)
+    }
     CompositionLocalProvider(
         LocalRippleConfiguration provides if (isEditable) {
             null
@@ -69,7 +81,7 @@ fun ShelfItemRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(item.iconId(episode)),
+                painter = painterResource(iconResId),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 16.dp)
@@ -82,7 +94,7 @@ fun ShelfItemRow(
                     .padding(horizontal = 24.dp, vertical = 8.dp),
             ) {
                 TextH40(
-                    text = stringResource(item.titleId(episode)),
+                    text = stringResource(titleResId),
                     color = MaterialTheme.theme.colors.playerContrast01,
                 )
                 if (isEditable && subtitleResId != null) {

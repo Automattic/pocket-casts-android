@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -143,17 +144,24 @@ object DataParser {
             return null
         }
         val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
+        val url = getString(jsonEpisode, "url")
+        val fileType = getString(jsonEpisode, "file_type")
+        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+            enclosures.firstHlsMimeType() ?: fileType
+        } else {
+            fileType
+        }
         return PodcastEpisode(
             downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
-            downloadUrl = getString(jsonEpisode, "url"),
-            hlsUrl = enclosures.firstHlsStreamUrl(),
+            downloadUrl = url,
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
-            fileType = getString(jsonEpisode, "file_type"),
+            fileType = resolvedFileType,
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),

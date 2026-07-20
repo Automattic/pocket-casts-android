@@ -1,8 +1,6 @@
-package au.com.shiftyjelly.pocketcasts.servers
+package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.media3.common.MimeTypes
-import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -31,6 +29,21 @@ class AlternateEnclosuresTest {
             enclosure("application/vnd.apple.mpegurl", "https://example.com/master.m3u8"),
         )
         assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
+    }
+
+    @Test
+    fun `matches every documented hls mime type`() {
+        val hlsTypes = listOf(
+            "application/vnd.apple.mpegurl",
+            "audio/mpegurl",
+            "application/x-mpegurl",
+            "application/mpegurl",
+            "audio/x-mpegurl",
+        )
+        hlsTypes.forEach { type ->
+            val enclosures = listOf(enclosure(type, "https://example.com/master.m3u8"))
+            assertEquals(type, "https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
+        }
     }
 
     @Test

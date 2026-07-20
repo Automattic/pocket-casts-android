@@ -10,6 +10,17 @@
          transitive merge from unrelated modules. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Package visibility (Android 11+) for callers validated against allowed_media_browser_callers.xml. -->
+    <queries>
+        <package android:name="com.google.android.autosimulator" />
+        <package android:name="com.google.android.carassistant" />
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.mediasimulator" />
+        <package android:name="com.google.android.projection.gearhead" />
+        <package android:name="com.google.android.wearable.app" />
+        <package android:name="com.sec.android.automotive.drivelink" />
+    </queries>
+
     <application android:usesCleartextTraffic="true">
         <provider
             android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider"

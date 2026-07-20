@@ -6,8 +6,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTiming
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import java.util.Date
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -27,7 +29,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class TranscriptWindowExtractorTest {
 
-    private val fingerprintTimingManager = mock<FingerprintTimingManager>()
+    private val fingerprintTimingManager = mock<FingerprintTimingManager> {
+        on { stateFlow } doReturn MutableStateFlow(FingerprintTimingManager.State.Idle)
+    }
     private val playbackManager = mock<PlaybackManager>()
     private val currentEpisode = PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
 
@@ -98,7 +102,32 @@ class TranscriptWindowExtractorTest {
             referenceSecs = 25.0
             mappingVersion.value++
             null
-        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode()
+        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
+
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+
+        assertEquals(
+            "Let me start by defining what AI actually means in practice. " +
+                "AI is a broad field that includes machine learning, deep learning, and more. " +
+                "The recent advances have been truly remarkable for the industry.",
+            result,
+        )
+    }
+
+    @Test
+    fun `wait for the mapping despite a stale unavailable state from another episode`() = runTest {
+        val mappingVersion = MutableStateFlow(0L)
+        var referenceSecs: Double? = null
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
+        whenever(fingerprintTimingManager.mappingVersion).thenReturn(mappingVersion)
+        whenever(fingerprintTimingManager.referenceTime(5000)).thenAnswer { referenceSecs }
+        whenever(fingerprintTimingManager.stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Unavailable("other-episode")))
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
+        doAnswer {
+            referenceSecs = 25.0
+            mappingVersion.value++
+            null
+        }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
 
         val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
 
@@ -119,6 +148,25 @@ class TranscriptWindowExtractorTest {
 
         val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
 
+        assertEquals(
+            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice.",
+            result,
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `use playback time without waiting when fingerprinting is unavailable`() = runTest {
+        whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
+        whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(null)
+        whenever(fingerprintTimingManager.mappingVersion).thenReturn(MutableStateFlow(0L))
+        whenever(fingerprintTimingManager.stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Unavailable("episode-id")))
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
+
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+
+        assertEquals(0, currentTime)
         assertEquals(
             "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
                 "Let me start by defining what AI actually means in practice.",

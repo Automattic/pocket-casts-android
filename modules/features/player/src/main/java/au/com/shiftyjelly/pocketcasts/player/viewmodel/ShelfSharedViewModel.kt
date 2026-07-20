@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -20,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.eventhorizon.EventHorizon
@@ -94,6 +97,8 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNextObservable.asFlow()
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
+        playbackManager.streamVideoState,
+        playbackManager.videoRenderingEnabled,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -105,12 +110,17 @@ class ShelfSharedViewModel @Inject constructor(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
+        streamVideoState: StreamVideoState,
+        videoRenderingEnabled: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
+        val streamHasVideo = streamVideoState == StreamVideoState.HasVideo || streamVideoState == StreamVideoState.Unknown
+        val canToggleVideo = FeatureFlag.isEnabled(Feature.HLS_STREAMING) && episode is PodcastEpisode && streamHasVideo
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
+            isVideoRenderingEnabled = videoRenderingEnabled,
         )
     }
 
@@ -119,6 +129,10 @@ class ShelfSharedViewModel @Inject constructor(
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowEffectsOption)
         }
+    }
+
+    fun onVideoToggleClick(source: ShelfItemSource) {
+        playbackManager.toggleVideoRendering()
     }
 
     fun onSleepClick(source: ShelfItemSource) {
@@ -319,6 +333,7 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val isVideoRenderingEnabled: Boolean = true,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)

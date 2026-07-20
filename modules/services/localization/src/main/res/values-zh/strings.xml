@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-07-09 15:55:32+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">收听活动热图</string>
+    <string name="profile_stats_listening_activity">收听活动</string>
+    <string name="player_action_show_video">显示视频</string>
+    <string name="player_action_hide_video">隐藏视频</string>
+    <string name="up_next_sort_duration_tooltip_body">从最短到最长，或者反过来 — 根据您实际拥有的时间来安排剧集。</string>
+    <string name="up_next_sort_duration_tooltip_title">按时长排序</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">下载该剧集后，即可通过点击跳转播放位置</string>
+    <string name="bookmark_play_from">从 %s 播放</string>
+    <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
+    <string name="summary_upsell_title">AI 驱动的摘要</string>
     <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>
+    <string name="tv_create_account_come_back">创建账户后，请返回并登录</string>
     <string name="tv_create_account_title">创建您的免费账户</string>
+    <string name="tv_onboarding_syncing_subtitle">您的播客正在同步，我们很快就会为您登录！</string>
+    <string name="tv_onboarding_welcome_back">欢迎回来！</string>
+    <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
+    <string name="tv_onboarding_sign_in_title">使用手机登录</string>
+    <string name="tv_sign_in_go_to_url">转至 %1$s</string>
+    <string name="tv_sign_in_or_enter_code">或输入以下代码</string>
+    <string name="tv_onboarding_syncing">正在同步您的播客\u2026</string>
+    <string name="tv_onboarding_browse_without_account">无需账户即可浏览</string>
+    <string name="tv_onboarding_create_free_account">创建免费账户</string>
+    <string name="tv_onboarding_subtitle">您的播客，大屏呈现</string>
+    <string name="tv_onboarding_welcome_tv">欢迎使用 Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">欢迎使用 Pocket Casts</string>
+    <string name="sort_longest_to_shortest">最长到最短</string>
+    <string name="sort_shortest_to_longest">最短到最长</string>
     <string name="synced_transcripts_whats_new_button_note">仅提供近期剧集的同步文字转录稿。</string>
     <string name="synced_transcripts_whats_new_message">快速阅读，不漏看任何内容。 您曾匆匆掠过的名字、他们推荐的书、您想要的统计信息 — 点击词条，即可跳转回原文。</string>
     <string name="synced_transcripts_whats_new_title">同步阅读。 即使在 2 倍速下也是如此。</string>
@@ -108,14 +133,10 @@ Language: zh_CN
     <string name="watch_synced_successfully">手表同步成功</string>
     <string name="watch_sync_waiting_for_phone">正在等待手机同步…</string>
     <string name="watch_sync_retry">重试</string>
-    <string name="watch_sync_error_unknown_help">重试或手动登录</string>
     <string name="watch_sync_error_login_failed_help">尝试手动登录</string>
     <string name="watch_sync_error_no_connection_help">检查与您手机的蓝牙连接</string>
-    <string name="watch_sync_error_timeout_help">确保您的手机在附近并已通过蓝牙连接</string>
-    <string name="watch_sync_error_unknown">出错了</string>
     <string name="watch_sync_error_login_failed">登录失败</string>
     <string name="watch_sync_error_no_connection">手机未连接</string>
-    <string name="watch_sync_error_timeout">无法连接到手机</string>
     <string name="watch_sync_success">已从手机登录！</string>
     <string name="watch_sync_syncing">正在与手机同步…</string>
     <string name="error_download_generic_failure">下载剧集失败。 %1$s</string>

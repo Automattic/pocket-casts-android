@@ -41,7 +41,7 @@ fun LoginWithPhoneScreen(
     onRetry: () -> Unit = {},
 ) {
     when (syncState) {
-        null -> LoginWithPhoneInstructionsContent(
+        null, WatchSyncState.Idle -> LoginWithPhoneInstructionsContent(
             onLoginClick = onLoginClick,
             modifier = modifier,
         )
@@ -184,17 +184,11 @@ private fun ErrorContent(
     modifier: Modifier = Modifier,
 ) {
     val (errorMessage, helpText) = when (error) {
-        WatchSyncError.Timeout -> stringResource(LR.string.watch_sync_error_timeout) to
-            stringResource(LR.string.watch_sync_error_timeout_help)
-
         WatchSyncError.NoPhoneConnection -> stringResource(LR.string.watch_sync_error_no_connection) to
             stringResource(LR.string.watch_sync_error_no_connection_help)
 
         is WatchSyncError.LoginFailed -> stringResource(LR.string.watch_sync_error_login_failed) to
             stringResource(LR.string.watch_sync_error_login_failed_help)
-
-        is WatchSyncError.Unknown -> stringResource(LR.string.watch_sync_error_unknown) to
-            stringResource(LR.string.watch_sync_error_unknown_help)
     }
 
     val columnState = rememberResponsiveColumnState()
@@ -288,17 +282,6 @@ private fun SuccessContentPreview() {
 
 @Preview
 @Composable
-private fun ErrorContentTimeoutPreview() {
-    WearAppTheme {
-        ErrorContent(
-            error = WatchSyncError.Timeout,
-            onRetry = {},
-        )
-    }
-}
-
-@Preview
-@Composable
 private fun ErrorContentNoConnectionPreview() {
     WearAppTheme {
         ErrorContent(
@@ -314,17 +297,6 @@ private fun ErrorContentLoginFailedPreview() {
     WearAppTheme {
         ErrorContent(
             error = WatchSyncError.LoginFailed("Invalid credentials"),
-            onRetry = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ErrorContentUnknownPreview() {
-    WearAppTheme {
-        ErrorContent(
-            error = WatchSyncError.Unknown("Network error"),
             onRetry = {},
         )
     }

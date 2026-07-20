@@ -6,8 +6,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -27,7 +31,10 @@ class ChapterManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
+    private val settings: Settings,
 ) : ChapterManager {
+    private var unalignedLogEpisodeUuid: String? = null
+
     override suspend fun updateChapters(
         episodeUuid: String,
         chapters: List<DbChapter>,
@@ -48,7 +55,16 @@ class ChapterManagerImpl @Inject constructor(
         val rawChapters = combine(
             episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
             chapterDao.observeChaptersForEpisode(episodeUuid),
-        ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
+            settings.showGeneratedChapters.flow,
+        ) { episode, dbChapters, showGeneratedChapters ->
+            // Already-saved generated chapters must stay hidden while the feature is off or the user opts out.
+            val visibleChapters = if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) && showGeneratedChapters) {
+                dbChapters
+            } else {
+                dbChapters.filterNot { it.origin == ChapterOrigin.Generated }
+            }
+            Chapters(visibleChapters.fixChapterTimestamps(episode))
+        }
 
         // Generated chapter timestamps are in the server reference timeline; align them to the real audio
         // stream via the fingerprint map. Phone only, to spare resources on automotive/wear.
@@ -70,6 +86,10 @@ class ChapterManagerImpl @Inject constructor(
     private fun alignGeneratedChapters(episodeUuid: String, chapters: Chapters): Chapters {
         val manager = fingerprintTimingManager.get()
         if (manager.activeEpisodeUuid != episodeUuid || manager.mappingSnapshot.isEmpty()) {
+            if (chapters.hasGeneratedChapters && unalignedLogEpisodeUuid != episodeUuid) {
+                unalignedLogEpisodeUuid = episodeUuid
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Generated chapters for $episodeUuid are unaligned: no fingerprint mapping available")
+            }
             return chapters
         }
         return alignGeneratedChapters(chapters) { reference ->

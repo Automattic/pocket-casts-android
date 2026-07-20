@@ -31,6 +31,17 @@ sealed interface EpisodeLocation {
 val EpisodeLocation?.isHlsStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isHls == true
 
+/**
+ * Whether the stream the player prepared carries video. HLS starts [Unknown] until the player's tracks
+ * resolve it to [HasVideo] or [AudioOnly]; the video surface is shown only once it reaches [HasVideo].
+ */
+enum class StreamVideoState {
+    NotVideo,
+    Unknown,
+    HasVideo,
+    AudioOnly,
+}
+
 interface Player {
     var isPip: Boolean
     val isRemote: Boolean
@@ -48,6 +59,7 @@ interface Player {
     suspend fun pause()
     suspend fun stop()
     suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects)
+    fun updateAudioOnly() {}
     suspend fun seekToTimeMs(positionMs: Int)
     suspend fun isPlaying(): Boolean
     suspend fun isBuffering(): Boolean

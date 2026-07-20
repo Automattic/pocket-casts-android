@@ -7,6 +7,15 @@ object FingerprintConstants {
     /** Slack window around the already-mapped range before playback is considered "outside". */
     const val PLAYBACK_RANGE_MARGIN_SECONDS = 30.0
 
+    /** Minimum time between stream restarts while playback sits outside the mapped range. */
+    const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
+
+    /** Position must be stable for this long before a seek restarts the stream; coalesces rapid multi-tap skips. */
+    const val RESTART_DEBOUNCE_MS = 1_500L
+
+    /** How often a running remote decode re-checks that the network still permits streaming. */
+    const val METERED_RECHECK_INTERVAL_MS = 5_000L
+
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
@@ -15,18 +24,6 @@ object FingerprintConstants {
 
     /** Interval between windowed fingerprints during live matching, in milliseconds. */
     const val WINDOW_INTERVAL_MS = 1000
-
-    /** Seconds of decoded PCM read per chunk during fingerprint generation. */
-    const val STREAM_CHUNK_SECONDS = 5.0
-
-    /** Seconds between polls when waiting for the streaming buffer to grow. */
-    const val BUFFER_GROW_POLL_CADENCE_SECONDS = 1.0
-
-    /** Give up the streaming grow-loop after this many consecutive seconds without new bytes. */
-    const val BUFFER_GROW_MAX_STALL_SECONDS = 60.0
-
-    /** Trailing audio the grow-loop refuses to read to avoid partial frame noise. */
-    const val BUFFER_GROW_TRAILING_MARGIN_SECONDS = 1.0
 
     /** Minimum number of mapping entries before transitioning to Active. */
     const val MINIMUM_COVERAGE_FOR_ACTIVE = 2

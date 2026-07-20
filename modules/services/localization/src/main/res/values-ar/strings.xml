@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-11 11:56:48+0000
+Translation-Revision-Date: 2026-07-08 22:57:25+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">مخطط غزارة نشاط الاستماع</string>
+    <string name="profile_stats_listening_activity">نشاط الاستماع</string>
+    <string name="player_action_show_video">عرض الفيديو</string>
+    <string name="player_action_hide_video">إخفاء الفيديو</string>
+    <string name="up_next_sort_duration_tooltip_body">رتّب الحلقات حسب المدة، من الأقصر إلى الأطول أو بالعكس — حتى تعثر على الحلقة المناسبة لوقتك.</string>
+    <string name="up_next_sort_duration_tooltip_title">فرز حسب المدة</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">قم بتنزيل الحلقة لتمكين ميزة Tap to Seek</string>
+    <string name="bookmark_play_from">تشغيل من %s</string>
+    <string name="summary_upsell_description">اشترك في خطة Plus للحصول على حق الوصول إليها وإلى الميزات الأخرى للخطة المميزة، مثل: الإشارات المرجعية والمجلدات.</string>
+    <string name="summary_upsell_title">ملخصات مدعومة بالذكاء الاصطناعي</string>
+    <string name="tv_create_account_come_back">بمجرد أن يتم إنشاء حسابك، يمكنك الرجوع وتسجيل الدخول</string>
+    <string name="tv_create_account_subtitle">امسح هذا الكود ضوئيًا للبدء على هاتفك، فالأمر لن يستغرق سوى دقيقة واحدة.</string>
+    <string name="tv_create_account_title">إنشاء حساب مجّاني لك</string>
+    <string name="tv_onboarding_syncing_subtitle">تتم مزامنة حلقات البث الصوتي لديك، وسنُسجِّل دخولك قريبًا!</string>
+    <string name="tv_onboarding_welcome_back">مرحبًا بك مرة أخرى!</string>
+    <string name="tv_onboarding_sign_in_instructions">افتح الكاميرا ووجّهها إلى كود الاستجابة السريعة (QR) هذا</string>
+    <string name="tv_onboarding_sign_in_title">تسجيل الدخول باستخدام هاتفك</string>
+    <string name="tv_sign_in_go_to_url">انتقال إلى ⁦%1$s⁩</string>
+    <string name="tv_sign_in_or_enter_code">أو أدخل الكود التالي</string>
+    <string name="tv_onboarding_syncing">جارٍ مزامنة حلقات البث الصوتي لديك\u2026</string>
+    <string name="tv_onboarding_browse_without_account">تصفح من دون حساب</string>
+    <string name="tv_onboarding_create_free_account">إنشاء حساب مجّاني</string>
+    <string name="tv_onboarding_subtitle">شاهد حلقات البث الصوتي لديك على الشاشة الكبيرة</string>
+    <string name="tv_onboarding_welcome_tv">مرحبًا بك في تطبيق Pocket Casts على التلفاز</string>
+    <string name="tv_onboarding_welcome">مرحبًا بك في تطبيق Pocket Casts</string>
+    <string name="sort_longest_to_shortest">من الأطول إلى الأقصر</string>
+    <string name="sort_shortest_to_longest">من الأقصر إلى الأطول</string>
     <string name="synced_transcripts_whats_new_button_note">النصوص المتزامنة متاحة للحلقات الأخيرة فقط.</string>
     <string name="synced_transcripts_whats_new_message">اقرأ بسرعة، ولا تفوِّت شيئًا. الاسم الذي فاتك، أو الكتاب الذي أوصوا به، أو الحالة التي أردتها — اضغط على الكلمة، وارجع للخلف.</string>
     <string name="synced_transcripts_whats_new_title">اقرأ النص. حتى بسرعة  2x.</string>
@@ -106,14 +133,10 @@ Language: ar
     <string name="watch_synced_successfully">اكتملت مزامنة الساعة بنجاح</string>
     <string name="watch_sync_waiting_for_phone">بانتظار مزامنة الهاتف…</string>
     <string name="watch_sync_retry">إعادة المحاولة</string>
-    <string name="watch_sync_error_unknown_help">يُرجى المحاولة مرة أخرى أو تسجيل الدخول يدويًا</string>
     <string name="watch_sync_error_login_failed_help">تسجيل الدخول يدويًا</string>
     <string name="watch_sync_error_no_connection_help">تحقق من اتصال البلوتوث بالهاتف</string>
-    <string name="watch_sync_error_timeout_help">تأكد من أن الهاتف قريب ومتصّل عبر البلوتوث</string>
-    <string name="watch_sync_error_unknown">حدث خطأ ما</string>
     <string name="watch_sync_error_login_failed">فشل تسجيل الدخول</string>
     <string name="watch_sync_error_no_connection">الهاتف غير متصل</string>
-    <string name="watch_sync_error_timeout">تعذّر الاتصال بالهاتف</string>
     <string name="watch_sync_success">جرت عملية تسجيل الدخول من الهاتف!</string>
     <string name="watch_sync_syncing">جارٍ المزامنة مع الهاتف…</string>
     <string name="error_download_generic_failure">فشل تنزيل الحلقة. %1$s</string>

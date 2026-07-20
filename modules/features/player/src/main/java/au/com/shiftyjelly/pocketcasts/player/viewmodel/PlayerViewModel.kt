@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -116,6 +117,8 @@ class PlayerViewModel @Inject constructor(
         val isPlaying: Boolean = false,
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
+        val streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
+        val videoRenderingEnabled: Boolean = true,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -135,7 +138,12 @@ class PlayerViewModel @Inject constructor(
         val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
-        val isVideo = episode?.isVideo == true
+
+        val isVideo = videoRenderingEnabled && when (streamVideoState) {
+            StreamVideoState.HasVideo -> true
+            StreamVideoState.Unknown, StreamVideoState.AudioOnly -> false
+            StreamVideoState.NotVideo -> episode?.isVideo == true
+        }
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
@@ -194,8 +202,14 @@ class PlayerViewModel @Inject constructor(
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
 
-    val listDataRx = Observables.combineLatest(
+    private val upNextAndStreamVideoObservable = Observables.combineLatest(
         upNextStateObservable,
+        playbackManager.videoRenderingEnabled.asObservable(coroutineContext),
+        playbackManager.streamVideoState.asObservable(coroutineContext),
+    )
+
+    val listDataRx = Observables.combineLatest(
+        upNextAndStreamVideoObservable,
         playbackStateObservable,
         settings.skipBackInSecs.flow.asObservable(coroutineContext),
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
@@ -373,7 +387,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextState: UpNextQueue.State,
+        upNextAndStreamVideo: Triple<UpNextQueue.State, Boolean, StreamVideoState>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -383,6 +397,7 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
+        val (upNextState, videoRenderingEnabled, streamVideoState) = upNextAndStreamVideo
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -409,6 +424,8 @@ class PlayerViewModel @Inject constructor(
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
+                streamVideoState = streamVideoState,
+                videoRenderingEnabled = videoRenderingEnabled,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,

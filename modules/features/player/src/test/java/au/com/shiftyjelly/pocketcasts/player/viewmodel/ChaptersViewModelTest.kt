@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
+import com.automattic.eventhorizon.ChaptersShownEvent
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
@@ -108,6 +110,23 @@ class ChaptersViewModelTest {
     fun `paid user can skip chapters`() = runTest {
         chaptersViewModel.uiState.test {
             assertTrue(awaitItem().canSkipChapters)
+        }
+    }
+
+    @Test
+    fun `generated chapters appearing and disappearing are reflected in the ui state`() = runTest {
+        val embedded = Chapter("Embedded", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.PodcastIndex)
+        val generated = Chapter("Generated", 101.milliseconds, 200.milliseconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated)
+        chaptersFlow.value = Chapters(listOf(embedded, generated))
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().hasGeneratedChapters)
+
+            chaptersFlow.value = Chapters(listOf(embedded))
+            assertFalse(awaitItem().hasGeneratedChapters)
+
+            chaptersFlow.value = Chapters(listOf(embedded, generated))
+            assertTrue(awaitItem().hasGeneratedChapters)
         }
     }
 
@@ -255,6 +274,36 @@ class ChaptersViewModelTest {
         chaptersViewModel.playChapter(chapter)
 
         assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `chapters shown reports chapters origin and source`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters(
+            listOf(Chapter("1", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)),
+        )
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(
+            ChaptersShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `chapters shown is not reported when there are no chapters`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

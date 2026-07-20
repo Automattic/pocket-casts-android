@@ -333,12 +333,12 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
-    UP_NEXT_DURATION(
-        key = "up_next_duration",
-        title = "Up Next Duration",
+    UP_NEXT_SORT(
+        key = "up_next_sort",
+        title = "Up Next sort by duration",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-09"),
     ),
@@ -351,15 +351,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-27"),
     ),
-    TRIAL_CTA_COPY_AB_TEST(
-        key = "trial_cta_copy_ab_test",
-        title = "A/B/C test trial CTA button copy",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-06-11"),
-    ),
     HLS_STREAMING(
         key = "hls_streaming",
         title = "Prefer HLS stream when available",
@@ -368,6 +359,15 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
+    ),
+    STATS_HEATMAP(
+        key = "stats_heatmap",
+        title = "Show listening activity heatmap on Stats",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-07-02"),
     ),
 }
 

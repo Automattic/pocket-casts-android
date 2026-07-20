@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-07-14 13:58:33+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="profile_stats_listening_activity">Lyssningsaktivitet</string>
+    <string name="profile_stats_listening_activity_content_description">Färgdiagram över lyssningsaktivitet</string>
+    <string name="player_action_show_video">Visa videoklipp</string>
+    <string name="player_action_hide_video">Dölj videoklipp</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortaste till längsta, eller tvärtom – passa in avsnittet på den tid du faktiskt har.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sortera efter varaktighet</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Ladda ner avsnittet och tryck för att söka</string>
+    <string name="bookmark_play_from">Spela upp från %s</string>
+    <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
+    <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
     <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
+    <string name="tv_create_account_come_back">Kom tillbaka och logga in när du har skapat ditt konto</string>
     <string name="tv_create_account_title">Skapa ditt gratis konto</string>
+    <string name="tv_onboarding_syncing_subtitle">Dina podcasts synkroniseras, vi loggar in dig snart!</string>
+    <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
+    <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
+    <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
+    <string name="tv_sign_in_go_to_url">går till %1$s</string>
+    <string name="tv_sign_in_or_enter_code">eller ange följande kod</string>
+    <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
+    <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
+    <string name="tv_onboarding_subtitle">Dina podcasts på den stora skärmen</string>
+    <string name="tv_onboarding_welcome_tv">Välkommen till Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Välkommen till Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Längsta till kortaste</string>
+    <string name="sort_shortest_to_longest">Kortaste till längsta</string>
     <string name="synced_transcripts_whats_new_button_note">Synkroniserade transkriptioner är bara tillgängliga för de senaste avsnitten.</string>
     <string name="synced_transcripts_whats_new_message">Läs snabbt, missa ingenting. Namnet du svepte förbi, boken de rekommenderade, statistiken du ville ha — tryck på ordet och hoppa tillbaka.</string>
     <string name="synced_transcripts_whats_new_title">Läs med. Även vid 2x.</string>
@@ -105,16 +130,12 @@ Language: sv_SE
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
     <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
     <string name="watch_sync_retry">Försök igen</string>
-    <string name="watch_sync_error_unknown_help">Försök igen eller logga in manuellt</string>
     <string name="watch_sync_error_login_failed_help">Försök logga in manuellt</string>
-    <string name="watch_sync_error_unknown">Något gick fel</string>
     <string name="watch_sync_error_login_failed">Inloggning misslyckades</string>
     <string name="watch_sync_error_no_connection">Telefon inte ansluten</string>
-    <string name="watch_sync_error_timeout">Kunde inte ansluta till telefon</string>
     <string name="watch_sync_success">Inloggad från telefon!</string>
     <string name="watch_sync_syncing">Synkroniserar med telefon …</string>
     <string name="error_download_generic_failure">Misslyckades att ladda ner avsnittet. %1$s</string>
-    <string name="watch_sync_error_timeout_help">Se till att din telefon är i närheten och ansluten via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Kontrollera Bluetooth-anslutning till din telefon</string>
     <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
     <string name="watch_synced_successfully">Klockan har synkroniserats</string>
@@ -132,6 +153,7 @@ Language: sv_SE
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
     <string name="podcasts_add_episode">Lägg till</string>
     <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
+    <string name="add_to_up_next_top">Spela upp nästa i Nästa</string>
     <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
     <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
     <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>

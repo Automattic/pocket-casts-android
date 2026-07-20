@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-07-09 11:55:53+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Heatmap luisteractiviteit</string>
+    <string name="profile_stats_listening_activity">Luisteractiviteit</string>
+    <string name="player_action_show_video">Video tonen</string>
+    <string name="player_action_hide_video">Video verbergen</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortste naar langste, of andersom - pas de aflevering aan op de tijd die je daadwerkelijk hebt.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sorteren op duur</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Download de aflevering om te zoeken</string>
+    <string name="bookmark_play_from">Afspelen van %s</string>
+    <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
+    <string name="summary_upsell_title">AI-samenvattingen</string>
     <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
+    <string name="tv_create_account_come_back">Zodra je je account hebt aangemaakt, kom je terug en meld je je aan</string>
     <string name="tv_create_account_title">Je gratis account aanmaken</string>
+    <string name="tv_onboarding_syncing_subtitle">Je podcasts worden gesynchroniseerd, we melden je snel aan!</string>
+    <string name="tv_onboarding_welcome_back">Welkom terug</string>
+    <string name="tv_onboarding_sign_in_instructions">Open de camera en wijs naar deze QR-code</string>
+    <string name="tv_onboarding_sign_in_title">Aanmelden met je telefoon</string>
+    <string name="tv_sign_in_go_to_url">naar %1$s</string>
+    <string name="tv_sign_in_or_enter_code">of voer de volgende code in</string>
+    <string name="tv_onboarding_syncing">Je podcasts synchroniseren\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bladeren zonder account</string>
+    <string name="tv_onboarding_create_free_account">Een gratis account aanmaken</string>
+    <string name="tv_onboarding_subtitle">Je podcasts, op het grote scherm</string>
+    <string name="tv_onboarding_welcome_tv">Welkom bij Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Welkom bij Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Langste naar kortste</string>
+    <string name="sort_shortest_to_longest">Kortste naar langste</string>
     <string name="synced_transcripts_whats_new_button_note">Gesynchroniseerde transcripties alleen beschikbaar voor recente afleveringen.</string>
     <string name="synced_transcripts_whats_new_message">Lees snel, mis niets. De naam die je bent vergeten, het boek dat ze aanraadden, de statistiek die je wilde - tik op het woord, spring terug.</string>
     <string name="synced_transcripts_whats_new_title">Lees mee. Zelfs bij 2x.</string>
@@ -108,14 +133,10 @@ Language: nl
     <string name="watch_synced_successfully">Horloge is gesynchroniseerd</string>
     <string name="watch_sync_waiting_for_phone">Wachten tot de telefoon is gesynchroniseerd …</string>
     <string name="watch_sync_retry">Probeer opnieuw</string>
-    <string name="watch_sync_error_unknown_help">Probeer het opnieuw of log handmatig in</string>
     <string name="watch_sync_error_login_failed_help">Probeer handmatig in te loggen</string>
     <string name="watch_sync_error_no_connection_help">Controleer de Bluetooth-verbinding met je telefoon</string>
-    <string name="watch_sync_error_timeout_help">Zorg ervoor dat je telefoon in de buurt is en verbonden is via Bluetooth</string>
-    <string name="watch_sync_error_unknown">Er is iets fout gegaan</string>
     <string name="watch_sync_error_login_failed">Inloggen is mislukt</string>
     <string name="watch_sync_error_no_connection">Telefoon niet verbonden</string>
-    <string name="watch_sync_error_timeout">Kon niet verbinden met telefoon</string>
     <string name="watch_sync_success">Ingelogd via telefoon!</string>
     <string name="watch_sync_syncing">Synchroniseren met telefoon …</string>
     <string name="error_download_generic_failure">Downloaden van aflevering is mislukt. %1$s</string>
