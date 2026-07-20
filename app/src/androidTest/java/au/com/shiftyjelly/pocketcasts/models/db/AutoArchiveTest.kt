@@ -36,6 +36,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -532,8 +533,15 @@ class AutoArchiveTest {
         // Newer at the top of Up Next, older queued behind it. Without this set-up the older
         // episode would be at position 0 (== currentEpisode) and protected by the legacy guard,
         // so the test would pass even with the old buggy filter.
-        runBlocking { upNext.playLast(newerEpisode, onAdd = null) }
-        runBlocking { upNext.playLast(olderEpisode, onAdd = null) }
+        upNext.playLast(newerEpisode, onAdd = null)
+        upNext.playLast(olderEpisode, onAdd = null)
+
+        assertEquals("Newer episode should be current", newerUuid, upNext.currentEpisode?.uuid)
+        assertEquals(
+            "Older episode should be queued behind current",
+            listOf(olderUuid),
+            upNext.queueEpisodes.map { it.uuid },
+        )
 
         episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
 
