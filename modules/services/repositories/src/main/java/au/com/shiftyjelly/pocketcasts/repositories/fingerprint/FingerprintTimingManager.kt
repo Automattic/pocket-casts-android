@@ -376,7 +376,7 @@ class FingerprintTimingManager @Inject constructor(
         activeResolves.incrementAndGet()
         val timedOut = try {
             matcher.use {
-                withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+                withTimeoutOrNull(FingerprintConstants.ON_DEMAND_DECODE_TIMEOUT_MS) {
                     streamFingerprintBounded(
                         audioFilePath = audioSource,
                         matcher = it,
