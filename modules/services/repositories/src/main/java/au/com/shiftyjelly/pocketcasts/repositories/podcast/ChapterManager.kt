@@ -21,4 +21,9 @@ interface ChapterManager {
     suspend fun hasGeneratedChapters(episodeUuid: String): Boolean
 
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
+
+    suspend fun awaitStreamAlignedChapter(
+        episodeUuid: String,
+        chapter: au.com.shiftyjelly.pocketcasts.models.to.Chapter,
+    ): au.com.shiftyjelly.pocketcasts.models.to.Chapter
 }

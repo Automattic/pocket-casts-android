@@ -42,10 +42,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -112,6 +115,8 @@ class ChaptersViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSetting)
         whenever(fingerprintTimingManager.stateFlow).thenReturn(fingerprintStateFlow)
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("id")
+        whenever { chapterManager.awaitStreamAlignedChapter(any(), any()) }
+            .thenAnswer { it.getArgument<Chapter>(1) }
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -290,12 +295,66 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `play chapter reports chapter origin`() = runTest {
+    fun `play chapter reports origin source and zero latency when already playing in chapter`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
         val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
 
         chaptersViewModel.playChapter(chapter)
 
-        assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
+        assertEquals(ChapterOriginType.Generated, event.origin)
+        assertEquals(ChaptersShownSource.EpisodeDetails, event.source)
+        assertEquals("id", event.episodeUuid)
+        assertEquals(episode.podcastOrSubstituteUuid, event.podcastUuid)
+        assertEquals(0L, event.playbackStartLatencyMs)
+    }
+
+    @Test
+    fun `play chapter reports latency only once playback resumes at the chapter`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        chaptersViewModel.playChapter(chapter)
+
+        playbackStateFlow.update { it.copy(positionMs = 0, lastChangeFrom = PlaybackManager.LastChangeFrom.OnUserSeeking.value) }
+        assertTrue(eventSink.isEmpty())
+
+        playbackStateFlow.update { it.copy(positionMs = 0, lastChangeFrom = PlaybackManager.LastChangeFrom.OnSeekComplete.value) }
+        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
+        assertEquals(ChaptersShownSource.EpisodeDetails, event.source)
+        assertNotNull(event.playbackStartLatencyMs)
+        assertTrue(event.playbackStartLatencyMs!! >= 0)
+    }
+
+    @Test
+    fun `play chapter seeks to the stream-aligned position`() = runTest {
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val tapped = Chapter("gen", 2.seconds, 3.seconds, selected = true, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+        val aligned = tapped.copy(startTime = 30.seconds, endTime = 31.seconds)
+        whenever { chapterManager.awaitStreamAlignedChapter("id", tapped) }.thenReturn(aligned)
+
+        chaptersViewModel.playChapter(tapped)
+
+        verify(playbackManager).skipToChapter(aligned)
+    }
+
+    @Test
+    fun `does not switch back to the tapped episode when playback moves away during alignment`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", state = PlaybackState.State.PLAYING, positionMs = 5_000)
+        val tapped = Chapter("gen", 2.seconds, 3.seconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+        // The user switches to another episode while we are still waiting for the chapters to align.
+        whenever { chapterManager.awaitStreamAlignedChapter("id", tapped) }.thenAnswer {
+            playbackStateFlow.value = PlaybackState(episodeUuid = "other", state = PlaybackState.State.PLAYING)
+            tapped
+        }
+
+        chaptersViewModel.playChapter(tapped)
+
+        verify(playbackManager, never()).skipToChapter(any<Chapter>())
+        verify(episodeManager, never()).updatePlayedUpToBlocking(any<BaseEpisode>(), any<Double>(), any<Boolean>())
     }
 
     @Test
