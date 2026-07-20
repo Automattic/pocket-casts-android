@@ -58,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -407,6 +408,18 @@ private fun PlayerHeadingSectionPreview(
                         title = "Episode title / ".repeat(10),
                         isChaptersPresent = true,
                     ),
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+
+                Content(
+                    state = state.copy(
+                        isChaptersPresent = true,
+                        chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 1, uiIndex = 2),
+                    ),
+                    resolvingChapterIndex = 2,
                     onPreviousChapterClick = {},
                     onNextChapterClick = {},
                     onChapterTitleClick = {},
