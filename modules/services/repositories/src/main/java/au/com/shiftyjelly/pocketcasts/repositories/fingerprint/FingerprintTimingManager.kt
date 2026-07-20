@@ -31,6 +31,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
@@ -121,6 +122,7 @@ class FingerprintTimingManager @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
+    private val activeResolves = AtomicInteger(0)
 
     // Mapping state: writers mutate the accumulator under mutex, then atomically publish via @Volatile.
     // Readers access the snapshot without locking, safe for use from the UI thread.
@@ -367,6 +369,7 @@ class FingerprintTimingManager @Inject constructor(
 
         val window = searchWindow(referenceTimeSec, estimatedPlayback)
         val acc = MappingAccumulator()
+        activeResolves.incrementAndGet()
         val timedOut = try {
             matcher.use {
                 withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
@@ -385,6 +388,8 @@ class FingerprintTimingManager @Inject constructor(
         } catch (e: Exception) {
             Timber.w(e, "FingerprintTimingManager: on-demand resolve failed for $episodeUuid")
             return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_AUDIO_UNAVAILABLE)
+        } finally {
+            activeResolves.decrementAndGet()
         }
 
         // A timed-out decode may still have committed usable anchors; interpolate from what we have.
@@ -1157,6 +1162,7 @@ class FingerprintTimingManager @Inject constructor(
                     endingAt = null,
                     throttleToPlayhead = !currentEager,
                     trackFrontier = true,
+                    yieldToResolves = true,
                 ) { windows ->
                     mutex.withLock {
                         if (gen != generation) throw CancellationException("Fingerprint stream superseded")
@@ -1187,6 +1193,7 @@ class FingerprintTimingManager @Inject constructor(
         endingAt: Double?,
         throttleToPlayhead: Boolean,
         trackFrontier: Boolean,
+        yieldToResolves: Boolean = false,
         stopWhen: (() -> Boolean)? = null,
         onWindows: suspend (List<WindowedFingerprint>) -> Unit,
     ) {
@@ -1204,6 +1211,15 @@ class FingerprintTimingManager @Inject constructor(
         while (true) {
             currentCoroutineContext().ensureActive()
             if (gen != generation) throw CancellationException("Fingerprint stream superseded")
+
+            // An on-demand resolve is on a tight user-facing budget; give it the decode headroom.
+            if (yieldToResolves) {
+                while (activeResolves.get() > 0) {
+                    delay(FingerprintConstants.RESOLVE_YIELD_POLL_MS)
+                    currentCoroutineContext().ensureActive()
+                    if (gen != generation) throw CancellationException("Fingerprint stream superseded")
+                }
+            }
 
             val now = SystemClock.elapsedRealtime()
             if (isRemoteUrl && now - lastNetworkCheckMs >= FingerprintConstants.METERED_RECHECK_INTERVAL_MS) {

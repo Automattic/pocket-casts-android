@@ -78,4 +78,7 @@ object FingerprintConstants {
 
     /** Committed reference time must pass the target by this much before a resolve stops decoding early. */
     const val ON_DEMAND_EARLY_EXIT_MARGIN_SECONDS = 5.0
+
+    /** How often a yielded continuous decode re-checks for on-demand resolves in flight. */
+    const val RESOLVE_YIELD_POLL_MS = 250L
 }
