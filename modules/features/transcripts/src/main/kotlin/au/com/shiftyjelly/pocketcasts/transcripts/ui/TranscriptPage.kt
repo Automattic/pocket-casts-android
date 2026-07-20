@@ -145,11 +145,17 @@ fun TranscriptPage(
                                     val previousHighlight = highlightState
                                     highlightState = HighlightState(entryIndex = index)
                                     tapScope.launch {
-                                        val seekTarget = viewModel.resolveAndSeekToEntry(entry)
-                                        if (seekTarget != null) {
-                                            applySeek(seekTarget)
-                                        } else if (highlightState.entryIndex == index) {
-                                            highlightState = previousHighlight
+                                        var seekTarget: Int? = null
+                                        try {
+                                            seekTarget = viewModel.resolveAndSeekToEntry(entry)
+                                        } finally {
+                                            // Also restores the highlight when a user seek cancels the resolve.
+                                            val target = seekTarget
+                                            if (target != null) {
+                                                applySeek(target)
+                                            } else if (highlightState.entryIndex == index) {
+                                                highlightState = previousHighlight
+                                            }
                                         }
                                     }
                                 }

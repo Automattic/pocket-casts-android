@@ -29,10 +29,14 @@ import com.automattic.eventhorizon.TranscriptSourceType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -45,6 +49,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -66,8 +71,10 @@ class TranscriptViewModelTest {
         on { state } doReturn FingerprintTimingManager.State.Idle
         on { stateFlow } doReturn syncedStateFlow
     }
+    private val userSeeksFlow = MutableSharedFlow<Unit>()
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackStateFlow
+        on { userSeeks } doReturn userSeeksFlow
     }
     private val episodeManager = mock<EpisodeManager>()
 
@@ -398,6 +405,27 @@ class TranscriptViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `user seek cancels an active tap resolve`() = runTest {
+        setUpTapToSeek()
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any())).doSuspendableAnswer { awaitCancellation() }
+        syncedStateFlow.value = FingerprintTimingManager.State.Preparing
+
+        awaitTapToSeekAvailable()
+        drainEvents()
+
+        val entry = TranscriptEntry.Text("Line", startTimeMs = 30_000)
+        val resolveJob = launch { viewModel.resolveAndSeekToEntry(entry) }
+        runCurrent()
+
+        userSeeksFlow.emit(Unit)
+        resolveJob.join()
+
+        assertTrue(resolveJob.isCancelled)
+        verify(playbackManager, never()).seekToTimeMs(any(), anyOrNull())
     }
 
     @Test
