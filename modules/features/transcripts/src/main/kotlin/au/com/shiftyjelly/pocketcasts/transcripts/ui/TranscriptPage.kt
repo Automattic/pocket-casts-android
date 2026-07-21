@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
@@ -124,17 +125,42 @@ fun TranscriptPage(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
+                val tapScope = rememberCoroutineScope()
                 val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
                     if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && uiState.isTapToSeekAvailable && viewModel != null) {
                         { entry, index ->
-                            val seekTarget = viewModel.seekToTranscriptEntry(entry)
-                            if (seekTarget != null) {
+                            val applySeek = { seekTarget: Int ->
                                 // Hold the tapped row lit until fingerprinting catches up to the seek.
                                 highlightState = HighlightState(entryIndex = index)
                                 pendingSeek = PendingTapSeek(positionMs = seekTarget, entryIndex = index)
                                 if (!isPlaying) {
                                     forceScrollIndex = index
                                 }
+                            }
+                            when (val result = viewModel.seekToTranscriptEntry(entry)) {
+                                is TranscriptViewModel.TapSeekResult.Seeked -> applySeek(result.positionMs)
+
+                                TranscriptViewModel.TapSeekResult.Resolving -> {
+                                    // Light the row as immediate feedback while the bounded resolve runs.
+                                    val previousHighlight = highlightState
+                                    highlightState = HighlightState(entryIndex = index)
+                                    tapScope.launch {
+                                        var seekTarget: Int? = null
+                                        try {
+                                            seekTarget = viewModel.resolveAndSeekToEntry(entry)
+                                        } finally {
+                                            // Also restores the highlight when a user seek cancels the resolve.
+                                            val target = seekTarget
+                                            if (target != null) {
+                                                applySeek(target)
+                                            } else if (highlightState.entryIndex == index) {
+                                                highlightState = previousHighlight
+                                            }
+                                        }
+                                    }
+                                }
+
+                                TranscriptViewModel.TapSeekResult.Unavailable -> Unit
                             }
                         }
                     } else {

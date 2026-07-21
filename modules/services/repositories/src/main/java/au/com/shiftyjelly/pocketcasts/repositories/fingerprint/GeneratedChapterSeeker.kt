@@ -39,10 +39,13 @@ class GeneratedChapterSeeker @Inject constructor(
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
     private val mutex = Mutex()
+
+    @Volatile
     private var activeCaller: Job? = null
 
-    // Session cache of resolved chapter starts for the most recent episode.
-    private var cacheEpisodeUuid: String? = null
+    // Session cache of resolved chapter starts, dropped when the episode or its audio source
+    // changes: a mid-play download can carry differently stitched ads than the stream did.
+    private var cacheSourceKey: String? = null
     private val resolvedCache = mutableMapOf<Int, Duration>()
 
     private val _resolvingChapter = MutableStateFlow<ResolvingChapter?>(null)
@@ -55,13 +58,19 @@ class GeneratedChapterSeeker @Inject constructor(
         resolving?.takeIf { it.episodeUuid == uuid }?.chapterIndex
     }
 
+    /** Called when the user seeks by other means, so a stale chapter resolve can't yank playback later. */
+    fun cancelActiveResolve() {
+        activeCaller?.cancel()
+    }
+
     suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {
         if (!isEnabled(chapter)) return null
         val referenceTime = chapter.referenceStartTime ?: return null
 
+        val sourceKey = "${episode.uuid}|${episode.downloadedFilePath ?: episode.downloadUrl}"
         mutex.withLock {
-            if (cacheEpisodeUuid != episode.uuid) {
-                cacheEpisodeUuid = episode.uuid
+            if (cacheSourceKey != sourceKey) {
+                cacheSourceKey = sourceKey
                 resolvedCache.clear()
             }
             resolvedCache[chapter.index]
@@ -79,11 +88,11 @@ class GeneratedChapterSeeker @Inject constructor(
             _resolvingChapter.value = resolving
         }
         try {
-            return when (val result = manager.resolveChapterPlaybackTime(episode, referenceTime)) {
+            return when (val result = manager.resolvePlaybackTime(episode, referenceTime)) {
                 is ChapterSeekResult.Resolved -> {
                     val playbackTime = ceil(result.playbackTime.toDouble(DurationUnit.SECONDS)).seconds
                     mutex.withLock {
-                        if (cacheEpisodeUuid == episode.uuid) resolvedCache[chapter.index] = playbackTime
+                        if (cacheSourceKey == sourceKey) resolvedCache[chapter.index] = playbackTime
                     }
                     Timber.d("GeneratedChapterSeeker: resolved chapter ${chapter.index} to $playbackTime (usedPrior=${result.usedPrior})")
                     playbackTime
