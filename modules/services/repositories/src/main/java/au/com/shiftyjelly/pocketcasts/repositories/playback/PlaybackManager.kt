@@ -270,7 +270,11 @@ open class PlaybackManager @Inject constructor(
     private val _videoRenderingEnabled = MutableStateFlow(true)
     val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
 
-    private var currentStreamHlsAvailable = false
+    private val _streamHlsAvailable = MutableStateFlow(false)
+    val streamHlsAvailable = _streamHlsAvailable.asStateFlow()
+
+    private var videoStreamPreferred = false
+    private var videoStreamPreferredEpisodeUuid: String? = null
 
     private var lastPlaybackSource: SourceView? = null
 
@@ -389,7 +393,7 @@ open class PlaybackManager @Inject constructor(
         episode.overrideStreamContentType = null
         // Stream the first HLS alternate enclosure when streaming is on, or when the episode is HLS-only.
         val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
-        currentStreamHlsAvailable = hlsUrl != null
+        _streamHlsAvailable.value = hlsUrl != null
         val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
         if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
             episode.overrideStreamUrl = hlsUrl
@@ -397,15 +401,62 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun toggleVideoRendering() {
-        _videoRenderingEnabled.value = !_videoRenderingEnabled.value
-        getCurrentEpisode()?.let { episode ->
+    fun videoToggleRequiresStreamSwitch(): Boolean {
+        val episode = getCurrentEpisode() ?: return false
+        return episode.isDownloaded &&
+            _streamHlsAvailable.value &&
+            !videoStreamPreferred &&
+            player?.isRemote != true &&
+            FeatureFlag.isEnabled(Feature.HLS_STREAMING)
+    }
+
+    fun toggleVideoRendering(streamWarningConfirmed: Boolean = false) {
+        val episode = getCurrentEpisode()
+        when {
+            videoToggleRequiresStreamSwitch() -> {
+                videoStreamPreferred = true
+                videoStreamPreferredEpisodeUuid = episode?.uuid
+                trackVideoToggled(episode, PlaybackContentType.Video)
+                reloadForVideoToggle(episode, streamWarningConfirmed)
+            }
+
+            videoStreamPreferred && episode?.isDownloaded == true && player?.isRemote != true -> {
+                videoStreamPreferred = false
+                videoStreamPreferredEpisodeUuid = null
+                trackVideoToggled(episode, PlaybackContentType.Audio)
+                reloadForVideoToggle(episode, streamWarningConfirmed)
+            }
+
+            else -> {
+                _videoRenderingEnabled.value = !_videoRenderingEnabled.value
+                trackVideoToggled(episode, if (_videoRenderingEnabled.value) PlaybackContentType.Video else PlaybackContentType.Audio)
+            }
+        }
+    }
+
+    private fun trackVideoToggled(episode: BaseEpisode?, switchedTo: PlaybackContentType) {
+        episode?.let {
             eventHorizon.track(
                 PlaybackHlsToggledEvent(
-                    switchedTo = if (_videoRenderingEnabled.value) PlaybackContentType.Video else PlaybackContentType.Audio,
-                    episodeUuid = episode.uuid,
-                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    switchedTo = switchedTo,
+                    episodeUuid = it.uuid,
+                    podcastUuid = it.podcastOrSubstituteUuid,
                 ),
+            )
+        }
+    }
+
+    private fun reloadForVideoToggle(episode: BaseEpisode?, streamWarningConfirmed: Boolean) {
+        episode ?: return
+        launch(Dispatchers.Default) {
+            player?.let { player ->
+                val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
+                episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, true)
+            }
+            loadCurrentEpisode(
+                play = isPlaying(),
+                forceStream = streamWarningConfirmed,
+                showedStreamWarning = streamWarningConfirmed,
             )
         }
     }
@@ -1594,7 +1645,7 @@ open class PlaybackManager @Inject constructor(
                 PlayerEpisodeCompletedEvent(
                     podcastUuid = episode.podcastOrSubstituteUuid,
                     episodeUuid = episode.uuid,
-                    hlsAvailable = currentStreamHlsAvailable,
+                    hlsAvailable = _streamHlsAvailable.value,
                     audioOnlyMode = audioOnlyModeOrNull(),
                 ),
             )
@@ -1927,17 +1978,18 @@ open class PlaybackManager @Inject constructor(
     /**
      * Does the media player need to be recreated.
      */
-    private fun isPlayerResetNeeded(episode: BaseEpisode, sameEpisode: Boolean, chromeCastConnected: Boolean): Boolean {
+    private fun isPlayerResetNeeded(episode: BaseEpisode, sameEpisode: Boolean, chromeCastConnected: Boolean, playingStream: Boolean): Boolean {
         // reset the player if local and changing episode
         val playbackOnDevice = !chromeCastConnected
         return if (!sameEpisode) {
             playbackOnDevice
         } else {
-            episode.isDownloaded &&
-                playbackOnDevice &&
-                episode.downloadedFilePath != null &&
+            playbackOnDevice &&
                 player != null &&
-                episode.downloadedFilePath != player?.filePath
+                (
+                    player?.isStreaming != playingStream ||
+                        (episode.isDownloaded && episode.downloadedFilePath != null && episode.downloadedFilePath != player?.filePath)
+                    )
         }
     }
 
@@ -2025,9 +2077,16 @@ open class PlaybackManager @Inject constructor(
         // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
+        if (videoStreamPreferred && episode.uuid != videoStreamPreferredEpisodeUuid) {
+            videoStreamPreferred = false
+            videoStreamPreferredEpisodeUuid = null
+        }
+
+        val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castManager.isConnected())
+
         // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
         _streamVideoState.value = when {
-            !episode.isStreamUrlHls -> StreamVideoState.NotVideo
+            !playingStream || !episode.isStreamUrlHls -> StreamVideoState.NotVideo
             settings.audioOnly.value -> StreamVideoState.AudioOnly
             else -> StreamVideoState.Unknown
         }
@@ -2052,7 +2111,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         episodeSubscription?.dispose()
-        if (!episode.isDownloaded) {
+        if (playingStream) {
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) &&
                 // The watch handles these warnings before this is called
@@ -2076,7 +2135,7 @@ open class PlaybackManager @Inject constructor(
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)
                 }
-            } else {
+            } else if (!episode.isDownloaded) {
                 val episodeObservable = when (episode) {
                     is PodcastEpisode -> {
                         episodeManager.findByUuidFlow(episode.uuid)
@@ -2092,7 +2151,8 @@ open class PlaybackManager @Inject constructor(
                     .takeUntil { it.isDownloaded }
                     .subscribeBy(
                         onNext = {
-                            if (player?.isStreaming == true && it.isDownloaded && player?.isRemote == false) {
+                            val watchingVideo = _streamVideoState.value == StreamVideoState.HasVideo && _videoRenderingEnabled.value
+                            if (player?.isStreaming == true && it.isDownloaded && player?.isRemote == false && !watchingVideo) {
                                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode was streaming but was now downloaded, switching to downloaded file")
 
                                 launch(Dispatchers.Default) {
@@ -2133,7 +2193,7 @@ open class PlaybackManager @Inject constructor(
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
             isPlayerSwitchRequired() ||
-            isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected())
+            isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected(), playingStream)
         ) {
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
@@ -2163,7 +2223,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         player?.setPodcast(podcast)
-        player?.setEpisode(episode)
+        player?.setEpisode(episode, videoStreamPreferred)
 
         val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
             podcast.playbackEffects
@@ -2378,7 +2438,7 @@ open class PlaybackManager @Inject constructor(
             PlaybackPlayEvent(
                 source = source.analyticsValue,
                 contentType = contentType,
-                hlsAvailable = currentStreamHlsAvailable,
+                hlsAvailable = _streamHlsAvailable.value,
                 audioOnlyMode = audioOnlyModeOrNull(),
             )
         }
@@ -2507,7 +2567,7 @@ open class PlaybackManager @Inject constructor(
                         PlayerEpisodeCompletedEvent(
                             podcastUuid = episode.podcastOrSubstituteUuid,
                             episodeUuid = episode.uuid,
-                            hlsAvailable = currentStreamHlsAvailable,
+                            hlsAvailable = _streamHlsAvailable.value,
                             audioOnlyMode = audioOnlyModeOrNull(),
                         ),
                     )
