@@ -435,11 +435,15 @@ private fun HighlightEffect(
         }
     } else if (isSyncedActive) {
         // Paused but synced: no frame loop, so recompute once per position change. A held tap
-        // stays lit; the playing branch releases it once resolution reaches the row.
+        // stays lit while the position sits at its target; seeking elsewhere releases it.
         LaunchedEffect(transcript.entries, playbackState?.positionMs) {
             val posMs = playbackState?.positionMs ?: return@LaunchedEffect
-            if (latestPendingSeek != null) {
-                return@LaunchedEffect
+            val pending = latestPendingSeek
+            if (pending != null) {
+                if (!TranscriptCueHelper.isHeldTapStale(posMs, pending.positionMs)) {
+                    return@LaunchedEffect
+                }
+                latestOnConsumePendingSeek()
             }
             when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
                 is HighlightOutcome.Show -> {
