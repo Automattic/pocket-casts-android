@@ -71,6 +71,19 @@ class FingerprintPcmTapTest {
     }
 
     @Test
+    fun `a consumed sink time cannot re-anchor later buffers`() = runTest {
+        tap.chunks.test {
+            tap.onSinkBuffer(10_000_000L)
+            tap.onPcm(pcmBuffer(frames = 100), format)
+            awaitItem()
+            tap.onPcm(pcmBuffer(frames = 300), format)
+            assertEquals(10.1, awaitItem().positionSec, 1e-6)
+            tap.onPcm(pcmBuffer(frames = 100), format)
+            assertEquals(10.4, awaitItem().positionSec, 1e-6)
+        }
+    }
+
+    @Test
     fun `sink flush clears the anchor until a new buffer arrives`() = runTest {
         tap.chunks.test {
             tap.onSinkBuffer(10_000_000L)

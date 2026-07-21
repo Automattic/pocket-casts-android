@@ -54,6 +54,7 @@ class FingerprintPcmTap @Inject constructor() {
         val frames = buffer.remaining() / format.bytesPerFrame
         if (frames == 0) return
         val pending = pendingAnchorUs
+        pendingAnchorUs = C.TIME_UNSET
         if (anchorUs == C.TIME_UNSET) {
             if (pending == C.TIME_UNSET) return
             anchorUs = pending
