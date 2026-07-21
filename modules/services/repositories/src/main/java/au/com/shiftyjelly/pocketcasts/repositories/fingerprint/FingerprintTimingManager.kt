@@ -37,6 +37,7 @@ import javax.inject.Singleton
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -427,9 +428,20 @@ class FingerprintTimingManager @Inject constructor(
 
         mergeResolvedAnchors(episodeUuid, acc.playbackToReference)
 
-        // The ad offset is non-negative, so the true position is never before the reference time.
+        Timber.d(
+            "FingerprintTimingManager: resolve ref=%.1f window=[%.1f,%.1f] anchors=%d playback=%.1f usedPrior=%b",
+            referenceTimeSec,
+            window.startSec,
+            window.endSec,
+            acc.referenceToPlayback.size,
+            playback,
+            usedPrior,
+        )
+
+        // The offset can be negative when the reference audio carries ads this copy doesn't,
+        // so the resolved position must not be clamped to the reference time.
         return ChapterSeekResult.Resolved(
-            playbackTime = max(referenceTimeSec, playback).seconds,
+            playbackTime = max(0.0, playback).seconds,
             usedPrior = usedPrior,
         )
     }
@@ -1168,6 +1180,11 @@ class FingerprintTimingManager @Inject constructor(
 
         if (startingAt > 0) {
             extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+            Timber.d(
+                "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
+                startingAt,
+                extractor.sampleTime / 1_000_000.0,
+            )
         }
 
         val codec = try {
@@ -1545,9 +1562,10 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         /**
-         * Audio region to decode for an on-demand resolve. Ad offsets are non-negative and
-         * non-decreasing, so the true position is at or after the reference time; cold resolves
-         * only search forward, warm ones bracket the mapping-derived estimate.
+         * Audio region to decode for an on-demand resolve. The offset can run negative when the
+         * reference audio carries ads this copy doesn't, so warm windows start at the estimate when
+         * it sits before the reference time; cold resolves search forward and rely on slope-1
+         * extrapolation for negative offsets.
          */
         internal fun searchWindow(referenceTimeSec: Double, estimatedPlaybackSec: Double?): SearchWindow {
             if (estimatedPlaybackSec == null) {
@@ -1556,7 +1574,8 @@ class FingerprintTimingManager @Inject constructor(
                     endSec = referenceTimeSec + FingerprintConstants.ON_DEMAND_COLD_BUDGET_SECONDS,
                 )
             }
-            val startSec = max(referenceTimeSec, estimatedPlaybackSec - FingerprintConstants.ON_DEMAND_BACKWARD_MAX_SECONDS)
+            val backstop = min(referenceTimeSec, estimatedPlaybackSec)
+            val startSec = max(0.0, max(backstop, estimatedPlaybackSec - FingerprintConstants.ON_DEMAND_BACKWARD_MAX_SECONDS))
             val endSec = max(estimatedPlaybackSec, startSec) + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS
             return SearchWindow(startSec, endSec)
         }

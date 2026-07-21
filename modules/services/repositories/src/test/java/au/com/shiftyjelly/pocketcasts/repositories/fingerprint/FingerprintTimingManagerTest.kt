@@ -208,17 +208,30 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
-    fun `searchWindow warm never starts below reference time`() {
+    fun `searchWindow warm starts at reference time when the estimate is just ahead`() {
         val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 650.0)
         assertEquals(600.0, window.startSec, 0.001)
         assertEquals(650.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
     }
 
     @Test
-    fun `searchWindow warm keeps forward budget when estimate is below reference time`() {
+    fun `searchWindow warm starts at the estimate when the offset is negative`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 570.0)
+        assertEquals(570.0, window.startSec, 0.001)
+        assertEquals(570.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
+    }
+
+    @Test
+    fun `searchWindow warm keeps the backward bound below a far-back estimate`() {
         val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 300.0)
-        assertEquals(600.0, window.startSec, 0.001)
-        assertEquals(600.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
+        assertEquals(300.0, window.startSec, 0.001)
+        assertEquals(300.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
+    }
+
+    @Test
+    fun `searchWindow warm never starts below zero`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 10.0, estimatedPlaybackSec = -20.0)
+        assertEquals(0.0, window.startSec, 0.001)
     }
 
     @Test
