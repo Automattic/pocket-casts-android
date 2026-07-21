@@ -375,7 +375,7 @@ class FingerprintTimingManager @Inject constructor(
 
         // The fetch and the decode get separate budgets, so a slow reference download can't eat the decode time.
         val reference = warmReference ?: run {
-            val referenceData = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+            val referenceData = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_FETCH_TIMEOUT_MS) {
                 loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
             } ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
             ReferenceFingerprint.decode(referenceData)

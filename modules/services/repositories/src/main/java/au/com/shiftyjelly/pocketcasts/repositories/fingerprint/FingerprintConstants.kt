@@ -73,7 +73,10 @@ object FingerprintConstants {
     /** Minimum committed anchors for an on-demand resolve to be trusted. */
     const val ON_DEMAND_MIN_ANCHORS = 2
 
-    /** Timeout applied separately to the reference fetch and the decode of an on-demand resolve. */
+    /** Timeout for the reference fetch of an on-demand resolve; short because reference files are small. */
+    const val ON_DEMAND_FETCH_TIMEOUT_MS = 3_000L
+
+    /** Timeout for the decode of an on-demand resolve. */
     const val ON_DEMAND_TIMEOUT_MS = 5_000L
 
     /** Committed reference time must pass the target by this much before a resolve stops decoding early. */
