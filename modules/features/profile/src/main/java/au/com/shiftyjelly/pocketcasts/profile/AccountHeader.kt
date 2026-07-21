@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMod
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -67,7 +68,7 @@ internal fun AccountHeader(
             UserAvatar(
                 imageUrl = state.imageUrl,
                 subscriptionTier = state.subscription.tier,
-                borderCompletion = state.subscription.expiresIn?.let { it / 30.days }?.toFloat() ?: 1f,
+                borderCompletion = state.subscription.borderCompletion(),
                 config = config.avatarConfig,
                 showBadge = false,
             )
@@ -182,6 +183,16 @@ internal sealed interface SubscriptionHeaderState {
         val platform: SubscriptionPlatform,
         val giftDaysLeft: Int,
     ) : SubscriptionHeaderState
+}
+
+private fun SubscriptionHeaderState.borderCompletion(): Float = when (this) {
+    is SubscriptionHeaderState.PaidCancel -> {
+        (expiresIn / Subscription.EXPIRING_WINDOW).toFloat().coerceIn(0f, 1f)
+    }
+
+    SubscriptionHeaderState.Free,
+    is SubscriptionHeaderState.PaidRenew,
+    -> 1f
 }
 
 @Composable

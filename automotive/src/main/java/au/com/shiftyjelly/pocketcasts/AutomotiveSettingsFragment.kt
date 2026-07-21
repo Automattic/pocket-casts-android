@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
-import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -115,7 +114,7 @@ class AutomotiveSettingsFragment : BaseFragment() {
                     imageUrl = Gravatar.getUrl(state.email),
                     subscriptionTier = state.subscription?.tier,
                     email = state.email,
-                    expiresIn = state.subscription?.expiryDate?.toDurationFromNow(),
+                    expiresIn = state.subscription?.expiresIn,
                 )
 
                 is SignInState.SignedOut -> ProfileHeaderState(

@@ -1,3 +1,9 @@
+8.18
+-----
+*   Bug Fixes
+    *   Hide the "Plus expires in X days" label and expiring avatar ring for auto-renewing subscribers
+        ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
+
 8.17
 -----
 *   New Features
