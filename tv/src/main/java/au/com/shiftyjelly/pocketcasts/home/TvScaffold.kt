@@ -31,7 +31,12 @@ fun TvScaffold(
         selectedTabIndex = uiState.selectedTabIndex,
         onTabSelect = viewModel::selectTab,
         modifier = modifier,
-    )
+    ) { tab ->
+        when (tab) {
+            is TvTab.Home -> TvHomeScreen()
+            else -> TvTabPlaceholder(tab = tab)
+        }
+    }
 }
 
 @Composable
@@ -40,6 +45,7 @@ private fun TvScaffoldContent(
     selectedTabIndex: Int,
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    tabContent: @Composable (TvTab) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -61,7 +67,7 @@ private fun TvScaffoldContent(
         )
         Box(modifier = Modifier.weight(1f)) {
             val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
-            TvTabPlaceholder(tab = currentTab)
+            tabContent(currentTab)
         }
     }
 }
@@ -76,7 +82,9 @@ private fun TvScaffoldPreview() {
                 tabs = TvTab.entries,
                 selectedTabIndex = selectedIndex,
                 onTabSelect = { selectedIndex = it },
-            )
+            ) { tab ->
+                TvTabPlaceholder(tab = tab)
+            }
         }
     }
 }
