@@ -314,13 +314,13 @@ class FingerprintTimingManager @Inject constructor(
         val playback = densePlaybackSec(
             referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
             entries = snapshotReferenceToPlayback,
-            allowTrailingGrace = !isLiveEdgeUnmatched(),
+            allowTrailingGrace = !isLiveEdgeUnmatched(snapshotPlaybackToReference),
         ) ?: return null
         return playback.seconds
     }
 
     /** True when completed tap windows have passed the newest anchor without matching, so the live edge is an ad. */
-    private fun isLiveEdgeUnmatched(): Boolean = isLiveEdgeUnmatched(tapFrontierSec, snapshotPlaybackToReference.lastOrNull()?.playbackTime)
+    private fun isLiveEdgeUnmatched(entries: List<TimeMappingEntry>): Boolean = isLiveEdgeUnmatched(tapFrontierSec, entries.lastOrNull()?.playbackTime)
 
     /**
      * One-shot bounded resolve of a generated chapter's reference time to the playback timeline.
@@ -537,15 +537,15 @@ class FingerprintTimingManager @Inject constructor(
                     stream = stream,
                     gen = gen,
                     streamer = streamer,
-                    startOffset = startingAt,
+                    startOffset = stream.startSec,
                     endingAt = endingAt,
                     stopWhen = { isResolveTargetCovered(acc, targetReferenceSec) },
                 ) { windows ->
-                    matchWindows(windows, matcher, startingAt, acc)
+                    matchWindows(windows, matcher, stream.startSec, acc)
                 }
                 val tail = streamer.flush()
                 if (tail.isNotEmpty()) {
-                    matchWindows(tail, matcher, startingAt, acc)
+                    matchWindows(tail, matcher, stream.startSec, acc)
                 }
             } finally {
                 streamer.close()
@@ -627,7 +627,7 @@ class FingerprintTimingManager @Inject constructor(
     fun matchedReferenceTime(forPlaybackTimeMs: Int): Double? {
         val playbackTimeSec = forPlaybackTimeMs / 1000.0
         val entries = snapshotPlaybackToReference
-        if (!isWithinMatchedContent(playbackTimeSec, entries, allowTrailingGrace = !isLiveEdgeUnmatched())) {
+        if (!isWithinMatchedContent(playbackTimeSec, entries, allowTrailingGrace = !isLiveEdgeUnmatched(entries))) {
             if (lastMatchedContentResult) {
                 lastMatchedContentResult = false
                 logMatchedContentTransition(playbackTimeSec, entries, matched = false)
@@ -1088,6 +1088,7 @@ class FingerprintTimingManager @Inject constructor(
         val format: MediaFormat,
         val sampleRate: Int,
         val channelCount: Int,
+        val startSec: Double,
         private val cacheSource: AutoCloseable? = null,
     ) : AutoCloseable {
         fun start() {
@@ -1178,12 +1179,17 @@ class FingerprintTimingManager @Inject constructor(
         val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
 
+        var startSec = startingAt
         if (startingAt > 0) {
             extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+            val landedUs = extractor.sampleTime
+            if (landedUs >= 0) {
+                startSec = landedUs / 1_000_000.0
+            }
             Timber.d(
                 "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
                 startingAt,
-                extractor.sampleTime / 1_000_000.0,
+                startSec,
             )
         }
 
@@ -1194,7 +1200,7 @@ class FingerprintTimingManager @Inject constructor(
             cacheSource?.close()
             throw AudioOpenException(e)
         }
-        return AudioStream(extractor, codec, format, sampleRate, channelCount, cacheSource)
+        return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
     }
 
     private suspend fun streamFingerprint(
@@ -1233,13 +1239,13 @@ class FingerprintTimingManager @Inject constructor(
                     stream = stream,
                     gen = gen,
                     streamer = streamer,
-                    startOffset = startingAt,
+                    startOffset = stream.startSec,
                     endingAt = null,
                     yieldToResolves = true,
                 ) { windows ->
                     mutex.withLock {
                         if (gen != generation) throw CancellationException("Fingerprint stream superseded")
-                        processMatches(windows, matcher, startingAt)
+                        processMatches(windows, matcher, stream.startSec)
                     }
                 }
 
@@ -1248,7 +1254,7 @@ class FingerprintTimingManager @Inject constructor(
                 if (tail.isNotEmpty()) {
                     mutex.withLock {
                         if (gen != generation) throw CancellationException("Fingerprint stream superseded")
-                        processMatches(tail, matcher, startingAt)
+                        processMatches(tail, matcher, stream.startSec)
                     }
                 }
             } finally {
