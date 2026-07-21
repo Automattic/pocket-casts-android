@@ -462,7 +462,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun audioOnlyModeOrNull(): Boolean? {
-        if (getCurrentEpisode()?.isStreamUrlHls != true) return null
+        if (getCurrentEpisode()?.isStreamUrlHls != true || player?.isStreaming != true) return null
         return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
     }
 
@@ -2096,12 +2096,12 @@ open class PlaybackManager @Inject constructor(
 
         eventHorizon.track(
             PlaybackSourceResolvedEvent(
-                playbackProtocol = if (episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                playbackProtocol = if (playingStream && episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
                 isFallback = false,
                 contentType = playbackContentTypeFor(episode),
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
-                hlsEngine = if (episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
+                hlsEngine = if (playingStream && episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
             ),
         )
 
