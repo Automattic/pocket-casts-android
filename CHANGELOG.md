@@ -1,3 +1,9 @@
+8.18
+-----
+*   Bug Fixes
+    *   Avoid showing duplicate launcher icons when using a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+
 8.17
 -----
 *   New Features

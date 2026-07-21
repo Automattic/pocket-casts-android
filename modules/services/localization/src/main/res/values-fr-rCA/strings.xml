@@ -1669,7 +1669,6 @@ Language: fr
     <string name="settings_auto_archive_episode_limit">Limite d’épisode</string>
     <string name="settings_apply_archived_show">Souhaitez-vous modifier tous vos podcasts existants pour afficher ceux qui sont archivés ?</string>
     <string name="settings_apply_archived_hide">Souhaitez-vous modifier tous vos podcasts existants pour masquer ceux qui sont archivés ?</string>
-    <string name="settings_app_icon_updated_message">Cette nouvelle icône peut mettre quelques minutes pour apparaître et vous verrez deux icônes sur l’écran de toutes les applications. C’est normal. Faites glisser la nouvelle sur votre écran d’accueil et cela devrait être bon !</string>
     <string name="settings_app_icon_updated">Icône mise à jour</string>
     <string name="settings_app_icon_title">Titre</string>
     <string name="settings_app_icon_image">image d’icône</string>

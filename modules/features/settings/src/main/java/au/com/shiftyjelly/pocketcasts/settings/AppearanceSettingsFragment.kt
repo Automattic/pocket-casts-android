@@ -103,7 +103,7 @@ class AppearanceSettingsFragment : BaseFragment() {
 
                             AlertDialog.Builder(binding.appIconRecyclerView.context)
                                 .setTitle(LR.string.settings_app_icon_updated)
-                                .setMessage(LR.string.settings_app_icon_updated_message)
+                                .setMessage(LR.string.settings_app_icon_updated_message_v2)
                                 .setPositiveButton(LR.string.settings_app_icon_ok, null)
                                 .show()
                         } else {
@@ -151,7 +151,7 @@ class AppearanceSettingsFragment : BaseFragment() {
 
                         AlertDialog.Builder(binding.appIconRecyclerView.context)
                             .setTitle(LR.string.settings_app_icon_updated)
-                            .setMessage(LR.string.settings_app_icon_updated_message)
+                            .setMessage(LR.string.settings_app_icon_updated_message_v2)
                             .setPositiveButton(LR.string.settings_app_icon_ok, null)
                             .show()
                     } else {

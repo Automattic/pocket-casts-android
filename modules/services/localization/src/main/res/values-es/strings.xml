@@ -1672,7 +1672,6 @@ Language: es
     <string name="settings_apply_group_by">¿Quieres cambiar todos tus podcasts actuales y que se agrupen por %s?</string>
     <string name="settings_apply_archived_show">¿Quieres cambiar todos tus podcasts actuales y que se muestren los archivados?</string>
     <string name="settings_apply_archived_hide">¿Quieres cambiar todos tus podcasts actuales y que se oculten los archivados?</string>
-    <string name="settings_app_icon_updated_message">Es posible que el icono nuevo tarde un par de minutos en aparecer y verás dos iconos en la pantalla en la que se muestren tus aplicaciones. Es normal. Arrastra el nuevo a la pantalla de inicio y estará todo listo.</string>
     <string name="settings_app_icon_updated">Icono actualizado</string>
     <string name="settings_app_icon_title">Título</string>
     <string name="settings_app_icon_image">imagen del icono</string>
