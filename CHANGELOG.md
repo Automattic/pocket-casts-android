@@ -1,4 +1,4 @@
-8.17
+8.18
 -----
 *   Bug Fixes
     *   Fix playback repeatedly pausing on wireless Android Auto
