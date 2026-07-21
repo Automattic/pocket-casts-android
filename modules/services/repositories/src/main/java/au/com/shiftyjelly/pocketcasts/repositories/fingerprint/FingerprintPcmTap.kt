@@ -59,13 +59,12 @@ class FingerprintPcmTap @Inject constructor() {
             anchorUs = pending
             framesSinceAnchor = 0
         } else if (pending != C.TIME_UNSET) {
-            val expectedUs = anchorUs + framesSinceAnchor * 1_000_000 / format.sampleRate
-            if (abs(pending - expectedUs) > REANCHOR_TOLERANCE_US) {
+            if (abs(pending - positionUs(format.sampleRate)) > REANCHOR_TOLERANCE_US) {
                 anchorUs = pending
                 framesSinceAnchor = 0
             }
         }
-        val positionSec = (anchorUs + framesSinceAnchor * 1_000_000.0 / format.sampleRate) / 1_000_000.0
+        val positionSec = positionUs(format.sampleRate) / 1_000_000.0
         framesSinceAnchor += frames
         if (chunkFlow.subscriptionCount.value == 0) return
         val data = ByteArray(buffer.remaining())
@@ -80,6 +79,8 @@ class FingerprintPcmTap @Inject constructor() {
             ),
         )
     }
+
+    private fun positionUs(sampleRate: Int): Long = anchorUs + framesSinceAnchor * 1_000_000 / sampleRate
 
     companion object {
         private const val CHUNK_BUFFER_CAPACITY = 64
