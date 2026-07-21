@@ -1,21 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 object FingerprintConstants {
-    /** If consecutive playback-progress updates differ by more than this, treat it as a seek/skip. */
-    const val RESTART_DELTA_SECONDS = 10.0
-
-    /** Slack window around the already-mapped range before playback is considered "outside". */
-    const val PLAYBACK_RANGE_MARGIN_SECONDS = 30.0
-
-    /** Minimum time between stream restarts while playback sits outside the mapped range. */
-    const val STREAM_BOOTSTRAP_COOLDOWN_MS = 5_000L
-
-    /** Position must be stable for this long before a seek restarts the stream; coalesces rapid multi-tap skips. */
-    const val RESTART_DEBOUNCE_MS = 1_500L
-
-    /** How often a running remote decode re-checks that the network still permits streaming. */
-    const val METERED_RECHECK_INTERVAL_MS = 5_000L
-
     /** Minimum match score to accept a fingerprint match result. */
     const val MATCH_SCORE_THRESHOLD = 0.5f
 
@@ -40,17 +25,35 @@ object FingerprintConstants {
     /** Minimum score gap between top-1 and top-2 matcher candidates. */
     const val DRIFT_SCORE_DOMINANCE_GAP = 0.05f
 
-    /** Distance ahead of current playback within which fingerprinting runs at full speed. */
-    const val LOOKAHEAD_SECONDS = 60.0
-
-    /** Sleep between chunks when fingerprinting ahead of the lookahead window. */
-    const val OUTSIDE_LOOKAHEAD_SLEEP_SECONDS = 0.5
+    /** Position drift between consecutive tap chunks beyond which the window stream restarts. */
+    const val TAP_CONTINUITY_TOLERANCE_SECONDS = 0.25
 
     /** Minimum fraction of reference timeline a cached mapping must cover. */
     const val FULL_COVERAGE_THRESHOLD = 0.95
 
     /** Max gap between bracketing anchors to consider playback on matched content. */
     const val HIGHLIGHT_MAX_GAP_SECONDS = 8.0
+
+    /**
+     * Grace past the newest anchor before the live edge counts as unmatched. The tap-built map lags
+     * the playhead by a full window plus stride and sink-buffer variance, so this must exceed
+     * [WINDOW_DURATION_MS] + [WINDOW_INTERVAL_MS] with headroom for the odd missed match.
+     */
+    const val TAP_TRAILING_GRACE_SECONDS = 12.0
+
+    /**
+     * Drop the trailing grace once completed tap windows reach this far past the newest anchor
+     * without matching — the live edge is provably unmatched (an ad), not merely pending. Wide
+     * enough that a couple of isolated missed matches never trip it.
+     */
+    const val TAP_UNMATCHED_EDGE_SECONDS = 3.0
+
+    /**
+     * Audio decoded in one shot when a tap stream starts in unmapped territory. The tap only sees
+     * audio in realtime, so its first window lands [WINDOW_DURATION_MS] after a seek; a faster-than-
+     * realtime decode of this span puts anchors at the new playhead within ~a second instead.
+     */
+    const val TAP_CATCH_UP_SECONDS = 12.0
 
     /** Persistent cache schema version. Bump when on-disk shape changes. */
     const val MAPPING_CACHE_SCHEMA_VERSION = 4
@@ -76,15 +79,12 @@ object FingerprintConstants {
     /** Timeout for the reference fetch of an on-demand resolve; short because reference files are small. */
     const val ON_DEMAND_FETCH_TIMEOUT_MS = 3_000L
 
-    /** Timeout for the decode of an on-demand resolve. */
-    const val ON_DEMAND_TIMEOUT_MS = 5_000L
+    /** Budget for the decode of an on-demand resolve; opening a remote source alone can take seconds. */
+    const val ON_DEMAND_DECODE_TIMEOUT_MS = 8_000L
 
     /** Committed reference time must pass the target by this much before a resolve stops decoding early. */
     const val ON_DEMAND_EARLY_EXIT_MARGIN_SECONDS = 5.0
 
     /** How often a yielded continuous decode re-checks for on-demand resolves in flight. */
     const val RESOLVE_YIELD_POLL_MS = 250L
-
-    /** Release a parked throttled decode after playback has been idle this long. */
-    const val PARKED_DECODE_RELEASE_MS = 120_000L
 }

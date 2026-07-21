@@ -20,6 +20,9 @@
         ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
     *   Fix Automotive crash when using Google Assistant voice commands to control playback
         ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
+*   Updates
+    *   Tap into ExoPlayer's cache instead of a standalone MediaSource for fingerprinting
+        ([#5618](https://github.com/Automattic/pocket-casts-android/pull/5618))
 
 8.16
 -----

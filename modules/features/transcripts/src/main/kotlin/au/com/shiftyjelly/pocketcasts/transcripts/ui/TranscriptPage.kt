@@ -142,8 +142,10 @@ fun TranscriptPage(
 
                                 TranscriptViewModel.TapSeekResult.Resolving -> {
                                     // Light the row as immediate feedback while the bounded resolve runs.
+                                    // The null-target hold keeps the frame loop from overwriting it.
                                     val previousHighlight = highlightState
                                     highlightState = HighlightState(entryIndex = index)
+                                    pendingSeek = PendingTapSeek(positionMs = null, entryIndex = index)
                                     tapScope.launch {
                                         var seekTarget: Int? = null
                                         try {
@@ -153,8 +155,11 @@ fun TranscriptPage(
                                             val target = seekTarget
                                             if (target != null) {
                                                 applySeek(target)
-                                            } else if (highlightState.entryIndex == index) {
-                                                highlightState = previousHighlight
+                                            } else {
+                                                pendingSeek = pendingSeek?.takeUnless { it.positionMs == null && it.entryIndex == index }
+                                                if (highlightState.entryIndex == index) {
+                                                    highlightState = previousHighlight
+                                                }
                                             }
                                         }
                                     }
@@ -366,13 +371,19 @@ private fun HighlightEffect(
 
     val cueIndexHolder = remember(transcript.entries) { intArrayOf(0) }
 
+    // A new transcript makes any held tap stale; branch flaps below must not drop it.
+    LaunchedEffect(transcript.entries) {
+        latestOnConsumePendingSeek()
+    }
+
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
             cueIndexHolder[0] = 0
-            latestOnConsumePendingSeek()
             var wasHighlighting = false
             var settledForSeek: Int? = null
-            latestOnHighlightChanged(HighlightState())
+            if (latestPendingSeek == null) {
+                latestOnHighlightChanged(HighlightState())
+            }
             val episode = playbackManager.getCurrentEpisode()
             while (true) {
                 withFrameNanos { }
@@ -385,13 +396,15 @@ private fun HighlightEffect(
 
                 val pending = latestPendingSeek
                 if (pending != null) {
-                    // Hold the tapped row until the seek settles and resolution reaches it.
-                    if (settledForSeek != pending.positionMs &&
-                        TranscriptCueHelper.isSeekSettled(posMs, pending.positionMs)
+                    // Hold the tapped row until the target is known, the seek settles, and
+                    // resolution reaches it.
+                    val targetMs = pending.positionMs
+                    if (targetMs != null && settledForSeek != targetMs &&
+                        TranscriptCueHelper.isSeekSettled(posMs, targetMs)
                     ) {
-                        settledForSeek = pending.positionMs
+                        settledForSeek = targetMs
                     }
-                    val settled = settledForSeek == pending.positionMs
+                    val settled = targetMs != null && settledForSeek == targetMs
                     val reachedRow = TranscriptCueHelper.hasReachedTappedRow(outcome, pending.entryIndex)
                     if (settled && reachedRow) {
                         latestOnConsumePendingSeek()
@@ -421,13 +434,17 @@ private fun HighlightEffect(
             }
         }
     } else if (isSyncedActive) {
-        // Paused but synced: no frame loop, so recompute once per position change.
+        // Paused but synced: no frame loop, so recompute once per position change. A held tap
+        // stays lit while the position sits at its target; seeking elsewhere releases it.
         LaunchedEffect(transcript.entries, playbackState?.positionMs) {
             val posMs = playbackState?.positionMs ?: return@LaunchedEffect
-            if (posMs == latestPendingSeek?.positionMs) {
-                return@LaunchedEffect
+            val pending = latestPendingSeek
+            if (pending != null) {
+                if (!TranscriptCueHelper.isHeldTapStale(posMs, pending.positionMs)) {
+                    return@LaunchedEffect
+                }
+                latestOnConsumePendingSeek()
             }
-            latestOnConsumePendingSeek()
             when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
                 is HighlightOutcome.Show -> {
                     cueIndexHolder[0] = outcome.entryIndex
@@ -553,7 +570,8 @@ internal data class HighlightState(
 )
 
 internal data class PendingTapSeek(
-    val positionMs: Int,
+    // Null while the bounded resolve is still computing the target position.
+    val positionMs: Int?,
     val entryIndex: Int,
 )
 
