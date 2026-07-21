@@ -404,6 +404,11 @@ class PlayerHeaderFragment :
                             }
                         }
 
+                        NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(onConfirm = { shelfSharedViewModel.onVideoToggleConfirmed() })
+                                .show(parentFragmentManager, "stream warning")
+                        }
+
                         NavigationState.ShowAddBookmark -> {
                             val bookmarkArguments = viewModel.createBookmarkArguments()
                             if (bookmarkArguments != null) {
