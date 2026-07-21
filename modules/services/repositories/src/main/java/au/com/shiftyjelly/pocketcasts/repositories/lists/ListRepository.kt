@@ -17,7 +17,7 @@ class ListRepository(
 ) {
 
     suspend fun getDiscoverFeed(): Discover {
-        val version = if (FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) 3 else 2
+        val version = if (platform == PLATFORM_TV || FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) 3 else 2
         return listWebService.getDiscoverFeed(platform = platform, version = version)
     }
 
@@ -45,5 +45,11 @@ class ListRepository(
 
     suspend fun getPodcastRecommendations(podcastUuid: String, countryCode: String?): ListFeed? {
         return getListFeed(url = "${Settings.SERVER_API_URL}/recommendations/podcast/$podcastUuid?country=${countryCode ?: "global"}")
+    }
+
+    companion object {
+        const val PLATFORM_ANDROID = "android"
+        const val PLATFORM_AUTOMOTIVE = "automotive"
+        const val PLATFORM_TV = "tv"
     }
 }

@@ -29,6 +29,8 @@ object Util {
 
     fun isAutomotive(context: Context): Boolean = appInfoHasBoolean("pocketcasts_automotive", context)
 
+    fun isTv(context: Context): Boolean = appInfoHasBoolean("pocketcasts_tv", context)
+
     fun isWearOs(context: Context): Boolean = appInfoHasBoolean("pocketcasts_wear_os", context)
 
     // Caching this value since it will always be the same for a given app
