@@ -1,4 +1,4 @@
-8.17
+8.18
 -----
 *   New Features
     *   Add support for Flightcast transcripts
