@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
@@ -8,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
+import io.reactivex.processors.BehaviorProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -15,6 +17,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvScaffoldViewModelTest {
@@ -56,5 +60,45 @@ class TvScaffoldViewModelTest {
             viewModel.selectTab(0)
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `profile is signed out without an account`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(TvProfileState.SignedOut, awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `profile has the account email when signed in`() = runTest {
+        whenever(userManager.getSignInState())
+            .doReturn(Flowable.just(SignInState.SignedIn(email = "user@example.com", subscription = null)))
+
+        viewModel.uiState.test {
+            assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `profile updates when the sign in state changes`() = runTest {
+        val signInState = BehaviorProcessor.createDefault<SignInState>(SignInState.SignedOut)
+        whenever(userManager.getSignInState()).doReturn(signInState)
+
+        viewModel.uiState.test {
+            assertEquals(TvProfileState.SignedOut, awaitItem().profile)
+
+            signInState.offer(SignInState.SignedIn(email = "user@example.com", subscription = null))
+            assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
+
+            signInState.offer(SignInState.SignedOut)
+            assertEquals(TvProfileState.SignedOut, awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `signOut delegates to the user manager`() = runTest {
+        viewModel.signOut()
+
+        verify(userManager).signOut(playbackManager, wasInitiatedByUser = true)
     }
 }
