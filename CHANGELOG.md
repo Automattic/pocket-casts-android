@@ -1,6 +1,8 @@
 8.18
 -----
-
+*   Updates
+    *   Respect Audio only toggle when playing progressive mp4 episodes
+        ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
 
 8.17
 -----
