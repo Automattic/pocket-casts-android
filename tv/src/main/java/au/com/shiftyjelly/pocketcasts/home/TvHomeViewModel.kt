@@ -30,8 +30,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -52,7 +54,11 @@ class TvHomeViewModel @Inject constructor(
     private var loadJob: Job? = null
 
     init {
-        load()
+        viewModelScope.launch {
+            syncManager.isLoggedInObservable.asFlow()
+                .distinctUntilChanged()
+                .collect { load() }
+        }
     }
 
     fun load() {

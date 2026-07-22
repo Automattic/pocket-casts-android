@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.compose.activity)
     implementation(libs.compose.foundation)
     implementation(libs.coroutines.reactive)
+    implementation(libs.coroutines.rx2)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.dagger.hilt.android)
