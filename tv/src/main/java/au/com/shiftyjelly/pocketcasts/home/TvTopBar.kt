@@ -43,18 +43,6 @@ fun TvTopBar(
             .padding(horizontal = 32.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(IR.drawable.ic_pocket_casts_logo),
-            contentDescription = stringResource(LR.string.app_name),
-            modifier = Modifier.size(40.dp),
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        TvTabBar(
-            tabs = tabs,
-            selectedTabIndex = selectedTabIndex,
-            onTabSelect = onTabSelect,
-        )
-        Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = onProfileClick,
             colors = IconButtonDefaults.colors(
@@ -71,6 +59,18 @@ fun TvTopBar(
                 modifier = Modifier.padding(8.dp),
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
+        TvTabBar(
+            tabs = tabs,
+            selectedTabIndex = selectedTabIndex,
+            onTabSelect = onTabSelect,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+            contentDescription = stringResource(LR.string.app_name),
+            modifier = Modifier.size(40.dp),
+        )
     }
 }
 
