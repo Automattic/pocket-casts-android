@@ -411,7 +411,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun audioOnlyModeOrNull(): Boolean? {
-        if (getCurrentEpisode()?.isStreamUrlHls != true) return null
+        val episode = getCurrentEpisode() ?: return null
+        if (!episode.isStreamUrlHls && !episode.isVideo) return null
         return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
     }
 
@@ -2025,12 +2026,8 @@ open class PlaybackManager @Inject constructor(
         // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
-        // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
-        _streamVideoState.value = when {
-            !episode.isStreamUrlHls -> StreamVideoState.NotVideo
-            settings.audioOnly.value -> StreamVideoState.AudioOnly
-            else -> StreamVideoState.Unknown
-        }
+        // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
+        _streamVideoState.value = StreamVideoState.initialFor(episode, audioOnly = settings.audioOnly.value)
         _videoRenderingEnabled.value = true
 
         lastPlaybackSource = sourceView
