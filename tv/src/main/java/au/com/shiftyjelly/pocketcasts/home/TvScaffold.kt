@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun TvScaffold(
     onLogIn: () -> Unit,
     onCreateAccount: () -> Unit,
-    onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvScaffoldViewModel = hiltViewModel(),
 ) {
@@ -64,7 +63,6 @@ fun TvScaffold(
             onLogOut = {
                 isProfileModalVisible = false
                 viewModel.signOut()
-                onLogOut()
             },
         )
     }
