@@ -343,6 +343,15 @@ open class PlaybackManager @Inject constructor(
                 player?.updateAudioOnly()
             }
         }
+
+        launch {
+            upNextQueue.changesObservable.asFlow()
+                .map { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
+                .distinctUntilChanged()
+                .collect { uuid ->
+                    _streamHlsAvailable.value = uuid != null && alternateEnclosureManager.findForEpisode(uuid).firstHlsStreamUrl() != null
+                }
+        }
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
