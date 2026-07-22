@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +28,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.component.TvModal
+import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
@@ -81,20 +80,15 @@ private fun ColumnScope.TvProfileModalContent(
 
     when (profile) {
         is TvProfileState.SignedIn -> {
-            GravatarProfileImage(
-                email = profile.email,
-                contentDescription = null,
-                placeholder = { TvProfileModalAvatarPlaceholder() },
-                modifier = Modifier
-                    .size(107.dp)
-                    .clip(CircleShape),
-            )
-            Text(
-                text = profile.email,
-                color = Color.White,
-                style = TvTextStyles.ModalEmail,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
+            TvProfileModalAvatar(email = profile.email)
+            if (profile.email != null) {
+                Text(
+                    text = profile.email,
+                    color = Color.White,
+                    style = TvTextStyles.ModalEmail,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+            }
             TvProfileModalButton(
                 text = stringResource(LR.string.tv_profile_starred_episodes),
                 onClick = onStarredEpisodes,
@@ -133,6 +127,23 @@ private fun ColumnScope.TvProfileModalContent(
         style = TvTextStyles.ModalFootnote,
         modifier = Modifier.padding(top = 8.dp),
     )
+}
+
+@Composable
+private fun TvProfileModalAvatar(email: String?, modifier: Modifier = Modifier) {
+    val avatarModifier = modifier
+        .size(107.dp)
+        .clip(CircleShape)
+    if (email != null) {
+        GravatarProfileImage(
+            email = email,
+            contentDescription = null,
+            placeholder = { TvProfileModalAvatarPlaceholder() },
+            modifier = avatarModifier,
+        )
+    } else {
+        TvProfileModalAvatarPlaceholder(modifier = avatarModifier)
+    }
 }
 
 @Composable
@@ -176,13 +187,7 @@ private fun TvProfileModalButton(
 private fun TvProfileModalSignedOutPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .background(TvColors.Dark)
-                    .padding(horizontal = 53.dp, vertical = 40.dp),
-            ) {
+            TvModalSurface {
                 TvProfileModalContent(
                     profile = TvProfileState.SignedOut,
                     onLogIn = {},
@@ -201,13 +206,7 @@ private fun TvProfileModalSignedOutPreview() {
 private fun TvProfileModalSignedInPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .background(TvColors.Dark)
-                    .padding(horizontal = 53.dp, vertical = 40.dp),
-            ) {
+            TvModalSurface {
                 TvProfileModalContent(
                     profile = TvProfileState.SignedIn(email = "user@example.com"),
                     onLogIn = {},

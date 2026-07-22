@@ -83,19 +83,18 @@ private fun TvProfileButton(
         ),
         modifier = modifier.size(40.dp),
     ) {
-        when (profile) {
-            is TvProfileState.SignedIn -> {
-                GravatarProfileImage(
-                    email = profile.email,
-                    contentDescription = stringResource(LR.string.profile),
-                    placeholder = { TvProfilePlaceholderIcon(contentDescription = null) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape),
-                )
-            }
-
-            is TvProfileState.SignedOut -> TvProfilePlaceholderIcon(contentDescription = stringResource(LR.string.profile))
+        val email = (profile as? TvProfileState.SignedIn)?.email
+        if (email != null) {
+            GravatarProfileImage(
+                email = email,
+                contentDescription = stringResource(LR.string.profile),
+                placeholder = { TvProfilePlaceholderIcon(contentDescription = null) },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+            )
+        } else {
+            TvProfilePlaceholderIcon(contentDescription = stringResource(LR.string.profile))
         }
     }
 }
