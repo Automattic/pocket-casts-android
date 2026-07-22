@@ -15,10 +15,24 @@ class WebViewTest {
     }
 
     @Test
-    fun `returns URL for an image link`() {
+    fun `returns focused node URL for an image link`() {
         assertEquals(
-            "https://pocketcasts.com",
-            webViewLinkUrl(WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE, "https://pocketcasts.com"),
+            "https://pocketcasts.com/destination",
+            webViewLinkUrl(
+                type = WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+                hitTestUrl = "https://pocketcasts.com/image.jpg",
+                focusedNodeUrl = "https://pocketcasts.com/destination",
+            ),
+        )
+    }
+
+    @Test
+    fun `does not use image source URL for an image link`() {
+        assertNull(
+            webViewLinkUrl(
+                type = WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+                hitTestUrl = "https://pocketcasts.com/image.jpg",
+            ),
         )
     }
 
@@ -31,5 +45,12 @@ class WebViewTest {
     fun `ignores missing or blank URLs`() {
         assertNull(webViewLinkUrl(WebView.HitTestResult.SRC_ANCHOR_TYPE, null))
         assertNull(webViewLinkUrl(WebView.HitTestResult.SRC_ANCHOR_TYPE, ""))
+        assertNull(
+            webViewLinkUrl(
+                type = WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+                hitTestUrl = "https://pocketcasts.com/image.jpg",
+                focusedNodeUrl = "",
+            ),
+        )
     }
 }
