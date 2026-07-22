@@ -40,15 +40,6 @@ enum class StreamVideoState {
     Unknown,
     HasVideo,
     AudioOnly,
-    ;
-
-    companion object {
-        fun initialFor(episode: BaseEpisode, audioOnly: Boolean) = when {
-            audioOnly && (episode.isVideo || episode.isStreamUrlHls) -> AudioOnly
-            episode.isStreamUrlHls -> Unknown
-            else -> NotVideo
-        }
-    }
 }
 
 interface Player {
