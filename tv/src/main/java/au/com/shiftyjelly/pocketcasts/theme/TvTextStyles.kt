@@ -61,6 +61,21 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
+    val ModalEmail = TextStyle(
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 21.sp,
+        textAlign = TextAlign.Center,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val ModalFootnote = TextStyle(
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        textAlign = TextAlign.Center,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
     val WelcomeSubtitle = TextStyle(
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,

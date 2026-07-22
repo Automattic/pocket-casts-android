@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
@@ -24,8 +25,9 @@ class TvScaffoldViewModelTest {
     private val userManager = mock<UserManager> {
         on { getSignInState() } doReturn Flowable.just(SignInState.SignedOut)
     }
+    private val playbackManager = mock<PlaybackManager>()
 
-    private val viewModel by lazy { TvScaffoldViewModel(userManager) }
+    private val viewModel by lazy { TvScaffoldViewModel(userManager, playbackManager) }
 
     @Test
     fun `initial state has all tabs with first tab selected`() = runTest {
