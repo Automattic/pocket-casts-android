@@ -22,6 +22,8 @@
         ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
     *   Fix Automotive crash when using Google Assistant voice commands to control playback
         ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
+    *   Fix podcast episode row button not switching to play when connected to Chromecast
+        ([#5604](https://github.com/Automattic/pocket-casts-android/pull/5604))
 
 8.16
 -----
