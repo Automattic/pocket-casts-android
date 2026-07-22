@@ -110,6 +110,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -275,6 +276,7 @@ open class PlaybackManager @Inject constructor(
 
     private var videoStreamPreferred = false
     private var videoStreamPreferredEpisodeUuid: String? = null
+    private val isVideoToggleReloading = AtomicBoolean(false)
 
     private var lastPlaybackSource: SourceView? = null
 
@@ -423,6 +425,7 @@ open class PlaybackManager @Inject constructor(
         val episode = getCurrentEpisode()
         when {
             videoToggleRequiresStreamSwitch() -> {
+                if (!isVideoToggleReloading.compareAndSet(false, true)) return
                 videoStreamPreferred = true
                 videoStreamPreferredEpisodeUuid = episode?.uuid
                 trackVideoToggled(episode, PlaybackContentType.Video)
@@ -430,6 +433,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             videoStreamPreferred && episode?.isDownloaded == true && player?.isRemote != true -> {
+                if (!isVideoToggleReloading.compareAndSet(false, true)) return
                 videoStreamPreferred = false
                 videoStreamPreferredEpisodeUuid = null
                 trackVideoToggled(episode, PlaybackContentType.Audio)
@@ -456,17 +460,24 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun reloadForVideoToggle(episode: BaseEpisode?, streamWarningConfirmed: Boolean) {
-        episode ?: return
+        if (episode == null) {
+            isVideoToggleReloading.set(false)
+            return
+        }
         launch(Dispatchers.Default) {
-            player?.let { player ->
-                val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
-                episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, true)
+            try {
+                player?.let { player ->
+                    val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
+                    episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, true)
+                }
+                loadCurrentEpisode(
+                    play = isPlaying(),
+                    forceStream = streamWarningConfirmed,
+                    showedStreamWarning = streamWarningConfirmed,
+                )
+            } finally {
+                isVideoToggleReloading.set(false)
             }
-            loadCurrentEpisode(
-                play = isPlaying(),
-                forceStream = streamWarningConfirmed,
-                showedStreamWarning = streamWarningConfirmed,
-            )
         }
     }
 
@@ -581,7 +592,9 @@ open class PlaybackManager @Inject constructor(
         pauseSuspend(sourceView = SourceView.METERED_NETWORK_CHANGE)
     }
 
-    fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
+    fun shouldWarnAboutPlayback(): Boolean = shouldWarnAboutPlayback(upNextQueue.currentEpisode?.uuid)
+
+    fun shouldWarnAboutPlayback(episodeUUID: String?): Boolean {
         return !Util.isCarUiMode(application) &&
             settings.warnOnMeteredNetwork.value &&
             !Network.isUnmeteredConnection(application) &&

@@ -51,7 +51,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -368,7 +367,7 @@ class ShelfSharedViewModelTest {
     fun `given stream switch required and warning needed, when video toggle clicked, then streaming warning dialog is shown`() = runTest {
         initViewModel()
         whenever(playbackManager.videoToggleRequiresStreamSwitch()).thenReturn(true)
-        whenever(playbackManager.shouldWarnAboutPlayback(anyOrNull())).thenReturn(true)
+        whenever(playbackManager.shouldWarnAboutPlayback()).thenReturn(true)
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
@@ -382,7 +381,7 @@ class ShelfSharedViewModelTest {
     fun `given stream switch required without warning, when video toggle clicked, then video rendering is toggled`() = runTest {
         initViewModel()
         whenever(playbackManager.videoToggleRequiresStreamSwitch()).thenReturn(true)
-        whenever(playbackManager.shouldWarnAboutPlayback(anyOrNull())).thenReturn(false)
+        whenever(playbackManager.shouldWarnAboutPlayback()).thenReturn(false)
 
         shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
 
@@ -406,9 +405,6 @@ class ShelfSharedViewModelTest {
     ) {
         FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
 
-        PlaybackManager::class.java.getDeclaredField("upNextQueue")
-            .apply { isAccessible = true }
-            .set(playbackManager, upNextQueue)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         val upNextState = if (currentEpisode != null) {
             UpNextQueue.State.Loaded(currentEpisode, null, listOf(currentEpisode))
