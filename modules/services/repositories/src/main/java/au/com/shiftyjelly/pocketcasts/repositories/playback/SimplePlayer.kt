@@ -311,8 +311,9 @@ class SimplePlayer(
     @OptIn(UnstableApi::class)
     private fun applyAudioOnly() {
         val trackSelector = trackSelector ?: return
+        val disableVideo = settings.audioOnly.value && episodeLocation.isHlsStream
         trackSelector.parameters = trackSelector.buildUponParameters()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, settings.audioOnly.value)
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, disableVideo)
             .build()
     }
 
