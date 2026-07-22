@@ -172,6 +172,7 @@ class PodcastsFragment :
     private var lastOrientationRefreshed = LAST_ORIENTATION_NOT_SET
     private var lastWidthPx: Int = 0
     private var listState: Parcelable? = null
+    private var sortTypeToKeepAtTop: PodcastsSortType? = null
 
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
@@ -286,7 +287,17 @@ class PodcastsFragment :
                     toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
                     toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
-                    folderAdapter?.setFolderItems(uiState.items)
+                    val pendingSortType = sortTypeToKeepAtTop
+                    val currentSortType = uiState.folder?.podcastsSortType ?: uiState.sortType
+                    val shouldScrollToTop = pendingSortType == currentSortType
+                    folderAdapter?.setFolderItems(uiState.items) {
+                        if (shouldScrollToTop) {
+                            scrollRecyclerViewToTop()
+                            if (sortTypeToKeepAtTop == pendingSortType) {
+                                sortTypeToKeepAtTop = null
+                            }
+                        }
+                    }
 
                     val isEmpty = uiState.items.isEmpty()
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
@@ -374,6 +385,7 @@ class PodcastsFragment :
 
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
+        sortTypeToKeepAtTop = null
         binding.recyclerView.adapter = null
         super.onDestroyView()
         realBinding = null
@@ -424,6 +436,9 @@ class PodcastsFragment :
                 )
             }
             val onSortTypeChanged = { sort: PodcastsSortType ->
+                if (sort != folder.podcastsSortType) {
+                    keepRecyclerViewAtTopAfterSort(sort)
+                }
                 eventHorizon.track(
                     FolderSortByChangedEvent(
                         sortOrder = sort.analyticsValue,
@@ -455,7 +470,14 @@ class PodcastsFragment :
                 show()
             }
         } else {
-            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, eventHorizon).apply {
+            podcastOptionsDialog = PodcastsOptionsDialog(
+                fragment = this,
+                settings = settings,
+                eventHorizon = eventHorizon,
+                onSortTypeChanged = { sort ->
+                    keepRecyclerViewAtTopAfterSort(sort)
+                },
+            ).apply {
                 show()
             }
         }
@@ -666,6 +688,20 @@ class PodcastsFragment :
         val canScroll = binding.recyclerView.canScrollVertically(-1)
         binding.recyclerView.quickScrollToTop()
         return canScroll
+    }
+
+    private fun scrollRecyclerViewToTop() {
+        val recyclerView = realBinding?.recyclerView ?: return
+        (recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+            ?: recyclerView.scrollToPosition(0)
+    }
+
+    private fun keepRecyclerViewAtTopAfterSort(sortType: PodcastsSortType) {
+        sortTypeToKeepAtTop = if (realBinding?.recyclerView?.canScrollVertically(-1) == false) {
+            sortType
+        } else {
+            null
+        }
     }
 
     private fun showTooltip() {
