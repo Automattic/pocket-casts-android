@@ -29,6 +29,7 @@ fun TvScaffold(
     TvScaffoldContent(
         tabs = uiState.tabs,
         selectedTabIndex = uiState.selectedTabIndex,
+        profile = uiState.profile,
         onTabSelect = viewModel::selectTab,
         modifier = modifier,
     ) { tab ->
@@ -43,6 +44,7 @@ fun TvScaffold(
 private fun TvScaffoldContent(
     tabs: List<TvTab>,
     selectedTabIndex: Int,
+    profile: TvProfileState,
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
     tabContent: @Composable (TvTab) -> Unit,
@@ -62,6 +64,7 @@ private fun TvScaffoldContent(
         TvTopBar(
             tabs = tabs,
             selectedTabIndex = selectedTabIndex,
+            profile = profile,
             onTabSelect = onTabSelect,
             onProfileClick = {},
         )
@@ -81,6 +84,7 @@ private fun TvScaffoldPreview() {
             TvScaffoldContent(
                 tabs = TvTab.entries,
                 selectedTabIndex = selectedIndex,
+                profile = TvProfileState.SignedOut,
                 onTabSelect = { selectedIndex = it },
             ) { tab ->
                 TvTabPlaceholder(tab = tab)

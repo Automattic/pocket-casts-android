@@ -3,12 +3,17 @@ package au.com.shiftyjelly.pocketcasts
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvScaffoldViewModelTest {
@@ -16,7 +21,11 @@ class TvScaffoldViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val viewModel = TvScaffoldViewModel()
+    private val userManager = mock<UserManager> {
+        on { getSignInState() } doReturn Flowable.just(SignInState.SignedOut)
+    }
+
+    private val viewModel by lazy { TvScaffoldViewModel(userManager) }
 
     @Test
     fun `initial state has all tabs with first tab selected`() = runTest {
