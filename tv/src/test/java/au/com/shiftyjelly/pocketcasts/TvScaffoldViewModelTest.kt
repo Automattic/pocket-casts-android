@@ -6,8 +6,10 @@ import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import dagger.Lazy
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,9 +31,14 @@ class TvScaffoldViewModelTest {
     private val userManager = mock<UserManager> {
         on { getSignInState() } doReturn Flowable.just(SignInState.SignedOut)
     }
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedIn() } doReturn false
+    }
     private val playbackManager = mock<PlaybackManager>()
 
-    private val viewModel by lazy { TvScaffoldViewModel(userManager, playbackManager) }
+    private val viewModel by lazy {
+        TvScaffoldViewModel(userManager, syncManager, Lazy { playbackManager })
+    }
 
     @Test
     fun `initial state has all tabs with first tab selected`() = runTest {
@@ -76,6 +83,39 @@ class TvScaffoldViewModelTest {
 
         viewModel.uiState.test {
             assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `profile email is null when signed in with a blank email`() = runTest {
+        whenever(userManager.getSignInState())
+            .doReturn(Flowable.just(SignInState.SignedIn(email = "", subscription = null)))
+
+        viewModel.uiState.test {
+            assertEquals(TvProfileState.SignedIn(email = null), awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `profile is seeded from the sync manager before the sign in state emits`() = runTest {
+        whenever(userManager.getSignInState()).doReturn(BehaviorProcessor.create())
+        whenever(syncManager.isLoggedIn()).doReturn(true)
+        whenever(syncManager.getEmail()).doReturn("user@example.com")
+
+        viewModel.uiState.test {
+            assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `tabs can be selected before the sign in state emits`() = runTest {
+        whenever(userManager.getSignInState()).doReturn(BehaviorProcessor.create())
+
+        viewModel.uiState.test {
+            assertEquals(0, awaitItem().selectedTabIndex)
+
+            viewModel.selectTab(3)
+            assertEquals(3, awaitItem().selectedTabIndex)
         }
     }
 
