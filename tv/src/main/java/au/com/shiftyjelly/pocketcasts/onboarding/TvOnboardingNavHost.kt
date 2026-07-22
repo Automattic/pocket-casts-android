@@ -46,7 +46,7 @@ fun TvOnboardingNavHost(
                     TvSignInScreen(
                         onSignInComplete = {
                             navController.navigate(TvOnboardingRoutes.SYNCING) {
-                                popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
+                                popUpTo(0) { inclusive = true }
                             }
                         },
                     )
@@ -62,7 +62,15 @@ fun TvOnboardingNavHost(
                     )
                 }
                 composable(TvOnboardingRoutes.HOME) {
-                    TvScaffold()
+                    TvScaffold(
+                        onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                        onLogOut = {
+                            navController.navigate(TvOnboardingRoutes.HOME) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        },
+                    )
                 }
             }
         }
