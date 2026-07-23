@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-01 16:58:48+0000
+Translation-Revision-Date: 2026-07-09 11:55:53+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Heatmap luisteractiviteit</string>
+    <string name="profile_stats_listening_activity">Luisteractiviteit</string>
+    <string name="player_action_show_video">Video tonen</string>
+    <string name="player_action_hide_video">Video verbergen</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortste naar langste, of andersom - pas de aflevering aan op de tijd die je daadwerkelijk hebt.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sorteren op duur</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Download de aflevering om te zoeken</string>
     <string name="bookmark_play_from">Afspelen van %s</string>
-    <string name="profile_try_days_for_free">Probeer 30 dagen gratis</string>
-    <string name="profile_start_free_trial_specific_duration">Start nu je gratis proefabonnement van 30 dagen</string>
     <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
     <string name="summary_upsell_title">AI-samenvattingen</string>
     <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
@@ -129,14 +133,10 @@ Language: nl
     <string name="watch_synced_successfully">Horloge is gesynchroniseerd</string>
     <string name="watch_sync_waiting_for_phone">Wachten tot de telefoon is gesynchroniseerd …</string>
     <string name="watch_sync_retry">Probeer opnieuw</string>
-    <string name="watch_sync_error_unknown_help">Probeer het opnieuw of log handmatig in</string>
     <string name="watch_sync_error_login_failed_help">Probeer handmatig in te loggen</string>
     <string name="watch_sync_error_no_connection_help">Controleer de Bluetooth-verbinding met je telefoon</string>
-    <string name="watch_sync_error_timeout_help">Zorg ervoor dat je telefoon in de buurt is en verbonden is via Bluetooth</string>
-    <string name="watch_sync_error_unknown">Er is iets fout gegaan</string>
     <string name="watch_sync_error_login_failed">Inloggen is mislukt</string>
     <string name="watch_sync_error_no_connection">Telefoon niet verbonden</string>
-    <string name="watch_sync_error_timeout">Kon niet verbinden met telefoon</string>
     <string name="watch_sync_success">Ingelogd via telefoon!</string>
     <string name="watch_sync_syncing">Synchroniseren met telefoon …</string>
     <string name="error_download_generic_failure">Downloaden van aflevering is mislukt. %1$s</string>

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import com.squareup.moshi.Moshi
 import kotlin.math.roundToLong
+import okio.Buffer
 import okio.BufferedSource
 import okio.use
 import androidx.media3.extractor.text.SubtitleParser as Media3SubtitleParser
@@ -138,19 +139,41 @@ internal class JsonParser(
     override val type get() = TranscriptType.Json
 
     private val adapter = moshi.adapter(TranscriptSegments::class.java)
+    private val vttParser by lazy { WebVttParser() }
 
     override fun parse(source: BufferedSource) = runCatching {
-        requireNotNull(adapter.fromJson(source))
-            .segments
-            .flatMap(::toEntries)
+        val data = requireNotNull(adapter.fromJson(source))
+        val segments = data.segments
+        val firstSegment = segments.firstOrNull()
+        val vtt = data.vtt
+
+        when {
+            // Podcast Index style: segments carry a speaker and a body.
+            firstSegment?.speaker != null && firstSegment.body != null -> {
+                segments.flatMap(::toEntries)
+            }
+
+            // Flightcast style: prefer the embedded WEBVTT document when present,
+            // but fall back to the segments if it is missing or fails to parse.
+            vtt != null && vtt.contains("WEBVTT") -> {
+                vttParser.parse(Buffer().writeUtf8(vtt))
+                    .getOrNull()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?: segments.flatMap(::toEntries)
+            }
+
+            // Fallback: segments carrying plain text (Flightcast) or body-only entries.
+            else -> segments.flatMap(::toEntries)
+        }
     }
 
     private fun toEntries(cue: TranscriptCue) = buildList<TranscriptEntry> {
         cue.speaker?.let { speaker ->
             add(TranscriptEntry.Speaker(speaker))
         }
-        val startTimeMs = cue.startTime?.let { (it * 1000).roundToLong() } ?: -1L
-        val endTimeMs = cue.endTime?.let { (it * 1000).roundToLong() } ?: -1L
-        add(TranscriptEntry.Text(cue.body, startTimeMs = startTimeMs, endTimeMs = endTimeMs))
+        val content = cue.content ?: return@buildList
+        val startTimeMs = cue.startSeconds?.let { (it * 1000).roundToLong() } ?: -1L
+        val endTimeMs = cue.endSeconds?.let { (it * 1000).roundToLong() } ?: -1L
+        add(TranscriptEntry.Text(content, startTimeMs = startTimeMs, endTimeMs = endTimeMs))
     }
 }

@@ -61,6 +61,15 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         .let { if (cache != null) it.setCache(cache) else it }
 
+    val blockingCacheFactory get() = CacheDataSource.Factory()
+        .setUpstreamDataSourceFactory(defaultFactory)
+        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or CacheDataSource.FLAG_BLOCK_ON_CACHE)
+        .let { if (cache != null) it.setCache(cache) else it }
+
+    val isCacheAvailable get() = cache != null
+
+    fun cachedLengthAt(cacheKey: String, position: Long, length: Long): Long = cache?.getCachedLength(cacheKey, position, length) ?: -1L
+
     fun createMediaSource(
         episodeLocation: EpisodeLocation,
         clipRange: ClosedRange<Long>? = null,
@@ -124,6 +133,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
                 context = context,
                 url = episodeUri,
                 episodeUuid = episodeLocation.episode.uuid,
+                networkConstraint = cacheNetworkConstraint(settings.warnOnMeteredNetwork.value),
                 onCachingComplete = onCachingComplete,
             )
         }
