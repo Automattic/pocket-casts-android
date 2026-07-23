@@ -3,10 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import io.reactivex.Single
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 class StatsManagerImpl @Inject constructor(
@@ -208,10 +205,6 @@ class StatsManagerImpl @Inject constructor(
 
     override fun setSyncStatus(isSynced: Boolean) {
         settings.setBooleanForKey(SYNC_STATUS, isSynced)
-    }
-
-    override fun getServerStatsRx(): Single<StatsBundle> {
-        return rxSingle(Dispatchers.IO) { getServerStats() }
     }
 
     override suspend fun getServerStats(): StatsBundle {

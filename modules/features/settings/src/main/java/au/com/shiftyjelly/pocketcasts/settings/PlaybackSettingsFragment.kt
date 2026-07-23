@@ -49,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.ArchivedEpisodeBehaviorType
@@ -57,11 +59,13 @@ import com.automattic.eventhorizon.RowActionType
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralAudioOnlyToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoSleepTimerRestartToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoplayToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralIntelligentPlaybackToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralKeepScreenAwakeToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralOpenPlayerAutomaticallyToggledEvent
@@ -305,6 +309,22 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_GENERATED_CHAPTERS -> {
+                            if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                                GeneratedChapters(
+                                    saved = settings.showGeneratedChapters.flow.collectAsState().value,
+                                    onSave = { isGeneratedChaptersEnabled ->
+                                        eventHorizon.track(
+                                            SettingsGeneralGeneratedChaptersToggledEvent(
+                                                enabled = isGeneratedChaptersEnabled,
+                                            ),
+                                        )
+                                        settings.showGeneratedChapters.set(isGeneratedChaptersEnabled, updateModifiedAt = true)
+                                    },
+                                )
+                            }
+                        }
+
                         SettingsItems.SETTINGS_INTELLIGENT_PLAYBACK -> {
                             IntelligentPlaybackResumption(
                                 saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
@@ -357,6 +377,20 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         ),
                                     )
                                     settings.autoPlayNextEpisodeOnEmpty.set(isAutoplayEnabled, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
+                        SettingsItems.SETTINGS_AUDIO_ONLY -> {
+                            AudioOnly(
+                                saved = settings.audioOnly.flow.collectAsState().value,
+                                onSave = { isAudioOnlyEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralAudioOnlyToggledEvent(
+                                            enabled = isAudioOnlyEnabled,
+                                        ),
+                                    )
+                                    settings.audioOnly.set(isAudioOnlyEnabled, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -559,6 +593,24 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun AudioOnly(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_audio_only),
+        secondaryText = stringResource(LR.string.settings_audio_only_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
+    private fun GeneratedChapters(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_generated_chapters),
+        secondaryText = stringResource(LR.string.settings_generated_chapters_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_playback_resumption),
         secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
@@ -674,10 +726,12 @@ private enum class SettingsItems {
     SETTINGS_SKIP_BACK_TIME,
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
+    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_INTELLIGENT_PLAYBACK,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
+    SETTINGS_AUDIO_ONLY,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,

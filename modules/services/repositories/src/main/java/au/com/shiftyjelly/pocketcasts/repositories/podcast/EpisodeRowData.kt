@@ -28,6 +28,7 @@ data class EpisodeRowData(
     val playbackState: PlaybackState,
     val isInUpNext: Boolean,
     val hasBookmarks: Boolean,
+    val hasHlsAlternateEnclosure: Boolean,
 )
 
 data class UserEpisodeRowData(
@@ -46,6 +47,7 @@ class EpisodeRowDataProvider @Inject constructor(
     private val upNextQueue: UpNextQueue,
     private val bookmarkManager: BookmarkManager,
     private val userEpisodeManager: UserEpisodeManager,
+    private val alternateEnclosureManager: AlternateEnclosureManager,
     private val settings: Settings,
 ) {
 
@@ -71,6 +73,7 @@ class EpisodeRowDataProvider @Inject constructor(
                     playbackStatusObservable(episodeUuid),
                     isInUpNextObservable(episodeUuid),
                     hasBookmarksObservable(episodeUuid),
+                    hasHlsAlternateEnclosureObservable(episodeUuid),
                     ::EpisodeRowData,
                 )
             }
@@ -105,6 +108,13 @@ class EpisodeRowDataProvider @Inject constructor(
                     prev.positionMs == curr.positionMs &&
                     prev.isBuffering == curr.isBuffering
             }
+    }
+
+    private fun hasHlsAlternateEnclosureObservable(episodeUuid: String): Observable<Boolean> {
+        return alternateEnclosureManager.hasHlsAlternateEnclosure(episodeUuid)
+            .asObservable()
+            .startWith(false)
+            .distinctUntilChanged()
     }
 
     private fun isInUpNextObservable(episodeUuid: String): Observable<Boolean> {

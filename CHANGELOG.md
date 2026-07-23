@@ -1,17 +1,47 @@
+8.18
+-----
+*   New Features
+    *   Add option to switch to the HLS video stream when playing a downloaded episode
+        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
+*   Bug Fixes
+    *   Allow copying description and show notes links with a long press
+        ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix episode artwork on the filters page not updating after embedded artwork is extracted during playback
+        ([#5548](https://github.com/Automattic/pocket-casts-android/pull/5548))
+
 8.17
 -----
 *   New Features
+    *   Add Audio only playback setting
+        ([#5572](https://github.com/Automattic/pocket-casts-android/pull/5572))
     *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+    *   Stats Heatmap
+        ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
+    *   HLS support
+        ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
 *   Bug Fixes
-    *   Fix episode artwork on the filters page not updating after embedded artwork is extracted during playback
-        ([#5548](https://github.com/Automattic/pocket-casts-android/pull/5548))
+    *   Fix episodes being cached over mobile data when Warn before using data is enabled
+        ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
+    *   Reduce the chance of episode playback progress reverting during listening history sync
+        ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
+    *   Fix a crash that could occur when seeking during playback
+        ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
+    *   Fix Automotive crash when using Google Assistant voice commands to control playback
+        ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
+    *   Fix podcast episode row button not switching to play when connected to Chromecast
+        ([#5604](https://github.com/Automattic/pocket-casts-android/pull/5604))
 
 8.16
 -----
 *   New Features
     *   Up Next sort by duration
         ([#5399](https://github.com/Automattic/pocket-casts-android/pull/5399))
+    *   Add settings to hide generated chapters
+        ([#5564](https://github.com/Automattic/pocket-casts-android/pull/5564))
+*   Bug Fixes
+    *   Fix leaked network connections when refreshing episode details
+        ([#5546](https://github.com/Automattic/pocket-casts-android/pull/5546))
 
 8.15
 -----

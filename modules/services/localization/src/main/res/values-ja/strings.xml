@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-30 09:57:15+0000
+Translation-Revision-Date: 2026-07-08 10:55:39+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">聴取アクティビティのヒートマップ</string>
+    <string name="profile_stats_listening_activity">聴取アクティビティ</string>
+    <string name="player_action_show_video">動画を表示</string>
+    <string name="player_action_hide_video">動画を非表示</string>
+    <string name="up_next_sort_duration_tooltip_body">短いエピソードから長いエピソード、またはその逆に並べ替えて、あなたの時間に合わせます。</string>
+    <string name="up_next_sort_duration_tooltip_title">所要時間で並び替え</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">エピソードをダウンロードし、タップして検索</string>
     <string name="bookmark_play_from">%s から再生</string>
-    <string name="profile_try_days_for_free">30日間無料でお試し</string>
-    <string name="profile_start_free_trial_specific_duration">30日間無料お試しを開始する</string>
     <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
     <string name="summary_upsell_title">AI を活用した概要</string>
     <string name="tv_create_account_subtitle">このコードをスキャンして、スマートフォンで開始できます。わずか1分で完了します。</string>
@@ -129,14 +133,10 @@ Language: ja_JP
     <string name="watch_synced_successfully">視聴の同期に成功しました</string>
     <string name="watch_sync_waiting_for_phone">スマートフォンの同期を待機中…</string>
     <string name="watch_sync_retry">もう一度試す</string>
-    <string name="watch_sync_error_unknown_help">もう一度試すか、手動でログインする</string>
     <string name="watch_sync_error_login_failed_help">手動でログインを試す</string>
     <string name="watch_sync_error_no_connection_help">スマートフォンへの Bluetooth 接続を確認する</string>
-    <string name="watch_sync_error_timeout_help">スマートフォンが近くにあり、Bluetooth 経由で接続されていることを確認してください</string>
-    <string name="watch_sync_error_unknown">エラーが発生しました</string>
     <string name="watch_sync_error_login_failed">ログインに失敗しました</string>
     <string name="watch_sync_error_no_connection">スマートフォンが接続されていません</string>
-    <string name="watch_sync_error_timeout">スマートフォンに接続できませんでした</string>
     <string name="watch_sync_success">スマートフォンからログインしました</string>
     <string name="watch_sync_syncing">スマートフォンと同期中…</string>
     <string name="error_download_generic_failure">エピソードをダウンロードできませんでした。 %1$s</string>

@@ -59,7 +59,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -125,7 +125,7 @@ internal data class RemainingPodcastsByCategoryRow(val listId: String?, val cate
 internal data class CategoryAdRow(val categoryId: Int, val categoryName: String, val region: String?, val discoverRow: DiscoverRow)
 internal class DiscoverAdapter(
     val context: Context,
-    val staticServiceManager: StaticServiceManagerImpl,
+    val staticServiceManager: StaticServiceManager,
     val listener: Listener,
     val theme: Theme,
     loadPodcastList: (String, Boolean?) -> Flowable<PodcastList>,
@@ -379,6 +379,7 @@ internal class DiscoverAdapter(
             super.onRestoreInstanceState(state)
             recyclerView?.post {
                 val position = scrollingLayoutManager.findFirstVisibleItemPosition()
+                if (position == RecyclerView.NO_POSITION) return@post
                 binding.pageIndicatorView.position = position
                 recyclerView.scrollToPosition(position)
                 trackSponsoredListImpression(position)
@@ -386,6 +387,7 @@ internal class DiscoverAdapter(
         }
 
         private fun trackPageChanged(position: Int) {
+            if (position == RecyclerView.NO_POSITION) return
             eventHorizon.track(
                 DiscoverFeaturedPageChangedEvent(
                     currentPage = position.toLong(),
@@ -395,7 +397,7 @@ internal class DiscoverAdapter(
         }
 
         private fun trackSponsoredListImpression(position: Int) {
-            val discoverPodcast = adapter.currentList[position] as? DiscoverPodcast
+            val discoverPodcast = adapter.currentList.getOrNull(position) as? DiscoverPodcast
             discoverPodcast?.listId?.let { listId ->
                 if (listIdImpressionTracked.contains(listId)) return
                 eventHorizon.track(

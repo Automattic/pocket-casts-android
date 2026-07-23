@@ -67,7 +67,6 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
-import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -231,7 +230,6 @@ class PodcastAdapter(
         val VIEW_TYPE_DIVIDER_TITLE = R.layout.adapter_divider_row
     }
 
-    private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
     private var podcastDescription = AnnotatedString("")
 
@@ -378,11 +376,6 @@ class PodcastAdapter(
         }
     }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        disposables.clear()
-    }
-
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
         val episodeHeader = getItem(position) as? EpisodeHeader ?: return
         holder.binding.episodesSummary.let {
@@ -424,7 +417,7 @@ class PodcastAdapter(
             isMultiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
-            streamByDefault = settings.streamingMode.value,
+            streamByDefault = settings.streamingMode.value || castConnected,
             tint = tintColor,
             animateMultiSelection = animateMultiSelection,
         )
