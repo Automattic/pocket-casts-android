@@ -621,6 +621,20 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    /**
+     * Plays the queue only if playback isn't already running, unlike the [playPause] toggle.
+     * Used for KEYCODE_MEDIA_PLAY, which has explicit play semantics: some head units
+     * (wireless Android Auto in particular) send it redundantly while playback is already
+     * running, and toggling would pause playback.
+     */
+    fun playIfNotPlaying(sourceView: SourceView = SourceView.UNKNOWN) {
+        if (isPlaying()) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Ignoring play request because playback is already playing")
+        } else {
+            playQueue(sourceView)
+        }
+    }
+
     fun playQueue(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,

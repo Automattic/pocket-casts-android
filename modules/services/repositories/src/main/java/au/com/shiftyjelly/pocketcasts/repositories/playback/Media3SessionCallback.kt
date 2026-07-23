@@ -262,7 +262,7 @@ internal class Media3SessionCallback(
                 try {
                     val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                     when (outputEvent) {
-                        MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                        MediaEvent.SingleTap -> handleMediaButtonSingleTap(playOnly = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY)
                         MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                         MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                         null -> Unit
@@ -277,8 +277,12 @@ internal class Media3SessionCallback(
         return false
     }
 
-    private fun handleMediaButtonSingleTap() {
-        playbackManager.playPause(sourceView = source)
+    private fun handleMediaButtonSingleTap(playOnly: Boolean = false) {
+        if (playOnly) {
+            playbackManager.playIfNotPlaying(sourceView = source)
+        } else {
+            playbackManager.playPause(sourceView = source)
+        }
     }
 
     private fun handleMediaButtonDoubleTap() {

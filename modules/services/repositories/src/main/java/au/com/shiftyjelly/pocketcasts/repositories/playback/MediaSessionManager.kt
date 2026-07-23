@@ -1246,7 +1246,7 @@ class MediaSessionManager(
                             val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
                             when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                                MediaEvent.SingleTap -> handleMediaButtonSingleTap(playOnly = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY)
                                 MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                                 MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                                 null -> Unit
@@ -1281,8 +1281,12 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
 
-        private fun handleMediaButtonSingleTap() {
-            playbackManager.playPause(sourceView = source)
+        private fun handleMediaButtonSingleTap(playOnly: Boolean = false) {
+            if (playOnly) {
+                playbackManager.playIfNotPlaying(sourceView = source)
+            } else {
+                playbackManager.playPause(sourceView = source)
+            }
         }
 
         private fun handleMediaButtonDoubleTap() {
