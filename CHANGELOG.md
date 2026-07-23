@@ -1,5 +1,8 @@
 8.18
 -----
+*   New Features
+    *   Add option to switch to the HLS video stream when playing a downloaded episode
+        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
