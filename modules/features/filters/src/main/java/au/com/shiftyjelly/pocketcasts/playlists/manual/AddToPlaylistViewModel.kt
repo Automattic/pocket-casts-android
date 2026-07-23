@@ -108,10 +108,11 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun getPlaylistsAddedTo(): Set<PlaylistPreviewForEpisode> {
-        val playlists = uiState.value?.playlistPreviews.orEmpty()
-        val uuidsAddedTo = playlistsChanges.filterValues { it }.keys
-        return playlists.filterTo(mutableSetOf()) { playlist -> playlist.uuid in uuidsAddedTo }
+    fun getPlaylistChangeSummary(): PlaylistChangeSummary {
+        return PlaylistChangeSummary(
+            addedCount = playlistsChanges.count { it.value },
+            removedCount = playlistsChanges.count { !it.value },
+        )
     }
 
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
@@ -290,6 +291,13 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         val uuid: String,
         val title: String,
     )
+
+    data class PlaylistChangeSummary(
+        val addedCount: Int,
+        val removedCount: Int,
+    ) {
+        val totalCount = addedCount + removedCount
+    }
 
     @AssistedFactory
     interface Factory {

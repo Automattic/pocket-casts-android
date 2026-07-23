@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.manual
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.playlists.create.FakePlaylistManager
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeSummary
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.automattic.eventhorizon.EventHorizon
@@ -30,6 +31,31 @@ class AddToPlaylistViewModelTest {
                 EpisodeUuidPair("episode-uuid-$index", "podcast-uuid-$index")
             },
             initialPlaylistTitle = "Title",
+        )
+    }
+
+    @Test
+    fun `playlist change summary reports net added and removed playlist counts`() {
+        assertEquals(
+            PlaylistChangeSummary(addedCount = 0, removedCount = 0),
+            viewModel.getPlaylistChangeSummary(),
+        )
+
+        viewModel.addToPlaylist("playlist-uuid-1")
+        viewModel.addToPlaylist("playlist-uuid-2")
+        viewModel.removeFromPlaylist("playlist-uuid-3")
+
+        assertEquals(
+            PlaylistChangeSummary(addedCount = 2, removedCount = 1),
+            viewModel.getPlaylistChangeSummary(),
+        )
+
+        viewModel.removeFromPlaylist("playlist-uuid-2")
+        viewModel.addToPlaylist("playlist-uuid-3")
+
+        assertEquals(
+            PlaylistChangeSummary(addedCount = 1, removedCount = 0),
+            viewModel.getPlaylistChangeSummary(),
         )
     }
 
