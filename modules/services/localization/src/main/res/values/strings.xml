@@ -1016,7 +1016,7 @@
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort by</string>
-    <string name="removed_from_playlist">Removed from playlist</string>
+    <string name="removed_from_playlist_feedback">Removed from playlist</string>
     <plurals name="removed_from_playlists">
         <item quantity="one">Removed from %d playlist</item>
         <item quantity="other">Removed from %d playlists</item>

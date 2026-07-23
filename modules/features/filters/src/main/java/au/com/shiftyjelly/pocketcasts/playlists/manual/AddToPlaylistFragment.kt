@@ -186,7 +186,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                 )
             }
 
-            summary.removedCount == 1 -> getString(LR.string.removed_from_playlist)
+            summary.removedCount == 1 -> getString(LR.string.removed_from_playlist_feedback)
 
             summary.removedCount > 1 -> {
                 resources.getQuantityString(
