@@ -160,29 +160,45 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!requireActivity().isChangingConfigurations && isDoneTapped) {
-            showDoneSnackbar(viewModel.getPlaylistsAddedTo())
+            showDoneSnackbar(viewModel.getPlaylistChangeSummary())
         }
     }
 
-    private fun showDoneSnackbar(playlistsAddedTo: Set<PlaylistPreviewForEpisode>) {
+    private fun showDoneSnackbar(summary: AddToPlaylistViewModel.PlaylistChangeSummary) {
         val hostListener = requireActivity() as FragmentHostListener
         val snackbarView = hostListener.snackBarView()
-        val snackbar = when (val size = playlistsAddedTo.size) {
-            0 -> return
-
-            1 -> {
-                val playlist = playlistsAddedTo.first()
-                val message = getString(LR.string.added_to_playlist_single, playlist.title)
-                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
-                    .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
+        val message = when {
+            summary.addedCount > 0 && summary.removedCount > 0 -> {
+                resources.getQuantityString(
+                    LR.plurals.changed_playlists,
+                    summary.totalCount,
+                    summary.totalCount,
+                )
             }
 
-            else -> {
-                val message = resources.getQuantityString(LR.plurals.added_to_playlist_single_multiple, size, size)
-                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+            summary.addedCount == 1 -> getString(LR.string.added_to_playlist_feedback)
+
+            summary.addedCount > 1 -> {
+                resources.getQuantityString(
+                    LR.plurals.added_to_playlist_single_multiple,
+                    summary.addedCount,
+                    summary.addedCount,
+                )
             }
+
+            summary.removedCount == 1 -> getString(LR.string.removed_from_playlist)
+
+            summary.removedCount > 1 -> {
+                resources.getQuantityString(
+                    LR.plurals.removed_from_playlists,
+                    summary.removedCount,
+                    summary.removedCount,
+                )
+            }
+
+            else -> return
         }
-        snackbar.show()
+        Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG).show()
     }
 
     @Composable
