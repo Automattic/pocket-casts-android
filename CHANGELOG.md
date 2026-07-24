@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Prevent simultaneous audio streams on Android Automotive
+        ([#5636](https://github.com/Automattic/pocket-casts-android/pull/5636))
 
 8.17
 -----
