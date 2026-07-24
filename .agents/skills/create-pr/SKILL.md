@@ -1,7 +1,6 @@
 ---
 name: create-pr
 description: Create a pull request
-disable-model-invocation: true
 allowed-tools: Read, Bash(which gh), Bash(git diff *), Bash(git log *), Bash(gh pr create --repo Automattic/pocket-casts-android *), Bash(gh pr edit --repo Automattic/pocket-casts-android *), Bash(gh label list --repo Automattic/pocket-casts-android *), Bash(gh api repos/Automattic/pocket-casts-android/*)
 ---
 
