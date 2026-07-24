@@ -26,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -160,43 +160,21 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!requireActivity().isChangingConfigurations && isDoneTapped) {
-            showDoneSnackbar(viewModel.getPlaylistChangeSummary())
+            showDoneSnackbar(viewModel.getPlaylistChangeFeedback())
         }
     }
 
-    private fun showDoneSnackbar(summary: AddToPlaylistViewModel.PlaylistChangeSummary) {
+    private fun showDoneSnackbar(feedback: PlaylistChangeFeedback) {
         val hostListener = requireActivity() as FragmentHostListener
         val snackbarView = hostListener.snackBarView()
-        val message = when {
-            summary.addedCount > 0 && summary.removedCount > 0 -> {
-                resources.getQuantityString(
-                    LR.plurals.changed_playlists,
-                    summary.totalCount,
-                    summary.totalCount,
-                )
+        val message = when (feedback) {
+            is PlaylistChangeFeedback.StringResource -> getString(feedback.resourceId)
+
+            is PlaylistChangeFeedback.PluralResource -> {
+                resources.getQuantityString(feedback.resourceId, feedback.quantity, feedback.quantity)
             }
 
-            summary.addedCount == 1 -> getString(LR.string.added_to_playlist_feedback)
-
-            summary.addedCount > 1 -> {
-                resources.getQuantityString(
-                    LR.plurals.added_to_playlist_single_multiple,
-                    summary.addedCount,
-                    summary.addedCount,
-                )
-            }
-
-            summary.removedCount == 1 -> getString(LR.string.removed_from_playlist_feedback)
-
-            summary.removedCount > 1 -> {
-                resources.getQuantityString(
-                    LR.plurals.removed_from_playlists,
-                    summary.removedCount,
-                    summary.removedCount,
-                )
-            }
-
-            else -> return
+            PlaylistChangeFeedback.None -> return
         }
         Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG).show()
     }
