@@ -224,10 +224,13 @@ open class PlaybackManager @Inject constructor(
     val playbackStateFlow: Flow<PlaybackState> = playbackStateRelay.asFlow()
 
     private var updateCount = 0
+
+    @Volatile
     private var resettingPlayer = false
+
+    private val playerTransitions = PlayerTransitionCoordinator()
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
-    private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
     private var bufferUpdateTimerDisposable: Disposable? = null
     private var pauseTimerDisposable: Disposable? = null
@@ -365,9 +368,15 @@ open class PlaybackManager @Inject constructor(
         return currentEpisode.podcastUuid.let { podcastManager.findPodcastByUuidBlocking(it) }
     }
 
-    private suspend fun autoLoadEpisode(autoPlay: Boolean): BaseEpisode? {
+    private suspend fun autoLoadEpisode(
+        autoPlay: Boolean,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ): BaseEpisode? {
+        if (!playerTransitions.isCurrent(transitionVersion)) return null
+
         val nextEpisode = getCurrentEpisode()
         if (nextEpisode != null) {
+            completeNoOpTransition(transitionVersion)
             return nextEpisode
         }
 
@@ -377,14 +386,22 @@ open class PlaybackManager @Inject constructor(
 
         // auto queue next episode on empty
         val autoPlayEpisode = autoSelectNextEpisode() ?: return null
+        if (!playerTransitions.isCurrent(transitionVersion)) return null
 
-        withContext(Dispatchers.Default) {
-            upNextQueue.playNextBlocking(autoPlayEpisode) {
-                launch {
-                    loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
+        val episodeQueued = playerTransitions.runIfCurrent(transitionVersion) {
+            withContext(Dispatchers.Default) {
+                upNextQueue.playNextBlocking(autoPlayEpisode) {
+                    launch {
+                        loadCurrentEpisode(
+                            play = autoPlay,
+                            sourceView = SourceView.AUTO_PLAY,
+                            transitionVersion = transitionVersion,
+                        )
+                    }
                 }
             }
         }
+        if (!episodeQueued) return null
 
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
@@ -399,11 +416,20 @@ open class PlaybackManager @Inject constructor(
         return playbackStateRelay.blockingFirst().isPlaying
     }
 
-    private suspend fun applyStreamOverride(episode: BaseEpisode) {
+    private suspend fun completeNoOpTransition(transitionVersion: PlayerTransitionCoordinator.Token) {
+        playerTransitions.runIfCurrent(transitionVersion) {
+            player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+        }
+    }
+
+    private suspend fun resolveStreamOverride(episode: BaseEpisode): String? {
+        return alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
+    }
+
+    private fun applyStreamOverride(episode: BaseEpisode, hlsUrl: String?) {
         episode.overrideStreamUrl = null
         episode.overrideStreamContentType = null
         // Stream the first HLS alternate enclosure when streaming is on, or when the episode is HLS-only.
-        val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
         _streamHlsAvailable.value = hlsUrl != null
         val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
         if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
@@ -464,6 +490,8 @@ open class PlaybackManager @Inject constructor(
             isVideoToggleReloading.set(false)
             return
         }
+        val transitionVersion = playerTransitions.beginTransition()
+        val play = isPlaying()
         launch(Dispatchers.Default) {
             try {
                 player?.let { player ->
@@ -471,9 +499,10 @@ open class PlaybackManager @Inject constructor(
                     episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, true)
                 }
                 loadCurrentEpisode(
-                    play = isPlaying(),
+                    play = play,
                     forceStream = streamWarningConfirmed,
                     showedStreamWarning = streamWarningConfirmed,
+                    transitionVersion = transitionVersion,
                 )
             } finally {
                 isVideoToggleReloading.set(false)
@@ -625,15 +654,26 @@ open class PlaybackManager @Inject constructor(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,
     ) {
-        launch { playQueueSuspend(sourceView, showedStreamWarning) }
+        val transitionVersion = playerTransitions.beginTransition()
+        launch { playQueueSuspend(sourceView, showedStreamWarning, transitionVersion) }
     }
 
     suspend fun playQueueSuspend(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,
     ) {
+        playQueueSuspend(sourceView, showedStreamWarning, playerTransitions.beginTransition())
+    }
+
+    private suspend fun playQueueSuspend(
+        sourceView: SourceView,
+        showedStreamWarning: Boolean,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
         if (upNextQueue.currentEpisode != null) {
-            loadEpisodeWhenRequired(sourceView, showedStreamWarning)
+            loadEpisodeWhenRequired(sourceView, showedStreamWarning, transitionVersion)
+        } else {
+            completeNoOpTransition(transitionVersion)
         }
     }
 
@@ -643,12 +683,14 @@ open class PlaybackManager @Inject constructor(
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
     ) {
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
             playNowSuspend(
                 episode = episode,
                 forceStream = forceStream,
                 showedStreamWarning = showedStreamWarning,
                 sourceView = sourceView,
+                transitionVersion = transitionVersion,
             )
         }
     }
@@ -659,8 +701,13 @@ open class PlaybackManager @Inject constructor(
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
     ) {
-        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
-        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView)
+        val transitionVersion = playerTransitions.beginTransition()
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid)
+        if (episode == null) {
+            completeNoOpTransition(transitionVersion)
+            return
+        }
+        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView, transitionVersion)
     }
 
     suspend fun playNowSuspend(
@@ -669,12 +716,29 @@ open class PlaybackManager @Inject constructor(
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
     ) {
-        forcePlayerSwitch = true
+        playNowSuspend(
+            episode = episode,
+            forceStream = forceStream,
+            showedStreamWarning = showedStreamWarning,
+            sourceView = sourceView,
+            transitionVersion = playerTransitions.beginTransition(),
+        )
+    }
+
+    private suspend fun playNowSuspend(
+        episode: BaseEpisode,
+        forceStream: Boolean,
+        showedStreamWarning: Boolean,
+        sourceView: SourceView,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
         playNowSync(
             episode = episode,
             forceStream = forceStream,
             showedStreamWarning = showedStreamWarning,
             sourceView = sourceView,
+            transitionVersion = transitionVersion,
+            forcePlayerSwitch = true,
         )
     }
 
@@ -683,6 +747,24 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
+        playNowSync(
+            episode = episode,
+            forceStream = forceStream,
+            showedStreamWarning = showedStreamWarning,
+            sourceView = sourceView,
+            transitionVersion = playerTransitions.beginTransition(),
+            forcePlayerSwitch = false,
+        )
+    }
+
+    private suspend fun playNowSync(
+        episode: BaseEpisode,
+        forceStream: Boolean,
+        showedStreamWarning: Boolean,
+        sourceView: SourceView,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+        forcePlayerSwitch: Boolean,
     ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
@@ -696,30 +778,38 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
-        if (switchEpisode || isPlayerSwitchRequired()) {
+        if (switchEpisode || isPlayerSwitchRequired(forcePlayerSwitch)) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Player switch required. Different episode: $switchEpisode")
-            pause(transientLoss = true)
-            upNextQueue.playNow(
-                episode = episode,
-                automaticUpNextSource = autoPlaySource(sourceView, episode),
-                onAdd = {
-                    launch {
-                        loadCurrentEpisode(
-                            play = true,
-                            forceStream = forceStream,
-                            showedStreamWarning = showedStreamWarning,
-                            sourceView = sourceView,
-                        )
-                    }
-                },
+            val episodeQueued = playerTransitions.runIfCurrent(transitionVersion) {
+                pausePlayer(transientLoss = true, sourceView = SourceView.UNKNOWN)
+                upNextQueue.playNow(
+                    episode = episode,
+                    automaticUpNextSource = autoPlaySource(sourceView, episode),
+                    onAdd = null,
+                )
+            }
+            if (!episodeQueued) return
+
+            loadCurrentEpisode(
+                play = true,
+                forceStream = forceStream,
+                showedStreamWarning = showedStreamWarning,
+                sourceView = sourceView,
+                forcePlayerReset = forcePlayerSwitch && switchEpisode,
+                transitionVersion = transitionVersion,
             )
         } else if (playbackStateRelay.blockingFirst().isPaused) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No player switch required. Playing queue.")
-            playQueue(
+            playQueueSuspend(
                 showedStreamWarning = showedStreamWarning,
                 sourceView = sourceView,
+                transitionVersion = transitionVersion,
             )
+        } else {
+            completeNoOpTransition(transitionVersion)
         }
     }
 
@@ -820,21 +910,24 @@ open class PlaybackManager @Inject constructor(
         episode: BaseEpisode,
         source: SourceView,
         userInitiated: Boolean = true,
-    ) = withContext(Dispatchers.Default) {
+    ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
-        if (userInitiated) {
-            eventHorizon.track(
-                EpisodeAddedToUpNextEvent(
-                    episodeUuid = episode.uuid,
-                    toTop = true,
-                    source = source.analyticsValue,
-                ),
-            )
-            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
-        }
-        if (wasEmpty) {
-            loadCurrentEpisode(play = false)
+        val transitionVersion = if (wasEmpty) playerTransitions.beginTransition() else null
+        withContext(Dispatchers.Default) {
+            upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
+            if (userInitiated) {
+                eventHorizon.track(
+                    EpisodeAddedToUpNextEvent(
+                        episodeUuid = episode.uuid,
+                        toTop = true,
+                        source = source.analyticsValue,
+                    ),
+                )
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
+            }
+            if (transitionVersion != null) {
+                loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
+            }
         }
     }
 
@@ -844,6 +937,7 @@ open class PlaybackManager @Inject constructor(
         userInitiated: Boolean = true,
     ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
+        val transitionVersion = if (wasEmpty) playerTransitions.beginTransition() else null
         upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
             eventHorizon.track(
@@ -855,23 +949,28 @@ open class PlaybackManager @Inject constructor(
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
-        if (wasEmpty) {
-            loadCurrentEpisode(play = false)
+        if (transitionVersion != null) {
+            loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
         }
     }
 
     private suspend fun loadEpisodeWhenRequired(
-        sourceView: SourceView = SourceView.UNKNOWN,
-        showedStreamWarning: Boolean = false,
+        sourceView: SourceView,
+        showedStreamWarning: Boolean,
+        transitionVersion: PlayerTransitionCoordinator.Token,
     ) {
         if (isPlayerSwitchRequired()) {
             loadCurrentEpisode(
                 play = true,
                 showedStreamWarning = showedStreamWarning,
                 sourceView = sourceView,
+                transitionVersion = transitionVersion,
             )
         } else {
-            play(sourceView)
+            playerTransitions.runIfCurrent(transitionVersion) {
+                player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+                play(sourceView)
+            }
         }
     }
 
@@ -904,11 +1003,23 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
             val topEpisode = episodes.first()
-            playNowSync(episode = topEpisode, sourceView = sourceView)
+            playNowSync(
+                episode = topEpisode,
+                forceStream = false,
+                showedStreamWarning = false,
+                sourceView = sourceView,
+                transitionVersion = transitionVersion,
+                forcePlayerSwitch = false,
+            )
             if (episodes.size > 1) {
-                upNextQueue.clearAndPlayAll(episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())))
+                playerTransitions.runIfCurrent(transitionVersion) {
+                    upNextQueue.clearAndPlayAll(
+                        episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())),
+                    )
+                }
             }
         }
     }
@@ -918,11 +1029,12 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        val wasEmpty = upNextQueue.isEmpty
+        val transitionVersion = if (wasEmpty) playerTransitions.beginTransition() else null
         launch {
-            val wasEmpty = upNextQueue.isEmpty
             addEpisodesLast(episodes, source)
-            if (wasEmpty) {
-                loadCurrentEpisode(play = false)
+            if (transitionVersion != null) {
+                loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
             }
         }
     }
@@ -948,9 +1060,10 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        val wasEmpty = upNextQueue.isEmpty
+        val transitionVersion = if (wasEmpty) playerTransitions.beginTransition() else null
         launch {
             val currentEpisode = upNextQueue.currentEpisode?.uuid
-            val wasEmpty: Boolean = upNextQueue.isEmpty
             upNextQueue.playAllNext(episodes.filter { it.uuid != currentEpisode })
             eventHorizon.track(
                 EpisodeBulkAddToUpNextEvent(
@@ -960,8 +1073,8 @@ open class PlaybackManager @Inject constructor(
                 ),
             )
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
-            if (wasEmpty) {
-                loadCurrentEpisode(play = false)
+            if (transitionVersion != null) {
+                loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
             }
         }
     }
@@ -973,12 +1086,28 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun pause(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
-            pauseSuspend(transientLoss, sourceView)
+            pauseSuspend(transientLoss, sourceView, transitionVersion)
         }
     }
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        pauseSuspend(transientLoss, sourceView, playerTransitions.beginTransition())
+    }
+
+    private suspend fun pauseSuspend(
+        transientLoss: Boolean,
+        sourceView: SourceView,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        playerTransitions.runIfCurrent(transitionVersion) {
+            player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+            pausePlayer(transientLoss, sourceView)
+        }
+    }
+
+    private suspend fun pausePlayer(transientLoss: Boolean, sourceView: SourceView) {
         if (!transientLoss) {
             focusManager.giveUpAudioFocus()
             playbackStateRelay.blockingFirst().let { playbackState ->
@@ -1004,12 +1133,27 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
-            stopSuspend(isAudioFocusFailed, sourceView)
+            stopSuspend(isAudioFocusFailed, sourceView, transitionVersion)
         }
     }
 
     suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        stopSuspend(isAudioFocusFailed, sourceView, playerTransitions.beginTransition())
+    }
+
+    private suspend fun stopSuspend(
+        isAudioFocusFailed: Boolean,
+        sourceView: SourceView,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        playerTransitions.runIfCurrent(transitionVersion) {
+            stopPlayback(isAudioFocusFailed, sourceView)
+        }
+    }
+
+    private suspend fun stopPlayback(isAudioFocusFailed: Boolean, sourceView: SourceView) {
         if (!isAudioFocusFailed) {
             trackPlaybackEvent(sourceView) { source, contentType ->
                 PlaybackStopEvent(
@@ -1018,10 +1162,20 @@ open class PlaybackManager @Inject constructor(
                 )
             }
         }
-        stop()
+        stopPlayback()
     }
 
     suspend fun stop() {
+        stop(playerTransitions.beginTransition())
+    }
+
+    private suspend fun stop(transitionVersion: PlayerTransitionCoordinator.Token) {
+        playerTransitions.runIfCurrent(transitionVersion) {
+            stopPlayback()
+        }
+    }
+
+    private suspend fun stopPlayback() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Stopping playback")
 
         cancelPrefetchNextEpisode()
@@ -1029,8 +1183,9 @@ open class PlaybackManager @Inject constructor(
         cancelBufferUpdateTimer()
 
         withContext(Dispatchers.Main) {
-            if (player != null) {
-                player?.stop()
+            player?.let { playerToStop ->
+                playerToStop.stop()
+                playerTransitions.clearEventSource(playerToStop)
                 player = null
             }
         }
@@ -1047,15 +1202,30 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun shutdown() {
-        stop()
+        shutdown(playerTransitions.beginTransition())
+    }
 
-        audioNoisyManager.unregister()
-        focusManager.giveUpAudioFocus()
+    private suspend fun shutdown(
+        transitionVersion: PlayerTransitionCoordinator.Token,
+        beforeCastSessionEnd: suspend () -> Unit = {},
+    ) {
+        playerTransitions.runIfCurrent(transitionVersion) {
+            stopPlayback()
 
-        withContext(Dispatchers.Main) {
-            playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
+            audioNoisyManager.unregister()
+            focusManager.giveUpAudioFocus()
+
+            withContext(Dispatchers.Main) {
+                playbackStateRelay.accept(
+                    PlaybackState(
+                        state = PlaybackState.State.EMPTY,
+                        lastChangeFrom = LastChangeFrom.OnShutdown.value,
+                    ),
+                )
+            }
+            beforeCastSessionEnd()
+            castManager.endSession()
         }
-        castManager.endSession()
     }
 
     suspend fun hibernatePlayback() {
@@ -1135,8 +1305,9 @@ open class PlaybackManager @Inject constructor(
         sourceView: SourceView = SourceView.UNKNOWN,
         jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
     ) {
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
-            skipForwardSuspend(sourceView, jumpAmountSeconds)
+            skipForwardSuspend(sourceView, jumpAmountSeconds, transitionVersion)
         }
     }
 
@@ -1144,23 +1315,44 @@ open class PlaybackManager @Inject constructor(
         sourceView: SourceView = SourceView.UNKNOWN,
         jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
     ) {
+        skipForwardSuspend(sourceView, jumpAmountSeconds, playerTransitions.beginTransition())
+    }
+
+    private suspend fun skipForwardSuspend(
+        sourceView: SourceView,
+        jumpAmountSeconds: Int,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
-        val episode = getCurrentEpisode() ?: return
+        val episode = getCurrentEpisode()
+        if (episode == null) {
+            completeNoOpTransition(transitionVersion)
+            return
+        }
         val jumpAmountMs = jumpAmountSeconds * 1000
 
         val currentTimeMs = getCurrentTimeMs(episode = episode)
-        if (currentTimeMs < 0 || player?.episodeUuid != episode.uuid) return // Make sure the player hasn't changed episodes before using the current time to seek
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+        if (currentTimeMs < 0 || player?.episodeUuid != episode.uuid) {
+            // Make sure the player hasn't changed episodes before using the current time to seek.
+            completeNoOpTransition(transitionVersion)
+            return
+        }
 
         val newPositionMs = currentTimeMs + jumpAmountMs
         val durationMs = player?.durationMs() ?: Int.MAX_VALUE // If we don't have a duration, just let them skip
 
-        statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
         if (newPositionMs < durationMs) {
-            seekToTimeMsInternal(newPositionMs)
+            playerTransitions.runIfCurrent(transitionVersion) {
+                player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+                statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
+                seekToTimeMsInternal(newPositionMs)
+            }
         } else {
+            statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Seek beyond end of episode so completing. ${episode.uuid}")
-            onCompletion(episode.uuid)
+            onCompletion(episode.uuid, transitionVersion)
         }
 
         trackPlaybackEvent(sourceView) { source, contentType ->
@@ -1275,10 +1467,12 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun endPlaybackAndClearUpNextAsync() {
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
-            shutdown()
-            upNextHistoryManager.snapshotUpNext()
-            upNextQueue.removeAll()
+            shutdown(transitionVersion) {
+                upNextHistoryManager.snapshotUpNext()
+                upNextQueue.removeAll()
+            }
         }
     }
 
@@ -1304,96 +1498,167 @@ open class PlaybackManager @Inject constructor(
 
     private val removeMutex = Mutex()
     fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true, shouldShuffleUpNext: Boolean = false) {
-        launch {
-            if (episodeToRemove == null) {
-                return@launch
-            }
+        if (episodeToRemove == null) return
 
+        val currentEpisodeUuid = getCurrentEpisode()?.uuid
+        val currentPlayerUuid = player?.episodeUuid
+        val removesCurrentPlayback = currentEpisodeUuid == episodeToRemove.uuid &&
+            (currentPlayerUuid == null || currentPlayerUuid == episodeToRemove.uuid)
+        val transitionVersion = if (removesCurrentPlayback) playerTransitions.beginTransition() else null
+        removeEpisode(
+            episodeToRemove = episodeToRemove,
+            source = source,
+            userInitiated = userInitiated,
+            shouldShuffleUpNext = shouldShuffleUpNext,
+            transitionVersion = transitionVersion,
+        )
+    }
+
+    private fun removeEpisode(
+        episodeToRemove: BaseEpisode,
+        source: SourceView,
+        userInitiated: Boolean,
+        shouldShuffleUpNext: Boolean,
+        transitionVersion: PlayerTransitionCoordinator.Token?,
+    ) {
+        launch {
             removeMutex.withLock {
                 val currentEpisode = getCurrentEpisode()
-
                 val isCurrentEpisode = currentEpisode != null && currentEpisode.uuid == episodeToRemove.uuid && (player == null || player?.episodeUuid == episodeToRemove.uuid)
                 val isPlaying = isPlaying()
 
                 if (isCurrentEpisode) {
+                    val currentTransitionVersion = transitionVersion ?: return@withLock
                     // when there is another episode in the Up Next and we are playing, don't stop so the foreground service isn't stopped
                     val moreEpisodes = upNextQueue.size > 1
-                    if (moreEpisodes && isPlaying) {
-                        pause(transientLoss = true)
-                    } else {
-                        stop()
+                    val episodeRemoved = playerTransitions.runIfCurrent(currentTransitionVersion) {
+                        if (moreEpisodes && isPlaying) {
+                            pausePlayer(transientLoss = true, sourceView = SourceView.UNKNOWN)
+                        } else {
+                            stopPlayback()
+                        }
+                        upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
+                        trackEpisodeRemoved(episodeToRemove, source, userInitiated)
                     }
-                }
+                    if (!episodeRemoved) return@withLock
 
-                upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
-                if (userInitiated) {
-                    eventHorizon.track(
-                        EpisodeRemovedFromUpNextEvent(
-                            episodeUuid = episodeToRemove.uuid,
-                            source = source.analyticsValue,
-                        ),
+                    loadCurrentEpisode(
+                        play = isPlaying,
+                        sourceView = SourceView.AUTO_PLAY,
+                        transitionVersion = currentTransitionVersion,
                     )
-                }
-
-                if (isCurrentEpisode) {
-                    loadCurrentEpisode(play = isPlaying, sourceView = SourceView.AUTO_PLAY)
+                } else if (transitionVersion != null) {
+                    playerTransitions.runIfCurrent(transitionVersion) {
+                        upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
+                        trackEpisodeRemoved(episodeToRemove, source, userInitiated)
+                        player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+                    }
+                } else {
+                    upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
+                    trackEpisodeRemoved(episodeToRemove, source, userInitiated)
                 }
             }
         }
     }
 
-    private suspend fun onRemoteMetaDataNotMatched(episodeUuid: String) {
+    private fun trackEpisodeRemoved(episode: BaseEpisode, source: SourceView, userInitiated: Boolean) {
+        if (userInitiated) {
+            eventHorizon.track(
+                EpisodeRemovedFromUpNextEvent(
+                    episodeUuid = episode.uuid,
+                    source = source.analyticsValue,
+                ),
+            )
+        }
+    }
+
+    private suspend fun onRemoteMetaDataNotMatched(
+        episodeUuid: String,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+
         val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
-        val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidBlocking(episode.podcastUuid) else null
+        val podcast = if (episode is PodcastEpisode) {
+            podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
+        } else {
+            null
+        }
+        if (!playerTransitions.isCurrent(transitionVersion)) return
 
         if (player?.isRemote == true && player?.isPlaying() == false) {
             if (castManager.isPlaying()) {
                 Timber.d("Playing remote episode %s", episode.title)
-                playNowSync(episode)
+                playNowSync(
+                    episode = episode,
+                    forceStream = false,
+                    showedStreamWarning = false,
+                    sourceView = SourceView.UNKNOWN,
+                    transitionVersion = transitionVersion,
+                    forcePlayerSwitch = false,
+                )
             } else {
-                loadCurrentEpisode(play = false)
+                loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
+                playerTransitions.runIfCurrent(transitionVersion) {
+                    player?.setEpisode(episode)
+                    player?.setPodcast(podcast)
+                }
             }
-
-            player?.setEpisode(episode)
-            player?.setPodcast(podcast)
         }
     }
 
     fun castReconnected() {
+        val transitionVersion = playerTransitions.beginTransition()
         launch(Dispatchers.Main) {
-            if (player != null) {
-                player?.stop()
-                player = null
+            playerTransitions.runIfCurrent(transitionVersion) {
+                player?.let { playerToStop ->
+                    playerToStop.stop()
+                    playerTransitions.clearEventSource(playerToStop)
+                    player = null
+                }
+
+                player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+                mediaSessionManager.installCastPlayer()
+                (player as? CastPlayer)?.updateFromRemoteIfRequired()
+                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+
+                setupUpdateTimer()
             }
-
-            player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-            mediaSessionManager.installCastPlayer()
-            (player as? CastPlayer)?.updateFromRemoteIfRequired()
-            Timber.i("Cast reconnected. Creating media player of type CastPlayer")
-
-            setupUpdateTimer()
         }
     }
 
     fun castConnected() {
         upNextQueue.currentEpisode ?: return
+        val transitionVersion = playerTransitions.beginTransition()
         cancelPrefetchNextEpisode()
         launch {
             if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
+                loadCurrentEpisode(
+                    play = true,
+                    sourceView = SourceView.CHROMECAST,
+                    transitionVersion = transitionVersion,
+                )
+            } else {
+                completeNoOpTransition(transitionVersion)
             }
         }
     }
 
     fun castDisconnected() {
         upNextQueue.currentEpisode ?: return
+        val transitionVersion = playerTransitions.beginTransition()
         launch {
             updateCurrentPositionInDatabase()
 
-            stop()
+            stop(transitionVersion)
 
             if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(false, sourceView = SourceView.CHROMECAST)
+                loadCurrentEpisode(
+                    play = false,
+                    sourceView = SourceView.CHROMECAST,
+                    transitionVersion = transitionVersion,
+                )
             }
         }
     }
@@ -1402,6 +1667,16 @@ open class PlaybackManager @Inject constructor(
 
     @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
+        onPlayerError(event, playerTransitions.beginTransition())
+    }
+
+    @OptIn(UnstableApi::class)
+    private suspend fun onPlayerError(
+        event: PlayerEvent.PlayerError,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+
         settings.recordErrorSession()
         val episode = getCurrentEpisode()
 
@@ -1438,28 +1713,46 @@ open class PlaybackManager @Inject constructor(
         }
 
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
+        if (!playerTransitions.isCurrent(transitionVersion)) return
 
         // If a downloaded episode's file is missing, clear the stale download status
         // and retry playback via streaming instead of leaving the user stuck.
         if (episode != null && episode.isDownloaded && episode.downloadUrl != null && isDownloadedFileMissing(event)) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Downloaded file missing for ${episode.uuid}, clearing download status and retrying via stream")
             downloadQueue.cancel(episode.uuid, SourceView.UNKNOWN).join()
+            if (!playerTransitions.isCurrent(transitionVersion)) return
+
             episodeManager.clearPlaybackErrorBlocking(episode)
-            playNow(episode = episode, forceStream = true, sourceView = SourceView.UNKNOWN)
+            playNowSuspend(
+                episode = episode,
+                forceStream = true,
+                showedStreamWarning = false,
+                sourceView = SourceView.UNKNOWN,
+                transitionVersion = transitionVersion,
+            )
             return
         }
 
         val currentEpisode = getCurrentEpisode()
-        if (currentEpisode is BaseEpisode) {
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+        if (currentEpisode?.uuid != episode?.uuid) {
+            completeNoOpTransition(transitionVersion)
+            return
+        }
+        if (currentEpisode != null) {
             episodeManager.markAsPlaybackErrorBlocking(currentEpisode, event, isPlaybackRemote())
         }
 
-        stop()
+        stop(transitionVersion)
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+
         onPlayerPaused()
 
         val stuckException = event.error?.cause as? StuckPlayerException
 
         withContext(Dispatchers.Main) {
+            if (!playerTransitions.isCurrent(transitionVersion)) return@withContext
+
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val cause = event.error?.cause
                 val playbackIssue = when {
@@ -1633,8 +1926,24 @@ open class PlaybackManager @Inject constructor(
         mediaSessionManager.updateCastState(isPlaying, isBuffering, positionMs)
     }
 
-    private suspend fun onCompletion(episodeUUID: String?) {
+    private suspend fun onCompletion(
+        episodeUUID: String?,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        if (!playerTransitions.isCurrent(transitionVersion)) return
         if (resettingPlayer) {
+            completeNoOpTransition(transitionVersion)
+            return
+        }
+
+        val episode = getCurrentEpisode()
+        if (episode != null && episode.uuid != episodeUUID) {
+            // We have already completed this episode, don't do it again or we may skip the next one.
+            LogBuffer.e(
+                LogBuffer.TAG_PLAYBACK,
+                "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.",
+            )
+            completeNoOpTransition(transitionVersion)
             return
         }
 
@@ -1644,8 +1953,6 @@ open class PlaybackManager @Inject constructor(
 
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
-
-        val episode = getCurrentEpisode()
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $hadSleepAfterEpisode")
 
@@ -1658,11 +1965,6 @@ open class PlaybackManager @Inject constructor(
         cancelBufferUpdateTimer()
 
         if (episode != null) {
-            if (episode.uuid != episodeUUID) {
-                // We have already completed this episode, don't do it again or we may skip the next one
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
-                return
-            }
             eventHorizon.track(
                 PlayerEpisodeCompletedEvent(
                     podcastUuid = episode.podcastOrSubstituteUuid,
@@ -1673,7 +1975,18 @@ open class PlaybackManager @Inject constructor(
             )
 
             // remove from Up Next
-            upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
+            var episodeRemoved = false
+            val transitionCommitted = playerTransitions.runIfCurrent(transitionVersion) {
+                if (upNextQueue.currentEpisode?.uuid == episode.uuid) {
+                    upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
+                    episodeRemoved = true
+                }
+            }
+            if (!transitionCommitted) return
+            if (!episodeRemoved) {
+                completeNoOpTransition(transitionVersion)
+                return
+            }
 
             // mark as played
             episodeManager.updatePlayingStatusBlocking(episode, EpisodePlayingStatus.COMPLETED)
@@ -1725,14 +2038,17 @@ open class PlaybackManager @Inject constructor(
 
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
-            nextEpisode = autoLoadEpisode(autoPlay)
+            nextEpisode = autoLoadEpisode(autoPlay, transitionVersion)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                stop()
-                shutdown()
+                shutdown(transitionVersion)
             }
         } else {
-            loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
+            loadCurrentEpisode(
+                play = autoPlay,
+                sourceView = SourceView.AUTO_PLAY,
+                transitionVersion = transitionVersion,
+            )
         }
     }
 
@@ -1762,11 +2078,19 @@ open class PlaybackManager @Inject constructor(
         if (episode == null) return
 
         sleepTimer.sleepEndOfEpisode(episode) {
+            val transitionVersion = playerTransitions.beginTransition()
             showToast(application.getString(LR.string.player_sleep_time_fired))
+            if (!playerTransitions.isCurrent(transitionVersion)) return@sleepEndOfEpisode
 
             val podcast = playbackStateRelay.blockingFirst().podcast
             if (podcast != null && podcast.skipLastSecs > 0) {
-                pause(sourceView = SourceView.AUTO_PAUSE)
+                pauseSuspend(
+                    transientLoss = false,
+                    sourceView = SourceView.AUTO_PAUSE,
+                    transitionVersion = transitionVersion,
+                )
+                if (!playerTransitions.isCurrent(transitionVersion)) return@sleepEndOfEpisode
+
                 onPlayerPaused()
             }
 
@@ -1779,7 +2103,7 @@ open class PlaybackManager @Inject constructor(
                 }
             }
 
-            stop()
+            stop(transitionVersion)
         }
     }
 
@@ -1981,12 +2305,11 @@ open class PlaybackManager @Inject constructor(
     /**
      * Check the player is initialised and if we are using the correct player either the system or cast player.
      */
-    private suspend fun isPlayerSwitchRequired(): Boolean {
+    private suspend fun isPlayerSwitchRequired(forcePlayerSwitch: Boolean = false): Boolean {
         if (player == null) {
             return true
         }
         if (forcePlayerSwitch) {
-            forcePlayerSwitch = false
             return true
         }
         // using Chrome Cast make sure the player is connected
@@ -2023,6 +2346,8 @@ open class PlaybackManager @Inject constructor(
         showedStreamWarning: Boolean = false,
         forceStream: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        forcePlayerReset: Boolean = false,
+        transitionVersion: PlayerTransitionCoordinator.Token,
     ) {
         // make sure we have the most recent copy from the database
         val episode = when (val currentUpNextEpisode = upNextQueue.currentEpisode) {
@@ -2048,22 +2373,20 @@ open class PlaybackManager @Inject constructor(
         }
 
         if (episode == null) {
-            val nextEpisode = autoLoadEpisode(autoPlay = play)
+            val nextEpisode = autoLoadEpisode(autoPlay = play, transitionVersion = transitionVersion)
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
-                shutdown()
+                shutdown(transitionVersion)
             }
+            return
+        }
+        if (!playerTransitions.isCurrent(transitionVersion)) return
+        if (upNextQueue.currentEpisode?.uuid != episode.uuid) {
+            completeNoOpTransition(transitionVersion)
             return
         }
 
         val podcast = findPodcastByEpisode(episode)
-
-        cancelPauseTimer()
-        cancelUpdateTimer()
-        cancelBufferUpdateTimer()
-
-        val currentPlayer = this.player
-        val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
         // completed episodes should play from the start
         if (episode.isFinished) {
@@ -2088,16 +2411,74 @@ open class PlaybackManager @Inject constructor(
                         val newDownloadUrl = userEpisodeManager.getPlaybackUrlRxSingle(episode).await()
                         episode.downloadUrl = newDownloadUrl
                     } catch (e: Exception) {
-                        onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                        removeEpisode(episode, source = sourceView)
+                        if (!playerTransitions.isCurrent(transitionVersion)) {
+                            return
+                        }
+                        if (upNextQueue.currentEpisode?.uuid != episode.uuid) {
+                            completeNoOpTransition(transitionVersion)
+                            return
+                        }
+
+                        onPlayerError(
+                            event = PlayerEvent.PlayerError("Could not load cloud file ${e.message}"),
+                            transitionVersion = transitionVersion,
+                        )
+                        if (!playerTransitions.isCurrent(transitionVersion)) return
+
+                        removeEpisode(
+                            episodeToRemove = episode,
+                            source = sourceView,
+                            userInitiated = true,
+                            shouldShuffleUpNext = false,
+                            transitionVersion = transitionVersion,
+                        )
                         return
                     }
                 }
             }
         }
 
-        // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
-        applyStreamOverride(episode)
+        val hlsStreamUrl = resolveStreamOverride(episode)
+
+        playerTransitions.runIfCurrent(transitionVersion) {
+            val isCurrentEpisode = upNextQueue.currentEpisode?.uuid == episode.uuid
+            if (!isCurrentEpisode) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Ignoring superseded episode load for ${episode.uuid}")
+                player?.let { playerTransitions.bindEventSource(it, transitionVersion) }
+                return@runIfCurrent
+            }
+
+            // Apply the resolved enclosure only after confirming that this request is still current.
+            applyStreamOverride(episode, hlsStreamUrl)
+            loadCurrentEpisodeIntoPlayer(
+                episode = episode,
+                podcast = podcast,
+                play = play,
+                showedStreamWarning = showedStreamWarning,
+                forceStream = forceStream,
+                sourceView = sourceView,
+                forcePlayerReset = forcePlayerReset,
+                transitionVersion = transitionVersion,
+            )
+        }
+    }
+
+    private suspend fun loadCurrentEpisodeIntoPlayer(
+        episode: BaseEpisode,
+        podcast: Podcast?,
+        play: Boolean,
+        showedStreamWarning: Boolean,
+        forceStream: Boolean,
+        sourceView: SourceView,
+        forcePlayerReset: Boolean,
+        transitionVersion: PlayerTransitionCoordinator.Token,
+    ) {
+        cancelPauseTimer()
+        cancelUpdateTimer()
+        cancelBufferUpdateTimer()
+
+        val currentPlayer = this.player
+        val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
         if (videoStreamPreferred && episode.uuid != videoStreamPreferredEpisodeUuid) {
             videoStreamPreferred = false
@@ -2177,12 +2558,14 @@ open class PlaybackManager @Inject constructor(
                             if (player?.isStreaming == true && it.isDownloaded && player?.isRemote == false && !watchingVideo) {
                                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode was streaming but was now downloaded, switching to downloaded file")
 
+                                val transitionVersion = playerTransitions.beginTransition()
+                                val play = isPlaying()
                                 launch(Dispatchers.Default) {
                                     player?.let { player ->
                                         val currentTimeSecs = player.getCurrentPositionMs().toDouble() / 1000.0
                                         episodeManager.updatePlayedUpToBlocking(it, currentTimeSecs, true)
                                     }
-                                    loadCurrentEpisode(isPlaying())
+                                    loadCurrentEpisode(play = play, transitionVersion = transitionVersion)
                                 }
                             } else {
                                 Timber.d("Episode is not downloaded $this")
@@ -2214,7 +2597,7 @@ open class PlaybackManager @Inject constructor(
         var posUpdatedOnPlayerReset = false
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
-            isPlayerSwitchRequired() ||
+            isPlayerSwitchRequired(forcePlayerReset) ||
             isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected(), playingStream)
         ) {
             // Don't create a player if we aren't playing because it will start to buffer
@@ -2244,8 +2627,11 @@ open class PlaybackManager @Inject constructor(
             player?.getCurrentPositionMs()
         }
 
-        player?.setPodcast(podcast)
-        player?.setEpisode(episode, videoStreamPreferred)
+        player?.let {
+            playerTransitions.bindEventSource(it, transitionVersion)
+            it.setPodcast(podcast)
+            it.setEpisode(episode, videoStreamPreferred)
+        }
 
         val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
             podcast.playbackEffects
@@ -2484,25 +2870,25 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun resetPlayer() {
-        if (resettingPlayer) return
         resettingPlayer = true
-
-        withContext(Dispatchers.Main) {
-            player?.stop()
-            if (castManager.isConnected()) {
-                player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-                mediaSessionManager.installCastPlayer()
-                Timber.i("Creating media player of type CastPlayer.")
-            } else {
-                player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
-                // Start the service early so it's ready when we install the player later.
-                // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
-                mediaSessionManager.startServiceIfNeeded(application)
-                Timber.i("Creating media player of type SimplePlayer.")
+        try {
+            withContext(Dispatchers.Main) {
+                player?.stop()
+                if (castManager.isConnected()) {
+                    player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                    mediaSessionManager.installCastPlayer()
+                    Timber.i("Creating media player of type CastPlayer.")
+                } else {
+                    player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
+                    // Start the service early so it's ready when we install the player later.
+                    // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
+                    mediaSessionManager.startServiceIfNeeded(application)
+                    Timber.i("Creating media player of type SimplePlayer.")
+                }
             }
+        } finally {
+            resettingPlayer = false
         }
-
-        resettingPlayer = false
     }
 
     private suspend fun stopPlayer() {
@@ -2512,23 +2898,41 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun onPlayerEvent(player: Player, event: PlayerEvent) {
-        if (this.player != player) return
+        if (this.player !== player) return
+        val transitionVersion = playerTransitions.tokenForEventSource(player)
 
         launch {
+            if (this@PlaybackManager.player !== player) return@launch
+            if (transitionVersion == null || !playerTransitions.isCurrent(transitionVersion)) return@launch
+
             Timber.d("Player %s event %s", player, event)
             when (event) {
-                is PlayerEvent.Completion -> onCompletion(event.episodeUUID)
+                is PlayerEvent.Completion -> onCompletion(event.episodeUUID, transitionVersion)
+
                 is PlayerEvent.PlayerPaused -> onPlayerPaused()
+
                 is PlayerEvent.PlayerPlaying -> onPlayerPlaying()
+
                 is PlayerEvent.BufferingStateChanged -> onBufferingStateChanged()
+
                 is PlayerEvent.DurationAvailable -> onDurationAvailable()
+
                 is PlayerEvent.SeekComplete -> onSeekComplete(event.positionMs)
+
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
-                is PlayerEvent.PlayerError -> onPlayerError(event)
-                is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
+
+                is PlayerEvent.PlayerError -> onPlayerError(event, transitionVersion)
+
+                is PlayerEvent.RemoteMetadataNotMatched -> {
+                    onRemoteMetaDataNotMatched(event.remoteEpisodeUuid, transitionVersion)
+                }
+
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
+
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
+
                 is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
+
                 is PlayerEvent.VideoTrackChanged -> onVideoTrackChanged(event.hasVideo)
             }
         }
@@ -2664,17 +3068,24 @@ open class PlaybackManager @Inject constructor(
                 currentChapterUuid = getCurrentChapterUuid(),
                 currentEpisodeUuid = getCurrentEpisode()?.uuid,
                 onSleepEndOfChapter = {
+                    val transitionVersion = playerTransitions.beginTransition()
                     showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
+                    if (!playerTransitions.isCurrent(transitionVersion)) return@verifySleepTimeForEndOfChapter
 
                     val podcast = playbackStateRelay.blockingFirst().podcast
                     // When the "skip last" option is enabled, we need to pause the chapter at the time configured in "skip last."
                     // Otherwise, this won't work with the sleep timer, as the sleep timer stops only when the chapter finishes
                     if (podcast != null && podcast.skipLastSecs > 0) {
-                        pause(sourceView = SourceView.AUTO_PAUSE)
+                        pauseSuspend(
+                            transientLoss = false,
+                            sourceView = SourceView.AUTO_PAUSE,
+                            transitionVersion = transitionVersion,
+                        )
+                        if (!playerTransitions.isCurrent(transitionVersion)) return@verifySleepTimeForEndOfChapter
                     }
                     onPlayerPaused()
 
-                    stop()
+                    stop(transitionVersion)
                 },
             )
         }
@@ -2779,20 +3190,31 @@ open class PlaybackManager @Inject constructor(
         val episode = upNextQueue.currentEpisode ?: return
         val currentPlayer = this.player
         if (currentPlayer == null || episode.uuid != currentPlayer.episodeUuid) {
-            loadCurrentEpisode(false)
+            val transitionVersion = playerTransitions.beginTransition()
+            loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
         }
     }
 
     fun loadQueue(): Job {
+        val episode = upNextQueue.currentEpisode
+        val currentPlayer = player
+        val shouldLoadEpisode = episode != null &&
+            currentPlayer != null &&
+            episode.uuid != currentPlayer.episodeUuid
+        val transitionVersion = if (shouldLoadEpisode) {
+            playerTransitions.beginTransition()
+        } else {
+            null
+        }
         return launch {
-            val episode = upNextQueue.currentEpisode ?: return@launch
-            val currentPlayer = this@PlaybackManager.player
+            if (episode == null) return@launch
+
             if (currentPlayer == null) {
                 withContext(Dispatchers.Main) {
                     updatePausedPlaybackState()
                 }
-            } else if (episode.uuid != currentPlayer.episodeUuid) {
-                loadCurrentEpisode(false)
+            } else if (transitionVersion != null) {
+                loadCurrentEpisode(play = false, transitionVersion = transitionVersion)
             }
         }
     }
