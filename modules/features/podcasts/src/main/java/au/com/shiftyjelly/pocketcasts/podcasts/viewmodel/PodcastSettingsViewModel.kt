@@ -273,7 +273,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
             podcastFlow.update { it?.copy(trimMode = mode) }
             updatePlayerEffects()
-            podcastManager.updateTrimModeBlocking(podcast, mode)
+            podcastManager.updateTrimMode(podcast, mode)
         }
     }
 
@@ -291,7 +291,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
             podcastFlow.update { it?.copy(trimMode = mode) }
             updatePlayerEffects()
-            podcastManager.updateTrimModeBlocking(podcast, mode)
+            podcastManager.updateTrimMode(podcast, mode)
         }
     }
 

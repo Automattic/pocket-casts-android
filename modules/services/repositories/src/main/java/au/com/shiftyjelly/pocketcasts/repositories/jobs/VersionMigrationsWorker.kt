@@ -326,7 +326,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
             val podcasts = podcastManager.findSubscribedBlocking()
             podcasts.forEach { podcast ->
                 if (podcast.isSilenceRemoved && podcast.trimMode == TrimMode.OFF) {
-                    podcastManager.updateTrimModeBlocking(podcast, TrimMode.LOW)
+                    podcastManager.updateTrimMode(podcast, TrimMode.LOW)
                 }
             }
         } catch (e: Exception) {
