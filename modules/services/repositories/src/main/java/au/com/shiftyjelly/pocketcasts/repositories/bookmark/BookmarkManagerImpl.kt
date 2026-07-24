@@ -218,13 +218,6 @@ class BookmarkManagerImpl @Inject constructor(
     }
 
     /**
-     * Find all bookmarks that need to be synced.
-     */
-    override fun findBookmarksToSyncBlocking(): List<Bookmark> {
-        return bookmarkDao.findNotSyncedBlocking()
-    }
-
-    /**
      * Upsert the bookmarks from the server. The insert will replace the bookmark if the UUID already exists.
      */
     override suspend fun upsertSynced(bookmark: Bookmark): Bookmark {
