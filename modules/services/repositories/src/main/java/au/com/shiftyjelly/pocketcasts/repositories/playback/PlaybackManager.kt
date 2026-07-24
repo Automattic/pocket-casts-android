@@ -371,10 +371,15 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
-                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
+                hlsAvailable = autoPlayOffersHls,
+                // The next episode hasn't started; its per-session video toggle resets to video when it
+                // opens, so only the global "Audio only" setting carries over. `audioOnlyModeOrNull()`
+                // would report the finishing episode's toggle state, which is the wrong episode here.
+                audioOnlyMode = if (autoPlayOffersHls) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
@@ -412,7 +417,10 @@ open class PlaybackManager @Inject constructor(
 
     private fun audioOnlyModeOrNull(): Boolean? {
         if (getCurrentEpisode()?.isStreamUrlHls != true) return null
-        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
+        // Whether the user is effectively listening audio-only: the global "Audio only" setting is on,
+        // or they switched this stream to audio via the player toggle. Deliberately does NOT include a
+        // stream that merely lacks a video track (no user intent), to match iOS and web.
+        return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
     private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
