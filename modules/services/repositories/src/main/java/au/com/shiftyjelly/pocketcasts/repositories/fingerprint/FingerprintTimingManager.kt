@@ -10,6 +10,7 @@ import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
@@ -35,6 +36,9 @@ import javax.inject.Singleton
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +54,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import uniffi.fingerprint_uniffi.CheckpointMatcher
 import uniffi.fingerprint_uniffi.StreamingWindowedFingerprinter
@@ -92,6 +98,11 @@ class FingerprintTimingManager @Inject constructor(
         val score: Float?,
     )
 
+    internal data class SearchWindow(
+        val startSec: Double,
+        val endSec: Double,
+    )
+
     private val _stateFlow = MutableStateFlow<State>(State.Idle)
     val stateFlow: StateFlow<State> = _stateFlow.asStateFlow()
     val state: State get() = _stateFlow.value
@@ -110,10 +121,9 @@ class FingerprintTimingManager @Inject constructor(
     private val decodeDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val mutex = Mutex()
 
-    // Mapping state: writers build new lists under mutex, then atomically publish via @Volatile.
+    // Mapping state: writers mutate the accumulator under mutex, then atomically publish via @Volatile.
     // Readers access the snapshot without locking, safe for use from the UI thread.
-    private var mappingPlaybackToReference = mutableListOf<TimeMappingEntry>()
-    private var mappingReferenceToPlayback = mutableListOf<TimeMappingEntry>()
+    private val mapping = MappingAccumulator()
 
     @Volatile
     private var snapshotPlaybackToReference: List<TimeMappingEntry> = emptyList()
@@ -146,10 +156,6 @@ class FingerprintTimingManager @Inject constructor(
 
     @Volatile
     private var generation = 0L
-
-    // Drift filter state
-    private var filterLastTrusted: TimeMappingEntry? = null
-    private var filterCandidatePool = mutableListOf<TimeMappingEntry>()
 
     @VisibleForTesting
     internal var debugTrackingEnabled = false
@@ -266,6 +272,206 @@ class FingerprintTimingManager @Inject constructor(
                 if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
                     currentTrigger = PrepareTrigger.PLAYBACK
                 }
+            }
+        }
+    }
+
+    /**
+     * Playback time for [referenceTime] when the active mapping is dense around it, so a full
+     * on-demand resolve is unnecessary. Null when the mapping is missing, sparse, or another episode's.
+     */
+    fun densePlaybackTime(episodeUuid: String, referenceTime: Duration): Duration? {
+        if (activeEpisodeUuid != episodeUuid) return null
+        val entries = snapshotReferenceToPlayback
+        val referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS)
+        var lo = 0
+        var hi = entries.size
+        while (lo < hi) {
+            val mid = (lo + hi) / 2
+            if (entries[mid].referenceTime <= referenceTimeSec) lo = mid + 1 else hi = mid
+        }
+        if (hi - 1 < 0 || hi >= entries.size) return null
+        if (entries[hi].referenceTime - entries[hi - 1].referenceTime > FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS) return null
+        val playback = interpolate(
+            time = referenceTimeSec,
+            entries = entries,
+            keySelector = { it.referenceTime },
+            valueSelector = { it.playbackTime },
+        ) ?: return null
+        return playback.seconds
+    }
+
+    /**
+     * One-shot bounded resolve of a generated chapter's reference time to the playback timeline.
+     * Decodes only a small search window around the expected location, matches into a scratch
+     * accumulator, and never touches the continuous mapping or the public state.
+     */
+    suspend fun resolveChapterPlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
+        val audioSource = episode.downloadedFilePath
+            ?: episode.downloadUrl
+            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
+        return withContext(Dispatchers.Default) {
+            withTimeoutOrNull(FingerprintConstants.ON_DEMAND_TIMEOUT_MS) {
+                performResolve(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    audioSource = audioSource,
+                    isDownloaded = episode.isDownloaded,
+                    referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
+                )
+            } ?: ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
+        }
+    }
+
+    private suspend fun performResolve(
+        episodeUuid: String,
+        podcastUuid: String,
+        audioSource: String,
+        isDownloaded: Boolean,
+        referenceTimeSec: Double,
+    ): ChapterSeekResult {
+        val blocked = shouldBlockOnDemandResolve(
+            isDownloaded = isDownloaded,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+        if (blocked) {
+            Timber.d("FingerprintTimingManager: skipping on-demand resolve on metered network")
+            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK)
+        }
+        var estimatedPlayback: Double? = null
+        var warmReferenceData: ByteArray? = null
+        mutex.withLock {
+            if (currentEpisodeUuid == episodeUuid) {
+                warmReferenceData = currentReferenceData
+                estimatedPlayback = interpolate(
+                    time = referenceTimeSec,
+                    entries = snapshotReferenceToPlayback,
+                    keySelector = { it.referenceTime },
+                    valueSelector = { it.playbackTime },
+                )
+            }
+        }
+        val usedPrior = estimatedPlayback != null
+
+        val referenceData = warmReferenceData
+            ?: loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
+            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+
+        val reference = ReferenceFingerprint.decode(referenceData)
+            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+        val matcher = buildMatcher(reference)
+            ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+
+        val window = searchWindow(referenceTimeSec, estimatedPlayback)
+        val acc = MappingAccumulator()
+        try {
+            matcher.use {
+                streamFingerprintBounded(
+                    audioFilePath = audioSource,
+                    matcher = it,
+                    startingAt = alignToWindowGrid(window.startSec),
+                    endingAt = window.endSec,
+                    acc = acc,
+                )
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.w(e, "FingerprintTimingManager: on-demand resolve failed for $episodeUuid")
+            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_AUDIO_UNAVAILABLE)
+        }
+
+        if (acc.playbackToReference.size < FingerprintConstants.ON_DEMAND_MIN_ANCHORS) {
+            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
+        }
+        val playback = interpolate(
+            time = referenceTimeSec,
+            entries = acc.referenceToPlayback,
+            keySelector = { it.referenceTime },
+            valueSelector = { it.playbackTime },
+        ) ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
+
+        // The ad offset is non-negative, so the true position is never before the reference time.
+        return ChapterSeekResult.Resolved(
+            playbackTime = max(referenceTimeSec, playback).seconds,
+            usedPrior = usedPrior,
+        )
+    }
+
+    private suspend fun loadOrFetchReferenceData(
+        podcastUuid: String,
+        episodeUuid: String,
+        audioSource: String,
+        isDownloaded: Boolean,
+    ): ByteArray? {
+        if (isDownloaded) {
+            referenceRetriever.loadReferenceData(audioSource)?.let { return it }
+        } else {
+            referenceRetriever.loadCachedReference(episodeUuid)?.let { return it }
+        }
+        val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
+        val data = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid) ?: return null
+        if (isDownloaded) {
+            referenceRetriever.saveReferenceData(data, audioSource)
+        } else {
+            referenceRetriever.saveCachedReference(episodeUuid, data)
+        }
+        return data
+    }
+
+    private fun buildMatcher(reference: ReferenceFingerprint): CheckpointMatcher? {
+        val checkpoints = reference.libraryCheckpoints()
+        if (checkpoints.isEmpty()) return null
+        val matcher = CheckpointMatcher()
+        for (checkpoint in checkpoints) {
+            matcher.add(
+                checkpoint.timestampSeconds,
+                checkpoint.hashes.map { it.toUInt() },
+                reference.checkpointDurationSeconds,
+            )
+        }
+        return matcher
+    }
+
+    private suspend fun streamFingerprintBounded(
+        audioFilePath: String,
+        matcher: CheckpointMatcher,
+        startingAt: Double,
+        endingAt: Double,
+        acc: MappingAccumulator,
+    ) {
+        // Capture the current generation so the decode aborts if the episode changes mid-resolve.
+        val gen = generation
+        val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
+        openAudioStream(gen, audioFilePath, startingAt).use { stream ->
+            stream.start()
+
+            val streamer = StreamingWindowedFingerprinter(
+                stream.sampleRate.toUInt(),
+                stream.channelCount.toUShort(),
+                FingerprintConstants.WINDOW_DURATION_MS.toUInt(),
+                FingerprintConstants.WINDOW_INTERVAL_MS.toUInt(),
+            )
+            try {
+                decodeAndFingerprint(
+                    stream = stream,
+                    gen = gen,
+                    isRemoteUrl = isRemoteUrl,
+                    streamer = streamer,
+                    startOffset = startingAt,
+                    endingAt = endingAt,
+                    throttleToPlayhead = false,
+                    trackFrontier = false,
+                ) { windows ->
+                    matchWindows(windows, matcher, startingAt, acc)
+                }
+                val tail = streamer.flush()
+                if (tail.isNotEmpty()) {
+                    matchWindows(tail, matcher, startingAt, acc)
+                }
+            } finally {
+                streamer.close()
             }
         }
     }
@@ -435,8 +641,7 @@ class FingerprintTimingManager @Inject constructor(
         pendingRestartJob?.cancel()
         pendingRestartJob = null
         unregisterUnmeteredRetry()
-        mappingPlaybackToReference.clear()
-        mappingReferenceToPlayback.clear()
+        mapping.reset()
         debugRejections.clear()
         debugRejectionsSnapshot = emptyList()
         publishSnapshot()
@@ -444,8 +649,6 @@ class FingerprintTimingManager @Inject constructor(
         lastStreamStartTimeMs = 0L
         activeDecodeStartSec = 0.0
         activeDecodeFrontierSec = 0.0
-        filterLastTrusted = null
-        filterCandidatePool.clear()
         currentEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
@@ -466,14 +669,14 @@ class FingerprintTimingManager @Inject constructor(
 
     /**
      * Eager full-stream mapping only makes sense on mobile, for episodes with generated chapters,
-     * and when pulling the whole audio is cheap: a local download, or streaming on an unmetered network.
+     * and only for local downloads. Streaming episodes fall back to the throttled follow-the-playhead
+     * pass plus the bounded on-demand resolver, so we never pull a whole file over the network to map it.
      */
     private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
         return computeEager(
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
-            isUnmetered = { Network.isUnmeteredConnection(context) },
         )
     }
 
@@ -599,8 +802,8 @@ class FingerprintTimingManager @Inject constructor(
         audioFilePath: String,
         episodeUuid: String,
     ) {
-        val libraryCheckpoints = reference.libraryCheckpoints()
-        if (libraryCheckpoints.isEmpty()) {
+        val matcher = buildMatcher(reference)
+        if (matcher == null) {
             markUnavailable(reason = "no_checkpoints", isStreaming = currentIsStreaming, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: no usable checkpoints for $episodeUuid")
             return
@@ -609,18 +812,8 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d(
             "FingerprintTimingManager: reference for $episodeUuid — " +
                 "totalDuration=${reference.totalDuration}s, " +
-                "${libraryCheckpoints.size} checkpoints",
+                "${matcher.count()} checkpoints",
         )
-
-        // Create matcher and populate with reference checkpoints
-        val matcher = CheckpointMatcher()
-        for (checkpoint in libraryCheckpoints) {
-            matcher.add(
-                checkpoint.timestampSeconds,
-                checkpoint.hashes.map { it.toUInt() },
-                reference.checkpointDurationSeconds,
-            )
-        }
 
         // Try loading mapping cache (only for local files)
         val refPath = FingerprintReferenceRetriever.referencePath(audioFilePath)
@@ -638,10 +831,9 @@ class FingerprintTimingManager @Inject constructor(
             currentMatcher = matcher
             _stateFlow.value = State.Preparing
             if (cached != null) {
-                mappingPlaybackToReference = cached.entries.toMutableList()
-                mappingReferenceToPlayback = cached.entries.sortedBy { it.referenceTime }.toMutableList()
+                mapping.replaceAll(cached.entries)
                 publishSnapshot()
-                filterLastTrusted = cached.entries.lastOrNull()
+                mapping.lastTrusted = cached.entries.lastOrNull()
                 markActive(cached.entries.size)
                 Timber.d("FingerprintTimingManager: loaded mapping from cache for $episodeUuid (${cached.entries.size} entries)")
                 return
@@ -669,13 +861,13 @@ class FingerprintTimingManager @Inject constructor(
 
     private fun processProgress(positionMs: Int) {
         val positionSec = positionMs / 1000.0
-        val mappedRunEndSec = mappedRunEnd(positionSec, mappingPlaybackToReference)
+        val mappedRunEndSec = mappedRunEnd(positionSec, mapping.playbackToReference)
         val decision = decideOnProgress(
             positionSec = positionSec,
             lastPositionSec = if (lastProgressPositionMs >= 0) lastProgressPositionMs / 1000.0 else null,
             isEager = currentEager,
             mappedRunEndSec = mappedRunEndSec,
-            hasAnyMapping = mappingPlaybackToReference.isNotEmpty(),
+            hasAnyMapping = mapping.playbackToReference.isNotEmpty(),
             isDecodeActive = generationJob?.isActive == true,
             isCoveredByActiveDecode = isCoveredByActiveDecode(positionSec),
             isRunEndCoveredByActiveDecode = mappedRunEndSec != null && isCoveredByActiveDecode(mappedRunEndSec),
@@ -723,7 +915,7 @@ class FingerprintTimingManager @Inject constructor(
             mutex.withLock {
                 if (gen != generation) return@withLock
                 val settledSec = lastProgressPositionMs / 1000.0
-                if (mappedRunEnd(settledSec, mappingPlaybackToReference) != null || isCoveredByActiveDecode(settledSec)) return@withLock
+                if (mappedRunEnd(settledSec, mapping.playbackToReference) != null || isCoveredByActiveDecode(settledSec)) return@withLock
                 Timber.d("FingerprintTimingManager: playback jumped — restarting")
                 restartFromPlayhead()
             }
@@ -747,8 +939,7 @@ class FingerprintTimingManager @Inject constructor(
         val matcher = currentMatcher ?: return
         val audioPath = currentAudioFilePath ?: return
         val uuid = currentEpisodeUuid ?: return
-        filterLastTrusted = null
-        filterCandidatePool.clear()
+        mapping.resetFilter()
         startStream(audioPath, matcher, uuid, startPosition = lastProgressPositionMs / 1000.0)
     }
 
@@ -796,19 +987,37 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
-    private suspend fun streamFingerprint(
-        gen: Long,
-        audioFilePath: String,
-        matcher: CheckpointMatcher,
-        episodeUuid: String,
-        startingAt: Double,
-    ) {
+    private class AudioOpenException(cause: Exception) : Exception(cause)
+    private class AudioUnavailableException(message: String) : Exception(message)
+
+    private class AudioStream(
+        val extractor: MediaExtractor,
+        val codec: MediaCodec,
+        val format: MediaFormat,
+        val sampleRate: Int,
+        val channelCount: Int,
+        private val cacheSource: AutoCloseable? = null,
+    ) : AutoCloseable {
+        fun start() {
+            // Request float PCM output. If the codec doesn't support it,
+            // it falls back to 16-bit; we detect the actual format below.
+            format.setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
+            codec.configure(format, null, null, 0)
+            codec.start()
+        }
+
+        override fun close() {
+            runCatching { codec.stop() }
+            codec.release()
+            extractor.release()
+            cacheSource?.close()
+        }
+    }
+
+    private fun openAudioStream(gen: Long, audioFilePath: String, startingAt: Double): AudioStream {
         val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
         if (!isRemoteUrl && !File(audioFilePath).exists()) {
-            Timber.w("FingerprintTimingManager: audio file not found at $audioFilePath")
-            if (gen != generation) return
-            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
-            return
+            throw AudioUnavailableException("audio file not found at $audioFilePath")
         }
 
         val factory = dataSourceFactory.get()
@@ -831,23 +1040,16 @@ class FingerprintTimingManager @Inject constructor(
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
-            Timber.w(e, "FingerprintTimingManager: failed to open audio file")
-            if (gen != generation) return
-            markFailed(e, stage = "audio_open")
-            return
+            throw AudioOpenException(e)
         }
 
-        // Find audio track
         val audioTrackIndex = (0 until extractor.trackCount).firstOrNull { i ->
             extractor.getTrackFormat(i).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
         }
         if (audioTrackIndex == null) {
             extractor.release()
             cacheSource?.close()
-            Timber.w("FingerprintTimingManager: no audio track found")
-            if (gen != generation) return
-            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
-            return
+            throw AudioUnavailableException("no audio track found")
         }
 
         extractor.selectTrack(audioTrackIndex)
@@ -856,28 +1058,66 @@ class FingerprintTimingManager @Inject constructor(
         val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
 
-        // Seek to start position
         if (startingAt > 0) {
             extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
         }
 
-        val codec = MediaCodec.createDecoderByType(mime)
-        try {
-            // Request float PCM output. If the codec doesn't support it,
-            // it falls back to 16-bit; we detect the actual format below.
-            format.setInteger(MediaFormat.KEY_PCM_ENCODING, android.media.AudioFormat.ENCODING_PCM_FLOAT)
-            codec.configure(format, null, null, 0)
-            codec.start()
+        val codec = try {
+            MediaCodec.createDecoderByType(mime)
+        } catch (e: Exception) {
+            extractor.release()
+            cacheSource?.close()
+            throw AudioOpenException(e)
+        }
+        return AudioStream(extractor, codec, format, sampleRate, channelCount, cacheSource)
+    }
+
+    private suspend fun streamFingerprint(
+        gen: Long,
+        audioFilePath: String,
+        matcher: CheckpointMatcher,
+        episodeUuid: String,
+        startingAt: Double,
+    ) {
+        val isRemoteUrl = audioFilePath.startsWith("http://") || audioFilePath.startsWith("https://")
+        val stream = try {
+            openAudioStream(gen, audioFilePath, startingAt)
+        } catch (e: AudioUnavailableException) {
+            Timber.w("FingerprintTimingManager: ${e.message}")
+            markUnavailable(reason = "audio_unavailable", isStreaming = isRemoteUrl, episodeUuid = episodeUuid)
+            return
+        } catch (e: AudioOpenException) {
+            Timber.w(e, "FingerprintTimingManager: failed to open audio file")
+            markFailed(e.cause ?: e, stage = "audio_open")
+            return
+        }
+
+        stream.use {
+            stream.start()
 
             val streamer = StreamingWindowedFingerprinter(
-                sampleRate.toUInt(),
-                channelCount.toUShort(),
+                stream.sampleRate.toUInt(),
+                stream.channelCount.toUShort(),
                 FingerprintConstants.WINDOW_DURATION_MS.toUInt(),
                 FingerprintConstants.WINDOW_INTERVAL_MS.toUInt(),
             )
 
             try {
-                decodeAndFingerprint(gen, isRemoteUrl, extractor, codec, streamer, matcher, episodeUuid, startingAt, sampleRate, channelCount)
+                decodeAndFingerprint(
+                    stream = stream,
+                    gen = gen,
+                    isRemoteUrl = isRemoteUrl,
+                    streamer = streamer,
+                    startOffset = startingAt,
+                    endingAt = null,
+                    throttleToPlayhead = !currentEager,
+                    trackFrontier = true,
+                ) { windows ->
+                    mutex.withLock {
+                        if (gen != generation) throw CancellationException("Fingerprint stream superseded")
+                        processMatches(windows, matcher, startingAt)
+                    }
+                }
 
                 // Flush remaining windows
                 val tail = streamer.flush()
@@ -890,26 +1130,22 @@ class FingerprintTimingManager @Inject constructor(
             } finally {
                 streamer.close()
             }
-        } finally {
-            runCatching { codec.stop() }
-            codec.release()
-            extractor.release()
-            cacheSource?.close()
         }
     }
 
     private suspend fun decodeAndFingerprint(
+        stream: AudioStream,
         gen: Long,
         isRemoteUrl: Boolean,
-        extractor: MediaExtractor,
-        codec: MediaCodec,
         streamer: StreamingWindowedFingerprinter,
-        matcher: CheckpointMatcher,
-        episodeUuid: String,
         startOffset: Double,
-        sampleRate: Int,
-        channelCount: Int,
+        endingAt: Double?,
+        throttleToPlayhead: Boolean,
+        trackFrontier: Boolean,
+        onWindows: suspend (List<WindowedFingerprint>) -> Unit,
     ) {
+        val extractor = stream.extractor
+        val codec = stream.codec
         val bufferInfo = MediaCodec.BufferInfo()
         var inputDone = false
         val timeoutUs = FingerprintConstants.CODEC_TIMEOUT_US
@@ -969,22 +1205,19 @@ class FingerprintTimingManager @Inject constructor(
                     if (outputBuffer != null && bufferInfo.size > 0) {
                         val samples = extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
                         if (samples.isNotEmpty()) {
-                            val windows = streamer.pushSamplesF32(samples, channelCount.toUShort())
+                            val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
                             if (windows.isNotEmpty()) {
-                                mutex.withLock {
-                                    if (gen != generation) throw CancellationException("Fingerprint stream superseded")
-                                    processMatches(windows, matcher, startOffset)
-                                }
+                                onWindows(windows)
                             }
                         }
 
                         val decodedSeconds = startOffset + streamer.durationMs().toDouble() / 1000.0
-                        if (gen == generation) {
+                        if (trackFrontier && gen == generation) {
                             activeDecodeFrontierSec = decodedSeconds
                         }
 
                         // Eager passes decode as fast as possible; throttled passes stay near the playhead.
-                        if (!currentEager) {
+                        if (throttleToPlayhead) {
                             val lastKnownPositionMs = lastProgressPositionMs
                             val playheadSec = if (lastKnownPositionMs >= 0) lastKnownPositionMs / 1000.0 else startOffset
                             if (decodedSeconds - playheadSec > FingerprintConstants.LOOKAHEAD_SECONDS) {
@@ -994,6 +1227,7 @@ class FingerprintTimingManager @Inject constructor(
                     }
                     codec.releaseOutputBuffer(outputIndex, false)
                     if (isEos) break
+                    if (endingAt != null && startOffset + streamer.durationMs().toDouble() / 1000.0 >= endingAt) break
                 }
             }
         }
@@ -1041,6 +1275,27 @@ class FingerprintTimingManager @Inject constructor(
     ) {
         val isDebug = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG)
 
+        matchWindows(windows, matcher, startOffset, mapping) { rejected ->
+            if (isDebug) recordDebugRejection(rejected.playbackTime, rejected.score)
+        }
+
+        publishSnapshot()
+        val coverage = mapping.playbackToReference.size
+        if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
+            markActive(coverage)
+        }
+        if (isDebug) {
+            debugRejectionsSnapshot = debugRejections.toList()
+        }
+    }
+
+    private fun matchWindows(
+        windows: List<WindowedFingerprint>,
+        matcher: CheckpointMatcher,
+        startOffset: Double,
+        acc: MappingAccumulator,
+        onRejected: (TimeMappingEntry) -> Unit = {},
+    ) {
         for (window in windows) {
             val absolutePlaybackTime = startOffset + window.timestampMs.toDouble() / 1000.0
             val matches = matcher.findTopMatches(window.hashes, 2u)
@@ -1053,30 +1308,21 @@ class FingerprintTimingManager @Inject constructor(
 
             val runnerUpScore = matches.getOrNull(1)?.score ?: 0f
             val dominance = best.score - runnerUpScore
-
-            // Passes floor but fails anchor threshold or dominance → rejection (red)
-            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD ||
-                dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP
-            ) {
-                if (isDebug) recordDebugRejection(absolutePlaybackTime, best.score)
-                continue
-            }
-
             val candidate = TimeMappingEntry(
                 playbackTime = absolutePlaybackTime,
                 referenceTime = best.timestamp.toDouble(),
                 score = best.score,
             )
-            consider(candidate, isDebug)
-        }
 
-        publishSnapshot()
-        val coverage = mappingPlaybackToReference.size
-        if (coverage >= FingerprintConstants.MINIMUM_COVERAGE_FOR_ACTIVE) {
-            markActive(coverage)
-        }
-        if (isDebug) {
-            debugRejectionsSnapshot = debugRejections.toList()
+            // Passes floor but fails anchor threshold or dominance → rejection (red)
+            if (best.score < FingerprintConstants.DRIFT_ANCHOR_SCORE_THRESHOLD ||
+                dominance < FingerprintConstants.DRIFT_SCORE_DOMINANCE_GAP
+            ) {
+                onRejected(candidate)
+                continue
+            }
+
+            acc.consider(candidate, onRejected)
         }
     }
 
@@ -1095,64 +1341,12 @@ class FingerprintTimingManager @Inject constructor(
         candidate: TimeMappingEntry,
         isDebug: Boolean = debugTrackingEnabled || FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPT_DEBUG),
     ): Int {
-        val trusted = filterLastTrusted
-        if (trusted != null && isInTrend(candidate, trusted)) {
-            flushPoolAsRejected(isDebug)
-            insertMapping(candidate)
-            filterLastTrusted = candidate
-            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-            return 1
+        val inserted = mapping.consider(candidate) { rejected ->
+            if (isDebug) recordDebugRejection(rejected.playbackTime, rejected.score)
+            Timber.d("FingerprintTimingManager: drift filter rejected candidate at playback ${rejected.playbackTime}s")
         }
-
-        filterCandidatePool.add(candidate)
-        val n = FingerprintConstants.DRIFT_BOOTSTRAP_COUNT
-
-        if (filterCandidatePool.size < n) return 0
-
-        val recent = filterCandidatePool.takeLast(n)
-        if (formsConsistentSequence(recent)) {
-            val keepStart = filterCandidatePool.size - n
-            for (i in 0 until keepStart) {
-                if (isDebug) recordDebugRejection(filterCandidatePool[i].playbackTime, filterCandidatePool[i].score)
-                Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${filterCandidatePool[i].playbackTime}s")
-            }
-            for (entry in recent) {
-                insertMapping(entry)
-            }
-            filterLastTrusted = recent.last()
-            filterCandidatePool.clear()
-            if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-            return n
-        }
-
-        val evicted = filterCandidatePool.removeAt(0)
-        if (isDebug) recordDebugRejection(evicted.playbackTime, evicted.score)
-        Timber.d("FingerprintTimingManager: drift filter evicted candidate at playback ${evicted.playbackTime}s")
         if (isDebug) debugRejectionsSnapshot = debugRejections.toList()
-        return 0
-    }
-
-    private fun flushPoolAsRejected(isDebug: Boolean) {
-        if (isDebug) {
-            for (candidate in filterCandidatePool) {
-                recordDebugRejection(candidate.playbackTime, candidate.score)
-            }
-        }
-        filterCandidatePool.clear()
-    }
-
-    private fun isInTrend(candidate: TimeMappingEntry, anchor: TimeMappingEntry): Boolean {
-        val deltaPlayback = candidate.playbackTime - anchor.playbackTime
-        val deltaReference = candidate.referenceTime - anchor.referenceTime
-        return abs(deltaReference - deltaPlayback) <= FingerprintConstants.DRIFT_TOLERANCE_SECONDS
-    }
-
-    private fun formsConsistentSequence(entries: List<TimeMappingEntry>): Boolean {
-        if (entries.size < 2) return true
-        for (i in 1 until entries.size) {
-            if (!isInTrend(entries[i], entries[i - 1])) return false
-        }
-        return true
+        return inserted
     }
 
     private fun recordDebugRejection(playbackTime: Double, score: Float?) {
@@ -1163,17 +1357,13 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     internal fun insertMapping(entry: TimeMappingEntry) {
-        val pbIdx = mappingPlaybackToReference.sortedInsertionIndex { it.playbackTime < entry.playbackTime }
-        mappingPlaybackToReference.add(pbIdx, entry)
-
-        val refIdx = mappingReferenceToPlayback.sortedInsertionIndex { it.referenceTime < entry.referenceTime }
-        mappingReferenceToPlayback.add(refIdx, entry)
+        mapping.insert(entry)
     }
 
     /** Publish an immutable snapshot of the mapping lists for lock-free reads. */
     private fun publishSnapshot() {
-        snapshotPlaybackToReference = mappingPlaybackToReference.toList()
-        snapshotReferenceToPlayback = mappingReferenceToPlayback.toList()
+        snapshotPlaybackToReference = mapping.playbackToReference.toList()
+        snapshotReferenceToPlayback = mapping.referenceToPlayback.toList()
         _mappingVersion.value++
     }
 
@@ -1203,15 +1393,18 @@ class FingerprintTimingManager @Inject constructor(
     }
 
     companion object {
-        /**
-         * Core eager-pass gate (assumes the platform check already passed). [isUnmetered] is a supplier so the
-         * network lookup is skipped for downloaded episodes.
-         */
+        /** Core eager-pass gate (assumes the platform check already passed). */
         internal fun computeEager(
             hasGeneratedChapters: Boolean,
             isDownloaded: Boolean,
+        ): Boolean = hasGeneratedChapters && isDownloaded
+
+        /** A chapter tap is user-initiated, so metered data is allowed unless the user asked to be warned. */
+        internal fun shouldBlockOnDemandResolve(
+            isDownloaded: Boolean,
+            warnOnMeteredNetwork: Boolean,
             isUnmetered: () -> Boolean,
-        ): Boolean = hasGeneratedChapters && (isDownloaded || isUnmetered())
+        ): Boolean = !isDownloaded && warnOnMeteredNetwork && !isUnmetered()
 
         /** [isUnmetered] is a supplier so the network lookup is skipped for downloaded episodes. */
         internal fun shouldBlockRemoteFingerprinting(
@@ -1339,6 +1532,23 @@ class FingerprintTimingManager @Inject constructor(
             return v0 + fraction * (v1 - v0)
         }
 
+        /**
+         * Audio region to decode for an on-demand resolve. Ad offsets are non-negative and
+         * non-decreasing, so the true position is at or after the reference time; cold resolves
+         * only search forward, warm ones bracket the mapping-derived estimate.
+         */
+        internal fun searchWindow(referenceTimeSec: Double, estimatedPlaybackSec: Double?): SearchWindow {
+            if (estimatedPlaybackSec == null) {
+                return SearchWindow(
+                    startSec = referenceTimeSec,
+                    endSec = referenceTimeSec + FingerprintConstants.ON_DEMAND_COLD_BUDGET_SECONDS,
+                )
+            }
+            val startSec = max(referenceTimeSec, estimatedPlaybackSec - FingerprintConstants.ON_DEMAND_BACKWARD_MAX_SECONDS)
+            val endSec = max(estimatedPlaybackSec, startSec) + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS
+            return SearchWindow(startSec, endSec)
+        }
+
         /** True when [playbackTime] is bracketed by two anchors ≤ [FingerprintConstants.HIGHLIGHT_MAX_GAP_SECONDS] apart. */
         fun isWithinMatchedContent(playbackTime: Double, entries: List<TimeMappingEntry>): Boolean {
             var lo = 0
@@ -1361,18 +1571,4 @@ class FingerprintTimingManager @Inject constructor(
             return max(0.0, floor(time / stride) * stride)
         }
     }
-}
-
-private inline fun <T> MutableList<T>.sortedInsertionIndex(crossinline predicate: (T) -> Boolean): Int {
-    var lo = 0
-    var hi = size
-    while (lo < hi) {
-        val mid = (lo + hi) / 2
-        if (predicate(this[mid])) {
-            lo = mid + 1
-        } else {
-            hi = mid
-        }
-    }
-    return lo
 }

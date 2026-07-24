@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -21,6 +22,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -56,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -83,9 +86,12 @@ fun EpisodeTitles(
         }
     }.observeAsState(PlayerHeadingSectionState())
 
+    val resolvingChapterIndex by playerViewModel.resolvingChapterIndex.collectAsState()
+
     Content(
         state = state,
         playerColors = playerColors,
+        resolvingChapterIndex = resolvingChapterIndex,
         onPreviousChapterClick = { playerViewModel.onPreviousChapterClick() },
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
@@ -104,9 +110,14 @@ private fun Content(
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
     modifier: Modifier = Modifier,
+    resolvingChapterIndex: Int? = null,
     textAlign: TextAlign = TextAlign.Center,
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
+    val currentChapterIndex = state.chapter?.index
+    val isResolvingPrevious = resolvingChapterIndex != null && currentChapterIndex != null && resolvingChapterIndex < currentChapterIndex
+    val isResolvingNext = resolvingChapterIndex != null && currentChapterIndex != null && resolvingChapterIndex > currentChapterIndex
+
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(color = playerColors.contrast01),
     ) {
@@ -115,8 +126,9 @@ private fun Content(
         ) {
             if (state.isChaptersPresent) {
                 ChapterPreviousButton(
-                    enabled = !state.isFirstChapter,
+                    enabled = !state.isFirstChapter && !isResolvingPrevious,
                     alpha = if (state.isFirstChapter) 0.5f else 1f,
+                    isResolving = isResolvingPrevious,
                     iconTint = playerColors.contrast01,
                     onClick = onPreviousChapterClick,
                 )
@@ -194,9 +206,10 @@ private fun Content(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     ChapterNextButtonWithChapterProgressCircle(
-                        enabled = !state.isLastChapter,
+                        enabled = !state.isLastChapter && !isResolvingNext,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
                         progress = state.chapterProgress,
+                        isResolving = isResolvingNext,
                         iconTint = playerColors.contrast01,
                         progressTint = playerColors.contrast04,
                         onClick = onNextChapterClick,
@@ -221,6 +234,7 @@ private fun Content(
 private fun ChapterPreviousButton(
     enabled: Boolean,
     alpha: Float,
+    isResolving: Boolean,
     iconTint: Color,
     onClick: () -> Unit,
 ) {
@@ -233,11 +247,19 @@ private fun ChapterPreviousButton(
             contentAlignment = Alignment.Center,
             modifier = Modifier.clip(CircleShape),
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_chapter_skipbackwards),
-                tint = iconTint,
-                contentDescription = stringResource(LR.string.player_action_previous_chapter),
-            )
+            if (isResolving) {
+                CircularProgressIndicator(
+                    color = iconTint,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(16.dp),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_chapter_skipbackwards),
+                    tint = iconTint,
+                    contentDescription = stringResource(LR.string.player_action_previous_chapter),
+                )
+            }
         }
     }
 }
@@ -247,6 +269,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     enabled: Boolean,
     progress: Float,
     alpha: Float,
+    isResolving: Boolean,
     iconTint: Color,
     progressTint: Color,
     onClick: () -> Unit,
@@ -259,11 +282,19 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             .alpha(alpha)
             .semantics { this.contentDescription = contentDescription },
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_chapter_skipforward),
-            tint = iconTint,
-            contentDescription = null,
-        )
+        if (isResolving) {
+            CircularProgressIndicator(
+                color = iconTint,
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(16.dp),
+            )
+        } else {
+            Icon(
+                painter = painterResource(R.drawable.ic_chapter_skipforward),
+                tint = iconTint,
+                contentDescription = null,
+            )
+        }
 
         ChapterProgressCircle(
             progress = progress,
@@ -377,6 +408,18 @@ private fun PlayerHeadingSectionPreview(
                         title = "Episode title / ".repeat(10),
                         isChaptersPresent = true,
                     ),
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+
+                Content(
+                    state = state.copy(
+                        isChaptersPresent = true,
+                        chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 1, uiIndex = 2),
+                    ),
+                    resolvingChapterIndex = 2,
                     onPreviousChapterClick = {},
                     onNextChapterClick = {},
                     onChapterTitleClick = {},

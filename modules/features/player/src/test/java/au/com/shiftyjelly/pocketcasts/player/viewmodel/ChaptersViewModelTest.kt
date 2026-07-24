@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -41,6 +42,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -59,6 +62,9 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
+        on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
+    }
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
@@ -102,6 +108,7 @@ class ChaptersViewModelTest {
             episodeManager = episodeManager,
             settings = settings,
             eventHorizon = EventHorizon(eventSink),
+            generatedChapterSeeker = generatedChapterSeeker,
             ioDispatcher = testDispatcher,
         )
     }
@@ -254,6 +261,7 @@ class ChaptersViewModelTest {
             episodeManager = episodeManager,
             settings = settings,
             eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
             ioDispatcher = testDispatcher,
         )
 
