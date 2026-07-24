@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix episode artwork on the filters page not updating after embedded artwork is extracted during playback
+        ([#5548](https://github.com/Automattic/pocket-casts-android/pull/5548))
 
 8.17
 -----
