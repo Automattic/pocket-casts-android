@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
@@ -44,6 +46,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
@@ -113,6 +116,10 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             addedCount = playlistsChanges.count { it.value },
             removedCount = playlistsChanges.count { !it.value },
         )
+    }
+
+    fun getPlaylistChangeFeedback(): PlaylistChangeFeedback {
+        return PlaylistChangeFeedback.from(getPlaylistChangeSummary())
     }
 
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
@@ -295,8 +302,52 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     data class PlaylistChangeSummary(
         val addedCount: Int,
         val removedCount: Int,
-    ) {
-        val totalCount = addedCount + removedCount
+    )
+
+    sealed interface PlaylistChangeFeedback {
+        data class StringResource(
+            @StringRes val resourceId: Int,
+        ) : PlaylistChangeFeedback
+
+        data class PluralResource(
+            @PluralsRes val resourceId: Int,
+            val quantity: Int,
+        ) : PlaylistChangeFeedback
+
+        data object None : PlaylistChangeFeedback
+
+        companion object {
+            fun from(summary: PlaylistChangeSummary): PlaylistChangeFeedback {
+                return when {
+                    summary.addedCount > 0 && summary.removedCount > 0 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.changed_playlists,
+                            quantity = summary.addedCount + summary.removedCount,
+                        )
+                    }
+
+                    summary.addedCount == 1 -> StringResource(LR.string.added_to_playlist_feedback)
+
+                    summary.addedCount > 1 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.added_to_playlist_single_multiple,
+                            quantity = summary.addedCount,
+                        )
+                    }
+
+                    summary.removedCount == 1 -> StringResource(LR.string.removed_from_playlist_feedback)
+
+                    summary.removedCount > 1 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.removed_from_playlists,
+                            quantity = summary.removedCount,
+                        )
+                    }
+
+                    else -> None
+                }
+            }
+        }
     }
 
     @AssistedFactory
