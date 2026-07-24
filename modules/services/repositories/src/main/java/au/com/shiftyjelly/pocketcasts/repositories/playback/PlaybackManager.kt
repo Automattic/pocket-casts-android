@@ -484,7 +484,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun audioOnlyModeOrNull(): Boolean? {
         if (getCurrentEpisode()?.isStreamUrlHls != true || player?.isStreaming != true) return null
-        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
+        return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
     private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
