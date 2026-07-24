@@ -413,7 +413,10 @@ open class PlaybackManager @Inject constructor(
 
     private fun audioOnlyModeOrNull(): Boolean? {
         if (getCurrentEpisode()?.isStreamUrlHls != true) return null
-        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
+        // Whether the user is effectively listening audio-only: the global "Audio only" setting is on,
+        // or they switched this stream to audio via the player toggle. Deliberately does NOT include a
+        // stream that merely lacks a video track (no user intent), to match iOS and web.
+        return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
     private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
