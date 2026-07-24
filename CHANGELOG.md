@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix the app briefly freezing when showing the default podcast artwork
+        ([#5634](https://github.com/Automattic/pocket-casts-android/pull/5634))
 
 8.17
 -----
