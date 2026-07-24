@@ -62,7 +62,7 @@ class DeveloperViewModel
                     for (podcast in podcasts) {
                         if (podcast.isShowNotifications) {
                             // find first podcast with more than one episode
-                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
+                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
                             if (episodes.size <= 1) {
                                 continue
                             } else {
@@ -99,7 +99,7 @@ class DeveloperViewModel
                 val podcasts = podcastManager.findSubscribedBlocking()
                 for (podcast in podcasts) {
                     // find first podcast with more than one episode
-                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
+                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
                     if (episodes.size <= 1) {
                         continue
                     } else {
@@ -111,7 +111,7 @@ class DeveloperViewModel
 
                         podcast.latestEpisodeUuid = newLatest?.uuid
                         podcast.latestEpisodeDate = newLatest?.publishedDate
-                        podcastManager.updatePodcastBlocking(podcast)
+                        podcastManager.updatePodcast(podcast)
 
                         continue
                     }
