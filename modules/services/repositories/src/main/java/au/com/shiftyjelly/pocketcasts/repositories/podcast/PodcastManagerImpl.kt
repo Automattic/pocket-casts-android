@@ -400,7 +400,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast> {
-        return podcastDao.findFolderPodcastsOrderByLatestEpisodeBlocking(folderUuid)
+        return podcastDao.findFolderPodcastsOrderByLatestEpisode(folderUuid)
     }
 
     override suspend fun findPodcastsOrderByRecentlyPlayedEpisode(): List<Podcast> {
