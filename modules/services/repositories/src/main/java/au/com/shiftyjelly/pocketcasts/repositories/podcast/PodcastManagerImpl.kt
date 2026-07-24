@@ -540,7 +540,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateOverrideGlobalEffectsBlocking(override, podcast.uuid)
     }
 
-    override suspend fun updateTrimModeBlocking(podcast: Podcast, trimMode: TrimMode) {
+    override suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
         podcastDao.updateTrimSilenceModeBlocking(trimMode, podcast.uuid)
     }
 
@@ -555,7 +555,7 @@ class PodcastManagerImpl @Inject constructor(
     override fun updateEffectsBlocking(podcast: Podcast, effects: PlaybackEffects) {
         podcastDao.updateEffectsBlocking(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
         launch {
-            updateTrimModeBlocking(podcast, effects.trimMode)
+            updateTrimMode(podcast, effects.trimMode)
         }
     }
 
