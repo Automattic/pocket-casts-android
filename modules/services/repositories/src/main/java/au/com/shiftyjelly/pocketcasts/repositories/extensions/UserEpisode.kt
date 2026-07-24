@@ -10,5 +10,5 @@ fun UserEpisode.getUrlForArtwork(themeIsDark: Boolean = false, thumbnail: Boolea
 
     val themeType = if (themeIsDark) "dark" else "light"
     val size = if (thumbnail) 280 else 960
-    return "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$size/$tintColorIndex.png"
+    return "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$size/$tintColorIndex.webp"
 }
