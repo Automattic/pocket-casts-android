@@ -375,6 +375,7 @@ open class PlaybackManager @Inject constructor(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
                 hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
+                audioOnlyMode = audioOnlyModeOrNull(),
             ),
         )
         return autoPlayEpisode
