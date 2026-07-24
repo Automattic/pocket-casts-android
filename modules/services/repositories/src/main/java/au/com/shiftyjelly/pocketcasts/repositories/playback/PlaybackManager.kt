@@ -371,11 +371,15 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
-                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
-                audioOnlyMode = audioOnlyModeOrNull(),
+                hlsAvailable = autoPlayOffersHls,
+                // The next episode hasn't started; its per-session video toggle resets to video when it
+                // opens, so only the global "Audio only" setting carries over. `audioOnlyModeOrNull()`
+                // would report the finishing episode's toggle state, which is the wrong episode here.
+                audioOnlyMode = if (autoPlayOffersHls) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
