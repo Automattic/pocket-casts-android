@@ -386,11 +386,12 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
-                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
-                audioOnlyMode = audioOnlyModeOrNull(),
+                hlsAvailable = autoPlayOffersHls,
+                audioOnlyMode = if (autoPlayOffersHls) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
