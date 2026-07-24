@@ -954,9 +954,14 @@
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
     <!-- %1$s is a playlist title  -->
     <string name="added_to_playlist_single">Added to %1$s</string>
+    <string name="added_to_playlist_feedback">Added to playlist</string>
     <plurals name="added_to_playlist_single_multiple">
         <item quantity="one">Added to %d playlist</item>
         <item quantity="other">Added to %d playlists</item>
+    </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="one">Changed %d playlist</item>
+        <item quantity="other">Changed %d playlists</item>
     </plurals>
     <string name="create_playlist">Create playlist</string>
     <string name="create_smart_playlist">Create smart playlist</string>
@@ -1011,6 +1016,11 @@
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort by</string>
+    <string name="removed_from_playlist_feedback">Removed from playlist</string>
+    <plurals name="removed_from_playlists">
+        <item quantity="one">Removed from %d playlist</item>
+        <item quantity="other">Removed from %d playlists</item>
+    </plurals>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with smart rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
