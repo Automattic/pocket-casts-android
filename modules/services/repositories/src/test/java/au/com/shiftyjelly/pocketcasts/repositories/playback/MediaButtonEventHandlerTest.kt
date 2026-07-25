@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.view.KeyEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,6 +71,39 @@ class MediaButtonEventHandlerTest {
 
         advanceUntilIdle()
         assertEquals(listOf(MediaEvent.DoubleTap), events)
+    }
+
+    @Test
+    fun `resolved multi tap actions are deferred beyond event registration`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+        )
+
+        assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_NEXT)))
+        assertEquals(emptyList<MediaEvent>(), events)
+
+        runCurrent()
+        assertEquals(listOf(MediaEvent.DoubleTap), events)
+    }
+
+    @Test
+    fun `cancelled scope does not handle events`() = runTest {
+        val cancelledJob = Job().apply { cancel() }
+        val cancelledScope = CoroutineScope(coroutineContext + cancelledJob)
+        var immediatePlayCount = 0
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { cancelledScope },
+            onImmediatePlay = { immediatePlayCount++ },
+            onMediaEvent = events::add,
+        )
+
+        assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+        assertEquals(0, immediatePlayCount)
+        assertEquals(emptyList<MediaEvent>(), events)
     }
 
     @Test

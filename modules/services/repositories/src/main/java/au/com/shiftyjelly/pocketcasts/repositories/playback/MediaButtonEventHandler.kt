@@ -1,18 +1,28 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.view.KeyEvent
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
-import timber.log.Timber
 
+/**
+ * Serializes media-button key events before dispatching their resolved actions.
+ *
+ * Event registration starts synchronously to preserve framework callback order. [onImmediatePlay] may therefore run
+ * on the caller's stack and must stay fast. [onMediaEvent] runs only after a suspension boundary, outside that
+ * synchronous registration section.
+ */
 internal class MediaButtonEventHandler(
     private val scopeProvider: () -> CoroutineScope,
     private val onImmediatePlay: () -> Unit,
     private val onMediaEvent: (MediaEvent) -> Unit,
-    private val onError: (Exception) -> Unit = { Timber.e(it, "Media button event handling failed") },
+    private val onError: (Exception) -> Unit = {
+        LogBuffer.e(LogBuffer.TAG_PLAYBACK, it, "Media button event handling failed")
+    },
 ) {
     private val mediaEventQueue = MediaEventQueue(scopeProvider)
 
@@ -36,15 +46,20 @@ internal class MediaButtonEventHandler(
             else -> null
         } ?: return false
 
+        val immediateSingleTapHandler = if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
+            onImmediatePlay
+        } else {
+            null
+        }
+
         // Register the event before returning to the framework callback. This preserves
         // delivery order while the queue's timeout still resumes on the provided scope.
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             try {
+                coroutineContext.ensureActive()
                 val outputEvent = mediaEventQueue.consumeEvent(
                     event = inputEvent,
-                    onImmediateSingleTap = onImmediatePlay.takeIf {
-                        keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY
-                    },
+                    onImmediateSingleTap = immediateSingleTapHandler,
                 )
                 if (outputEvent != null) {
                     // Output actions historically ran asynchronously on the callback scope.
