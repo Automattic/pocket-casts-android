@@ -11,7 +11,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MediaEventQueueTest {
@@ -82,6 +84,44 @@ class MediaEventQueueTest {
     }
 
     @Test
+    fun `handle an immediate single tap before the multi tap window expires`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var isHandled = false
+
+        val event = async {
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                isHandled = true
+            }
+        }
+
+        yield()
+        assertTrue(isHandled)
+        assertNull(event.await())
+    }
+
+    @Test
+    fun `map immediate single taps to multi tap events`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var immediateTapCount = 0
+
+        val firstEvent = async {
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                immediateTapCount++
+            }
+        }
+
+        yield()
+        assertNull(
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                immediateTapCount++
+            },
+        )
+
+        assertEquals(1, immediateTapCount)
+        assertEquals(MediaEvent.DoubleTap, firstEvent.await())
+    }
+
+    @Test
     fun `handle concurrent immediate single taps exactly once`() = runBlocking {
         val handler = MediaEventQueue(scopeProvider = { this })
         val immediateTapCount = AtomicInteger()
@@ -101,6 +141,21 @@ class MediaEventQueueTest {
         }
 
         assertEquals(1, immediateTapCount.get())
+    }
+
+    @Test
+    fun `do not handle immediate single tap while multi tap window is active`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var isHandled = false
+
+        handler.consumeEvent(MediaEvent.DoubleTap)
+
+        assertNull(
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                isHandled = true
+            },
+        )
+        assertFalse(isHandled)
     }
 
     @Test
