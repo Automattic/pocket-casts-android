@@ -71,6 +71,49 @@ class MediaSessionManagerCallbackTest {
         assertEquals(listOf("skip forwards"), queuedCommands)
     }
 
+    @Test
+    fun `legacy KEYCODE_HEADSETHOOK resolves to play pause`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        val episodeManager = mock<EpisodeManager>()
+        val manager = createManager(this, playbackManager, episodeManager)
+        val callback = manager.createCallback(this, playbackManager, episodeManager)
+
+        callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_HEADSETHOOK))
+        advanceUntilIdle()
+
+        verify(playbackManager).playPause(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        verify(playbackManager, never()).playIfNotPlaying(any())
+    }
+
+    @Test
+    fun `legacy rapid KEYCODE_MEDIA_PLAY resolves previous action after immediate play`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        val episodeManager = mock<EpisodeManager>()
+        val settings = mock<Settings>()
+        val previousAction = mock<UserSetting<HeadphoneAction>>()
+        whenever(settings.headphoneControlsPreviousAction).thenReturn(previousAction)
+        whenever(previousAction.value).thenReturn(HeadphoneAction.SKIP_BACK)
+        val manager = createManager(this, playbackManager, episodeManager, settings)
+        val queuedCommands = mutableListOf<String>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            enqueueCommand = { tag, _ -> queuedCommands += tag },
+        )
+
+        repeat(3) {
+            callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY))
+        }
+
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+
+        advanceUntilIdle()
+
+        assertEquals(listOf("skip backwards"), queuedCommands)
+        verify(playbackManager, never()).playPause(any())
+    }
+
     private fun createManager(
         scope: CoroutineScope,
         playbackManager: PlaybackManager,

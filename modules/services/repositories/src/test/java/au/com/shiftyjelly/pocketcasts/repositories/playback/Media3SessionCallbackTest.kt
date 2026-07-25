@@ -20,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -67,7 +67,7 @@ class Media3SessionCallbackTest {
         bookmarkHelper = mock()
         mockSession = mock()
         mockController = mock()
-        testScope = TestScope(UnconfinedTestDispatcher())
+        testScope = TestScope(StandardTestDispatcher())
 
         callback = Media3SessionCallback(
             playbackManager = playbackManager,
