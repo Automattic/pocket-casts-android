@@ -49,6 +49,9 @@ class SimplePlayer(
 
     private var player: ExoPlayer? = null
 
+    @UnstableApi
+    private var trackSelector: DefaultTrackSelector? = null
+
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
@@ -135,8 +138,12 @@ class SimplePlayer(
         if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            player?.seekTo(positionMs.toLong())
-            super.onSeekComplete(positionMs)
+            try {
+                player?.seekTo(positionMs.toLong())
+                super.onSeekComplete(positionMs)
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
+            }
         }
     }
 
@@ -188,6 +195,8 @@ class SimplePlayer(
     @OptIn(UnstableApi::class)
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
+        this.trackSelector = trackSelector
+        applyAudioOnly()
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
@@ -225,6 +234,7 @@ class SimplePlayer(
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
+                updateVideoState()
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -236,6 +246,7 @@ class SimplePlayer(
                     Player.STATE_READY -> {
                         onBufferingStateChanged()
                         onDurationAvailable()
+                        updateVideoState()
                     }
 
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
@@ -286,11 +297,36 @@ class SimplePlayer(
         prepared = true
     }
 
+    private fun updateVideoState() {
+        val player = player ?: return
+        if (player.playbackState == Player.STATE_READY) {
+            onVideoTrackChanged(player.currentTracks.isTypeSelected(C.TRACK_TYPE_VIDEO))
+        }
+    }
+
+    override fun updateAudioOnly() {
+        applyAudioOnly()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun applyAudioOnly() {
+        val trackSelector = trackSelector ?: return
+        val disableVideo = settings.audioOnly.value && episodeLocation.isHlsStream
+        trackSelector.parameters = trackSelector.buildUponParameters()
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, disableVideo)
+            .build()
+    }
+
     private fun addVideoListener(player: ExoPlayer) {
         player.addListener(object : Player.Listener {
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 videoWidth = videoSize.width
                 videoHeight = videoSize.height
+
+                // Real video dimensions are definitive proof the stream carries video.
+                if (videoSize.width > 0 && videoSize.height > 0) {
+                    onVideoTrackChanged(true)
+                }
 
                 videoChangedListener?.let {
                     Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }

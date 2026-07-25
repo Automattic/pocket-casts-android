@@ -82,10 +82,13 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
             val (index, punctuation) = midSentence
 
             val midSentenceText = text.substring(0, index + punctuation.length)
-            val sentence = buildFullSentence(midSentenceText, startTimeMs, endTimeMs)
-
             val leftOverText = text.drop(midSentenceText.length)
-            appendToAccumulator(leftOverText, startTimeMs, endTimeMs)
+
+            // Split the time range at the sentence boundary so the two halves don't overlap.
+            val splitTimeMs = splitTimeMs(startTimeMs, endTimeMs, midSentenceText.length, text.length)
+            val sentence = buildFullSentence(midSentenceText, startTimeMs, splitTimeMs)
+
+            appendToAccumulator(leftOverText, splitTimeMs, endTimeMs)
 
             sentence
         } else {
@@ -215,6 +218,14 @@ private val MidSentencePunctuation = listOf(
 private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
     val quotationMarks = listOf("\"", "”", "'", "’")
     quotationMarks.map { quotationMark -> "$punctuation$quotationMark" }
+}
+
+// Splits a cue's time range proportionally at a character position, falling back to [endTimeMs]
+// for untimed/degenerate cues.
+private fun splitTimeMs(startTimeMs: Long, endTimeMs: Long, splitIndex: Int, totalLength: Int): Long {
+    if (startTimeMs < 0 || endTimeMs <= startTimeMs || totalLength <= 0) return endTimeMs
+    val offset = (endTimeMs - startTimeMs) * splitIndex / totalLength
+    return (startTimeMs + offset).coerceIn(startTimeMs, endTimeMs)
 }
 
 private fun TranscriptEntry.Text.recalculateWordOffsets(): TranscriptEntry.Text {

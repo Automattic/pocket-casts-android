@@ -111,6 +111,13 @@ enum class ShelfItem(
         iconId = { if (it is UserEpisode) IR.drawable.ic_delete else IR.drawable.ic_archive },
         analyticsValue = ShelfActionType.Archive,
     ),
+    StreamSelector(
+        id = "stream_selector",
+        titleId = { LR.string.player_action_show_video },
+        iconId = { IR.drawable.ic_video_on },
+        showIf = { it is PodcastEpisode },
+        analyticsValue = ShelfActionType.PlaybackEffects,
+    ),
     ;
 
     // We can safely use the ID as server ID. Keeping it if need to make changes in the future.

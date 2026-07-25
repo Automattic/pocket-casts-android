@@ -127,7 +127,6 @@ internal fun OnboardingLoginPage(
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = false,
                 modifier = Modifier.padding(vertical = 16.dp),
-                focusEnabled = false,
             )
 
             state.errorMessage?.let { errorMessage ->

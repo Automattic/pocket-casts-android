@@ -148,6 +148,7 @@ class PodcastViewModelTest {
             podcastManager = podcastManager,
             theme = theme,
             settings = settings,
+            backgroundDispatcher = coroutineRule.testDispatcher,
         )
     }
 

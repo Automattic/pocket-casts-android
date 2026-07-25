@@ -22,8 +22,13 @@ internal class Media3AutomotiveStrategy(
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
     ): AutomotiveSessionStrategy.ButtonLayout {
-        val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
+
+        if (currentEpisode == null) {
+            return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = emptyList(), overflowButtons = emptyList())
+        }
+
+        val buttons = mutableListOf<CommandButton>()
 
         if (useCustomSkipButtons()) {
             buttons.add(
@@ -55,10 +60,10 @@ internal class Media3AutomotiveStrategy(
     /**
      * Builds the Up Next shuffle toggle button shown in the AAOS player.
      *
-     * Mirrors the mobile Up Next shuffle control: it is a paid (Plus/Patron) feature, so it is
-     * only shown to subscribers. Shuffle is a persistent mode toggle, so the button is always
-     * present for subscribers regardless of the current queue length. The icon reflects whether
-     * shuffle mode is currently enabled.
+     * Mirrors the mobile Up Next shuffle control: it is a paid (Plus/Patron) feature, so it is only
+     * shown to subscribers. Shuffle is a persistent mode toggle, so the button is present for
+     * subscribers whenever the player has a current episode, regardless of the queue length. The
+     * icon reflects whether shuffle mode is currently enabled.
      */
     private fun buildShuffleButton(
         settings: Settings,

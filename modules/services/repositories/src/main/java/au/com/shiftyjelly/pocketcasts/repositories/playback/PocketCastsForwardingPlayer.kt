@@ -43,7 +43,11 @@ class PocketCastsForwardingPlayer(
     private val onPause: (() -> Unit)? = null,
     private val onSeekTo: ((Long) -> Unit)? = null,
     internal val playGuard: (() -> Boolean) = { true },
+    private val isAutomotive: Boolean = false,
 ) : ForwardingPlayer(wrappedPlayer) {
+
+    private val isEmptyState: Boolean
+        get() = isAutomotive && super.getCurrentTimeline().isEmpty
 
     internal var currentMediaItem: MediaItem = MediaItem.EMPTY
     internal var previousMediaId: String? = null
@@ -68,7 +72,7 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard).also {
+        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, playGuard, isAutomotive).also {
             it.currentMediaItem = this.currentMediaItem
             it.previousMediaId = this.previousMediaId
             it.isTransientLoss = this.isTransientLoss
@@ -154,11 +158,20 @@ class PocketCastsForwardingPlayer(
         dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED)
     }
 
-    override fun getCurrentMediaItem(): MediaItem = currentMediaItem
+    override fun getCurrentMediaItem(): MediaItem? = if (isEmptyState) null else currentMediaItem
 
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
     override fun getAvailableCommands(): Player.Commands {
+        if (isEmptyState) {
+            return Player.Commands.Builder()
+                .addAll(
+                    Player.COMMAND_SET_MEDIA_ITEM,
+                    Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+                    Player.COMMAND_GET_METADATA,
+                )
+                .build()
+        }
         return Player.Commands.Builder()
             .addAll(
                 Player.COMMAND_PLAY_PAUSE,

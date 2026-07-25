@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -67,7 +68,7 @@ class ShowNotesProcessor @AssistedInject constructor(
             ?.mapNotNull { episodeShowNotes ->
                 val mappingEpisodeId = episodeShowNotes.uuid
                 val chapters =
-                    episodeShowNotes.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, mappingEpisodeId) }
+                    episodeShowNotes.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, mappingEpisodeId, ChapterOrigin.ShowNotes) }
                 chapters?.let { episodeShowNotes.uuid to it }
             }
         chapters?.forEach { (episodeUuid, chapters) ->
@@ -80,13 +81,13 @@ class ShowNotesProcessor @AssistedInject constructor(
 
         val podcastIndexChapters = try {
             episode.chaptersUrl?.let { url ->
-                service.getShowNotesChapters(url).chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, episodeUuid) }
+                service.getShowNotesChapters(url).chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, episodeUuid, ChapterOrigin.PodcastIndex) }
             }
         } catch (e: Throwable) {
             Timber.e(e, "Failed to fetch chapters for episode $episodeUuid from ${episode.chaptersUrl}")
             null
         }
-        val podLoveChapters = episode.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, episodeUuid) }
+        val podLoveChapters = episode.chapters?.mapIndexedNotNull { index, chapter -> chapter.toDbChapter(index, episodeUuid, ChapterOrigin.ShowNotes) }
 
         val newChapters = if (podcastIndexChapters != null && podLoveChapters != null) {
             maxOf(podcastIndexChapters, podLoveChapters) { a, b -> a.size.compareTo(b.size) }
@@ -113,7 +114,7 @@ class ShowNotesProcessor @AssistedInject constructor(
         }
     }
 
-    private fun ShowNotesChapter.toDbChapter(index: Int, episodeUuid: String) = if (useInTableOfContents != false) {
+    private fun ShowNotesChapter.toDbChapter(index: Int, episodeUuid: String, origin: ChapterOrigin) = if (useInTableOfContents != false) {
         DbChapter(
             index = index,
             episodeUuid = episodeUuid,
@@ -122,7 +123,7 @@ class ShowNotesProcessor @AssistedInject constructor(
             title = title,
             imageUrl = image,
             url = url,
-            isEmbedded = false,
+            origin = origin,
         )
     } else {
         null

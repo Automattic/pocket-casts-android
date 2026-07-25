@@ -111,7 +111,7 @@ class UpNextSortTypeTest {
     }
 
     @Test
-    fun `sort shortest to longest`() {
+    fun `sort shortest to longest by time remaining`() {
         val episodes = listOf(
             PodcastEpisode(
                 uuid = "2",
@@ -172,7 +172,7 @@ class UpNextSortTypeTest {
     }
 
     @Test
-    fun `sort longest to shortest`() {
+    fun `sort longest to shortest by time remaining`() {
         val episodes = listOf(
             PodcastEpisode(
                 uuid = "2",
@@ -228,6 +228,72 @@ class UpNextSortTypeTest {
                     addedDate = Date(2),
                 ),
             ),
+            episodes.sortedWith(UpNextSortType.LongestToShortest),
+        )
+    }
+
+    @Test
+    fun `sort by time remaining accounts for already played time`() {
+        // A long episode that's almost finished has less time remaining than a
+        // short, unplayed one, so it sorts first when shortest to longest.
+        val longAlmostDone = PodcastEpisode(
+            uuid = "longAlmostDone",
+            duration = 3000.0,
+            playedUpTo = 2900.0, // 100 remaining
+            publishedDate = Date(0),
+            addedDate = Date(0),
+        )
+        val shortUnplayed = PodcastEpisode(
+            uuid = "shortUnplayed",
+            duration = 600.0,
+            playedUpTo = 0.0, // 600 remaining
+            publishedDate = Date(0),
+            addedDate = Date(0),
+        )
+        val midHalfPlayed = PodcastEpisode(
+            uuid = "midHalfPlayed",
+            duration = 1800.0,
+            playedUpTo = 900.0, // 900 remaining
+            publishedDate = Date(0),
+            addedDate = Date(0),
+        )
+        val episodes = listOf(longAlmostDone, shortUnplayed, midHalfPlayed)
+
+        assertEquals(
+            listOf(longAlmostDone, shortUnplayed, midHalfPlayed),
+            episodes.sortedWith(UpNextSortType.ShortestToLongest),
+        )
+        assertEquals(
+            listOf(midHalfPlayed, shortUnplayed, longAlmostDone),
+            episodes.sortedWith(UpNextSortType.LongestToShortest),
+        )
+    }
+
+    @Test
+    fun `sort by time remaining breaks ties by added date`() {
+        // Both have 1000 remaining, so the earlier added episode sorts first.
+        val addedEarlier = PodcastEpisode(
+            uuid = "addedEarlier",
+            duration = 1000.0,
+            playedUpTo = 0.0, // 1000 remaining
+            publishedDate = Date(0),
+            addedDate = Date(1),
+        )
+        val addedLater = PodcastEpisode(
+            uuid = "addedLater",
+            duration = 2000.0,
+            playedUpTo = 1000.0, // 1000 remaining
+            publishedDate = Date(0),
+            addedDate = Date(2),
+        )
+        val episodes = listOf(addedLater, addedEarlier)
+
+        assertEquals(
+            listOf(addedEarlier, addedLater),
+            episodes.sortedWith(UpNextSortType.ShortestToLongest),
+        )
+        assertEquals(
+            listOf(addedEarlier, addedLater),
             episodes.sortedWith(UpNextSortType.LongestToShortest),
         )
     }

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
@@ -142,6 +143,10 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     override suspend fun loadSummaryText(episodeUuid: String): String? {
+        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+        if (!isChaptersEnabled && !isSummaryEnabled) return null
+
         return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
                 .firstOrNull { it.isGenerated } ?: return null
@@ -151,11 +156,15 @@ class TranscriptManagerImpl @Inject constructor(
             response.use { body ->
                 val meta = metaAdapter.fromJson(body.source()) ?: return@use null
 
-                if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                if (isChaptersEnabled) {
                     saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
                 }
 
-                meta.summary?.takeIf { it.isNotBlank() }
+                if (isSummaryEnabled) {
+                    meta.summary?.takeIf { it.isNotBlank() }
+                } else {
+                    null
+                }
             }
         } catch (e: CancellationException) {
             throw e
@@ -179,7 +188,7 @@ class TranscriptManagerImpl @Inject constructor(
                     episodeUuid = episodeUuid,
                     startTimeMs = startTime * 1000,
                     title = title,
-                    isGenerated = true,
+                    origin = ChapterOrigin.Generated,
                 )
             }
             .mapIndexed { index, chapter -> chapter.copy(index = index) }

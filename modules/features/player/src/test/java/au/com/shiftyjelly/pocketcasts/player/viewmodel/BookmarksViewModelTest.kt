@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -20,7 +21,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
@@ -43,6 +47,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -54,6 +59,9 @@ class BookmarksViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var bookmarkManager: BookmarkManager
@@ -172,5 +180,39 @@ class BookmarksViewModelTest {
         assertEquals(2, result.size)
         assertEquals("uuid1", result[0].uuid)
         assertEquals("uuid2", result[1].uuid)
+    }
+
+    @Test
+    fun `given not multi-selecting, when row clicked, then showBookmarkDetail emits`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid)
+        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.TIMESTAMP))
+            .thenReturn(flowOf(listOf(bookmark)))
+
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
+
+        bookmarksViewModel.showBookmarkDetail.test {
+            val loaded = bookmarksViewModel.uiState.value as BookmarksViewModel.UiState.Loaded
+            loaded.onRowClick(bookmark)
+            assertEquals("uuid1", awaitItem().bookmark.uuid)
+        }
+    }
+
+    @Test
+    fun `given multi-selecting, when row clicked, then showBookmarkDetail does not emit`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid)
+        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.TIMESTAMP))
+            .thenReturn(flowOf(listOf(bookmark)))
+        whenever(multiSelectHelper.isMultiSelectingLive)
+            .thenReturn(MutableLiveData<Boolean>().apply { value = true })
+
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
+
+        bookmarksViewModel.showBookmarkDetail.test {
+            val loaded = bookmarksViewModel.uiState.value as BookmarksViewModel.UiState.Loaded
+            loaded.onRowClick(bookmark)
+            expectNoEvents()
+        }
+        verify(multiSelectHelper).select(bookmark)
     }
 }

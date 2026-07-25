@@ -169,6 +169,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 source = source.analyticsValue,
                 flow = flow.adjustedFlow(source).analyticsValue,
                 isInstallment = plan.isInstallment,
+                frequency = plan.billingCycle.analyticsValue,
             ),
         )
     }

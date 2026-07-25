@@ -1,11 +1,18 @@
-
 *   New Features
-    *   Synced episode transcripts
-        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
-    *   Add the explicit badge to the Discover section
-        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
+    *   Add Audio only playback setting
+        ([#5572](https://github.com/Automattic/pocket-casts-android/pull/5572))
+    *   Add support for Flightcast transcripts
+        ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
+    *   Stats Heatmap
+        ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
+    *   HLS support
+        ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
 *   Bug Fixes
-    *   Fix Profile settings gear being unreachable in landscape
-        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
-    *   Fix missing episode dates and durations in Android Auto and Wear OS
-        ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
+    *   Fix episodes being cached over mobile data when Warn before using data is enabled
+        ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
+    *   Reduce the chance of episode playback progress reverting during listening history sync
+        ([#5552](https://github.com/Automattic/pocket-casts-android/pull/5552))
+    *   Fix a crash that could occur when seeking during playback
+        ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
+    *   Fix Automotive crash when using Google Assistant voice commands to control playback
+        ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))

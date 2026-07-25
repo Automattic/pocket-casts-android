@@ -32,15 +32,18 @@ class ImprovedSearchManagerImpl @Inject constructor(
 
     override suspend fun combinedSearch(term: String): List<ImprovedSearchResultItem> {
         val response = combinedSearchService.combinedSearch(CombinedSearchRequest(term))
-        return response.results.map {
+        return response.results.mapNotNull {
             when (it) {
-                is CombinedResult.PodcastResult -> ImprovedSearchResultItem.PodcastItem(
-                    uuid = it.uuid,
-                    title = it.title,
-                    author = it.author.orEmpty(),
-                    isFollowed = false,
-                    isExplicit = it.explicit == true,
-                )
+                is CombinedResult.PodcastResult -> {
+                    val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
+                    ImprovedSearchResultItem.PodcastItem(
+                        uuid = it.uuid,
+                        title = title,
+                        author = it.author.orEmpty(),
+                        isFollowed = false,
+                        isExplicit = it.explicit == true,
+                    )
+                }
 
                 is CombinedResult.EpisodeResult -> ImprovedSearchResultItem.EpisodeItem(
                     uuid = it.uuid,

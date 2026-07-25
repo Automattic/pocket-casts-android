@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.eventhorizon.EventHorizon
 import dagger.Module
@@ -30,6 +31,10 @@ class RepositoryProviderModule {
     @Provides
     @Singleton
     fun provideTokenHandler(syncAccountManager: SyncAccountManager): TokenHandler = syncAccountManager
+
+    @Provides
+    @Singleton
+    fun provideAppPlatform(@ApplicationContext context: Context): AppPlatform = Util.getAppPlatform(context)
 
     @Provides
     @Singleton

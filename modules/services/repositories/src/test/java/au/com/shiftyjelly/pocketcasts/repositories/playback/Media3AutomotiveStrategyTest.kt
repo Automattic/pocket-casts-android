@@ -2,14 +2,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import androidx.media3.session.CommandButton
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,7 +46,9 @@ class Media3AutomotiveStrategyTest {
         context = mock()
         whenever(context.getString(any())).thenReturn("Shuffle")
 
-        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+        // A current episode is present by default; the shuffle button (and the rest of the layout)
+        // is only built when something is playing. Tests that need the empty case override this.
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(createEpisode())
         whenever(settings.customMediaActionsVisibility).thenReturn(customMediaActionsVisibility)
         whenever(customMediaActionsVisibility.value).thenReturn(false)
         whenever(settings.mediaControlItems).thenReturn(mediaControlItems)
@@ -64,7 +69,27 @@ class Media3AutomotiveStrategyTest {
     }
 
     private fun setPaid(isPaid: Boolean) {
-        whenever(cachedSubscription.value).thenReturn(if (isPaid) mock<Subscription>() else null)
+        val subscription = if (isPaid) mock<Subscription>() else null
+        whenever(cachedSubscription.value).thenReturn(subscription)
+    }
+
+    private fun createEpisode() = PodcastEpisode(
+        uuid = "ep-uuid",
+        title = "Test Episode",
+        publishedDate = Date(),
+        podcastUuid = "podcast-uuid",
+    )
+
+    @Test
+    fun `returns empty layout when there is no current episode`() {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+        setPaid(true)
+        whenever(upNextShuffle.value).thenReturn(false)
+
+        val layout = buildLayout()
+
+        assertTrue(layout.primaryButtons.isEmpty())
+        assertTrue(layout.overflowButtons.isEmpty())
     }
 
     @Test

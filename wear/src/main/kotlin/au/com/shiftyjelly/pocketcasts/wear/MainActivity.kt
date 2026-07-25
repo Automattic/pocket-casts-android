@@ -377,28 +377,35 @@ private fun WearApp(
 
         is SignInState.SignedIn -> {
             val subscription = signInState.subscription
-            if (subscription == null) {
-                // This gets the user back to the start destination if they logged in as free. The
-                // start destination should have been reset to the RequirePlusScreen already.
-                signOut()
-                val popped = navController.popBackStack(startDestination, inclusive = false)
-                if (popped) {
-                    ScrollToTop.initiate(navController)
-                }
-                val email = if (signInState.email.length > 16) {
-                    buildString {
-                        append(signInState.email.substring(0, 6))
-                        append("…")
-                        append(signInState.email.takeLast(6))
+            val phoneLoginInProgress = syncState == WatchSyncState.Syncing || syncState == WatchSyncState.Success
+            when {
+                subscription == null && phoneLoginInProgress -> Unit
+
+                subscription == null -> {
+                    // This gets the user back to the start destination if they logged in as free. The
+                    // start destination should have been reset to the RequirePlusScreen already.
+                    signOut()
+                    val popped = navController.popBackStack(startDestination, inclusive = false)
+                    if (popped) {
+                        ScrollToTop.initiate(navController)
                     }
-                } else {
-                    signInState.email
+                    val email = if (signInState.email.length > 16) {
+                        buildString {
+                            append(signInState.email.substring(0, 6))
+                            append("…")
+                            append(signInState.email.takeLast(6))
+                        }
+                    } else {
+                        signInState.email
+                    }
+                    val message = stringResource(LR.string.log_in_free_account, email)
+                    Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
                 }
-                val message = stringResource(LR.string.log_in_free_account, email)
-                Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
-            } else if (waitingForSignIn.value) {
-                navController.navigate(LoggingInScreen.ROUTE)
-                waitingForSignIn.value = false
+
+                waitingForSignIn.value -> {
+                    navController.navigate(LoggingInScreen.ROUTE)
+                    waitingForSignIn.value = false
+                }
             }
         }
     }

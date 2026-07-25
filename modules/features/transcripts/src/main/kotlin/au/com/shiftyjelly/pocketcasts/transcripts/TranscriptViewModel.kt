@@ -21,6 +21,9 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
+import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
 import com.automattic.eventhorizon.Trackable
 import com.automattic.eventhorizon.TranscriptErrorEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
@@ -36,9 +39,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -58,6 +63,9 @@ class TranscriptViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(UiState.Empty)
     val uiState = _uiState.asStateFlow()
+
+    private val _messages = Channel<TranscriptMessage>(Channel.BUFFERED)
+    val messages = _messages.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -136,7 +144,7 @@ class TranscriptViewModel @AssistedInject constructor(
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
                 val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
                 if (currentPlayingUuid == episodeUuid) {
-                    fingerprintTimingManager.prepareForCurrentEpisode()
+                    fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
                     _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
                     observeSyncedState()
                 }
@@ -155,9 +163,12 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
+    private var currentPlaybackPositionMs: Int = 0
+
     private fun observePlaybackState() {
         viewModelScope.launch {
             playbackManager.playbackStateFlow.collect { playbackState ->
+                currentPlaybackPositionMs = playbackState.positionMs
                 _uiState.update { state ->
                     state.copy(playingEpisodeUuid = playbackState.episodeUuid.ifEmpty { null })
                 }
@@ -165,15 +176,61 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    fun seekToTranscriptEntry(entry: TranscriptEntry) {
-        val textEntry = entry as? TranscriptEntry.Text ?: return
-        if (textEntry.startTimeMs < 0) return
+    /**
+     * Seeks playback to the tapped transcript [entry]. Returns the playback position (ms) sought
+     * to, or `null` if the entry is untimed, tap-to-seek is unavailable, or no mapping is
+     * available (which tracks a seek failure). The caller uses the returned position to drive the
+     * highlight directly rather than re-deriving it from the (lossy) playback position.
+     */
+    fun seekToTranscriptEntry(entry: TranscriptEntry): Int? {
+        val textEntry = entry as? TranscriptEntry.Text ?: return null
+        if (textEntry.startTimeMs < 0) return null
         val currentState = _uiState.value
-        if (!currentState.isSyncedActive) return
+        if (!currentState.isTapToSeekAvailable) return null
 
         val refTimeSec = textEntry.startTimeMs / 1000.0
-        val seekTimeMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec) ?: return
+        val seekTimeMs = if (currentState.isSyncedActive) {
+            fingerprintTimingManager.playbackTimeMs(forReferenceTime = refTimeSec)
+        } else {
+            null
+        }
+        if (seekTimeMs == null) {
+            track { source, podcastUuid, episodeUuid ->
+                SyncedTranscriptsSeekFailedEvent(
+                    reason = "mapping_unavailable",
+                    syncedState = currentState.syncedState.analyticsName(),
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
+                )
+            }
+            notifyTapToSeekUnavailable(currentState.syncedState)
+            return null
+        }
+
+        val fromPositionSeconds = currentPlaybackPositionMs / 1000L
         playbackManager.seekToTimeMs(seekTimeMs)
+        track { source, podcastUuid, episodeUuid ->
+            SyncedTranscriptsSeekUsedEvent(
+                fromPositionSeconds = fromPositionSeconds,
+                toPositionSeconds = seekTimeMs / 1000L,
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = source,
+            )
+        }
+        return seekTimeMs
+    }
+
+    // Prompt to download only when it could help, not if already downloaded or sync is unavailable.
+    private fun notifyTapToSeekUnavailable(syncedState: FingerprintTimingManager.State) {
+        if (syncedState is FingerprintTimingManager.State.Unavailable) return
+        val uuid = episodeUuid ?: return
+        viewModelScope.launch {
+            val episode = episodeManager.findByUuid(uuid)
+            if (episode?.isDownloaded == true) return@launch
+            _messages.send(TranscriptMessage.TapToSeekStreamingUnavailable)
+        }
     }
 
     override fun onCleared() {
@@ -342,11 +399,30 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
+    fun trackAutoScrollResumed(manualScrollDurationMs: Long?) {
+        track { source, podcastUuid, episodeUuid ->
+            SyncedTranscriptsAutoScrollResumedEvent(
+                manualScrollDurationMs = manualScrollDurationMs,
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                source = source,
+            )
+        }
+    }
+
     fun track(event: (TranscriptSourceType, podcastUuid: String, episodeUuid: String) -> Trackable) {
         val podcastUuid = podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val episodeUuid = episodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE
         val event = event(source.analyticsValue, podcastUuid, episodeUuid)
         eventHorizon.track(event)
+    }
+
+    private fun FingerprintTimingManager.State.analyticsName() = when (this) {
+        FingerprintTimingManager.State.Idle -> "idle"
+        FingerprintTimingManager.State.Preparing -> "preparing"
+        is FingerprintTimingManager.State.Active -> "active"
+        is FingerprintTimingManager.State.Failed -> "failed"
+        is FingerprintTimingManager.State.Unavailable -> "unavailable"
     }
 
     private suspend fun updateEpisodeMetadata(episodeUuid: String) {
@@ -373,6 +449,10 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 }
 
+sealed interface TranscriptMessage {
+    data object TapToSeekStreamingUnavailable : TranscriptMessage
+}
+
 data class UiState(
     val transcriptState: TranscriptState,
     val searchState: SearchState,
@@ -388,6 +468,13 @@ data class UiState(
     val transcriptEpisodeUuid get() = (transcriptState as? TranscriptState.Loaded)?.transcript?.episodeUuid
 
     val isSyncedActive get() = syncedState is FingerprintTimingManager.State.Active &&
+        transcriptEpisodeUuid != null &&
+        transcriptEpisodeUuid == playingEpisodeUuid
+
+    val isGeneratedTextTranscript get() = ((transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text)?.isGenerated == true
+
+    val isTapToSeekAvailable get() = isGeneratedTextTranscript &&
+        !isPaywallVisible &&
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
 

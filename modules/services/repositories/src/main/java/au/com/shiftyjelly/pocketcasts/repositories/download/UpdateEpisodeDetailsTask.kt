@@ -26,7 +26,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import timber.log.Timber
 
 @HiltWorker
 class UpdateEpisodeDetailsTask @AssistedInject constructor(
@@ -101,27 +100,22 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 
                 try {
                     val client = withContext(Dispatchers.Default) { httpClient.get() }
-                    val response = client.newCall(request).await()
-
-                    val contentType = response.header("Content-Type")
-                    if (!contentType.isNullOrBlank()) {
-                        if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
-                            episodeManager.updateFileTypeBlocking(episode, contentType)
-                            episode.fileType = contentType
+                    client.newCall(request).await().use { response ->
+                        val contentType = response.header("Content-Type")
+                        if (!contentType.isNullOrBlank()) {
+                            if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
+                                episodeManager.updateFileTypeBlocking(episode, contentType)
+                                episode.fileType = contentType
+                            }
                         }
-                    }
 
-                    val contentLengthHeader = response.header("Content-Length")
-                    if (!contentLengthHeader.isNullOrBlank()) {
-                        try {
-                            val contentLength = java.lang.Long.parseLong(contentLengthHeader)
+                        val contentLength = response.header("Content-Length")?.toLongOrNull()
+                        if (contentLength != null) {
                             val sizeInBytes = episode.sizeInBytes
                             if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
                                 episodeManager.updateSizeInBytesBlocking(episode, contentLength)
                                 episode.sizeInBytes = contentLength
                             }
-                        } catch (nfe: NumberFormatException) {
-                            Timber.i(nfe, "Unable to read content length.")
                         }
                     }
                 } catch (ioException: IOException) {

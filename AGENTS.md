@@ -128,6 +128,29 @@ Core Services (model, servers)
 
 ## Development Guidelines
 
+### Git Workflow
+
+**Develop feature work on a branch off `main`. The only reason to branch off a release branch is to cherry-pick an already-merged commit into that release.**
+
+Branching feature *development* off a release branch causes confusion later: when
+the release branch is merged back into `main`, it is unclear which commits belong
+to the release and which belong to the unrelated feature work. To avoid this:
+
+- **Create every feature branch from `main`**, even if the
+  change is also needed in an in-flight release. Never develop a feature on a
+  branch based on `release/*`.
+- If a change must also land in a release branch (e.g. a fix needed for an
+  upcoming release):
+  1. Develop and merge it on a branch off `main` first.
+  2. Create a new branch off the release branch, cherry-pick the relevant commit(s)
+     from the origin branch onto it, then open a PR into the release branch.
+- Keep cherry-picks limited to the specific commits the release needs, so the release branch never accumulates
+  feature work that does not belong in it.
+- Cherry-picking may surface merge conflicts. Resolve them carefully, then verify the result before opening the PR:
+  - The apps build on all platforms (`app`, `automotive`, `wear`).
+  - All quality gates pass (`./gradlew spotlessCheck`, lint).
+  - Unit and integration tests succeed.
+
 ### Technology Preferences
 
 **Use Jetpack Compose for new UI**:

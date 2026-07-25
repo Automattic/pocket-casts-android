@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PocketCastsLoadError
 import java.io.FileNotFoundException
 import java.io.IOException
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -266,6 +267,31 @@ class PocketCastsLoadErrorHandlingPolicyTest {
     @Test
     fun `getMinimumLoadableRetryCount returns MAX_VALUE for other`() {
         assertEquals(Int.MAX_VALUE, policy.getMinimumLoadableRetryCount(C.DATA_TYPE_DRM))
+    }
+
+    @Test
+    fun `404 excludes the track for fallback`() {
+        assertTrue(policy.shouldExcludeTrack(404))
+    }
+
+    @Test
+    fun `410 excludes the track for fallback`() {
+        assertTrue(policy.shouldExcludeTrack(410))
+    }
+
+    @Test
+    fun `401 does not exclude the track`() {
+        assertFalse(policy.shouldExcludeTrack(401))
+    }
+
+    @Test
+    fun `403 does not exclude the track`() {
+        assertFalse(policy.shouldExcludeTrack(403))
+    }
+
+    @Test
+    fun `5xx does not exclude the track`() {
+        assertFalse(policy.shouldExcludeTrack(500))
     }
 
     private fun createHttpException(responseCode: Int): InvalidResponseCodeException {

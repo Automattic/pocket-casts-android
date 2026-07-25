@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.SystemClock
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -31,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptMessage
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
@@ -38,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
@@ -69,9 +75,24 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+
+    val syncableEpisodeUuid = uiState.transcriptEpisodeUuid.takeIf { uiState.isTextTranscriptLoaded }
+    DisposableEffect(fingerprintTimingManager, syncableEpisodeUuid) {
+        if (syncableEpisodeUuid != null) {
+            fingerprintTimingManager?.onTranscriptShown(syncableEpisodeUuid)
+        }
+        onDispose {
+            if (syncableEpisodeUuid != null) {
+                fingerprintTimingManager?.onTranscriptDismissed(syncableEpisodeUuid)
+            }
+        }
+    }
+
     var highlightState by remember { mutableStateOf(HighlightState()) }
     var hasInitiallyScrolled by remember { mutableStateOf(false) }
     var isAutoScrollSuppressed by remember { mutableStateOf(false) }
+    var pendingSeek by remember { mutableStateOf<PendingTapSeek?>(null) }
+    var forceScrollIndex by remember { mutableStateOf<Int?>(null) }
     val playbackState by remember(playbackManager) {
         playbackManager?.playbackStateFlow ?: flowOf(null)
     }.collectAsState(initial = null)
@@ -104,8 +125,18 @@ fun TranscriptPage(
                     .fillMaxWidth(),
             ) {
                 val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
-                    if (uiState.isSyncedActive && viewModel != null) {
-                        { entry, _ -> viewModel.seekToTranscriptEntry(entry) }
+                    if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && uiState.isTapToSeekAvailable && viewModel != null) {
+                        { entry, index ->
+                            val seekTarget = viewModel.seekToTranscriptEntry(entry)
+                            if (seekTarget != null) {
+                                // Hold the tapped row lit until fingerprinting catches up to the seek.
+                                highlightState = HighlightState(entryIndex = index)
+                                pendingSeek = PendingTapSeek(positionMs = seekTarget, entryIndex = index)
+                                if (!isPlaying) {
+                                    forceScrollIndex = index
+                                }
+                            }
+                        }
                     } else {
                         null
                     }
@@ -160,6 +191,8 @@ fun TranscriptPage(
         uiState = uiState,
         fingerprintTimingManager = fingerprintTimingManager,
         playbackManager = playbackManager,
+        pendingSeek = pendingSeek,
+        onConsumePendingSeek = { pendingSeek = null },
         onHighlightChange = { highlightState = it },
     )
 
@@ -170,16 +203,41 @@ fun TranscriptPage(
         isPlaying = isPlaying,
         isAutoScrollSuppressed = isAutoScrollSuppressed,
         animate = hasInitiallyScrolled,
+        forceScrollIndex = forceScrollIndex,
+        onConsumeForceScroll = { forceScrollIndex = null },
         onScroll = { hasInitiallyScrolled = true },
     )
 
     UserScrollDetectionEffect(
         listState = listState,
         onSuppressScroll = { isAutoScrollSuppressed = true },
-        onResumeScroll = { isAutoScrollSuppressed = false },
+        onResumeScroll = { manualScrollDurationMs ->
+            isAutoScrollSuppressed = false
+            if (uiState.isSyncedActive) {
+                viewModel?.trackAutoScrollResumed(manualScrollDurationMs)
+            }
+        },
     )
 
     KeepScreenOnEffect(keepOn = uiState.isSyncedActive)
+
+    TranscriptMessageEffect(viewModel = viewModel)
+}
+
+@Composable
+private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
+    if (viewModel == null) return
+    val context = LocalContext.current
+    val tapToSeekUnavailableMessage = stringResource(LR.string.transcript_tap_to_seek_streaming_unavailable)
+    LaunchedEffect(viewModel) {
+        viewModel.messages.collect { message ->
+            when (message) {
+                TranscriptMessage.TapToSeekStreamingUnavailable -> {
+                    Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -263,6 +321,8 @@ private fun HighlightEffect(
     uiState: UiState,
     fingerprintTimingManager: FingerprintTimingManager?,
     playbackManager: PlaybackManager?,
+    pendingSeek: PendingTapSeek?,
+    onConsumePendingSeek: () -> Unit,
     onHighlightChange: (HighlightState) -> Unit,
 ) {
     if (fingerprintTimingManager == null || playbackManager == null) return
@@ -270,50 +330,110 @@ private fun HighlightEffect(
     val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
     val isSyncedActive = uiState.isSyncedActive
     val latestOnHighlightChanged by rememberUpdatedState(onHighlightChange)
+    val latestPendingSeek by rememberUpdatedState(pendingSeek)
+    val latestOnConsumePendingSeek by rememberUpdatedState(onConsumePendingSeek)
 
     val playbackState by remember(playbackManager) {
         playbackManager.playbackStateFlow
     }.collectAsState(initial = null)
     val isPlaying = playbackState?.isPlaying == true
 
+    val cueIndexHolder = remember(transcript.entries) { intArrayOf(0) }
+
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
-            var cachedIndex = 0
+            cueIndexHolder[0] = 0
+            latestOnConsumePendingSeek()
             var wasHighlighting = false
+            var settledForSeek: Int? = null
             latestOnHighlightChanged(HighlightState())
+            val episode = playbackManager.getCurrentEpisode()
             while (true) {
-                withFrameNanos { _ ->
-                    val posMs = playbackState?.positionMs ?: return@withFrameNanos
-                    val currentRefTime = fingerprintTimingManager.matchedReferenceTime(forPlaybackTimeMs = posMs)
-                    if (currentRefTime == null) {
+                withFrameNanos { }
+                val posMs = if (episode != null) {
+                    playbackManager.getCurrentTimeMs(episode)
+                } else {
+                    playbackState?.positionMs ?: continue
+                }
+                val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])
+
+                val pending = latestPendingSeek
+                if (pending != null) {
+                    // Hold the tapped row until the seek settles and resolution reaches it.
+                    if (settledForSeek != pending.positionMs &&
+                        TranscriptCueHelper.isSeekSettled(posMs, pending.positionMs)
+                    ) {
+                        settledForSeek = pending.positionMs
+                    }
+                    val settled = settledForSeek == pending.positionMs
+                    val reachedRow = TranscriptCueHelper.hasReachedTappedRow(outcome, pending.entryIndex)
+                    if (settled && reachedRow) {
+                        latestOnConsumePendingSeek()
+                        settledForSeek = null
+                    } else {
+                        wasHighlighting = true
+                        continue
+                    }
+                }
+
+                when (outcome) {
+                    is HighlightOutcome.Show -> {
+                        cueIndexHolder[0] = outcome.entryIndex
+                        latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                        wasHighlighting = true
+                    }
+
+                    HighlightOutcome.Clear -> {
                         if (wasHighlighting) {
                             latestOnHighlightChanged(HighlightState())
                             wasHighlighting = false
                         }
-                        return@withFrameNanos
                     }
-                    val currentRefTimeMs = (currentRefTime * 1000).toLong()
-                    val idx = TranscriptCueHelper.findCueIndex(transcript.entries, currentRefTimeMs, cachedIndex)
-                    if (idx != null) {
-                        cachedIndex = idx
-                        val entry = transcript.entries[idx]
-                        val wordIdx = if (entry is TranscriptEntry.Text && entry.words.isNotEmpty()) {
-                            TranscriptCueHelper.findWordIndex(entry, currentRefTimeMs)
-                        } else {
-                            null
-                        }
-                        latestOnHighlightChanged(HighlightState(entryIndex = idx, wordIndex = wordIdx))
-                        wasHighlighting = true
-                    } else if (wasHighlighting) {
-                        latestOnHighlightChanged(HighlightState())
-                        wasHighlighting = false
-                    }
+
+                    HighlightOutcome.Keep -> Unit
                 }
             }
         }
-    } else if (!isSyncedActive) {
+    } else if (isSyncedActive) {
+        // Paused but synced: no frame loop, so recompute once per position change.
+        LaunchedEffect(transcript.entries, playbackState?.positionMs) {
+            val posMs = playbackState?.positionMs ?: return@LaunchedEffect
+            if (posMs == latestPendingSeek?.positionMs) {
+                return@LaunchedEffect
+            }
+            latestOnConsumePendingSeek()
+            when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
+                is HighlightOutcome.Show -> {
+                    cueIndexHolder[0] = outcome.entryIndex
+                    latestOnHighlightChanged(HighlightState(entryIndex = outcome.entryIndex, wordIndex = outcome.wordIndex))
+                }
+
+                HighlightOutcome.Clear -> latestOnHighlightChanged(HighlightState())
+
+                HighlightOutcome.Keep -> Unit
+            }
+        }
+    } else {
         LaunchedEffect(Unit) { latestOnHighlightChanged(HighlightState()) }
     }
+}
+
+/**
+ * Maps the current playback position to a highlight outcome. Returns [HighlightOutcome.Clear]
+ * when playback is off matched content (ads / unmatched / outside the mapped range), otherwise
+ * delegates the cue decision to [TranscriptCueHelper.resolveHighlight].
+ */
+private fun resolveHighlight(
+    entries: List<TranscriptEntry>,
+    posMs: Int,
+    fingerprintTimingManager: FingerprintTimingManager,
+    cachedIndex: Int,
+): HighlightOutcome {
+    val refTime = fingerprintTimingManager.matchedReferenceTime(forPlaybackTimeMs = posMs)
+        ?: return HighlightOutcome.Clear
+    // Round, not truncate: truncating lands before a cue boundary and resolves to the prior cue.
+    val refTimeMs = (refTime * 1000).roundToLong()
+    return TranscriptCueHelper.resolveHighlight(entries, refTimeMs, cachedIndex)
 }
 
 @Composable
@@ -324,9 +444,12 @@ private fun AutoScrollEffect(
     isPlaying: Boolean,
     isAutoScrollSuppressed: Boolean,
     animate: Boolean,
+    forceScrollIndex: Int?,
+    onConsumeForceScroll: () -> Unit,
     onScroll: () -> Unit,
 ) {
     val latestOnScroll by rememberUpdatedState(onScroll)
+    val latestOnConsumeForceScroll by rememberUpdatedState(onConsumeForceScroll)
     if (highlightIndex != null && isPlaying && !isSearching && !isAutoScrollSuppressed) {
         LaunchedEffect(highlightIndex) {
             if (highlightIndex >= listState.layoutInfo.totalItemsCount) return@LaunchedEffect
@@ -340,30 +463,45 @@ private fun AutoScrollEffect(
             latestOnScroll()
         }
     }
+
+    if (forceScrollIndex != null && !isSearching) {
+        LaunchedEffect(forceScrollIndex) {
+            if (forceScrollIndex < listState.layoutInfo.totalItemsCount) {
+                val viewportHeight = listState.layoutInfo.viewportSize.height
+                val scrollOffset = (viewportHeight * 0.3f).roundToInt()
+                listState.animateScrollToItem(forceScrollIndex, -scrollOffset)
+            }
+            latestOnConsumeForceScroll()
+        }
+    }
 }
 
 @Composable
 private fun UserScrollDetectionEffect(
     listState: LazyListState,
     onSuppressScroll: () -> Unit,
-    onResumeScroll: () -> Unit,
+    onResumeScroll: (manualScrollDurationMs: Long?) -> Unit,
 ) {
     val latestOnSuppressScroll by rememberUpdatedState(onSuppressScroll)
     val latestOnResumeScroll by rememberUpdatedState(onResumeScroll)
     LaunchedEffect(listState) {
         var resumeJob: Job? = null
+        var dragStartMs: Long? = null
         listState.interactionSource.interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> {
                     resumeJob?.cancel()
+                    dragStartMs = SystemClock.elapsedRealtime()
                     latestOnSuppressScroll()
                 }
 
                 is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                    val manualScrollDurationMs = dragStartMs?.let { SystemClock.elapsedRealtime() - it }
+                    dragStartMs = null
                     resumeJob?.cancel()
                     resumeJob = launch {
-                        delay(AUTO_SCROLL_BACK_DELAY_MS)
-                        latestOnResumeScroll()
+                        delay(AUTO_SCROLL_BACK_DELAY_MS.milliseconds)
+                        latestOnResumeScroll(manualScrollDurationMs)
                     }
                 }
             }
@@ -386,6 +524,11 @@ private fun KeepScreenOnEffect(keepOn: Boolean) {
 internal data class HighlightState(
     val entryIndex: Int? = null,
     val wordIndex: Int? = null,
+)
+
+internal data class PendingTapSeek(
+    val positionMs: Int,
+    val entryIndex: Int,
 )
 
 private const val AUTO_SCROLL_BACK_DELAY_MS = 5000L

@@ -126,8 +126,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
@@ -406,6 +404,11 @@ class PlayerHeaderFragment :
                             }
                         }
 
+                        NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(onConfirm = { shelfSharedViewModel.onVideoToggleConfirmed() })
+                                .show(parentFragmentManager, "stream warning")
+                        }
+
                         NavigationState.ShowAddBookmark -> {
                             val bookmarkArguments = viewModel.createBookmarkArguments()
                             if (bookmarkArguments != null) {
@@ -589,6 +592,7 @@ class PlayerHeaderFragment :
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
+            old.podcastHeader.isVideo == new.podcastHeader.isVideo &&
             old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
             old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
             old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
@@ -1050,7 +1054,7 @@ class PlayerHeaderFragment :
                     }
                 },
                 toolbarTrailingContent = { toolbarColors ->
-                    if (state.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                    if (state.isTextTranscriptLoaded) {
                         TranscriptShareButton(
                             toolbarColors = toolbarColors,
                             onClick = transcriptViewModel::shareTranscript,
