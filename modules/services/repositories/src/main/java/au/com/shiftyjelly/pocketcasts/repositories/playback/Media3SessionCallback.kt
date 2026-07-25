@@ -67,7 +67,17 @@ internal class Media3SessionCallback(
 
     private val scope: CoroutineScope get() = scopeProvider()
 
-    private val mediaEventQueue = MediaEventQueue(scopeProvider = scopeProvider)
+    private val mediaButtonEventHandler = MediaButtonEventHandler(
+        scopeProvider = scopeProvider,
+        onImmediatePlay = { playbackManager.playIfNotPlaying(sourceView = source) },
+        onMediaEvent = { event ->
+            when (event) {
+                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                MediaEvent.TripleTap -> handleMediaButtonTripleTap()
+            }
+        },
+    )
 
     override fun onConnect(
         session: MediaSession,
@@ -204,9 +214,10 @@ internal class Media3SessionCallback(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3 media button event: keyCode=${keyEvent.keyCode}")
 
         // Dedicated pause key has explicit semantics — handle it directly.
-        // KEYCODE_MEDIA_PLAY is routed through the multi-tap system because some
-        // Bluetooth headphones (e.g. Pixel Buds) send it spuriously after multi-tap
-        // sequences, and the MediaEventQueue suppresses those duplicates.
+        // KEYCODE_MEDIA_PLAY stays in the multi-tap system because some Bluetooth
+        // headphones send it spuriously after multi-tap sequences. Its play-only
+        // action runs as soon as the queue accepts the first tap, without waiting
+        // for the multi-tap window to expire.
         when (keyEvent.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PAUSE -> {
                 scope.launch { playbackManager.pauseSuspend(sourceView = source) }
@@ -244,37 +255,7 @@ internal class Media3SessionCallback(
             }
         }
 
-        val inputEvent = when (keyEvent.keyCode) {
-            KeyEvent.KEYCODE_MEDIA_PLAY,
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
-            KeyEvent.KEYCODE_HEADSETHOOK,
-            -> MediaEvent.SingleTap
-
-            KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
-
-            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
-
-            else -> null
-        }
-
-        if (inputEvent != null) {
-            scope.launch {
-                try {
-                    val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
-                    when (outputEvent) {
-                        MediaEvent.SingleTap -> handleMediaButtonSingleTap()
-                        MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                        MediaEvent.TripleTap -> handleMediaButtonTripleTap()
-                        null -> Unit
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Media button event handling failed")
-                }
-            }
-            return true
-        }
-
-        return false
+        return mediaButtonEventHandler.handle(keyEvent)
     }
 
     private fun handleMediaButtonSingleTap() {

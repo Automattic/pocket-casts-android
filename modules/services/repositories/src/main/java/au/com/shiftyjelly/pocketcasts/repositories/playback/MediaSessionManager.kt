@@ -252,6 +252,7 @@ class MediaSessionManager(
                                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                             }
                         },
+                        scopeProvider = { scope },
                     ),
                 )
             }
@@ -1218,48 +1219,50 @@ class MediaSessionManager(
         stateBuilder.addCustomAction(skipBackBuilder.build())
     }
 
-    inner class MediaSessionCallback(
+    internal inner class MediaSessionCallback(
         val playbackManager: PlaybackManager,
         val episodeManager: EpisodeManager,
         val enqueueCommand: (String, suspend () -> Unit) -> Unit,
+        scopeProvider: () -> CoroutineScope,
     ) : MediaSessionCompat.Callback() {
 
         private var playFromSearchDisposable: Disposable? = null
-        private val mediaEventQueue = MediaEventQueue(scopeProvider = { this@MediaSessionManager.scope })
+        private val mediaButtonEventHandler = MediaButtonEventHandler(
+            scopeProvider = scopeProvider,
+            onImmediatePlay = {
+                playbackManager.playIfNotPlaying(sourceView = source)
+            },
+            onMediaEvent = { event ->
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: $event")
+                when (event) {
+                    MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                    MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                    MediaEvent.TripleTap -> handleMediaButtonTripleTap()
+                }
+            },
+        )
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-            if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
-                val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
-                logEvent(keyEvent.toString())
-                if (keyEvent.action == KeyEvent.ACTION_DOWN) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
-                    val inputEvent = when (keyEvent.keyCode) {
-                        KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
-                        KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
-                        else -> null
-                    }
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button input event: ${keyEvent.action}")
-
-                    if (inputEvent != null) {
-                        scope.launch {
-                            val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
-                            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
-                            when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
-                                MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                                MediaEvent.TripleTap -> handleMediaButtonTripleTap()
-                                null -> Unit
-                            }
-                        }
-                        return true
-                    }
-                }
-            } else {
+            if (Intent.ACTION_MEDIA_BUTTON != mediaButtonEvent.action) {
                 logEvent("onMediaButtonEvent(${mediaButtonEvent.action ?: "unknown action"})")
+                return super.onMediaButtonEvent(mediaButtonEvent)
             }
 
-            return super.onMediaButtonEvent(mediaButtonEvent)
+            val keyEvent = IntentCompat.getParcelableExtra(
+                mediaButtonEvent,
+                Intent.EXTRA_KEY_EVENT,
+                KeyEvent::class.java,
+            ) ?: return false
+            logEvent(keyEvent.toString())
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
+            }
+
+            return if (mediaButtonEventHandler.handle(keyEvent)) {
+                true
+            } else {
+                super.onMediaButtonEvent(mediaButtonEvent)
+            }
         }
 
         private fun onAddBookmark() {
