@@ -1,7 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -73,6 +79,28 @@ class MediaEventQueueTest {
         }
 
         assertEquals(MediaEvent.TripleTap, firstEvent.await())
+    }
+
+    @Test
+    fun `handle concurrent immediate single taps exactly once`() = runBlocking {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        val immediateTapCount = AtomicInteger()
+        val eventCount = 8
+        val startBarrier = CyclicBarrier(eventCount)
+        val dispatcher = Executors.newFixedThreadPool(eventCount).asCoroutineDispatcher()
+
+        dispatcher.use {
+            List(eventCount) {
+                async(dispatcher) {
+                    startBarrier.await()
+                    handler.consumeEvent(MediaEvent.SingleTap) {
+                        immediateTapCount.incrementAndGet()
+                    }
+                }
+            }.awaitAll()
+        }
+
+        assertEquals(1, immediateTapCount.get())
     }
 
     @Test

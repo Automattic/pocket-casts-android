@@ -4,49 +4,60 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal class MediaEventQueue(
     private val scopeProvider: () -> CoroutineScope,
 ) {
     private var singleTapJob: SingleTapJob? = null
     private var multiTapJob: Job? = null
+    private val stateMutex = Mutex()
 
     private val scope: CoroutineScope get() = scopeProvider()
 
-    suspend fun consumeEvent(event: MediaEvent) = when (event) {
-        MediaEvent.SingleTap -> handleSingleTapEvent()
+    suspend fun consumeEvent(
+        event: MediaEvent,
+        onImmediateSingleTap: (() -> Unit)? = null,
+    ) = when (event) {
+        MediaEvent.SingleTap -> handleSingleTapEvent(onImmediateSingleTap)
         MediaEvent.DoubleTap, MediaEvent.TripleTap -> handleMultiTapEvent(event)
     }
 
-    private suspend fun handleSingleTapEvent(): MediaEvent? {
-        val currentSingleTapJob = singleTapJob
-        return when {
-            // Pixel Buds (and possibly other headphones) trigger KEYCODE_MEDIA_PLAY
-            // after KEYCODE_MEDIA_NEXT or KEYCODE_MEDIA_PREVIOUS.
-            // We need to ignore it so the single tap action isn't triggered in such cases.
-            multiTapJob?.isActive == true -> {
-                null
-            }
+    private suspend fun handleSingleTapEvent(onImmediateSingleTap: (() -> Unit)?): MediaEvent? {
+        val newSingleTapJob = stateMutex.withLock {
+            val currentSingleTapJob = singleTapJob
+            when {
+                // Pixel Buds (and possibly other headphones) trigger KEYCODE_MEDIA_PLAY
+                // after KEYCODE_MEDIA_NEXT or KEYCODE_MEDIA_PREVIOUS.
+                // We need to ignore it so the single tap action isn't triggered in such cases.
+                multiTapJob?.isActive == true -> null
 
-            currentSingleTapJob?.isActive == true -> {
-                currentSingleTapJob.incrementTaps()
-                null
-            }
+                currentSingleTapJob?.isActive == true -> {
+                    currentSingleTapJob.incrementTaps()
+                    null
+                }
 
-            else -> {
-                val newSingleTapJob = SingleTapJob(scope)
-                singleTapJob = newSingleTapJob
-                newSingleTapJob.await()
-                newSingleTapJob.event()
+                else -> SingleTapJob(scope).also { singleTapJob = it }
+            }
+        } ?: return null
+
+        onImmediateSingleTap?.invoke()
+        newSingleTapJob.await()
+        return stateMutex.withLock {
+            // The immediate callback owns a resolved SingleTap. Follow-up taps still
+            // return their DoubleTap or TripleTap action after the window closes.
+            newSingleTapJob.event().takeUnless {
+                it == MediaEvent.SingleTap && onImmediateSingleTap != null
             }
         }
     }
 
-    private fun handleMultiTapEvent(event: MediaEvent): MediaEvent {
+    private suspend fun handleMultiTapEvent(event: MediaEvent): MediaEvent = stateMutex.withLock {
         val currentJob = multiTapJob
         multiTapJob = scope.launch { delay(250) }
         currentJob?.cancel()
-        return event
+        event
     }
 
     private class SingleTapJob(
