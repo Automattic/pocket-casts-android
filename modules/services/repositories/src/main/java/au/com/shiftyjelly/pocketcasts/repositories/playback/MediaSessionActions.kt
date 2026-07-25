@@ -136,10 +136,8 @@ internal class MediaSessionActions(
     }
 
     suspend fun toggleUpNextShuffleSuspend() {
-        // Up Next shuffle is a paid (Plus/Patron) feature. Enforce the subscription gate here, not
-        // just in the button's visibility: this command is registered on the media session and can
-        // be invoked directly by any connected controller, so the visibility check alone is
-        // bypassable. Silently ignore the toggle for non-subscribers.
+        // Up Next shuffle is a paid feature. Prevent other connected controllers from triggering
+        // shuffle even if the button is hidden.
         if (settings.cachedSubscription.value == null) return
         val newValue = !settings.upNextShuffle.value
         settings.upNextShuffle.set(newValue, updateModifiedAt = false)
