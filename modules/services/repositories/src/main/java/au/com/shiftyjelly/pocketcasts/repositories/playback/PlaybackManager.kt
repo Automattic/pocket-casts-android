@@ -371,10 +371,12 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
-                hlsAvailable = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null,
+                hlsAvailable = autoPlayOffersHls,
+                audioOnlyMode = if (autoPlayOffersHls) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
@@ -411,8 +413,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun audioOnlyModeOrNull(): Boolean? {
-        if (getCurrentEpisode()?.isStreamUrlHls != true) return null
-        return _streamVideoState.value == StreamVideoState.AudioOnly || !_videoRenderingEnabled.value
+        if (getCurrentEpisode()?.isStreamUrlHls != true || player?.isStreaming != true) return null
+        return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
     private fun playbackContentTypeFor(episode: BaseEpisode?): PlaybackContentType {
