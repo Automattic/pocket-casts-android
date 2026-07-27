@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -35,6 +36,7 @@ import java.util.function.Consumer
 fun TvModal(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    width: Dp = DefaultModalWidth,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Dialog(
@@ -45,6 +47,7 @@ fun TvModal(
         TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled)
         TvModalSurface(
             isTranslucent = isBlurBehindEnabled,
+            width = width,
             modifier = modifier,
             content = content,
         )
@@ -55,6 +58,7 @@ fun TvModal(
 internal fun TvModalSurface(
     modifier: Modifier = Modifier,
     isTranslucent: Boolean = false,
+    width: Dp = DefaultModalWidth,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -62,7 +66,7 @@ internal fun TvModalSurface(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = content,
         modifier = modifier
-            .width(400.dp)
+            .width(width)
             .clip(ModalShape)
             .background(if (isTranslucent) TranslucentContainerColor else OpaqueContainerColor)
             .background(HighlightBrush)
@@ -105,6 +109,7 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
     return isBlurBehindEnabled
 }
 
+private val DefaultModalWidth = 400.dp
 private val ModalShape = RoundedCornerShape(28.dp)
 private val TranslucentContainerColor = TvColors.Dark.copy(alpha = 0.6f)
 private val OpaqueContainerColor = TvColors.Dark.copy(alpha = 0.94f)
