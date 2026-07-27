@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.playlists.manual
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
 import au.com.shiftyjelly.pocketcasts.playlists.create.FakePlaylistManager
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.AddedPlaylist
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback.PluralResource
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback.SinglePlaylistAddition
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback.StringResource
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeSummary
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -45,8 +47,8 @@ class AddToPlaylistViewModelTest {
             viewModel.getPlaylistChangeSummary(),
         )
 
-        viewModel.addToPlaylist("playlist-uuid-1")
-        viewModel.addToPlaylist("playlist-uuid-2")
+        viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
+        viewModel.addToPlaylist("playlist-uuid-2", "Playlist 2")
         viewModel.removeFromPlaylist("playlist-uuid-3")
 
         assertEquals(
@@ -55,7 +57,7 @@ class AddToPlaylistViewModelTest {
         )
 
         viewModel.removeFromPlaylist("playlist-uuid-2")
-        viewModel.addToPlaylist("playlist-uuid-3")
+        viewModel.addToPlaylist("playlist-uuid-3", "Playlist 3")
 
         assertEquals(
             PlaylistChangeSummary(addedCount = 1, removedCount = 0),
@@ -65,37 +67,92 @@ class AddToPlaylistViewModelTest {
 
     @Test
     fun `playlist change feedback selects the correct message for every outcome`() = runTest(coroutineRule.testDispatcher) {
-        val cases: List<Pair<PlaylistChangeSummary, PlaylistChangeFeedback>> = listOf(
-            PlaylistChangeSummary(addedCount = 0, removedCount = 0) to PlaylistChangeFeedback.None,
-            PlaylistChangeSummary(addedCount = 1, removedCount = 0) to
-                StringResource(LR.string.added_to_playlist_feedback),
-            PlaylistChangeSummary(addedCount = 2, removedCount = 0) to
-                PluralResource(LR.plurals.added_to_playlist_single_multiple, quantity = 2),
-            PlaylistChangeSummary(addedCount = 0, removedCount = 1) to
-                StringResource(LR.string.removed_from_playlist_feedback),
-            PlaylistChangeSummary(addedCount = 0, removedCount = 2) to
-                PluralResource(LR.plurals.removed_from_playlists, quantity = 2),
-            PlaylistChangeSummary(addedCount = 1, removedCount = 1) to
-                PluralResource(LR.plurals.changed_playlists, quantity = 2),
-            PlaylistChangeSummary(addedCount = 2, removedCount = 1) to
-                PluralResource(LR.plurals.changed_playlists, quantity = 3),
+        val addedPlaylist = AddedPlaylist(uuid = "playlist-uuid", title = "Playlist title")
+        val cases = listOf(
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 0, removedCount = 0),
+                singleAddedPlaylist = null,
+                expectedFeedback = PlaylistChangeFeedback.None,
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 1, removedCount = 0),
+                singleAddedPlaylist = addedPlaylist,
+                expectedFeedback = SinglePlaylistAddition(
+                    resourceId = LR.string.added_to_playlist_single,
+                    playlist = addedPlaylist,
+                ),
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 2, removedCount = 0),
+                singleAddedPlaylist = null,
+                expectedFeedback = PluralResource(LR.plurals.added_to_playlist_single_multiple, quantity = 2),
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 0, removedCount = 1),
+                singleAddedPlaylist = null,
+                expectedFeedback = StringResource(LR.string.removed_from_playlist_feedback),
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 0, removedCount = 2),
+                singleAddedPlaylist = null,
+                expectedFeedback = PluralResource(LR.plurals.removed_from_playlists, quantity = 2),
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 1, removedCount = 1),
+                singleAddedPlaylist = addedPlaylist,
+                expectedFeedback = PluralResource(LR.plurals.changed_playlists, quantity = 2),
+            ),
+            FeedbackCase(
+                summary = PlaylistChangeSummary(addedCount = 2, removedCount = 1),
+                singleAddedPlaylist = null,
+                expectedFeedback = PluralResource(LR.plurals.changed_playlists, quantity = 3),
+            ),
         )
 
-        cases.forEach { (summary, expectedFeedback) ->
-            assertEquals(expectedFeedback, PlaylistChangeFeedback.from(summary))
+        cases.forEach { case ->
+            assertEquals(
+                case.expectedFeedback,
+                PlaylistChangeFeedback.from(case.summary, case.singleAddedPlaylist),
+            )
         }
     }
 
     @Test
-    fun `submit playlist changes only when committing`() = runTest(coroutineRule.testDispatcher) {
-        viewModel.addToPlaylist("playlist-uuid-1")
-        viewModel.removeFromPlaylist("playlist-uuid-1")
-        viewModel.addToPlaylist("playlist-uuid-1")
+    fun `single playlist addition feedback keeps the cached playlist title and uuid`() = runTest(
+        coroutineRule.testDispatcher,
+    ) {
+        viewModel.addToPlaylist(
+            playlistUuid = "playlist-uuid",
+            playlistTitle = "Playlist title",
+        )
+        viewModel.addToPlaylist(
+            playlistUuid = "other-playlist-uuid",
+            playlistTitle = "Other playlist",
+        )
+        viewModel.removeFromPlaylist("other-playlist-uuid")
 
-        viewModel.addToPlaylist("playlist-uuid-2")
+        assertEquals(
+            SinglePlaylistAddition(
+                resourceId = LR.string.added_to_playlist_single,
+                playlist = AddedPlaylist(
+                    uuid = "playlist-uuid",
+                    title = "Playlist title",
+                ),
+            ),
+            viewModel.getPlaylistChangeFeedback(),
+        )
+    }
+
+    @Test
+    fun `submit playlist changes only when committing`() = runTest(coroutineRule.testDispatcher) {
+        viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
+        viewModel.removeFromPlaylist("playlist-uuid-1")
+        viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
+
+        viewModel.addToPlaylist("playlist-uuid-2", "Playlist 2")
         viewModel.removeFromPlaylist("playlist-uuid-2")
 
-        viewModel.addToPlaylist("playlist-uuid-3")
+        viewModel.addToPlaylist("playlist-uuid-3", "Playlist 3")
 
         viewModel.removeFromPlaylist("playlist-uuid-4")
 
@@ -124,4 +181,10 @@ class AddToPlaylistViewModelTest {
         playlistManager.addManualEpisodeTurbine.expectNoEvents()
         playlistManager.deleteManualEpisodeTurbine.expectNoEvents()
     }
+
+    private data class FeedbackCase(
+        val summary: PlaylistChangeSummary,
+        val singleAddedPlaylist: AddedPlaylist?,
+        val expectedFeedback: PlaylistChangeFeedback,
+    )
 }
