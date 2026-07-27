@@ -27,6 +27,24 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
+    val ScreenTitle = TextStyle(
+        fontSize = 28.sp,
+        fontWeight = FontWeight.SemiBold,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val PlaylistCardTitle = TextStyle(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 28.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
+    val PlaylistCardCaption = TextStyle(
+        fontSize = 15.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
     val FeaturedTileSponsoredLabel = TextStyle(
         fontSize = 14.sp,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
