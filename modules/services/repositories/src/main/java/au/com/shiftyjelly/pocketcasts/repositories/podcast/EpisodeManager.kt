@@ -118,7 +118,6 @@ interface EpisodeManager {
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
     fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
-    fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
