@@ -222,7 +222,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
 
     internal fun onSelectedPodcastsChanged(newSelection: List<String>) {
         viewModelScope.launch(Dispatchers.IO) {
-            podcastManager.findSubscribedBlocking().forEach {
+            podcastManager.findSubscribedNoOrder().forEach {
                 podcastManager.updateShowNotifications(it.uuid, newSelection.contains(it.uuid))
             }
             loadPreferences()
@@ -234,7 +234,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }
 
     internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
-        val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
+        val uuids = podcastManager.findSubscribedNoOrder().filter { it.isShowNotifications }.map { it.uuid }
         uuids
     }
 
