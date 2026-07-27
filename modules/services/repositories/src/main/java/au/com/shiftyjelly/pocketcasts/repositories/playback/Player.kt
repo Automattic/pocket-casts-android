@@ -20,7 +20,7 @@ sealed interface EpisodeLocation {
     ) : EpisodeLocation
 
     companion object {
-        fun create(episode: BaseEpisode) = if (episode.isDownloaded) {
+        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlHls)) {
             EpisodeLocation.Downloaded(episode, episode.downloadedFilePath)
         } else {
             EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
@@ -43,9 +43,9 @@ enum class StreamVideoState {
     ;
 
     companion object {
-        fun initialFor(episode: BaseEpisode, audioOnly: Boolean) = when {
-            audioOnly && (episode.isVideo || episode.isStreamUrlHls) -> AudioOnly
-            episode.isStreamUrlHls -> Unknown
+        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean) = when {
+            audioOnly && (episode.isVideo || playingHlsStream) -> AudioOnly
+            playingHlsStream -> Unknown
             else -> NotVideo
         }
     }
@@ -80,5 +80,5 @@ interface Player {
     fun supportsVideo(): Boolean
     fun setVolume(volume: Float)
     fun setPodcast(podcast: Podcast?)
-    fun setEpisode(episode: BaseEpisode)
+    fun setEpisode(episode: BaseEpisode, preferStream: Boolean = false)
 }

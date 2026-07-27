@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
+import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkOnLongPress
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -124,6 +125,7 @@ class NotesFragment : BaseFragment() {
                 // stop the web view jumping after loading
                 isFocusable = false
                 setBackgroundColor(Color.TRANSPARENT)
+                copyLinkOnLongPress()
                 webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                         val url = request.url.toString()
