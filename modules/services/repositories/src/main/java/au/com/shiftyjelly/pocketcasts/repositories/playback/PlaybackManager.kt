@@ -484,7 +484,9 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun audioOnlyModeOrNull(): Boolean? {
-        if (getCurrentEpisode()?.isStreamUrlHls != true || player?.isStreaming != true) return null
+        val episode = getCurrentEpisode() ?: return null
+        val playingHlsStream = episode.isStreamUrlHls && player?.isStreaming == true
+        if (!playingHlsStream && !episode.isVideo) return null
         return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
@@ -2108,12 +2110,12 @@ open class PlaybackManager @Inject constructor(
 
         val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castManager.isConnected())
 
-        // HLS may carry video, so start it Unknown until the tracks resolve it, unless audio only forces no video. Non-HLS keeps its own flag.
-        _streamVideoState.value = when {
-            !playingStream || !episode.isStreamUrlHls -> StreamVideoState.NotVideo
-            settings.audioOnly.value -> StreamVideoState.AudioOnly
-            else -> StreamVideoState.Unknown
-        }
+        // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
+        _streamVideoState.value = StreamVideoState.initialFor(
+            episode,
+            audioOnly = settings.audioOnly.value,
+            playingHlsStream = playingStream && episode.isStreamUrlHls,
+        )
         _videoRenderingEnabled.value = true
 
         lastPlaybackSource = sourceView
