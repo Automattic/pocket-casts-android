@@ -299,7 +299,7 @@ class PodcastViewModel @Inject constructor(
     fun onUnarchiveClicked() {
         launch {
             val p = podcast.value ?: return@launch
-            val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(p)
+            val episodes = episodeManager.findEpisodesByPodcastOrdered(p)
             episodeManager.unarchiveAllInListBlocking(episodes)
             eventHorizon.track(
                 EpisodeBulkUnarchivedEvent(
@@ -410,7 +410,7 @@ class PodcastViewModel @Inject constructor(
     fun archivePlayed() {
         val podcast = this.podcast.value ?: return
         launch {
-            val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(podcast).filter { it.isFinished }
+            val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filter { it.isFinished }
             episodeManager.archiveAllInList(episodes, playbackManager)
             eventHorizon.track(
                 EpisodeBulkArchivedEvent(
