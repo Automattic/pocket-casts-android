@@ -6,6 +6,11 @@ interface CastManager {
 
     val isConnectedFlow: StateFlow<Boolean>
 
+    enum class SessionFailureType {
+        START,
+        RESUME,
+    }
+
     suspend fun isAvailable(): Boolean
     suspend fun isConnected(): Boolean
     suspend fun endSession()
@@ -17,6 +22,6 @@ interface CastManager {
         fun sessionStarted()
         fun sessionEnded()
         fun sessionReconnected()
-        fun sessionFailed(errorCode: Int) {}
+        fun sessionFailed(errorCode: Int, failureType: SessionFailureType) {}
     }
 }
