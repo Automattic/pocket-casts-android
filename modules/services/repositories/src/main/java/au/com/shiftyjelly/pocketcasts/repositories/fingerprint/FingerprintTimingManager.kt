@@ -1111,10 +1111,10 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         override fun close() {
-            runCatching { codec.stop() }
-            codec.release()
-            extractor.release()
-            cacheSource?.close()
+            // Skip stop(): release() works from any state and the Executing→Idle transition crashes some OMX decoders.
+            runCatching { codec.release() }
+            runCatching { extractor.release() }
+            runCatching { cacheSource?.close() }
         }
     }
 
@@ -1184,34 +1184,34 @@ class FingerprintTimingManager @Inject constructor(
             throw AudioUnavailableException("no audio track found")
         }
 
-        extractor.selectTrack(audioTrackIndex)
-        val format = extractor.getTrackFormat(audioTrackIndex)
-        val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-        val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-        val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
+        try {
+            extractor.selectTrack(audioTrackIndex)
+            val format = extractor.getTrackFormat(audioTrackIndex)
+            val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+            val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+            val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
 
-        var startSec = startingAt
-        if (startingAt > 0) {
-            extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
-            val landedUs = extractor.sampleTime
-            if (landedUs >= 0) {
-                startSec = landedUs / 1_000_000.0
+            var startSec = startingAt
+            if (startingAt > 0) {
+                extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+                val landedUs = extractor.sampleTime
+                if (landedUs >= 0) {
+                    startSec = landedUs / 1_000_000.0
+                }
+                Timber.d(
+                    "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
+                    startingAt,
+                    startSec,
+                )
             }
-            Timber.d(
-                "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
-                startingAt,
-                startSec,
-            )
-        }
 
-        val codec = try {
-            MediaCodec.createDecoderByType(mime)
+            val codec = MediaCodec.createDecoderByType(mime)
+            return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
             throw AudioOpenException(e)
         }
-        return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
     }
 
     private suspend fun streamFingerprint(
@@ -1341,19 +1341,22 @@ class FingerprintTimingManager @Inject constructor(
                     val isEos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
 
                     val outputBuffer = codec.getOutputBuffer(outputIndex)
-                    if (outputBuffer != null && bufferInfo.size > 0) {
-                        val samples = extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
-                        if (samples.isNotEmpty()) {
-                            val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
-                            if (windows.isNotEmpty()) {
-                                onWindows(windows)
-                                if (stopWhen?.invoke() == true) {
-                                    stopRequested = true
-                                }
+                    val samples = if (outputBuffer != null && bufferInfo.size > 0) {
+                        extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
+                    } else {
+                        emptyList()
+                    }
+                    // Release before onWindows suspends, a buffer held across cancellation crashes some OMX decoders.
+                    codec.releaseOutputBuffer(outputIndex, false)
+                    if (samples.isNotEmpty()) {
+                        val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
+                        if (windows.isNotEmpty()) {
+                            onWindows(windows)
+                            if (stopWhen?.invoke() == true) {
+                                stopRequested = true
                             }
                         }
                     }
-                    codec.releaseOutputBuffer(outputIndex, false)
                     if (isEos || stopRequested) break
                     if (endingAt != null && startOffset + streamer.durationMs().toDouble() / 1000.0 >= endingAt) break
                 }
