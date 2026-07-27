@@ -238,10 +238,13 @@ private fun ChapterPreviousButton(
     iconTint: Color,
     onClick: () -> Unit,
 ) {
+    val contentDescription = stringResource(LR.string.player_action_previous_chapter)
     IconButton(
         enabled = enabled,
         onClick = onClick,
-        modifier = Modifier.alpha(alpha),
+        modifier = Modifier
+            .alpha(alpha)
+            .semantics { this.contentDescription = contentDescription },
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -257,7 +260,7 @@ private fun ChapterPreviousButton(
                 Icon(
                     painter = painterResource(R.drawable.ic_chapter_skipbackwards),
                     tint = iconTint,
-                    contentDescription = stringResource(LR.string.player_action_previous_chapter),
+                    contentDescription = null,
                 )
             }
         }
