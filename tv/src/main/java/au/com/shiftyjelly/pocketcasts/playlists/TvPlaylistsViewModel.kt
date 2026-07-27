@@ -2,11 +2,11 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 @HiltViewModel
 class TvPlaylistsViewModel @Inject constructor(
     private val playlistManager: PlaylistManager,
-    private val podcastDao: PodcastDao,
+    private val podcastManager: PodcastManager,
 ) : ViewModel() {
 
     val uiState: StateFlow<TvPlaylistsUiState> = playlistManager.playlistPreviewsFlow()
@@ -45,7 +45,7 @@ class TvPlaylistsViewModel @Inject constructor(
     }
 
     suspend fun findPodcastTint(podcastUuid: String): Int? {
-        return podcastDao.findPodcastByUuid(podcastUuid)?.tintColorForLightBg?.takeIf { it != 0 }
+        return podcastManager.findPodcastByUuid(podcastUuid)?.tintColorForLightBg?.takeIf { it != 0 }
     }
 
     private fun isDownloadPlaylist(preview: PlaylistPreview): Boolean {

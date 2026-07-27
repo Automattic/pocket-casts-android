@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -10,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,7 +31,7 @@ class TvPlaylistsViewModelTest {
     private val playlistManager = mock<PlaylistManager> {
         on { playlistPreviewsFlow() } doReturn playlistPreviews
     }
-    private val podcastDao = mock<PodcastDao>()
+    private val podcastManager = mock<PodcastManager>()
 
     @Test
     fun `state starts as loading`() = runTest {
@@ -101,20 +101,20 @@ class TvPlaylistsViewModelTest {
     fun `podcast tint is looked up from the database`() = runTest {
         val tintedPodcast = Podcast(uuid = "podcast-1").apply { tintColorForLightBg = 0xFF123456.toInt() }
         val untintedPodcast = Podcast(uuid = "podcast-2")
-        val podcastDao = mock<PodcastDao> {
+        val podcastManager = mock<PodcastManager> {
             on { findPodcastByUuid("podcast-1") } doReturn tintedPodcast
             on { findPodcastByUuid("podcast-2") } doReturn untintedPodcast
         }
-        val viewModel = createViewModel(podcastDao = podcastDao)
+        val viewModel = createViewModel(podcastManager = podcastManager)
 
         assertEquals(0xFF123456.toInt(), viewModel.findPodcastTint("podcast-1"))
         assertNull(viewModel.findPodcastTint("podcast-2"))
         assertNull(viewModel.findPodcastTint("podcast-3"))
     }
 
-    private fun createViewModel(podcastDao: PodcastDao = this.podcastDao) = TvPlaylistsViewModel(
+    private fun createViewModel(podcastManager: PodcastManager = this.podcastManager) = TvPlaylistsViewModel(
         playlistManager = playlistManager,
-        podcastDao = podcastDao,
+        podcastManager = podcastManager,
     )
 
     private fun smartPreview(

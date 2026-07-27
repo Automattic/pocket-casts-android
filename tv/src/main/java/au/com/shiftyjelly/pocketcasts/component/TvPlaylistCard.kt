@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -205,8 +206,11 @@ private fun PlaylistCover(
     val offsetX = (if (isBackCover) 0.7f else -16f) + restingOffset
     val offsetY = (if (isBackCover) 66.7f else 44.7f) + restingOffset
 
+    val coverPlaceholder = remember { ColorPainter(Color.Black.copy(alpha = 0.2f)) }
     AsyncImage(
         model = artworkUrl,
+        placeholder = coverPlaceholder,
+        error = coverPlaceholder,
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
