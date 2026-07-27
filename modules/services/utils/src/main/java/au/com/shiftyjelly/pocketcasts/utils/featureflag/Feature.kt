@@ -125,15 +125,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2025-04-11"),
     ),
-    RECOMMENDATIONS(
-        key = "recommendations",
-        title = "Recommendations",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2025-04-04"),
-    ),
     NOTIFICATIONS_REVAMP(
         key = "notifications_revamp",
         title = "Notifications Revamp",
