@@ -68,6 +68,8 @@ fun TvPlaylistsScreen(
     viewModel: TvPlaylistsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
+
     TvPlaylistsContent(
         uiState = uiState,
         getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
@@ -75,8 +77,15 @@ fun TvPlaylistsScreen(
         refreshArtworkUuids = viewModel::refreshArtworkUuids,
         refreshEpisodeCount = viewModel::refreshEpisodeCount,
         findPodcastTint = viewModel::findPodcastTint,
+        onCreatePlaylist = { isDownloadModalVisible = true },
         modifier = modifier,
     )
+
+    if (isDownloadModalVisible) {
+        TvDownloadAppModal(
+            onDismissRequest = { isDownloadModalVisible = false },
+        )
+    }
 }
 
 @Composable
@@ -87,6 +96,7 @@ private fun TvPlaylistsContent(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onCreatePlaylist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -105,7 +115,10 @@ private fun TvPlaylistsContent(
             is TvPlaylistsUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
-                TvPlaylistsEmpty(modifier = Modifier.fillMaxSize())
+                TvPlaylistsEmpty(
+                    onCreatePlaylist = onCreatePlaylist,
+                    modifier = Modifier.fillMaxSize(),
+                )
             } else {
                 TvPlaylistsGrid(
                     playlists = state.playlists,
@@ -217,13 +230,14 @@ private fun TvPlaylistGridItem(
 
 @Composable
 private fun TvPlaylistsEmpty(
+    onCreatePlaylist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TvEmptyState(
         title = stringResource(LR.string.tv_playlists_empty_title),
         subtitle = stringResource(LR.string.tv_playlists_empty_subtitle),
         actionLabel = stringResource(LR.string.tv_playlists_empty_action_title),
-        onAction = {},
+        onAction = onCreatePlaylist,
         modifier = modifier,
     )
 }
@@ -243,6 +257,7 @@ private fun TvPlaylistsGridPreview() {
                     refreshArtworkUuids = {},
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
+                    onCreatePlaylist = {},
                 )
             }
         }
@@ -262,6 +277,7 @@ private fun TvPlaylistsEmptyPreview() {
                     refreshArtworkUuids = {},
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
+                    onCreatePlaylist = {},
                 )
             }
         }
