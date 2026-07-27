@@ -41,9 +41,12 @@ class GeneratedChapterSeeker @Inject constructor(
     private val mutex = Mutex()
     private var activeCaller: Job? = null
 
-    // Session cache of resolved chapter starts for the most recent episode.
+    // Session cache of resolved chapter starts for the most recent episode. Deterministic failures
+    // are remembered too: a missing reference blocks the episode, a no-match blocks its chapter.
     private var cacheEpisodeUuid: String? = null
     private val resolvedCache = mutableMapOf<Int, Duration>()
+    private val failedChapters = mutableSetOf<Int>()
+    private var referenceUnavailable = false
 
     private val _resolvingChapter = MutableStateFlow<ResolvingChapter?>(null)
     val resolvingChapter: StateFlow<ResolvingChapter?> = _resolvingChapter.asStateFlow()
@@ -63,12 +66,17 @@ class GeneratedChapterSeeker @Inject constructor(
             if (cacheEpisodeUuid != episode.uuid) {
                 cacheEpisodeUuid = episode.uuid
                 resolvedCache.clear()
+                failedChapters.clear()
+                referenceUnavailable = false
             }
             resolvedCache[chapter.index]
         }?.let { return it }
 
         val manager = fingerprintTimingManager.get()
         manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it }
+
+        // A remembered failure repeats deterministically, so fall back without re-resolving.
+        if (mutex.withLock { referenceUnavailable || chapter.index in failedChapters }) return null
 
         // Last tap wins: a new resolve cancels the previous caller, so a superseded tap never seeks.
         val myJob = currentCoroutineContext().job
@@ -90,6 +98,14 @@ class GeneratedChapterSeeker @Inject constructor(
                 }
 
                 is ChapterSeekResult.Unresolved -> {
+                    mutex.withLock {
+                        if (cacheEpisodeUuid == episode.uuid) {
+                            when (result.reason) {
+                                ChapterSeekResult.REASON_NO_REFERENCE -> referenceUnavailable = true
+                                ChapterSeekResult.REASON_NO_MATCH -> failedChapters += chapter.index
+                            }
+                        }
+                    }
                     Timber.d("GeneratedChapterSeeker: unresolved chapter ${chapter.index} (${result.reason})")
                     null
                 }

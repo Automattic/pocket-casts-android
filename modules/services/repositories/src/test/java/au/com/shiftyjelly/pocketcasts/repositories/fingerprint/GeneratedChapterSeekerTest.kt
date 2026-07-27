@@ -25,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doReturnConsecutively
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -117,7 +118,20 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
-    fun `returns null and does not cache when unresolved`() = runTest {
+    fun `retries when unresolved for a transient reason`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
+        }
+        val seeker = seeker()
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `does not retry a chapter that failed with no match`() = runTest {
         timingManager = mock {
             on { resolveChapterPlaybackTime(any(), any()) } doReturn
                 ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
@@ -126,6 +140,62 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
         assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `no match failure does not block other chapters`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
+        }
+        val seeker = seeker()
+        val otherChapter = generatedChapter.copy(index = 3, referenceStartTime = 300.seconds)
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeekTime(episode, otherChapter))
+        verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `missing reference blocks further resolves for the episode`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+        }
+        val seeker = seeker()
+        val otherChapter = generatedChapter.copy(index = 3, referenceStartTime = 300.seconds)
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeekTime(episode, otherChapter))
+        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `dense mapping still serves a chapter that previously failed`() = runTest {
+        timingManager = mock {
+            on { densePlaybackTime(any(), any()) } doReturnConsecutively listOf(null, 131.5.seconds)
+            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH)
+        }
+        val seeker = seeker()
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.5.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, times(1)) { resolveChapterPlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `negative results are dropped when the episode changes`() = runTest {
+        timingManager = mock {
+            on { resolveChapterPlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+        }
+        val seeker = seeker()
+        val otherEpisode = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeekTime(otherEpisode, generatedChapter))
         verifyBlocking(timingManager, times(2)) { resolveChapterPlaybackTime(any(), any()) }
     }
 
