@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -132,13 +131,14 @@ private fun ColumnScope.TvProfileModalContent(
 @Composable
 private fun TvProfileModalAvatar(email: String?, modifier: Modifier = Modifier) {
     val avatarModifier = modifier
-        .size(107.dp)
+        .size(AvatarSize)
         .clip(CircleShape)
     if (email != null) {
         GravatarProfileImage(
             email = email,
             contentDescription = null,
-            placeholder = { TvProfileModalAvatarPlaceholder() },
+            // The placeholder composes outside the sized image slot, so it needs its own size.
+            placeholder = { TvProfileModalAvatarPlaceholder(modifier = Modifier.size(AvatarSize)) },
             modifier = avatarModifier,
         )
     } else {
@@ -150,9 +150,7 @@ private fun TvProfileModalAvatar(email: String?, modifier: Modifier = Modifier) 
 private fun TvProfileModalAvatarPlaceholder(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .background(TvColors.Gray, CircleShape),
+        modifier = modifier.background(TvColors.Gray, CircleShape),
     ) {
         Icon(
             painter = painterResource(IR.drawable.ic_profile),
@@ -162,6 +160,8 @@ private fun TvProfileModalAvatarPlaceholder(modifier: Modifier = Modifier) {
         )
     }
 }
+
+private val AvatarSize = 107.dp
 
 @Composable
 private fun TvProfileModalButton(
