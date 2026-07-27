@@ -72,9 +72,24 @@ class TvHomeViewModel @Inject constructor(
 
     private suspend fun loadRows(): List<TvHomeRow> = coroutineScope {
         val isLoggedIn = syncManager.isLoggedIn()
-        val localRows = async { loadLocalRows(isLoggedIn) }
-        val discoverRows = async { loadDiscoverRows(isLoggedIn) }
-        (localRows.await() + discoverRows.await()).distinctBy(TvHomeRow::id)
+        val localRowsDeferred = async { loadLocalRows(isLoggedIn) }
+        val discoverRowsDeferred = async {
+            try {
+                Result.success(loadDiscoverRows(isLoggedIn))
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Result.failure(exception)
+            }
+        }
+        val localRows = localRowsDeferred.await()
+        val discoverRows = discoverRowsDeferred.await().getOrElse { exception ->
+            // Keep the local rows on screen, surface the error only when there is nothing to show.
+            if (localRows.isEmpty()) throw exception
+            Timber.e(exception, "Failed to load TV discover rows")
+            emptyList()
+        }
+        (localRows + discoverRows).distinctBy(TvHomeRow::id)
     }
 
     private suspend fun loadDiscoverRows(isLoggedIn: Boolean): List<TvHomeRow> = coroutineScope {
@@ -89,6 +104,7 @@ class TvHomeViewModel @Inject constructor(
 
         discover.layout
             .transformWithRegion(region, replacements, context.resources)
+            .filter { it.categoryId == null } // Rows with a category ID are sponsored ads for the category pages.
             .filter { isLoggedIn || it.authenticated != true }
             .map { row -> async { loadRow(row) } }
             .awaitAll()

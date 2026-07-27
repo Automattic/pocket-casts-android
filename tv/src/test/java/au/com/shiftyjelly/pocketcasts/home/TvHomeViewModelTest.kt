@@ -239,6 +239,33 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `category sponsor rows are excluded`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getDiscoverFeed()).thenReturn(
+            discover(
+                row(
+                    id = "category-ad",
+                    title = "Row Category Ad",
+                    source = "https://lists/category-ad.json",
+                    sponsored = true,
+                    categoryId = 3,
+                ),
+                row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("podcast-trending"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf("trending"), state.rows.map { it.id })
+        }
+        verify(listRepository, never()).getListFeed(eq("https://lists/category-ad.json"), any())
+    }
+
+    @Test
     fun `rows with duplicate ids are deduplicated`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(listRepository.getDiscoverFeed()).thenReturn(
@@ -327,6 +354,24 @@ class TvHomeViewModelTest {
             assertEquals(TvHomeUiState.Loading, awaitItem())
             val state = awaitItem() as TvHomeUiState.Ready
             assertEquals(listOf("trending"), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `feed failure keeps local rows on screen`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getDiscoverFeed()).thenThrow(RuntimeException("Network error"))
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+        )
+        whenever(podcastDao.findAllIn(any()))
+            .thenReturn(listOf(Podcast(uuid = "podcast-1", title = "Podcast One")))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
         }
     }
 
@@ -479,6 +524,7 @@ class TvHomeViewModelTest {
         sponsored: Boolean = false,
         authenticated: Boolean = false,
         regions: List<String> = listOf("us"),
+        categoryId: Int? = null,
     ) = DiscoverRow(
         id = id,
         type = type,
@@ -488,7 +534,7 @@ class TvHomeViewModelTest {
         title = title,
         source = source,
         listUuid = listUuid,
-        categoryId = null,
+        categoryId = categoryId,
         regions = regions,
         curated = curated,
         sponsored = sponsored,
