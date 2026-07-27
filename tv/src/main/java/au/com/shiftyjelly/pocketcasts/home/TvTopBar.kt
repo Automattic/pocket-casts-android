@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Border
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.IconButtonDefaults
@@ -80,6 +82,10 @@ private fun TvProfileButton(
             contentColor = Color.White,
             focusedContainerColor = Color.White,
             focusedContentColor = TvColors.Dark,
+        ),
+        // The avatar image covers the focused container color, so show focus with a border as well.
+        border = IconButtonDefaults.border(
+            focusedBorder = Border(BorderStroke(2.dp, Color.White), inset = 2.dp, shape = CircleShape),
         ),
         modifier = modifier.size(40.dp),
     ) {
