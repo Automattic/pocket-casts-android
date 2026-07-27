@@ -40,7 +40,9 @@ class TvScaffoldViewModel @Inject constructor(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        // Lazily keeps a single getSignInState() subscription for the ViewModel's lifetime. Restarting it would
+        // re-run its sign-in side effects and replay the construction-time profile seed over a fresher state.
+        started = SharingStarted.Lazily,
         initialValue = TvScaffoldUiState(profile = initialProfile),
     )
 
