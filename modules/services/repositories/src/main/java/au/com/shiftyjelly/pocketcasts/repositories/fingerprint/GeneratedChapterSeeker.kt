@@ -67,7 +67,11 @@ class GeneratedChapterSeeker @Inject constructor(
         activeCaller?.cancel()
     }
 
-    suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {
+    // Never land before the chapter's own displayed start: the skip buttons picked the chapter from
+    // that boundary, and a resolve landing short of it would make the next button loop in place.
+    suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? = resolveSeekTimeUnclamped(episode, chapter)?.coerceAtLeast(chapter.startTime)
+
+    private suspend fun resolveSeekTimeUnclamped(episode: BaseEpisode, chapter: Chapter): Duration? {
         if (!isEnabled(chapter)) return null
         val referenceTime = chapter.referenceStartTime ?: return null
 

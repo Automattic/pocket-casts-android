@@ -119,6 +119,25 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
+    fun `clamps a resolve landing short of the chapter start`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), eq(100.seconds)) } doReturn
+                ChapterSeekResult.Resolved(playbackTime = 120.2.seconds, usedPrior = false)
+        }
+
+        assertEquals(130.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+    }
+
+    @Test
+    fun `clamps a dense mapping time short of the chapter start`() = runTest {
+        timingManager = mock {
+            on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 129.5.seconds
+        }
+
+        assertEquals(130.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+    }
+
+    @Test
     fun `retries when unresolved for a transient reason`() = runTest {
         timingManager = mock {
             on { resolvePlaybackTime(any(), any()) } doReturn
