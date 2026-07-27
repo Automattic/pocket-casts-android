@@ -69,6 +69,7 @@ class ChaptersFragment : BaseFragment() {
                     totalChaptersCount = state.chaptersCount,
                     isTogglingChapters = state.isTogglingChapters,
                     showSubscriptionIcon = state.showSubscriptionIcon,
+                    isAligningChapters = state.isAligningChapters,
                     onChapterClick = viewModel::playChapter,
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
                     onSelectionChange = viewModel::selectChapter,

@@ -11,10 +11,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -33,6 +37,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +46,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -53,6 +59,8 @@ class ChaptersViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
+    private val fingerprintTimingManager: FingerprintTimingManager,
+    private val appPlatform: AppPlatform,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -77,7 +85,20 @@ class ChaptersViewModel @AssistedInject constructor(
         settings.cachedSubscription.flow,
         isTogglingChapters,
         ::createUiState,
-    )
+    ).combine(aligningFlow(episodeId)) { uiState, isAligning ->
+        uiState.copy(isAligningChapters = isAligning && uiState.hasGeneratedChapters)
+    }
+
+    private fun aligningFlow(episodeId: String): Flow<Boolean> = if (appPlatform != AppPlatform.Phone || !FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
+        flowOf(false)
+    } else {
+        fingerprintTimingManager.stateFlow
+            .map { state ->
+                state is FingerprintTimingManager.State.Preparing &&
+                    fingerprintTimingManager.activeEpisodeUuid == episodeId
+            }
+            .distinctUntilChanged()
+    }
 
     private var playChapterJob: Job? = null
 
@@ -257,6 +278,7 @@ class ChaptersViewModel @AssistedInject constructor(
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
+        val isAligningChapters: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }

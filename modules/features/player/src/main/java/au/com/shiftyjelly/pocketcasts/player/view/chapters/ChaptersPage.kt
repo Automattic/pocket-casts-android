@@ -3,18 +3,23 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,6 +41,7 @@ fun ChaptersPage(
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
+    isAligningChapters: Boolean,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -60,6 +66,11 @@ fun ChaptersPage(
                     isTogglingChapters = isTogglingChapters,
                     showSubscriptionIcon = showSubscriptionIcon,
                 )
+            }
+        }
+        if (isAligningChapters) {
+            item {
+                AligningChaptersRow()
             }
         }
         if (hasGeneratedChapters) {
@@ -91,5 +102,28 @@ fun ChaptersPage(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun AligningChaptersRow(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 8.dp),
+    ) {
+        CircularProgressIndicator(
+            color = LocalChaptersTheme.current.headerTitle,
+            strokeWidth = 2.dp,
+            modifier = Modifier.size(16.dp),
+        )
+        TextP50(
+            text = stringResource(LR.string.chapters_aligning),
+            color = LocalChaptersTheme.current.headerTitle,
+        )
     }
 }
