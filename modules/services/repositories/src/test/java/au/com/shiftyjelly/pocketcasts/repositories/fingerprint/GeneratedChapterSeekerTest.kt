@@ -151,6 +151,19 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
+    fun `retries when the reference fetch failed transiently`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_REFERENCE_FETCH_FAILED)
+        }
+        val seeker = seeker()
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
     fun `does not retry a chapter that failed with no match`() = runTest {
         timingManager = mock {
             on { resolvePlaybackTime(any(), any()) } doReturn

@@ -374,10 +374,20 @@ class FingerprintTimingManager @Inject constructor(
         val usedPrior = estimatedPlayback != null
 
         // The fetch and the decode get separate budgets, so a slow reference download can't eat the decode time.
+        // Only a definitive 404 reports the reference as missing; transient fetch failures stay retryable.
         val reference = warmReference ?: run {
-            val referenceData = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_FETCH_TIMEOUT_MS) {
+            val fetched = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_FETCH_TIMEOUT_MS) {
                 loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
-            } ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+            } ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
+            val referenceData = when (fetched) {
+                is FingerprintReferenceRetriever.FetchResult.Success -> fetched.data
+
+                is FingerprintReferenceRetriever.FetchResult.NotFound ->
+                    return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+
+                is FingerprintReferenceRetriever.FetchResult.Error ->
+                    return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_REFERENCE_FETCH_FAILED)
+            }
             ReferenceFingerprint.decode(referenceData)
                 ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
         }
@@ -456,25 +466,26 @@ class FingerprintTimingManager @Inject constructor(
         episodeUuid: String,
         audioSource: String,
         isDownloaded: Boolean,
-    ): ByteArray? {
+    ): FingerprintReferenceRetriever.FetchResult {
         if (isDownloaded) {
-            referenceRetriever.loadReferenceData(audioSource)?.let { return it }
+            referenceRetriever.loadReferenceData(audioSource)?.let { return FingerprintReferenceRetriever.FetchResult.Success(it) }
             referenceRetriever.loadCachedReference(episodeUuid)?.let {
                 referenceRetriever.saveReferenceData(it, audioSource)
-                return it
+                return FingerprintReferenceRetriever.FetchResult.Success(it)
             }
         } else {
-            referenceRetriever.loadCachedReference(episodeUuid)?.let { return it }
+            referenceRetriever.loadCachedReference(episodeUuid)?.let { return FingerprintReferenceRetriever.FetchResult.Success(it) }
         }
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
         val fetched = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
-        val data = (fetched as? FingerprintReferenceRetriever.FetchResult.Success)?.data ?: return null
-        if (isDownloaded) {
-            referenceRetriever.saveReferenceData(data, audioSource)
-        } else {
-            referenceRetriever.saveCachedReference(episodeUuid, data)
+        if (fetched is FingerprintReferenceRetriever.FetchResult.Success) {
+            if (isDownloaded) {
+                referenceRetriever.saveReferenceData(fetched.data, audioSource)
+            } else {
+                referenceRetriever.saveCachedReference(episodeUuid, fetched.data)
+            }
         }
-        return data
+        return fetched
     }
 
     private fun buildMatcher(reference: ReferenceFingerprint): CheckpointMatcher? {
