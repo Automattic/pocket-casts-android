@@ -954,7 +954,6 @@
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
     <!-- %1$s is a playlist title  -->
     <string name="added_to_playlist_single">Added to %1$s</string>
-    <string name="added_to_playlist_feedback">Added to playlist</string>
     <plurals name="added_to_playlist_single_multiple">
         <item quantity="one">Added to %d playlist</item>
         <item quantity="other">Added to %d playlists</item>

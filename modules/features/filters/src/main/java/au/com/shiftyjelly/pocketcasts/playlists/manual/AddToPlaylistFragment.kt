@@ -105,7 +105,10 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
                                 viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = false)
-                                viewModel.addToPlaylist(playlist.uuid)
+                                viewModel.addToPlaylist(
+                                    playlistUuid = playlist.uuid,
+                                    playlistTitle = playlist.title,
+                                )
                             }
                         } else {
                             viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
@@ -167,16 +170,26 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     private fun showDoneSnackbar(feedback: PlaylistChangeFeedback) {
         val hostListener = requireActivity() as FragmentHostListener
         val snackbarView = hostListener.snackBarView()
-        val message = when (feedback) {
-            is PlaylistChangeFeedback.StringResource -> getString(feedback.resourceId)
+        val snackbar = when (feedback) {
+            is PlaylistChangeFeedback.SinglePlaylistAddition -> {
+                val playlist = feedback.playlist
+                val message = getString(feedback.resourceId, playlist.title)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+                    .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
+            }
+
+            is PlaylistChangeFeedback.StringResource -> {
+                Snackbar.make(snackbarView, getString(feedback.resourceId), Snackbar.LENGTH_LONG)
+            }
 
             is PlaylistChangeFeedback.PluralResource -> {
-                resources.getQuantityString(feedback.resourceId, feedback.quantity, feedback.quantity)
+                val message = resources.getQuantityString(feedback.resourceId, feedback.quantity, feedback.quantity)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
             }
 
             PlaylistChangeFeedback.None -> return
         }
-        Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG).show()
+        snackbar.show()
     }
 
     @Composable

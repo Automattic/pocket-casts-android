@@ -96,14 +96,22 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
-    private val playlistsChanges = mutableMapOf<String, Boolean>()
+    private val playlistsChanges = mutableMapOf<String, PlaylistChange>()
 
-    private fun cachePlaylistChange(uuid: String, shouldAdd: Boolean) {
+    private fun cachePlaylistChange(
+        uuid: String,
+        shouldAdd: Boolean,
+        playlistTitle: String? = null,
+    ) {
+        val change = PlaylistChange(
+            shouldAdd = shouldAdd,
+            playlistTitle = playlistTitle,
+        )
         // If the change is not present add it.
-        playlistsChanges.merge(uuid, shouldAdd) { isCurrentlyAdded, _ ->
-            if (isCurrentlyAdded == shouldAdd) {
+        playlistsChanges.merge(uuid, change) { currentChange, _ ->
+            if (currentChange.shouldAdd == shouldAdd) {
                 // If the change is already stored keep it.
-                isCurrentlyAdded
+                currentChange
             } else {
                 // If playlist was added but will be removed or vice versa remove the change value.
                 null
@@ -113,13 +121,25 @@ class AddToPlaylistViewModel @AssistedInject constructor(
 
     fun getPlaylistChangeSummary(): PlaylistChangeSummary {
         return PlaylistChangeSummary(
-            addedCount = playlistsChanges.count { it.value },
-            removedCount = playlistsChanges.count { !it.value },
+            addedCount = playlistsChanges.count { it.value.shouldAdd },
+            removedCount = playlistsChanges.count { !it.value.shouldAdd },
         )
     }
 
     fun getPlaylistChangeFeedback(): PlaylistChangeFeedback {
-        return PlaylistChangeFeedback.from(getPlaylistChangeSummary())
+        val singleAddedPlaylist = playlistsChanges
+            .entries
+            .singleOrNull { it.value.shouldAdd }
+            ?.let { (uuid, change) ->
+                AddedPlaylist(
+                    uuid = uuid,
+                    title = requireNotNull(change.playlistTitle),
+                )
+            }
+        return PlaylistChangeFeedback.from(
+            summary = getPlaylistChangeSummary(),
+            singleAddedPlaylist = singleAddedPlaylist,
+        )
     }
 
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
@@ -149,8 +169,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun addToPlaylist(playlistUuid: String) {
-        cachePlaylistChange(playlistUuid, shouldAdd = true)
+    fun addToPlaylist(
+        playlistUuid: String,
+        playlistTitle: String,
+    ) {
+        cachePlaylistChange(
+            uuid = playlistUuid,
+            shouldAdd = true,
+            playlistTitle = playlistTitle,
+        )
 
         viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
@@ -187,8 +214,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             withContext(NonCancellable) {
                 val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
-                for ((playlistUuid, isAdded) in playlistsChanges) {
-                    if (isAdded) {
+                for ((playlistUuid, change) in playlistsChanges) {
+                    if (change.shouldAdd) {
                         playlistManager.addManualEpisodes(playlistUuid, uuids)
                     } else {
                         playlistManager.deleteManualEpisodes(playlistUuid, uuids)
@@ -304,7 +331,22 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         val removedCount: Int,
     )
 
+    data class AddedPlaylist(
+        val uuid: String,
+        val title: String,
+    )
+
+    private data class PlaylistChange(
+        val shouldAdd: Boolean,
+        val playlistTitle: String?,
+    )
+
     sealed interface PlaylistChangeFeedback {
+        data class SinglePlaylistAddition(
+            @StringRes val resourceId: Int,
+            val playlist: AddedPlaylist,
+        ) : PlaylistChangeFeedback
+
         data class StringResource(
             @StringRes val resourceId: Int,
         ) : PlaylistChangeFeedback
@@ -317,7 +359,10 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         data object None : PlaylistChangeFeedback
 
         companion object {
-            fun from(summary: PlaylistChangeSummary): PlaylistChangeFeedback {
+            fun from(
+                summary: PlaylistChangeSummary,
+                singleAddedPlaylist: AddedPlaylist?,
+            ): PlaylistChangeFeedback {
                 return when {
                     summary.addedCount > 0 && summary.removedCount > 0 -> {
                         PluralResource(
@@ -326,7 +371,12 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                         )
                     }
 
-                    summary.addedCount == 1 -> StringResource(LR.string.added_to_playlist_feedback)
+                    summary.addedCount == 1 -> {
+                        SinglePlaylistAddition(
+                            resourceId = LR.string.added_to_playlist_single,
+                            playlist = requireNotNull(singleAddedPlaylist),
+                        )
+                    }
 
                     summary.addedCount > 1 -> {
                         PluralResource(
