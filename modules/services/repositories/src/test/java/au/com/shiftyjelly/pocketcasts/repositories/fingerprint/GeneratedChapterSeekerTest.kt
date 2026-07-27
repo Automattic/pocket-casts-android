@@ -119,13 +119,26 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
-    fun `clamps a resolve landing short of the chapter start`() = runTest {
+    fun `does not clamp a fresh resolve landing short of the chapter start`() = runTest {
         timingManager = mock {
             on { resolvePlaybackTime(any(), eq(100.seconds)) } doReturn
                 ChapterSeekResult.Resolved(playbackTime = 120.2.seconds, usedPrior = false)
         }
 
-        assertEquals(130.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+        assertEquals(121.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+    }
+
+    @Test
+    fun `clamps a cached resolve landing short of the chapter start`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), eq(100.seconds)) } doReturn
+                ChapterSeekResult.Resolved(playbackTime = 120.2.seconds, usedPrior = false)
+        }
+        val seeker = seeker()
+
+        assertEquals(121.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        assertEquals(130.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
