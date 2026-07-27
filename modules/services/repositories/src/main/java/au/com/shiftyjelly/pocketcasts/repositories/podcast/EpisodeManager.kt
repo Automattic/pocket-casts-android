@@ -34,7 +34,7 @@ interface EpisodeManager {
 
     fun findEpisodesWhereBlocking(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedBlocking(podcast: Podcast): List<PodcastEpisode>
-    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedByPublishDateBlocking(podcast: Podcast): List<PodcastEpisode>
     suspend fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode>

@@ -136,7 +136,7 @@ class DeveloperViewModel
                     .shuffled()
                     .asFlow()
                     .flatMapConcat {
-                        episodeManager.findEpisodesByPodcastOrderedSuspend(it).asFlow()
+                        episodeManager.findEpisodesByPodcastOrdered(it).asFlow()
                     }
                     .take(5)
                     .toList()
