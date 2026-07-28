@@ -68,9 +68,9 @@ internal fun TvModalSurface(
         modifier = modifier
             .width(width)
             .clip(ModalShape)
-            .background(if (isTranslucent) TranslucentContainerColor else OpaqueContainerColor)
+            .background(if (isTranslucent) TranslucentContainerColor else TvOverlayContainerColor)
             .background(HighlightBrush)
-            .border(1.dp, BorderColor, ModalShape)
+            .border(1.dp, TvOverlayBorderColor, ModalShape)
             .padding(horizontal = 53.dp, vertical = 40.dp),
     )
 }
@@ -112,8 +112,8 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
 private val DefaultModalWidth = 400.dp
 private val ModalShape = RoundedCornerShape(28.dp)
 private val TranslucentContainerColor = TvColors.Dark.copy(alpha = 0.6f)
-private val OpaqueContainerColor = TvColors.Dark.copy(alpha = 0.94f)
-private val BorderColor = Color.White.copy(alpha = 0.12f)
+internal val TvOverlayContainerColor = TvColors.Dark.copy(alpha = 0.94f)
+internal val TvOverlayBorderColor = Color.White.copy(alpha = 0.12f)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
         Color.White.copy(alpha = 0.08f),
