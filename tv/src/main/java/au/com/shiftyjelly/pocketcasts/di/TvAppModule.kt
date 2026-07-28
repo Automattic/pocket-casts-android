@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.NoOpDefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import dagger.Binds
 import dagger.Module
@@ -36,5 +36,5 @@ abstract class TvAppModule {
     abstract fun downloadsCallFactory(@Downloads client: OkHttpClient): Call.Factory
 
     @Binds
-    abstract fun defaultPlaylistsInitializer(initializer: DefaultPlaylistsInitializerImpl): DefaultPlaylistsInitializer
+    abstract fun defaultPlaylistsInitializer(initializer: NoOpDefaultPlaylistsInitializer): DefaultPlaylistsInitializer
 }
