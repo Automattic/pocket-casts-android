@@ -53,7 +53,11 @@ import timber.log.Timber
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
+
+    /** Returns the job for the async credential sign out, or null when the sign out is skipped. */
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job?
+
+    /** Returns the [signOut] job; the data is already cleared when this call returns. */
     fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean): Job?
 }
 

@@ -588,17 +588,16 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
-    @SuppressLint("ApplySharedPref")
     override fun clearUserPreferences() {
         val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
             .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
             .toSet() + PROCESSED_SIGNOUT_KEY
         listOf(sharedPreferences, privatePreferences).forEach { preferences ->
-            val editor = preferences.edit()
-            preferences.all.keys
-                .filterNot { key -> key in preservedKeys }
-                .forEach { key -> editor.remove(key) }
-            editor.commit()
+            preferences.edit(commit = true) {
+                preferences.all.keys
+                    .filterNot { key -> key in preservedKeys }
+                    .forEach { key -> remove(key) }
+            }
             UserSetting.refreshAll(preferences)
         }
     }

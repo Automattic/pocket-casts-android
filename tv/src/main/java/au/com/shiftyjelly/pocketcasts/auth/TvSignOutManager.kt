@@ -11,9 +11,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -34,18 +36,22 @@ class TvSignOutManager @Inject constructor(
 ) {
     fun signOutAndWipeData() {
         applicationScope.launch(ioDispatcher) {
-            val signOutJob = userManager.signOutAndClearData(
-                playbackManager = playbackManager.get(),
-                upNextQueue = upNextQueue.get(),
-                folderManager = folderManager.get(),
-                searchHistoryManager = searchHistoryManager.get(),
-                episodeManager = episodeManager.get(),
-                wasInitiatedByUser = true,
-            )
-            withTimeoutOrNull(SIGN_OUT_TIMEOUT) { signOutJob?.join() }
-            deleteDownloadedFiles()
-            coilManager.clearAll()
-            settings.clearUserPreferences()
+            val signOutJob = runWipeStep("sign out and clear data") {
+                userManager.signOutAndClearData(
+                    playbackManager = playbackManager.get(),
+                    upNextQueue = upNextQueue.get(),
+                    folderManager = folderManager.get(),
+                    searchHistoryManager = searchHistoryManager.get(),
+                    episodeManager = episodeManager.get(),
+                    wasInitiatedByUser = true,
+                )
+            }
+            if (signOutJob != null && withTimeoutOrNull(SIGN_OUT_TIMEOUT) { signOutJob.join() } == null) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "TV sign out did not finish before the wipe timeout")
+            }
+            runWipeStep("delete downloaded files") { deleteDownloadedFiles() }
+            runWipeStep("clear image caches") { coilManager.clearAll() }
+            runWipeStep("clear user preferences") { settings.clearUserPreferences() }
         }
     }
 
@@ -64,6 +70,15 @@ class TvSignOutManager @Inject constructor(
                 }
             }
         }
+    }
+
+    private inline fun <T> runWipeStep(name: String, block: () -> T): T? = try {
+        block()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "TV sign out step failed: $name")
+        null
     }
 
     private companion object {
