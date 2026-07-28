@@ -179,30 +179,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findEpisodesBlocking(SimpleSQLiteQuery(query))
     }
 
-    override fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int> {
-        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
-            .switchMap {
-                val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT COUNT(*) FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
-                return@switchMap Flowable.just(query)
-            }
-            .switchMap {
-                episodeDao.countRxFlowable(SimpleSQLiteQuery(it))
-            }
-    }
-
-    override fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>> {
-        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
-            .switchMap {
-                val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT podcast_episodes.* FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
-                return@switchMap Flowable.just(query)
-            }
-            .switchMap {
-                episodeDao.findEpisodesRxFlowable(SimpleSQLiteQuery(it))
-            }
-    }
-
     override fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>> {
         return episodeDao.findPlaybackHistoryFlow()
     }
