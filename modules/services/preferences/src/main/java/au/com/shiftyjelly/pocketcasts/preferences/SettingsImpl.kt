@@ -592,7 +592,7 @@ class SettingsImpl @Inject constructor(
     override fun clearUserPreferences() {
         val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
             .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
-            .toSet()
+            .toSet() + PROCESSED_SIGNOUT_KEY
         listOf(sharedPreferences, privatePreferences).forEach { preferences ->
             val editor = preferences.edit()
             preferences.all.keys

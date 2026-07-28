@@ -44,7 +44,6 @@ class TvSignOutManager @Inject constructor(
             deleteDownloadedFiles()
             coilManager.clearAll()
             settings.clearUserPreferences()
-            settings.setFullySignedOut(true)
         }
     }
 

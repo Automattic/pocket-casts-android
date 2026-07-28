@@ -76,6 +76,15 @@ class SettingsImplTest {
     }
 
     @Test
+    fun `clearUserPreferences keeps the processed sign out flag`() {
+        settings.setFullySignedOut(false)
+
+        settings.clearUserPreferences()
+
+        assertFalse(settings.getFullySignedOut())
+    }
+
+    @Test
     fun `clearUserPreferences refreshes the in-memory setting values`() {
         settings.hideNotificationOnPause.set(true, updateModifiedAt = false)
         assertTrue(settings.hideNotificationOnPause.flow.value)
