@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
@@ -35,6 +36,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -56,6 +58,8 @@ class AutomotiveApplication :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
@@ -111,6 +115,8 @@ class AutomotiveApplication :
 
         val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS
         Log.i(Settings.LOG_TAG_AUTO, "Play services $playServices")
+
+        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
 
         userEpisodeManager.monitorUploads(applicationContext)
         downloadStatusObserver.monitorDownloadStatus()

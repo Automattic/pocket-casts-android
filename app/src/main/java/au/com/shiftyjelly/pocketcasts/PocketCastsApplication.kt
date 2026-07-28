@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -105,6 +106,8 @@ class PocketCastsApplication :
     @Inject lateinit var coilImageLoader: ImageLoader
 
     @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
 
     @Inject lateinit var analyticsController: AnalyticsController
 
@@ -287,6 +290,8 @@ class PocketCastsApplication :
         }
 
         applicationScope.launch(Dispatchers.IO) { fileStorage.fixBrokenFiles(episodeManager) }
+
+        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
 
         userEpisodeManager.monitorUploads(applicationContext)
         downloadStatusObserver.monitorDownloadStatus()
