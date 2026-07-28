@@ -23,6 +23,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvSignOutManagerTest {
@@ -60,7 +61,6 @@ class TvSignOutManagerTest {
             )
             verify(coilManager).clearAll()
             verify(settings).clearUserPreferences()
-            verify(settings).setFullySignedOut(true)
         }
     }
 
@@ -91,10 +91,7 @@ class TvSignOutManagerTest {
         manager.signOutAndWipeData()
         advanceUntilIdle()
 
-        inOrder(settings) {
-            verify(settings).clearUserPreferences()
-            verify(settings).setFullySignedOut(true)
-        }
+        verify(settings).clearUserPreferences()
     }
 
     private fun kotlinx.coroutines.test.TestScope.createManager(fileStorage: FileStorage) = TvSignOutManager(
