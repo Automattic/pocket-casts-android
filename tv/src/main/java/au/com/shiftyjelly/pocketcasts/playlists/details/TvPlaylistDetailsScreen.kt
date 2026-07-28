@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -41,12 +43,15 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import java.util.Date
+import kotlinx.coroutines.flow.first
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -99,8 +104,11 @@ private fun TvPlaylistDetailsContent(
                         playAllFocusRequester = playAllFocusRequester,
                         modifier = Modifier.width(ArtworkSize),
                     )
-                    if (uiState.totalEpisodeCount == 0) {
-                        NoEpisodes(modifier = Modifier.weight(1f).fillMaxHeight())
+                    if (uiState.episodes.isEmpty()) {
+                        NoEpisodes(
+                            playlistType = uiState.playlist.type,
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                        )
                     } else {
                         EpisodeList(
                             episodes = uiState.episodes,
@@ -122,28 +130,39 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    val firstEpisodeFocusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
+        runCatching { firstEpisodeFocusRequester.requestFocus() }
+    }
     LazyColumn(
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier,
     ) {
-        items(
+        itemsIndexed(
             items = episodes,
-            key = { episode -> episode.uuid },
-        ) { episode ->
+            key = { _, episode -> episode.uuid },
+        ) { index, episode ->
             TvEpisodeRow(
                 episode = episode,
                 onClick = {},
                 dateFormatter = dateFormatter,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusProperties { left = playAllFocusRequester },
+                    .focusProperties { left = playAllFocusRequester }
+                    .then(if (index == 0) Modifier.focusRequester(firstEpisodeFocusRequester) else Modifier),
             )
         }
     }
 }
 
 @Composable
-private fun NoEpisodes(modifier: Modifier = Modifier) {
+private fun NoEpisodes(
+    playlistType: Playlist.Type,
+    modifier: Modifier = Modifier,
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
@@ -159,7 +178,10 @@ private fun NoEpisodes(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = stringResource(LR.string.tv_playlist_empty_subtitle),
+                text = when (playlistType) {
+                    Playlist.Type.Manual -> stringResource(LR.string.tv_playlist_empty_subtitle_manual)
+                    Playlist.Type.Smart -> stringResource(LR.string.tv_playlist_empty_subtitle)
+                },
                 style = MaterialTheme.typography.bodyLarge,
                 color = TvColors.TextSecondary,
                 textAlign = TextAlign.Center,
@@ -223,7 +245,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     return if (episodes.isEmpty()) {
         countText
     } else {
-        val totalDurationMs = episodes.sumOf { episode -> episode.duration * 1000 }.toLong()
+        val totalDurationMs = episodes.sumOf { episode -> episode.durationMs.toLong() }
         "$countText · ${TimeHelper.getTimeDurationShortString(totalDurationMs, LocalContext.current)}"
     }
 }
@@ -245,6 +267,35 @@ private fun TvPlaylistDetailsPreview() {
                         metadata = Playlist.Metadata.ForPreview,
                     ),
                     episodes = emptyList(),
+                ),
+            )
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvPlaylistDetailsLoadedPreview() {
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        MaterialTheme {
+            val episodes = List(5) { index ->
+                PodcastEpisode(
+                    uuid = "episode-$index",
+                    title = "Episode $index",
+                    duration = 1800.0,
+                    publishedDate = Date(0),
+                )
+            }
+            TvPlaylistDetailsContent(
+                uiState = TvPlaylistDetailsUiState.Loaded(
+                    playlist = ManualPlaylist(
+                        uuid = "playlist-uuid",
+                        title = "New Releases",
+                        episodes = episodes.map(PlaylistEpisode::Available),
+                        settings = Playlist.Settings.ForPreview,
+                        metadata = Playlist.Metadata.ForPreview,
+                    ),
+                    episodes = episodes,
                 ),
             )
         }

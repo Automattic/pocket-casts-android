@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,37 +76,42 @@ fun TvPlaylistsScreen(
     var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
     var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
 
+    val stateHolder = rememberSaveableStateHolder()
     val playlist = openedPlaylist
     if (playlist != null) {
         BackHandler {
             openedPlaylist = null
         }
-        TvPlaylistDetailsScreen(
-            playlistUuid = playlist.uuid,
-            playlistType = playlist.type,
-            onClose = { openedPlaylist = null },
-            modifier = modifier,
-        )
-    } else {
-        TvPlaylistsContent(
-            uiState = uiState,
-            getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
-            getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
-            refreshArtworkUuids = viewModel::refreshArtworkUuids,
-            refreshEpisodeCount = viewModel::refreshEpisodeCount,
-            findPodcastTint = viewModel::findPodcastTint,
-            onCreatePlaylist = { isDownloadModalVisible = true },
-            onOpenPlaylist = { preview ->
-                isDownloadModalVisible = false
-                openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
-            },
-            modifier = modifier,
-        )
-
-        if (isDownloadModalVisible) {
-            TvDownloadAppModal(
-                onDismissRequest = { isDownloadModalVisible = false },
+        stateHolder.SaveableStateProvider("details-${playlist.uuid}") {
+            TvPlaylistDetailsScreen(
+                playlistUuid = playlist.uuid,
+                playlistType = playlist.type,
+                onClose = { openedPlaylist = null },
+                modifier = modifier,
             )
+        }
+    } else {
+        stateHolder.SaveableStateProvider("grid") {
+            TvPlaylistsContent(
+                uiState = uiState,
+                getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+                getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
+                refreshArtworkUuids = viewModel::refreshArtworkUuids,
+                refreshEpisodeCount = viewModel::refreshEpisodeCount,
+                findPodcastTint = viewModel::findPodcastTint,
+                onCreatePlaylist = { isDownloadModalVisible = true },
+                onOpenPlaylist = { preview ->
+                    isDownloadModalVisible = false
+                    openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
+                },
+                modifier = modifier,
+            )
+
+            if (isDownloadModalVisible) {
+                TvDownloadAppModal(
+                    onDismissRequest = { isDownloadModalVisible = false },
+                )
+            }
         }
     }
 }

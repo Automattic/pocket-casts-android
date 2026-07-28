@@ -62,7 +62,5 @@ sealed interface TvPlaylistDetailsUiState {
     data class Loaded(
         val playlist: Playlist,
         val episodes: List<PodcastEpisode>,
-    ) : TvPlaylistDetailsUiState {
-        val totalEpisodeCount get() = playlist.episodes.size
-    }
+    ) : TvPlaylistDetailsUiState
 }

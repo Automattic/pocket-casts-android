@@ -43,7 +43,6 @@ class TvPlaylistDetailsViewModelTest {
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(episode), state.episodes)
-            assertEquals(1, state.totalEpisodeCount)
         }
     }
 
