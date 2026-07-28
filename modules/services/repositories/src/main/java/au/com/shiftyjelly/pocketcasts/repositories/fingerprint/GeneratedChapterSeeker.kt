@@ -67,14 +67,14 @@ class GeneratedChapterSeeker @Inject constructor(
         activeCaller?.cancel()
     }
 
-    // Never land before the chapter's own displayed start: the skip buttons picked the chapter from
-    // that boundary, and a resolve landing short of it would make the next button loop in place.
-    suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? = resolveSeekTimeUnclamped(episode, chapter)?.coerceAtLeast(chapter.startTime)
-
-    private suspend fun resolveSeekTimeUnclamped(episode: BaseEpisode, chapter: Chapter): Duration? {
+    suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {
         if (!isEnabled(chapter)) return null
         val referenceTime = chapter.referenceStartTime ?: return null
 
+        // Cached and dense times can predate a boundary re-alignment, and landing short of the
+        // displayed start the skip buttons picked the chapter from would loop the next button in
+        // place, so clamp them. A fresh resolve stays unclamped: it may legitimately land before
+        // the displayed start (negative ad offset) and re-aligns the boundary via its own anchors.
         val sourceKey = "${episode.uuid}|${episode.downloadedFilePath ?: episode.downloadUrl}"
         mutex.withLock {
             if (cacheSourceKey != sourceKey) {
@@ -84,10 +84,10 @@ class GeneratedChapterSeeker @Inject constructor(
                 referenceUnavailable = false
             }
             resolvedCache[chapter.index]
-        }?.let { return it }
+        }?.let { return it.coerceAtLeast(chapter.startTime) }
 
         val manager = fingerprintTimingManager.get()
-        manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it }
+        manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it.coerceAtLeast(chapter.startTime) }
 
         // A remembered failure repeats deterministically, so fall back without re-resolving.
         if (mutex.withLock { referenceUnavailable || chapter.index in failedChapters }) return null

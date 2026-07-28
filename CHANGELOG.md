@@ -20,6 +20,8 @@
 *   Updates
     *   Respect Audio only toggle when playing progressive mp4 episodes
         ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
+    *   Tap into ExoPlayer's cache instead of a standalone MediaSource for fingerprinting
+        ([#5618](https://github.com/Automattic/pocket-casts-android/pull/5618))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
