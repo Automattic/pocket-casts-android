@@ -113,27 +113,17 @@ class FingerprintTimingManagerTest {
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = true,
             isDownloaded = true,
-            isUnmetered = { false },
         )
         assertTrue(eager)
     }
 
     @Test
-    fun `computeEager runs for streaming episode on unmetered network`() {
+    fun `computeEager skips streaming episode`() {
+        // Streaming episodes never eager-decode the whole file; they use the throttled pass plus
+        // the bounded on-demand resolver, regardless of network, to avoid pulling the whole file.
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = true,
             isDownloaded = false,
-            isUnmetered = { true },
-        )
-        assertTrue(eager)
-    }
-
-    @Test
-    fun `computeEager skips streaming episode on metered network`() {
-        val eager = FingerprintTimingManager.computeEager(
-            hasGeneratedChapters = true,
-            isDownloaded = false,
-            isUnmetered = { false },
         )
         assertFalse(eager)
     }
@@ -143,23 +133,8 @@ class FingerprintTimingManagerTest {
         val eager = FingerprintTimingManager.computeEager(
             hasGeneratedChapters = false,
             isDownloaded = true,
-            isUnmetered = { true },
         )
         assertFalse(eager)
-    }
-
-    @Test
-    fun `computeEager does not query network for downloaded episode`() {
-        var queriedNetwork = false
-        FingerprintTimingManager.computeEager(
-            hasGeneratedChapters = true,
-            isDownloaded = true,
-            isUnmetered = {
-                queriedNetwork = true
-                true
-            },
-        )
-        assertFalse(queriedNetwork)
     }
 
     @Test
@@ -241,6 +216,46 @@ class FingerprintTimingManagerTest {
             isUnmetered = { false },
         )
         assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve never blocks downloaded episodes`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = true,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { error("network should not be queried") },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve allows streaming on metered network by default`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve blocks streaming on metered network when user warns on data use`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertTrue(blocked)
+    }
+
+    @Test
+    fun `shouldBlockOnDemandResolve never blocks on unmetered network`() {
+        val blocked = FingerprintTimingManager.shouldBlockOnDemandResolve(
+            isDownloaded = false,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { true },
+        )
+        assertFalse(blocked)
     }
 
     @Test
@@ -615,5 +630,33 @@ class FingerprintTimingManagerTest {
     fun `alignToWindowGrid zero stays zero`() {
         val aligned = FingerprintTimingManager.alignToWindowGrid(0.0)
         assertEquals(0.0, aligned, 0.001)
+    }
+
+    @Test
+    fun `searchWindow cold searches forward from reference time`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = null)
+        assertEquals(600.0, window.startSec, 0.001)
+        assertEquals(600.0 + FingerprintConstants.ON_DEMAND_COLD_BUDGET_SECONDS, window.endSec, 0.001)
+    }
+
+    @Test
+    fun `searchWindow warm brackets the estimate within budgets`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 900.0)
+        assertEquals(900.0 - FingerprintConstants.ON_DEMAND_BACKWARD_MAX_SECONDS, window.startSec, 0.001)
+        assertEquals(900.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
+    }
+
+    @Test
+    fun `searchWindow warm never starts below reference time`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 650.0)
+        assertEquals(600.0, window.startSec, 0.001)
+        assertEquals(650.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
+    }
+
+    @Test
+    fun `searchWindow warm keeps forward budget when estimate is below reference time`() {
+        val window = FingerprintTimingManager.searchWindow(referenceTimeSec = 600.0, estimatedPlaybackSec = 300.0)
+        assertEquals(600.0, window.startSec, 0.001)
+        assertEquals(600.0 + FingerprintConstants.ON_DEMAND_FORWARD_BUDGET_SECONDS, window.endSec, 0.001)
     }
 }

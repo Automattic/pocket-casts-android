@@ -15,6 +15,8 @@
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
     *   Add option to switch to the HLS video stream when playing a downloaded episode
         ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
+    *   Resolve generated chapter seeks through on-demand audio fingerprinting
+        ([#5613](https://github.com/Automattic/pocket-casts-android/pull/5613))
 *   Updates
     *   Respect Audio only toggle when playing progressive mp4 episodes
         ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))

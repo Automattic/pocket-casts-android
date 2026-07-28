@@ -60,4 +60,19 @@ object FingerprintConstants {
 
     /** Maximum stored debug rejections (FIFO eviction). */
     const val DEBUG_REJECTION_CAP = 500
+
+    /** Forward audio decoded from the raw reference time when no mapping estimate exists. */
+    const val ON_DEMAND_COLD_BUDGET_SECONDS = 240.0
+
+    /** Audio decoded past the mapping estimate to absorb intervening ads. */
+    const val ON_DEMAND_FORWARD_BUDGET_SECONDS = 120.0
+
+    /** Cap on searching below the mapping estimate when the accumulated offset is large. */
+    const val ON_DEMAND_BACKWARD_MAX_SECONDS = 180.0
+
+    /** Minimum committed anchors for an on-demand resolve to be trusted. */
+    const val ON_DEMAND_MIN_ANCHORS = 2
+
+    /** Hard timeout for an on-demand chapter resolve. */
+    const val ON_DEMAND_TIMEOUT_MS = 5_000L
 }
