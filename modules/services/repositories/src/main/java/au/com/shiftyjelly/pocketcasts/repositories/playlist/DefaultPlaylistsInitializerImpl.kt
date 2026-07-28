@@ -30,6 +30,6 @@ class DefaultPlaylistsInitializerImpl @Inject constructor(
     }
 
     companion object {
-        private const val CREATED_DEFAULT_PLAYLISTS_KEY = "createdDefaultPlaylists"
+        internal const val CREATED_DEFAULT_PLAYLISTS_KEY = "createdDefaultPlaylists"
     }
 }

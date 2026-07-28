@@ -34,6 +34,7 @@ import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -100,7 +101,15 @@ class AutomotiveApplication :
     private fun setupApp() {
         Log.i(Settings.LOG_TAG_AUTO, "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
-        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
+        applicationScope.launch {
+            try {
+                defaultPlaylistsInitializer.initialize()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to seed the default playlists")
+            }
+        }
 
         runBlocking {
             withContext(Dispatchers.Default) {

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializerImpl.Companion.CREATED_DEFAULT_PLAYLISTS_KEY
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -23,7 +24,7 @@ class DefaultPlaylistsInitializerImplTest {
 
     @Test
     fun `seed the default playlists on first initialization`() = runTest {
-        whenever(settings.getBooleanForKey(CREATED_KEY, false)).thenReturn(false)
+        whenever(settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, false)).thenReturn(false)
         whenever(playlistManager.createSmartPlaylist(SmartPlaylistDraft.InProgress)).thenReturn("in-progress-uuid")
         whenever(playlistManager.createSmartPlaylist(SmartPlaylistDraft.NewReleases)).thenReturn("new-releases-uuid")
 
@@ -33,12 +34,12 @@ class DefaultPlaylistsInitializerImplTest {
         verify(playlistManager).updateName("in-progress-uuid", "In Progress")
         verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.NewReleases)
         verify(playlistManager).updateName("new-releases-uuid", "New Releases")
-        verify(settings).setBooleanForKey(CREATED_KEY, true)
+        verify(settings).setBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, true)
     }
 
     @Test
     fun `do not seed again once the playlists were created`() = runTest {
-        whenever(settings.getBooleanForKey(CREATED_KEY, false)).thenReturn(true)
+        whenever(settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, false)).thenReturn(true)
 
         initializer.initialize()
 
@@ -47,7 +48,7 @@ class DefaultPlaylistsInitializerImplTest {
 
     @Test
     fun `seed again when forced`() = runTest {
-        whenever(settings.getBooleanForKey(CREATED_KEY, false)).thenReturn(true)
+        whenever(settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, false)).thenReturn(true)
         whenever(playlistManager.createSmartPlaylist(SmartPlaylistDraft.InProgress)).thenReturn("in-progress-uuid")
         whenever(playlistManager.createSmartPlaylist(SmartPlaylistDraft.NewReleases)).thenReturn("new-releases-uuid")
 
@@ -55,9 +56,5 @@ class DefaultPlaylistsInitializerImplTest {
 
         verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.InProgress)
         verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.NewReleases)
-    }
-
-    private companion object {
-        const val CREATED_KEY = "createdDefaultPlaylists"
     }
 }
