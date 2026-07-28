@@ -60,7 +60,7 @@ class TvHomeViewModelTest {
         on { getUpNextBaseEpisodes(any()) }.thenReturn(emptyList())
     }
     private val playlistManager = mock<PlaylistManager> {
-        whenever(it.smartEpisodesFlow(any(), any(), anyOrNull())).thenReturn(flowOf(emptyList()))
+        whenever(it.smartEpisodesFlow(any(), any(), anyOrNull(), any())).thenReturn(flowOf(emptyList()))
     }
     private val resources = mock<Resources>()
     private val context = mock<Context> {
@@ -442,7 +442,7 @@ class TvHomeViewModelTest {
                 episode(uuid = "episode-3", podcastUuid = "podcast-2"),
             ),
         )
-        whenever(playlistManager.smartEpisodesFlow(any(), any(), anyOrNull())).thenReturn(
+        whenever(playlistManager.smartEpisodesFlow(any(), any(), anyOrNull(), any())).thenReturn(
             flowOf(listOf(PlaylistEpisode.Available(episode(uuid = "episode-new", podcastUuid = "podcast-2")))),
         )
         whenever(podcastDao.findAllIn(any())).thenReturn(

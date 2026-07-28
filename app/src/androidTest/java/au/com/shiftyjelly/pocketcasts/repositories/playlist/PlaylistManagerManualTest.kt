@@ -612,6 +612,26 @@ class PlaylistManagerManualTest {
     }
 
     @Test
+    fun observeEpisodesIncludingArchived() = dsl.test {
+        insertManualPlaylist(0)
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0) { it.copy(isArchived = true) }
+        insertPodcastEpisode(index = 1, podcastIndex = 0)
+
+        manager.manualPlaylistFlow("playlist-id-0", includeArchived = true).test {
+            val playlist = awaitItem()!!
+            assertEquals(
+                listOf(
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(isArchived = true) },
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0),
+                ),
+                playlist.episodes,
+            )
+        }
+    }
+
+    @Test
     fun observeArchivedEpisodes() = dsl.test {
         insertManualPlaylist(0)
         insertManualEpisode(index = 0, podcastIndex = 1, playlistIndex = 0)
