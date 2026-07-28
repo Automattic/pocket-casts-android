@@ -72,12 +72,16 @@ class TvSignOutManagerTest {
     @Test
     fun `sign out deletes the downloaded files`() = runTest {
         val episodesDir = temporaryFolder.newFolder("episodes")
-        val cloudDir = temporaryFolder.newFolder("cloud_files")
+        val imagesDir = temporaryFolder.newFolder("network_images")
         val downloadedEpisode = File(episodesDir, "episode.mp3").apply { writeText("audio") }
-        val cloudFile = File(cloudDir, "file.mp3").apply { writeText("audio") }
+        val noMediaFile = File(episodesDir, ".nomedia").apply { writeText("") }
+        val groupImage = File(imagesDir, "groups/group.webp").apply {
+            parentFile?.mkdirs()
+            writeText("image")
+        }
         val fileStorage = mock<FileStorage> {
             on { getOrCreateEpisodesDir() } doReturn episodesDir
-            on { getOrCreateCloudDir() } doReturn cloudDir
+            on { getOrCreateNetworkImagesDir() } doReturn imagesDir
         }
         val manager = createManager(fileStorage = fileStorage)
 
@@ -85,7 +89,8 @@ class TvSignOutManagerTest {
         advanceUntilIdle()
 
         assertFalse(downloadedEpisode.exists())
-        assertFalse(cloudFile.exists())
+        assertFalse(groupImage.exists())
+        assertTrue(noMediaFile.exists())
         assertTrue(episodesDir.exists())
     }
 
