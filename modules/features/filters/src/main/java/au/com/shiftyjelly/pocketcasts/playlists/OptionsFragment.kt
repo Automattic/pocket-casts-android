@@ -28,15 +28,16 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOption
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOptionsColumn
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistSortOptionsColumn
-import au.com.shiftyjelly.pocketcasts.playlists.component.displayLabel
 import au.com.shiftyjelly.pocketcasts.playlists.manual.EditPlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
@@ -79,7 +80,7 @@ class OptionsFragment : BaseDialogFragment() {
                     AnimatedContent(targetState = isSelectingSortType) { isSorting ->
                         if (isSorting) {
                             PlaylistSortOptionsColumn(
-                                availableSortTypes = playlist.availableSortOptions,
+                                availableSortTypes = playlist.availableSortTypes,
                                 selectedSortType = playlist.settings.sortType,
                                 onSelectSortType = { type ->
                                     viewModel.updateSortType(type)
@@ -247,11 +248,3 @@ class OptionsFragment : BaseDialogFragment() {
         }
     }
 }
-
-private val smartSortTypes = PlaylistEpisodeSortType.entries - PlaylistEpisodeSortType.DragAndDrop
-
-private val Playlist.availableSortOptions
-    get() = when (type) {
-        Playlist.Type.Manual -> PlaylistEpisodeSortType.entries
-        Playlist.Type.Smart -> smartSortTypes
-    }
