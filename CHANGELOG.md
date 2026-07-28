@@ -1,11 +1,6 @@
 8.18
 -----
-*   New Features
-    *   Add option to switch to the HLS video stream when playing a downloaded episode
-        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
-*   Updates
-    *   Respect Audio only toggle when playing progressive mp4 episodes
-        ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
+
 
 8.17
 -----
@@ -18,6 +13,11 @@
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
     *   HLS support
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
+    *   Add option to switch to the HLS video stream when playing a downloaded episode
+        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
+*   Updates
+    *   Respect Audio only toggle when playing progressive mp4 episodes
+        ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
