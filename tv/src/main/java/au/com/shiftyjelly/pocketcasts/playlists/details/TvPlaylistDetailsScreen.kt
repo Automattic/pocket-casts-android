@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,7 +18,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
@@ -26,6 +31,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,22 +41,31 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
+import androidx.tv.material3.Icon
+import androidx.tv.material3.IconButton
+import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
+import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeRow
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
+import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import java.util.Date
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
@@ -77,6 +92,7 @@ fun TvPlaylistDetailsScreen(
 
     TvPlaylistDetailsContent(
         uiState = uiState,
+        onChangeSortType = viewModel::changeSortType,
         modifier = modifier,
     )
 }
@@ -84,6 +100,7 @@ fun TvPlaylistDetailsScreen(
 @Composable
 private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
+    onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -112,12 +129,86 @@ private fun TvPlaylistDetailsContent(
                             modifier = Modifier.weight(1f).fillMaxHeight(),
                         )
                     } else {
-                        EpisodeList(
-                            episodes = uiState.episodes,
+                        SortableEpisodeList(
+                            uiState = uiState,
+                            onChangeSortType = onChangeSortType,
                             playAllFocusRequester = playAllFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SortableEpisodeList(
+    uiState: TvPlaylistDetailsUiState.Loaded,
+    onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    playAllFocusRequester: FocusRequester,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        SortDropdownButton(
+            selectedSortType = uiState.playlist.settings.sortType,
+            availableSortTypes = uiState.playlist.availableSortTypes,
+            onSelectSortType = onChangeSortType,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(bottom = 12.dp),
+        )
+        if (uiState.episodes.isNotEmpty()) {
+            EpisodeList(
+                episodes = uiState.episodes,
+                playAllFocusRequester = playAllFocusRequester,
+                modifier = Modifier.weight(1f),
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun SortDropdownButton(
+    selectedSortType: PlaylistEpisodeSortType,
+    availableSortTypes: List<PlaylistEpisodeSortType>,
+    onSelectSortType: (PlaylistEpisodeSortType) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        IconButton(
+            onClick = { isExpanded = true },
+            colors = IconButtonDefaults.colors(
+                containerColor = TvColors.BgActive20,
+                contentColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedContentColor = TvColors.Dark,
+            ),
+        ) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_sort),
+                contentDescription = stringResource(LR.string.sort_by),
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        if (isExpanded) {
+            TvDropdownMenu(
+                title = stringResource(LR.string.sort_by),
+                onDismissRequest = { isExpanded = false },
+            ) {
+                availableSortTypes.forEach { sortType ->
+                    TvDropdownMenuItem(
+                        label = sortType.displayLabel(),
+                        isSelected = sortType == selectedSortType,
+                        onClick = {
+                            isExpanded = false
+                            onSelectSortType(sortType)
+                        },
+                    )
                 }
             }
         }
@@ -275,6 +366,7 @@ private fun TvPlaylistDetailsPreview() {
                     ),
                     episodes = emptyList(),
                 ),
+                onChangeSortType = {},
             )
         }
     }
@@ -304,6 +396,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
                     ),
                     episodes = episodes,
                 ),
+                onChangeSortType = {},
             )
         }
     }
