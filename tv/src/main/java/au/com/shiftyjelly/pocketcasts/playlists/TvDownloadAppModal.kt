@@ -64,7 +64,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
     )
     Image(
         painter = rememberQrPainter(content = DOWNLOAD_URL, size = QrCodeSize),
-        contentDescription = stringResource(LR.string.tv_playlists_download_subtitle),
+        contentDescription = null,
         modifier = Modifier
             .padding(vertical = 16.dp)
             .background(Color.White, RoundedCornerShape(8.dp))
@@ -88,7 +88,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
 }
 
 private const val DOWNLOAD_URL = "https://www.pocketcasts.com/downloads"
-private const val DOWNLOAD_URL_LABEL = "pocketcasts.com/downloads"
+private val DOWNLOAD_URL_LABEL = DOWNLOAD_URL.removePrefix("https://www.")
 private val QrCodeSize = 144.dp
 
 @Preview
