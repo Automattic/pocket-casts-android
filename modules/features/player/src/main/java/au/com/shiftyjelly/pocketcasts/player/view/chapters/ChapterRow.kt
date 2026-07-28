@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
@@ -56,6 +57,7 @@ fun ChapterRow(
     onClick: () -> Unit,
     onUrlClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isResolving: Boolean = false,
 ) {
     val chapter = state.chapter
     var selectedState by remember(chapter.index) { mutableStateOf(state.chapter.selected) }
@@ -100,12 +102,22 @@ fun ChapterRow(
                 )
                 Spacer(Modifier.width(8.dp))
             }
-            TextH50(
-                text = (chapter.uiIndex).toString(),
-                color = textColor,
-                modifier = Modifier
-                    .padding(horizontal = 12.dp),
-            )
+            if (isResolving) {
+                CircularProgressIndicator(
+                    color = textColor,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .size(16.dp),
+                )
+            } else {
+                TextH50(
+                    text = (chapter.uiIndex).toString(),
+                    color = textColor,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp),
+                )
+            }
             Spacer(Modifier.width(8.dp))
             TextH50(
                 text = chapter.title,
