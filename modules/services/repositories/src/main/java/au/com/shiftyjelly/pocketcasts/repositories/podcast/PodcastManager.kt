@@ -88,6 +88,7 @@ interface PodcastManager {
     fun updateEffectsBlocking(podcast: Podcast, effects: PlaybackEffects)
     fun updateEpisodesSortTypeBlocking(podcast: Podcast, episodesSortType: EpisodesSortType)
     suspend fun updateShowNotifications(podcastUuid: String, show: Boolean)
+    suspend fun updateShowNotificationsForSubscribed(enabledPodcastUuids: Collection<String>)
     suspend fun updatePodcastPositions(podcasts: List<Podcast>)
     suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int)
     fun updateColorsBlocking(podcastUuid: String, background: Int, tintForLightBg: Int, tintForDarkBg: Int, fabForLightBg: Int, fabForDarkBg: Int, linkForLightBg: Int, linkForDarkBg: Int, colorLastDownloaded: Long)

@@ -406,6 +406,15 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updateShowNotifications(uuid: String, show: Boolean, modified: Date = Date())
 
+    @Transaction
+    open suspend fun updateShowNotificationsForSubscribed(enabledUuids: Collection<String>) {
+        val enabled = enabledUuids.toSet()
+        val modified = Date()
+        findSubscribedUuids().forEach { uuid ->
+            updateShowNotifications(uuid, uuid in enabled, modified)
+        }
+    }
+
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
     abstract fun updateSubscribedBlocking(subscribed: Boolean, uuid: String)
 

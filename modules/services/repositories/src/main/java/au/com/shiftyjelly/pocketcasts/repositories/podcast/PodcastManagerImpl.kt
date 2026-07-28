@@ -570,6 +570,13 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateShowNotifications(podcastUuid, show)
     }
 
+    override suspend fun updateShowNotificationsForSubscribed(enabledPodcastUuids: Collection<String>) {
+        if (enabledPodcastUuids.isNotEmpty()) {
+            settings.notifyRefreshPodcast.set(true, updateModifiedAt = true)
+        }
+        podcastDao.updateShowNotificationsForSubscribed(enabledPodcastUuids)
+    }
+
     override suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int) {
         podcastDao.updateStartFrom(autoStartFrom, podcast.uuid)
     }
