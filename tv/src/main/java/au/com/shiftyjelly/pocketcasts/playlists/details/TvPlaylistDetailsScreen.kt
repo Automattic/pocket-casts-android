@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
@@ -177,7 +176,7 @@ private fun SortDropdownButton(
     onSelectSortType: (PlaylistEpisodeSortType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
         IconButton(

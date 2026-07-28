@@ -30,7 +30,6 @@ import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOption
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOptionsColumn
