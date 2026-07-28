@@ -10,7 +10,9 @@ class FakeSharedPreferences : SharedPreferences {
     override fun getString(key: String, defValue: String?) = values[key] as? String ?: defValue
 
     @Suppress("UNCHECKED_CAST")
-    override fun getStringSet(key: String, defValues: MutableSet<String>?) = (values[key] as? Set<String>)?.toMutableSet() ?: defValues
+    override fun getStringSet(key: String, defValues: MutableSet<String>?): MutableSet<String>? {
+        return (values[key] as? Set<String>)?.toMutableSet() ?: defValues
+    }
 
     override fun getInt(key: String, defValue: Int) = values[key] as? Int ?: defValue
 
@@ -24,9 +26,13 @@ class FakeSharedPreferences : SharedPreferences {
 
     override fun edit(): SharedPreferences.Editor = Editor()
 
-    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) = Unit
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) = Unit
 
-    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) = Unit
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) = Unit
 
     private inner class Editor : SharedPreferences.Editor {
         private val pending = mutableMapOf<String, Any?>()
