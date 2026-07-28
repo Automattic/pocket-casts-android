@@ -7,7 +7,7 @@ class PodcastLicensingEnumConverter {
 
     @TypeConverter
     fun toLicensing(value: Int?): Podcast.Licensing? {
-        return if (value == null) null else Podcast.Licensing.values()[value]
+        return if (value == null) null else Podcast.Licensing.entries.getOrNull(value) ?: Podcast.Licensing.KEEP_EPISODES
     }
 
     @TypeConverter
