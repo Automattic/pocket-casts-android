@@ -206,6 +206,8 @@ class PocketCastsApplication :
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
+        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
+
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
@@ -290,8 +292,6 @@ class PocketCastsApplication :
         }
 
         applicationScope.launch(Dispatchers.IO) { fileStorage.fixBrokenFiles(episodeManager) }
-
-        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
 
         userEpisodeManager.monitorUploads(applicationContext)
         downloadStatusObserver.monitorDownloadStatus()

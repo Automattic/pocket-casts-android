@@ -117,6 +117,12 @@ class PocketCastsWearApplication :
             moshi = moshi,
         )
 
+        applicationScope.launch {
+            runStartupStep("default playlists seeding") {
+                defaultPlaylistsInitializer.initialize()
+            }
+        }
+
         // Defer the expensive playback/storage setup and monitors off the main thread to avoid blocking onCreate (ANRs).
         applicationScope.launch {
             runStartupStep("playback setup and account monitoring") {
@@ -137,9 +143,6 @@ class PocketCastsWearApplication :
             }
             runStartupStep("download monitoring") {
                 downloadStatusObserver.monitorDownloadStatus()
-            }
-            runStartupStep("default playlists seeding") {
-                defaultPlaylistsInitializer.initialize()
             }
             runStartupStep("playback stats scheduling") {
                 PlaybackStatsSyncWorker.scheduleOneTimeWork(application)

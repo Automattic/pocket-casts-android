@@ -100,6 +100,8 @@ class AutomotiveApplication :
     private fun setupApp() {
         Log.i(Settings.LOG_TAG_AUTO, "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
+        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
+
         runBlocking {
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
@@ -115,8 +117,6 @@ class AutomotiveApplication :
 
         val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS
         Log.i(Settings.LOG_TAG_AUTO, "Play services $playServices")
-
-        applicationScope.launch { defaultPlaylistsInitializer.initialize() }
 
         userEpisodeManager.monitorUploads(applicationContext)
         downloadStatusObserver.monitorDownloadStatus()
