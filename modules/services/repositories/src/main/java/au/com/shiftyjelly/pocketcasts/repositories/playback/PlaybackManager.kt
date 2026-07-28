@@ -430,6 +430,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun toggleVideoRendering(streamWarningConfirmed: Boolean = false) {
+        // Audio only forces audio, so toggling would only desync the rendering flag.
+        if (settings.audioOnly.value) return
         val episode = getCurrentEpisode()
         when {
             videoToggleRequiresStreamSwitch() -> {
