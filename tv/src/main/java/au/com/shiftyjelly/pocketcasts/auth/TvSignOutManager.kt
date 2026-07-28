@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
-import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import dagger.Lazy
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -55,9 +54,16 @@ class TvSignOutManager @Inject constructor(
             fileStorage.getOrCreateEpisodesDir(),
             fileStorage.getOrCreateCloudDir(),
             fileStorage.getOrCreateNetworkImagesDir(),
+            fileStorage.getOrCreateEpisodesOldTempDir(),
             fileStorage.getOrCreateEpisodesTempDir(),
         )
-        dirs.forEach { dir -> FileUtil.deleteDirContents(dir.absolutePath) }
+        dirs.forEach { dir ->
+            dir.listFiles()?.forEach { file ->
+                if (!file.name.equals(".nomedia", ignoreCase = true)) {
+                    file.deleteRecursively()
+                }
+            }
+        }
     }
 
     private companion object {
