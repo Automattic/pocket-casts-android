@@ -588,6 +588,21 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
+    @SuppressLint("ApplySharedPref")
+    override fun clearUserPreferences() {
+        val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
+            .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
+            .toSet()
+        listOf(sharedPreferences, privatePreferences).forEach { preferences ->
+            val editor = preferences.edit()
+            preferences.all.keys
+                .filterNot { key -> key in preservedKeys }
+                .forEach { key -> editor.remove(key) }
+            editor.commit()
+            UserSetting.refreshAll(preferences)
+        }
+    }
+
     private fun getDefaultCountryCode(): String {
         val languageCode = languageCode
         if (languageCode != null) {
