@@ -12,18 +12,23 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvSignOutManagerTest {
@@ -82,6 +87,27 @@ class TvSignOutManagerTest {
         assertFalse(downloadedEpisode.exists())
         assertFalse(cloudFile.exists())
         assertTrue(episodesDir.exists())
+    }
+
+    @Test
+    fun `wipe waits for the pending sign out before clearing caches`() = runTest {
+        val signOutJob = Job()
+        whenever(
+            userManager.signOutAndClearData(any(), any(), any(), any(), any(), any()),
+        ).thenReturn(signOutJob)
+        val manager = createManager(fileStorage = mock<FileStorage>())
+
+        manager.signOutAndWipeData()
+        runCurrent()
+
+        verify(coilManager, never()).clearAll()
+        verify(settings, never()).clearUserPreferences()
+
+        signOutJob.complete()
+        runCurrent()
+
+        verify(coilManager).clearAll()
+        verify(settings).clearUserPreferences()
     }
 
     @Test

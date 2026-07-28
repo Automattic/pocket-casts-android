@@ -14,9 +14,11 @@ import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import dagger.Lazy
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class TvSignOutManager @Inject constructor(
     private val userManager: UserManager,
@@ -33,7 +35,7 @@ class TvSignOutManager @Inject constructor(
 ) {
     fun signOutAndWipeData() {
         applicationScope.launch(ioDispatcher) {
-            userManager.signOutAndClearData(
+            val signOutJob = userManager.signOutAndClearData(
                 playbackManager = playbackManager.get(),
                 upNextQueue = upNextQueue.get(),
                 folderManager = folderManager.get(),
@@ -41,6 +43,7 @@ class TvSignOutManager @Inject constructor(
                 episodeManager = episodeManager.get(),
                 wasInitiatedByUser = true,
             )
+            withTimeoutOrNull(SIGN_OUT_TIMEOUT) { signOutJob?.join() }
             deleteDownloadedFiles()
             coilManager.clearAll()
             settings.clearUserPreferences()
@@ -55,5 +58,9 @@ class TvSignOutManager @Inject constructor(
             fileStorage.getOrCreateEpisodesTempDir(),
         )
         dirs.forEach { dir -> FileUtil.deleteDirContents(dir.absolutePath) }
+    }
+
+    private companion object {
+        val SIGN_OUT_TIMEOUT = 10.seconds
     }
 }
