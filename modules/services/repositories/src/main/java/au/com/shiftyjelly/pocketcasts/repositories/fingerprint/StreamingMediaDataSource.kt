@@ -8,13 +8,18 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 
+/**
+ * Adapts a Media3 [DataSource] to [MediaDataSource] so MediaExtractor reads go through the app's
+ * HTTP stack. When [cachedLengthAt] is provided, reads follow the player's cache writes instead of
+ * racing them over the network.
+ */
 @OptIn(UnstableApi::class)
-internal class CacheBackedMediaDataSource(
+internal class StreamingMediaDataSource(
     private val dataSourceFactory: DataSource.Factory,
     private val uri: Uri,
-    private val cacheKey: String,
+    private val cacheKey: String? = null,
     private val isActive: () -> Boolean = { true },
-    private val cachedLengthAt: (position: Long, length: Long) -> Long,
+    private val cachedLengthAt: ((position: Long, length: Long) -> Long)? = null,
 ) : MediaDataSource() {
     private var dataSource: DataSource? = null
     private var position = -1L
@@ -29,11 +34,14 @@ internal class CacheBackedMediaDataSource(
 
     override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int {
         if (size == 0) return 0
-        var waited = 0L
-        while (cachedLengthAt(position, size.toLong()) <= 0L && waited < FOLLOW_TIMEOUT_MS && isActive()) {
-            Thread.sleep(POLL_MS)
-            waited += POLL_MS
+        if (cachedLengthAt != null) {
+            var waited = 0L
+            while (cachedLengthAt.invoke(position, size.toLong()) <= 0L && waited < FOLLOW_TIMEOUT_MS && isActive()) {
+                Thread.sleep(POLL_MS)
+                waited += POLL_MS
+            }
         }
+        if (!isActive()) return -1
         if (position != this.position || dataSource == null) {
             openAt(position)
         }

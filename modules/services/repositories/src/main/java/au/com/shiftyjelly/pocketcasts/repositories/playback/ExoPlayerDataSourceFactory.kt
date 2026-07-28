@@ -7,6 +7,7 @@ import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
@@ -67,6 +68,8 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         .let { if (cache != null) it.setCache(cache) else it }
 
     val isCacheAvailable get() = cache != null
+
+    val upstreamFactory: DataSource.Factory get() = defaultFactory
 
     fun cachedLengthAt(cacheKey: String, position: Long, length: Long): Long = cache?.getCachedLength(cacheKey, position, length) ?: -1L
 
