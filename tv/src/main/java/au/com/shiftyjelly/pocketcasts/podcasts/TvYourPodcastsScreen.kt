@@ -110,12 +110,12 @@ private fun TvYourPodcastsGrid(
     podcasts: List<Podcast>,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.padding(horizontal = 32.dp)) {
+    Column(modifier = modifier) {
         Text(
             text = stringResource(LR.string.tv_tab_your_podcasts),
             style = TvTextStyles.ScreenTitle,
             color = Color.White,
-            modifier = Modifier.padding(top = 8.dp, bottom = 26.dp),
+            modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
         )
         var lastFocusedIndex by rememberSaveable(podcasts.size) { mutableIntStateOf(0) }
         val focusRequesters = remember(podcasts.size) { List(podcasts.size) { FocusRequester() } }
@@ -124,7 +124,7 @@ private fun TvYourPodcastsGrid(
             columns = GridCells.Fixed(GRID_COLUMNS),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
+            contentPadding = PaddingValues(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 32.dp),
             modifier = Modifier
                 .focusGroup()
                 .focusProperties {
