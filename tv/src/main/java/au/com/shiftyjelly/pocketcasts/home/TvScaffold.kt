@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
+import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
@@ -42,13 +43,18 @@ fun TvScaffold(
         onProfileClick = { isProfileModalVisible = true },
         modifier = modifier,
     ) { tab ->
+        val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
         when (tab) {
             is TvTab.Home -> TvHomeScreen()
+
+            is TvTab.YourPodcasts -> TvYourPodcastsScreen(
+                onNavigateToDiscover = navigateToHome,
+            )
 
             is TvTab.Playlists -> TvPlaylistsScreen()
 
             is TvTab.UpNext -> TvUpNextScreen(
-                onNavigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) },
+                onNavigateToHome = navigateToHome,
             )
 
             else -> TvTabPlaceholder(tab = tab)
