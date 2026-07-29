@@ -1,9 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -392,7 +401,6 @@ private fun EpisodeListItem(
     var isItemFocused by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { isItemFocused = it.hasFocus },
@@ -406,11 +414,17 @@ private fun EpisodeListItem(
                 .focusProperties { left = playAllFocusRequester }
                 .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
         )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(48.dp),
+        AnimatedVisibility(
+            visible = isItemFocused,
+            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), expandFrom = Alignment.Start) +
+                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), initialOffsetX = { it }) +
+                fadeIn(tween(MORE_BUTTON_ANIMATION_MILLIS)),
+            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), shrinkTowards = Alignment.Start) +
+                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), targetOffsetX = { it }) +
+                fadeOut(tween(MORE_BUTTON_ANIMATION_MILLIS)),
         ) {
-            if (isItemFocused) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(Modifier.width(16.dp))
                 TvMoreButton(onClick = onOpenActions)
             }
         }
@@ -510,6 +524,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
 }
 
 private val ArtworkSize = 200.dp
+private const val MORE_BUTTON_ANIMATION_MILLIS = 200
 
 @Preview(device = Devices.TV_1080p)
 @Composable
