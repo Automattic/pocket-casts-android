@@ -1169,6 +1169,11 @@ class FingerprintTimingManager @Inject constructor(
             } else {
                 extractor.setDataSource(audioFilePath)
             }
+        } catch (e: CancellationException) {
+            // Cancellation is not an open failure, don't let it reach markFailed.
+            extractor.release()
+            cacheSource?.close()
+            throw e
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
@@ -1207,6 +1212,11 @@ class FingerprintTimingManager @Inject constructor(
 
             val codec = MediaCodec.createDecoderByType(mime)
             return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
+        } catch (e: CancellationException) {
+            // Cancellation is not an open failure, don't let it reach markFailed.
+            extractor.release()
+            cacheSource?.close()
+            throw e
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
