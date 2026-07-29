@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -16,12 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -39,14 +42,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
+import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -56,18 +64,44 @@ fun TvYourPodcastsScreen(
     viewModel: TvYourPodcastsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedFolder by rememberSaveable(stateSaver = OpenedFolderSaver) { mutableStateOf<OpenedFolder?>(null) }
 
-    TvYourPodcastsContent(
-        uiState = uiState,
-        onNavigateToHome = onNavigateToHome,
-        modifier = modifier,
-    )
+    val folder = openedFolder
+    if (folder != null) {
+        BackHandler {
+            openedFolder = null
+        }
+        TvFolderDetailScreen(
+            folderUuid = folder.uuid,
+            folderName = folder.name,
+            getFolderPodcasts = viewModel::folderPodcasts,
+            onClose = { openedFolder = null },
+            modifier = modifier,
+        )
+    } else {
+        TvYourPodcastsContent(
+            uiState = uiState,
+            getFolderCoverUuids = viewModel::folderCoverUuids,
+            onNavigateToHome = onNavigateToHome,
+            onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
+            modifier = modifier,
+        )
+    }
 }
+
+private data class OpenedFolder(val uuid: String, val name: String)
+
+private val OpenedFolderSaver = listSaver<OpenedFolder?, String>(
+    save = { folder -> folder?.let { listOf(it.uuid, it.name) }.orEmpty() },
+    restore = { saved -> saved.takeIf { it.size == 2 }?.let { (uuid, name) -> OpenedFolder(uuid, name) } },
+)
 
 @Composable
 private fun TvYourPodcastsContent(
     uiState: TvYourPodcastsUiState,
+    getFolderCoverUuids: suspend (String) -> List<String>,
     onNavigateToHome: () -> Unit,
+    onOpenFolder: (Folder) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -95,7 +129,9 @@ private fun TvYourPodcastsContent(
             )
 
             is TvYourPodcastsUiState.Loaded -> TvYourPodcastsGrid(
-                podcasts = state.podcasts,
+                items = state.items,
+                getFolderCoverUuids = getFolderCoverUuids,
+                onOpenFolder = onOpenFolder,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -104,19 +140,78 @@ private fun TvYourPodcastsContent(
 
 @Composable
 private fun TvYourPodcastsGrid(
-    podcasts: List<Podcast>,
+    items: List<FolderItem>,
+    getFolderCoverUuids: suspend (String) -> List<String>,
+    onOpenFolder: (Folder) -> Unit,
     modifier: Modifier = Modifier,
+) {
+    TvPodcastGridScaffold(
+        title = stringResource(LR.string.tv_tab_your_podcasts),
+        itemKeys = items.map(FolderItem::uuid),
+        modifier = modifier,
+    ) { index, itemModifier ->
+        when (val item = items[index]) {
+            is FolderItem.Podcast -> TvPodcastTile(
+                artworkUrl = PodcastImage.getMediumArtworkUrl(item.podcast.uuid),
+                podcastTitle = item.podcast.title,
+                onClick = {},
+                imageModifier = Modifier.fillMaxWidth(),
+                modifier = itemModifier,
+            )
+
+            is FolderItem.Folder -> FolderGridItem(
+                folder = item.folder,
+                getFolderCoverUuids = getFolderCoverUuids,
+                onOpenFolder = onOpenFolder,
+                modifier = itemModifier,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FolderGridItem(
+    folder: Folder,
+    getFolderCoverUuids: suspend (String) -> List<String>,
+    onOpenFolder: (Folder) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var coverUrls by remember(folder.uuid) { mutableStateOf(emptyList<String>()) }
+    LaunchedEffect(folder.uuid, getFolderCoverUuids) {
+        coverUrls = getFolderCoverUuids(folder.uuid).map(PodcastImage::getMediumArtworkUrl)
+    }
+    TvFolderCard(
+        folder = folder,
+        coverUrls = coverUrls,
+        onClick = { onOpenFolder(folder) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun TvPodcastGridScaffold(
+    title: String,
+    itemKeys: List<Any>,
+    modifier: Modifier = Modifier,
+    autoFocusFirstItem: Boolean = false,
+    itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
     Column(modifier = modifier) {
         Text(
-            text = stringResource(LR.string.tv_tab_your_podcasts),
+            text = title,
             style = TvTextStyles.ScreenTitle,
             color = Color.White,
             modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
         )
         val gridState = rememberLazyGridState()
-        var lastFocusedUuid by rememberSaveable { mutableStateOf<String?>(null) }
-        val focusRequesters = remember(podcasts.size) { List(podcasts.size) { FocusRequester() } }
+        var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
+        val focusRequesters = remember(itemKeys.size) { List(itemKeys.size) { FocusRequester() } }
+
+        if (autoFocusFirstItem) {
+            LaunchedEffect(focusRequesters) {
+                focusRequesters.firstOrNull()?.requestFocus()
+            }
+        }
 
         LazyVerticalGrid(
             state = gridState,
@@ -129,27 +224,24 @@ private fun TvYourPodcastsGrid(
                 .focusProperties {
                     onEnter = {
                         val visible = gridState.layoutInfo.visibleItemsInfo
-                        val target = podcasts.indexOfFirst { it.uuid == lastFocusedUuid }
+                        val target = itemKeys.indexOfFirst { it.toString() == lastFocusedKey }
                             .takeIf { index -> index >= 0 && visible.any { it.index == index } }
                             ?: visible.firstOrNull()?.index
                         target?.let { runCatching { focusRequesters.getOrNull(it)?.requestFocus() } }
                     }
                 },
         ) {
-            itemsIndexed(
-                items = podcasts,
-                key = { _, podcast -> podcast.uuid },
-            ) { index, podcast ->
-                TvPodcastTile(
-                    artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
-                    podcastTitle = podcast.title,
-                    onClick = {},
-                    imageModifier = Modifier.fillMaxWidth(),
-                    modifier = Modifier
+            items(
+                count = itemKeys.size,
+                key = { index -> itemKeys[index] },
+            ) { index ->
+                itemContent(
+                    index,
+                    Modifier
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { focusState ->
                             if (focusState.hasFocus) {
-                                lastFocusedUuid = podcast.uuid
+                                lastFocusedKey = itemKeys[index].toString()
                             }
                         },
                 )
@@ -168,9 +260,30 @@ private fun TvYourPodcastsGridPreview() {
             Box(modifier = Modifier.background(TvColors.Dark)) {
                 TvYourPodcastsContent(
                     uiState = TvYourPodcastsUiState.Loaded(
-                        podcasts = List(12) { index -> Podcast(uuid = "podcast-$index", title = "Podcast $index") },
+                        items = buildList {
+                            add(
+                                FolderItem.Folder(
+                                    folder = Folder(
+                                        uuid = "folder",
+                                        name = "Tech & Science",
+                                        color = 3,
+                                        addedDate = Date(0),
+                                        sortPosition = 0,
+                                        podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                                        deleted = false,
+                                        syncModified = 0,
+                                    ),
+                                    podcasts = emptyList(),
+                                ),
+                            )
+                            repeat(11) { index ->
+                                add(FolderItem.Podcast(Podcast(uuid = "podcast-$index", title = "Podcast $index")))
+                            }
+                        },
                     ),
+                    getFolderCoverUuids = { emptyList() },
                     onNavigateToHome = {},
+                    onOpenFolder = {},
                 )
             }
         }
@@ -185,7 +298,9 @@ private fun TvYourPodcastsEmptyPreview() {
             Box(modifier = Modifier.background(TvColors.Dark)) {
                 TvYourPodcastsContent(
                     uiState = TvYourPodcastsUiState.Empty,
+                    getFolderCoverUuids = { emptyList() },
                     onNavigateToHome = {},
+                    onOpenFolder = {},
                 )
             }
         }
