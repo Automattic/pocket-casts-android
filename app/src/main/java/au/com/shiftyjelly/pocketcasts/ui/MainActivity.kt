@@ -718,7 +718,7 @@ class MainActivity :
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             val isPlayingVideo = (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
-                playbackManager.streamVideoState.value == StreamVideoState.HasVideo
+                (playbackManager.streamVideoState.value == StreamVideoState.HasVideo && playbackManager.videoRenderingEnabled.value)
             if (!videoPlayerShown && isPlayingVideo && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
             } else {
@@ -1072,47 +1072,52 @@ class MainActivity :
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    viewModel.playbackState,
-                    playbackManager.streamVideoState,
-                ) { state, streamVideoState -> state to streamVideoState }
-                    .collect { (state, streamVideoState) ->
-                        val lastPlaybackState = viewModel.lastPlaybackState
-                        val isEpisodeChanged = lastPlaybackState?.episodeUuid != state.episodeUuid
-                        val isPlaybackChanged = lastPlaybackState?.isPlaying == false && state.isPlaying
-                        val didResolveVideoStream = viewModel.lastStreamVideoState == StreamVideoState.Unknown &&
-                            streamVideoState == StreamVideoState.HasVideo
+                viewModel.playbackState.collect { state ->
+                    val lastPlaybackState = viewModel.lastPlaybackState
+                    val isEpisodeChanged = lastPlaybackState?.episodeUuid != state.episodeUuid
+                    val isPlaybackChanged = lastPlaybackState?.isPlaying == false && state.isPlaying
 
-                        if (isEpisodeChanged || isPlaybackChanged) {
-                            val episode = withContext(Dispatchers.Default) {
-                                episodeManager.findEpisodeByUuid(state.episodeUuid)
-                            }
-                            if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value) {
-                                openVideoPlayer()
-                            }
+                    if (isEpisodeChanged || isPlaybackChanged) {
+                        val episode = withContext(Dispatchers.Default) {
+                            episodeManager.findEpisodeByUuid(state.episodeUuid)
                         }
-
-                        if (didResolveVideoStream &&
-                            state.isPlaying &&
-                            playbackManager.isPlaybackLocal() &&
-                            playbackManager.getCurrentEpisode()?.isVideo != true
-                        ) {
+                        if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value) {
                             openVideoPlayer()
                         }
-
-                        if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                            updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
-                        }
-
-                        if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
-                            binding.playerBottomSheet.openPlayer()
-                        }
-
-                        updatePlaybackState(state)
-
-                        viewModel.lastPlaybackState = state
-                        viewModel.lastStreamVideoState = streamVideoState
                     }
+
+                    if (viewModel.isPlayerOpen && isEpisodeChanged) {
+                        updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
+                    }
+
+                    if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
+                        binding.playerBottomSheet.openPlayer()
+                    }
+
+                    updatePlaybackState(state)
+
+                    viewModel.lastPlaybackState = state
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var previousStreamVideoState: StreamVideoState? = null
+                playbackManager.streamVideoState.collect { streamVideoState ->
+                    val didResolveVideoStream = previousStreamVideoState == StreamVideoState.Unknown &&
+                        streamVideoState == StreamVideoState.HasVideo
+                    previousStreamVideoState = streamVideoState
+
+                    if (didResolveVideoStream &&
+                        playbackManager.isPlaying() &&
+                        playbackManager.isPlaybackLocal() &&
+                        playbackManager.videoRenderingEnabled.value &&
+                        playbackManager.getCurrentEpisode()?.isVideo != true
+                    ) {
+                        openVideoPlayer()
+                    }
+                }
             }
         }
 

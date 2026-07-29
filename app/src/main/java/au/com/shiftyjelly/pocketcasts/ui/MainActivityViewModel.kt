@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeInfo
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -78,7 +77,6 @@ class MainActivityViewModel
             _isPlayerOpen.value = value
         }
     var lastPlaybackState: PlaybackState? = null
-    var lastStreamVideoState: StreamVideoState = StreamVideoState.NotVideo
 
     val playbackNoticeFlow: StateFlow<PlaybackNoticeInfo?> = playbackNoticeManager.playbackNotice
         .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)

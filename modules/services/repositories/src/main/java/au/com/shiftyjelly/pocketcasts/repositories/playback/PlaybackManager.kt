@@ -1042,6 +1042,8 @@ open class PlaybackManager @Inject constructor(
     suspend fun stop() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Stopping playback")
 
+        flushPendingContentTypeEvents()
+
         cancelPrefetchNextEpisode()
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
@@ -2923,24 +2925,30 @@ open class PlaybackManager @Inject constructor(
     private fun trackWithContentType(episode: BaseEpisode, build: (PlaybackContentType) -> Trackable) {
         val contentType = playbackContentTypeFor(episode)
         if (contentType == PlaybackContentType.Unknown) {
-            pendingContentTypeEvents += PendingContentTypeEvent(episode.uuid, build)
+            synchronized(pendingContentTypeEvents) {
+                pendingContentTypeEvents += PendingContentTypeEvent(episode.uuid, build)
+            }
         } else {
             eventHorizon.track(build(contentType))
         }
     }
 
     private fun firePendingContentTypeEvents(contentType: PlaybackContentType) {
-        if (pendingContentTypeEvents.isEmpty()) return
         val currentUuid = getCurrentEpisode()?.uuid
-        val ready = pendingContentTypeEvents.filter { it.episodeUuid == currentUuid }
-        pendingContentTypeEvents.removeAll(ready)
+        val ready = synchronized(pendingContentTypeEvents) {
+            val matched = pendingContentTypeEvents.filter { it.episodeUuid == currentUuid }
+            pendingContentTypeEvents.removeAll(matched)
+            matched
+        }
         ready.forEach { eventHorizon.track(it.build(contentType)) }
     }
 
     private fun flushPendingContentTypeEvents() {
-        if (pendingContentTypeEvents.isEmpty()) return
-        val pending = pendingContentTypeEvents.toList()
-        pendingContentTypeEvents.clear()
+        val pending = synchronized(pendingContentTypeEvents) {
+            val copy = pendingContentTypeEvents.toList()
+            pendingContentTypeEvents.clear()
+            copy
+        }
         pending.forEach { eventHorizon.track(it.build(PlaybackContentType.Unknown)) }
     }
 
