@@ -1350,14 +1350,17 @@ class FingerprintTimingManager @Inject constructor(
                 outputIndex >= 0 -> {
                     val isEos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
 
-                    val outputBuffer = codec.getOutputBuffer(outputIndex)
-                    val samples = if (outputBuffer != null && bufferInfo.size > 0) {
-                        extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
-                    } else {
-                        emptyList()
+                    // Never hold a buffer across onWindows suspending or an extraction throw, OMX decoders crash on it.
+                    val samples = try {
+                        val outputBuffer = codec.getOutputBuffer(outputIndex)
+                        if (outputBuffer != null && bufferInfo.size > 0) {
+                            extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
+                        } else {
+                            emptyList()
+                        }
+                    } finally {
+                        codec.releaseOutputBuffer(outputIndex, false)
                     }
-                    // Release before onWindows suspends, a buffer held across cancellation crashes some OMX decoders.
-                    codec.releaseOutputBuffer(outputIndex, false)
                     if (samples.isNotEmpty()) {
                         val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
                         if (windows.isNotEmpty()) {
