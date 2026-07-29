@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -88,10 +90,7 @@ private fun TvUpNextContent(
             }
 
             is TvUpNextUiState.Loaded -> {
-                UpNextList(
-                    episodes = uiState.episodes,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                UpNextList(episodes = uiState.episodes)
             }
         }
     }
@@ -112,8 +111,9 @@ private fun UpNextList(
 
     Column(
         modifier = modifier
-            .padding(start = 32.dp, top = 16.dp, end = 32.dp)
-            .widthIn(max = ContentWidth),
+            .fillMaxHeight()
+            .fillMaxWidth(ROW_WIDTH_FRACTION)
+            .padding(start = 32.dp, top = 16.dp),
     ) {
         UpNextHeader(episodes = episodes)
         Spacer(Modifier.height(24.dp))
@@ -218,7 +218,7 @@ private fun UpNextEmpty(
     }
 }
 
-private val ContentWidth = 800.dp
+private const val ROW_WIDTH_FRACTION = 0.75f
 
 @Preview(device = Devices.TV_1080p)
 @Composable
