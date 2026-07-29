@@ -10,10 +10,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvYourPodcastsViewModelTest {
@@ -53,15 +51,6 @@ class TvYourPodcastsViewModelTest {
 
             assertEquals(TvYourPodcastsUiState.Loaded(listOf(apple, theBeat, zebra)), awaitItem())
         }
-    }
-
-    @Test
-    fun `showing the tab refreshes podcasts`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onShown()
-
-        verify(podcastManager).refreshPodcasts(any())
     }
 
     private fun createViewModel() = TvYourPodcastsViewModel(

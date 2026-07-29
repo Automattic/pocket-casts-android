@@ -63,10 +63,6 @@ fun TvYourPodcastsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.onShown()
-    }
-
     TvYourPodcastsContent(
         uiState = uiState,
         onNavigateToDiscover = onNavigateToDiscover,

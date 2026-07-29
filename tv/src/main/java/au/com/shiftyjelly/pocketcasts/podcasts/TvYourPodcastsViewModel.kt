@@ -33,10 +33,6 @@ class TvYourPodcastsViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds),
             TvYourPodcastsUiState.Loading,
         )
-
-    fun onShown() {
-        podcastManager.refreshPodcasts(fromLog = "tv your podcasts")
-    }
 }
 
 sealed interface TvYourPodcastsUiState {
