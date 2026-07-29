@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 
 @Composable
 fun TvScaffold(
@@ -43,7 +44,18 @@ fun TvScaffold(
     ) { tab ->
         when (tab) {
             is TvTab.Home -> TvHomeScreen()
+
             is TvTab.Playlists -> TvPlaylistsScreen()
+
+            is TvTab.UpNext -> TvUpNextScreen(
+                onNavigateToDiscover = {
+                    val homeIndex = uiState.tabs.indexOfFirst { it is TvTab.Home }
+                    if (homeIndex >= 0) {
+                        viewModel.selectTab(homeIndex)
+                    }
+                },
+            )
+
             else -> TvTabPlaceholder(tab = tab)
         }
     }
