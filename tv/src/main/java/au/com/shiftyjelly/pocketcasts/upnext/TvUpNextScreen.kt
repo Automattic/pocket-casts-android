@@ -57,6 +57,10 @@ fun TvUpNextScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.onShown()
+    }
+
     TvUpNextContent(
         uiState = uiState,
         onNavigateToDiscover = onNavigateToDiscover,
@@ -179,6 +183,10 @@ private fun UpNextEmpty(
     onNavigateToDiscover: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
@@ -202,6 +210,7 @@ private fun UpNextEmpty(
             Button(
                 onClick = onNavigateToDiscover,
                 colors = TvButtonDefaults.filledButtonColors(),
+                modifier = Modifier.focusRequester(focusRequester),
             ) {
                 Text(stringResource(LR.string.tv_up_next_empty_action_title))
             }
