@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,7 +49,9 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeRow
+import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
@@ -350,6 +353,7 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -359,15 +363,56 @@ private fun EpisodeList(
             items = episodes,
             key = { _, episode -> episode.uuid },
         ) { index, episode ->
-            TvEpisodeRow(
+            EpisodeListItem(
                 episode = episode,
-                onClick = {},
                 dateFormatter = dateFormatter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusProperties { left = playAllFocusRequester }
-                    .then(if (index == initialFocusIndex) Modifier.focusRequester(firstEpisodeFocusRequester) else Modifier),
+                onOpenActions = { actionsEpisode = episode },
+                playAllFocusRequester = playAllFocusRequester,
+                episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == initialFocusIndex },
             )
+        }
+    }
+    actionsEpisode?.let { episode ->
+        TvEpisodeActionsModal(
+            episode = episode,
+            onDismissRequest = { actionsEpisode = null },
+        )
+    }
+}
+
+@Composable
+private fun EpisodeListItem(
+    episode: PodcastEpisode,
+    dateFormatter: RelativeDateFormatter,
+    onOpenActions: () -> Unit,
+    playAllFocusRequester: FocusRequester,
+    episodeFocusRequester: FocusRequester?,
+    modifier: Modifier = Modifier,
+) {
+    var isItemFocused by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .onFocusChanged { isItemFocused = it.hasFocus },
+    ) {
+        TvEpisodeRow(
+            episode = episode,
+            onClick = {},
+            dateFormatter = dateFormatter,
+            modifier = Modifier
+                .weight(1f)
+                .focusProperties { left = playAllFocusRequester }
+                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
+        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(48.dp),
+        ) {
+            if (isItemFocused) {
+                TvMoreButton(onClick = onOpenActions)
+            }
         }
     }
 }
