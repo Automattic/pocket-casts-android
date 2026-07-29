@@ -286,13 +286,11 @@ open class PlaybackManager @Inject constructor(
 
     private var lastPlaybackSource: SourceView? = null
 
-    private data class PendingPlayEvent(
-        val source: SourceView,
+    private class PendingContentTypeEvent(
         val episodeUuid: String,
-        val hlsAvailable: Boolean?,
-        val audioOnlyMode: Boolean?,
+        val build: (PlaybackContentType) -> Trackable,
     )
-    private var pendingPlayEvent: PendingPlayEvent? = null
+    private val pendingContentTypeEvents = mutableListOf<PendingContentTypeEvent>()
 
     var player: Player?
         get() = _playerFlow.value
@@ -2162,7 +2160,7 @@ open class PlaybackManager @Inject constructor(
 
         val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castManager.isConnected())
 
-        flushPendingPlayEvent()
+        flushPendingContentTypeEvents()
 
         // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
         _streamVideoState.value = StreamVideoState.initialFor(
@@ -2174,16 +2172,16 @@ open class PlaybackManager @Inject constructor(
 
         lastPlaybackSource = sourceView
 
-        eventHorizon.track(
+        trackWithContentType(episode) { contentType ->
             PlaybackSourceResolvedEvent(
                 playbackProtocol = if (playingStream && episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
                 isFallback = false,
-                contentType = playbackContentTypeFor(episode),
+                contentType = contentType,
                 episodeUuid = episode.uuid,
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 hlsEngine = if (playingStream && episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
-            ),
-        )
+            )
+        }
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
         if (BuildConfig.DEBUG) {
@@ -2514,7 +2512,7 @@ open class PlaybackManager @Inject constructor(
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
         lastPlaybackSource = sourceView
-        trackPlaybackPlay(sourceView, episode.uuid)
+        trackPlaybackPlay(sourceView, episode)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: PodcastEpisode, podcast: Podcast?, isPlaying: Boolean) {
@@ -2587,13 +2585,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun onVideoTrackChanged(hasVideo: Boolean) {
         _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
-
-        val pending = pendingPlayEvent
-        if (pending != null && pending.episodeUuid == getCurrentEpisode()?.uuid) {
-            pendingPlayEvent = null
-            val contentType = if (hasVideo) PlaybackContentType.Video else PlaybackContentType.Audio
-            firePlaybackPlayEvent(pending.source, contentType, pending.hlsAvailable, pending.audioOnlyMode)
-        }
+        firePendingContentTypeEvents(if (hasVideo) PlaybackContentType.Video else PlaybackContentType.Audio)
     }
 
     private suspend fun updateCurrentPositionInDatabase() {
@@ -2909,7 +2901,7 @@ open class PlaybackManager @Inject constructor(
         eventHorizon.track(event(source, contentType))
     }
 
-    private fun trackPlaybackPlay(source: SourceView, episodeUuid: String) {
+    private fun trackPlaybackPlay(source: SourceView, episode: BaseEpisode) {
         if (source == SourceView.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
@@ -2918,34 +2910,38 @@ open class PlaybackManager @Inject constructor(
         }
         val hlsAvailable = _streamHlsAvailable.value
         val audioOnlyMode = audioOnlyModeOrNull()
-        val contentType = playbackContentTypeFor(getCurrentEpisode())
-        if (contentType == PlaybackContentType.Unknown) {
-            pendingPlayEvent = PendingPlayEvent(source, episodeUuid, hlsAvailable, audioOnlyMode)
-        } else {
-            firePlaybackPlayEvent(source, contentType, hlsAvailable, audioOnlyMode)
-        }
-    }
-
-    private fun firePlaybackPlayEvent(
-        source: SourceView,
-        contentType: PlaybackContentType,
-        hlsAvailable: Boolean?,
-        audioOnlyMode: Boolean?,
-    ) {
-        eventHorizon.track(
+        trackWithContentType(episode) { contentType ->
             PlaybackPlayEvent(
                 source = source.analyticsValue,
                 contentType = contentType,
                 hlsAvailable = hlsAvailable,
                 audioOnlyMode = audioOnlyMode,
-            ),
-        )
+            )
+        }
     }
 
-    private fun flushPendingPlayEvent() {
-        val pending = pendingPlayEvent ?: return
-        pendingPlayEvent = null
-        firePlaybackPlayEvent(pending.source, PlaybackContentType.Unknown, pending.hlsAvailable, pending.audioOnlyMode)
+    private fun trackWithContentType(episode: BaseEpisode, build: (PlaybackContentType) -> Trackable) {
+        val contentType = playbackContentTypeFor(episode)
+        if (contentType == PlaybackContentType.Unknown) {
+            pendingContentTypeEvents += PendingContentTypeEvent(episode.uuid, build)
+        } else {
+            eventHorizon.track(build(contentType))
+        }
+    }
+
+    private fun firePendingContentTypeEvents(contentType: PlaybackContentType) {
+        if (pendingContentTypeEvents.isEmpty()) return
+        val currentUuid = getCurrentEpisode()?.uuid
+        val ready = pendingContentTypeEvents.filter { it.episodeUuid == currentUuid }
+        pendingContentTypeEvents.removeAll(ready)
+        ready.forEach { eventHorizon.track(it.build(contentType)) }
+    }
+
+    private fun flushPendingContentTypeEvents() {
+        if (pendingContentTypeEvents.isEmpty()) return
+        val pending = pendingContentTypeEvents.toList()
+        pendingContentTypeEvents.clear()
+        pending.forEach { eventHorizon.track(it.build(PlaybackContentType.Unknown)) }
     }
 
     fun trackPlaybackSeek(
