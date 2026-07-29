@@ -163,6 +163,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -716,7 +717,9 @@ class MainActivity :
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
+            val isPlayingVideo = (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
+                playbackManager.streamVideoState.value == StreamVideoState.HasVideo
+            if (!videoPlayerShown && isPlayingVideo && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
             } else {
                 videoPlayerShown = false
@@ -733,6 +736,14 @@ class MainActivity :
         // addCallback() again in order to tell the media router that it no longer
         // needs to invest effort trying to discover routes of these kinds for now.
         mediaRouter?.addCallback(mediaRouteSelector, mediaRouterCallback, 0)
+    }
+
+    private fun openVideoPlayer() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.playerBottomSheet.openPlayer()
+        } else {
+            openFullscreenViewPlayer()
+        }
     }
 
     private fun openFullscreenViewPlayer() {
@@ -1061,36 +1072,47 @@ class MainActivity :
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.playbackState.collect { state ->
-                    val lastPlaybackState = viewModel.lastPlaybackState
-                    val isEpisodeChanged = lastPlaybackState?.episodeUuid != state.episodeUuid
-                    val isPlaybackChanged = lastPlaybackState?.isPlaying == false && state.isPlaying
+                combine(
+                    viewModel.playbackState,
+                    playbackManager.streamVideoState,
+                ) { state, streamVideoState -> state to streamVideoState }
+                    .collect { (state, streamVideoState) ->
+                        val lastPlaybackState = viewModel.lastPlaybackState
+                        val isEpisodeChanged = lastPlaybackState?.episodeUuid != state.episodeUuid
+                        val isPlaybackChanged = lastPlaybackState?.isPlaying == false && state.isPlaying
+                        val didResolveVideoStream = viewModel.lastStreamVideoState == StreamVideoState.Unknown &&
+                            streamVideoState == StreamVideoState.HasVideo
 
-                    if (isEpisodeChanged || isPlaybackChanged) {
-                        val episode = withContext(Dispatchers.Default) {
-                            episodeManager.findEpisodeByUuid(state.episodeUuid)
-                        }
-                        if (episode?.isVideo == true && state.isPlaying) {
-                            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                binding.playerBottomSheet.openPlayer()
-                            } else {
-                                openFullscreenViewPlayer()
+                        if (isEpisodeChanged || isPlaybackChanged) {
+                            val episode = withContext(Dispatchers.Default) {
+                                episodeManager.findEpisodeByUuid(state.episodeUuid)
+                            }
+                            if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value) {
+                                openVideoPlayer()
                             }
                         }
+
+                        if (didResolveVideoStream &&
+                            state.isPlaying &&
+                            playbackManager.isPlaybackLocal() &&
+                            playbackManager.getCurrentEpisode()?.isVideo != true
+                        ) {
+                            openVideoPlayer()
+                        }
+
+                        if (viewModel.isPlayerOpen && isEpisodeChanged) {
+                            updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
+                        }
+
+                        if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
+                            binding.playerBottomSheet.openPlayer()
+                        }
+
+                        updatePlaybackState(state)
+
+                        viewModel.lastPlaybackState = state
+                        viewModel.lastStreamVideoState = streamVideoState
                     }
-
-                    if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                        updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
-                    }
-
-                    if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
-                        binding.playerBottomSheet.openPlayer()
-                    }
-
-                    updatePlaybackState(state)
-
-                    viewModel.lastPlaybackState = state
-                }
             }
         }
 
