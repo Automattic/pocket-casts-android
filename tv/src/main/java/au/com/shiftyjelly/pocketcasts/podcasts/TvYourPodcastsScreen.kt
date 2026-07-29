@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,8 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
-import au.com.shiftyjelly.pocketcasts.component.TvTile
+import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -124,7 +122,7 @@ private fun TvYourPodcastsGrid(
             modifier = Modifier.padding(top = 8.dp, bottom = 26.dp),
         )
         var lastFocusedIndex by rememberSaveable(podcasts.size) { mutableIntStateOf(0) }
-        val focusRequesters = remember(podcasts) { List(podcasts.size) { FocusRequester() } }
+        val focusRequesters = remember(podcasts.size) { List(podcasts.size) { FocusRequester() } }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(GRID_COLUMNS),
@@ -143,8 +141,11 @@ private fun TvYourPodcastsGrid(
                 items = podcasts,
                 key = { _, podcast -> podcast.uuid },
             ) { index, podcast ->
-                TvPodcastGridItem(
-                    podcast = podcast,
+                TvPodcastTile(
+                    artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
+                    podcastTitle = podcast.title,
+                    onClick = {},
+                    imageModifier = Modifier.fillMaxWidth(),
                     modifier = Modifier
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { focusState ->
@@ -155,24 +156,6 @@ private fun TvYourPodcastsGrid(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun TvPodcastGridItem(
-    podcast: Podcast,
-    modifier: Modifier = Modifier,
-) {
-    TvTile(
-        onClick = {},
-        modifier = modifier,
-    ) {
-        TvArtworkImage(
-            model = PodcastImage.getMediumArtworkUrl(podcast.uuid),
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-        )
     }
 }
 
