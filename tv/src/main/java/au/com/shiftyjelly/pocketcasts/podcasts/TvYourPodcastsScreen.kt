@@ -122,8 +122,8 @@ private fun TvYourPodcastsGrid(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(GRID_COLUMNS),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 32.dp),
             modifier = Modifier
                 .focusGroup()
