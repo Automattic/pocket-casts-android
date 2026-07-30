@@ -43,34 +43,46 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvYourPodcastsScreen(
     onNavigateToHome: () -> Unit,
-    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvYourPodcastsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedFolder by rememberSaveable(stateSaver = OpenedFolderSaver) { mutableStateOf<OpenedFolder?>(null) }
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
+    val podcastUuid = openedPodcastUuid
     val folder = openedFolder
-    if (folder != null) {
-        BackHandler {
-            openedFolder = null
+    when {
+        podcastUuid != null -> {
+            BackHandler { openedPodcastUuid = null }
+            TvPodcastDetailsScreen(
+                podcastUuid = podcastUuid,
+                onClose = { openedPodcastUuid = null },
+                modifier = modifier,
+            )
         }
-        TvFolderDetailScreen(
-            folderUuid = folder.uuid,
-            folderName = folder.name,
-            getFolderPodcasts = viewModel::folderPodcasts,
-            onOpenPodcast = onOpenPodcast,
-            onClose = { openedFolder = null },
-            modifier = modifier,
-        )
-    } else {
-        TvYourPodcastsContent(
-            uiState = uiState,
-            onNavigateToHome = onNavigateToHome,
-            onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
-            onOpenPodcast = onOpenPodcast,
-            modifier = modifier,
-        )
+
+        folder != null -> {
+            BackHandler { openedFolder = null }
+            TvFolderDetailScreen(
+                folderUuid = folder.uuid,
+                folderName = folder.name,
+                getFolderPodcasts = viewModel::folderPodcasts,
+                onOpenPodcast = { openedPodcastUuid = it },
+                onClose = { openedFolder = null },
+                modifier = modifier,
+            )
+        }
+
+        else -> {
+            TvYourPodcastsContent(
+                uiState = uiState,
+                onNavigateToHome = onNavigateToHome,
+                onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
+                onOpenPodcast = { openedPodcastUuid = it },
+                modifier = modifier,
+            )
+        }
     }
 }
 

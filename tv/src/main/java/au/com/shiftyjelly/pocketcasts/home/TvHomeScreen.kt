@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,23 +34,35 @@ import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvHomeScreen(
-    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvHomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TvHomeContent(
-        uiState = uiState,
-        onRetry = viewModel::load,
-        onOpenPodcast = onOpenPodcast,
-        modifier = modifier,
-    )
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+    } else {
+        TvHomeContent(
+            uiState = uiState,
+            onRetry = viewModel::load,
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable

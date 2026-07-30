@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.home
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
-import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -36,7 +34,6 @@ fun TvScaffold(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
-    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     TvScaffoldContent(
         tabs = uiState.tabs,
@@ -46,33 +43,21 @@ fun TvScaffold(
         onProfileClick = { isProfileModalVisible = true },
         modifier = modifier,
     ) { tab ->
-        val podcastUuid = openedPodcastUuid
-        if (podcastUuid != null) {
-            BackHandler { openedPodcastUuid = null }
-            TvPodcastDetailsScreen(
-                podcastUuid = podcastUuid,
-                onClose = { openedPodcastUuid = null },
+        val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
+        when (tab) {
+            is TvTab.Home -> TvHomeScreen()
+
+            is TvTab.YourPodcasts -> TvYourPodcastsScreen(
+                onNavigateToHome = navigateToHome,
             )
-        } else {
-            val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
-            when (tab) {
-                is TvTab.Home -> TvHomeScreen(
-                    onOpenPodcast = { openedPodcastUuid = it },
-                )
 
-                is TvTab.YourPodcasts -> TvYourPodcastsScreen(
-                    onNavigateToHome = navigateToHome,
-                    onOpenPodcast = { openedPodcastUuid = it },
-                )
+            is TvTab.Playlists -> TvPlaylistsScreen()
 
-                is TvTab.Playlists -> TvPlaylistsScreen()
+            is TvTab.UpNext -> TvUpNextScreen(
+                onNavigateToHome = navigateToHome,
+            )
 
-                is TvTab.UpNext -> TvUpNextScreen(
-                    onNavigateToHome = navigateToHome,
-                )
-
-                else -> TvTabPlaceholder(tab = tab)
-            }
+            else -> TvTabPlaceholder(tab = tab)
         }
     }
 

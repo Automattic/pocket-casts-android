@@ -171,7 +171,6 @@ private fun EpisodeList(
                 episode = episode,
                 dateFormatter = dateFormatter,
                 onClick = {},
-                onOpenActions = {},
                 episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
             )
         }

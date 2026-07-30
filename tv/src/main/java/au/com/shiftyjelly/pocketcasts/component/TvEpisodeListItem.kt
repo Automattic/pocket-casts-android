@@ -32,8 +32,8 @@ fun TvEpisodeListItem(
     episode: PodcastEpisode,
     dateFormatter: RelativeDateFormatter,
     onClick: () -> Unit,
-    onOpenActions: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenActions: (() -> Unit)? = null,
     episodeFocusRequester: FocusRequester? = null,
     leftFocusRequester: FocusRequester? = null,
 ) {
@@ -53,18 +53,20 @@ fun TvEpisodeListItem(
                 .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
                 .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
         )
-        AnimatedVisibility(
-            visible = isItemFocused,
-            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
-                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
-                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
-            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
-                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
-                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.width(16.dp))
-                TvMoreButton(onClick = onOpenActions)
+        if (onOpenActions != null) {
+            AnimatedVisibility(
+                visible = isItemFocused,
+                enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
+                    slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
+                    fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+                exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
+                    slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
+                    fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width(16.dp))
+                    TvMoreButton(onClick = onOpenActions)
+                }
             }
         }
     }
