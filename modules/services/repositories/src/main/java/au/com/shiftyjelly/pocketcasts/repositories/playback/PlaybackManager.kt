@@ -2586,8 +2586,15 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun onVideoTrackChanged(hasVideo: Boolean) {
-        _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
-        firePendingContentTypeEvents(if (hasVideo) PlaybackContentType.Video else PlaybackContentType.Audio)
+        val currentUuid = getCurrentEpisode()?.uuid
+        val contentType = if (hasVideo) PlaybackContentType.Video else PlaybackContentType.Audio
+        val ready = synchronized(pendingContentTypeEvents) {
+            _streamVideoState.value = if (hasVideo) StreamVideoState.HasVideo else StreamVideoState.AudioOnly
+            val matched = pendingContentTypeEvents.filter { it.episodeUuid == currentUuid }
+            pendingContentTypeEvents.removeAll(matched)
+            matched
+        }
+        ready.forEach { eventHorizon.track(it.build(contentType)) }
     }
 
     private suspend fun updateCurrentPositionInDatabase() {
@@ -2923,24 +2930,16 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun trackWithContentType(episode: BaseEpisode, build: (PlaybackContentType) -> Trackable) {
-        val contentType = playbackContentTypeFor(episode)
-        if (contentType == PlaybackContentType.Unknown) {
-            synchronized(pendingContentTypeEvents) {
+        val event = synchronized(pendingContentTypeEvents) {
+            val contentType = playbackContentTypeFor(episode)
+            if (contentType == PlaybackContentType.Unknown) {
                 pendingContentTypeEvents += PendingContentTypeEvent(episode.uuid, build)
+                null
+            } else {
+                build(contentType)
             }
-        } else {
-            eventHorizon.track(build(contentType))
         }
-    }
-
-    private fun firePendingContentTypeEvents(contentType: PlaybackContentType) {
-        val currentUuid = getCurrentEpisode()?.uuid
-        val ready = synchronized(pendingContentTypeEvents) {
-            val matched = pendingContentTypeEvents.filter { it.episodeUuid == currentUuid }
-            pendingContentTypeEvents.removeAll(matched)
-            matched
-        }
-        ready.forEach { eventHorizon.track(it.build(contentType)) }
+        event?.let(eventHorizon::track)
     }
 
     private fun flushPendingContentTypeEvents() {

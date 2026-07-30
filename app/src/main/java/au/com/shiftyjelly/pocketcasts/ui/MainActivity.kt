@@ -717,8 +717,11 @@ class MainActivity :
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val isPlayingVideo = (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
-                (playbackManager.streamVideoState.value == StreamVideoState.HasVideo && playbackManager.videoRenderingEnabled.value)
+            val isPlayingVideo = playbackManager.videoRenderingEnabled.value &&
+                (
+                    (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
+                        playbackManager.streamVideoState.value == StreamVideoState.HasVideo
+                    )
             if (!videoPlayerShown && isPlayingVideo && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
             } else {
