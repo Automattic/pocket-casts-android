@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -118,7 +120,7 @@ private fun TvPodcastDetailsContent(
                         followFocusRequester = followFocusRequester,
                         modifier = Modifier.width(InfoPaneWidth),
                     )
-                    if (uiState.episodes.isEmpty()) {
+                    if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
                         TvEmptyState(
                             title = stringResource(LR.string.podcast_no_episodes_found),
                             subtitle = stringResource(LR.string.podcast_no_episodes),
@@ -128,6 +130,7 @@ private fun TvPodcastDetailsContent(
                         EpisodeList(
                             podcast = uiState.podcast,
                             episodes = uiState.episodes,
+                            archivedEpisodeCount = uiState.archivedEpisodeCount,
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
                             leftFocusRequester = followFocusRequester,
@@ -207,6 +210,7 @@ private fun PodcastInfo(
 private fun EpisodeList(
     podcast: Podcast,
     episodes: List<PodcastEpisode>,
+    archivedEpisodeCount: Int,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
     leftFocusRequester: FocusRequester,
@@ -214,13 +218,6 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
-    val listState = rememberLazyListState()
-    LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
-        runCatching { firstEpisodeFocusRequester.requestFocus() }
-            .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
-    }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     Column(modifier = modifier) {
         Row(
@@ -248,23 +245,37 @@ private fun EpisodeList(
                 onSelect = onChangeSortType,
             )
         }
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f),
-        ) {
-            itemsIndexed(
-                items = episodes,
-                key = { _, episode -> episode.uuid },
-            ) { index, episode ->
-                TvEpisodeListItem(
-                    episode = episode,
-                    dateFormatter = dateFormatter,
-                    onClick = {},
-                    onOpenActions = { actionsEpisode = episode },
-                    episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
-                    leftFocusRequester = leftFocusRequester,
-                )
+        if (episodes.isEmpty()) {
+            AllEpisodesArchived(
+                episodeCount = archivedEpisodeCount,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            )
+        } else {
+            val firstEpisodeFocusRequester = remember { FocusRequester() }
+            val listState = rememberLazyListState()
+            LaunchedEffect(Unit) {
+                snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
+                runCatching { firstEpisodeFocusRequester.requestFocus() }
+                    .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
+            }
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                itemsIndexed(
+                    items = episodes,
+                    key = { _, episode -> episode.uuid },
+                ) { index, episode ->
+                    TvEpisodeListItem(
+                        episode = episode,
+                        dateFormatter = dateFormatter,
+                        onClick = {},
+                        onOpenActions = { actionsEpisode = episode },
+                        episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
+                        leftFocusRequester = leftFocusRequester,
+                    )
+                }
             }
         }
     }
@@ -272,6 +283,25 @@ private fun EpisodeList(
         TvEpisodeActionsModal(
             episode = episode,
             onDismissRequest = { actionsEpisode = null },
+        )
+    }
+}
+
+@Composable
+private fun AllEpisodesArchived(
+    episodeCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        Text(
+            text = stringResource(LR.string.podcast_no_episodes_all_archived, episodeCount),
+            style = MaterialTheme.typography.bodyLarge,
+            color = TvColors.TextSecondary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 400.dp),
         )
     }
 }
@@ -329,6 +359,7 @@ private fun TvPodcastDetailsContentPreview(
                 uiState = TvPodcastDetailsUiState.Loaded(
                     podcast = podcast,
                     episodes = episodes,
+                    archivedEpisodeCount = 0,
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},

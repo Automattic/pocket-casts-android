@@ -52,6 +52,29 @@ class TvPodcastDetailsViewModelTest {
             val state = awaitItem() as TvPodcastDetailsUiState.Loaded
             assertEquals(podcast, state.podcast)
             assertEquals(listOf(availableEpisode), state.episodes)
+            assertEquals(1, state.archivedEpisodeCount)
+        }
+    }
+
+    @Test
+    fun `a podcast with only archived episodes reports the archived count`() = runTest {
+        val podcast = podcast(showArchived = false)
+        val viewModel = createViewModel(
+            podcastManager = mock {
+                on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+                on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
+            },
+            episodeManager = mock { on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes },
+        )
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+
+            episodes.emit(listOf(archivedEpisode))
+
+            val state = awaitItem() as TvPodcastDetailsUiState.Loaded
+            assertEquals(emptyList<PodcastEpisode>(), state.episodes)
+            assertEquals(1, state.archivedEpisodeCount)
         }
     }
 

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -52,7 +53,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             emit(TvPodcastDetailsUiState.NotFound)
         } else {
             emitAll(
-                podcastManager.podcastByUuidFlow(podcastUuid).flatMapLatest { updatedPodcast ->
+                podcastManager.podcastByUuidFlow(podcastUuid).filterNotNull().flatMapLatest { updatedPodcast ->
                     episodeManager.findEpisodesByPodcastOrderedFlow(updatedPodcast).map { episodes ->
                         TvPodcastDetailsUiState.Loaded(
                             podcast = updatedPodcast,
@@ -61,6 +62,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
                             } else {
                                 episodes.filterNot(PodcastEpisode::isArchived)
                             },
+                            archivedEpisodeCount = episodes.count(PodcastEpisode::isArchived),
                         )
                     }
                 },
@@ -101,5 +103,6 @@ sealed interface TvPodcastDetailsUiState {
     data class Loaded(
         val podcast: Podcast,
         val episodes: List<PodcastEpisode>,
+        val archivedEpisodeCount: Int,
     ) : TvPodcastDetailsUiState
 }
