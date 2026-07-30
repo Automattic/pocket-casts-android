@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
@@ -102,7 +103,7 @@ private fun PodcastInfoPane(
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_website),
-                value = podcast.getShortUrl().takeIf { it.isNotBlank() },
+                value = podcast.podcastUrl?.takeIf { it.isNotBlank() },
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_schedule),
@@ -110,7 +111,7 @@ private fun PodcastInfoPane(
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_next_episode),
-                value = podcast.displayableNextEpisodeShortDate(),
+                value = podcast.displayableNextEpisode(context),
             )
         }
     }
@@ -204,17 +205,32 @@ private fun Podcast.displayableSchedule(context: Context): String? {
     return context.getString(stringId)
 }
 
-private fun Podcast.displayableNextEpisodeShortDate(): String? {
+private fun Podcast.displayableNextEpisode(context: Context): String? {
     val expectedDate = estimatedNextEpisode ?: return null
     if (expectedDate.time <= 0) {
         return null
     }
-    if (!DateUtils.isToday(expectedDate.time) && expectedDate.time < System.currentTimeMillis()) {
-        return null
+    val now = System.currentTimeMillis()
+    return when {
+        expectedDate.time < now - 7 * DateUtils.DAY_IN_MILLIS -> null
+        DateUtils.isToday(expectedDate.time) -> context.getString(LR.string.today)
+        DateUtils.isToday(expectedDate.time - DateUtils.DAY_IN_MILLIS) -> context.getString(LR.string.tv_podcast_next_episode_tomorrow)
+        expectedDate.time < now -> context.getString(LR.string.tv_podcast_next_episode_soon)
+        expectedDate.time < now + 6 * DateUtils.DAY_IN_MILLIS -> expectedDate.formatSkeleton("EEEE")
+        else -> expectedDate.formatSkeleton(if (expectedDate.isSameYearAsNow()) "dMMMM" else "yMMMMd")
     }
+}
+
+private fun Date.isSameYearAsNow(): Boolean {
+    val calendar = Calendar.getInstance()
+    val currentYear = calendar.get(Calendar.YEAR)
+    calendar.time = this
+    return calendar.get(Calendar.YEAR) == currentYear
+}
+
+private fun Date.formatSkeleton(skeleton: String): String {
     val locale = Locale.getDefault()
-    val pattern = DateFormat.getBestDateTimePattern(locale, "MMMMd")
-    return SimpleDateFormat(pattern, locale).format(expectedDate)
+    return SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(this)
 }
 
 private val InfoModalWidth = 860.dp
@@ -252,7 +268,7 @@ private val previewPodcast = Podcast(
     uuid = "podcast-uuid",
     title = "The Writer's Voice",
     author = "The New Yorker",
+    podcastUrl = "https://www.newyorker.com/podcast/the-writers-voice",
     episodeFrequency = "weekly",
-    estimatedNextEpisode = Date(0),
     podcastDescription = "New Yorker fiction writers read and discuss stories from the magazine's archive.",
 )

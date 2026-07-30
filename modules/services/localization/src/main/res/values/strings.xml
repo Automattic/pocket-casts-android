@@ -286,6 +286,8 @@
     <string name="tv_podcast_info_website">Website</string>
     <string name="tv_podcast_info_schedule">Schedule</string>
     <string name="tv_podcast_info_next_episode">Next episode</string>
+    <string name="tv_podcast_next_episode_tomorrow">Tomorrow</string>
+    <string name="tv_podcast_next_episode_soon">Any day now</string>
     <string name="tv_podcast_schedule_hourly">Hourly</string>
     <string name="tv_podcast_schedule_daily">Daily</string>
     <string name="tv_podcast_schedule_weekly">Weekly</string>
