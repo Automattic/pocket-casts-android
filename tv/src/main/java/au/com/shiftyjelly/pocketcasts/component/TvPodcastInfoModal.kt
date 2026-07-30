@@ -63,7 +63,7 @@ fun TvPodcastInfoModal(
         modifier = modifier,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(48.dp),
+            horizontalArrangement = Arrangement.spacedBy(38.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(InfoModalHeight),
@@ -233,10 +233,10 @@ private fun Date.formatSkeleton(skeleton: String): String {
     return SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(this)
 }
 
-private val InfoModalWidth = 860.dp
-private val InfoModalHeight = 420.dp
-private val InfoPaneWidth = 220.dp
-private val InfoArtworkSize = 120.dp
+private val InfoModalWidth = 688.dp
+private val InfoModalHeight = 336.dp
+private val InfoPaneWidth = 176.dp
+private val InfoArtworkSize = 96.dp
 
 @Preview
 @Composable
@@ -245,7 +245,7 @@ private fun TvPodcastInfoModalPreview() {
         MaterialTheme {
             TvModalSurface(width = InfoModalWidth) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(48.dp),
+                    horizontalArrangement = Arrangement.spacedBy(38.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(InfoModalHeight),
