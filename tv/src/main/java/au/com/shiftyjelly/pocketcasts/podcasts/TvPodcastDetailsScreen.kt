@@ -132,7 +132,7 @@ private fun PodcastInfo(
         modifier = modifier,
     ) {
         TvArtworkImage(
-            model = PodcastImage.getArtworkUrl(size = null, uuid = podcast.uuid, isWearOS = false),
+            model = PodcastImage.getMediumArtworkUrl(podcast.uuid),
             modifier = Modifier
                 .size(TvDetailsArtworkSize)
                 .clip(RoundedCornerShape(8.dp)),
@@ -172,7 +172,7 @@ private fun PodcastInfo(
                     modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(if (podcast.isSubscribed) LR.string.tv_podcast_following else LR.string.tv_podcast_follow))
+                Text(stringResource(if (podcast.isSubscribed) LR.string.podcast_subscribed else LR.string.tv_podcast_follow))
             }
             Button(
                 onClick = {},

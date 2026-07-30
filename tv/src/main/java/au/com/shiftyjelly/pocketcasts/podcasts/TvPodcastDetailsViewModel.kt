@@ -7,12 +7,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,9 +35,14 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<TvPodcastDetailsUiState> = flow {
-        val podcast = runCatching {
+        val podcast = try {
             podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, waitForSubscribe = false).await()
-        }.getOrNull()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not load TV podcast details for $podcastUuid")
+            null
+        }
         if (podcast == null) {
             emit(TvPodcastDetailsUiState.NotFound)
         } else {
