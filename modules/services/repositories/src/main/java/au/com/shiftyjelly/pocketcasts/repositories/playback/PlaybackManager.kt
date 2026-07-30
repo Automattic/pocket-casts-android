@@ -1028,6 +1028,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        flushPendingContentTypeEvents()
         if (!isAudioFocusFailed) {
             trackPlaybackEvent(sourceView) { source, contentType ->
                 PlaybackStopEvent(
@@ -2165,11 +2166,13 @@ open class PlaybackManager @Inject constructor(
         flushPendingContentTypeEvents()
 
         // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
-        _streamVideoState.value = StreamVideoState.initialFor(
-            episode,
-            audioOnly = settings.audioOnly.value,
-            playingHlsStream = playingStream && episode.isStreamUrlHls,
-        )
+        synchronized(pendingContentTypeEvents) {
+            _streamVideoState.value = StreamVideoState.initialFor(
+                episode,
+                audioOnly = settings.audioOnly.value,
+                playingHlsStream = playingStream && episode.isStreamUrlHls,
+            )
+        }
         _videoRenderingEnabled.value = true
 
         lastPlaybackSource = sourceView

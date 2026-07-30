@@ -1084,7 +1084,7 @@ class MainActivity :
                         val episode = withContext(Dispatchers.Default) {
                             episodeManager.findEpisodeByUuid(state.episodeUuid)
                         }
-                        if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value) {
+                        if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value && playbackManager.videoRenderingEnabled.value) {
                             openVideoPlayer()
                         }
                     }
