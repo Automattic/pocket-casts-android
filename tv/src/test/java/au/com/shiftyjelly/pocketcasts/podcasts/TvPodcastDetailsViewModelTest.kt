@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -40,7 +41,7 @@ class TvPodcastDetailsViewModelTest {
     private val episodeManager = mock<EpisodeManager> {
         on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes
     }
-    private val preferences = mock<TvPodcastPreferences>()
+    private val preferences = mock<TvPreferences>()
 
     @Test
     fun `archived episodes are hidden by default`() = runTest {
@@ -61,8 +62,8 @@ class TvPodcastDetailsViewModelTest {
 
     @Test
     fun `archived episodes are shown when the stored preference allows them`() = runTest {
-        val preferences = mock<TvPodcastPreferences> {
-            on { isShowingArchived("podcast-uuid") } doReturn true
+        val preferences = mock<TvPreferences> {
+            on { isPodcastShowingArchived("podcast-uuid") } doReturn true
         }
         val viewModel = createViewModel(preferences)
 
@@ -107,7 +108,7 @@ class TvPodcastDetailsViewModelTest {
             val state = awaitItem() as TvPodcastDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
             assertEquals(true, state.isShowingArchived)
-            verify(preferences).setShowingArchived(eq("podcast-uuid"), eq(true))
+            verify(preferences).setPodcastShowingArchived(eq("podcast-uuid"), eq(true))
         }
     }
 
@@ -139,7 +140,7 @@ class TvPodcastDetailsViewModelTest {
     }
 
     private fun createViewModel(
-        prefs: TvPodcastPreferences = preferences,
+        prefs: TvPreferences = preferences,
         podcastManager: PodcastManager = this.podcastManager,
     ) = TvPodcastDetailsViewModel(
         podcastUuid = "podcast-uuid",

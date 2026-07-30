@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import dagger.assisted.Assisted
@@ -28,7 +29,7 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     @Assisted private val playlistType: Playlist.Type,
     private val playlistManager: PlaylistManager,
-    private val preferences: TvPlaylistPreferences,
+    private val preferences: TvPreferences,
 ) : ViewModel() {
 
     private val playlistFlow: Flow<Playlist?> = when (playlistType) {
@@ -36,7 +37,7 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         Playlist.Type.Smart -> playlistManager.smartPlaylistFlow(playlistUuid, includeArchived = true)
     }
 
-    private val isShowingArchivedFlow = MutableStateFlow(preferences.isShowingArchived(playlistUuid))
+    private val isShowingArchivedFlow = MutableStateFlow(preferences.isPlaylistShowingArchived(playlistUuid))
 
     val uiState: StateFlow<TvPlaylistDetailsUiState> = combine(
         playlistFlow,
@@ -66,7 +67,7 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
 
     fun toggleArchiveFilter() {
         val isShowingArchived = !isShowingArchivedFlow.value
-        preferences.setShowingArchived(playlistUuid, isShowingArchived)
+        preferences.setPlaylistShowingArchived(playlistUuid, isShowingArchived)
         isShowingArchivedFlow.value = isShowingArchived
     }
 

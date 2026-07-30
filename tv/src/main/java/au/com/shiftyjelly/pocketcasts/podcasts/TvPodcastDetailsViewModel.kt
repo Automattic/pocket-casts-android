@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -39,11 +40,11 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
-    private val preferences: TvPodcastPreferences,
+    private val preferences: TvPreferences,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val isShowingArchivedFlow = MutableStateFlow(preferences.isShowingArchived(podcastUuid))
+    private val isShowingArchivedFlow = MutableStateFlow(preferences.isPodcastShowingArchived(podcastUuid))
 
     val uiState: StateFlow<TvPodcastDetailsUiState> = flow {
         val podcast = try {
@@ -90,7 +91,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     fun toggleArchiveFilter() {
         val isShowingArchived = !isShowingArchivedFlow.value
-        preferences.setShowingArchived(podcastUuid, isShowingArchived)
+        preferences.setPodcastShowingArchived(podcastUuid, isShowingArchived)
         isShowingArchivedFlow.value = isShowingArchived
     }
 
