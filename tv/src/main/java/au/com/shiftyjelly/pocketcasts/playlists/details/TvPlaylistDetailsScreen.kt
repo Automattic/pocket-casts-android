@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -123,7 +124,7 @@ private fun TvPlaylistDetailsContent(
                         playlist = uiState.playlist,
                         episodes = uiState.episodes,
                         playAllFocusRequester = playAllFocusRequester,
-                        modifier = Modifier.width(ArtworkSize),
+                        modifier = Modifier.width(InfoPaneWidth),
                     )
                     if (uiState.availableEpisodeCount == 0) {
                         NoEpisodes(
@@ -419,7 +420,7 @@ private fun PlaylistInfo(
     ) {
         PlaylistArtwork(
             podcastUuids = playlist.metadata.artworkUuids,
-            artworkSize = ArtworkSize,
+            artworkSize = TvDetailsArtworkSize,
             cornerSize = 8.dp,
         )
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -465,7 +466,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     }
 }
 
-private val ArtworkSize = 200.dp
+private val InfoPaneWidth = 200.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
