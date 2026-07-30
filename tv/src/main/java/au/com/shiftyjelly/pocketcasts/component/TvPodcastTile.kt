@@ -22,7 +22,7 @@ fun TvPodcastTile(
     podcastTitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    imageModifier: Modifier = Modifier.width(123.dp),
+    imageModifier: Modifier = Modifier,
 ) {
     TvTile(
         onClick = onClick,
@@ -47,6 +47,7 @@ private fun TvPodcastTilePreview() {
                     artworkUrl = "",
                     podcastTitle = "Sample Podcast",
                     onClick = {},
+                    imageModifier = Modifier.width(123.dp),
                 )
             }
         }

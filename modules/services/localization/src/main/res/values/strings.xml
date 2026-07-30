@@ -272,9 +272,9 @@
     <string name="tv_up_next_empty_title">Nothing queued up</string>
     <string name="tv_up_next_empty_subtitle">Add episodes to Up Next and they’ll play in order, back to back</string>
     <string name="tv_up_next_empty_action_title">Add episodes</string>
-    <string name="tv_podcasts_empty_title">Time to fill this up</string>
-    <string name="tv_podcasts_empty_subtitle">Followed podcasts show up here, ready to play.</string>
-    <string name="tv_podcasts_empty_action_title">Discover podcasts</string>
+    <string name="tv_your_podcasts_empty_title">Time to fill this up</string>
+    <string name="tv_your_podcasts_empty_subtitle">Followed podcasts show up here, ready to play.</string>
+    <string name="tv_your_podcasts_empty_action_title">Discover podcasts</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>

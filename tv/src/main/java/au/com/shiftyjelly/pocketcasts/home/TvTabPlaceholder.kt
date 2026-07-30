@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -79,6 +80,7 @@ fun TvTabPlaceholder(
                     artworkUrl = "https://picsum.photos/seed/rec$index/272/272",
                     podcastTitle = "Podcast $index",
                     onClick = {},
+                    imageModifier = Modifier.width(123.dp),
                 )
             }
         }
@@ -92,6 +94,7 @@ fun TvTabPlaceholder(
                     artworkUrl = "https://picsum.photos/seed/liked$index/272/272",
                     podcastTitle = "Podcast $index",
                     onClick = {},
+                    imageModifier = Modifier.width(123.dp),
                 )
             }
         }

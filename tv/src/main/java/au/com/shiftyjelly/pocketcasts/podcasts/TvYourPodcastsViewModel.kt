@@ -4,19 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class TvYourPodcastsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val uiState: StateFlow<TvYourPodcastsUiState> = podcastManager.findSubscribedFlow()
@@ -28,6 +32,7 @@ class TvYourPodcastsViewModel @Inject constructor(
                 TvYourPodcastsUiState.Loaded(sorted)
             }
         }
+        .flowOn(defaultDispatcher)
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds),

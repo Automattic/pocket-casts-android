@@ -20,10 +20,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -117,10 +118,12 @@ private fun TvYourPodcastsGrid(
             color = Color.White,
             modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
         )
-        var lastFocusedIndex by rememberSaveable(podcasts.size) { mutableIntStateOf(0) }
+        val gridState = rememberLazyGridState()
+        var lastFocusedUuid by rememberSaveable { mutableStateOf<String?>(null) }
         val focusRequesters = remember(podcasts.size) { List(podcasts.size) { FocusRequester() } }
 
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(GRID_COLUMNS),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -129,7 +132,11 @@ private fun TvYourPodcastsGrid(
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
-                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                        val visible = gridState.layoutInfo.visibleItemsInfo
+                        val target = podcasts.indexOfFirst { it.uuid == lastFocusedUuid }
+                            .takeIf { index -> index >= 0 && visible.any { it.index == index } }
+                            ?: visible.firstOrNull()?.index
+                        target?.let { focusRequesters.getOrNull(it)?.requestFocus() }
                     }
                 },
         ) {
@@ -146,7 +153,7 @@ private fun TvYourPodcastsGrid(
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { focusState ->
                             if (focusState.hasFocus) {
-                                lastFocusedIndex = index
+                                lastFocusedUuid = podcast.uuid
                             }
                         },
                 )
@@ -170,14 +177,14 @@ private fun TvYourPodcastsEmpty(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(LR.string.tv_podcasts_empty_title),
+                text = stringResource(LR.string.tv_your_podcasts_empty_title),
                 style = TvTextStyles.ScreenTitle,
                 color = Color.White,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = stringResource(LR.string.tv_podcasts_empty_subtitle),
+                text = stringResource(LR.string.tv_your_podcasts_empty_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = TvColors.TextSecondary,
                 textAlign = TextAlign.Center,
@@ -189,7 +196,7 @@ private fun TvYourPodcastsEmpty(
                 colors = TvButtonDefaults.filledButtonColors(),
                 modifier = Modifier.focusRequester(focusRequester),
             ) {
-                Text(stringResource(LR.string.tv_podcasts_empty_action_title))
+                Text(stringResource(LR.string.tv_your_podcasts_empty_action_title))
             }
         }
     }

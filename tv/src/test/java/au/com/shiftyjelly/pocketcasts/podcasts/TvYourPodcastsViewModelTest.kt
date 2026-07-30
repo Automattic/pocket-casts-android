@@ -53,8 +53,25 @@ class TvYourPodcastsViewModelTest {
         }
     }
 
+    @Test
+    fun `unsubscribing the last podcast falls back to the empty state`() = runTest {
+        val viewModel = createViewModel()
+        val apple = podcast("apple", "Apple Cast")
+
+        viewModel.uiState.test {
+            assertEquals(TvYourPodcastsUiState.Loading, awaitItem())
+
+            subscribed.emit(listOf(apple))
+            assertEquals(TvYourPodcastsUiState.Loaded(listOf(apple)), awaitItem())
+
+            subscribed.emit(emptyList())
+            assertEquals(TvYourPodcastsUiState.Empty, awaitItem())
+        }
+    }
+
     private fun createViewModel() = TvYourPodcastsViewModel(
         podcastManager = podcastManager,
+        defaultDispatcher = coroutineRule.testDispatcher,
     )
 
     private fun podcast(uuid: String, title: String) = Podcast(uuid = uuid, title = title)
