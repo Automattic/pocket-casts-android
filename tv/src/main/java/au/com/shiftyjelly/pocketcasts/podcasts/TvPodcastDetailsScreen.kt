@@ -31,6 +31,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -220,6 +221,20 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    val firstEpisodeFocusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
+    LaunchedEffect(podcast.episodesSortType) {
+        listState.scrollToItem(0)
+    }
+    var hasRequestedInitialFocus by remember { mutableStateOf(episodes.isEmpty()) }
+    LaunchedEffect(episodes.isNotEmpty()) {
+        if (episodes.isNotEmpty() && !hasRequestedInitialFocus) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
+            runCatching { firstEpisodeFocusRequester.requestFocus() }
+                .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
+            hasRequestedInitialFocus = true
+        }
+    }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     Column(modifier = modifier) {
         Row(
@@ -253,13 +268,6 @@ private fun EpisodeList(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
             )
         } else {
-            val firstEpisodeFocusRequester = remember { FocusRequester() }
-            val listState = rememberLazyListState()
-            LaunchedEffect(Unit) {
-                snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
-                runCatching { firstEpisodeFocusRequester.requestFocus() }
-                    .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
-            }
             LazyColumn(
                 state = listState,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -299,7 +307,7 @@ private fun AllEpisodesArchived(
         modifier = modifier,
     ) {
         Text(
-            text = stringResource(LR.string.podcast_no_episodes_all_archived, episodeCount),
+            text = pluralStringResource(LR.plurals.tv_podcast_all_archived, episodeCount, episodeCount),
             style = MaterialTheme.typography.bodyLarge,
             color = TvColors.TextSecondary,
             textAlign = TextAlign.Center,

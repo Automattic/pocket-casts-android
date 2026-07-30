@@ -265,6 +265,10 @@
         <item quantity="one">The only episode of this playlist has been archived.</item>
         <item quantity="other">All %1$d episodes of this playlist have been archived.</item>
     </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">The only episode of this podcast has been archived.</item>
+        <item quantity="other">All %1$d episodes of this podcast have been archived.</item>
+    </plurals>
     <string name="tv_playlist_empty_title">No episodes</string>
     <string name="tv_playlist_empty_subtitle">Either it’s time to celebrate completing this list or edit your rules in the mobile app to get some more.</string>
     <string name="tv_playlist_empty_subtitle_manual">Add episodes to this playlist from the mobile app and they’ll show up here.</string>

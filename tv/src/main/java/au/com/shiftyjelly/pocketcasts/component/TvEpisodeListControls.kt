@@ -12,17 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
-import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -99,12 +96,7 @@ fun <T> TvSortButton(
     Box(modifier = modifier) {
         IconButton(
             onClick = { isExpanded = true },
-            colors = IconButtonDefaults.colors(
-                containerColor = TvColors.BgActive20,
-                contentColor = Color.White,
-                focusedContainerColor = Color.White,
-                focusedContentColor = TvColors.Dark,
-            ),
+            colors = TvButtonDefaults.iconButtonColors(),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_sort),
@@ -123,7 +115,9 @@ fun <T> TvSortButton(
                         isSelected = option == selected,
                         onClick = {
                             isExpanded = false
-                            onSelect(option)
+                            if (option != selected) {
+                                onSelect(option)
+                            }
                         },
                     )
                 }

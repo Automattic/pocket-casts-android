@@ -21,6 +21,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -113,6 +114,72 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
+    fun `toggling the archive filter off hides archived episodes again`() = runTest {
+        val preferences = mock<TvPreferences> {
+            on { isPodcastShowingArchived("podcast-uuid") } doReturn true
+        }
+        val viewModel = createViewModel(preferences)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+
+            episodes.emit(listOf(availableEpisode, archivedEpisode))
+            assertEquals(listOf(availableEpisode, archivedEpisode), (awaitItem() as TvPodcastDetailsUiState.Loaded).episodes)
+
+            viewModel.toggleArchiveFilter()
+
+            val state = awaitItem() as TvPodcastDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode), state.episodes)
+            assertEquals(false, state.isShowingArchived)
+            verify(preferences).setPodcastShowingArchived(eq("podcast-uuid"), eq(false))
+        }
+    }
+
+    @Test
+    fun `a sort order change re-runs the episodes query`() = runTest {
+        val podcastFlow = MutableStateFlow(podcast.copy(episodesSortType = EpisodesSortType.EPISODES_SORT_BY_DATE_DESC))
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+            on { podcastByUuidFlow(any()) } doReturn podcastFlow
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            podcastFlow.value = podcastFlow.value.copy(episodesSortType = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(episodeManager, times(2)).findEpisodesByPodcastOrderedFlow(any())
+    }
+
+    @Test
+    fun `a non-sort podcast change does not re-run the episodes query`() = runTest {
+        val podcastFlow = MutableStateFlow(podcast.copy(episodesSortType = EpisodesSortType.EPISODES_SORT_BY_DATE_DESC))
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+            on { podcastByUuidFlow(any()) } doReturn podcastFlow
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            podcastFlow.value = podcastFlow.value.copy(title = "Renamed podcast")
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(episodeManager, times(1)).findEpisodesByPodcastOrderedFlow(any())
+    }
+
+    @Test
     fun `changing the sort type persists it to the podcast`() = runTest {
         val viewModel = createViewModel()
 
@@ -124,7 +191,7 @@ class TvPodcastDetailsViewModelTest {
 
         viewModel.changeSortType(EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
 
-        verify(podcastManager).updateEpisodesSortTypeBlocking(podcast, EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
+        verify(podcastManager).updateEpisodesSortTypeBlocking(Podcast(uuid = "podcast-uuid"), EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
     }
 
     @Test
@@ -148,6 +215,7 @@ class TvPodcastDetailsViewModelTest {
         episodeManager = episodeManager,
         preferences = prefs,
         defaultDispatcher = coroutineRule.testDispatcher,
+        ioDispatcher = coroutineRule.testDispatcher,
     )
 
     private fun episode(uuid: String, isArchived: Boolean) = PodcastEpisode(
