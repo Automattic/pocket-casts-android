@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -16,16 +17,20 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = TvPodcastDetailsViewModel.Factory::class)
 class TvPodcastDetailsViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
@@ -47,11 +52,17 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             emit(TvPodcastDetailsUiState.NotFound)
         } else {
             emitAll(
-                episodeManager.findEpisodesByPodcastOrderedFlow(podcast).map { episodes ->
-                    TvPodcastDetailsUiState.Loaded(
-                        podcast = podcast,
-                        episodes = episodes.filterNot(PodcastEpisode::isArchived),
-                    )
+                podcastManager.podcastByUuidFlow(podcastUuid).flatMapLatest { updatedPodcast ->
+                    episodeManager.findEpisodesByPodcastOrderedFlow(updatedPodcast).map { episodes ->
+                        TvPodcastDetailsUiState.Loaded(
+                            podcast = updatedPodcast,
+                            episodes = if (updatedPodcast.showArchived) {
+                                episodes
+                            } else {
+                                episodes.filterNot(PodcastEpisode::isArchived)
+                            },
+                        )
+                    }
                 },
             )
         }
@@ -61,6 +72,20 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds, replayExpiration = Duration.ZERO),
             TvPodcastDetailsUiState.Loading,
         )
+
+    fun changeSortType(sortType: EpisodesSortType) {
+        val podcast = (uiState.value as? TvPodcastDetailsUiState.Loaded)?.podcast ?: return
+        viewModelScope.launch(defaultDispatcher) {
+            podcastManager.updateEpisodesSortTypeBlocking(podcast, sortType)
+        }
+    }
+
+    fun toggleArchiveFilter() {
+        val podcast = (uiState.value as? TvPodcastDetailsUiState.Loaded)?.podcast ?: return
+        viewModelScope.launch {
+            podcastManager.updateShowArchived(podcast, !podcast.showArchived)
+        }
+    }
 
     @AssistedFactory
     interface Factory {
