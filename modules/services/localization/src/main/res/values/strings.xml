@@ -276,6 +276,10 @@
     <string name="tv_your_podcasts_empty_subtitle">Followed podcasts show up here, ready to play.</string>
     <string name="tv_your_podcasts_empty_action_title">Discover podcasts</string>
     <string name="tv_folder_empty_message">Add podcasts to this folder in the mobile app and they’ll show up here.</string>
+    <string name="tv_podcast_follow">Follow this podcast</string>
+    <string name="tv_podcast_following">Following</string>
+    <string name="tv_podcast_more_info">More info</string>
+    <string name="tv_podcast_all_episodes">All episodes</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
