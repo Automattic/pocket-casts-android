@@ -160,7 +160,7 @@ private fun PodcastInfo(
                 )
             }
         }
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {},
                 colors = TvButtonDefaults.filledButtonColors(),
@@ -258,7 +258,7 @@ private fun NoEpisodes(modifier: Modifier = Modifier) {
     }
 }
 
-private val InfoPaneWidth = 280.dp
+private val InfoPaneWidth = 380.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
