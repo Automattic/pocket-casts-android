@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 
@@ -31,10 +33,18 @@ class TvYourPodcastsViewModel @Inject constructor(
 
     val uiState: StateFlow<TvYourPodcastsUiState> = combine(
         folderManager.observeFolders(),
-        podcastManager.findSubscribedFlow(),
-    ) { _, _ -> }
+        podcastManager.findSubscribedFlow().map { podcasts -> podcasts.map { it.uuid to it.folderUuid } },
+    ) { folders, membership -> folders to membership }
+        .distinctUntilChanged()
         .mapLatest {
-            val items = folderManager.getHomeFolder().sortedWith(PodcastsSortType.NAME_A_TO_Z.folderComparator)
+            val items = folderManager.getHomeFolder()
+                .map { item ->
+                    when (item) {
+                        is FolderItem.Folder -> item.copy(podcasts = folderManager.findFolderPodcastsSorted(item.folder.uuid))
+                        is FolderItem.Podcast -> item
+                    }
+                }
+                .sortedWith(PodcastsSortType.NAME_A_TO_Z.folderComparator)
             if (items.isEmpty()) {
                 TvYourPodcastsUiState.Empty
             } else {
@@ -48,16 +58,8 @@ class TvYourPodcastsViewModel @Inject constructor(
             TvYourPodcastsUiState.Loading,
         )
 
-    suspend fun folderCoverUuids(folderUuid: String): List<String> {
-        return folderManager.findFolderPodcastsSorted(folderUuid).take(FOLDER_COVER_COUNT).map(Podcast::uuid)
-    }
-
     suspend fun folderPodcasts(folderUuid: String): List<Podcast> {
         return folderManager.findFolderPodcastsSorted(folderUuid)
-    }
-
-    private companion object {
-        const val FOLDER_COVER_COUNT = 4
     }
 }
 

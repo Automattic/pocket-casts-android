@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,15 +55,15 @@ fun TvFolderCard(
                 .aspectRatio(1f),
         ) {
             val cardWidth = maxWidth
-            val coverSize = cardWidth * 0.32f
-            val coverSpacing = cardWidth * 0.024f
-            val coverCornerRadius = cardWidth * 0.024f
+            val coverSize = cardWidth * COVER_SIZE_RATIO
+            val coverSpacing = cardWidth * COVER_SPACING_RATIO
+            val coverCornerRadius = cardWidth * COVER_SPACING_RATIO
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(coverSpacing),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = cardWidth * 0.096f),
+                    .padding(top = cardWidth * COVERS_TOP_PADDING_RATIO),
             ) {
                 repeat(2) { row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(coverSpacing)) {
@@ -83,14 +84,21 @@ fun TvFolderCard(
                 style = TvTextStyles.FolderCardTitle,
                 color = Color.White,
                 maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(horizontal = 16.dp, vertical = cardWidth * 0.064f)
+                    .padding(horizontal = 16.dp, vertical = cardWidth * TITLE_VERTICAL_PADDING_RATIO)
                     .fillMaxWidth(),
             )
         }
     }
 }
+
+private const val COVER_SIZE_RATIO = 0.32f
+private const val COVER_SPACING_RATIO = 0.024f
+private const val COVERS_TOP_PADDING_RATIO = 0.096f
+private const val TITLE_VERTICAL_PADDING_RATIO = 0.064f
 
 @Preview(device = Devices.TV_1080p)
 @Composable
