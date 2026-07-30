@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvHomeScreen(
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvHomeViewModel = hiltViewModel(),
 ) {
@@ -43,6 +44,7 @@ fun TvHomeScreen(
     TvHomeContent(
         uiState = uiState,
         onRetry = viewModel::load,
+        onOpenPodcast = onOpenPodcast,
         modifier = modifier,
     )
 }
@@ -51,6 +53,7 @@ fun TvHomeScreen(
 private fun TvHomeContent(
     uiState: TvHomeUiState,
     onRetry: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -61,7 +64,7 @@ private fun TvHomeContent(
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
             TvHomeError(onRetry = onRetry, modifier = modifier)
         } else {
-            TvHomeRows(rows = uiState.rows, modifier = modifier)
+            TvHomeRows(rows = uiState.rows, onOpenPodcast = onOpenPodcast, modifier = modifier)
         }
     }
 }
@@ -92,6 +95,7 @@ private fun TvHomeError(
 @Composable
 private fun TvHomeRows(
     rows: List<TvHomeRow>,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -147,7 +151,7 @@ private fun TvHomeRows(
                         TvPodcastTile(
                             artworkUrl = podcast.artworkUrl,
                             podcastTitle = podcast.title,
-                            onClick = {},
+                            onClick = { onOpenPodcast(podcast.uuid) },
                             imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                         )
                     }
@@ -193,6 +197,7 @@ private fun TvHomeContentPreview() {
                         ),
                     ),
                     onRetry = {},
+                    onOpenPodcast = {},
                 )
             }
         }
@@ -208,6 +213,7 @@ private fun TvHomeErrorPreview() {
                 TvHomeContent(
                     uiState = TvHomeUiState.Error,
                     onRetry = {},
+                    onOpenPodcast = {},
                 )
             }
         }

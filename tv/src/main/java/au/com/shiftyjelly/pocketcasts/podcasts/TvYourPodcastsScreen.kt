@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvYourPodcastsScreen(
     onNavigateToHome: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvYourPodcastsViewModel = hiltViewModel(),
 ) {
@@ -58,6 +59,7 @@ fun TvYourPodcastsScreen(
             folderUuid = folder.uuid,
             folderName = folder.name,
             getFolderPodcasts = viewModel::folderPodcasts,
+            onOpenPodcast = onOpenPodcast,
             onClose = { openedFolder = null },
             modifier = modifier,
         )
@@ -66,6 +68,7 @@ fun TvYourPodcastsScreen(
             uiState = uiState,
             onNavigateToHome = onNavigateToHome,
             onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
+            onOpenPodcast = onOpenPodcast,
             modifier = modifier,
         )
     }
@@ -83,6 +86,7 @@ private fun TvYourPodcastsContent(
     uiState: TvYourPodcastsUiState,
     onNavigateToHome: () -> Unit,
     onOpenFolder: (Folder) -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -112,6 +116,7 @@ private fun TvYourPodcastsContent(
             is TvYourPodcastsUiState.Loaded -> TvYourPodcastsGrid(
                 items = state.items,
                 onOpenFolder = onOpenFolder,
+                onOpenPodcast = onOpenPodcast,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -122,6 +127,7 @@ private fun TvYourPodcastsContent(
 private fun TvYourPodcastsGrid(
     items: List<FolderItem>,
     onOpenFolder: (Folder) -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TvPodcastGridScaffold(
@@ -133,7 +139,7 @@ private fun TvYourPodcastsGrid(
             is FolderItem.Podcast -> TvPodcastTile(
                 artworkUrl = PodcastImage.getMediumArtworkUrl(item.podcast.uuid),
                 podcastTitle = item.podcast.title,
-                onClick = {},
+                onClick = { onOpenPodcast(item.podcast.uuid) },
                 imageModifier = Modifier.fillMaxWidth(),
                 modifier = itemModifier,
             )
@@ -181,6 +187,7 @@ private fun TvYourPodcastsGridPreview() {
                     ),
                     onNavigateToHome = {},
                     onOpenFolder = {},
+                    onOpenPodcast = {},
                 )
             }
         }
@@ -197,6 +204,7 @@ private fun TvYourPodcastsEmptyPreview() {
                     uiState = TvYourPodcastsUiState.Empty,
                     onNavigateToHome = {},
                     onOpenFolder = {},
+                    onOpenPodcast = {},
                 )
             }
         }
