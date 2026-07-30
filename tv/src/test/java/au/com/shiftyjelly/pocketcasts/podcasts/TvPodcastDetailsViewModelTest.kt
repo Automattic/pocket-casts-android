@@ -17,8 +17,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -28,21 +28,23 @@ class TvPodcastDetailsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    private val podcast = Podcast(uuid = "podcast-uuid", title = "Podcast")
     private val availableEpisode = episode(uuid = "episode-1", isArchived = false)
     private val archivedEpisode = episode(uuid = "episode-2", isArchived = true)
 
     private val episodes = MutableSharedFlow<List<PodcastEpisode>>(replay = 1)
+    private val podcastManager = mock<PodcastManager> {
+        on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+        on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
+    }
+    private val episodeManager = mock<EpisodeManager> {
+        on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes
+    }
+    private val preferences = mock<TvPodcastPreferences>()
 
     @Test
-    fun `archived episodes are hidden`() = runTest {
-        val podcast = podcast(showArchived = false)
-        val viewModel = createViewModel(
-            podcastManager = mock {
-                on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
-                on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
-            },
-            episodeManager = mock { on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes },
-        )
+    fun `archived episodes are hidden by default`() = runTest {
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -53,19 +55,31 @@ class TvPodcastDetailsViewModelTest {
             assertEquals(podcast, state.podcast)
             assertEquals(listOf(availableEpisode), state.episodes)
             assertEquals(1, state.archivedEpisodeCount)
+            assertEquals(false, state.isShowingArchived)
+        }
+    }
+
+    @Test
+    fun `archived episodes are shown when the stored preference allows them`() = runTest {
+        val preferences = mock<TvPodcastPreferences> {
+            on { isShowingArchived("podcast-uuid") } doReturn true
+        }
+        val viewModel = createViewModel(preferences)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+
+            episodes.emit(listOf(availableEpisode, archivedEpisode))
+
+            val state = awaitItem() as TvPodcastDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
+            assertEquals(true, state.isShowingArchived)
         }
     }
 
     @Test
     fun `a podcast with only archived episodes reports the archived count`() = runTest {
-        val podcast = podcast(showArchived = false)
-        val viewModel = createViewModel(
-            podcastManager = mock {
-                on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
-                on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
-            },
-            episodeManager = mock { on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes },
-        )
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -79,18 +93,8 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
-    fun `archived episodes are shown once the filter is toggled`() = runTest {
-        val podcastFlow = MutableStateFlow(podcast(showArchived = false))
-        val viewModel = createViewModel(
-            podcastManager = mock {
-                on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcastFlow.value)
-                on { podcastByUuidFlow(any()) } doReturn podcastFlow
-                on { updateShowArchived(any(), any()) } doAnswer { invocation ->
-                    podcastFlow.value = podcast(showArchived = invocation.getArgument(1))
-                }
-            },
-            episodeManager = mock { on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes },
-        )
+    fun `toggling the archive filter updates the list and persists the preference`() = runTest {
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -100,24 +104,16 @@ class TvPodcastDetailsViewModelTest {
 
             viewModel.toggleArchiveFilter()
 
-            assertEquals(
-                listOf(availableEpisode, archivedEpisode),
-                (awaitItem() as TvPodcastDetailsUiState.Loaded).episodes,
-            )
+            val state = awaitItem() as TvPodcastDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
+            assertEquals(true, state.isShowingArchived)
+            verify(preferences).setShowingArchived(eq("podcast-uuid"), eq(true))
         }
     }
 
     @Test
     fun `changing the sort type persists it to the podcast`() = runTest {
-        val podcast = podcast(showArchived = false)
-        val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
-            on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
-        }
-        val viewModel = createViewModel(
-            podcastManager = podcastManager,
-            episodeManager = mock { on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes },
-        )
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -132,12 +128,10 @@ class TvPodcastDetailsViewModelTest {
 
     @Test
     fun `a podcast that cannot be resolved maps to the not found state`() = runTest {
-        val viewModel = createViewModel(
-            podcastManager = mock {
-                on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.error(RuntimeException("boom"))
-            },
-            episodeManager = mock(),
-        )
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.error(RuntimeException("boom"))
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.NotFound, expectMostRecentItem())
@@ -145,19 +139,14 @@ class TvPodcastDetailsViewModelTest {
     }
 
     private fun createViewModel(
-        podcastManager: PodcastManager,
-        episodeManager: EpisodeManager,
+        prefs: TvPodcastPreferences = preferences,
+        podcastManager: PodcastManager = this.podcastManager,
     ) = TvPodcastDetailsViewModel(
         podcastUuid = "podcast-uuid",
         podcastManager = podcastManager,
         episodeManager = episodeManager,
+        preferences = prefs,
         defaultDispatcher = coroutineRule.testDispatcher,
-    )
-
-    private fun podcast(showArchived: Boolean) = Podcast(
-        uuid = "podcast-uuid",
-        title = "Podcast",
-        showArchived = showArchived,
     )
 
     private fun episode(uuid: String, isArchived: Boolean) = PodcastEpisode(

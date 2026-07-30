@@ -131,6 +131,7 @@ private fun TvPodcastDetailsContent(
                             podcast = uiState.podcast,
                             episodes = uiState.episodes,
                             archivedEpisodeCount = uiState.archivedEpisodeCount,
+                            isShowingArchived = uiState.isShowingArchived,
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
                             leftFocusRequester = followFocusRequester,
@@ -211,6 +212,7 @@ private fun EpisodeList(
     podcast: Podcast,
     episodes: List<PodcastEpisode>,
     archivedEpisodeCount: Int,
+    isShowingArchived: Boolean,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
     leftFocusRequester: FocusRequester,
@@ -233,7 +235,7 @@ private fun EpisodeList(
                 modifier = Modifier.weight(1f),
             )
             TvArchivedFilterButton(
-                isShowingArchived = podcast.showArchived,
+                isShowingArchived = isShowingArchived,
                 onToggleArchiveFilter = onToggleArchiveFilter,
                 leftFocusRequester = leftFocusRequester,
             )
@@ -360,6 +362,7 @@ private fun TvPodcastDetailsContentPreview(
                     podcast = podcast,
                     episodes = episodes,
                     archivedEpisodeCount = 0,
+                    isShowingArchived = false,
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
