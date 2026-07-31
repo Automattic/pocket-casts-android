@@ -345,6 +345,26 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
+    fun `given audio only enabled, then stream selector is hidden`() = runTest {
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(
+            currentEpisode = episode,
+            hlsAvailable = true,
+            streamVideoState = StreamVideoState.AudioOnly,
+            audioOnly = true,
+        )
+
+        shelfSharedViewModel.uiState.test {
+            var state = awaitItem()
+            while (state.episode == null) {
+                state = awaitItem()
+            }
+            assertFalse(state.shelfItems.contains(ShelfItem.StreamSelector))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `given no hls stream and no video, then stream selector is hidden`() = runTest {
         val episode = PodcastEpisode("uuid", publishedDate = Date())
         initViewModel(
@@ -402,6 +422,7 @@ class ShelfSharedViewModelTest {
         currentEpisode: PodcastEpisode? = null,
         hlsAvailable: Boolean = false,
         streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
+        audioOnly: Boolean = false,
     ) {
         FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
 
@@ -433,6 +454,10 @@ class ShelfSharedViewModelTest {
         whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(streamVideoState))
         whenever(playbackManager.streamHlsAvailable).thenReturn(MutableStateFlow(hlsAvailable))
         whenever(playbackManager.videoRenderingEnabled).thenReturn(MutableStateFlow(true))
+
+        val audioOnlySetting = mock<UserSetting<Boolean>>()
+        whenever(audioOnlySetting.flow).thenReturn(MutableStateFlow(audioOnly))
+        whenever(settings.audioOnly).thenReturn(audioOnlySetting)
 
         shelfSharedViewModel = ShelfSharedViewModel(
             eventHorizon = EventHorizon(TestEventSink()),
