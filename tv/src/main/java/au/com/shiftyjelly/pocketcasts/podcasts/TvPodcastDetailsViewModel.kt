@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.deviceAuthFlow
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -22,10 +24,12 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
@@ -51,6 +55,10 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val isShowingArchivedFlow = MutableStateFlow(preferences.isPodcastShowingArchived(podcastUuid))
+
+    private val _accountAuthState = MutableStateFlow<TvSignInUiState>(TvSignInUiState.Loading)
+    val accountAuthState: StateFlow<TvSignInUiState> = _accountAuthState.asStateFlow()
+    private var accountAuthJob: Job? = null
 
     val uiState: StateFlow<TvPodcastDetailsUiState> = flow {
         val podcast = try {
@@ -90,6 +98,23 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     fun subscribe() {
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
+    }
+
+    fun startAccountAuth() {
+        accountAuthJob?.cancel()
+        _accountAuthState.value = TvSignInUiState.Loading
+        accountAuthJob = viewModelScope.launch {
+            deviceAuthFlow(syncManager).collect { _accountAuthState.value = it }
+        }
+    }
+
+    fun retryAccountAuth() {
+        startAccountAuth()
+    }
+
+    fun stopAccountAuth() {
+        accountAuthJob?.cancel()
+        accountAuthJob = null
     }
 
     fun toggleSubscribe() {

@@ -127,4 +127,11 @@ private fun CodeRow(userCode: List<String>, modifier: Modifier = Modifier) {
     }
 }
 
+fun verificationDisplayUrl(verificationUri: String): String {
+    return verificationUri
+        .removePrefix("https://")
+        .removePrefix("http://")
+        .trimEnd('/')
+}
+
 private val QrSize = 132.dp

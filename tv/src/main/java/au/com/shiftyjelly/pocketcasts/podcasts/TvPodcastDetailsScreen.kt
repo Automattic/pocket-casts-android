@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -59,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountModal
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
@@ -67,6 +70,8 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -91,8 +96,12 @@ fun TvPodcastDetailsScreen(
 
     TvPodcastDetailsContent(
         uiState = uiState,
+        accountAuthState = viewModel.accountAuthState,
         onToggleSubscribe = viewModel::toggleSubscribe,
         onSubscribe = viewModel::subscribe,
+        onStartAccountAuth = viewModel::startAccountAuth,
+        onStopAccountAuth = viewModel::stopAccountAuth,
+        onRetryAccountAuth = viewModel::retryAccountAuth,
         onChangeSortType = viewModel::changeSortType,
         onToggleArchiveFilter = viewModel::toggleArchiveFilter,
         modifier = modifier,
@@ -102,8 +111,12 @@ fun TvPodcastDetailsScreen(
 @Composable
 private fun TvPodcastDetailsContent(
     uiState: TvPodcastDetailsUiState,
+    accountAuthState: StateFlow<TvSignInUiState>,
     onToggleSubscribe: () -> Unit,
     onSubscribe: () -> Unit,
+    onStartAccountAuth: () -> Unit,
+    onStopAccountAuth: () -> Unit,
+    onRetryAccountAuth: () -> Unit,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
     modifier: Modifier = Modifier,
@@ -131,6 +144,7 @@ private fun TvPodcastDetailsContent(
                             if (uiState.isLoggedIn) {
                                 onToggleSubscribe()
                             } else {
+                                onStartAccountAuth()
                                 isShowingAccountModal = true
                             }
                         },
@@ -163,12 +177,22 @@ private fun TvPodcastDetailsContent(
                     )
                 }
                 if (isShowingAccountModal) {
-                    TvCreateAccountModal(
-                        onDismissRequest = { isShowingAccountModal = false },
-                        onSignedIn = {
+                    val authState by accountAuthState.collectAsStateWithLifecycle()
+                    val currentOnSubscribe by rememberUpdatedState(onSubscribe)
+                    val currentOnStopAccountAuth by rememberUpdatedState(onStopAccountAuth)
+                    DisposableEffect(Unit) {
+                        onDispose { currentOnStopAccountAuth() }
+                    }
+                    LaunchedEffect(authState) {
+                        if (authState is TvSignInUiState.Complete) {
                             isShowingAccountModal = false
-                            onSubscribe()
-                        },
+                            currentOnSubscribe()
+                        }
+                    }
+                    TvCreateAccountModal(
+                        uiState = authState,
+                        onRetry = onRetryAccountAuth,
+                        onDismissRequest = { isShowingAccountModal = false },
                     )
                 }
             }
@@ -406,8 +430,12 @@ private fun TvPodcastDetailsContentPreview(
                     isShowingArchived = false,
                     isLoggedIn = true,
                 ),
+                accountAuthState = MutableStateFlow(TvSignInUiState.Loading),
                 onToggleSubscribe = {},
                 onSubscribe = {},
+                onStartAccountAuth = {},
+                onStopAccountAuth = {},
+                onRetryAccountAuth = {},
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
             )

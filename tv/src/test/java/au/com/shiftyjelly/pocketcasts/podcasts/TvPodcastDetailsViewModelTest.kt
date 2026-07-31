@@ -5,10 +5,15 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
@@ -19,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -28,6 +34,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvPodcastDetailsViewModelTest {
@@ -275,6 +282,43 @@ class TvPodcastDetailsViewModelTest {
 
         verifyBlocking(podcastManager) { unsubscribe("podcast-uuid", SourceView.PODCAST_SCREEN) }
     }
+
+    @Test
+    fun `starting account auth drives the account state to complete`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
+        whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(loginSuccess())
+        val viewModel = createViewModel()
+
+        viewModel.accountAuthState.test {
+            assertEquals(TvSignInUiState.Loading, awaitItem())
+
+            viewModel.startAccountAuth()
+
+            val states = mutableListOf<TvSignInUiState>()
+            while (states.lastOrNull() !is TvSignInUiState.Complete) {
+                states.add(awaitItem())
+            }
+            assertTrue(states.any { it is TvSignInUiState.Ready })
+            assertEquals(TvSignInUiState.Complete, states.last())
+        }
+    }
+
+    private fun deviceAuthorizeResponse() = DeviceAuthorizeResponse(
+        deviceCode = "device-code",
+        userCode = "ABC123",
+        verificationUri = "https://pocketcasts.com/pair",
+        verificationUriComplete = "https://pocketcasts.com/pair?code=ABC123",
+        expiresIn = 1800,
+        interval = 1,
+    )
+
+    private fun loginSuccess() = LoginResult.Success(
+        AuthResultModel(
+            token = AccessToken("access-token"),
+            uuid = "user-uuid",
+            isNewAccount = false,
+        ),
+    )
 
     private fun createViewModel(
         prefs: TvPreferences = preferences,

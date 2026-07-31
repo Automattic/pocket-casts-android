@@ -184,12 +184,7 @@ private fun TvSignInContent(
 
 @Composable
 private fun signInSteps(verificationUri: String): List<String> {
-    val url = remember(verificationUri) {
-        verificationUri
-            .removePrefix("https://")
-            .removePrefix("http://")
-            .trimEnd('/')
-    }
+    val url = remember(verificationUri) { verificationDisplayUrl(verificationUri) }
     return listOf(
         stringResource(LR.string.tv_sign_in_step_scan, url),
         stringResource(LR.string.tv_sign_in_step_login),

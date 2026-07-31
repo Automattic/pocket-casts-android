@@ -4,15 +4,12 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -21,15 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
-import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInViewModel
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.verificationDisplayUrl
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
@@ -37,46 +32,26 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvCreateAccountModal(
+    uiState: TvSignInUiState,
+    onRetry: () -> Unit,
     onDismissRequest: () -> Unit,
-    onSignedIn: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TvSignInViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentOnSignedIn by rememberUpdatedState(onSignedIn)
-
-    LaunchedEffect(uiState) {
-        if (uiState is TvSignInUiState.Complete) {
-            currentOnSignedIn()
-        }
-    }
-
     TvModal(
         onDismissRequest = onDismissRequest,
         width = ModalWidth,
         modifier = modifier,
     ) {
-        TvCreateAccountModalContent(
-            uiState = uiState,
-            onRetry = viewModel::retry,
-        )
-    }
-}
-
-@Composable
-private fun ColumnScope.TvCreateAccountModalContent(
-    uiState: TvSignInUiState,
-    onRetry: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(32.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Header()
-        when (uiState) {
-            is TvSignInUiState.Ready -> ReadyContent(uiState)
-            is TvSignInUiState.Error -> ErrorContent(onRetry = onRetry)
-            is TvSignInUiState.Loading, is TvSignInUiState.Complete -> LoadingContent()
+        Column(
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Header()
+            when (uiState) {
+                is TvSignInUiState.Ready -> ReadyContent(uiState)
+                is TvSignInUiState.Error -> ErrorContent(onRetry = onRetry)
+                is TvSignInUiState.Loading, is TvSignInUiState.Complete -> LoadingContent()
+            }
         }
     }
 }
@@ -105,12 +80,7 @@ private fun Header(modifier: Modifier = Modifier) {
 @Composable
 private fun ReadyContent(state: TvSignInUiState.Ready, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
-    val url = remember(state.verificationUri) {
-        state.verificationUri
-            .removePrefix("https://")
-            .removePrefix("http://")
-            .trimEnd('/')
-    }
+    val url = remember(state.verificationUri) { verificationDisplayUrl(state.verificationUri) }
     val steps = listOf(
         stringResource(LR.string.tv_sign_in_step_scan, url),
         stringResource(LR.string.tv_create_account_modal_step_create),
