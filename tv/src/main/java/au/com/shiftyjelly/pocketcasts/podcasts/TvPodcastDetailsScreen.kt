@@ -146,13 +146,13 @@ private fun TvPodcastDetailsContent(
                             }
                         },
                         onMoreInfo = { isShowingInfoModal = true },
-                        modifier = Modifier.width(InfoPaneWidth),
+                        modifier = Modifier.weight(INFO_PANE_WEIGHT),
                     )
                     if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
                         TvEmptyState(
                             title = stringResource(LR.string.podcast_no_episodes_found),
                             subtitle = stringResource(LR.string.podcast_no_episodes),
-                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            modifier = Modifier.weight(1f - INFO_PANE_WEIGHT).fillMaxHeight(),
                         )
                     } else {
                         EpisodeList(
@@ -163,7 +163,7 @@ private fun TvPodcastDetailsContent(
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
                             leftFocusRequester = followFocusRequester,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f - INFO_PANE_WEIGHT),
                         )
                     }
                 }
@@ -364,7 +364,7 @@ private fun AllEpisodesArchived(
     }
 }
 
-private val InfoPaneWidth = 380.dp
+private const val INFO_PANE_WEIGHT = 0.3f
 
 private val PodcastSortOptions = listOf(
     EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
