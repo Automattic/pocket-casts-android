@@ -408,6 +408,9 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET download_url = :url WHERE uuid = :uuid")
     abstract suspend fun updateDownloadUrl(url: String, uuid: String)
 
+    @Query("UPDATE podcast_episodes SET thumbnail_status = :thumbnailStatus WHERE uuid = :uuid AND thumbnail_status = ${PodcastEpisode.THUMBNAIL_STATUS_UNKNOWN}")
+    abstract suspend fun updateThumbnailStatusIfUnknown(thumbnailStatus: Int, uuid: String)
+
     @Query("UPDATE podcast_episodes SET downloaded_file_path = :downloadedFilePath WHERE uuid = :uuid")
     abstract fun updateDownloadedFilePathBlocking(downloadedFilePath: String, uuid: String)
 

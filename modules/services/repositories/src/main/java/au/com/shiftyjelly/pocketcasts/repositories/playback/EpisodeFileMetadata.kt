@@ -41,10 +41,15 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
     var embeddedTitle: String? = null
     var embeddedLength: Long? = null
 
+    /** Whether artwork extraction was attempted during the last [read]. */
+    var artworkExtractionAttempted: Boolean = false
+        private set
+
     @UnstableApi
     fun read(tracks: Tracks?, useEpisodeArtwork: Boolean, context: Context) {
         val newChapters = mutableListOf<Chapter>()
         embeddedArtworkPath = null
+        artworkExtractionAttempted = useEpisodeArtwork
 
         if (tracks == null) {
             return
