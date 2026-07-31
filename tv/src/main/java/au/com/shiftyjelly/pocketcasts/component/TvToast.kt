@@ -101,8 +101,8 @@ private fun TvToastContent(
     )
 }
 
-private const val ToastDurationMillis = 3000L
-private const val ToastAnimationMillis = 300
+private val ToastDurationMillis = 3000L
+private val ToastAnimationMillis = 300
 private val ToastMaxWidth = 600.dp
 private val ToastShape = RoundedCornerShape(16.dp)
 
