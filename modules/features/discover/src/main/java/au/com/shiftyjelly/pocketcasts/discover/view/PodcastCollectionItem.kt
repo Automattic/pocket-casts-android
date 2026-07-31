@@ -33,7 +33,7 @@ class PodcastCollectionItem @JvmOverloads constructor(
             if (value != null) {
                 val binding = binding ?: return
 
-                binding.lblTitle.text = value.title
+                binding.lblTitle.setPodcastTitleWithExplicitBadge(value.title, value.explicit)
                 binding.lblSubtitle.text = value.author
                 imageRequestFactory.createForPodcast(podcast?.uuid).loadInto(binding.imageView)
                 binding.btnSubscribe.updateSubscribeButtonIcon(value.isSubscribed)
@@ -54,7 +54,7 @@ class PodcastCollectionItem @JvmOverloads constructor(
     fun clear() {
         val binding = binding ?: return
 
-        binding.lblTitle.text = null
+        binding.lblTitle.setPodcastTitleWithExplicitBadge(null, null)
         binding.lblSubtitle.text = null
         binding.imageView.setImageResource(binding.imageView.context.getThemeDrawable(UR.attr.defaultArtworkSmall))
     }

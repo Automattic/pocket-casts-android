@@ -39,9 +39,11 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.parseTokenErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
@@ -214,6 +216,53 @@ class SyncManagerImpl @Inject constructor(
         signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
         syncServiceManager.login(email = email, password = password)
+    }
+
+    override suspend fun deviceAuthorize(): DeviceAuthorizeResponse {
+        return syncServiceManager.deviceAuthorize()
+    }
+
+    override suspend fun loginWithDeviceAuth(
+        deviceCode: String,
+        signInSource: SignInSource,
+    ): LoginResult {
+        return try {
+            val response = syncServiceManager.deviceToken(deviceCode)
+            val email = response.email.orEmpty()
+            val uuid = response.uuid.orEmpty()
+            syncAccountManager.addAccount(
+                email = email,
+                uuid = uuid,
+                refreshToken = response.refreshToken,
+                accessToken = response.accessToken,
+                loginIdentity = LoginIdentity.PocketCasts,
+            )
+            isLoggedInObservable.accept(true)
+            settings.setFullySignedOut(false)
+            settings.setLastModified(null)
+            val result = AuthResultModel(
+                token = response.accessToken,
+                uuid = uuid,
+                isNewAccount = false,
+            )
+            trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.PocketCasts)
+            LoginResult.Success(result)
+        } catch (ex: HttpException) {
+            val tokenError = ex.parseTokenErrorResponse(moshi)
+            val result = LoginResult.Failed(
+                message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
+                messageId = tokenError?.error,
+            )
+            if (tokenError?.error != "authorization_pending") {
+                trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            }
+            result
+        } catch (ex: Exception) {
+            Timber.e(ex, "Device auth failed")
+            val result = exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+            trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            result
+        }
     }
 
     private suspend fun handleLogin(
@@ -666,11 +715,10 @@ class SyncManagerImpl @Inject constructor(
     }
 
     private fun handleTokenResponse(loginIdentity: LoginIdentity, response: LoginTokenResponse): AuthResultModel {
-        val email = response.email
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully")
         // Store details in android account manager
         syncAccountManager.addAccount(
-            email = email,
+            email = response.email,
             uuid = response.uuid,
             refreshToken = response.refreshToken,
             accessToken = response.accessToken,

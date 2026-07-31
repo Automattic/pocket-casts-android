@@ -55,6 +55,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -203,15 +204,17 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                         titleColor = textColor?.toArgb(),
                         click = {
                             val appContext = requireContext().applicationContext
-                            lifecycleScope.launch(NonCancellable) {
-                                val request = SharingRequest
-                                    .episodeFile(podcast, episode, args.source)
-                                    .build()
-                                val response = sharingClient.share(request)
-                                if (!response.isSuccessful && response.feedbackMessage != null) {
-                                    Toast.makeText(appContext, response.feedbackMessage, Toast.LENGTH_SHORT).show()
+                            lifecycleScope.launch {
+                                withContext(NonCancellable) {
+                                    val request = SharingRequest
+                                        .episodeFile(podcast, episode, args.source)
+                                        .build()
+                                    val response = sharingClient.share(request)
+                                    if (!response.isSuccessful && response.feedbackMessage != null) {
+                                        Toast.makeText(appContext, response.feedbackMessage, Toast.LENGTH_SHORT).show()
+                                    }
+                                    dismiss()
                                 }
-                                dismiss()
                             }
                         },
                     ),

@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,9 +35,11 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.BetaFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.BetaFeaturesViewModel.SortOrder
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -57,6 +63,7 @@ class BetaFeaturesFragment : BaseFragment() {
             BetaFeaturesPage(
                 state = state,
                 onFeatureChange = viewModel::setFeatureEnabled,
+                onSortClick = ::openSortOptions,
                 onBackPress = {
                     activity?.onBackPressedDispatcher?.onBackPressed()
                 },
@@ -64,12 +71,26 @@ class BetaFeaturesFragment : BaseFragment() {
             )
         }
     }
+
+    private fun openSortOptions() {
+        val selectedSortOrder = viewModel.state.value.sortOrder
+        val dialog = OptionsDialog().setTitle(getString(R.string.sort_by))
+        for (sortOrder in SortOrder.entries) {
+            dialog.addCheckedOption(
+                titleId = sortOrder.labelId,
+                checked = sortOrder == selectedSortOrder,
+                click = { viewModel.setSortOrder(sortOrder) },
+            )
+        }
+        dialog.show(parentFragmentManager, "beta_features_sort_dialog")
+    }
 }
 
 @Composable
 private fun BetaFeaturesPage(
     state: BetaFeaturesViewModel.State,
     onFeatureChange: (Feature, Boolean) -> Unit,
+    onSortClick: () -> Unit,
     onBackPress: () -> Unit,
     bottomInset: Dp,
 ) {
@@ -79,6 +100,15 @@ private fun BetaFeaturesPage(
         ThemedTopAppBar(
             title = stringResource(R.string.settings_beta_features),
             onNavigationClick = { onBackPress() },
+            actions = { iconColor ->
+                IconButton(onClick = onSortClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Sort,
+                        contentDescription = stringResource(R.string.settings_beta_features_sort),
+                        tint = iconColor,
+                    )
+                }
+            },
         )
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
@@ -111,6 +141,7 @@ private fun BetaFeaturesPagePreview(
         BetaFeaturesPage(
             state = BetaFeaturesViewModel.State(featureFlags = Feature.entries.map { BetaFeaturesViewModel.FeatureFlagWrapper(featureFlag = it, isEnabled = true) }),
             onFeatureChange = { _, _ -> },
+            onSortClick = {},
             onBackPress = {},
             bottomInset = 0.dp,
         )

@@ -10,8 +10,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListCreateActivit
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastListModalOptionType
@@ -110,12 +108,7 @@ class PodcastsOptionsDialog(
         val sortOrder = settings.podcastsSortType.value
         val title = fragment.getString(LR.string.sort_by)
         val dialog = OptionsDialog().setTitle(title)
-        val sortOptions = if (FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES)) {
-            PodcastsSortType.entries
-        } else {
-            PodcastsSortType.entries.filterNot { it == PodcastsSortType.RECENTLY_PLAYED }
-        }
-        for (order in sortOptions) {
+        for (order in PodcastsSortType.entries) {
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,

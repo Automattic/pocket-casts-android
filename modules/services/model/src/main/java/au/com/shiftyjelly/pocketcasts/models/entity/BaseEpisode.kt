@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import java.util.Date
@@ -9,6 +10,25 @@ sealed interface BaseEpisode {
     companion object {
         const val AUTO_DOWNLOAD_STATUS_ALLOW = 0
         const val AUTO_DOWNLOAD_STATUS_IGNORE = 1
+
+        fun isHlsUrl(url: String?): Boolean {
+            url ?: return false
+            val path = url.substringBefore('?').substringBefore('#')
+            return path.endsWith(".m3u8", ignoreCase = true)
+        }
+
+        /** The HLS MIME types the server may pass through verbatim; match case-insensitively. */
+        val HLS_MIME_TYPES: Set<String> = setOf(
+            MimeTypes.APPLICATION_M3U8.lowercase(), // application/x-mpegurl
+            "application/vnd.apple.mpegurl",
+            "audio/mpegurl",
+            "application/mpegurl",
+            "audio/x-mpegurl",
+        )
+
+        fun isHlsMimeType(type: String?): Boolean {
+            return type != null && type.lowercase() in HLS_MIME_TYPES
+        }
 
         /**
          * Used to reduce the changes sent out by the media session.
@@ -34,6 +54,7 @@ sealed interface BaseEpisode {
     var fileType: String?
     var duration: Double
     var downloadUrl: String?
+
     var playedUpTo: Double
     var playingStatus: EpisodePlayingStatus
     var addedDate: Date
@@ -105,7 +126,7 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHlsOnly
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
@@ -113,11 +134,37 @@ sealed interface BaseEpisode {
     val isVideo: Boolean
         get() = fileType?.startsWith("video/") ?: false
 
-    val isHLS: Boolean
-        get() = downloadUrl?.endsWith("m3u8") ?: false
+    /** The enclosure itself is HLS, so there is no progressive file to download. */
+    val isHlsOnly: Boolean
+        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
+
+    /** A runtime-only resolved stream (e.g. the HLS alternate enclosure); overrides [streamUrl] when set. */
+    var overrideStreamUrl: String?
+
+    /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
+    var overrideStreamContentType: String?
+
+    /**
+     * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. Falls back
+     * to the progressive [downloadUrl] unless a stream has been resolved into [overrideStreamUrl].
+     */
+    val streamUrl: String?
+        get() = overrideStreamUrl ?: downloadUrl
+
+    /** Whether the URL that streaming will actually use is HLS. */
+    val isStreamUrlHls: Boolean
+        get() {
+            val url = streamUrl ?: return false
+            if (overrideStreamUrl != null) {
+                return isHlsMimeType(overrideStreamContentType) || isHlsUrl(url)
+            }
+            return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
+        }
 
     val isAudio: Boolean
         get() = !isVideo
+
+    fun showsVideoIcon(hasHlsAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasHlsAlternateEnclosure
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid
@@ -158,6 +205,8 @@ sealed interface BaseEpisode {
             fileType.equals("audio/x-m4p", ignoreCase = true) -> return ".m4p"
             fileType.equals("audio/ogg", ignoreCase = true) -> return ".ogg"
             fileType.equals("audio/x-ms-wma", ignoreCase = true) -> return ".wma"
+            fileType.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) -> return ".m3u8"
+            fileType.equals("application/vnd.apple.mpegurl", ignoreCase = true) -> return ".m3u8"
             else -> return if (fileType.startsWith("video/")) ".mp4" else ".mp3"
         }
     }

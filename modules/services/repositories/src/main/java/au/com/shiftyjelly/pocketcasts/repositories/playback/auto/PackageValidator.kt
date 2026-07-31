@@ -112,9 +112,9 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         }
 
         val callerSignature = callerPackageInfo.signature
-        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.first {
+        val isPackageInAllowList = certificateAllowList[callingPackage]?.signatures?.any {
             it.signature == callerSignature
-        } != null
+        } == true
 
         val isCallerKnown = when {
             // If it's our own app making the call, allow it.
@@ -131,7 +131,7 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
 
             // [MEDIA_CONTENT_CONTROL] permission is only available to system applications, and
             // while it isn't required to allow these apps to connect to a
-            // [MediaBrowserServiceCompat], allowing this ensures optimal compatability with apps
+            // [MediaBrowserServiceCompat], allowing this ensures optimal compatibility with apps
             // such as Android TV and the Google Assistant.
             callerPackageInfo.permissions.contains(MEDIA_CONTENT_CONTROL) -> true
 
@@ -200,10 +200,15 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
      */
     @Suppress("DEPRECATION")
     @SuppressLint("PackageManagerGetSignatures")
-    private fun getPackageInfo(callingPackage: String): PackageInfo? = packageManager.getPackageInfo(
-        callingPackage,
-        PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS,
-    )
+    private fun getPackageInfo(callingPackage: String): PackageInfo? = try {
+        packageManager.getPackageInfo(
+            callingPackage,
+            PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS,
+        )
+    } catch (e: PackageManager.NameNotFoundException) {
+        Timber.e(e, "Failed to get package info for $callingPackage")
+        null
+    }
 
     /**
      * Gets the signature of a given package's [PackageInfo].

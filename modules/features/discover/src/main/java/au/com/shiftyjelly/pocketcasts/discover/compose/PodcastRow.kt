@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.ExplicitIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
@@ -43,6 +44,7 @@ internal fun PodcastRow(
     podcast: DiscoverPodcast,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
+    showExplicitIndicator: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
 ) {
     Box(
@@ -64,6 +66,7 @@ internal fun PodcastRow(
 
             Labels(
                 podcast = podcast,
+                showExplicitIndicator = showExplicitIndicator,
                 modifier = Modifier.weight(1f),
             )
 
@@ -100,6 +103,7 @@ internal fun PodcastRowPlaceholder(
 @Composable
 private fun Labels(
     podcast: DiscoverPodcast,
+    showExplicitIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -108,9 +112,9 @@ private fun Labels(
     ) {
         val title = podcast.title
         if (title != null) {
-            TextP40(
-                text = title,
-                maxLines = 1,
+            PodcastTitle(
+                title = title,
+                isExplicit = podcast.explicit == true && showExplicitIndicator,
             )
         }
 
@@ -121,6 +125,28 @@ private fun Labels(
                 maxLines = 1,
                 color = MaterialTheme.theme.colors.primaryText02,
             )
+        }
+    }
+}
+
+@Composable
+private fun PodcastTitle(
+    title: String,
+    isExplicit: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier,
+    ) {
+        TextP40(
+            text = title,
+            maxLines = 1,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        if (isExplicit) {
+            ExplicitIcon()
         }
     }
 }

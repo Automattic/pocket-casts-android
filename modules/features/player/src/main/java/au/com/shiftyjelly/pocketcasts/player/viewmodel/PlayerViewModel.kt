@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -30,11 +31,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -79,6 +82,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -95,6 +99,7 @@ class PlayerViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val downloadQueue: DownloadQueue,
+    private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
@@ -115,6 +120,8 @@ class PlayerViewModel @Inject constructor(
         val isPlaying: Boolean = false,
         val isPrepared: Boolean = false,
         val episode: BaseEpisode? = null,
+        val streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
+        val videoRenderingEnabled: Boolean = true,
         val podcastTitle: String? = null,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
@@ -134,7 +141,12 @@ class PlayerViewModel @Inject constructor(
         val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
         val episodeUuid = episode?.uuid.orEmpty()
         val episodeTitle = episode?.title.orEmpty()
-        val isVideo = episode?.isVideo == true
+
+        val isVideo = videoRenderingEnabled && when (streamVideoState) {
+            StreamVideoState.HasVideo -> true
+            StreamVideoState.Unknown, StreamVideoState.AudioOnly -> false
+            StreamVideoState.NotVideo -> episode?.isVideo == true
+        }
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
@@ -193,8 +205,14 @@ class PlayerViewModel @Inject constructor(
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
 
-    val listDataRx = Observables.combineLatest(
+    private val upNextAndStreamVideoObservable = Observables.combineLatest(
         upNextStateObservable,
+        playbackManager.videoRenderingEnabled.asObservable(coroutineContext),
+        playbackManager.streamVideoState.asObservable(coroutineContext),
+    )
+
+    val listDataRx = Observables.combineLatest(
+        upNextAndStreamVideoObservable,
         playbackStateObservable,
         settings.skipBackInSecs.flow.asObservable(coroutineContext),
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
@@ -321,6 +339,10 @@ class PlayerViewModel @Inject constructor(
     val playbackNotice = playbackNoticeManager.playbackNotice
         .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)
 
+    val resolvingChapterIndex = generatedChapterSeeker
+        .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     val playerFlow = playbackManager.playerFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -372,7 +394,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun mergeListData(
-        upNextState: UpNextQueue.State,
+        upNextAndStreamVideo: Triple<UpNextQueue.State, Boolean, StreamVideoState>,
         playbackState: PlaybackState,
         skipBackwardInSecs: Int,
         skipForwardInSecs: Int,
@@ -382,6 +404,7 @@ class PlayerViewModel @Inject constructor(
         artworkConfiguration: ArtworkConfiguration,
         sleepTimerState: SleepTimerState,
     ): ListData {
+        val (upNextState, videoRenderingEnabled, streamVideoState) = upNextAndStreamVideo
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -408,6 +431,8 @@ class PlayerViewModel @Inject constructor(
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
                 episode = episode,
+                streamVideoState = streamVideoState,
+                videoRenderingEnabled = videoRenderingEnabled,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
@@ -739,14 +764,16 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextChapterClick() {
-        eventHorizon.track(PlayerNextChapterTappedEvent)
+        eventHorizon.track(PlayerNextChapterTappedEvent(origin = currentChapterOrigin()))
         playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun onPreviousChapterClick() {
-        eventHorizon.track(PlayerPreviousChapterTappedEvent)
+        eventHorizon.track(PlayerPreviousChapterTappedEvent(origin = currentChapterOrigin()))
         playbackManager.skipToPreviousSelectedOrLastChapter()
     }
+
+    private fun currentChapterOrigin() = listDataLive.value?.podcastHeader?.chapters?.origin?.toChapterOriginType()
 
     fun onChapterTitleClick(chapter: Chapter) {
         viewModelScope.launch {

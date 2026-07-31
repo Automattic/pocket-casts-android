@@ -7,6 +7,7 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -187,6 +188,44 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `automotive empty timeline drops transport commands but keeps SET_MEDIA_ITEM`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val commands = PocketCastsForwardingPlayer(player, isAutomotive = true).availableCommands
+
+        assertFalse(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(commands.contains(Player.COMMAND_STOP))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
+    }
+
+    @Test
+    fun `automotive empty timeline reports null current media item`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val forwarding: Player = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertNull(forwarding.currentMediaItem)
+    }
+
+    @Test
+    fun `non-automotive keeps full commands even with empty timeline`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val commands = PocketCastsForwardingPlayer(player, isAutomotive = false).availableCommands
+
+        assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
+    }
+
+    @Test
     fun `duration falls back to metadata when player reports unset`() {
         val episode = createPodcastEpisode(uuid = "ep-1", title = "Test", durationMs = 120_000)
         forwardingPlayer.updateMetadata(episode, null)
@@ -233,6 +272,23 @@ class PocketCastsForwardingPlayerTest {
         assertEquals("ep-1", swapped.currentMediaItem.mediaId)
         assertEquals("Preserved", swapped.mediaMetadata.title)
         assertTrue(swapped.isTransientLoss)
+    }
+
+    @Test
+    fun `swapPlayer preserves isAutomotive so swapped-in empty player shows empty state`() {
+        val emptyPlayer = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+        }
+        val player = PocketCastsForwardingPlayer(mockPlayer, isAutomotive = true)
+        val swapped: Player = player.swapPlayer(emptyPlayer)
+
+        assertNull(swapped.currentMediaItem)
+        val commands = swapped.availableCommands
+        assertFalse(commands.contains(Player.COMMAND_PLAY_PAUSE))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(commands.contains(Player.COMMAND_STOP))
+        assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
     }
 
     @Test

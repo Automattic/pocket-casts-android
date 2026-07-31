@@ -22,6 +22,7 @@ sealed interface ImprovedSearchResultItem {
         override val title: String,
         val author: String,
         val isFollowed: Boolean,
+        val isExplicit: Boolean = false,
     ) : ImprovedSearchResultItem
 
     data class EpisodeItem(

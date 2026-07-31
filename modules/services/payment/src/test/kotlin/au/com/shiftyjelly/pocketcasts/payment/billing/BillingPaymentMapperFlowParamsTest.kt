@@ -231,7 +231,7 @@ class BillingPaymentMapperFlowParamsTest {
         }
 
         @Test
-        fun `do not log anything when mapped succesfully`() {
+        fun `do not log anything when mapped successfully`() {
             val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = createGoogleProductDetails(
                 productId = requireNotNull(planKey.productId),

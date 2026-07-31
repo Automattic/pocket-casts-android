@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.ArchivedEpisodeBehaviorType
@@ -55,11 +59,13 @@ import com.automattic.eventhorizon.RowActionType
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralAudioOnlyToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoSleepTimerRestartToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralAutoplayToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralEpisodeGroupingDoNotApplyToExistingEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralIntelligentPlaybackToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralKeepScreenAwakeToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralOpenPlayerAutomaticallyToggledEvent
@@ -72,7 +78,6 @@ import com.automattic.eventhorizon.SettingsGeneralSkipForwardChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralUpNextSwipeChangedEvent
 import com.automattic.eventhorizon.SettingsUseRealTimeForPlaybackRemainingTimeEvent
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -304,6 +309,22 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_GENERATED_CHAPTERS -> {
+                            if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                                GeneratedChapters(
+                                    saved = settings.showGeneratedChapters.flow.collectAsState().value,
+                                    onSave = { isGeneratedChaptersEnabled ->
+                                        eventHorizon.track(
+                                            SettingsGeneralGeneratedChaptersToggledEvent(
+                                                enabled = isGeneratedChaptersEnabled,
+                                            ),
+                                        )
+                                        settings.showGeneratedChapters.set(isGeneratedChaptersEnabled, updateModifiedAt = true)
+                                    },
+                                )
+                            }
+                        }
+
                         SettingsItems.SETTINGS_INTELLIGENT_PLAYBACK -> {
                             IntelligentPlaybackResumption(
                                 saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
@@ -360,6 +381,20 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_AUDIO_ONLY -> {
+                            AudioOnly(
+                                saved = settings.audioOnly.flow.collectAsState().value,
+                                onSave = { isAudioOnlyEnabled ->
+                                    eventHorizon.track(
+                                        SettingsGeneralAudioOnlyToggledEvent(
+                                            enabled = isAudioOnlyEnabled,
+                                        ),
+                                    )
+                                    settings.audioOnly.set(isAudioOnlyEnabled, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
                             Column {
                                 Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
@@ -408,7 +443,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         saved: Boolean,
         onSave: (Boolean) -> Unit,
     ) {
-        val savedString = stringResource(rowActionToStringRes(saved)).lowercase(Locale.getDefault())
+        val savedString = stringResource(rowActionToStringRes(saved)).toLowerCase(Locale.current)
         val secondaryText = stringResource(LR.string.settings_row_action_summary, savedString)
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_row_action),
@@ -433,7 +468,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         onSave: (Settings.UpNextAction) -> Unit,
     ) {
         val savedString =
-            stringResource(upNextActionToStringRes(saved)).lowercase(Locale.getDefault())
+            stringResource(upNextActionToStringRes(saved)).toLowerCase(Locale.current)
         val secondaryText = stringResource(LR.string.settings_up_next_swipe_summary, savedString)
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_up_next_swipe),
@@ -463,7 +498,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                 PodcastGrouping.None -> stringResource(LR.string.settings_podcast_episode_grouping_summary_none)
 
                 else -> {
-                    val selected = stringResource(saved.groupName).lowercase(Locale.getDefault())
+                    val selected = stringResource(saved.groupName).toLowerCase(Locale.current)
                     stringResource(LR.string.settings_podcast_episode_grouping_summary, selected)
                 }
             },
@@ -552,6 +587,24 @@ class PlaybackSettingsFragment : BaseFragment() {
     private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(id = LR.string.settings_open_player_automatically),
         secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
+    private fun AudioOnly(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_audio_only),
+        secondaryText = stringResource(LR.string.settings_audio_only_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
+    private fun GeneratedChapters(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_generated_chapters),
+        secondaryText = stringResource(LR.string.settings_generated_chapters_summary),
         toggle = SettingRowToggle.Switch(checked = saved),
         modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         indent = false,
@@ -673,10 +726,12 @@ private enum class SettingsItems {
     SETTINGS_SKIP_BACK_TIME,
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
+    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_INTELLIGENT_PLAYBACK,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
+    SETTINGS_AUDIO_ONLY,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,

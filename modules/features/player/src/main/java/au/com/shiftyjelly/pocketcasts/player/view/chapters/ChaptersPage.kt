@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,8 +16,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -24,6 +28,7 @@ fun ChaptersPage(
     lazyListState: LazyListState,
     chapters: List<ChaptersViewModel.ChapterState>,
     showHeader: Boolean,
+    hasGeneratedChapters: Boolean,
     totalChaptersCount: Int,
     onSelectionChange: (Boolean, Chapter) -> Unit,
     onChapterClick: (Chapter) -> Unit,
@@ -32,6 +37,7 @@ fun ChaptersPage(
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
+    resolvingChapterIndex: Int? = null,
 ) {
     LazyColumn(
         state = lazyListState,
@@ -57,6 +63,17 @@ fun ChaptersPage(
                 )
             }
         }
+        if (hasGeneratedChapters) {
+            item {
+                TextP50(
+                    text = stringResource(LR.string.chapters_generated_disclaimer),
+                    color = LocalChaptersTheme.current.headerTitle,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                )
+            }
+        }
         itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
             ChapterRow(
                 state = state,
@@ -65,6 +82,7 @@ fun ChaptersPage(
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter) },
                 onUrlClick = { onUrlClick(state.chapter) },
+                isResolving = state.chapter.index == resolvingChapterIndex,
                 modifier = Modifier.animateItem(),
             )
             if (index < chapters.lastIndex) {

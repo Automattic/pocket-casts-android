@@ -9,17 +9,21 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 @Composable
 internal fun SmallListRow(
@@ -29,6 +33,10 @@ internal fun SmallListRow(
     onClickSubscribe: (DiscoverPodcast) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val showExplicitIndicator by FeatureFlag
+        .isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR)
+        .collectAsStateWithLifecycle()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(ItemSpacing),
@@ -43,6 +51,7 @@ internal fun SmallListRow(
                     PodcastRow(
                         podcast = podcast,
                         onClickSubscribe = { onClickSubscribe(podcast) },
+                        showExplicitIndicator = showExplicitIndicator,
                         modifier = Modifier.clickable(onClick = { onClickPodcast(podcast) }),
                     )
                 }

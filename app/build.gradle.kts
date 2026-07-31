@@ -152,6 +152,7 @@ dependencies {
     androidTestImplementation(libs.androidx.preference.ktx)
     androidTestImplementation(libs.androidx.recyclerview)
     androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.junit.ext)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)

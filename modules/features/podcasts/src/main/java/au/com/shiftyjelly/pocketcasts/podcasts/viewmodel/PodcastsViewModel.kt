@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -308,7 +306,7 @@ class PodcastsViewModel @AssistedInject constructor(
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
 
-    fun shouldShowTooltip() = FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
+    fun shouldShowTooltip() = settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
 
     fun onTooltipShown() {
         eventHorizon.track(EpisodeRecentlyPlayedSortOptionTooltipShownEvent)

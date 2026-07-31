@@ -9,8 +9,11 @@ import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.InternationalizationInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.android.tracks.crashlogging.CrashLoggingOkHttpInterceptorProvider
 import com.automattic.android.tracks.crashlogging.FormattedUrl
 import com.automattic.android.tracks.crashlogging.RequestFormatter
@@ -109,17 +112,30 @@ object InterceptorModule {
             return builder.build()
         }
 
+        fun getAccessToken(): AccessToken? {
+            return if (FeatureFlag.isEnabled(Feature.INTERCEPTOR_REFRESH_TOKEN_FALLBACK)) {
+                try {
+                    runBlocking { tokenHandler.getAccessToken() }
+                } catch (_: RefreshTokenExpiredException) {
+                    null
+                }
+            } else {
+                runBlocking { tokenHandler.getAccessToken() }
+            }
+        }
+
         return Interceptor { chain ->
             val original = chain.request()
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = runBlocking { tokenHandler.getAccessToken() }
+                val token = getAccessToken()
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         tokenHandler.invalidateAccessToken()
-                        val newToken = runBlocking { tokenHandler.getAccessToken() }
+                        response.close()
+                        val newToken = getAccessToken()
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response

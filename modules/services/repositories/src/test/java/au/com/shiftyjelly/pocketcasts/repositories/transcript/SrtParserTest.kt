@@ -34,10 +34,10 @@ class SrtParserTest {
 
         assertEquals(
             listOf(
-                TranscriptEntry.Text("Text"),
-                TranscriptEntry.Text("Text with HTML tags"),
+                TranscriptEntry.Text("Text", startTimeMs = 0, endTimeMs = 1000),
+                TranscriptEntry.Text("Text with HTML tags", startTimeMs = 1000, endTimeMs = 2000),
                 TranscriptEntry.Speaker("Speaker 1"),
-                TranscriptEntry.Text("Text with speaker"),
+                TranscriptEntry.Text("Text with speaker", startTimeMs = 2000, endTimeMs = 3000),
             ),
             entries,
         )

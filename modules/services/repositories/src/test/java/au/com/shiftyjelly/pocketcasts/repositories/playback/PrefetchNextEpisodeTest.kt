@@ -110,6 +110,35 @@ class PrefetchNextEpisodeTest {
     }
 
     @Test
+    fun `should not prefetch when the next episode streams hls by default`() {
+        val result = buildPrefetchRequest(
+            isFeatureEnabled = true,
+            isPlayerRemote = false,
+            nextEpisode = createEpisode(),
+            warnOnMeteredNetwork = false,
+            isHlsDefault = true,
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `should not prefetch when a selected stream override is HLS`() {
+        val episode = createEpisode().apply {
+            overrideStreamUrl = "https://example.com/episode.m3u8"
+            overrideStreamContentType = "application/x-mpegURL"
+        }
+        val result = buildPrefetchRequest(
+            isFeatureEnabled = true,
+            isPlayerRemote = false,
+            nextEpisode = episode,
+            warnOnMeteredNetwork = false,
+        )
+
+        assertNull(result)
+    }
+
+    @Test
     fun `should not prefetch when download URL is null`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,

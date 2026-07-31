@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -15,12 +16,17 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.ChapterOriginType
+import com.automattic.eventhorizon.ChaptersShownEvent
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -36,6 +42,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -54,6 +62,9 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
+        on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
+    }
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
@@ -77,6 +88,8 @@ class ChaptersViewModelTest {
     )
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
+    private val eventSink = TestEventSink()
+
     private lateinit var chaptersViewModel: ChaptersViewModel
 
     @Before
@@ -94,7 +107,8 @@ class ChaptersViewModelTest {
             playbackManager = playbackManager,
             episodeManager = episodeManager,
             settings = settings,
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
+            generatedChapterSeeker = generatedChapterSeeker,
             ioDispatcher = testDispatcher,
         )
     }
@@ -103,6 +117,23 @@ class ChaptersViewModelTest {
     fun `paid user can skip chapters`() = runTest {
         chaptersViewModel.uiState.test {
             assertTrue(awaitItem().canSkipChapters)
+        }
+    }
+
+    @Test
+    fun `generated chapters appearing and disappearing are reflected in the ui state`() = runTest {
+        val embedded = Chapter("Embedded", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.PodcastIndex)
+        val generated = Chapter("Generated", 101.milliseconds, 200.milliseconds, index = 1, uiIndex = 2, origin = ChapterOrigin.Generated)
+        chaptersFlow.value = Chapters(listOf(embedded, generated))
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().hasGeneratedChapters)
+
+            chaptersFlow.value = Chapters(listOf(embedded))
+            assertFalse(awaitItem().hasGeneratedChapters)
+
+            chaptersFlow.value = Chapters(listOf(embedded, generated))
+            assertTrue(awaitItem().hasGeneratedChapters)
         }
     }
 
@@ -230,6 +261,7 @@ class ChaptersViewModelTest {
             episodeManager = episodeManager,
             settings = settings,
             eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
             ioDispatcher = testDispatcher,
         )
 
@@ -241,6 +273,45 @@ class ChaptersViewModelTest {
 
         verify(episodeManager, times(1)).updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
         verifyBlocking(playbackManager, times(1)) { playNowSuspend(episode) }
+    }
+
+    @Test
+    fun `play chapter reports chapter origin`() = runTest {
+        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
+
+        chaptersViewModel.playChapter(chapter)
+
+        assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `chapters shown reports chapters origin and source`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters(
+            listOf(Chapter("1", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)),
+        )
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(
+            ChaptersShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `chapters shown is not reported when there are no chapters`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

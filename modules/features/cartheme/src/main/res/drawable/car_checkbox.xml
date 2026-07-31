@@ -19,5 +19,5 @@
     <item
         android:width="@dimen/car_primary_icon_size"
         android:height="@dimen/car_primary_icon_size"
-        android:drawable="@drawable/abc_btn_check_material_anim"/>
+        android:drawable="@drawable/car_checkbox_state"/>
 </layer-list>

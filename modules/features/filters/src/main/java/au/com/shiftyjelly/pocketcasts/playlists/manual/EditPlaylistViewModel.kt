@@ -78,12 +78,14 @@ class EditPlaylistViewModel @AssistedInject constructor(
 
     fun persistEpisodesOrder() {
         if (isOrderChanged) {
-            viewModelScope.launch(NonCancellable) {
-                eventHorizon.track(FilterManualEpisodesRearrangedEvent)
-                val sortedUuids = withContext(Dispatchers.Default) {
-                    _episodes.map(PlaylistEpisode::uuid)
+            viewModelScope.launch {
+                withContext(NonCancellable) {
+                    eventHorizon.track(FilterManualEpisodesRearrangedEvent)
+                    val sortedUuids = withContext(Dispatchers.Default) {
+                        _episodes.map(PlaylistEpisode::uuid)
+                    }
+                    playlistManager.sortManualEpisodes(playlistUuid, sortedUuids)
                 }
-                playlistManager.sortManualEpisodes(playlistUuid, sortedUuids)
             }
         }
     }

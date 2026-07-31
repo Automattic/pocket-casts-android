@@ -297,6 +297,7 @@ class RefreshPodcastsThread(
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
         val episodeManager = entryPoint.episodeManager()
+        val alternateEnclosureDao = entryPoint.appDatabase().alternateEnclosureDao()
 
         var newEpisodeCount = 0
 
@@ -316,6 +317,7 @@ class RefreshPodcastsThread(
             for (episode in episodes) {
                 episode.addedDate = addedDate
             }
+            val enclosuresByUuid = episodes.associate { it.uuid to it.alternateEnclosures }
             episodes = episodeManager.addBlocking(episodes, podcast.uuid, downloadMetaData)
 
             if (episodes.isEmpty()) {
@@ -328,6 +330,10 @@ class RefreshPodcastsThread(
                 podcastManager.updateLatestEpisodeBlocking(podcast, episodes[0])
                 for ((uuid) in episodes) {
                     episodeUuidsAdded.add(uuid)
+                    val enclosures = enclosuresByUuid[uuid].orEmpty()
+                    if (enclosures.isNotEmpty()) {
+                        alternateEnclosureDao.replaceForEpisodeBlocking(uuid, enclosures)
+                    }
                 }
 
                 // prepare to add to up next

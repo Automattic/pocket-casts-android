@@ -20,5 +20,5 @@
         android:color="?attr/colorControlActivated"
         android:state_checked="true"/>
     <item
-        android:color="?attr/colorSwitchThumbNormal"/>
+        android:color="?android:attr/colorControlNormal"/>
 </selector>

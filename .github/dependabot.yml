@@ -54,3 +54,14 @@ updates:
       - dependency-name: "androidx.wear.compose:compose-foundation"
       - dependency-name: "androidx.wear.compose:compose-material"
       - dependency-name: "androidx.wear.compose:compose-navigation"
+  - package-ecosystem: "bundler"
+    open-pull-requests-limit: 5
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
+    groups:
+      ruby-minor-and-patch:
+        update-types: [minor, patch]

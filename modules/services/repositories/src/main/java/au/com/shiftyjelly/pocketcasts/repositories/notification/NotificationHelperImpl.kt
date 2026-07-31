@@ -230,6 +230,8 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationTag = intentExtras?.getString(INTENT_EXTRA_NOTIFICATION_TAG, null)
         if (!notificationTag.isNullOrBlank()) {
+            manager.cancel(notificationTag, notificationId)
+        } else {
             manager.cancel(notificationId)
         }
     }

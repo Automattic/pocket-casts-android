@@ -1,0 +1,90 @@
+package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
+
+object FingerprintConstants {
+    /** Minimum match score to accept a fingerprint match result. */
+    const val MATCH_SCORE_THRESHOLD = 0.5f
+
+    /** Duration of each windowed fingerprint during live matching, in milliseconds. */
+    const val WINDOW_DURATION_MS = 8000
+
+    /** Interval between windowed fingerprints during live matching, in milliseconds. */
+    const val WINDOW_INTERVAL_MS = 1000
+
+    /** Minimum number of mapping entries before transitioning to Active. */
+    const val MINIMUM_COVERAGE_FOR_ACTIVE = 2
+
+    /** Residual tolerance, in seconds, on the rate-≈1 drift filter. */
+    const val DRIFT_TOLERANCE_SECONDS = 5.0
+
+    /** Consecutive rate-≈1 candidates required to establish a trusted anchor. */
+    const val DRIFT_BOOTSTRAP_COUNT = 3
+
+    /** Minimum matcher score for a match to reach the drift filter. */
+    const val DRIFT_ANCHOR_SCORE_THRESHOLD = 0.65f
+
+    /** Minimum score gap between top-1 and top-2 matcher candidates. */
+    const val DRIFT_SCORE_DOMINANCE_GAP = 0.05f
+
+    /** Position drift between consecutive tap chunks beyond which the window stream restarts. */
+    const val TAP_CONTINUITY_TOLERANCE_SECONDS = 0.25
+
+    /** Minimum fraction of reference timeline a cached mapping must cover. */
+    const val FULL_COVERAGE_THRESHOLD = 0.95
+
+    /** Max gap between bracketing anchors to consider playback on matched content. */
+    const val HIGHLIGHT_MAX_GAP_SECONDS = 8.0
+
+    /**
+     * Grace past the newest anchor before the live edge counts as unmatched. The tap-built map lags
+     * the playhead by a full window plus stride and sink-buffer variance, so this must exceed
+     * [WINDOW_DURATION_MS] + [WINDOW_INTERVAL_MS] with headroom for the odd missed match.
+     */
+    const val TAP_TRAILING_GRACE_SECONDS = 12.0
+
+    /**
+     * Drop the trailing grace once completed tap windows reach this far past the newest anchor
+     * without matching — the live edge is provably unmatched (an ad), not merely pending. Wide
+     * enough that a couple of isolated missed matches never trip it.
+     */
+    const val TAP_UNMATCHED_EDGE_SECONDS = 3.0
+
+    /**
+     * Audio decoded in one shot when a tap stream starts in unmapped territory. The tap only sees
+     * audio in realtime, so its first window lands [WINDOW_DURATION_MS] after a seek; a faster-than-
+     * realtime decode of this span puts anchors at the new playhead within ~a second instead.
+     */
+    const val TAP_CATCH_UP_SECONDS = 12.0
+
+    /** Persistent cache schema version. Bump when on-disk shape changes. */
+    const val MAPPING_CACHE_SCHEMA_VERSION = 4
+
+    /** Timeout for MediaCodec dequeue operations, in microseconds. */
+    const val CODEC_TIMEOUT_US = 10_000L
+
+    /** Maximum stored debug rejections (FIFO eviction). */
+    const val DEBUG_REJECTION_CAP = 500
+
+    /** Forward audio decoded from the raw reference time when no mapping estimate exists. */
+    const val ON_DEMAND_COLD_BUDGET_SECONDS = 240.0
+
+    /** Audio decoded past the mapping estimate to absorb intervening ads. */
+    const val ON_DEMAND_FORWARD_BUDGET_SECONDS = 120.0
+
+    /** Cap on searching below the mapping estimate when the accumulated offset is large. */
+    const val ON_DEMAND_BACKWARD_MAX_SECONDS = 180.0
+
+    /** Minimum committed anchors for an on-demand resolve to be trusted. */
+    const val ON_DEMAND_MIN_ANCHORS = 2
+
+    /** Timeout for the reference fetch of an on-demand resolve; short because reference files are small. */
+    const val ON_DEMAND_FETCH_TIMEOUT_MS = 3_000L
+
+    /** Budget for the decode of an on-demand resolve; opening a remote source alone can take seconds. */
+    const val ON_DEMAND_DECODE_TIMEOUT_MS = 8_000L
+
+    /** Committed reference time must pass the target by this much before a resolve stops decoding early. */
+    const val ON_DEMAND_EARLY_EXIT_MARGIN_SECONDS = 5.0
+
+    /** How often a yielded continuous decode re-checks for on-demand resolves in flight. */
+    const val RESOLVE_YIELD_POLL_MS = 250L
+}

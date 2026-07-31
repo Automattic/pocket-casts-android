@@ -59,7 +59,7 @@ internal class LargeListRowAdapter(
         if (podcast is DiscoverPodcast) {
             imageRequestFactory.createForPodcast(podcast.uuid).loadInto(holder.imageView)
 
-            holder.lblTitle.text = podcast.title
+            holder.lblTitle.setPodcastTitleWithExplicitBadge(podcast.title, podcast.explicit)
             holder.lblSubtitle.text = podcast.author
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
@@ -92,7 +92,7 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.isVisible = true
         } else {
             holder.imageView.setImageResource(holder.placeholderDrawable)
-            holder.lblTitle.text = ""
+            holder.lblTitle.setPodcastTitleWithExplicitBadge("", null)
             holder.lblSubtitle.text = ""
             holder.itemView.isClickable = false
             holder.btnSubscribe.isClickable = false

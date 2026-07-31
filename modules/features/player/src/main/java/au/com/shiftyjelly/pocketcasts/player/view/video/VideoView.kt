@@ -46,6 +46,20 @@ class VideoView @JvmOverloads constructor(
         }
     }
 
+    override fun onDetachedFromWindow() {
+        // Compose removes (rather than hides) this view when the player switches off video, so detach
+        // the surface here too — otherwise the SurfaceView keeps showing the last decoded frame.
+        releaseSurface()
+        super.onDetachedFromWindow()
+    }
+
+    /** Detach the surface from the player so no frozen frame lingers once video is no longer shown. */
+    fun releaseSurface() {
+        (player as? SimplePlayer)?.setDisplay(null)
+        isSurfaceConnected = false
+        isSurfaceConnectionPending = false
+    }
+
     fun connectWithDelay() {
         if (isSurfaceConnected) {
             return

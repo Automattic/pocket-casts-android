@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile.blogs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeed
@@ -20,9 +21,14 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -40,24 +46,28 @@ class AddBlogViewModel @Inject constructor(
     private val _url = MutableStateFlow("")
     val url: StateFlow<String> = _url.asStateFlow()
 
+    private val _podcastNavigationEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val podcastNavigationEvents: SharedFlow<String> = _podcastNavigationEvents.asSharedFlow()
+
     private var findFeedsJob: Job? = null
     private var createFeedJob: Job? = null
+    private var pollEpisodesJob: Job? = null
 
     fun onUrlChange(url: String) {
         _url.value = url
     }
 
-    fun onFindFeedsTapped(url: String, onNavigateToPodcast: (String) -> Unit) {
+    fun onFindFeedsTapped(url: String) {
         eventHorizon.track(BlogsFindFeedsTappedEvent)
-        findFeeds(url = url, onNavigateToPodcast = onNavigateToPodcast)
+        findFeeds(url = url)
     }
 
-    fun onRetryTapped(url: String, onNavigateToPodcast: (String) -> Unit) {
+    fun onRetryTapped(url: String) {
         eventHorizon.track(BlogsRetryTappedEvent)
-        findFeeds(url = url, onNavigateToPodcast = onNavigateToPodcast)
+        findFeeds(url = url)
     }
 
-    private fun findFeeds(url: String, onNavigateToPodcast: (String) -> Unit) {
+    private fun findFeeds(url: String) {
         val cleanUrl = url.trim()
         if (cleanUrl.isEmpty()) {
             return
@@ -70,7 +80,7 @@ class AddBlogViewModel @Inject constructor(
                 eventHorizon.track(BlogsFeedsFoundEvent(feedCount = feeds.size.toLong()))
                 when {
                     feeds.isEmpty() -> _uiState.value = UiState.Error(ErrorReason.NoFeedsFound)
-                    feeds.size == 1 -> createFeed(webFeed = feeds.first(), onNavigateToPodcast = onNavigateToPodcast)
+                    feeds.size == 1 -> createFeed(webFeed = feeds.first())
                     else -> _uiState.value = UiState.Pick(feeds)
                 }
             } catch (e: CancellationException) {
@@ -87,12 +97,12 @@ class AddBlogViewModel @Inject constructor(
         }
     }
 
-    fun onFeedSelected(webFeed: WebFeed, onNavigateToPodcast: (String) -> Unit) {
+    fun onFeedSelected(webFeed: WebFeed) {
         eventHorizon.track(BlogsFeedSelectedEvent)
-        createFeed(webFeed = webFeed, onNavigateToPodcast = onNavigateToPodcast)
+        createFeed(webFeed = webFeed)
     }
 
-    fun createFeed(webFeed: WebFeed, onNavigateToPodcast: (String) -> Unit) {
+    fun createFeed(webFeed: WebFeed) {
         createFeedJob?.cancel()
         createFeedJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
@@ -102,7 +112,21 @@ class AddBlogViewModel @Inject constructor(
                     val podcastUuid = response.podcast.uuid
                     podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
                     eventHorizon.track(BlogsSubscribedEvent(uuid = podcastUuid))
-                    onNavigateToPodcast(podcastUuid)
+                    val podcast = awaitSubscribedPodcast(podcastUuid)
+                    // jump straight to the podcast page if the subscribe is slow or didn't work
+                    if (podcast == null) {
+                        _podcastNavigationEvents.tryEmit(podcastUuid)
+                    } else {
+                        val episodeCount = podcastManager.countEpisodesByPodcast(podcastUuid)
+                        _uiState.value = UiState.Found(
+                            webFeed = webFeed,
+                            podcastUuid = podcastUuid,
+                            episodeCount = episodeCount,
+                        )
+                        if (episodeCount == 0) {
+                            pollForFirstEpisode(podcast = podcast, webFeed = webFeed)
+                        }
+                    }
                 } else {
                     Timber.e("Timed out waiting for podcast creation for ${webFeed.href}")
                     eventHorizon.track(BlogsCreateFailedEvent)
@@ -129,9 +153,48 @@ class AddBlogViewModel @Inject constructor(
         _uiState.value = UiState.Start
     }
 
+    private suspend fun awaitSubscribedPodcast(podcastUuid: String): Podcast? {
+        repeat(10) {
+            val podcast = podcastManager.findPodcastByUuid(podcastUuid)
+            if (podcast != null) return podcast
+            delay(1000L)
+        }
+        return null
+    }
+
+    private fun pollForFirstEpisode(podcast: Podcast, webFeed: WebFeed) {
+        pollEpisodesJob?.cancel()
+        pollEpisodesJob = viewModelScope.launch {
+            repeat(POLL_FIRST_EPISODE_MAX_ATTEMPTS) {
+                if (!isActive) return@launch
+                delay(POLL_FIRST_EPISODE_INTERVAL_MS)
+                try {
+                    podcastManager.refreshPodcastFeed(podcast)
+                    val count = podcastManager.countEpisodesByPodcast(podcast.uuid)
+                    if (count > 0) {
+                        _uiState.value = UiState.Found(
+                            webFeed = webFeed,
+                            podcastUuid = podcast.uuid,
+                            episodeCount = count,
+                        )
+                        _podcastNavigationEvents.tryEmit(podcast.uuid)
+                        return@launch
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Polling for first episode failed for ${podcast.uuid}")
+                }
+            }
+            // when waiting for too long, take the user to the podcast page
+            _podcastNavigationEvents.tryEmit(podcast.uuid)
+        }
+    }
+
     private fun cancelJobs() {
         findFeedsJob?.cancel()
         createFeedJob?.cancel()
+        pollEpisodesJob?.cancel()
     }
 
     fun onBackPressed(): Boolean {
@@ -147,6 +210,11 @@ class AddBlogViewModel @Inject constructor(
         data object Start : UiState
         data object Loading : UiState
         data class Pick(val feeds: List<WebFeed>) : UiState
+        data class Found(
+            val webFeed: WebFeed,
+            val podcastUuid: String,
+            val episodeCount: Int,
+        ) : UiState
         data class Error(val reason: ErrorReason) : UiState
     }
 
@@ -154,5 +222,10 @@ class AddBlogViewModel @Inject constructor(
         NoInternet,
         NoFeedsFound,
         Generic,
+    }
+
+    private companion object {
+        const val POLL_FIRST_EPISODE_INTERVAL_MS = 20_000L
+        const val POLL_FIRST_EPISODE_MAX_ATTEMPTS = 15
     }
 }

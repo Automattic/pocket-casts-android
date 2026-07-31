@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.initializerEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 
 class DefaultPlaylistsStartupInitializer : Initializer<Unit> {
@@ -17,7 +16,7 @@ class DefaultPlaylistsStartupInitializer : Initializer<Unit> {
 
     override fun create(context: Context) {
         context.initializerEntryPoint().inject(this)
-        applicationScope.launch(NonCancellable) {
+        applicationScope.launch {
             initializer.initialize()
         }
     }

@@ -48,8 +48,7 @@ internal class MostPopularPodcastsAdapter(
         fun bind(podcast: DiscoverPodcast) {
             imageRequestFactory.createForPodcast(podcast.uuid).loadInto(binding.imageView)
 
-            binding.lblTitle.text = podcast.title
-            binding.lblTitle.contentDescription = podcast.title
+            binding.lblTitle.setPodcastTitleWithExplicitBadge(podcast.title, podcast.explicit)
 
             binding.lblSubtitle.text = podcast.author
             binding.lblSubtitle.contentDescription = podcast.author

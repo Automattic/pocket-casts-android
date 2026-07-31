@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -132,9 +133,7 @@ class PodcastViewModel @Inject constructor(
 
     val tintColor = MutableLiveData<Int>()
 
-    val castConnected = castManager.isConnectedObservable
-        .toFlowable(BackpressureStrategy.LATEST)
-        .toLiveData()
+    val castConnected = castManager.isConnectedFlow.asLiveData()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -300,7 +299,7 @@ class PodcastViewModel @Inject constructor(
     fun onUnarchiveClicked() {
         launch {
             val p = podcast.value ?: return@launch
-            val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(p)
+            val episodes = episodeManager.findEpisodesByPodcastOrdered(p)
             episodeManager.unarchiveAllInListBlocking(episodes)
             eventHorizon.track(
                 EpisodeBulkUnarchivedEvent(
@@ -411,7 +410,7 @@ class PodcastViewModel @Inject constructor(
     fun archivePlayed() {
         val podcast = this.podcast.value ?: return
         launch {
-            val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast).filter { it.isFinished }
+            val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filter { it.isFinished }
             episodeManager.archiveAllInList(episodes, playbackManager)
             eventHorizon.track(
                 EpisodeBulkArchivedEvent(

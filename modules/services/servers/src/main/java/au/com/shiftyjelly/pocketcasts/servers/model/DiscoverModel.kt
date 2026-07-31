@@ -206,6 +206,7 @@ data class DiscoverPodcast(
     @Json(name = "description") val description: String?,
     @Json(name = "language") val language: String?,
     @Json(name = "media_type") val mediaType: String?,
+    @Json(name = "explicit") val explicit: Boolean? = null,
     val isSubscribed: Boolean = false,
     val isSponsored: Boolean = false,
     val listId: String? = null, // for carousel sponsored podcast

@@ -96,7 +96,6 @@ dependencies {
     implementation(libs.rx2.java)
     implementation(libs.timber)
     implementation(libs.work.runtime)
-    implementation(libs.zxing)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.cartheme)
@@ -116,6 +115,7 @@ dependencies {
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.preferences)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.sharing)

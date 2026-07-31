@@ -13,8 +13,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -23,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.util.Locale
 
 @Composable
 fun TextH10(
@@ -497,7 +498,7 @@ fun TextC50(
     fontWeight: FontWeight = FontWeight.W700,
 ) {
     Text(
-        text = text.uppercase(Locale.getDefault()),
+        text = text.toUpperCase(Locale.current),
         color = color,
         fontFamily = FontFamily.SansSerif,
         fontSize = 13.sp.scaled(disableAutoScale, fontScale),
@@ -522,7 +523,7 @@ fun TextC70(
     fontWeight: FontWeight = FontWeight.W500,
 ) {
     Text(
-        text = if (isUpperCase) text.uppercase(Locale.getDefault()) else text,
+        text = if (isUpperCase) text.toUpperCase(Locale.current) else text,
         color = MaterialTheme.theme.colors.primaryText02,
         fontFamily = FontFamily.SansSerif,
         fontSize = fontSize.scaled(disableAutoScale, fontScale),

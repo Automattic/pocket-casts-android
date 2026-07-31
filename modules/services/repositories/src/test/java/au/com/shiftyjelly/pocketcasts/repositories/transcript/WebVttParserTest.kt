@@ -39,14 +39,14 @@ class WebVttParserTest {
 
         assertEquals(
             listOf(
-                TranscriptEntry.Text("Text"),
+                TranscriptEntry.Text("Text", startTimeMs = 0, endTimeMs = 1000),
                 TranscriptEntry.Speaker("Alice"),
-                TranscriptEntry.Text("Text with speaker"),
-                TranscriptEntry.Text("Text with decorations"),
+                TranscriptEntry.Text("Text with speaker", startTimeMs = 1000, endTimeMs = 2000),
+                TranscriptEntry.Text("Text with decorations", startTimeMs = 2000, endTimeMs = 3000),
                 TranscriptEntry.Speaker("Bob"),
-                TranscriptEntry.Text("Text with speaker and with spans"),
+                TranscriptEntry.Text("Text with speaker and with spans", startTimeMs = 3000, endTimeMs = 4000),
                 TranscriptEntry.Speaker("Alice, Bob"),
-                TranscriptEntry.Text("Text with multiple speakers"),
+                TranscriptEntry.Text("Text with multiple speakers", startTimeMs = 4000, endTimeMs = 5000),
             ),
             entries,
         )

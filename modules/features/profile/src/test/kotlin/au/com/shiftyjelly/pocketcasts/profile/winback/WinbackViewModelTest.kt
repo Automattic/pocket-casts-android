@@ -35,6 +35,9 @@ import com.automattic.eventhorizon.WinbackRowType
 import com.automattic.eventhorizon.WinbackScreenDismissedEvent
 import com.automattic.eventhorizon.WinbackScreenShownEvent
 import com.pocketcasts.service.api.winbackResponse
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Currency
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -718,7 +721,8 @@ class WinbackViewModelTest {
                     tier = SubscriptionTier.Plus,
                     billingCycle = BillingCycle.Yearly,
                     isInstallment = true,
-                    formattedTotalSavings = "$19.98",
+                    // Match the locale currency formatting used by WinbackViewModel, for example en_US prints $19.98, while en_AU can print USD19.98.
+                    formattedTotalSavings = formatCurrency(amount = "19.98", currencyCode = "USD"),
                 ),
                 offer,
             )
@@ -902,3 +906,9 @@ private fun createSuccessReferralResult(
         this.offer = offerId
     },
 )
+
+private fun formatCurrency(amount: String, currencyCode: String): String {
+    return NumberFormat.getCurrencyInstance().apply {
+        currency = Currency.getInstance(currencyCode)
+    }.format(BigDecimal(amount))
+}

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.compose.stats.HeatLevel
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -11,9 +12,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -48,6 +53,9 @@ class StatsViewModel @Inject constructor(
             val totalSaved: Long,
             val funnyText: String,
             val startedAt: Date?,
+            val heatmapStart: LocalDate = LocalDate.now(),
+            val heatmapEnd: LocalDate = LocalDate.now(),
+            val heatLevels: Map<LocalDate, HeatLevel> = emptyMap(),
             val showAppReviewDialog: Boolean = false,
         ) : State()
     }
@@ -77,6 +85,18 @@ class StatsViewModel @Inject constructor(
 
                 val funnyText = FunnyTimeConverter().timeSecsToFunnyText(totalListened, application.resources)
 
+                val zone = ZoneId.systemDefault()
+                val heatmapEnd = LocalDate.now(zone)
+                val heatmapStart = heatmapEnd.minusDays(HEATMAP_DAYS)
+                val heatLevels = if (FeatureFlag.isEnabled(Feature.STATS_HEATMAP)) {
+                    withContext(ioDispatcher) {
+                        val fromEpochMs = heatmapStart.atStartOfDay(zone).toInstant().toEpochMilli()
+                        listeningHeatLevels(episodeManager.dailyListenedTime(fromEpochMs), heatmapStart, heatmapEnd)
+                    }
+                } else {
+                    emptyMap()
+                }
+
                 mutableState.value = State.Loaded(
                     totalListened = totalListened,
                     skipping = skipping,
@@ -86,6 +106,9 @@ class StatsViewModel @Inject constructor(
                     totalSaved = skipping + variableSpeed + trimSilence + autoSkipping,
                     funnyText = funnyText,
                     startedAt = serverStats?.startedAt,
+                    heatmapStart = heatmapStart,
+                    heatmapEnd = heatmapEnd,
+                    heatLevels = heatLevels,
                 )
                 withContext(ioDispatcher) {
                     serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
@@ -135,5 +158,6 @@ class StatsViewModel @Inject constructor(
         private const val DAYS_LIMIT_FOR_PLAYED_UPTO = 7
         private const val MIN_DAYS_STATS_STARTED = 7
         private const val IN_APP_REVIEW_LAUNCH_DELAY_IN_MS = 1000L
+        private const val HEATMAP_DAYS = 364L
     }
 }
