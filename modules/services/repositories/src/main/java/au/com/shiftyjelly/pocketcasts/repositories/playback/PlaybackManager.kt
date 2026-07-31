@@ -403,7 +403,7 @@ open class PlaybackManager @Inject constructor(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
                 hlsAvailable = autoPlayOffersHls,
-                audioOnlyMode = if (autoPlayOffersHls) settings.audioOnly.value else null,
+                audioOnlyMode = audioOnlyModeOrNull(autoPlayEpisode, hlsRelevant = autoPlayOffersHls),
             ),
         )
         return autoPlayEpisode
@@ -499,8 +499,12 @@ open class PlaybackManager @Inject constructor(
 
     private fun audioOnlyModeOrNull(): Boolean? {
         val episode = getCurrentEpisode() ?: return null
-        val playingHlsStream = episode.isStreamUrlHls && player?.isStreaming == true
-        if (!playingHlsStream && !episode.isVideo) return null
+        return audioOnlyModeOrNull(episode, hlsRelevant = _streamVideoState.value != StreamVideoState.NotVideo)
+    }
+
+    private fun audioOnlyModeOrNull(episode: BaseEpisode?, hlsRelevant: Boolean): Boolean? {
+        if (episode == null) return null
+        if (!hlsRelevant && !episode.isVideo) return null
         return settings.audioOnly.value || !_videoRenderingEnabled.value
     }
 
@@ -2921,13 +2925,12 @@ open class PlaybackManager @Inject constructor(
             return
         }
         val hlsAvailable = _streamHlsAvailable.value
-        val audioOnlyMode = audioOnlyModeOrNull()
         trackWithContentType(episode) { contentType ->
             PlaybackPlayEvent(
                 source = source.analyticsValue,
                 contentType = contentType,
                 hlsAvailable = hlsAvailable,
-                audioOnlyMode = audioOnlyMode,
+                audioOnlyMode = audioOnlyModeOrNull(),
             )
         }
     }
