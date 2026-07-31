@@ -58,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountModal
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
@@ -90,6 +91,8 @@ fun TvPodcastDetailsScreen(
 
     TvPodcastDetailsContent(
         uiState = uiState,
+        onToggleSubscribe = viewModel::toggleSubscribe,
+        onSubscribe = viewModel::subscribe,
         onChangeSortType = viewModel::changeSortType,
         onToggleArchiveFilter = viewModel::toggleArchiveFilter,
         modifier = modifier,
@@ -99,6 +102,8 @@ fun TvPodcastDetailsScreen(
 @Composable
 private fun TvPodcastDetailsContent(
     uiState: TvPodcastDetailsUiState,
+    onToggleSubscribe: () -> Unit,
+    onSubscribe: () -> Unit,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
     modifier: Modifier = Modifier,
@@ -112,6 +117,7 @@ private fun TvPodcastDetailsContent(
             is TvPodcastDetailsUiState.Loaded -> {
                 val followFocusRequester = remember { FocusRequester() }
                 var isShowingInfoModal by remember { mutableStateOf(false) }
+                var isShowingAccountModal by remember { mutableStateOf(false) }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(80.dp),
                     modifier = Modifier
@@ -121,6 +127,13 @@ private fun TvPodcastDetailsContent(
                     PodcastInfo(
                         podcast = uiState.podcast,
                         followFocusRequester = followFocusRequester,
+                        onFollow = {
+                            if (uiState.isLoggedIn) {
+                                onToggleSubscribe()
+                            } else {
+                                isShowingAccountModal = true
+                            }
+                        },
                         onMoreInfo = { isShowingInfoModal = true },
                         modifier = Modifier.width(InfoPaneWidth),
                     )
@@ -149,6 +162,15 @@ private fun TvPodcastDetailsContent(
                         onDismissRequest = { isShowingInfoModal = false },
                     )
                 }
+                if (isShowingAccountModal) {
+                    TvCreateAccountModal(
+                        onDismissRequest = { isShowingAccountModal = false },
+                        onSignedIn = {
+                            isShowingAccountModal = false
+                            onSubscribe()
+                        },
+                    )
+                }
             }
         }
     }
@@ -158,6 +180,7 @@ private fun TvPodcastDetailsContent(
 private fun PodcastInfo(
     podcast: Podcast,
     followFocusRequester: FocusRequester,
+    onFollow: () -> Unit,
     onMoreInfo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -196,7 +219,7 @@ private fun PodcastInfo(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
-                onClick = {},
+                onClick = onFollow,
                 colors = TvButtonDefaults.filledButtonColors(),
                 modifier = Modifier.focusRequester(followFocusRequester),
             ) {
@@ -381,7 +404,10 @@ private fun TvPodcastDetailsContentPreview(
                     episodes = episodes,
                     archivedEpisodeCount = 0,
                     isShowingArchived = false,
+                    isLoggedIn = true,
                 ),
+                onToggleSubscribe = {},
+                onSubscribe = {},
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
             )

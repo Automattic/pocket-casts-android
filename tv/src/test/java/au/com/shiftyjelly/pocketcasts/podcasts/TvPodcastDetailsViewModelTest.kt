@@ -1,18 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.podcasts
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -23,6 +27,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvPodcastDetailsViewModelTest {
@@ -43,6 +48,10 @@ class TvPodcastDetailsViewModelTest {
         on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes
     }
     private val preferences = mock<TvPreferences>()
+    private val loggedIn = BehaviorRelay.createDefault(false)
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedInObservable } doReturn loggedIn
+    }
 
     @Test
     fun `archived episodes are hidden by default`() = runTest {
@@ -206,6 +215,67 @@ class TvPodcastDetailsViewModelTest {
         }
     }
 
+    @Test
+    fun `the logged in state is reflected in the loaded state`() = runTest {
+        loggedIn.accept(true)
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            assertEquals(true, (awaitItem() as TvPodcastDetailsUiState.Loaded).isLoggedIn)
+        }
+    }
+
+    @Test
+    fun `subscribe follows the podcast and syncs`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.subscribe()
+
+        verify(podcastManager).subscribeToPodcast(podcastUuid = "podcast-uuid", sync = true)
+    }
+
+    @Test
+    fun `toggling an unsubscribed podcast follows it`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(podcastManager).subscribeToPodcast(podcastUuid = "podcast-uuid", sync = true)
+    }
+
+    @Test
+    fun `toggling a subscribed podcast unfollows it`() = runTest {
+        val subscribedPodcast = podcast.copy(isSubscribed = true)
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(subscribedPodcast)
+            on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(subscribedPodcast)
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+        advanceUntilIdle()
+
+        verifyBlocking(podcastManager) { unsubscribe("podcast-uuid", SourceView.PODCAST_SCREEN) }
+    }
+
     private fun createViewModel(
         prefs: TvPreferences = preferences,
         podcastManager: PodcastManager = this.podcastManager,
@@ -213,6 +283,7 @@ class TvPodcastDetailsViewModelTest {
         podcastUuid = "podcast-uuid",
         podcastManager = podcastManager,
         episodeManager = episodeManager,
+        syncManager = syncManager,
         preferences = prefs,
         defaultDispatcher = coroutineRule.testDispatcher,
         ioDispatcher = coroutineRule.testDispatcher,
