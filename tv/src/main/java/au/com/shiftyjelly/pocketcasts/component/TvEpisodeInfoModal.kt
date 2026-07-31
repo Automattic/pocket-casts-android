@@ -5,6 +5,7 @@ import android.text.format.DateFormat
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -40,7 +41,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoViewModel.ShowNotes
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
@@ -60,17 +64,21 @@ fun TvEpisodeInfoModal(
     modifier: Modifier = Modifier,
     viewModel: TvEpisodeInfoViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(episode.podcastUuid) {
-        viewModel.load(episode.podcastUuid)
+    LaunchedEffect(episode.uuid) {
+        viewModel.load(episode.podcastUuid, episode.uuid)
     }
-    val podcastTitleState by viewModel.podcastTitle.collectAsStateWithLifecycle()
-    val podcastTitle = podcastTitleState?.takeIf { it.podcastUuid == episode.podcastUuid }?.title
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state = uiState?.takeIf { it.episodeUuid == episode.uuid }
     TvModal(
         onDismissRequest = onDismissRequest,
         width = EpisodeInfoModalWidth,
         modifier = modifier,
     ) {
-        TvEpisodeInfoModalContent(episode = episode, podcastTitle = podcastTitle)
+        TvEpisodeInfoModalContent(
+            episode = episode,
+            podcastTitle = state?.podcastTitle,
+            showNotes = state?.showNotes ?: ShowNotes.Loading,
+        )
     }
 }
 
@@ -78,6 +86,7 @@ fun TvEpisodeInfoModal(
 private fun ColumnScope.TvEpisodeInfoModalContent(
     episode: PodcastEpisode,
     podcastTitle: String?,
+    showNotes: ShowNotes,
 ) {
     val context = LocalContext.current
     EpisodeHeader(episode = episode, podcastTitle = podcastTitle, context = context)
@@ -89,7 +98,7 @@ private fun ColumnScope.TvEpisodeInfoModalContent(
         modifier = Modifier.fillMaxWidth(),
     )
     EpisodeDescriptionPane(
-        description = episode.episodeDescription,
+        showNotes = showNotes,
         modifier = Modifier
             .fillMaxWidth()
             .height(DescriptionHeight),
@@ -138,7 +147,7 @@ private fun EpisodeHeader(
 
 @Composable
 private fun EpisodeDescriptionPane(
-    description: String,
+    showNotes: ShowNotes,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -148,7 +157,8 @@ private fun EpisodeDescriptionPane(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    Column(
+    val isScrollable = showNotes !is ShowNotes.Loading
+    Box(
         modifier = modifier
             .focusRequester(focusRequester)
             .onKeyEvent { event ->
@@ -164,14 +174,24 @@ private fun EpisodeDescriptionPane(
                 true
             }
             .focusable()
-            .verticalScroll(scrollState),
+            .then(if (isScrollable) Modifier.verticalScroll(scrollState) else Modifier),
     ) {
-        val hasDescription = description.isNotBlank()
-        Text(
-            text = if (hasDescription) description else stringResource(LR.string.error_loading_show_notes),
-            style = TvTextStyles.FeaturedTileDescription,
-            color = if (hasDescription) Color.White else TvColors.TextSecondary,
-        )
+        when (showNotes) {
+            is ShowNotes.Loading -> LoadingView(color = Color.White)
+
+            is ShowNotes.Loaded -> HtmlText(
+                html = showNotes.html,
+                color = Color.White,
+                linkColor = Color.White,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            is ShowNotes.Unavailable -> Text(
+                text = stringResource(LR.string.error_loading_show_notes),
+                style = TvTextStyles.FeaturedTileDescription,
+                color = TvColors.TextSecondary,
+            )
+        }
     }
 }
 
@@ -203,10 +223,12 @@ private fun TvEpisodeInfoModalPreview() {
                         podcastUuid = "podcast-uuid",
                         duration = 1560.0,
                         publishedDate = Date(0),
-                        episodeDescription = "Our sense of smell is often dismissed as our less important than sight and " +
-                            "hearing, but what if it's quietly shaping our memories, mood and long-term brain health?",
                     ),
                     podcastTitle = "The Writer's Voice",
+                    showNotes = ShowNotes.Loaded(
+                        html = "Our sense of smell is often dismissed as our less important than sight and hearing, " +
+                            "but what if it's quietly shaping our memories, mood and long-term brain health?",
+                    ),
                 )
             }
         }
