@@ -33,7 +33,9 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,7 +46,6 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoViewModel.ShowNotes
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
@@ -179,10 +180,10 @@ private fun EpisodeDescriptionPane(
         when (showNotes) {
             is ShowNotes.Loading -> LoadingView(color = Color.White)
 
-            is ShowNotes.Loaded -> HtmlText(
-                html = showNotes.html,
+            is ShowNotes.Loaded -> Text(
+                text = AnnotatedString.fromHtml(showNotes.html),
+                style = TvTextStyles.FeaturedTileDescription,
                 color = Color.White,
-                linkColor = Color.White,
                 modifier = Modifier.fillMaxWidth(),
             )
 
