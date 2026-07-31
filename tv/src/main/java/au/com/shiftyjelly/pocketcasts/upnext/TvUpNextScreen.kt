@@ -36,6 +36,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -102,6 +103,7 @@ private fun UpNextList(
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
+    var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
     Column(
         modifier = modifier
@@ -134,6 +136,16 @@ private fun UpNextList(
         TvEpisodeActionsModal(
             episode = episode,
             onDismissRequest = { actionsEpisode = null },
+            onShowEpisodeDetails = {
+                detailsEpisode = episode
+                actionsEpisode = null
+            },
+        )
+    }
+    detailsEpisode?.let { episode ->
+        TvEpisodeInfoModal(
+            episode = episode,
+            onDismissRequest = { detailsEpisode = null },
         )
     }
 }

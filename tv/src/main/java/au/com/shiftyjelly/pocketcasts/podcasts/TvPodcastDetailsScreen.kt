@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
@@ -282,6 +283,7 @@ private fun EpisodeList(
         }
     }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
+    var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -339,6 +341,16 @@ private fun EpisodeList(
         TvEpisodeActionsModal(
             episode = episode,
             onDismissRequest = { actionsEpisode = null },
+            onShowEpisodeDetails = {
+                detailsEpisode = episode
+                actionsEpisode = null
+            },
+        )
+    }
+    detailsEpisode?.let { episode ->
+        TvEpisodeInfoModal(
+            episode = episode,
+            onDismissRequest = { detailsEpisode = null },
         )
     }
 }

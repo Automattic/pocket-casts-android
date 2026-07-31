@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun TvEpisodeActionsModal(
     episode: PodcastEpisode,
     onDismissRequest: () -> Unit,
+    onShowEpisodeDetails: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TvModal(
@@ -38,6 +39,7 @@ fun TvEpisodeActionsModal(
         TvEpisodeActionsModalContent(
             episode = episode,
             onDismissRequest = onDismissRequest,
+            onShowEpisodeDetails = onShowEpisodeDetails,
         )
     }
 }
@@ -46,6 +48,7 @@ fun TvEpisodeActionsModal(
 private fun ColumnScope.TvEpisodeActionsModalContent(
     episode: PodcastEpisode,
     onDismissRequest: () -> Unit,
+    onShowEpisodeDetails: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
@@ -60,18 +63,18 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     val archiveToggle = stringResource(if (episode.isArchived) LR.string.unarchive else LR.string.archive)
 
     val actions = listOf(
-        episodeDetails,
-        goToPodcast,
-        playNext,
-        playLast,
-        playedToggle,
-        archiveToggle,
+        episodeDetails to onShowEpisodeDetails,
+        goToPodcast to {},
+        playNext to {},
+        playLast to {},
+        playedToggle to {},
+        archiveToggle to {},
     )
 
-    actions.forEachIndexed { index, label ->
+    actions.forEachIndexed { index, (label, onClick) ->
         TvEpisodeActionButton(
             text = label,
-            onClick = {},
+            onClick = onClick,
             modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
         )
     }
