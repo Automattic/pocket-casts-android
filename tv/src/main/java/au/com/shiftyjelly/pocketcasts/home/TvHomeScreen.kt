@@ -134,7 +134,7 @@ private fun TvHomeRows(
                             isSponsored = podcast.isSponsored,
                             title = podcast.title,
                             description = podcast.description,
-                            onGoToPodcast = {},
+                            onGoToPodcast = { onOpenPodcast(podcast.uuid) },
                             onPlayLastEpisode = {},
                         )
                     }
@@ -153,7 +153,7 @@ private fun TvHomeRows(
                             podcastTitle = episode.podcastTitle,
                             episodeTitle = episode.episodeTitle,
                             onPlayEpisode = {},
-                            onGoToPodcast = {},
+                            onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
                         )
                     }
                 }
