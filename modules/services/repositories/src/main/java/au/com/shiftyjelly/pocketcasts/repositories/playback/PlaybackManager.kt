@@ -2165,11 +2165,10 @@ open class PlaybackManager @Inject constructor(
             videoStreamPreferredEpisodeUuid = null
         }
 
-        val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castManager.isConnected())
+        val castConnected = castManager.isConnected()
+        val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castConnected)
 
         flushPendingContentTypeEvents()
-
-        val playingRemotely = castManager.isConnected()
 
         // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
         synchronized(pendingContentTypeEvents) {
@@ -2177,7 +2176,7 @@ open class PlaybackManager @Inject constructor(
                 episode,
                 audioOnly = settings.audioOnly.value,
                 playingHlsStream = playingStream && episode.isStreamUrlHls,
-                isRemote = playingRemotely,
+                isRemote = castConnected,
             )
         }
         _videoRenderingEnabled.value = true
@@ -2283,7 +2282,7 @@ open class PlaybackManager @Inject constructor(
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
             isPlayerSwitchRequired() ||
-            isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected(), playingStream)
+            isPlayerResetNeeded(episode, sameEpisode, castConnected, playingStream)
         ) {
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
