@@ -63,7 +63,8 @@ fun TvEpisodeInfoModal(
     LaunchedEffect(episode.podcastUuid) {
         viewModel.load(episode.podcastUuid)
     }
-    val podcastTitle by viewModel.podcastTitle.collectAsStateWithLifecycle()
+    val podcastTitleState by viewModel.podcastTitle.collectAsStateWithLifecycle()
+    val podcastTitle = podcastTitleState?.takeIf { it.podcastUuid == episode.podcastUuid }?.title
     TvModal(
         onDismissRequest = onDismissRequest,
         width = EpisodeInfoModalWidth,
@@ -165,10 +166,11 @@ private fun EpisodeDescriptionPane(
             .focusable()
             .verticalScroll(scrollState),
     ) {
+        val hasDescription = description.isNotBlank()
         Text(
-            text = description,
+            text = if (hasDescription) description else stringResource(LR.string.error_loading_show_notes),
             style = TvTextStyles.FeaturedTileDescription,
-            color = Color.White,
+            color = if (hasDescription) Color.White else TvColors.TextSecondary,
         )
     }
 }

@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 class TvEpisodeInfoViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
 ) : ViewModel() {
-    private val _podcastTitle = MutableStateFlow<String?>(null)
-    val podcastTitle: StateFlow<String?> = _podcastTitle.asStateFlow()
+    private val _podcastTitle = MutableStateFlow<PodcastTitle?>(null)
+    val podcastTitle: StateFlow<PodcastTitle?> = _podcastTitle.asStateFlow()
 
     private var loadedUuid: String? = null
 
@@ -24,9 +24,10 @@ class TvEpisodeInfoViewModel @Inject constructor(
             return
         }
         loadedUuid = podcastUuid
-        _podcastTitle.value = null
         viewModelScope.launch {
-            _podcastTitle.value = podcastManager.findPodcastByUuid(podcastUuid)?.title
+            _podcastTitle.value = PodcastTitle(podcastUuid, podcastManager.findPodcastByUuid(podcastUuid)?.title)
         }
     }
+
+    data class PodcastTitle(val podcastUuid: String, val title: String?)
 }
