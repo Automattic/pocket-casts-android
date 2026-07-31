@@ -43,9 +43,9 @@ enum class StreamVideoState {
     ;
 
     companion object {
-        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean) = when {
+        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean, isRemote: Boolean) = when {
             audioOnly && (episode.isVideo || playingHlsStream) -> AudioOnly
-            playingHlsStream -> Unknown
+            playingHlsStream && !isRemote -> Unknown
             else -> NotVideo
         }
     }

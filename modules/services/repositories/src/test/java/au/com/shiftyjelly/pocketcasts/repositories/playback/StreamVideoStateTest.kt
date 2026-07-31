@@ -11,56 +11,70 @@ class StreamVideoStateTest {
     fun `audio episode starts not video`() {
         val episode = createEpisode(fileType = "audio/mpeg")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
     }
 
     @Test
     fun `audio episode ignores audio only`() {
         val episode = createEpisode(fileType = "audio/mpeg")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
     }
 
     @Test
     fun `video episode starts not video so its own flag decides`() {
         val episode = createEpisode(fileType = "video/mp4")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
     }
 
     @Test
     fun `audio only forces a video episode to audio`() {
         val episode = createEpisode(fileType = "video/mp4")
 
-        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false))
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
     }
 
     @Test
     fun `hls stream starts unknown`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = true))
+        assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = true, isRemote = false))
     }
 
     @Test
     fun `audio only forces an hls stream to audio`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = true))
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = true, isRemote = false))
+    }
+
+    @Test
+    fun `remote hls stream resolves without waiting for tracks`() {
+        val episode = createHlsEpisode()
+
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = true, isRemote = true))
+    }
+
+    @Test
+    fun `audio only forces a remote hls stream to audio`() {
+        val episode = createHlsEpisode()
+
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = true, isRemote = true))
     }
 
     @Test
     fun `downloaded hls episode playing its local file starts not video`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
     }
 
     @Test
     fun `downloaded hls episode playing its local audio file ignores audio only`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
     }
 
     private fun createEpisode(fileType: String) = PodcastEpisode(
