@@ -34,19 +34,16 @@ interface EpisodeManager {
 
     fun findEpisodesWhereBlocking(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedBlocking(podcast: Podcast): List<PodcastEpisode>
-    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedByPublishDateBlocking(podcast: Podcast): List<PodcastEpisode>
     suspend fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode>
     fun findLatestUnfinishedEpisodeByPodcastBlocking(podcast: Podcast): PodcastEpisode?
     fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
     fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>>
-    fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
     suspend fun findEpisodesToSync(): List<PodcastEpisode>
     fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode>
-
-    fun findEpisodesDownloadingBlocking(): List<PodcastEpisode>
 
     fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
@@ -76,7 +73,6 @@ interface EpisodeManager {
     fun updateDownloadFilePathBlocking(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileTypeBlocking(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytesBlocking(episode: BaseEpisode?, sizeInBytes: Long)
-    fun updateDownloadErrorDetailsBlocking(episode: BaseEpisode?, message: String?)
 
     fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeDownloadStatus)
 
@@ -109,7 +105,6 @@ interface EpisodeManager {
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int
-    fun countEpisodesWhereBlocking(queryAfterWhere: String): Int
     fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
     suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
@@ -123,7 +118,6 @@ interface EpisodeManager {
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
     fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
-    fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long)
     suspend fun findStaleDownloads(): List<PodcastEpisode>

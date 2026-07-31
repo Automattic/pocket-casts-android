@@ -58,7 +58,7 @@ class ShareListIncomingViewModel
 
     fun subscribeToPodcast(uuid: String) {
         launch {
-            val podcast = podcastManager.findPodcastByUuidBlocking(uuid)
+            val podcast = podcastManager.findPodcastByUuid(uuid)
             if (podcast == null || !podcast.isSubscribed) {
                 podcastManager.subscribeToPodcast(uuid, true)
             }

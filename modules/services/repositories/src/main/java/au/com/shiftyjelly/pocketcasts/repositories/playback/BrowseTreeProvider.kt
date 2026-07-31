@@ -316,7 +316,7 @@ class BrowseTreeProvider @Inject constructor(
                 ?: podcastManager.findOrDownloadPodcastRxSingle(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
                 val episodes = episodeManager
-                    .findEpisodesByPodcastOrderedBlocking(podcast)
+                    .findEpisodesByPodcastOrdered(podcast)
                     .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
                     .take(EPISODE_LIMIT)
                     .toMutableList()

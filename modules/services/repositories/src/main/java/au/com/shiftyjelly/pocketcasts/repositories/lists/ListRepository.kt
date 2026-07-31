@@ -6,8 +6,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import timber.log.Timber
 
 class ListRepository(
@@ -17,8 +15,7 @@ class ListRepository(
 ) {
 
     suspend fun getDiscoverFeed(): Discover {
-        val version = if (FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) 3 else 2
-        return listWebService.getDiscoverFeed(platform = platform, version = version)
+        return listWebService.getDiscoverFeed(platform = platform, version = 3)
     }
 
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed? {
@@ -45,5 +42,11 @@ class ListRepository(
 
     suspend fun getPodcastRecommendations(podcastUuid: String, countryCode: String?): ListFeed? {
         return getListFeed(url = "${Settings.SERVER_API_URL}/recommendations/podcast/$podcastUuid?country=${countryCode ?: "global"}")
+    }
+
+    companion object {
+        const val PLATFORM_ANDROID = "android"
+        const val PLATFORM_AUTOMOTIVE = "automotive"
+        const val PLATFORM_TV = "tv"
     }
 }

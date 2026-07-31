@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -146,6 +147,18 @@ class PodcastDaoTest {
         assertEquals("Should only be 2 results", 2, folderPodcasts.size)
         assertEquals("First podcast should be most recently played", podcast2.uuid, folderPodcasts[0].uuid)
         assertEquals("Second podcast should be least recently played", podcast1.uuid, folderPodcasts[1].uuid)
+    }
+
+    @Test
+    fun testUpdateShowNotificationsForSubscribed() = runTest {
+        val (podcast1, podcast2, unsubscribed) = insertTestPodcastsAndEpisodes()
+        podcastDao.updateShowNotifications(podcast2.uuid, true)
+
+        podcastDao.updateShowNotificationsForSubscribed(listOf(podcast1.uuid, unsubscribed.uuid))
+
+        assertTrue("Selected podcast should be enabled", podcastDao.findPodcastByUuid(podcast1.uuid)!!.isShowNotifications)
+        assertFalse("Deselected podcast should be disabled", podcastDao.findPodcastByUuid(podcast2.uuid)!!.isShowNotifications)
+        assertFalse("Unsubscribed podcast should be left alone", podcastDao.findPodcastByUuid(unsubscribed.uuid)!!.isShowNotifications)
     }
 
     private suspend fun insertTestPodcastsAndEpisodes(folderId: String? = null): Triple<Podcast, Podcast, Podcast> {

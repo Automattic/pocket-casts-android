@@ -4,8 +4,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -29,9 +27,7 @@ class RecommendationsHandler @Inject constructor(
     private val retryCountObservable = BehaviorSubject.createDefault(0)
 
     fun setEnabled(enabled: Boolean) {
-        if (FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) {
-            enabledObservable.onNext(enabled)
-        }
+        enabledObservable.onNext(enabled)
     }
 
     fun getRecommendationsFlowable(podcastUuid: String): Flowable<RecommendationsResult> {

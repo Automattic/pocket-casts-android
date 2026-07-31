@@ -1,6 +1,8 @@
 8.18
 -----
-
+*   Bug Fixes
+    *   Allow copying description and show notes links with a long press
+        ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
 
 8.17
 -----
@@ -15,13 +17,13 @@
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
     *   Add option to switch to the HLS video stream when playing a downloaded episode
         ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
-    *   Resolve generated chapter seeks through on-demand audio fingerprinting
-        ([#5613](https://github.com/Automattic/pocket-casts-android/pull/5613))
 *   Updates
     *   Respect Audio only toggle when playing progressive mp4 episodes
         ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
     *   Tap into ExoPlayer's cache instead of a standalone MediaSource for fingerprinting
         ([#5618](https://github.com/Automattic/pocket-casts-android/pull/5618))
+    *   Resolve generated chapter seeks through on-demand audio fingerprinting
+        ([#5613](https://github.com/Automattic/pocket-casts-android/pull/5613))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))
@@ -31,6 +33,8 @@
         ([#5550](https://github.com/Automattic/pocket-casts-android/pull/5550))
     *   Fix Automotive crash when using Google Assistant voice commands to control playback
         ([#5551](https://github.com/Automattic/pocket-casts-android/pull/5551))
+    *   Fix podcast episode row button not switching to play when connected to Chromecast
+        ([#5604](https://github.com/Automattic/pocket-casts-android/pull/5604))
 
 8.16
 -----
