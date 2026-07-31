@@ -403,7 +403,7 @@ open class PlaybackManager @Inject constructor(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
                 hlsAvailable = autoPlayOffersHls,
-                audioOnlyMode = audioOnlyModeOrNull(autoPlayEpisode, hlsRelevant = autoPlayOffersHls),
+                audioOnlyMode = if (autoPlayOffersHls || autoPlayEpisode.isVideo) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
@@ -2169,12 +2169,15 @@ open class PlaybackManager @Inject constructor(
 
         flushPendingContentTypeEvents()
 
+        val playingRemotely = castManager.isConnected()
+
         // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
         synchronized(pendingContentTypeEvents) {
             _streamVideoState.value = StreamVideoState.initialFor(
                 episode,
                 audioOnly = settings.audioOnly.value,
                 playingHlsStream = playingStream && episode.isStreamUrlHls,
+                isRemote = playingRemotely,
             )
         }
         _videoRenderingEnabled.value = true
@@ -2930,7 +2933,7 @@ open class PlaybackManager @Inject constructor(
                 source = source.analyticsValue,
                 contentType = contentType,
                 hlsAvailable = hlsAvailable,
-                audioOnlyMode = audioOnlyModeOrNull(),
+                audioOnlyMode = audioOnlyModeOrNull(episode, hlsRelevant = _streamVideoState.value != StreamVideoState.NotVideo),
             )
         }
     }
