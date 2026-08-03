@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.jakewharton.rxrelay2.BehaviorRelay
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -34,6 +35,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -48,7 +50,9 @@ class TvHomeViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val listRepository = mock<ListRepository>()
-    private val syncManager = mock<SyncManager>()
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedInObservable } doReturn BehaviorRelay.createDefault(false)
+    }
     private val podcastDao = mock<PodcastDao> {
         on { findAllIn(any()) }.thenReturn(emptyList())
     }

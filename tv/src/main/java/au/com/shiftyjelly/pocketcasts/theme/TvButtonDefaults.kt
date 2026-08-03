@@ -11,9 +11,9 @@ object TvButtonDefaults {
 
     @Composable
     fun filledButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = TvColors.BgActive20,
-        contentColor = TvColors.TextSecondary,
-        focusedContainerColor = Color.White,
+        containerColor = TvColors.TextPrimary20,
+        contentColor = TvColors.TextPrimary,
+        focusedContainerColor = TvColors.BgActive,
         focusedContentColor = TvColors.Dark,
     )
 

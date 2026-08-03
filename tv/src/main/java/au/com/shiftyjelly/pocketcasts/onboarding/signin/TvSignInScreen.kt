@@ -260,7 +260,7 @@ private fun CodeCharacterBox(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(width = 48.dp, height = 56.dp)
-            .background(TvColors.BgActive20, RoundedCornerShape(8.dp)),
+            .background(TvColors.TextPrimary20, RoundedCornerShape(8.dp)),
     ) {
         Text(
             text = character,
