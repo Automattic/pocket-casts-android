@@ -55,12 +55,12 @@ fun TvEpisodeListItem(
         )
         AnimatedVisibility(
             visible = isItemFocused,
-            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), expandFrom = Alignment.Start) +
-                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), initialOffsetX = { it }) +
-                fadeIn(tween(MORE_BUTTON_ANIMATION_MILLIS)),
-            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), shrinkTowards = Alignment.Start) +
-                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), targetOffsetX = { it }) +
-                fadeOut(tween(MORE_BUTTON_ANIMATION_MILLIS)),
+            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
+                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
+                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
+                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
+                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(16.dp))
@@ -70,4 +70,4 @@ fun TvEpisodeListItem(
     }
 }
 
-private const val MORE_BUTTON_ANIMATION_MILLIS = 200
+private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200

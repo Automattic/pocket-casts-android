@@ -29,7 +29,8 @@ class TvApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
-        // The only setupBlocking() call on TV; there is no PlaybackManager.setup() here, so calling it again would double-subscribe the queue's sync pipeline.
+        // The only setupBlocking() call on TV; there is no PlaybackManager.setup() here,
+        // so calling it again would double-subscribe the queue's sync pipeline.
         applicationScope.launch {
             upNextQueue.setupBlocking()
         }

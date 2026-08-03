@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
@@ -177,13 +176,6 @@ private fun SortableEpisodeList(
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
             runCatching { firstEpisodeFocusRequester.requestFocus() }
                 .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
-            hasRequestedInitialFocus = true
-        }
-    }
-    LaunchedEffect(uiState.episodes.isNotEmpty()) {
-        if (uiState.episodes.isNotEmpty() && !hasRequestedInitialFocus) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
-            runCatching { firstEpisodeFocusRequester.requestFocus() }
             hasRequestedInitialFocus = true
         }
     }

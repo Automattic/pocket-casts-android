@@ -12,6 +12,7 @@ import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -85,6 +86,38 @@ class TvUpNextViewModelTest {
 
             changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(userEpisode)))
 
+            assertEquals(TvUpNextUiState.Empty, awaitItem())
+        }
+    }
+
+    @Test
+    fun `the current episode is excluded from the exposed queue`() = runTest {
+        val viewModel = createViewModel()
+        val queued = episode("queued")
+
+        viewModel.uiState.test {
+            assertEquals(TvUpNextUiState.Loading, awaitItem())
+
+            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+
+            val loaded = awaitItem() as TvUpNextUiState.Loaded
+            assertFalse(loaded.episodes.contains(currentEpisode))
+            assertEquals(listOf(queued), loaded.episodes)
+        }
+    }
+
+    @Test
+    fun `a queue that empties maps back to the empty state`() = runTest {
+        val viewModel = createViewModel()
+        val queued = episode("queued")
+
+        viewModel.uiState.test {
+            assertEquals(TvUpNextUiState.Loading, awaitItem())
+
+            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+            assertEquals(TvUpNextUiState.Loaded(listOf(queued)), awaitItem())
+
+            changes.onNext(UpNextQueue.State.Empty)
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
     }
