@@ -1112,9 +1112,9 @@ class FingerprintTimingManager @Inject constructor(
 
         override fun close() {
             // Skip stop(): release() works from any state and the Executing→Idle transition crashes some OMX decoders.
-            runCatching { codec.release() }
-            runCatching { extractor.release() }
-            runCatching { cacheSource?.close() }
+            runCatching { codec.release() }.onFailure { Timber.d(it, "FingerprintTimingManager: codec release failed") }
+            runCatching { extractor.release() }.onFailure { Timber.d(it, "FingerprintTimingManager: extractor release failed") }
+            runCatching { cacheSource?.close() }.onFailure { Timber.d(it, "FingerprintTimingManager: cache source close failed") }
         }
     }
 
@@ -1359,7 +1359,9 @@ class FingerprintTimingManager @Inject constructor(
                             emptyList()
                         }
                     } finally {
-                        codec.releaseOutputBuffer(outputIndex, false)
+                        runCatching { codec.releaseOutputBuffer(outputIndex, false) }.onFailure {
+                            Timber.d(it, "FingerprintTimingManager: codec releaseOutputBuffer failed")
+                        }
                     }
                     if (samples.isNotEmpty()) {
                         val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
