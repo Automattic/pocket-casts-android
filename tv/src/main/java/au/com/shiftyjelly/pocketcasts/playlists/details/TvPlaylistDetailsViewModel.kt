@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import dagger.assisted.Assisted
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = TvPlaylistDetailsViewModel.Factory::class)
 class TvPlaylistDetailsViewModel @AssistedInject constructor(
@@ -47,6 +49,12 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds, replayExpiration = Duration.ZERO),
             TvPlaylistDetailsUiState.Loading,
         )
+
+    fun changeSortType(sortType: PlaylistEpisodeSortType) {
+        viewModelScope.launch {
+            playlistManager.updateSortType(playlistUuid, sortType)
+        }
+    }
 
     @AssistedFactory
     interface Factory {

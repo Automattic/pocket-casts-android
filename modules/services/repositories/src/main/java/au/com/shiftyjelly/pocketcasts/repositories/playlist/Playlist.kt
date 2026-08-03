@@ -78,6 +78,12 @@ sealed interface Playlist {
     }
 }
 
+val Playlist.availableSortTypes: List<PlaylistEpisodeSortType>
+    get() = when (type) {
+        Playlist.Type.Manual -> PlaylistEpisodeSortType.entries
+        Playlist.Type.Smart -> PlaylistEpisodeSortType.entries - PlaylistEpisodeSortType.DragAndDrop
+    }
+
 data class SmartPlaylist(
     override val uuid: String,
     override val title: String,
