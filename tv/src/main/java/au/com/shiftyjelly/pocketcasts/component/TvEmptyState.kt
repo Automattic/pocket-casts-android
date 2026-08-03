@@ -33,13 +33,13 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun TvEmptyState(
     title: String,
     subtitle: String,
-    actionLabel: String,
-    onAction: () -> Unit,
     modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
     autoFocusAction: Boolean = false,
 ) {
     val focusRequester = remember { FocusRequester() }
-    if (autoFocusAction) {
+    if (autoFocusAction && onAction != null) {
         LaunchedEffect(Unit) {
             withFrameNanos {}
             runCatching { focusRequester.requestFocus() }
@@ -64,13 +64,15 @@ fun TvEmptyState(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 400.dp),
             )
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = onAction,
-                colors = TvButtonDefaults.filledButtonColors(),
-                modifier = if (autoFocusAction) Modifier.focusRequester(focusRequester) else Modifier,
-            ) {
-                Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
+            if (actionLabel != null && onAction != null) {
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(
+                    onClick = onAction,
+                    colors = TvButtonDefaults.filledButtonColors(),
+                    modifier = if (autoFocusAction) Modifier.focusRequester(focusRequester) else Modifier,
+                ) {
+                    Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
+                }
             }
         }
     }
