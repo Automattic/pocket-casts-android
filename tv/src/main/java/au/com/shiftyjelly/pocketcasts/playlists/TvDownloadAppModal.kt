@@ -87,8 +87,8 @@ private fun ColumnScope.TvDownloadAppModalContent(
     }
 }
 
-private const val DOWNLOAD_URL = "https://www.pocketcasts.com/downloads"
-private val DOWNLOAD_URL_LABEL = DOWNLOAD_URL.removePrefix("https://www.")
+private const val DOWNLOAD_URL = "https://pocketcasts.com/downloads"
+private val DOWNLOAD_URL_LABEL = DOWNLOAD_URL.removePrefix("https://")
 private val QrCodeSize = 144.dp
 
 @Preview
