@@ -592,14 +592,15 @@ class SettingsImpl @Inject constructor(
         val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
             .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
             .toSet() + PROCESSED_SIGNOUT_KEY
-        listOf(sharedPreferences, privatePreferences).forEach { preferences ->
+        val preferenceStores = listOf(sharedPreferences, privatePreferences)
+        preferenceStores.forEach { preferences ->
             preferences.edit(commit = true) {
                 preferences.all.keys
                     .filterNot { key -> key in preservedKeys }
                     .forEach { key -> remove(key) }
             }
-            UserSetting.refreshAll(preferences)
         }
+        preferenceStores.forEach { preferences -> UserSetting.refreshAll(preferences) }
     }
 
     private fun getDefaultCountryCode(): String {

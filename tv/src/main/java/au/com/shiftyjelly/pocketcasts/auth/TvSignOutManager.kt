@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Lazy
 import javax.inject.Inject
@@ -29,7 +28,6 @@ class TvSignOutManager @Inject constructor(
     private val searchHistoryManager: Lazy<SearchHistoryManager>,
     private val episodeManager: Lazy<EpisodeManager>,
     private val fileStorage: FileStorage,
-    private val coilManager: CoilManager,
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -50,7 +48,6 @@ class TvSignOutManager @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "TV sign out did not finish before the wipe timeout")
             }
             runWipeStep("delete downloaded files") { deleteDownloadedFiles() }
-            runWipeStep("clear image caches") { coilManager.clearAll() }
             runWipeStep("clear user preferences") { settings.clearUserPreferences() }
         }
     }
