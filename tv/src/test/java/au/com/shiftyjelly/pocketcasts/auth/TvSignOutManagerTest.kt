@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.auth
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
+import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -22,6 +23,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -89,6 +91,23 @@ class TvSignOutManagerTest {
         assertFalse(groupImage.exists())
         assertTrue(noMediaFile.exists())
         assertTrue(episodesDir.exists())
+    }
+
+    @Test
+    fun `sign out deletes the remaining directories when one lookup fails`() = runTest {
+        val cloudDir = temporaryFolder.newFolder("cloud")
+        val cloudFile = File(cloudDir, "file.mp3").apply { writeText("audio") }
+        val fileStorage = mock<FileStorage> {
+            on { getOrCreateEpisodesDir() } doThrow StorageException("no storage")
+            on { getOrCreateCloudDir() } doReturn cloudDir
+        }
+        val manager = createManager(fileStorage = fileStorage)
+
+        manager.signOutAndWipeData()
+        advanceUntilIdle()
+
+        assertFalse(cloudFile.exists())
+        verify(settings).clearUserPreferences()
     }
 
     @Test

@@ -89,6 +89,7 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
+        private const val MIGRATED_VERSION_CODE_KEY = "MIGRATED_VERSION_CODE"
         private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
     }
 
@@ -593,6 +594,7 @@ class SettingsImpl @Inject constructor(
             .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
             .toSet() + setOf(
             PROCESSED_SIGNOUT_KEY,
+            MIGRATED_VERSION_CODE_KEY,
             AccountConstants.ANON_ID_KEY,
             Settings.PREFERENCE_STORAGE_CHOICE,
             Settings.PREFERENCE_STORAGE_CHOICE_NAME,
@@ -607,6 +609,7 @@ class SettingsImpl @Inject constructor(
             }
         }
         preferenceStores.forEach { preferences -> UserSetting.refreshAll(preferences) }
+        refreshStateFlow.value = RefreshState.Never
     }
 
     private fun getDefaultCountryCode(): String {
@@ -792,11 +795,11 @@ class SettingsImpl @Inject constructor(
     )
 
     override fun getMigratedVersionCode(): Int {
-        return getInt("MIGRATED_VERSION_CODE", 0)
+        return getInt(MIGRATED_VERSION_CODE_KEY, 0)
     }
 
     override fun setMigratedVersionCode(versionCode: Int) {
-        setInt("MIGRATED_VERSION_CODE", versionCode)
+        setInt(MIGRATED_VERSION_CODE_KEY, versionCode)
     }
 
     override val podcastBadgeType = UserSetting.PrefFromInt<BadgeType>(

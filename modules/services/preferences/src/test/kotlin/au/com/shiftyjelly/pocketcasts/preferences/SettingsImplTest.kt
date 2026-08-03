@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import java.time.Instant
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -81,6 +83,7 @@ class SettingsImplTest {
         publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CHOICE, "choice").commit()
         publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CHOICE_NAME, "name").commit()
         publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER, "folder").commit()
+        settings.setMigratedVersionCode(42)
 
         settings.clearUserPreferences()
 
@@ -88,6 +91,17 @@ class SettingsImplTest {
         assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CHOICE))
         assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CHOICE_NAME))
         assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER))
+        assertEquals(42, settings.getMigratedVersionCode())
+    }
+
+    @Test
+    fun `clearUserPreferences resets the in-memory refresh state`() {
+        settings.setRefreshState(RefreshState.Failed("boom"))
+        assertTrue(settings.refreshStateFlow.value is RefreshState.Failed)
+
+        settings.clearUserPreferences()
+
+        assertTrue(settings.refreshStateFlow.value is RefreshState.Never)
     }
 
     @Test
