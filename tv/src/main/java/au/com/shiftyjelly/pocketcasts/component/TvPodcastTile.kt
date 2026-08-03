@@ -37,6 +37,10 @@ fun TvPodcastTile(
     }
 }
 
+object TvPodcastTileDefaults {
+    val RowImageWidth = 123.dp
+}
+
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPodcastTilePreview() {
@@ -47,7 +51,7 @@ private fun TvPodcastTilePreview() {
                     artworkUrl = "",
                     podcastTitle = "Sample Podcast",
                     onClick = {},
-                    imageModifier = Modifier.width(123.dp),
+                    imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                 )
             }
         }

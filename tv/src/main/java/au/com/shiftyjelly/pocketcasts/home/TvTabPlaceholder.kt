@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
+import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -80,7 +81,7 @@ fun TvTabPlaceholder(
                     artworkUrl = "https://picsum.photos/seed/rec$index/272/272",
                     podcastTitle = "Podcast $index",
                     onClick = {},
-                    imageModifier = Modifier.width(123.dp),
+                    imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                 )
             }
         }
@@ -94,7 +95,7 @@ fun TvTabPlaceholder(
                     artworkUrl = "https://picsum.photos/seed/liked$index/272/272",
                     podcastTitle = "Podcast $index",
                     onClick = {},
-                    imageModifier = Modifier.width(123.dp),
+                    imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                 )
             }
         }

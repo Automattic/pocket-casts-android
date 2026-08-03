@@ -38,16 +38,16 @@ class TvYourPodcastsViewModelTest {
     }
 
     @Test
-    fun `subscriptions are exposed sorted by title`() = runTest {
+    fun `subscriptions preserve the order provided by the dao`() = runTest {
         val viewModel = createViewModel()
-        val zebra = podcast("zebra", "Zebra Cast")
         val apple = podcast("apple", "Apple Cast")
         val theBeat = podcast("beat", "The Beat")
+        val zebra = podcast("zebra", "Zebra Cast")
 
         viewModel.uiState.test {
             assertEquals(TvYourPodcastsUiState.Loading, awaitItem())
 
-            subscribed.emit(listOf(zebra, apple, theBeat))
+            subscribed.emit(listOf(apple, theBeat, zebra))
 
             assertEquals(TvYourPodcastsUiState.Loaded(listOf(apple, theBeat, zebra)), awaitItem())
         }
@@ -71,7 +71,6 @@ class TvYourPodcastsViewModelTest {
 
     private fun createViewModel() = TvYourPodcastsViewModel(
         podcastManager = podcastManager,
-        defaultDispatcher = coroutineRule.testDispatcher,
     )
 
     private fun podcast(uuid: String, title: String) = Podcast(uuid = uuid, title = title)

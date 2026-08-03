@@ -48,7 +48,7 @@ fun TvScaffold(
             is TvTab.Home -> TvHomeScreen()
 
             is TvTab.YourPodcasts -> TvYourPodcastsScreen(
-                onNavigateToDiscover = navigateToHome,
+                onNavigateToHome = navigateToHome,
             )
 
             is TvTab.Playlists -> TvPlaylistsScreen()
