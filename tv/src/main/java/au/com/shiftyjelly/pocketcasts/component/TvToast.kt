@@ -22,10 +22,16 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.delay
 
 @Stable
@@ -93,6 +99,7 @@ private fun TvToastContent(
         color = Color.White,
         style = TvTextStyles.ModalBody,
         modifier = modifier
+            .semantics { liveRegion = LiveRegionMode.Polite }
             .widthIn(max = ToastMaxWidth)
             .clip(ToastShape)
             .background(TvOverlayContainerColor)
@@ -106,8 +113,10 @@ private val ToastAnimationMillis = 300
 private val ToastMaxWidth = 600.dp
 private val ToastShape = RoundedCornerShape(16.dp)
 
-@Preview
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvToastPreview() {
-    TvToastContent(message = "Marked as played")
+    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
+        TvToastContent(message = "Marked as played")
+    }
 }

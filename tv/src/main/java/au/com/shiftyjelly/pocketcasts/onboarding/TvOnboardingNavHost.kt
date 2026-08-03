@@ -39,6 +39,7 @@ fun TvOnboardingNavHost(
                     NavHost(
                         navController = navController,
                         startDestination = viewModel.startDestination,
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         composable(TvOnboardingRoutes.LANDING) {
                             TvWelcomeScreen(
