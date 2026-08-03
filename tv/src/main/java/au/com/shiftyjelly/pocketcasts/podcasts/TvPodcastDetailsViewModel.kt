@@ -96,15 +96,26 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             TvPodcastDetailsUiState.Loading,
         )
 
-    fun subscribe() {
-        podcastManager.subscribeToPodcast(podcastUuid, sync = true)
-    }
-
     fun startAccountAuth() {
         accountAuthJob?.cancel()
         _accountAuthState.value = TvSignInUiState.Loading
         accountAuthJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager).collect { _accountAuthState.value = it }
+            deviceAuthFlow(syncManager).collect { state ->
+                _accountAuthState.value = state
+                if (state is TvSignInUiState.Complete) {
+                    podcastManager.subscribeToPodcast(podcastUuid, sync = true)
+                    // Sibling of accountAuthJob so the modal dismiss cancel doesn't kill the refresh.
+                    viewModelScope.launch {
+                        try {
+                            podcastManager.refreshPodcastsAfterSignIn()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to refresh podcasts after TV account sign in")
+                        }
+                    }
+                }
+            }
         }
     }
 

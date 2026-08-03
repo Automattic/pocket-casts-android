@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -67,9 +68,9 @@ import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -95,7 +96,6 @@ fun TvPodcastDetailsScreen(
         uiState = uiState,
         accountAuthState = viewModel.accountAuthState,
         onToggleSubscribe = viewModel::toggleSubscribe,
-        onSubscribe = viewModel::subscribe,
         onStartAccountAuth = viewModel::startAccountAuth,
         onStopAccountAuth = viewModel::stopAccountAuth,
         onRetryAccountAuth = viewModel::retryAccountAuth,
@@ -110,7 +110,6 @@ private fun TvPodcastDetailsContent(
     uiState: TvPodcastDetailsUiState,
     accountAuthState: StateFlow<TvSignInUiState>,
     onToggleSubscribe: () -> Unit,
-    onSubscribe: () -> Unit,
     onStartAccountAuth: () -> Unit,
     onStopAccountAuth: () -> Unit,
     onRetryAccountAuth: () -> Unit,
@@ -127,7 +126,7 @@ private fun TvPodcastDetailsContent(
             is TvPodcastDetailsUiState.Loaded -> {
                 val followFocusRequester = remember { FocusRequester() }
                 var isShowingInfoModal by remember { mutableStateOf(false) }
-                var isShowingAccountModal by remember { mutableStateOf(false) }
+                var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(80.dp),
                     modifier = Modifier
@@ -138,10 +137,9 @@ private fun TvPodcastDetailsContent(
                         podcast = uiState.podcast,
                         followFocusRequester = followFocusRequester,
                         onFollow = {
-                            if (uiState.isLoggedIn) {
+                            if (uiState.isLoggedIn || uiState.podcast.isSubscribed) {
                                 onToggleSubscribe()
                             } else {
-                                onStartAccountAuth()
                                 isShowingAccountModal = true
                             }
                         },
@@ -175,15 +173,15 @@ private fun TvPodcastDetailsContent(
                 }
                 if (isShowingAccountModal) {
                     val authState by accountAuthState.collectAsStateWithLifecycle()
-                    val currentOnSubscribe by rememberUpdatedState(onSubscribe)
+                    val currentOnStartAccountAuth by rememberUpdatedState(onStartAccountAuth)
                     val currentOnStopAccountAuth by rememberUpdatedState(onStopAccountAuth)
                     DisposableEffect(Unit) {
+                        currentOnStartAccountAuth()
                         onDispose { currentOnStopAccountAuth() }
                     }
                     LaunchedEffect(authState) {
                         if (authState is TvSignInUiState.Complete) {
                             isShowingAccountModal = false
-                            currentOnSubscribe()
                         }
                     }
                     TvCreateAccountModal(
@@ -423,7 +421,6 @@ private fun TvPodcastDetailsContentPreview(
                 ),
                 accountAuthState = MutableStateFlow(TvSignInUiState.Loading),
                 onToggleSubscribe = {},
-                onSubscribe = {},
                 onStartAccountAuth = {},
                 onStopAccountAuth = {},
                 onRetryAccountAuth = {},

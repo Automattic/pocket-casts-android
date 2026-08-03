@@ -42,7 +42,10 @@ fun TvSignInQrContent(
             QrCode(content = verificationUriComplete)
             StepList(steps = steps)
         }
-        CodeRow(userCode = userCode)
+        CodeRow(
+            userCode = userCode,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
     }
 }
 
@@ -131,6 +134,7 @@ fun verificationDisplayUrl(verificationUri: String): String {
     return verificationUri
         .removePrefix("https://")
         .removePrefix("http://")
+        .removePrefix("www.")
         .trimEnd('/')
 }
 

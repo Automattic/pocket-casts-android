@@ -103,13 +103,20 @@ private fun ReadyContent(state: TvSignInUiState.Ready, modifier: Modifier = Modi
 
 @Composable
 private fun LoadingContent(modifier: Modifier = Modifier) {
+    val focusRequester = remember { FocusRequester() }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(LoadingHeight),
+            .height(LoadingHeight)
+            .focusRequester(focusRequester)
+            .focusable(),
     ) {
         LoadingView(color = Color.White)
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 

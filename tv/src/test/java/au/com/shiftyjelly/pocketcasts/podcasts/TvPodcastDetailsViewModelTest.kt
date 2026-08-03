@@ -235,15 +235,6 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
-    fun `subscribe follows the podcast and syncs`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.subscribe()
-
-        verify(podcastManager).subscribeToPodcast(podcastUuid = "podcast-uuid", sync = true)
-    }
-
-    @Test
     fun `toggling an unsubscribed podcast follows it`() = runTest {
         val viewModel = createViewModel()
 
@@ -301,6 +292,10 @@ class TvPodcastDetailsViewModelTest {
             assertTrue(states.any { it is TvSignInUiState.Ready })
             assertEquals(TvSignInUiState.Complete, states.last())
         }
+        advanceUntilIdle()
+
+        verify(podcastManager).subscribeToPodcast(podcastUuid = "podcast-uuid", sync = true)
+        verify(podcastManager).refreshPodcastsAfterSignIn()
     }
 
     private fun deviceAuthorizeResponse() = DeviceAuthorizeResponse(
