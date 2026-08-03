@@ -255,6 +255,9 @@
     <string name="tv_profile_starred_episodes">Starred Episodes</string>
     <string name="tv_sign_in_or_enter_code">or enter the following code</string>
     <string name="tv_sign_in_go_to_url">going to %1$s</string>
+    <string name="tv_playlists_empty_title">Your playlists live here</string>
+    <string name="tv_playlists_empty_subtitle">Build one manually or let Smart Rules do the sorting for you.</string>
+    <string name="tv_playlists_empty_action_title">Create a playlist</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
