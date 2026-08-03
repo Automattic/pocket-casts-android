@@ -46,7 +46,7 @@ fun TvOnboardingNavHost(
                     TvSignInScreen(
                         onSignInComplete = {
                             navController.navigate(TvOnboardingRoutes.SYNCING) {
-                                popUpTo(0) { inclusive = true }
+                                popUpTo(navController.graph.id) { inclusive = true }
                             }
                         },
                     )

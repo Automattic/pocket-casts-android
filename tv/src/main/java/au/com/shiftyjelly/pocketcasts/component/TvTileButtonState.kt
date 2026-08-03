@@ -112,8 +112,8 @@ fun Modifier.tvTileButtonNavigation(
 
 @Composable
 fun tileButtonColors(isSelected: Boolean): ButtonColors = ButtonDefaults.colors(
-    containerColor = if (isSelected) Color.White else TvColors.BgActive20,
+    containerColor = if (isSelected) Color.White else TvColors.TextPrimary20,
     contentColor = if (isSelected) Color.Black else TvColors.TextSecondary,
-    focusedContainerColor = TvColors.BgActive20,
+    focusedContainerColor = TvColors.TextPrimary20,
     focusedContentColor = TvColors.TextSecondary,
 )

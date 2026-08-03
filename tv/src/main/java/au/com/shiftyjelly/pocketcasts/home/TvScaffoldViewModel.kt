@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -13,10 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class TvScaffoldViewModel @Inject constructor(
@@ -26,24 +23,19 @@ class TvScaffoldViewModel @Inject constructor(
 ) : ViewModel() {
     private val selectedTabIndex = MutableStateFlow(0)
 
-    private val initialProfile = currentProfileState()
-
     val uiState: StateFlow<TvScaffoldUiState> = combine(
         selectedTabIndex,
-        userManager.getSignInState().asFlow()
-            .map { it.toProfileState() }
-            .onStart { emit(initialProfile) },
-    ) { tabIndex, profile ->
+        syncManager.isLoggedInObservable.asFlow(),
+        syncManager.emailFlow(),
+    ) { tabIndex, isLoggedIn, email ->
         TvScaffoldUiState(
             selectedTabIndex = tabIndex,
-            profile = profile,
+            profile = profileState(isLoggedIn, email),
         )
     }.stateIn(
         scope = viewModelScope,
-        // Lazily keeps a single getSignInState() subscription for the ViewModel's lifetime. Restarting it would
-        // re-run its sign-in side effects and replay the construction-time profile seed over a fresher state.
-        started = SharingStarted.Lazily,
-        initialValue = TvScaffoldUiState(profile = initialProfile),
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = TvScaffoldUiState(profile = currentProfileState()),
     )
 
     fun selectTab(index: Int) {
@@ -54,15 +46,12 @@ class TvScaffoldViewModel @Inject constructor(
         userManager.signOut(playbackManager.get(), wasInitiatedByUser = true)
     }
 
-    private fun currentProfileState() = if (syncManager.isLoggedIn()) {
-        TvProfileState.SignedIn(email = syncManager.getEmail()?.takeIf(String::isNotBlank))
+    private fun currentProfileState() = profileState(syncManager.isLoggedIn(), syncManager.getEmail())
+
+    private fun profileState(isLoggedIn: Boolean, email: String?) = if (isLoggedIn) {
+        TvProfileState.SignedIn(email = email?.takeIf(String::isNotBlank))
     } else {
         TvProfileState.SignedOut
-    }
-
-    private fun SignInState.toProfileState() = when (this) {
-        is SignInState.SignedIn -> TvProfileState.SignedIn(email = email.takeIf(String::isNotBlank))
-        is SignInState.SignedOut -> TvProfileState.SignedOut
     }
 }
 

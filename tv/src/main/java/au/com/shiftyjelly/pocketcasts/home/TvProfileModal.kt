@@ -15,10 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -83,7 +81,7 @@ private fun ColumnScope.TvProfileModalContent(
             if (profile.email != null) {
                 Text(
                     text = profile.email,
-                    color = Color.White,
+                    color = TvColors.TextPrimary,
                     style = TvTextStyles.ModalEmail,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
@@ -155,7 +153,7 @@ private fun TvProfileModalAvatarPlaceholder(modifier: Modifier = Modifier) {
         Icon(
             painter = painterResource(IR.drawable.ic_profile),
             contentDescription = null,
-            tint = Color.White,
+            tint = TvColors.TextPrimary,
             modifier = Modifier.size(48.dp),
         )
     }
@@ -176,7 +174,7 @@ private fun TvProfileModalButton(
     ) {
         Text(
             text = text,
-            textAlign = TextAlign.Center,
+            style = TvTextStyles.ModalButtonLabel,
             modifier = Modifier.fillMaxWidth(),
         )
     }

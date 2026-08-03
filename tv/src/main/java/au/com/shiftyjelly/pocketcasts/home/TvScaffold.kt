@@ -58,6 +58,7 @@ fun TvScaffold(
                 isProfileModalVisible = false
                 onCreateAccount()
             },
+            // TODO: wire up the Starred Episodes and Listening History destinations.
             onStarredEpisodes = {},
             onListeningHistory = {},
             onLogOut = {

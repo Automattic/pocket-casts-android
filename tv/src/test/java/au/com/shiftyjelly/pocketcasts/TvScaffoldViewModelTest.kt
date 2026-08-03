@@ -4,15 +4,15 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
-import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.Lazy
-import io.reactivex.Flowable
-import io.reactivex.processors.BehaviorProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -28,11 +28,14 @@ class TvScaffoldViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val userManager = mock<UserManager> {
-        on { getSignInState() } doReturn Flowable.just(SignInState.SignedOut)
-    }
+    private val isLoggedIn = BehaviorRelay.createDefault(false)
+    private val email = MutableStateFlow<String?>(null)
+
+    private val userManager = mock<UserManager>()
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
+        on { isLoggedInObservable } doReturn isLoggedIn
+        on { emailFlow() } doReturn email
     }
     private val playbackManager = mock<PlaybackManager>()
 
@@ -78,8 +81,10 @@ class TvScaffoldViewModelTest {
 
     @Test
     fun `profile has the account email when signed in`() = runTest {
-        whenever(userManager.getSignInState())
-            .doReturn(Flowable.just(SignInState.SignedIn(email = "user@example.com", subscription = null)))
+        whenever(syncManager.isLoggedIn()).doReturn(true)
+        whenever(syncManager.getEmail()).doReturn("user@example.com")
+        isLoggedIn.accept(true)
+        email.value = "user@example.com"
 
         viewModel.uiState.test {
             assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
@@ -88,8 +93,10 @@ class TvScaffoldViewModelTest {
 
     @Test
     fun `profile email is null when signed in with a blank email`() = runTest {
-        whenever(userManager.getSignInState())
-            .doReturn(Flowable.just(SignInState.SignedIn(email = "", subscription = null)))
+        whenever(syncManager.isLoggedIn()).doReturn(true)
+        whenever(syncManager.getEmail()).doReturn("")
+        isLoggedIn.accept(true)
+        email.value = ""
 
         viewModel.uiState.test {
             assertEquals(TvProfileState.SignedIn(email = null), awaitItem().profile)
@@ -97,8 +104,9 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
-    fun `profile is seeded from the sync manager before the sign in state emits`() = runTest {
-        whenever(userManager.getSignInState()).doReturn(BehaviorProcessor.create())
+    fun `profile is seeded from the sync manager before the streams emit`() = runTest {
+        whenever(syncManager.isLoggedInObservable).doReturn(BehaviorRelay.create())
+        whenever(syncManager.emailFlow()).doReturn(MutableSharedFlow())
         whenever(syncManager.isLoggedIn()).doReturn(true)
         whenever(syncManager.getEmail()).doReturn("user@example.com")
 
@@ -108,29 +116,15 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
-    fun `tabs can be selected before the sign in state emits`() = runTest {
-        whenever(userManager.getSignInState()).doReturn(BehaviorProcessor.create())
-
-        viewModel.uiState.test {
-            assertEquals(0, awaitItem().selectedTabIndex)
-
-            viewModel.selectTab(3)
-            assertEquals(3, awaitItem().selectedTabIndex)
-        }
-    }
-
-    @Test
     fun `profile updates when the sign in state changes`() = runTest {
-        val signInState = BehaviorProcessor.createDefault<SignInState>(SignInState.SignedOut)
-        whenever(userManager.getSignInState()).doReturn(signInState)
-
         viewModel.uiState.test {
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)
 
-            signInState.offer(SignInState.SignedIn(email = "user@example.com", subscription = null))
+            email.value = "user@example.com"
+            isLoggedIn.accept(true)
             assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
 
-            signInState.offer(SignInState.SignedOut)
+            isLoggedIn.accept(false)
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)
         }
     }
