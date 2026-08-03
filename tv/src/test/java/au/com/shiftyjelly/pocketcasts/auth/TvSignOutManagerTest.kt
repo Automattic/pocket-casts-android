@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -45,7 +44,6 @@ class TvSignOutManagerTest {
     private val folderManager = mock<FolderManager>()
     private val searchHistoryManager = mock<SearchHistoryManager>()
     private val episodeManager = mock<EpisodeManager>()
-    private val coilManager = mock<CoilManager>()
     private val settings = mock<Settings>()
 
     @Test
@@ -55,7 +53,7 @@ class TvSignOutManagerTest {
         manager.signOutAndWipeData()
         advanceUntilIdle()
 
-        inOrder(userManager, coilManager, settings) {
+        inOrder(userManager, settings) {
             verify(userManager).signOutAndClearData(
                 playbackManager = eq(playbackManager),
                 upNextQueue = eq(upNextQueue),
@@ -64,7 +62,6 @@ class TvSignOutManagerTest {
                 episodeManager = eq(episodeManager),
                 wasInitiatedByUser = eq(true),
             )
-            verify(coilManager).clearAll()
             verify(settings).clearUserPreferences()
         }
     }
@@ -105,13 +102,11 @@ class TvSignOutManagerTest {
         manager.signOutAndWipeData()
         runCurrent()
 
-        verify(coilManager, never()).clearAll()
         verify(settings, never()).clearUserPreferences()
 
         signOutJob.complete()
         runCurrent()
 
-        verify(coilManager).clearAll()
         verify(settings).clearUserPreferences()
     }
 
@@ -133,7 +128,6 @@ class TvSignOutManagerTest {
         searchHistoryManager = { searchHistoryManager },
         episodeManager = { episodeManager },
         fileStorage = fileStorage,
-        coilManager = coilManager,
         settings = settings,
         applicationScope = this,
         ioDispatcher = coroutineRule.testDispatcher,
