@@ -44,7 +44,13 @@ class TvUpNextViewModel @Inject constructor(
             TvUpNextUiState.Loading,
         )
 
+    private var hasSynced = false
+
     fun onShown() {
+        if (hasSynced) {
+            return
+        }
+        hasSynced = true
         UpNextSyncWorker.enqueue(syncManager, context)
     }
 }

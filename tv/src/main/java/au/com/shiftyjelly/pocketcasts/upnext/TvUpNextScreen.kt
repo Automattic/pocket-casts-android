@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvUpNextScreen(
-    onNavigateToDiscover: () -> Unit,
+    onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvUpNextViewModel = hiltViewModel(),
 ) {
@@ -65,7 +65,7 @@ fun TvUpNextScreen(
 
     TvUpNextContent(
         uiState = uiState,
-        onNavigateToDiscover = onNavigateToDiscover,
+        onNavigateToHome = onNavigateToHome,
         modifier = modifier,
     )
 }
@@ -73,7 +73,7 @@ fun TvUpNextScreen(
 @Composable
 private fun TvUpNextContent(
     uiState: TvUpNextUiState,
-    onNavigateToDiscover: () -> Unit,
+    onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -84,7 +84,7 @@ private fun TvUpNextContent(
 
             is TvUpNextUiState.Empty -> {
                 UpNextEmpty(
-                    onNavigateToDiscover = onNavigateToDiscover,
+                    onNavigateToHome = onNavigateToHome,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -103,10 +103,6 @@ private fun UpNextList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        firstEpisodeFocusRequester.requestFocus()
-    }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
     Column(
@@ -125,13 +121,12 @@ private fun UpNextList(
             itemsIndexed(
                 items = episodes,
                 key = { _, episode -> episode.uuid },
-            ) { index, episode ->
+            ) { _, episode ->
                 TvEpisodeListItem(
                     episode = episode,
                     dateFormatter = dateFormatter,
                     onClick = {},
                     onOpenActions = { actionsEpisode = episode },
-                    episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
                 )
             }
         }
@@ -172,7 +167,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     val context = LocalContext.current
     val countText = pluralStringResource(LR.plurals.episode_count, episodes.size, episodes.size)
     val remainingMs = episodes.sumOf { episode ->
-        ((episode.duration - episode.playedUpTo).coerceAtLeast(0.0) * 1000).toLong()
+        (episode.durationMs - episode.playedUpToMs).coerceAtLeast(0).toLong()
     }
     val timeLeftText = stringResource(LR.string.time_left, TimeHelper.getTimeDurationShortString(remainingMs, context))
     return "$countText · $timeLeftText"
@@ -180,13 +175,9 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
 
 @Composable
 private fun UpNextEmpty(
-    onNavigateToDiscover: () -> Unit,
+    onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
@@ -208,9 +199,8 @@ private fun UpNextEmpty(
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(
-                onClick = onNavigateToDiscover,
+                onClick = onNavigateToHome,
                 colors = TvButtonDefaults.filledButtonColors(),
-                modifier = Modifier.focusRequester(focusRequester),
             ) {
                 Text(stringResource(LR.string.tv_up_next_empty_action_title))
             }
@@ -238,7 +228,7 @@ private fun TvUpNextLoadedPreview() {
                             )
                         },
                     ),
-                    onNavigateToDiscover = {},
+                    onNavigateToHome = {},
                 )
             }
         }
@@ -253,7 +243,7 @@ private fun TvUpNextEmptyPreview() {
             Box(modifier = Modifier.background(TvColors.Dark)) {
                 TvUpNextContent(
                     uiState = TvUpNextUiState.Empty,
-                    onNavigateToDiscover = {},
+                    onNavigateToHome = {},
                 )
             }
         }

@@ -22,13 +22,14 @@ class TvApplication :
 
     @Inject lateinit var upNextQueue: UpNextQueue
 
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+        // The only setupBlocking() call on TV; there is no PlaybackManager.setup() here, so calling it again would double-subscribe the queue's sync pipeline.
         applicationScope.launch {
             upNextQueue.setupBlocking()
         }

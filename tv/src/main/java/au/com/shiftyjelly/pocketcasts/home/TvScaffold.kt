@@ -48,12 +48,7 @@ fun TvScaffold(
             is TvTab.Playlists -> TvPlaylistsScreen()
 
             is TvTab.UpNext -> TvUpNextScreen(
-                onNavigateToDiscover = {
-                    val homeIndex = uiState.tabs.indexOfFirst { it is TvTab.Home }
-                    if (homeIndex >= 0) {
-                        viewModel.selectTab(homeIndex)
-                    }
-                },
+                onNavigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) },
             )
 
             else -> TvTabPlaceholder(tab = tab)
