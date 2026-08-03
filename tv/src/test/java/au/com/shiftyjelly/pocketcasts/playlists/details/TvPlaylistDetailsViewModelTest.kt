@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
@@ -43,6 +44,30 @@ class TvPlaylistDetailsViewModelTest {
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(episode), state.episodes)
+        }
+    }
+
+    @Test
+    fun `only available episodes are surfaced`() = runTest {
+        val available = episode(uuid = "available")
+        val unavailable = PlaylistEpisode.Unavailable(ManualPlaylistEpisode.test(episodeUuid = "unavailable"))
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+
+            playlists.emit(
+                ManualPlaylist(
+                    uuid = "playlist-uuid",
+                    title = "Playlist",
+                    episodes = listOf(PlaylistEpisode.Available(available), unavailable),
+                    settings = Playlist.Settings.ForPreview,
+                    metadata = Playlist.Metadata.ForPreview,
+                ),
+            )
+
+            val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
+            assertEquals(listOf(available), state.episodes)
         }
     }
 

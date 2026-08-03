@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -52,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import kotlinx.coroutines.flow.first
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -132,9 +134,14 @@ private fun EpisodeList(
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val firstEpisodeFocusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
+    val initialFocusIndex = remember {
+        Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }
+            .coerceIn(0, episodes.lastIndex)
+    }
     LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
         runCatching { firstEpisodeFocusRequester.requestFocus() }
+            .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
     }
     LazyColumn(
         state = listState,
@@ -152,7 +159,7 @@ private fun EpisodeList(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusProperties { left = playAllFocusRequester }
-                    .then(if (index == 0) Modifier.focusRequester(firstEpisodeFocusRequester) else Modifier),
+                    .then(if (index == initialFocusIndex) Modifier.focusRequester(firstEpisodeFocusRequester) else Modifier),
             )
         }
     }
