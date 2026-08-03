@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
 import android.content.Context
-import android.text.format.DateFormat
 import android.text.format.DateUtils
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -34,20 +33,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -86,6 +83,7 @@ private fun PodcastInfoPane(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier,
@@ -103,7 +101,7 @@ private fun PodcastInfoPane(
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_website),
-                value = podcast.podcastUrl?.takeIf { it.isNotBlank() },
+                value = podcast.getShortUrl().takeIf { it.isNotBlank() },
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_schedule),
@@ -111,7 +109,7 @@ private fun PodcastInfoPane(
             )
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_next_episode),
-                value = podcast.displayableNextEpisode(context),
+                value = podcast.displayableNextEpisode(context, dateFormatter),
             )
         }
     }
@@ -136,6 +134,8 @@ private fun InfoRow(
             style = TvTextStyles.PlaylistCardCaption,
             fontWeight = FontWeight.Medium,
             color = Color.White,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -205,7 +205,7 @@ private fun Podcast.displayableSchedule(context: Context): String? {
     return context.getString(stringId)
 }
 
-private fun Podcast.displayableNextEpisode(context: Context): String? {
+private fun Podcast.displayableNextEpisode(context: Context, dateFormatter: RelativeDateFormatter): String? {
     val expectedDate = estimatedNextEpisode ?: return null
     if (expectedDate.time <= 0) {
         return null
@@ -216,21 +216,8 @@ private fun Podcast.displayableNextEpisode(context: Context): String? {
         DateUtils.isToday(expectedDate.time) -> context.getString(LR.string.today)
         DateUtils.isToday(expectedDate.time - DateUtils.DAY_IN_MILLIS) -> context.getString(LR.string.tv_podcast_next_episode_tomorrow)
         expectedDate.time < now -> context.getString(LR.string.tv_podcast_next_episode_soon)
-        expectedDate.time < now + 6 * DateUtils.DAY_IN_MILLIS -> expectedDate.formatSkeleton("EEEE")
-        else -> expectedDate.formatSkeleton(if (expectedDate.isSameYearAsNow()) "dMMMM" else "yMMMMd")
+        else -> dateFormatter.format(expectedDate)
     }
-}
-
-private fun Date.isSameYearAsNow(): Boolean {
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-    calendar.time = this
-    return calendar.get(Calendar.YEAR) == currentYear
-}
-
-private fun Date.formatSkeleton(skeleton: String): String {
-    val locale = Locale.getDefault()
-    return SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(this)
 }
 
 private val InfoModalWidth = 688.dp
