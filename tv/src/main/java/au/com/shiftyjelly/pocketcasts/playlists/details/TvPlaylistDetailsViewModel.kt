@@ -49,7 +49,7 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
             TvPlaylistDetailsUiState.Loaded(
                 playlist = playlist,
                 episodes = if (isShowingArchived) allEpisodes else allEpisodes.filterNot(PodcastEpisode::isArchived),
-                isShowingArchived = isShowingArchived,
+                isShowingArchivedOnDevice = isShowingArchived,
             )
         }
     }.stateIn(
@@ -84,7 +84,7 @@ sealed interface TvPlaylistDetailsUiState {
     data class Loaded(
         val playlist: Playlist,
         val episodes: List<PodcastEpisode>,
-        val isShowingArchived: Boolean,
+        val isShowingArchivedOnDevice: Boolean,
     ) : TvPlaylistDetailsUiState {
         val availableEpisodeCount get() = playlist.episodes.count { it is PlaylistEpisode.Available }
     }

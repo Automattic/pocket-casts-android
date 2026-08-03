@@ -162,6 +162,23 @@ private fun SortableEpisodeList(
             listState.scrollToItem(0)
         }
     }
+    val firstEpisodeFocusRequester = remember { FocusRequester() }
+    val initialFocusIndex = remember {
+        if (uiState.episodes.isEmpty()) {
+            0
+        } else {
+            Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }.coerceIn(0, uiState.episodes.lastIndex)
+        }
+    }
+    var hasRequestedInitialFocus by remember { mutableStateOf(uiState.episodes.isEmpty()) }
+    LaunchedEffect(uiState.episodes.isNotEmpty()) {
+        if (uiState.episodes.isNotEmpty() && !hasRequestedInitialFocus) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
+            runCatching { firstEpisodeFocusRequester.requestFocus() }
+                .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
+            hasRequestedInitialFocus = true
+        }
+    }
     Column(modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -171,7 +188,7 @@ private fun SortableEpisodeList(
                 .padding(bottom = 12.dp),
         ) {
             ArchivedDropdownButton(
-                isShowingArchived = uiState.isShowingArchived,
+                isShowingArchived = uiState.isShowingArchivedOnDevice,
                 onToggleArchiveFilter = onToggleArchiveFilter,
                 playAllFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
             )
@@ -185,6 +202,8 @@ private fun SortableEpisodeList(
             EpisodeList(
                 episodes = uiState.episodes,
                 playAllFocusRequester = playAllFocusRequester,
+                firstEpisodeFocusRequester = firstEpisodeFocusRequester,
+                initialFocusIndex = initialFocusIndex,
                 listState = listState,
                 modifier = Modifier.weight(1f),
             )
@@ -324,21 +343,13 @@ private fun SortDropdownButton(
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
     playAllFocusRequester: FocusRequester,
+    firstEpisodeFocusRequester: FocusRequester,
+    initialFocusIndex: Int,
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
-    val initialFocusIndex = remember {
-        Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }
-            .coerceIn(0, episodes.lastIndex)
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
-        runCatching { firstEpisodeFocusRequester.requestFocus() }
-            .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
-    }
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -470,7 +481,7 @@ private fun TvPlaylistDetailsPreview() {
                         metadata = Playlist.Metadata.ForPreview,
                     ),
                     episodes = emptyList(),
-                    isShowingArchived = false,
+                    isShowingArchivedOnDevice = false,
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
@@ -502,8 +513,10 @@ private fun TvPlaylistDetailsLoadedPreview() {
                         metadata = Playlist.Metadata.ForPreview,
                     ),
                     episodes = episodes,
+                    isShowingArchivedOnDevice = false,
                 ),
                 onChangeSortType = {},
+                onToggleArchiveFilter = {},
             )
         }
     }

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,8 +21,9 @@ class TvPlaylistPreferences @Inject constructor(
         prefs.edit().putBoolean(showArchivedKey(playlistUuid), isShowingArchived).apply()
     }
 
+    @SuppressLint("ApplySharedPref")
     fun clearAll() {
-        prefs.edit().clear().apply()
+        prefs.edit().clear().commit()
     }
 
     private fun showArchivedKey(playlistUuid: String) = "show_archived_playlist_$playlistUuid"

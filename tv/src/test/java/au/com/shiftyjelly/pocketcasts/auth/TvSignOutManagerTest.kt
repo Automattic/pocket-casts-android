@@ -57,7 +57,7 @@ class TvSignOutManagerTest {
         manager.signOutAndWipeData()
         advanceUntilIdle()
 
-        inOrder(userManager, settings) {
+        inOrder(userManager, settings, playlistPreferences) {
             verify(userManager).signOutAndClearData(
                 playbackManager = eq(playbackManager),
                 upNextQueue = eq(upNextQueue),
@@ -67,6 +67,7 @@ class TvSignOutManagerTest {
                 wasInitiatedByUser = eq(true),
             )
             verify(settings).clearUserPreferences()
+            verify(playlistPreferences).clearAll()
         }
     }
 

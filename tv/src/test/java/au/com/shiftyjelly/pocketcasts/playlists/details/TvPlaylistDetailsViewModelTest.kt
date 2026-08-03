@@ -49,7 +49,7 @@ class TvPlaylistDetailsViewModelTest {
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode), state.episodes)
             assertEquals(2, state.availableEpisodeCount)
-            assertEquals(false, state.isShowingArchived)
+            assertEquals(false, state.isShowingArchivedOnDevice)
         }
     }
 
@@ -67,13 +67,13 @@ class TvPlaylistDetailsViewModelTest {
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
-            assertEquals(true, state.isShowingArchived)
+            assertEquals(true, state.isShowingArchivedOnDevice)
         }
     }
 
     @Test
     fun `only available episodes are surfaced`() = runTest {
-        val available = episode(uuid = "available")
+        val available = episode(uuid = "available", isArchived = false)
         val unavailable = PlaylistEpisode.Unavailable(ManualPlaylistEpisode.test(episodeUuid = "unavailable"))
         val viewModel = createViewModel()
 
@@ -124,7 +124,7 @@ class TvPlaylistDetailsViewModelTest {
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
-            assertEquals(true, state.isShowingArchived)
+            assertEquals(true, state.isShowingArchivedOnDevice)
             verify(preferences).setShowingArchived(eq("playlist-uuid"), eq(true))
         }
     }
