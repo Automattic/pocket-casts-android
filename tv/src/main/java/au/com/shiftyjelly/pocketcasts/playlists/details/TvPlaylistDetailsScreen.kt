@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -92,6 +93,7 @@ fun TvPlaylistDetailsScreen(
     TvPlaylistDetailsContent(
         uiState = uiState,
         onChangeSortType = viewModel::changeSortType,
+        onToggleArchiveFilter = viewModel::toggleArchiveFilter,
         modifier = modifier,
     )
 }
@@ -100,6 +102,7 @@ fun TvPlaylistDetailsScreen(
 private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onToggleArchiveFilter: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -122,7 +125,7 @@ private fun TvPlaylistDetailsContent(
                         playAllFocusRequester = playAllFocusRequester,
                         modifier = Modifier.width(ArtworkSize),
                     )
-                    if (uiState.episodes.isEmpty()) {
+                    if (uiState.availableEpisodeCount == 0) {
                         NoEpisodes(
                             playlistType = uiState.playlist.type,
                             modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -131,6 +134,7 @@ private fun TvPlaylistDetailsContent(
                         SortableEpisodeList(
                             uiState = uiState,
                             onChangeSortType = onChangeSortType,
+                            onToggleArchiveFilter = onToggleArchiveFilter,
                             playAllFocusRequester = playAllFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
@@ -145,6 +149,7 @@ private fun TvPlaylistDetailsContent(
 private fun SortableEpisodeList(
     uiState: TvPlaylistDetailsUiState.Loaded,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onToggleArchiveFilter: () -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -157,21 +162,135 @@ private fun SortableEpisodeList(
             listState.scrollToItem(0)
         }
     }
+    val firstEpisodeFocusRequester = remember { FocusRequester() }
+    val initialFocusIndex = remember {
+        if (uiState.episodes.isEmpty()) {
+            0
+        } else {
+            Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }.coerceIn(0, uiState.episodes.lastIndex)
+        }
+    }
+    var hasRequestedInitialFocus by remember { mutableStateOf(uiState.episodes.isEmpty()) }
+    LaunchedEffect(uiState.episodes.isNotEmpty()) {
+        if (uiState.episodes.isNotEmpty() && !hasRequestedInitialFocus) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
+            runCatching { firstEpisodeFocusRequester.requestFocus() }
+                .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
+            hasRequestedInitialFocus = true
+        }
+    }
     Column(modifier = modifier) {
-        SortDropdownButton(
-            selectedSortType = sortType,
-            availableSortTypes = uiState.playlist.availableSortTypes,
-            onSelectSortType = onChangeSortType,
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(bottom = 12.dp),
+        ) {
+            ArchivedDropdownButton(
+                isShowingArchived = uiState.isShowingArchivedOnDevice,
+                onToggleArchiveFilter = onToggleArchiveFilter,
+                playAllFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
+            )
+            SortDropdownButton(
+                selectedSortType = sortType,
+                availableSortTypes = uiState.playlist.availableSortTypes,
+                onSelectSortType = onChangeSortType,
+            )
+        }
+        if (uiState.episodes.isNotEmpty()) {
+            EpisodeList(
+                episodes = uiState.episodes,
+                playAllFocusRequester = playAllFocusRequester,
+                firstEpisodeFocusRequester = firstEpisodeFocusRequester,
+                initialFocusIndex = initialFocusIndex,
+                listState = listState,
+                modifier = Modifier.weight(1f),
+            )
+        } else {
+            AllEpisodesArchived(
+                episodeCount = uiState.availableEpisodeCount,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun AllEpisodesArchived(
+    episodeCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        Text(
+            text = pluralStringResource(LR.plurals.tv_playlist_all_archived, episodeCount, episodeCount),
+            style = MaterialTheme.typography.bodyLarge,
+            color = TvColors.TextSecondary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 400.dp),
         )
-        EpisodeList(
-            episodes = uiState.episodes,
-            playAllFocusRequester = playAllFocusRequester,
-            listState = listState,
-            modifier = Modifier.weight(1f),
-        )
+    }
+}
+
+@Composable
+private fun ArchivedDropdownButton(
+    isShowingArchived: Boolean,
+    onToggleArchiveFilter: () -> Unit,
+    playAllFocusRequester: FocusRequester?,
+    modifier: Modifier = Modifier,
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        Button(
+            onClick = { isExpanded = true },
+            colors = TvButtonDefaults.filledButtonColors(),
+            modifier = if (playAllFocusRequester != null) {
+                Modifier.focusProperties { left = playAllFocusRequester }
+            } else {
+                Modifier
+            },
+        ) {
+            Text(
+                text = stringResource(if (isShowingArchived) LR.string.show_archived else LR.string.podcast_hide_archived),
+                style = TvTextStyles.PlaylistCardCaption,
+            )
+            Icon(
+                painter = painterResource(IR.drawable.ic_chevron_small_up),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .size(16.dp)
+                    .rotate(180f),
+            )
+        }
+        if (isExpanded) {
+            TvDropdownMenu(onDismissRequest = { isExpanded = false }) {
+                TvDropdownMenuItem(
+                    label = stringResource(LR.string.podcast_hide_archived),
+                    isSelected = !isShowingArchived,
+                    onClick = {
+                        isExpanded = false
+                        if (isShowingArchived) {
+                            onToggleArchiveFilter()
+                        }
+                    },
+                )
+                TvDropdownMenuItem(
+                    label = stringResource(LR.string.show_archived),
+                    isSelected = isShowingArchived,
+                    onClick = {
+                        isExpanded = false
+                        if (!isShowingArchived) {
+                            onToggleArchiveFilter()
+                        }
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -224,21 +343,13 @@ private fun SortDropdownButton(
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
     playAllFocusRequester: FocusRequester,
+    firstEpisodeFocusRequester: FocusRequester,
+    initialFocusIndex: Int,
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
-    val initialFocusIndex = remember {
-        Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }
-            .coerceIn(0, episodes.lastIndex)
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
-        runCatching { firstEpisodeFocusRequester.requestFocus() }
-            .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
-    }
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -370,8 +481,10 @@ private fun TvPlaylistDetailsPreview() {
                         metadata = Playlist.Metadata.ForPreview,
                     ),
                     episodes = emptyList(),
+                    isShowingArchivedOnDevice = false,
                 ),
                 onChangeSortType = {},
+                onToggleArchiveFilter = {},
             )
         }
     }
@@ -400,8 +513,10 @@ private fun TvPlaylistDetailsLoadedPreview() {
                         metadata = Playlist.Metadata.ForPreview,
                     ),
                     episodes = episodes,
+                    isShowingArchivedOnDevice = false,
                 ),
                 onChangeSortType = {},
+                onToggleArchiveFilter = {},
             )
         }
     }

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.auth
 
+import au.com.shiftyjelly.pocketcasts.playlists.details.TvPlaylistPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
@@ -47,6 +48,7 @@ class TvSignOutManagerTest {
     private val searchHistoryManager = mock<SearchHistoryManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val playlistPreferences = mock<TvPlaylistPreferences>()
 
     @Test
     fun `sign out clears the account data and caches in order`() = runTest {
@@ -55,7 +57,7 @@ class TvSignOutManagerTest {
         manager.signOutAndWipeData()
         advanceUntilIdle()
 
-        inOrder(userManager, settings) {
+        inOrder(userManager, settings, playlistPreferences) {
             verify(userManager).signOutAndClearData(
                 playbackManager = eq(playbackManager),
                 upNextQueue = eq(upNextQueue),
@@ -65,6 +67,7 @@ class TvSignOutManagerTest {
                 wasInitiatedByUser = eq(true),
             )
             verify(settings).clearUserPreferences()
+            verify(playlistPreferences).clearAll()
         }
     }
 
@@ -148,6 +151,7 @@ class TvSignOutManagerTest {
         episodeManager = { episodeManager },
         fileStorage = fileStorage,
         settings = settings,
+        playlistPreferences = playlistPreferences,
         applicationScope = this,
         ioDispatcher = coroutineRule.testDispatcher,
     )

@@ -18,7 +18,9 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvPlaylistDetailsViewModelTest {
@@ -28,28 +30,50 @@ class TvPlaylistDetailsViewModelTest {
 
     private val playlists = MutableSharedFlow<ManualPlaylist?>(replay = 1)
     private val playlistManager = mock<PlaylistManager> {
-        on { manualPlaylistFlow(any(), anyOrNull()) } doReturn playlists
+        on { manualPlaylistFlow(any(), anyOrNull(), any()) } doReturn playlists
     }
+    private val preferences = mock<TvPlaylistPreferences>()
 
-    private val episode = episode(uuid = "episode-1")
+    private val availableEpisode = episode(uuid = "episode-1", isArchived = false)
+    private val archivedEpisode = episode(uuid = "episode-2", isArchived = true)
 
     @Test
-    fun `playlist episodes load`() = runTest {
+    fun `archived episodes are hidden by default`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
 
-            playlists.emit(playlist(episode))
+            playlists.emit(playlist(availableEpisode, archivedEpisode))
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
-            assertEquals(listOf(episode), state.episodes)
+            assertEquals(listOf(availableEpisode), state.episodes)
+            assertEquals(2, state.availableEpisodeCount)
+            assertEquals(false, state.isShowingArchivedOnDevice)
+        }
+    }
+
+    @Test
+    fun `archived episodes are shown when the stored preference allows them`() = runTest {
+        val preferences = mock<TvPlaylistPreferences> {
+            on { isShowingArchived("playlist-uuid") } doReturn true
+        }
+        val viewModel = createViewModel(preferences)
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+
+            playlists.emit(playlist(availableEpisode, archivedEpisode))
+
+            val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
+            assertEquals(true, state.isShowingArchivedOnDevice)
         }
     }
 
     @Test
     fun `only available episodes are surfaced`() = runTest {
-        val available = episode(uuid = "available")
+        val available = episode(uuid = "available", isArchived = false)
         val unavailable = PlaylistEpisode.Unavailable(ManualPlaylistEpisode.test(episodeUuid = "unavailable"))
         val viewModel = createViewModel()
 
@@ -78,18 +102,38 @@ class TvPlaylistDetailsViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
 
-            playlists.emit(playlist(episode))
-            assertEquals(listOf(episode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+            playlists.emit(playlist(availableEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
 
             playlists.emit(null)
             assertEquals(TvPlaylistDetailsUiState.NotFound, awaitItem())
         }
     }
 
-    private fun createViewModel() = TvPlaylistDetailsViewModel(
+    @Test
+    fun `toggling the archive filter updates the list and persists the preference`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+
+            playlists.emit(playlist(availableEpisode, archivedEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+
+            viewModel.toggleArchiveFilter()
+
+            val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
+            assertEquals(true, state.isShowingArchivedOnDevice)
+            verify(preferences).setShowingArchived(eq("playlist-uuid"), eq(true))
+        }
+    }
+
+    private fun createViewModel(prefs: TvPlaylistPreferences = preferences) = TvPlaylistDetailsViewModel(
         playlistUuid = "playlist-uuid",
         playlistType = Playlist.Type.Manual,
         playlistManager = playlistManager,
+        preferences = prefs,
     )
 
     private fun playlist(vararg episodes: PodcastEpisode) = ManualPlaylist(
@@ -100,8 +144,9 @@ class TvPlaylistDetailsViewModelTest {
         metadata = Playlist.Metadata.ForPreview,
     )
 
-    private fun episode(uuid: String) = PodcastEpisode(
+    private fun episode(uuid: String, isArchived: Boolean) = PodcastEpisode(
         uuid = uuid,
         publishedDate = Date(0),
+        isArchived = isArchived,
     )
 }

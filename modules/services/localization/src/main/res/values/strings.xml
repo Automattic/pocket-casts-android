@@ -261,6 +261,10 @@
     <string name="tv_playlists_download_title">Create playlists on your phone</string>
     <string name="tv_playlists_download_subtitle">They’ll be waiting here when you’re done. Scan to get the app</string>
     <string name="tv_playlist_play_all">Play all episodes</string>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">The only episode of this playlist has been archived.</item>
+        <item quantity="other">All %1$d episodes of this playlist have been archived.</item>
+    </plurals>
     <string name="tv_playlist_empty_title">No episodes</string>
     <string name="tv_playlist_empty_subtitle">Either it’s time to celebrate completing this list or edit your rules in the mobile app to get some more.</string>
     <string name="tv_playlist_empty_subtitle_manual">Add episodes to this playlist from the mobile app and they’ll show up here.</string>
