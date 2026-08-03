@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -64,10 +64,10 @@ import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import java.util.Date
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -114,7 +114,7 @@ private fun TvPlaylistDetailsContent(
                     horizontalArrangement = Arrangement.spacedBy(80.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
+                        .padding(start = 32.dp, top = 16.dp, end = 56.dp),
                 ) {
                     PlaylistInfo(
                         playlist = uiState.playlist,
@@ -148,24 +148,30 @@ private fun SortableEpisodeList(
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    val sortType = uiState.playlist.settings.sortType
+    var lastSortType by remember { mutableStateOf(sortType) }
+    LaunchedEffect(sortType) {
+        if (sortType != lastSortType) {
+            lastSortType = sortType
+            listState.scrollToItem(0)
+        }
+    }
     Column(modifier = modifier) {
         SortDropdownButton(
-            selectedSortType = uiState.playlist.settings.sortType,
+            selectedSortType = sortType,
             availableSortTypes = uiState.playlist.availableSortTypes,
             onSelectSortType = onChangeSortType,
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(bottom = 12.dp),
         )
-        if (uiState.episodes.isNotEmpty()) {
-            EpisodeList(
-                episodes = uiState.episodes,
-                playAllFocusRequester = playAllFocusRequester,
-                modifier = Modifier.weight(1f),
-            )
-        } else {
-            Spacer(modifier = Modifier.weight(1f))
-        }
+        EpisodeList(
+            episodes = uiState.episodes,
+            playAllFocusRequester = playAllFocusRequester,
+            listState = listState,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -218,12 +224,12 @@ private fun SortDropdownButton(
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
     playAllFocusRequester: FocusRequester,
+    listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val firstEpisodeFocusRequester = remember { FocusRequester() }
-    val listState = rememberLazyListState()
     val initialFocusIndex = remember {
         Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }
             .coerceIn(0, episodes.lastIndex)
