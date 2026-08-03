@@ -11,7 +11,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,16 +62,14 @@ private fun ColumnScope.TvEpisodeActionsModalContent(episode: PodcastEpisode) {
     val playedToggle = stringResource(if (episode.isFinished) LR.string.mark_as_unplayed else LR.string.mark_as_played)
     val archiveToggle = stringResource(if (episode.isArchived) LR.string.unarchive else LR.string.archive)
 
-    val actions = buildList {
-        if (episode.podcastUuid.isNotBlank()) {
-            add(episodeDetails)
-        }
-        add(goToPodcast)
-        add(playNext)
-        add(playLast)
-        add(playedToggle)
-        add(archiveToggle)
-    }
+    val actions = listOf(
+        episodeDetails,
+        goToPodcast,
+        playNext,
+        playLast,
+        playedToggle,
+        archiveToggle,
+    )
 
     actions.forEachIndexed { index, label ->
         TvEpisodeActionButton(
@@ -96,7 +93,7 @@ private fun TvEpisodeActionButton(
     ) {
         Text(
             text = text,
-            textAlign = TextAlign.Center,
+            style = TvTextStyles.ModalButtonLabel,
             modifier = Modifier.fillMaxWidth(),
         )
     }
