@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -30,10 +31,12 @@ class DefaultPlaylistsInitializerImplTest {
 
         initializer.initialize()
 
-        verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.InProgress)
-        verify(playlistManager).updateName("in-progress-uuid", "In Progress")
-        verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.NewReleases)
-        verify(playlistManager).updateName("new-releases-uuid", "New Releases")
+        inOrder(playlistManager) {
+            verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.InProgress)
+            verify(playlistManager).updateName("in-progress-uuid", "In Progress")
+            verify(playlistManager).createSmartPlaylist(SmartPlaylistDraft.NewReleases)
+            verify(playlistManager).updateName("new-releases-uuid", "New Releases")
+        }
         verify(settings).setBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, true)
     }
 
