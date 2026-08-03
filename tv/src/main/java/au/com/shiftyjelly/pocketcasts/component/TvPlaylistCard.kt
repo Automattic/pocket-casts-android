@@ -193,7 +193,7 @@ private fun PlaylistCover(
         label = "PlaylistCoverRotation",
     )
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.25f else 1f,
+        targetValue = if (isFocused) 1.1f else 1f,
         animationSpec = animationSpec,
         label = "PlaylistCoverScale",
     )

@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -218,30 +219,13 @@ private fun TvPlaylistGridItem(
 private fun TvPlaylistsEmpty(
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
+    TvEmptyState(
+        title = stringResource(LR.string.tv_playlists_empty_title),
+        subtitle = stringResource(LR.string.tv_playlists_empty_subtitle),
+        actionLabel = stringResource(LR.string.tv_playlists_empty_action_title),
+        onAction = {},
         modifier = modifier,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(LR.string.tv_playlists_empty_title),
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = stringResource(LR.string.tv_playlists_empty_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                color = TvColors.TextSecondary,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            OutlinedButton(onClick = {}) {
-                Text(stringResource(LR.string.tv_playlists_empty_action_title))
-            }
-        }
-    }
+    )
 }
 
 @Preview(device = Devices.TV_1080p)
