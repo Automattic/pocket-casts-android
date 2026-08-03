@@ -117,7 +117,7 @@ private fun EpisodeHeader(
         modifier = Modifier.fillMaxWidth(),
     ) {
         TvArtworkImage(
-            model = episode.imageUrl ?: PodcastImage.getMediumArtworkUrl(episode.podcastUuid),
+            model = PodcastImage.getMediumArtworkUrl(episode.podcastUuid),
             modifier = Modifier
                 .size(ArtworkSize)
                 .clip(RoundedCornerShape(8.dp)),
@@ -126,7 +126,7 @@ private fun EpisodeHeader(
             if (!podcastTitle.isNullOrBlank()) {
                 Text(
                     text = podcastTitle,
-                    style = TvTextStyles.PlaylistCardCaption,
+                    style = TvTextStyles.Caption,
                     color = TvColors.TextSecondary,
                 )
             }
@@ -138,8 +138,8 @@ private fun EpisodeHeader(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = episode.metadataLine(context),
-                style = TvTextStyles.PlaylistCardCaption,
+                text = remember(episode.publishedDate, episode.durationMs) { episode.metadataLine(context) },
+                style = TvTextStyles.Caption,
                 color = TvColors.TextSecondary,
             )
         }
@@ -181,7 +181,7 @@ private fun EpisodeDescriptionPane(
             is ShowNotes.Loading -> LoadingView(color = Color.White)
 
             is ShowNotes.Loaded -> Text(
-                text = AnnotatedString.fromHtml(showNotes.html),
+                text = remember(showNotes.html) { AnnotatedString.fromHtml(showNotes.html) },
                 style = TvTextStyles.FeaturedTileDescription,
                 color = Color.White,
                 modifier = Modifier.fillMaxWidth(),

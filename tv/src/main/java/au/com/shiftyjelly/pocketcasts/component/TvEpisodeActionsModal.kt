@@ -48,7 +48,7 @@ fun TvEpisodeActionsModal(
 private fun ColumnScope.TvEpisodeActionsModalContent(
     episode: PodcastEpisode,
     onDismissRequest: () -> Unit,
-    onShowEpisodeDetails: () -> Unit = {},
+    onShowEpisodeDetails: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
@@ -140,6 +140,7 @@ private fun TvEpisodeActionsModalPreviewContent(episode: PodcastEpisode) {
                 TvEpisodeActionsModalContent(
                     episode = episode,
                     onDismissRequest = {},
+                    onShowEpisodeDetails = {},
                 )
             }
         }

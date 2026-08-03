@@ -35,8 +35,11 @@ class TvEpisodeInfoViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val showNotes = when (val state = showNotesManager.loadShowNotes(podcastUuid, episodeUuid)) {
-                is ShowNotesState.Loaded -> ShowNotes.Loaded(state.showNotes)
+                is ShowNotesState.Loaded -> state.showNotes.takeIf { it.isNotBlank() }?.let(ShowNotes::Loaded) ?: ShowNotes.Unavailable
                 else -> ShowNotes.Unavailable
+            }
+            if (showNotes is ShowNotes.Unavailable) {
+                loadedEpisodeUuid = null
             }
             updateFor(episodeUuid) { it.copy(showNotes = showNotes) }
         }

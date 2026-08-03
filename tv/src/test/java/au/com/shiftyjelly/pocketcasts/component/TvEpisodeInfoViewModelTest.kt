@@ -79,6 +79,21 @@ class TvEpisodeInfoViewModelTest {
     }
 
     @Test
+    fun `blank show notes map to Unavailable and can be retried`() = runTest {
+        stubShowNotes(ShowNotesState.Loaded("   "))
+        val viewModel = createViewModel()
+
+        viewModel.load(podcastUuid = "podcast", episodeUuid = "episode")
+        assertEquals(ShowNotes.Unavailable, viewModel.uiState.value?.showNotes)
+
+        stubShowNotes(ShowNotesState.Loaded("<p>notes</p>"))
+        viewModel.load(podcastUuid = "podcast", episodeUuid = "episode")
+
+        assertEquals(ShowNotes.Loaded("<p>notes</p>"), viewModel.uiState.value?.showNotes)
+        verifyBlocking(showNotesManager, times(2)) { loadShowNotes("podcast", "episode") }
+    }
+
+    @Test
     fun `loading the same episode again does not reload`() = runTest {
         stubShowNotes(ShowNotesState.Loaded("notes"))
         val viewModel = createViewModel()
