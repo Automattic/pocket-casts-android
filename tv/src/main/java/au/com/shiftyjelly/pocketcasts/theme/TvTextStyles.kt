@@ -45,6 +45,13 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
+    val EpisodeRowTitle = TextStyle(
+        fontSize = 19.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 24.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
     val FeaturedTileSponsoredLabel = TextStyle(
         fontSize = 14.sp,
         platformStyle = PlatformTextStyle(includeFontPadding = false),

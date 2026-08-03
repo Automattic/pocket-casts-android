@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -25,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.playlists.details.TvPlaylistDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -70,24 +74,58 @@ fun TvPlaylistsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
+    var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
 
-    TvPlaylistsContent(
-        uiState = uiState,
-        getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
-        getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
-        refreshArtworkUuids = viewModel::refreshArtworkUuids,
-        refreshEpisodeCount = viewModel::refreshEpisodeCount,
-        findPodcastTint = viewModel::findPodcastTint,
-        onCreatePlaylist = { isDownloadModalVisible = true },
-        modifier = modifier,
-    )
+    val stateHolder = rememberSaveableStateHolder()
+    val playlist = openedPlaylist
+    if (playlist != null) {
+        BackHandler {
+            openedPlaylist = null
+        }
+        stateHolder.SaveableStateProvider("details-${playlist.uuid}") {
+            TvPlaylistDetailsScreen(
+                playlistUuid = playlist.uuid,
+                playlistType = playlist.type,
+                onClose = { openedPlaylist = null },
+                modifier = modifier,
+            )
+        }
+    } else {
+        stateHolder.SaveableStateProvider("grid") {
+            TvPlaylistsContent(
+                uiState = uiState,
+                getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+                getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
+                refreshArtworkUuids = viewModel::refreshArtworkUuids,
+                refreshEpisodeCount = viewModel::refreshEpisodeCount,
+                findPodcastTint = viewModel::findPodcastTint,
+                onCreatePlaylist = { isDownloadModalVisible = true },
+                onOpenPlaylist = { preview ->
+                    isDownloadModalVisible = false
+                    openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
+                },
+                modifier = modifier,
+            )
 
-    if (isDownloadModalVisible) {
-        TvDownloadAppModal(
-            onDismissRequest = { isDownloadModalVisible = false },
-        )
+            if (isDownloadModalVisible) {
+                TvDownloadAppModal(
+                    onDismissRequest = { isDownloadModalVisible = false },
+                )
+            }
+        }
     }
 }
+
+private data class OpenedPlaylist(val uuid: String, val type: Playlist.Type)
+
+private val OpenedPlaylistSaver = listSaver<OpenedPlaylist?, String>(
+    save = { playlist -> playlist?.let { listOf(it.uuid, it.type.key) }.orEmpty() },
+    restore = { saved ->
+        saved.takeIf { it.size == 2 }?.let { (uuid, typeKey) ->
+            Playlist.Type.fromValue(typeKey)?.let { type -> OpenedPlaylist(uuid, type) }
+        }
+    },
+)
 
 @Composable
 private fun TvPlaylistsContent(
@@ -98,6 +136,7 @@ private fun TvPlaylistsContent(
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
     onCreatePlaylist: () -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -128,6 +167,7 @@ private fun TvPlaylistsContent(
                     refreshArtworkUuids = refreshArtworkUuids,
                     refreshEpisodeCount = refreshEpisodeCount,
                     findPodcastTint = findPodcastTint,
+                    onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -143,6 +183,7 @@ private fun TvPlaylistsGrid(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(horizontal = 32.dp)) {
@@ -164,7 +205,7 @@ private fun TvPlaylistsGrid(
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
-                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                        runCatching { focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus() }
                     }
                 },
         ) {
@@ -179,6 +220,7 @@ private fun TvPlaylistsGrid(
                     refreshArtworkUuids = refreshArtworkUuids,
                     refreshEpisodeCount = refreshEpisodeCount,
                     findPodcastTint = findPodcastTint,
+                    onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { focusState ->
@@ -200,6 +242,7 @@ private fun TvPlaylistGridItem(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val artworkUuids by remember(playlist.uuid) { getArtworkUuidsFlow(playlist.uuid) }.collectAsState()
@@ -224,7 +267,7 @@ private fun TvPlaylistGridItem(
         episodeCount = episodeCount,
         artworkUrls = artworkUuids.orEmpty().map(PodcastImage::getMediumArtworkUrl),
         cardColor = TvPlaylistCardColors.cardColor(podcastTint, seed = playlist.uuid),
-        onClick = {},
+        onClick = { onOpenPlaylist(playlist) },
         modifier = modifier,
     )
 }
@@ -259,6 +302,7 @@ private fun TvPlaylistsGridPreview() {
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
                     onCreatePlaylist = {},
+                    onOpenPlaylist = {},
                 )
             }
         }
@@ -279,6 +323,7 @@ private fun TvPlaylistsEmptyPreview() {
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
                     onCreatePlaylist = {},
+                    onOpenPlaylist = {},
                 )
             }
         }

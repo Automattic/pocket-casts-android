@@ -260,6 +260,10 @@
     <string name="tv_playlists_empty_action_title">Create a playlist</string>
     <string name="tv_playlists_download_title">Create playlists on your phone</string>
     <string name="tv_playlists_download_subtitle">They’ll be waiting here when you’re done. Scan to get the app</string>
+    <string name="tv_playlist_play_all">Play all episodes</string>
+    <string name="tv_playlist_empty_title">No episodes</string>
+    <string name="tv_playlist_empty_subtitle">Either it’s time to celebrate completing this list or edit your rules in the mobile app to get some more.</string>
+    <string name="tv_playlist_empty_subtitle_manual">Add episodes to this playlist from the mobile app and they’ll show up here.</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -1018,6 +1022,7 @@
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort by</string>
+    <string name="playlist">Playlist</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with smart rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
