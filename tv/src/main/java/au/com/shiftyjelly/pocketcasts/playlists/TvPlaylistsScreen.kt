@@ -41,8 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -68,6 +69,8 @@ fun TvPlaylistsScreen(
     viewModel: TvPlaylistsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
+
     TvPlaylistsContent(
         uiState = uiState,
         getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
@@ -75,8 +78,15 @@ fun TvPlaylistsScreen(
         refreshArtworkUuids = viewModel::refreshArtworkUuids,
         refreshEpisodeCount = viewModel::refreshEpisodeCount,
         findPodcastTint = viewModel::findPodcastTint,
+        onCreatePlaylist = { isDownloadModalVisible = true },
         modifier = modifier,
     )
+
+    if (isDownloadModalVisible) {
+        TvDownloadAppModal(
+            onDismissRequest = { isDownloadModalVisible = false },
+        )
+    }
 }
 
 @Composable
@@ -87,6 +97,7 @@ private fun TvPlaylistsContent(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onCreatePlaylist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -105,7 +116,10 @@ private fun TvPlaylistsContent(
             is TvPlaylistsUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
-                TvPlaylistsEmpty(modifier = Modifier.fillMaxSize())
+                TvPlaylistsEmpty(
+                    onCreatePlaylist = onCreatePlaylist,
+                    modifier = Modifier.fillMaxSize(),
+                )
             } else {
                 TvPlaylistsGrid(
                     playlists = state.playlists,
@@ -217,13 +231,14 @@ private fun TvPlaylistGridItem(
 
 @Composable
 private fun TvPlaylistsEmpty(
+    onCreatePlaylist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TvEmptyState(
         title = stringResource(LR.string.tv_playlists_empty_title),
         subtitle = stringResource(LR.string.tv_playlists_empty_subtitle),
         actionLabel = stringResource(LR.string.tv_playlists_empty_action_title),
-        onAction = {},
+        onAction = onCreatePlaylist,
         modifier = modifier,
     )
 }
@@ -243,6 +258,7 @@ private fun TvPlaylistsGridPreview() {
                     refreshArtworkUuids = {},
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
+                    onCreatePlaylist = {},
                 )
             }
         }
@@ -262,6 +278,7 @@ private fun TvPlaylistsEmptyPreview() {
                     refreshArtworkUuids = {},
                     refreshEpisodeCount = {},
                     findPodcastTint = { null },
+                    onCreatePlaylist = {},
                 )
             }
         }

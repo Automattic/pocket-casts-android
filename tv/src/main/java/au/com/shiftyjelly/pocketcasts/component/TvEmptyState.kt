@@ -15,10 +15,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -51,8 +52,11 @@ fun TvEmptyState(
                 modifier = Modifier.widthIn(max = 400.dp),
             )
             Spacer(modifier = Modifier.height(32.dp))
-            OutlinedButton(onClick = onAction) {
-                Text(actionLabel)
+            Button(
+                onClick = onAction,
+                colors = TvButtonDefaults.filledButtonColors(),
+            ) {
+                Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
             }
         }
     }

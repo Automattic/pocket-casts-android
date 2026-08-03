@@ -258,6 +258,8 @@
     <string name="tv_playlists_empty_title">Your playlists live here</string>
     <string name="tv_playlists_empty_subtitle">Build one manually or let Smart Rules do the sorting for you.</string>
     <string name="tv_playlists_empty_action_title">Create a playlist</string>
+    <string name="tv_playlists_download_title">Create playlists on your phone</string>
+    <string name="tv_playlists_download_subtitle">They’ll be waiting here when you’re done. Scan to get the app</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>

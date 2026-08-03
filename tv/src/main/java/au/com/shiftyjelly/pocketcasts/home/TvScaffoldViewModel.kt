@@ -2,10 +2,8 @@ package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +15,8 @@ import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class TvScaffoldViewModel @Inject constructor(
-    private val userManager: UserManager,
     private val syncManager: SyncManager,
-    private val playbackManager: Lazy<PlaybackManager>,
+    private val signOutManager: TvSignOutManager,
 ) : ViewModel() {
     private val selectedTabIndex = MutableStateFlow(0)
 
@@ -43,7 +40,7 @@ class TvScaffoldViewModel @Inject constructor(
     }
 
     fun signOut() {
-        userManager.signOut(playbackManager.get(), wasInitiatedByUser = true)
+        signOutManager.signOutAndWipeData()
     }
 
     private fun currentProfileState() = profileState(syncManager.isLoggedIn(), syncManager.getEmail())

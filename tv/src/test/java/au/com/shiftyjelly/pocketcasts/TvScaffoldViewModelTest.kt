@@ -1,15 +1,13 @@
 package au.com.shiftyjelly.pocketcasts
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
 import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
-import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,16 +29,15 @@ class TvScaffoldViewModelTest {
     private val isLoggedIn = BehaviorRelay.createDefault(false)
     private val email = MutableStateFlow<String?>(null)
 
-    private val userManager = mock<UserManager>()
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
         on { isLoggedInObservable } doReturn isLoggedIn
         on { emailFlow() } doReturn email
     }
-    private val playbackManager = mock<PlaybackManager>()
+    private val signOutManager = mock<TvSignOutManager>()
 
     private val viewModel by lazy {
-        TvScaffoldViewModel(userManager, syncManager, Lazy { playbackManager })
+        TvScaffoldViewModel(syncManager, signOutManager)
     }
 
     @Test
@@ -130,9 +127,9 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
-    fun `signOut delegates to the user manager`() = runTest {
+    fun `signOut delegates to the sign out manager`() = runTest {
         viewModel.signOut()
 
-        verify(userManager).signOut(playbackManager, wasInitiatedByUser = true)
+        verify(signOutManager).signOutAndWipeData()
     }
 }
