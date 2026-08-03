@@ -320,7 +320,16 @@ open class PlaybackManager @Inject constructor(
                     castReconnected()
                 }
 
-                override fun sessionFailed(errorCode: Int) {
+                override fun sessionFailed(errorCode: Int, failureType: CastManager.SessionFailureType) {
+                    // The Cast SDK can resume a saved session without user interaction. A failed cold resume must not
+                    // turn healthy local playback into an error or tear down its media notification.
+                    if (!shouldSurfaceCastSessionFailure(failureType, isCastPlayerActive = player?.isRemote == true)) {
+                        LogBuffer.i(
+                            LogBuffer.TAG_PLAYBACK,
+                            "Ignoring Cast session resume failure with error code $errorCode during local playback",
+                        )
+                        return
+                    }
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session failed with error code $errorCode")
                     launch(Dispatchers.Main) {
                         val message = application.getString(LR.string.error_cast_connection_failed)
@@ -3025,6 +3034,16 @@ open class PlaybackManager @Inject constructor(
         OnUpdatePausedPlaybackState("updatePausedPlaybackState"),
         OnUpdateSleepTimerStatus("updateSleepTimerStatus"),
         OnUserSeeking("onUserSeeking"),
+    }
+}
+
+internal fun shouldSurfaceCastSessionFailure(
+    failureType: CastManager.SessionFailureType,
+    isCastPlayerActive: Boolean,
+): Boolean {
+    return when (failureType) {
+        CastManager.SessionFailureType.START -> true
+        CastManager.SessionFailureType.RESUME -> isCastPlayerActive
     }
 }
 
