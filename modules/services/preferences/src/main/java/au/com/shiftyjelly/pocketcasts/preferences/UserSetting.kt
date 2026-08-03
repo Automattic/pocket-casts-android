@@ -37,10 +37,6 @@ abstract class UserSetting<T>(
     protected val sharedPrefs: SharedPreferences,
 ) : ReadWriteSetting<T> {
 
-    init {
-        allSettings.add(WeakReference(this))
-    }
-
     private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
     private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
@@ -58,7 +54,10 @@ abstract class UserSetting<T>(
     // These are lazy because (1) the class needs to initialize before calling get() and
     // (2) we don't want to get the current value from SharedPreferences for every
     // setting immediately on app startup.
-    private val flowDelegate = lazy { MutableStateFlow(get()) }
+    private val flowDelegate = lazy {
+        allSettings.add(WeakReference(this))
+        MutableStateFlow(get())
+    }
     protected val _flow by flowDelegate
     override val flow: StateFlow<T> by lazy { _flow }
 

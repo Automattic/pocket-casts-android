@@ -56,7 +56,7 @@ fun TvEmptyState(
                 onClick = onAction,
                 colors = TvButtonDefaults.filledButtonColors(),
             ) {
-                Text(actionLabel)
+                Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
             }
         }
     }

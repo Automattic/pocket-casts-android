@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +29,6 @@ class TvScaffoldViewModelTest {
     private val isLoggedIn = BehaviorRelay.createDefault(false)
     private val email = MutableStateFlow<String?>(null)
 
-    private val userManager = mock<UserManager>()
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
         on { isLoggedInObservable } doReturn isLoggedIn
@@ -39,7 +37,7 @@ class TvScaffoldViewModelTest {
     private val signOutManager = mock<TvSignOutManager>()
 
     private val viewModel by lazy {
-        TvScaffoldViewModel(userManager, syncManager, signOutManager)
+        TvScaffoldViewModel(syncManager, signOutManager)
     }
 
     @Test

@@ -53,17 +53,19 @@ class TvSignOutManager @Inject constructor(
     }
 
     private fun deleteDownloadedFiles() {
-        val dirs = listOfNotNull(
-            fileStorage.getOrCreateEpisodesDir(),
-            fileStorage.getOrCreateCloudDir(),
-            fileStorage.getOrCreateNetworkImagesDir(),
-            fileStorage.getOrCreateEpisodesOldTempDir(),
-            fileStorage.getOrCreateEpisodesTempDir(),
+        val dirProviders = listOf(
+            "episodes" to fileStorage::getOrCreateEpisodesDir,
+            "cloud" to fileStorage::getOrCreateCloudDir,
+            "network images" to fileStorage::getOrCreateNetworkImagesDir,
+            "old temp episodes" to fileStorage::getOrCreateEpisodesOldTempDir,
+            "temp episodes" to fileStorage::getOrCreateEpisodesTempDir,
         )
-        dirs.forEach { dir ->
-            dir.listFiles()?.forEach { file ->
-                if (!file.name.equals(".nomedia", ignoreCase = true)) {
-                    file.deleteRecursively()
+        dirProviders.forEach { (name, provider) ->
+            runWipeStep("delete $name directory") {
+                provider()?.listFiles()?.forEach { file ->
+                    if (!file.name.equals(".nomedia", ignoreCase = true)) {
+                        file.deleteRecursively()
+                    }
                 }
             }
         }

@@ -76,6 +76,21 @@ class SettingsImplTest {
     }
 
     @Test
+    fun `clearUserPreferences keeps the device level keys`() {
+        publicPrefs.edit().putString(AccountConstants.ANON_ID_KEY, "anon").commit()
+        publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CHOICE, "choice").commit()
+        publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CHOICE_NAME, "name").commit()
+        publicPrefs.edit().putString(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER, "folder").commit()
+
+        settings.clearUserPreferences()
+
+        assertTrue(publicPrefs.contains(AccountConstants.ANON_ID_KEY))
+        assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CHOICE))
+        assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CHOICE_NAME))
+        assertTrue(publicPrefs.contains(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER))
+    }
+
+    @Test
     fun `clearUserPreferences keeps the processed sign out flag`() {
         settings.setFullySignedOut(false)
 

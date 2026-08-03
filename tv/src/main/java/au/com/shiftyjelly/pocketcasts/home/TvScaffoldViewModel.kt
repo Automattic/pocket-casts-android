@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,6 @@ import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class TvScaffoldViewModel @Inject constructor(
-    private val userManager: UserManager,
     private val syncManager: SyncManager,
     private val signOutManager: TvSignOutManager,
 ) : ViewModel() {

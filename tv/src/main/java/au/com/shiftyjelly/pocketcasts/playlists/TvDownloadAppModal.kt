@@ -83,7 +83,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
             .padding(top = 16.dp)
             .focusRequester(focusRequester),
     ) {
-        Text(stringResource(LR.string.done))
+        Text(stringResource(LR.string.done), style = TvTextStyles.ModalButtonLabel)
     }
 }
 
