@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.upnext
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
@@ -58,22 +61,35 @@ fun TvUpNextScreen(
     viewModel: TvUpNextViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.onShown()
     }
 
-    TvUpNextContent(
-        uiState = uiState,
-        onNavigateToHome = onNavigateToHome,
-        modifier = modifier,
-    )
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+    } else {
+        TvUpNextContent(
+            uiState = uiState,
+            onNavigateToHome = onNavigateToHome,
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
 private fun TvUpNextContent(
     uiState: TvUpNextUiState,
     onNavigateToHome: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -90,7 +106,10 @@ private fun TvUpNextContent(
             }
 
             is TvUpNextUiState.Loaded -> {
-                UpNextList(episodes = uiState.episodes)
+                UpNextList(
+                    episodes = uiState.episodes,
+                    onOpenPodcast = onOpenPodcast,
+                )
             }
         }
     }
@@ -99,6 +118,7 @@ private fun TvUpNextContent(
 @Composable
 private fun UpNextList(
     episodes: List<PodcastEpisode>,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -142,6 +162,7 @@ private fun UpNextList(
                 detailsEpisode = episode
                 actionsEpisode = null
             },
+            onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
         )
     }
     detailsEpisode?.let { episode ->
@@ -241,6 +262,7 @@ private fun TvUpNextLoadedPreview() {
                         },
                     ),
                     onNavigateToHome = {},
+                    onOpenPodcast = {},
                 )
             }
         }
@@ -256,6 +278,7 @@ private fun TvUpNextEmptyPreview() {
                 TvUpNextContent(
                     uiState = TvUpNextUiState.Empty,
                     onNavigateToHome = {},
+                    onOpenPodcast = {},
                 )
             }
         }
