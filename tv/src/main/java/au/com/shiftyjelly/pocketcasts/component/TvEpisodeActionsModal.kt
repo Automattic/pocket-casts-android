@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -55,6 +56,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         focusRequester.requestFocus()
     }
 
+    val toastHostState = LocalTvToastHostState.current
     val episodeDetails = stringResource(LR.string.tv_episode_details)
     val goToPodcast = stringResource(LR.string.go_to_podcast)
     val playNext = stringResource(LR.string.add_to_up_next_top)
@@ -62,13 +64,27 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     val playedToggle = stringResource(if (episode.isFinished) LR.string.mark_as_unplayed else LR.string.mark_as_played)
     val archiveToggle = stringResource(if (episode.isArchived) LR.string.unarchive else LR.string.archive)
 
+    val playNextToast = stringResource(LR.string.tv_episode_will_play_next)
+    val playLastToast = stringResource(LR.string.tv_episode_will_play_last)
+    val playedToast = stringResource(
+        if (episode.isFinished) LR.string.tv_episode_marked_as_unplayed else LR.string.tv_episode_marked_as_played,
+    )
+    val archiveToast = stringResource(
+        if (episode.isArchived) LR.string.tv_episode_unarchived else LR.string.tv_episode_archived,
+    )
+
+    fun withToast(message: String): () -> Unit = {
+        toastHostState.show(message)
+        onDismissRequest()
+    }
+
     val actions = listOf(
         episodeDetails to onShowEpisodeDetails,
-        goToPodcast to {},
-        playNext to {},
-        playLast to {},
-        playedToggle to {},
-        archiveToggle to {},
+        goToPodcast to onDismissRequest,
+        playNext to withToast(playNextToast),
+        playLast to withToast(playLastToast),
+        playedToggle to withToast(playedToast),
+        archiveToggle to withToast(archiveToast),
     )
 
     actions.forEachIndexed { index, (label, onClick) ->
@@ -136,12 +152,14 @@ private fun TvEpisodeActionsModalPlayedArchivedPreview() {
 private fun TvEpisodeActionsModalPreviewContent(episode: PodcastEpisode) {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            TvModalSurface(contentPadding = ContentPadding) {
-                TvEpisodeActionsModalContent(
-                    episode = episode,
-                    onDismissRequest = {},
-                    onShowEpisodeDetails = {},
-                )
+            CompositionLocalProvider(LocalTvToastHostState provides remember { TvToastHostState() }) {
+                TvModalSurface(contentPadding = ContentPadding) {
+                    TvEpisodeActionsModalContent(
+                        episode = episode,
+                        onDismissRequest = {},
+                        onShowEpisodeDetails = {},
+                    )
+                }
             }
         }
     }
