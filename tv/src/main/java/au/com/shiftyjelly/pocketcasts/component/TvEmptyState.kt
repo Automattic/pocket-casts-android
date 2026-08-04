@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -31,7 +36,15 @@ fun TvEmptyState(
     actionLabel: String,
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
+    autoFocusAction: Boolean = false,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    if (autoFocusAction) {
+        LaunchedEffect(Unit) {
+            withFrameNanos {}
+            runCatching { focusRequester.requestFocus() }
+        }
+    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
@@ -55,6 +68,7 @@ fun TvEmptyState(
             Button(
                 onClick = onAction,
                 colors = TvButtonDefaults.filledButtonColors(),
+                modifier = if (autoFocusAction) Modifier.focusRequester(focusRequester) else Modifier,
             ) {
                 Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
             }
