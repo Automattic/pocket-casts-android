@@ -38,6 +38,7 @@ fun TvFolderDetailScreen(
     folderUuid: String,
     folderName: String,
     getFolderPodcasts: suspend (String) -> List<Podcast>,
+    onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -51,6 +52,7 @@ fun TvFolderDetailScreen(
     TvFolderDetailContent(
         folderName = folderName,
         uiState = uiState,
+        onOpenPodcast = onOpenPodcast,
         onClose = onClose,
         modifier = modifier,
     )
@@ -60,6 +62,7 @@ fun TvFolderDetailScreen(
 private fun TvFolderDetailContent(
     folderName: String,
     uiState: TvFolderDetailUiState,
+    onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,7 +101,7 @@ private fun TvFolderDetailContent(
                 TvPodcastTile(
                     artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
                     podcastTitle = podcast.title,
-                    onClick = {},
+                    onClick = { onOpenPodcast(podcast.uuid) },
                     imageModifier = Modifier.fillMaxWidth(),
                     modifier = itemModifier,
                 )
@@ -128,6 +131,7 @@ private fun TvFolderDetailPreview() {
                     uiState = TvFolderDetailUiState.Loaded(
                         podcasts = List(6) { index -> Podcast(uuid = "podcast-$index", title = "Podcast $index") },
                     ),
+                    onOpenPodcast = {},
                     onClose = {},
                 )
             }

@@ -45,6 +45,13 @@ object TvTextStyles {
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
+    val Caption = TextStyle(
+        fontSize = 17.sp,
+        fontWeight = FontWeight(510),
+        lineHeight = 21.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
+
     val FolderCardTitle = TextStyle(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
