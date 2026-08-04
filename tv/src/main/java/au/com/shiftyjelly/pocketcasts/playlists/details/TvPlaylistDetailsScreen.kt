@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
@@ -52,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
@@ -79,6 +82,7 @@ fun TvPlaylistDetailsScreen(
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPlaylistDetailsUiState.NotFound) {
@@ -86,12 +90,23 @@ fun TvPlaylistDetailsScreen(
         }
     }
 
-    TvPlaylistDetailsContent(
-        uiState = uiState,
-        onChangeSortType = viewModel::changeSortType,
-        onToggleArchiveFilter = viewModel::toggleArchiveFilter,
-        modifier = modifier,
-    )
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+    } else {
+        TvPlaylistDetailsContent(
+            uiState = uiState,
+            onChangeSortType = viewModel::changeSortType,
+            onToggleArchiveFilter = viewModel::toggleArchiveFilter,
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
@@ -99,6 +114,7 @@ private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -131,6 +147,7 @@ private fun TvPlaylistDetailsContent(
                             uiState = uiState,
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
+                            onOpenPodcast = onOpenPodcast,
                             playAllFocusRequester = playAllFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
@@ -146,6 +163,7 @@ private fun SortableEpisodeList(
     uiState: TvPlaylistDetailsUiState.Loaded,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -198,6 +216,7 @@ private fun SortableEpisodeList(
         if (uiState.episodes.isNotEmpty()) {
             EpisodeList(
                 episodes = uiState.episodes,
+                onOpenPodcast = onOpenPodcast,
                 playAllFocusRequester = playAllFocusRequester,
                 firstEpisodeFocusRequester = firstEpisodeFocusRequester,
                 initialFocusIndex = initialFocusIndex,
@@ -235,6 +254,7 @@ private fun AllEpisodesArchived(
 @Composable
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
+    onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
     firstEpisodeFocusRequester: FocusRequester,
     initialFocusIndex: Int,
@@ -273,6 +293,7 @@ private fun EpisodeList(
                 detailsEpisode = episode
                 actionsEpisode = null
             },
+            onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
         )
     }
     detailsEpisode?.let { episode ->
@@ -396,6 +417,7 @@ private fun TvPlaylistDetailsPreview() {
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
+                onOpenPodcast = {},
             )
         }
     }
@@ -428,6 +450,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
+                onOpenPodcast = {},
             )
         }
     }
