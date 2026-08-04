@@ -95,6 +95,27 @@ class TvYourPodcastsViewModelTest {
     }
 
     @Test
+    fun `following a new podcast adds it to the grid`() = runTest {
+        val viewModel = createViewModel()
+        val apple = podcastItem("Apple Cast")
+        homeFolder = listOf(apple)
+
+        viewModel.uiState.test {
+            assertEquals(TvYourPodcastsUiState.Loading, awaitItem())
+
+            folders.emit(emptyList())
+            subscribed.emit(listOf(Podcast(uuid = "apple")))
+            assertEquals(TvYourPodcastsUiState.Loaded(listOf(apple)), awaitItem())
+
+            val beat = podcastItem("Beat Cast")
+            homeFolder = listOf(apple, beat)
+            subscribed.emit(listOf(Podcast(uuid = "apple"), Podcast(uuid = "beat")))
+
+            assertEquals(TvYourPodcastsUiState.Loaded(listOf(apple, beat)), awaitItem())
+        }
+    }
+
+    @Test
     fun `folder items are enriched with their cover podcasts`() = runTest {
         val viewModel = createViewModel()
         val tech = folderItem("Tech")
