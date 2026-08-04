@@ -362,7 +362,7 @@ private fun AllEpisodesArchived(
     }
 }
 
-private const val INFO_PANE_WEIGHT = 0.3f
+private const val INFO_PANE_WEIGHT = 0.35f
 
 private val PodcastSortOptions = listOf(
     EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
