@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,13 +24,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,14 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
-import androidx.tv.material3.Icon
-import androidx.tv.material3.IconButton
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
-import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
+import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
@@ -69,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -188,15 +181,16 @@ private fun SortableEpisodeList(
                 .align(Alignment.End)
                 .padding(bottom = 12.dp),
         ) {
-            ArchivedDropdownButton(
+            TvArchivedFilterButton(
                 isShowingArchived = uiState.isShowingArchivedOnDevice,
                 onToggleArchiveFilter = onToggleArchiveFilter,
-                playAllFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
+                leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
             )
-            SortDropdownButton(
-                selectedSortType = sortType,
-                availableSortTypes = uiState.playlist.availableSortTypes,
-                onSelectSortType = onChangeSortType,
+            TvSortButton(
+                selected = sortType,
+                options = uiState.playlist.availableSortTypes,
+                label = { it.displayLabel() },
+                onSelect = onChangeSortType,
             )
         }
         if (uiState.episodes.isNotEmpty()) {
@@ -233,105 +227,6 @@ private fun AllEpisodesArchived(
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 400.dp),
         )
-    }
-}
-
-@Composable
-private fun ArchivedDropdownButton(
-    isShowingArchived: Boolean,
-    onToggleArchiveFilter: () -> Unit,
-    playAllFocusRequester: FocusRequester?,
-    modifier: Modifier = Modifier,
-) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier) {
-        Button(
-            onClick = { isExpanded = true },
-            colors = TvButtonDefaults.filledButtonColors(),
-            modifier = if (playAllFocusRequester != null) {
-                Modifier.focusProperties { left = playAllFocusRequester }
-            } else {
-                Modifier
-            },
-        ) {
-            Text(
-                text = stringResource(if (isShowingArchived) LR.string.show_archived else LR.string.podcast_hide_archived),
-                style = TvTextStyles.PlaylistCardCaption,
-            )
-            Icon(
-                painter = painterResource(IR.drawable.ic_chevron_small_up),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(start = 6.dp)
-                    .size(16.dp)
-                    .rotate(180f),
-            )
-        }
-        if (isExpanded) {
-            TvDropdownMenu(onDismissRequest = { isExpanded = false }) {
-                TvDropdownMenuItem(
-                    label = stringResource(LR.string.podcast_hide_archived),
-                    isSelected = !isShowingArchived,
-                    onClick = {
-                        isExpanded = false
-                        if (isShowingArchived) {
-                            onToggleArchiveFilter()
-                        }
-                    },
-                )
-                TvDropdownMenuItem(
-                    label = stringResource(LR.string.show_archived),
-                    isSelected = isShowingArchived,
-                    onClick = {
-                        isExpanded = false
-                        if (!isShowingArchived) {
-                            onToggleArchiveFilter()
-                        }
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SortDropdownButton(
-    selectedSortType: PlaylistEpisodeSortType,
-    availableSortTypes: List<PlaylistEpisodeSortType>,
-    onSelectSortType: (PlaylistEpisodeSortType) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier) {
-        IconButton(
-            onClick = { isExpanded = true },
-            colors = TvButtonDefaults.iconButtonColors(),
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_sort),
-                contentDescription = stringResource(LR.string.sort_by),
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        if (isExpanded) {
-            TvDropdownMenu(
-                title = stringResource(LR.string.sort_by),
-                onDismissRequest = { isExpanded = false },
-            ) {
-                availableSortTypes.forEach { sortType ->
-                    TvDropdownMenuItem(
-                        label = sortType.displayLabel(),
-                        isSelected = sortType == selectedSortType,
-                        onClick = {
-                            isExpanded = false
-                            onSelectSortType(sortType)
-                        },
-                    )
-                }
-            }
-        }
     }
 }
 

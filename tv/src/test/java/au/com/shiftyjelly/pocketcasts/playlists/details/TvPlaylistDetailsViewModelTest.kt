@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -32,7 +33,7 @@ class TvPlaylistDetailsViewModelTest {
     private val playlistManager = mock<PlaylistManager> {
         on { manualPlaylistFlow(any(), anyOrNull(), any()) } doReturn playlists
     }
-    private val preferences = mock<TvPlaylistPreferences>()
+    private val preferences = mock<TvPreferences>()
 
     private val availableEpisode = episode(uuid = "episode-1", isArchived = false)
     private val archivedEpisode = episode(uuid = "episode-2", isArchived = true)
@@ -55,8 +56,8 @@ class TvPlaylistDetailsViewModelTest {
 
     @Test
     fun `archived episodes are shown when the stored preference allows them`() = runTest {
-        val preferences = mock<TvPlaylistPreferences> {
-            on { isShowingArchived("playlist-uuid") } doReturn true
+        val preferences = mock<TvPreferences> {
+            on { isPlaylistShowingArchived("playlist-uuid") } doReturn true
         }
         val viewModel = createViewModel(preferences)
 
@@ -125,11 +126,11 @@ class TvPlaylistDetailsViewModelTest {
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
             assertEquals(true, state.isShowingArchivedOnDevice)
-            verify(preferences).setShowingArchived(eq("playlist-uuid"), eq(true))
+            verify(preferences).setPlaylistShowingArchived(eq("playlist-uuid"), eq(true))
         }
     }
 
-    private fun createViewModel(prefs: TvPlaylistPreferences = preferences) = TvPlaylistDetailsViewModel(
+    private fun createViewModel(prefs: TvPreferences = preferences) = TvPlaylistDetailsViewModel(
         playlistUuid = "playlist-uuid",
         playlistType = Playlist.Type.Manual,
         playlistManager = playlistManager,

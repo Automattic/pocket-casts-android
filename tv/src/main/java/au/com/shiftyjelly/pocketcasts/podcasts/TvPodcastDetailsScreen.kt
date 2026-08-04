@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -29,7 +31,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,15 +44,19 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
@@ -81,6 +89,8 @@ fun TvPodcastDetailsScreen(
 
     TvPodcastDetailsContent(
         uiState = uiState,
+        onChangeSortType = viewModel::changeSortType,
+        onToggleArchiveFilter = viewModel::toggleArchiveFilter,
         modifier = modifier,
     )
 }
@@ -88,6 +98,8 @@ fun TvPodcastDetailsScreen(
 @Composable
 private fun TvPodcastDetailsContent(
     uiState: TvPodcastDetailsUiState,
+    onChangeSortType: (EpisodesSortType) -> Unit,
+    onToggleArchiveFilter: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -109,7 +121,7 @@ private fun TvPodcastDetailsContent(
                         followFocusRequester = followFocusRequester,
                         modifier = Modifier.width(InfoPaneWidth),
                     )
-                    if (uiState.episodes.isEmpty()) {
+                    if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
                         TvEmptyState(
                             title = stringResource(LR.string.podcast_no_episodes_found),
                             subtitle = stringResource(LR.string.podcast_no_episodes),
@@ -117,7 +129,12 @@ private fun TvPodcastDetailsContent(
                         )
                     } else {
                         EpisodeList(
+                            podcast = uiState.podcast,
                             episodes = uiState.episodes,
+                            archivedEpisodeCount = uiState.archivedEpisodeCount,
+                            isShowingArchived = uiState.isShowingArchived,
+                            onChangeSortType = onChangeSortType,
+                            onToggleArchiveFilter = onToggleArchiveFilter,
                             leftFocusRequester = followFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
@@ -193,7 +210,12 @@ private fun PodcastInfo(
 
 @Composable
 private fun EpisodeList(
+    podcast: Podcast,
     episodes: List<PodcastEpisode>,
+    archivedEpisodeCount: Int,
+    isShowingArchived: Boolean,
+    onChangeSortType: (EpisodesSortType) -> Unit,
+    onToggleArchiveFilter: () -> Unit,
     leftFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -201,36 +223,69 @@ private fun EpisodeList(
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val firstEpisodeFocusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
-    LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
-        runCatching { firstEpisodeFocusRequester.requestFocus() }
-            .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
+    LaunchedEffect(podcast.episodesSortType) {
+        listState.scrollToItem(0)
+    }
+    var hasRequestedInitialFocus by remember { mutableStateOf(episodes.isEmpty()) }
+    LaunchedEffect(episodes.isNotEmpty()) {
+        if (episodes.isNotEmpty() && !hasRequestedInitialFocus) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
+            runCatching { firstEpisodeFocusRequester.requestFocus() }
+                .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
+            hasRequestedInitialFocus = true
+        }
     }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     Column(modifier = modifier) {
-        Text(
-            text = stringResource(LR.string.search_results_all_episodes),
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 12.dp),
-        )
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
         ) {
-            itemsIndexed(
-                items = episodes,
-                key = { _, episode -> episode.uuid },
-            ) { index, episode ->
-                TvEpisodeListItem(
-                    episode = episode,
-                    dateFormatter = dateFormatter,
-                    onClick = {},
-                    onOpenActions = { actionsEpisode = episode },
-                    episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
-                    leftFocusRequester = leftFocusRequester,
-                )
+            Text(
+                text = stringResource(LR.string.search_results_all_episodes),
+                style = TvTextStyles.ScreenTitle,
+                color = Color.White,
+                modifier = Modifier.weight(1f),
+            )
+            TvArchivedFilterButton(
+                isShowingArchived = isShowingArchived,
+                onToggleArchiveFilter = onToggleArchiveFilter,
+                leftFocusRequester = leftFocusRequester,
+            )
+            Spacer(Modifier.width(12.dp))
+            TvSortButton(
+                selected = podcast.episodesSortType,
+                options = PodcastSortOptions,
+                label = { it.displayLabel() },
+                onSelect = onChangeSortType,
+            )
+        }
+        if (episodes.isEmpty()) {
+            AllEpisodesArchived(
+                episodeCount = archivedEpisodeCount,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            )
+        } else {
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                itemsIndexed(
+                    items = episodes,
+                    key = { _, episode -> episode.uuid },
+                ) { index, episode ->
+                    TvEpisodeListItem(
+                        episode = episode,
+                        dateFormatter = dateFormatter,
+                        onClick = {},
+                        onOpenActions = { actionsEpisode = episode },
+                        episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
+                        leftFocusRequester = leftFocusRequester,
+                    )
+                }
             }
         }
     }
@@ -242,7 +297,35 @@ private fun EpisodeList(
     }
 }
 
+@Composable
+private fun AllEpisodesArchived(
+    episodeCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        Text(
+            text = pluralStringResource(LR.plurals.tv_podcast_all_archived, episodeCount, episodeCount),
+            style = MaterialTheme.typography.bodyLarge,
+            color = TvColors.TextSecondary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 400.dp),
+        )
+    }
+}
+
 private val InfoPaneWidth = 380.dp
+
+private val PodcastSortOptions = listOf(
+    EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
+    EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC,
+    EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
+    EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
+    EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
+    EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
+)
 
 @Preview(device = Devices.TV_1080p)
 @Composable
@@ -286,7 +369,11 @@ private fun TvPodcastDetailsContentPreview(
                 uiState = TvPodcastDetailsUiState.Loaded(
                     podcast = podcast,
                     episodes = episodes,
+                    archivedEpisodeCount = 0,
+                    isShowingArchived = false,
                 ),
+                onChangeSortType = {},
+                onToggleArchiveFilter = {},
             )
         }
     }

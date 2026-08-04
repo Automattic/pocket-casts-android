@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.auth
 
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.playlists.details.TvPlaylistPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -30,7 +30,7 @@ class TvSignOutManager @Inject constructor(
     private val episodeManager: Lazy<EpisodeManager>,
     private val fileStorage: FileStorage,
     private val settings: Settings,
-    private val playlistPreferences: TvPlaylistPreferences,
+    private val tvPreferences: TvPreferences,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -51,7 +51,7 @@ class TvSignOutManager @Inject constructor(
             }
             runWipeStep("delete downloaded files") { deleteDownloadedFiles() }
             runWipeStep("clear user preferences") { settings.clearUserPreferences() }
-            runWipeStep("clear playlist preferences") { playlistPreferences.clearAll() }
+            runWipeStep("clear tv preferences") { tvPreferences.clearAll() }
         }
     }
 

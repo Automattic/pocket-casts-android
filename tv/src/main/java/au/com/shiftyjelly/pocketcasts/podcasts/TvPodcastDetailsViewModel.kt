@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -16,23 +19,34 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = TvPodcastDetailsViewModel.Factory::class)
 class TvPodcastDetailsViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
+    private val preferences: TvPreferences,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+
+    private val isShowingArchivedFlow = MutableStateFlow(preferences.isPodcastShowingArchived(podcastUuid))
 
     val uiState: StateFlow<TvPodcastDetailsUiState> = flow {
         val podcast = try {
@@ -46,11 +60,17 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
         if (podcast == null) {
             emit(TvPodcastDetailsUiState.NotFound)
         } else {
+            val podcastFlow = podcastManager.podcastByUuidFlow(podcastUuid).filterNotNull()
+            val episodesFlow = podcastFlow
+                .distinctUntilChangedBy { it.episodesSortType }
+                .flatMapLatest { episodeManager.findEpisodesByPodcastOrderedFlow(it) }
             emitAll(
-                episodeManager.findEpisodesByPodcastOrderedFlow(podcast).map { episodes ->
+                combine(podcastFlow, episodesFlow, isShowingArchivedFlow) { loadedPodcast, episodes, isShowingArchived ->
                     TvPodcastDetailsUiState.Loaded(
-                        podcast = podcast,
-                        episodes = episodes.filterNot(PodcastEpisode::isArchived),
+                        podcast = loadedPodcast,
+                        episodes = if (isShowingArchived) episodes else episodes.filterNot(PodcastEpisode::isArchived),
+                        archivedEpisodeCount = episodes.count(PodcastEpisode::isArchived),
+                        isShowingArchived = isShowingArchived,
                     )
                 },
             )
@@ -61,6 +81,18 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds, replayExpiration = Duration.ZERO),
             TvPodcastDetailsUiState.Loading,
         )
+
+    fun changeSortType(sortType: EpisodesSortType) {
+        viewModelScope.launch(ioDispatcher) {
+            podcastManager.updateEpisodesSortTypeBlocking(Podcast(uuid = podcastUuid), sortType)
+        }
+    }
+
+    fun toggleArchiveFilter() {
+        val isShowingArchived = !isShowingArchivedFlow.value
+        preferences.setPodcastShowingArchived(podcastUuid, isShowingArchived)
+        isShowingArchivedFlow.value = isShowingArchived
+    }
 
     @AssistedFactory
     interface Factory {
@@ -76,5 +108,7 @@ sealed interface TvPodcastDetailsUiState {
     data class Loaded(
         val podcast: Podcast,
         val episodes: List<PodcastEpisode>,
+        val archivedEpisodeCount: Int,
+        val isShowingArchived: Boolean,
     ) : TvPodcastDetailsUiState
 }
