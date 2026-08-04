@@ -269,6 +269,9 @@
     <string name="tv_playlist_empty_subtitle">Either it’s time to celebrate completing this list or edit your rules in the mobile app to get some more.</string>
     <string name="tv_playlist_empty_subtitle_manual">Add episodes to this playlist from the mobile app and they’ll show up here.</string>
     <string name="tv_episode_details">Episode details</string>
+    <string name="tv_up_next_empty_title">Nothing queued up</string>
+    <string name="tv_up_next_empty_subtitle">Add episodes to Up Next and they’ll play in order, back to back</string>
+    <string name="tv_up_next_empty_action_title">Add episodes</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
