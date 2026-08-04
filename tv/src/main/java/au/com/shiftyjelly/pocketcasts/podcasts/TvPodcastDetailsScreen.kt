@@ -48,6 +48,7 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
@@ -340,6 +341,7 @@ private fun EpisodeList(
     actionsEpisode?.let { episode ->
         TvEpisodeActionsModal(
             episode = episode,
+            context = TvEpisodeActionContext.PodcastDetails,
             onDismissRequest = { actionsEpisode = null },
             onShowEpisodeDetails = {
                 detailsEpisode = episode

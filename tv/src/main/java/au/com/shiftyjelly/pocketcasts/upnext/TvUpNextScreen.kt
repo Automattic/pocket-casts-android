@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
@@ -135,6 +136,7 @@ private fun UpNextList(
     actionsEpisode?.let { episode ->
         TvEpisodeActionsModal(
             episode = episode,
+            context = TvEpisodeActionContext.UpNext,
             onDismissRequest = { actionsEpisode = null },
             onShowEpisodeDetails = {
                 detailsEpisode = episode
