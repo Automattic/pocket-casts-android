@@ -22,6 +22,7 @@ fun TvPodcastTile(
     podcastTitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    imageModifier: Modifier = Modifier,
 ) {
     TvTile(
         onClick = onClick,
@@ -31,11 +32,13 @@ fun TvPodcastTile(
             model = artworkUrl,
             contentDescription = podcastTitle,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .width(123.dp)
-                .aspectRatio(1f),
+            modifier = imageModifier.aspectRatio(1f),
         )
     }
+}
+
+object TvPodcastTileDefaults {
+    val RowImageWidth = 123.dp
 }
 
 @Preview(device = Devices.TV_1080p)
@@ -48,6 +51,7 @@ private fun TvPodcastTilePreview() {
                     artworkUrl = "",
                     podcastTitle = "Sample Podcast",
                     onClick = {},
+                    imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                 )
             }
         }
