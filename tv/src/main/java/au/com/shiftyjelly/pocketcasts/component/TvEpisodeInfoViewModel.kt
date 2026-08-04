@@ -38,7 +38,7 @@ class TvEpisodeInfoViewModel @Inject constructor(
                 is ShowNotesState.Loaded -> state.showNotes.takeIf { it.isNotBlank() }?.let(ShowNotes::Loaded) ?: ShowNotes.Unavailable
                 else -> ShowNotes.Unavailable
             }
-            if (showNotes is ShowNotes.Unavailable) {
+            if (showNotes is ShowNotes.Unavailable && loadedEpisodeUuid == episodeUuid) {
                 loadedEpisodeUuid = null
             }
             updateFor(episodeUuid) { it.copy(showNotes = showNotes) }

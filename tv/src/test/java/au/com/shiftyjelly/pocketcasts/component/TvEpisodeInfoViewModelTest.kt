@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -15,6 +16,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verifyBlocking
@@ -116,6 +118,23 @@ class TvEpisodeInfoViewModelTest {
         assertEquals("second", viewModel.uiState.value?.episodeUuid)
         verifyBlocking(showNotesManager) { loadShowNotes("podcast", "first") }
         verifyBlocking(showNotesManager) { loadShowNotes("podcast", "second") }
+    }
+
+    @Test
+    fun `a late failing load for a previous episode does not clear the current marker`() = runTest {
+        stubTitle("Buzzcast")
+        val firstNotes = CompletableDeferred<ShowNotesState>()
+        whenever(showNotesManager.loadShowNotes(any(), eq("first"))).doSuspendableAnswer { firstNotes.await() }
+        whenever(showNotesManager.loadShowNotes(any(), eq("second"))).doSuspendableAnswer { ShowNotesState.Loaded("notes") }
+        val viewModel = createViewModel()
+
+        viewModel.load(podcastUuid = "podcast", episodeUuid = "first")
+        viewModel.load(podcastUuid = "podcast", episodeUuid = "second")
+        firstNotes.complete(ShowNotesState.NotFound)
+
+        viewModel.load(podcastUuid = "podcast", episodeUuid = "second")
+
+        verifyBlocking(showNotesManager, times(1)) { loadShowNotes("podcast", "second") }
     }
 
     private suspend fun stubTitle(title: String) {
