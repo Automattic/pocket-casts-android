@@ -45,7 +45,7 @@ fun TvEpisodeActionsModal(
         TvEpisodeActionsModalContent(
             episode = episode,
             context = context,
-            actions = viewModel,
+            actions = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,
             onDismissRequest = onDismissRequest,
             onShowEpisodeDetails = onShowEpisodeDetails,
             onGoToPodcast = onGoToPodcast,
@@ -97,7 +97,12 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     val buttons = buildList {
         add(episodeDetails to onShowEpisodeDetails)
         if (context != TvEpisodeActionContext.PodcastDetails && onGoToPodcast != null) {
-            add(goToPodcast to { onGoToPodcast(); onDismissRequest() })
+            add(
+                goToPodcast to {
+                    onGoToPodcast()
+                    onDismissRequest()
+                },
+            )
         }
         add(playNext to perform(playNextToast) { actions.playNext(episode, source) })
         add(playLast to perform(playLastToast) { actions.playLast(episode, source) })

@@ -35,7 +35,8 @@ class TvEpisodeActionsViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel(), TvEpisodeActions {
+) : ViewModel(),
+    TvEpisodeActions {
 
     override fun playNext(episode: PodcastEpisode, source: SourceView) {
         viewModelScope.launch(ioDispatcher) {
