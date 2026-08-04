@@ -53,7 +53,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
-import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
@@ -318,12 +317,7 @@ private fun SortDropdownButton(
     Box(modifier = modifier) {
         IconButton(
             onClick = { isExpanded = true },
-            colors = IconButtonDefaults.colors(
-                containerColor = TvColors.BgActive20,
-                contentColor = Color.White,
-                focusedContainerColor = Color.White,
-                focusedContentColor = TvColors.Dark,
-            ),
+            colors = TvButtonDefaults.iconButtonColors(),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_sort),
@@ -416,12 +410,12 @@ private fun EpisodeListItem(
         )
         AnimatedVisibility(
             visible = isItemFocused,
-            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), expandFrom = Alignment.Start) +
-                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), initialOffsetX = { it }) +
-                fadeIn(tween(MORE_BUTTON_ANIMATION_MILLIS)),
-            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), shrinkTowards = Alignment.Start) +
-                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_MILLIS), targetOffsetX = { it }) +
-                fadeOut(tween(MORE_BUTTON_ANIMATION_MILLIS)),
+            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
+                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
+                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
+                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
+                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(16.dp))
@@ -524,7 +518,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
 }
 
 private val ArtworkSize = 200.dp
-private const val MORE_BUTTON_ANIMATION_MILLIS = 200
+private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200
 
 @Preview(device = Devices.TV_1080p)
 @Composable

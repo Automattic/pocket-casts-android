@@ -1,17 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.component
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -19,6 +17,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -33,27 +32,25 @@ fun TvEpisodeActionsModal(
 ) {
     TvModal(
         onDismissRequest = onDismissRequest,
+        contentPadding = ContentPadding,
         modifier = modifier,
     ) {
-        TvEpisodeActionsModalContent(episode = episode)
+        TvEpisodeActionsModalContent(
+            episode = episode,
+            onDismissRequest = onDismissRequest,
+        )
     }
 }
 
 @Composable
-private fun ColumnScope.TvEpisodeActionsModalContent(episode: PodcastEpisode) {
+private fun ColumnScope.TvEpisodeActionsModalContent(
+    episode: PodcastEpisode,
+    onDismissRequest: () -> Unit,
+) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-
-    Text(
-        text = episode.title,
-        color = Color.White,
-        style = TvTextStyles.ModalTitle,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.padding(bottom = 8.dp),
-    )
 
     val episodeDetails = stringResource(LR.string.tv_episode_details)
     val goToPodcast = stringResource(LR.string.go_to_podcast)
@@ -78,6 +75,11 @@ private fun ColumnScope.TvEpisodeActionsModalContent(episode: PodcastEpisode) {
             modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
         )
     }
+
+    TvEpisodeActionButton(
+        text = stringResource(LR.string.cancel),
+        onClick = onDismissRequest,
+    )
 }
 
 @Composable
@@ -102,18 +104,43 @@ private fun TvEpisodeActionButton(
 @Preview
 @Composable
 private fun TvEpisodeActionsModalPreview() {
+    TvEpisodeActionsModalPreviewContent(
+        episode = PodcastEpisode(
+            uuid = "episode-uuid",
+            title = "Episode title that might be quite long and wrap onto two lines",
+            podcastUuid = "podcast-uuid",
+            publishedDate = Date(0),
+        ),
+    )
+}
+
+@Preview
+@Composable
+private fun TvEpisodeActionsModalPlayedArchivedPreview() {
+    TvEpisodeActionsModalPreviewContent(
+        episode = PodcastEpisode(
+            uuid = "episode-uuid",
+            title = "Episode title that might be quite long and wrap onto two lines",
+            podcastUuid = "podcast-uuid",
+            publishedDate = Date(0),
+            playingStatus = EpisodePlayingStatus.COMPLETED,
+            isArchived = true,
+        ),
+    )
+}
+
+@Composable
+private fun TvEpisodeActionsModalPreviewContent(episode: PodcastEpisode) {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            TvModalSurface {
+            TvModalSurface(contentPadding = ContentPadding) {
                 TvEpisodeActionsModalContent(
-                    episode = PodcastEpisode(
-                        uuid = "episode-uuid",
-                        title = "Episode title that might be quite long and wrap onto two lines",
-                        podcastUuid = "podcast-uuid",
-                        publishedDate = Date(0),
-                    ),
+                    episode = episode,
+                    onDismissRequest = {},
                 )
             }
         }
     }
 }
+
+private val ContentPadding = PaddingValues(horizontal = 24.dp, vertical = 27.dp)
