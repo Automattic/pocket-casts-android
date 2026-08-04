@@ -1,9 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +38,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,12 +53,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
-import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeRow
+import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
@@ -306,12 +317,7 @@ private fun SortDropdownButton(
     Box(modifier = modifier) {
         IconButton(
             onClick = { isExpanded = true },
-            colors = IconButtonDefaults.colors(
-                containerColor = TvColors.BgActive20,
-                contentColor = Color.White,
-                focusedContainerColor = Color.White,
-                focusedContentColor = TvColors.Dark,
-            ),
+            colors = TvButtonDefaults.iconButtonColors(),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_sort),
@@ -350,6 +356,7 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -359,15 +366,61 @@ private fun EpisodeList(
             items = episodes,
             key = { _, episode -> episode.uuid },
         ) { index, episode ->
-            TvEpisodeRow(
+            EpisodeListItem(
                 episode = episode,
-                onClick = {},
                 dateFormatter = dateFormatter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusProperties { left = playAllFocusRequester }
-                    .then(if (index == initialFocusIndex) Modifier.focusRequester(firstEpisodeFocusRequester) else Modifier),
+                onOpenActions = { actionsEpisode = episode },
+                playAllFocusRequester = playAllFocusRequester,
+                episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == initialFocusIndex },
             )
+        }
+    }
+    actionsEpisode?.let { episode ->
+        TvEpisodeActionsModal(
+            episode = episode,
+            onDismissRequest = { actionsEpisode = null },
+        )
+    }
+}
+
+@Composable
+private fun EpisodeListItem(
+    episode: PodcastEpisode,
+    dateFormatter: RelativeDateFormatter,
+    onOpenActions: () -> Unit,
+    playAllFocusRequester: FocusRequester,
+    episodeFocusRequester: FocusRequester?,
+    modifier: Modifier = Modifier,
+) {
+    var isItemFocused by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .onFocusChanged { isItemFocused = it.hasFocus },
+    ) {
+        TvEpisodeRow(
+            episode = episode,
+            onClick = {},
+            dateFormatter = dateFormatter,
+            modifier = Modifier
+                .weight(1f)
+                .focusProperties { left = playAllFocusRequester }
+                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
+        )
+        AnimatedVisibility(
+            visible = isItemFocused,
+            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
+                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
+                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
+                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
+                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(Modifier.width(16.dp))
+                TvMoreButton(onClick = onOpenActions)
+            }
         }
     }
 }
@@ -465,6 +518,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
 }
 
 private val ArtworkSize = 200.dp
+private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200
 
 @Preview(device = Devices.TV_1080p)
 @Composable

@@ -6,6 +6,7 @@ import androidx.tv.material3.Border
 import androidx.tv.material3.ButtonBorder
 import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.IconButtonDefaults
 
 object TvButtonDefaults {
 
@@ -37,5 +38,13 @@ object TvButtonDefaults {
     fun borderlessButtonBorder(): ButtonBorder = ButtonDefaults.border(
         border = Border.None,
         focusedBorder = Border.None,
+    )
+
+    @Composable
+    fun iconButtonColors(containerColor: Color = TvColors.BgActive20) = IconButtonDefaults.colors(
+        containerColor = containerColor,
+        contentColor = Color.White,
+        focusedContainerColor = Color.White,
+        focusedContentColor = TvColors.Dark,
     )
 }

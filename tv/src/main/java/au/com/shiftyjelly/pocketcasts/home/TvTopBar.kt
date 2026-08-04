@@ -30,6 +30,7 @@ import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -77,12 +78,7 @@ private fun TvProfileButton(
 ) {
     IconButton(
         onClick = onClick,
-        colors = IconButtonDefaults.colors(
-            containerColor = TvColors.Gray,
-            contentColor = Color.White,
-            focusedContainerColor = Color.White,
-            focusedContentColor = TvColors.Dark,
-        ),
+        colors = TvButtonDefaults.iconButtonColors(containerColor = TvColors.Gray),
         // The avatar image covers the focused container color, so show focus with a border as well.
         border = IconButtonDefaults.border(
             focusedBorder = Border(BorderStroke(2.dp, Color.White), inset = 2.dp, shape = CircleShape),

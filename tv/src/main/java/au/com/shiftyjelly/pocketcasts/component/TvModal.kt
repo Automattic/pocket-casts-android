@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +38,7 @@ fun TvModal(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = DefaultModalWidth,
+    contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Dialog(
@@ -48,6 +50,7 @@ fun TvModal(
         TvModalSurface(
             isTranslucent = isBlurBehindEnabled,
             width = width,
+            contentPadding = contentPadding,
             modifier = modifier,
             content = content,
         )
@@ -59,6 +62,7 @@ internal fun TvModalSurface(
     modifier: Modifier = Modifier,
     isTranslucent: Boolean = false,
     width: Dp = DefaultModalWidth,
+    contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -71,7 +75,7 @@ internal fun TvModalSurface(
             .background(if (isTranslucent) TranslucentContainerColor else TvOverlayContainerColor)
             .background(HighlightBrush)
             .border(1.dp, TvOverlayBorderColor, ModalShape)
-            .padding(horizontal = 53.dp, vertical = 40.dp),
+            .padding(contentPadding),
     )
 }
 
@@ -110,6 +114,7 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
 }
 
 private val DefaultModalWidth = 400.dp
+private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
 private val ModalShape = RoundedCornerShape(28.dp)
 private val TranslucentContainerColor = TvColors.Dark.copy(alpha = 0.6f)
 internal val TvOverlayContainerColor = TvColors.Dark.copy(alpha = 0.94f)
