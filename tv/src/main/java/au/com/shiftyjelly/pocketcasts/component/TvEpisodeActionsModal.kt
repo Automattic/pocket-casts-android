@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvEpisodeActionsModal(
     episode: PodcastEpisode,
-    context: TvEpisodeActionContext,
+    actionContext: TvEpisodeActionContext,
     onDismissRequest: () -> Unit,
     onShowEpisodeDetails: () -> Unit,
     modifier: Modifier = Modifier,
@@ -44,7 +44,7 @@ fun TvEpisodeActionsModal(
     ) {
         TvEpisodeActionsModalContent(
             episode = episode,
-            context = context,
+            actionContext = actionContext,
             actions = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,
             onDismissRequest = onDismissRequest,
             onShowEpisodeDetails = onShowEpisodeDetails,
@@ -56,7 +56,7 @@ fun TvEpisodeActionsModal(
 @Composable
 private fun ColumnScope.TvEpisodeActionsModalContent(
     episode: PodcastEpisode,
-    context: TvEpisodeActionContext,
+    actionContext: TvEpisodeActionContext,
     actions: TvEpisodeActions,
     onDismissRequest: () -> Unit,
     onShowEpisodeDetails: () -> Unit,
@@ -68,7 +68,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     }
 
     val toastHostState = LocalTvToastHostState.current
-    val source = context.source
+    val source = actionContext.source
 
     val episodeDetails = stringResource(LR.string.tv_episode_details)
     val goToPodcast = stringResource(LR.string.go_to_podcast)
@@ -94,31 +94,30 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         onDismissRequest()
     }
 
-    val buttons = buildList {
-        add(episodeDetails to onShowEpisodeDetails)
-        if (context != TvEpisodeActionContext.PodcastDetails && onGoToPodcast != null) {
-            add(
-                goToPodcast to {
-                    onGoToPodcast()
-                    onDismissRequest()
-                },
-            )
-        }
-        add(playNext to perform(playNextToast) { actions.playNext(episode, source) })
-        add(playLast to perform(playLastToast) { actions.playLast(episode, source) })
-        if (context == TvEpisodeActionContext.UpNext) {
-            add(removeFromUpNext to perform(removedToast) { actions.removeFromUpNext(episode, source) })
-        } else {
-            add(
-                playedToggle to perform(playedToast) {
-                    if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
-                },
-            )
-            add(
-                archiveToggle to perform(archiveToast) {
-                    if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
-                },
-            )
+    val buttons = episodeActionButtons(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
+        when (button) {
+            EpisodeActionButton.Details -> episodeDetails to onShowEpisodeDetails
+
+            EpisodeActionButton.GoToPodcast -> goToPodcast to {
+                onGoToPodcast?.invoke()
+                onDismissRequest()
+            }
+
+            EpisodeActionButton.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
+
+            EpisodeActionButton.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
+
+            EpisodeActionButton.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
+                actions.removeFromUpNext(episode, source)
+            }
+
+            EpisodeActionButton.TogglePlayed -> playedToggle to perform(playedToast) {
+                if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
+            }
+
+            EpisodeActionButton.ToggleArchived -> archiveToggle to perform(archiveToast) {
+                if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
+            }
         }
     }
 
@@ -134,6 +133,34 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         text = stringResource(LR.string.cancel),
         onClick = onDismissRequest,
     )
+}
+
+internal enum class EpisodeActionButton {
+    Details,
+    GoToPodcast,
+    PlayNext,
+    PlayLast,
+    RemoveFromUpNext,
+    TogglePlayed,
+    ToggleArchived,
+}
+
+internal fun episodeActionButtons(
+    actionContext: TvEpisodeActionContext,
+    showGoToPodcast: Boolean,
+): List<EpisodeActionButton> = buildList {
+    add(EpisodeActionButton.Details)
+    if (showGoToPodcast) {
+        add(EpisodeActionButton.GoToPodcast)
+    }
+    add(EpisodeActionButton.PlayNext)
+    add(EpisodeActionButton.PlayLast)
+    if (actionContext == TvEpisodeActionContext.UpNext) {
+        add(EpisodeActionButton.RemoveFromUpNext)
+    } else {
+        add(EpisodeActionButton.TogglePlayed)
+        add(EpisodeActionButton.ToggleArchived)
+    }
 }
 
 @Composable
@@ -165,7 +192,7 @@ private fun TvEpisodeActionsModalPreview() {
             podcastUuid = "podcast-uuid",
             publishedDate = Date(0),
         ),
-        context = TvEpisodeActionContext.PodcastDetails,
+        actionContext = TvEpisodeActionContext.PodcastDetails,
     )
 }
 
@@ -181,7 +208,7 @@ private fun TvEpisodeActionsModalPlayedArchivedPreview() {
             playingStatus = EpisodePlayingStatus.COMPLETED,
             isArchived = true,
         ),
-        context = TvEpisodeActionContext.Playlist,
+        actionContext = TvEpisodeActionContext.Playlist,
     )
 }
 
@@ -195,14 +222,14 @@ private fun TvEpisodeActionsModalUpNextPreview() {
             podcastUuid = "podcast-uuid",
             publishedDate = Date(0),
         ),
-        context = TvEpisodeActionContext.UpNext,
+        actionContext = TvEpisodeActionContext.UpNext,
     )
 }
 
 @Composable
 private fun TvEpisodeActionsModalPreviewContent(
     episode: PodcastEpisode,
-    context: TvEpisodeActionContext,
+    actionContext: TvEpisodeActionContext,
 ) {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
@@ -210,7 +237,7 @@ private fun TvEpisodeActionsModalPreviewContent(
                 TvModalSurface(contentPadding = ContentPadding) {
                     TvEpisodeActionsModalContent(
                         episode = episode,
-                        context = context,
+                        actionContext = actionContext,
                         actions = NoOpTvEpisodeActions,
                         onDismissRequest = {},
                         onShowEpisodeDetails = {},

@@ -287,7 +287,7 @@ private fun EpisodeList(
     actionsEpisode?.let { episode ->
         TvEpisodeActionsModal(
             episode = episode,
-            context = TvEpisodeActionContext.Playlist,
+            actionContext = TvEpisodeActionContext.Playlist,
             onDismissRequest = { actionsEpisode = null },
             onShowEpisodeDetails = {
                 detailsEpisode = episode

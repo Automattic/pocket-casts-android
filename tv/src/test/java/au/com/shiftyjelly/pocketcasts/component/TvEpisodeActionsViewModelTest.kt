@@ -7,8 +7,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.util.Date
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -37,13 +37,13 @@ class TvEpisodeActionsViewModelTest {
         episodeManager = episodeManager,
         playbackManager = playbackManager,
         podcastManager = podcastManager,
+        applicationScope = CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
     )
 
     @Test
     fun `playNext adds episode to the top of the queue`() = runTest {
         viewModel().playNext(episode, SourceView.UP_NEXT)
-        advanceUntilIdle()
 
         verifyBlocking(playbackManager) { playNext(episode, SourceView.UP_NEXT) }
     }
@@ -51,7 +51,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `playLast adds episode to the bottom of the queue`() = runTest {
         viewModel().playLast(episode, SourceView.UP_NEXT)
-        advanceUntilIdle()
 
         verifyBlocking(playbackManager) { playLast(episode, SourceView.UP_NEXT) }
     }
@@ -59,7 +58,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `markAsPlayed marks the episode as played`() = runTest {
         viewModel().markAsPlayed(episode)
-        advanceUntilIdle()
 
         verify(episodeManager).markAsPlayedBlocking(episode, playbackManager, podcastManager)
     }
@@ -67,7 +65,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `markAsUnplayed marks the episode as not played`() = runTest {
         viewModel().markAsUnplayed(episode)
-        advanceUntilIdle()
 
         verify(episodeManager).markAsNotPlayedBlocking(episode)
     }
@@ -75,7 +72,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `archive archives the episode`() = runTest {
         viewModel().archive(episode)
-        advanceUntilIdle()
 
         verify(episodeManager).archiveBlocking(episode, playbackManager)
     }
@@ -83,7 +79,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `unarchive unarchives the episode`() = runTest {
         viewModel().unarchive(episode)
-        advanceUntilIdle()
 
         verify(episodeManager).unarchiveBlocking(episode)
     }
@@ -91,7 +86,6 @@ class TvEpisodeActionsViewModelTest {
     @Test
     fun `removeFromUpNext removes the episode from the queue`() = runTest {
         viewModel().removeFromUpNext(episode, SourceView.UP_NEXT)
-        advanceUntilIdle()
 
         verify(playbackManager).removeEpisode(episodeToRemove = episode, source = SourceView.UP_NEXT)
     }
