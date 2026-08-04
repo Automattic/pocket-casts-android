@@ -111,12 +111,12 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         } else {
             add(
                 playedToggle to perform(playedToast) {
-                    if (episode.isFinished) actions.markAsUnplayed(episode, source) else actions.markAsPlayed(episode, source)
+                    if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
                 },
             )
             add(
                 archiveToggle to perform(archiveToast) {
-                    if (episode.isArchived) actions.unarchive(episode, source) else actions.archive(episode, source)
+                    if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
                 },
             )
         }
@@ -225,10 +225,10 @@ private fun TvEpisodeActionsModalPreviewContent(
 private object NoOpTvEpisodeActions : TvEpisodeActions {
     override fun playNext(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playLast(episode: PodcastEpisode, source: SourceView) = Unit
-    override fun markAsPlayed(episode: PodcastEpisode, source: SourceView) = Unit
-    override fun markAsUnplayed(episode: PodcastEpisode, source: SourceView) = Unit
-    override fun archive(episode: PodcastEpisode, source: SourceView) = Unit
-    override fun unarchive(episode: PodcastEpisode, source: SourceView) = Unit
+    override fun markAsPlayed(episode: PodcastEpisode) = Unit
+    override fun markAsUnplayed(episode: PodcastEpisode) = Unit
+    override fun archive(episode: PodcastEpisode) = Unit
+    override fun unarchive(episode: PodcastEpisode) = Unit
     override fun removeFromUpNext(episode: PodcastEpisode, source: SourceView) = Unit
 }
 

@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
@@ -46,7 +45,7 @@ class TvEpisodeActionsViewModelTest {
         viewModel().playNext(episode, SourceView.UP_NEXT)
         advanceUntilIdle()
 
-        verifyBlocking(playbackManager) { playNext(episode = eq(episode), source = eq(SourceView.UP_NEXT)) }
+        verifyBlocking(playbackManager) { playNext(episode, SourceView.UP_NEXT) }
     }
 
     @Test
@@ -54,20 +53,20 @@ class TvEpisodeActionsViewModelTest {
         viewModel().playLast(episode, SourceView.UP_NEXT)
         advanceUntilIdle()
 
-        verifyBlocking(playbackManager) { playLast(episode = eq(episode), source = eq(SourceView.UP_NEXT)) }
+        verifyBlocking(playbackManager) { playLast(episode, SourceView.UP_NEXT) }
     }
 
     @Test
     fun `markAsPlayed marks the episode as played`() = runTest {
-        viewModel().markAsPlayed(episode, SourceView.PODCAST_SCREEN)
+        viewModel().markAsPlayed(episode)
         advanceUntilIdle()
 
-        verify(episodeManager).markAsPlayedBlocking(eq(episode), eq(playbackManager), eq(podcastManager))
+        verify(episodeManager).markAsPlayedBlocking(episode, playbackManager, podcastManager)
     }
 
     @Test
     fun `markAsUnplayed marks the episode as not played`() = runTest {
-        viewModel().markAsUnplayed(episode, SourceView.PODCAST_SCREEN)
+        viewModel().markAsUnplayed(episode)
         advanceUntilIdle()
 
         verify(episodeManager).markAsNotPlayedBlocking(episode)
@@ -75,7 +74,7 @@ class TvEpisodeActionsViewModelTest {
 
     @Test
     fun `archive archives the episode`() = runTest {
-        viewModel().archive(episode, SourceView.PODCAST_SCREEN)
+        viewModel().archive(episode)
         advanceUntilIdle()
 
         verify(episodeManager).archiveBlocking(episode, playbackManager)
@@ -83,7 +82,7 @@ class TvEpisodeActionsViewModelTest {
 
     @Test
     fun `unarchive unarchives the episode`() = runTest {
-        viewModel().unarchive(episode, SourceView.PODCAST_SCREEN)
+        viewModel().unarchive(episode)
         advanceUntilIdle()
 
         verify(episodeManager).unarchiveBlocking(episode)

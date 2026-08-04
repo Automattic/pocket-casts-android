@@ -22,10 +22,10 @@ enum class TvEpisodeActionContext(val source: SourceView) {
 interface TvEpisodeActions {
     fun playNext(episode: PodcastEpisode, source: SourceView)
     fun playLast(episode: PodcastEpisode, source: SourceView)
-    fun markAsPlayed(episode: PodcastEpisode, source: SourceView)
-    fun markAsUnplayed(episode: PodcastEpisode, source: SourceView)
-    fun archive(episode: PodcastEpisode, source: SourceView)
-    fun unarchive(episode: PodcastEpisode, source: SourceView)
+    fun markAsPlayed(episode: PodcastEpisode)
+    fun markAsUnplayed(episode: PodcastEpisode)
+    fun archive(episode: PodcastEpisode)
+    fun unarchive(episode: PodcastEpisode)
     fun removeFromUpNext(episode: PodcastEpisode, source: SourceView)
 }
 
@@ -50,25 +50,25 @@ class TvEpisodeActionsViewModel @Inject constructor(
         }
     }
 
-    override fun markAsPlayed(episode: PodcastEpisode, source: SourceView) {
+    override fun markAsPlayed(episode: PodcastEpisode) {
         viewModelScope.launch(ioDispatcher) {
             episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
         }
     }
 
-    override fun markAsUnplayed(episode: PodcastEpisode, source: SourceView) {
+    override fun markAsUnplayed(episode: PodcastEpisode) {
         viewModelScope.launch(ioDispatcher) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override fun archive(episode: PodcastEpisode, source: SourceView) {
+    override fun archive(episode: PodcastEpisode) {
         viewModelScope.launch(ioDispatcher) {
             episodeManager.archiveBlocking(episode, playbackManager)
         }
     }
 
-    override fun unarchive(episode: PodcastEpisode, source: SourceView) {
+    override fun unarchive(episode: PodcastEpisode) {
         viewModelScope.launch(ioDispatcher) {
             episodeManager.unarchiveBlocking(episode)
         }
