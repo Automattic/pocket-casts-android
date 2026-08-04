@@ -282,6 +282,17 @@
     <string name="tv_folder_empty_message">Add podcasts to this folder in the mobile app and they’ll show up here.</string>
     <string name="tv_podcast_follow">Follow this podcast</string>
     <string name="tv_podcast_more_info">More info</string>
+    <string name="tv_podcast_info_network">Network</string>
+    <string name="tv_podcast_info_website">Website</string>
+    <string name="tv_podcast_info_schedule">Schedule</string>
+    <string name="tv_podcast_info_next_episode">Next episode</string>
+    <string name="tv_podcast_next_episode_tomorrow">Tomorrow</string>
+    <string name="tv_podcast_next_episode_soon">Any day now</string>
+    <string name="tv_podcast_schedule_hourly">Hourly</string>
+    <string name="tv_podcast_schedule_daily">Daily</string>
+    <string name="tv_podcast_schedule_weekly">Weekly</string>
+    <string name="tv_podcast_schedule_fortnightly">Fortnightly</string>
+    <string name="tv_podcast_schedule_monthly">Monthly</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>

@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
@@ -110,6 +111,7 @@ private fun TvPodcastDetailsContent(
 
             is TvPodcastDetailsUiState.Loaded -> {
                 val followFocusRequester = remember { FocusRequester() }
+                var isShowingInfoModal by remember { mutableStateOf(false) }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(80.dp),
                     modifier = Modifier
@@ -119,6 +121,7 @@ private fun TvPodcastDetailsContent(
                     PodcastInfo(
                         podcast = uiState.podcast,
                         followFocusRequester = followFocusRequester,
+                        onMoreInfo = { isShowingInfoModal = true },
                         modifier = Modifier.width(InfoPaneWidth),
                     )
                     if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
@@ -140,6 +143,12 @@ private fun TvPodcastDetailsContent(
                         )
                     }
                 }
+                if (isShowingInfoModal) {
+                    TvPodcastInfoModal(
+                        podcast = uiState.podcast,
+                        onDismissRequest = { isShowingInfoModal = false },
+                    )
+                }
             }
         }
     }
@@ -149,6 +158,7 @@ private fun TvPodcastDetailsContent(
 private fun PodcastInfo(
     podcast: Podcast,
     followFocusRequester: FocusRequester,
+    onMoreInfo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -199,7 +209,7 @@ private fun PodcastInfo(
                 Text(stringResource(if (podcast.isSubscribed) LR.string.podcast_subscribed else LR.string.tv_podcast_follow))
             }
             Button(
-                onClick = {},
+                onClick = onMoreInfo,
                 colors = TvButtonDefaults.filledButtonColors(),
             ) {
                 Text(stringResource(LR.string.tv_podcast_more_info))
