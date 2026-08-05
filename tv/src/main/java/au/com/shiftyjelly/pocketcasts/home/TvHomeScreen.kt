@@ -27,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
@@ -49,6 +50,7 @@ fun TvHomeScreen(
 
     val podcastUuid = openedPodcastUuid
     if (podcastUuid != null) {
+        HideTvTopBar()
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,

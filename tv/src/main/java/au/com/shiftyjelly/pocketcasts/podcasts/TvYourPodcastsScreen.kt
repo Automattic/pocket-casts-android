@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
@@ -54,6 +55,7 @@ fun TvYourPodcastsScreen(
     val folder = openedFolder
     when {
         podcastUuid != null -> {
+            HideTvTopBar()
             BackHandler { openedPodcastUuid = null }
             TvPodcastDetailsScreen(
                 podcastUuid = podcastUuid,
@@ -63,6 +65,7 @@ fun TvYourPodcastsScreen(
         }
 
         folder != null -> {
+            HideTvTopBar()
             BackHandler { openedFolder = null }
             TvFolderDetailScreen(
                 folderUuid = folder.uuid,

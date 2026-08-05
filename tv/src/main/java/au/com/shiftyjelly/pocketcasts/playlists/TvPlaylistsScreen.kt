@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
@@ -79,6 +80,7 @@ fun TvPlaylistsScreen(
     val stateHolder = rememberSaveableStateHolder()
     val playlist = openedPlaylist
     if (playlist != null) {
+        HideTvTopBar()
         BackHandler {
             openedPlaylist = null
         }
