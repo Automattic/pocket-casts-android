@@ -122,7 +122,7 @@ private fun TvScaffoldContent(
     val density = LocalDensity.current
     var topBarHeight by remember { mutableStateOf(DEFAULT_TOP_BAR_HEIGHT) }
     val contentTopPadding by animateDpAsState(
-        targetValue = if (isTopBarVisible) topBarHeight else 0.dp,
+        targetValue = if (isTopBarVisible) topBarHeight else HIDDEN_TOP_BAR_PADDING,
         animationSpec = tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
         label = "TvTopBarPadding",
     )
@@ -180,6 +180,7 @@ private fun TvScaffoldContent(
 private const val TOP_BAR_ANIMATION_MILLIS = 300
 private const val TAB_CONTENT_ANIMATION_MILLIS = 300
 private val DEFAULT_TOP_BAR_HEIGHT = 82.dp
+private val HIDDEN_TOP_BAR_PADDING = 32.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
