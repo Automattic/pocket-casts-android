@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -25,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.verificationDisplayUrl
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -63,14 +64,14 @@ private fun Header(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(LR.string.tv_create_account_modal_title),
-            color = TvColors.TextPrimary,
-            style = TvTextStyles.Headline,
+            color = MaterialTheme.tvColors.textPrimary,
+            style = MaterialTheme.tvTypography.headline,
             textAlign = TextAlign.Start,
         )
         Text(
             text = stringResource(LR.string.tv_create_account_modal_subtitle),
-            color = TvColors.TextSecondary,
-            style = TvTextStyles.Body,
+            color = MaterialTheme.tvColors.textSecondary,
+            style = MaterialTheme.tvTypography.body,
         )
     }
 }
@@ -110,7 +111,7 @@ private fun LoadingContent(modifier: Modifier = Modifier) {
             .focusRequester(focusRequester)
             .focusable(),
     ) {
-        LoadingView(color = TvColors.TextPrimary)
+        LoadingView(color = MaterialTheme.tvColors.textPrimary)
     }
 
     LaunchedEffect(Unit) {
@@ -133,8 +134,8 @@ private fun ErrorContent(
     ) {
         Text(
             text = stringResource(LR.string.error_generic_message),
-            color = TvColors.TextSecondary,
-            style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+            color = MaterialTheme.tvColors.textSecondary,
+            style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(

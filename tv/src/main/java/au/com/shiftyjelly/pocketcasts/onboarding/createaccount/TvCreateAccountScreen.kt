@@ -28,12 +28,11 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -50,7 +49,7 @@ fun TvCreateAccountScreen(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.BackgroundSunken),
+            .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,14 +62,14 @@ fun TvCreateAccountScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
-                color = TvColors.TextPrimary,
-                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_subtitle),
-                color = TvColors.TextSecondary,
-                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textSecondary,
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Box(
@@ -87,8 +86,8 @@ fun TvCreateAccountScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_come_back),
-                color = TvColors.TextSecondary,
-                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textSecondary,
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
@@ -109,9 +108,7 @@ fun TvCreateAccountScreen(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvCreateAccountScreenPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvCreateAccountScreen(onSignIn = {})
-        }
+    TvTheme {
+        TvCreateAccountScreen(onSignIn = {})
     }
 }
