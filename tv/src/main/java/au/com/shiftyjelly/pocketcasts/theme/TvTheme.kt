@@ -89,7 +89,4 @@ private fun TvTypography.toMaterialTypography(): Typography = Typography(
     bodyLarge = caption1,
     bodyMedium = caption2,
     bodySmall = caption2,
-    labelLarge = caption1,
-    labelMedium = caption2,
-    labelSmall = caption2,
 )
