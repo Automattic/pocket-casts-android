@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
+import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -72,8 +72,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -269,19 +267,10 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
     LaunchedEffect(podcast.episodesSortType) {
         listState.scrollToItem(0)
-    }
-    var hasRequestedInitialFocus by remember { mutableStateOf(episodes.isEmpty()) }
-    LaunchedEffect(episodes.isNotEmpty()) {
-        if (episodes.isNotEmpty() && !hasRequestedInitialFocus) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == 0 } }.first { it }
-            runCatching { firstEpisodeFocusRequester.requestFocus() }
-                .onFailure { Timber.e(it, "Failed to focus the first podcast episode") }
-            hasRequestedInitialFocus = true
-        }
     }
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
@@ -330,8 +319,11 @@ private fun EpisodeList(
                         episode = episode,
                         dateFormatter = dateFormatter,
                         onClick = {},
-                        onOpenActions = { actionsEpisode = episode },
-                        episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == 0 },
+                        onOpenActions = {
+                            focus.watchForRemoval(episodes, index)
+                            actionsEpisode = episode
+                        },
+                        episodeFocusRequester = focus.requesterFor(episode.uuid),
                         leftFocusRequester = leftFocusRequester,
                     )
                 }

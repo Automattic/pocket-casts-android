@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
@@ -123,6 +125,8 @@ private fun UpNextList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    val listState = rememberLazyListState()
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = false)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
@@ -135,19 +139,24 @@ private fun UpNextList(
         UpNextHeader(episodes = episodes)
         Spacer(Modifier.height(24.dp))
         LazyColumn(
+            state = listState,
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.weight(1f),
         ) {
-            items(
+            itemsIndexed(
                 items = episodes,
-                key = { episode -> episode.uuid },
-            ) { episode ->
+                key = { _, episode -> episode.uuid },
+            ) { index, episode ->
                 TvEpisodeListItem(
                     episode = episode,
                     dateFormatter = dateFormatter,
                     onClick = {},
-                    onOpenActions = { actionsEpisode = episode },
+                    onOpenActions = {
+                        focus.watchForRemoval(episodes, index)
+                        actionsEpisode = episode
+                    },
+                    episodeFocusRequester = focus.requesterFor(episode.uuid),
                 )
             }
         }
