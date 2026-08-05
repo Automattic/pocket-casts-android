@@ -125,7 +125,7 @@ private fun EpisodeHeader(
             if (!podcastTitle.isNullOrBlank()) {
                 Text(
                     text = podcastTitle,
-                    style = TvTextStyles.Caption1,
+                    style = TvTextStyles.Caption2,
                     color = TvColors.TextSecondary,
                 )
             }
@@ -138,7 +138,7 @@ private fun EpisodeHeader(
             )
             Text(
                 text = remember(episode.publishedDate, episode.durationMs) { episode.metadataLine(context) },
-                style = TvTextStyles.Caption1,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
             )
         }
@@ -181,14 +181,14 @@ private fun EpisodeDescriptionPane(
 
             is ShowNotes.Loaded -> Text(
                 text = remember(showNotes.html) { AnnotatedString.fromHtml(showNotes.html) },
-                style = TvTextStyles.Body,
-                color = TvColors.TextPrimary,
+                style = TvTextStyles.Caption2,
+                color = TvColors.TextSecondary,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             is ShowNotes.Unavailable -> Text(
                 text = stringResource(LR.string.error_loading_show_notes),
-                style = TvTextStyles.Body,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
             )
         }

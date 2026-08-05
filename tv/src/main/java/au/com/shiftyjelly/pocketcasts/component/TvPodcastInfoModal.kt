@@ -179,14 +179,14 @@ private fun PodcastDescriptionPane(
         }
         Text(
             text = podcast.title,
-            style = TvTextStyles.Title3,
+            style = TvTextStyles.Headline,
             color = TvColors.TextPrimary,
         )
         if (podcast.podcastDescription.isNotBlank()) {
             Text(
                 text = podcast.podcastDescription,
-                style = TvTextStyles.Body,
-                color = TvColors.TextPrimary,
+                style = TvTextStyles.Caption2,
+                color = TvColors.TextSecondary,
             )
         }
     }

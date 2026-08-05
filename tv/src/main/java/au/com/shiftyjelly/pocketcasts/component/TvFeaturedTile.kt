@@ -127,7 +127,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = TvTextStyles.Title2,
+                        style = TvTextStyles.Headline,
                         color = TvColors.TextPrimary,
                     )
 
@@ -135,7 +135,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = description,
-                        style = TvTextStyles.Body,
+                        style = TvTextStyles.Caption2,
                         color = TvColors.TextPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
