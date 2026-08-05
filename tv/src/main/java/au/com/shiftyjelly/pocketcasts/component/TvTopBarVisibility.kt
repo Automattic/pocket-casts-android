@@ -23,7 +23,9 @@ class TvTopBarVisibility {
     }
 }
 
-val LocalTvTopBarVisibility = staticCompositionLocalOf { TvTopBarVisibility() }
+val LocalTvTopBarVisibility = staticCompositionLocalOf<TvTopBarVisibility> {
+    error("TvTopBarVisibility was not provided")
+}
 
 @Composable
 fun HideTvTopBar() {

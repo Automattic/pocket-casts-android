@@ -44,6 +44,8 @@ fun TvTopBar(
     onTabSelect: (Int) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    autoFocusSelectedTab: Boolean = true,
+    onSelectedTabFocus: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -60,6 +62,8 @@ fun TvTopBar(
             tabs = tabs,
             selectedTabIndex = selectedTabIndex,
             onTabSelect = onTabSelect,
+            autoFocusSelectedTab = autoFocusSelectedTab,
+            onSelectedTabFocus = onSelectedTabFocus,
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(

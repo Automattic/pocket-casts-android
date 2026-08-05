@@ -43,6 +43,7 @@ fun TvScaffold(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
+    var didFocusTopBar by remember { mutableStateOf(false) }
 
     CompositionLocalProvider(LocalTvTopBarVisibility provides topBarVisibility) {
         TvScaffoldContent(
@@ -50,6 +51,8 @@ fun TvScaffold(
             selectedTabIndex = uiState.selectedTabIndex,
             profile = uiState.profile,
             isTopBarVisible = topBarVisibility.isVisible,
+            autoFocusSelectedTab = !didFocusTopBar,
+            onSelectedTabFocus = { didFocusTopBar = true },
             onTabSelect = viewModel::selectTab,
             onProfileClick = { isProfileModalVisible = true },
             modifier = modifier,
@@ -105,6 +108,8 @@ private fun TvScaffoldContent(
     onTabSelect: (Int) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    autoFocusSelectedTab: Boolean = true,
+    onSelectedTabFocus: () -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
     Column(
@@ -130,6 +135,8 @@ private fun TvScaffoldContent(
                 profile = profile,
                 onTabSelect = onTabSelect,
                 onProfileClick = onProfileClick,
+                autoFocusSelectedTab = autoFocusSelectedTab,
+                onSelectedTabFocus = onSelectedTabFocus,
             )
         }
         Box(modifier = Modifier.weight(1f)) {
