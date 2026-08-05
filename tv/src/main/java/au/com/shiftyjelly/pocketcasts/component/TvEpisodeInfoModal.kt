@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -93,9 +92,9 @@ private fun ColumnScope.TvEpisodeInfoModalContent(
     EpisodeHeader(episode = episode, podcastTitle = podcastTitle, context = context)
     Text(
         text = stringResource(LR.string.tv_episode_details),
-        style = TvTextStyles.EpisodeRowTitle,
+        style = TvTextStyles.Callout,
         fontWeight = FontWeight.SemiBold,
-        color = Color.White,
+        color = TvColors.TextPrimary,
         modifier = Modifier.fillMaxWidth(),
     )
     EpisodeDescriptionPane(
@@ -126,20 +125,20 @@ private fun EpisodeHeader(
             if (!podcastTitle.isNullOrBlank()) {
                 Text(
                     text = podcastTitle,
-                    style = TvTextStyles.Caption,
+                    style = TvTextStyles.Caption1,
                     color = TvColors.TextSecondary,
                 )
             }
             Text(
                 text = episode.title,
-                style = TvTextStyles.PlaylistCardTitle,
-                color = Color.White,
+                style = TvTextStyles.Headline,
+                color = TvColors.TextPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = remember(episode.publishedDate, episode.durationMs) { episode.metadataLine(context) },
-                style = TvTextStyles.Caption,
+                style = TvTextStyles.Caption1,
                 color = TvColors.TextSecondary,
             )
         }
@@ -178,12 +177,12 @@ private fun EpisodeDescriptionPane(
             .then(if (isScrollable) Modifier.verticalScroll(scrollState) else Modifier),
     ) {
         when (showNotes) {
-            is ShowNotes.Loading -> LoadingView(color = Color.White)
+            is ShowNotes.Loading -> LoadingView(color = TvColors.TextPrimary)
 
             is ShowNotes.Loaded -> Text(
                 text = remember(showNotes.html) { AnnotatedString.fromHtml(showNotes.html) },
                 style = TvTextStyles.FeaturedTileDescription,
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 modifier = Modifier.fillMaxWidth(),
             )
 

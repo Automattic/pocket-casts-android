@@ -116,8 +116,8 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
 private val DefaultModalWidth = 400.dp
 private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
 private val ModalShape = RoundedCornerShape(28.dp)
-private val TranslucentContainerColor = TvColors.Dark.copy(alpha = 0.6f)
-internal val TvOverlayContainerColor = TvColors.Dark.copy(alpha = 0.94f)
+private val TranslucentContainerColor = TvColors.BackgroundSunken.copy(alpha = 0.6f)
+internal val TvOverlayContainerColor = TvColors.BackgroundSunken.copy(alpha = 0.94f)
 internal val TvOverlayBorderColor = Color.White.copy(alpha = 0.12f)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
