@@ -34,5 +34,5 @@ object TvColors {
 
 // Shared screen background so detail overlays fully occlude the content fading underneath them.
 val TvScreenBackgroundBrush: Brush = Brush.horizontalGradient(
-    colors = listOf(TvColors.DarkGray, TvColors.Dark),
+    colors = listOf(TvColors.BackgroundBase, TvColors.BackgroundSunken),
 )

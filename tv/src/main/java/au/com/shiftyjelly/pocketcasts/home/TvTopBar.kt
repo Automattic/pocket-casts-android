@@ -82,7 +82,7 @@ private fun TvProfileButton(
 ) {
     IconButton(
         onClick = onClick,
-        colors = TvButtonDefaults.iconButtonColors(containerColor = TvColors.Gray),
+        colors = TvButtonDefaults.iconButtonColors(containerColor = TvColors.BackgroundOverlay),
         // The avatar image covers the focused container color, so show focus with a border as well.
         border = IconButtonDefaults.border(
             focusedBorder = Border(BorderStroke(2.dp, Color.White), inset = 2.dp, shape = CircleShape),

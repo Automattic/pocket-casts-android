@@ -63,7 +63,7 @@ fun TvTabBar(
 
     Box(
         modifier = modifier
-            .background(TvColors.Dark, RoundedCornerShape(percent = 50))
+            .background(TvColors.BackgroundSunken, RoundedCornerShape(percent = 50))
             .padding(3.dp),
     ) {
         TabRow(
@@ -75,8 +75,8 @@ fun TvTabBar(
                     TabRowDefaults.PillIndicator(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
-                        activeColor = Color.White,
-                        inactiveColor = Color.White,
+                        activeColor = TvColors.BackgroundActive,
+                        inactiveColor = TvColors.BackgroundActive,
                     )
                 }
             },
@@ -90,11 +90,11 @@ fun TvTabBar(
                         .padding(horizontal = 21.dp)
                         .then(if (index == selectedTabIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
-                        contentColor = Color.White,
-                        selectedContentColor = TvColors.Dark,
-                        focusedContentColor = Color.White,
-                        focusedSelectedContentColor = TvColors.Dark,
-                        inactiveContentColor = Color.White,
+                        contentColor = TvColors.TextPrimary,
+                        selectedContentColor = TvColors.TextPrimaryActive,
+                        focusedContentColor = TvColors.TextPrimary,
+                        focusedSelectedContentColor = TvColors.TextPrimaryActive,
+                        inactiveContentColor = TvColors.TextPrimary,
                     ),
                 ) {
                     Box(
@@ -106,7 +106,7 @@ fun TvTabBar(
                                 Text(
                                     text = stringResource(tab.labelRes),
                                     color = LocalContentColor.current,
-                                    style = TvTextStyles.TabLabel,
+                                    style = TvTextStyles.Caption1,
                                 )
                             }
 

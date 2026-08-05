@@ -109,7 +109,7 @@ fun TvTabPlaceholder(
 private fun TvTabPlaceholderPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvTabPlaceholder(tab = TvTab.Home)
             }
         }
