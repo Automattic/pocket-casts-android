@@ -49,7 +49,7 @@ fun TvCreateAccountScreen(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,7 +62,7 @@ fun TvCreateAccountScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = TvTextStyles.WelcomeTitle,
             )
             Spacer(modifier = Modifier.height(8.dp))

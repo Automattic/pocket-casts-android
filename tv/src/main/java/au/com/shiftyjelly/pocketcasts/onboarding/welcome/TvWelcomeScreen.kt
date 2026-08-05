@@ -49,7 +49,7 @@ fun TvWelcomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         TvAnimatedPodcastGrid(
             modifier = Modifier
@@ -63,10 +63,10 @@ fun TvWelcomeScreen(
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.15f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.40f to TvColors.Dark,
-                            1f to TvColors.Dark,
+                            0f to TvColors.BackgroundSunken.copy(alpha = 0.5f),
+                            0.15f to TvColors.BackgroundSunken.copy(alpha = 0.5f),
+                            0.40f to TvColors.BackgroundSunken,
+                            1f to TvColors.BackgroundSunken,
                         ),
                     ),
                 ),
@@ -87,7 +87,7 @@ fun TvWelcomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = TvTextStyles.WelcomeTitle,
             )
             Spacer(modifier = Modifier.height(8.dp))

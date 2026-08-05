@@ -80,7 +80,7 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,7 +95,7 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = TvTextStyles.WelcomeTitle,
             )
             Spacer(modifier = Modifier.height(8.dp))

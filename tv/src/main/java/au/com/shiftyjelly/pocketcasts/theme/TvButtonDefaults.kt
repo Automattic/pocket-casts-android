@@ -12,26 +12,26 @@ object TvButtonDefaults {
 
     @Composable
     fun filledButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = TvColors.TextPrimary20,
+        containerColor = TvColors.BackgroundActive50,
         contentColor = TvColors.TextPrimary,
-        focusedContainerColor = TvColors.BgActive,
-        focusedContentColor = TvColors.Dark,
+        focusedContainerColor = TvColors.BackgroundActive,
+        focusedContentColor = TvColors.TextPrimaryActive,
     )
 
     @Composable
     fun prominentButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = Color.White,
-        contentColor = TvColors.Dark,
-        focusedContainerColor = Color.White,
-        focusedContentColor = TvColors.Dark,
+        containerColor = TvColors.BackgroundActive,
+        contentColor = TvColors.TextPrimaryActive,
+        focusedContainerColor = TvColors.BackgroundActive,
+        focusedContentColor = TvColors.TextPrimaryActive,
     )
 
     @Composable
     fun borderlessButtonColors(): ButtonColors = ButtonDefaults.colors(
         containerColor = Color.Transparent,
         contentColor = TvColors.TextSecondary,
-        focusedContainerColor = Color.White.copy(alpha = 0.1f),
-        focusedContentColor = Color.White,
+        focusedContainerColor = TvColors.BackgroundActive.copy(alpha = 0.1f),
+        focusedContentColor = TvColors.TextPrimary,
     )
 
     @Composable
@@ -41,10 +41,10 @@ object TvButtonDefaults {
     )
 
     @Composable
-    fun iconButtonColors(containerColor: Color = TvColors.BgActive20) = IconButtonDefaults.colors(
+    fun iconButtonColors(containerColor: Color = TvColors.BackgroundActive50) = IconButtonDefaults.colors(
         containerColor = containerColor,
-        contentColor = Color.White,
-        focusedContainerColor = Color.White,
-        focusedContentColor = TvColors.Dark,
+        contentColor = TvColors.TextPrimary,
+        focusedContainerColor = TvColors.BackgroundActive,
+        focusedContentColor = TvColors.TextPrimaryActive,
     )
 }

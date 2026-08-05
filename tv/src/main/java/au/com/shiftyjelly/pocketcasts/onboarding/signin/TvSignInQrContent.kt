@@ -89,7 +89,7 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(28.dp)
-                .background(TvColors.BgActive20, CircleShape),
+                .background(TvColors.BackgroundActive50, CircleShape),
         ) {
             Text(
                 text = number.toString(),
@@ -100,7 +100,7 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
         }
         Text(
             text = text,
-            color = Color.White,
+            color = TvColors.TextPrimary,
             style = TvTextStyles.SignInSubtitle,
         )
     }
@@ -117,7 +117,7 @@ private fun CodeRow(userCode: List<String>, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(44.dp)
-                    .background(TvColors.BgActive20, CircleShape),
+                    .background(TvColors.BackgroundActive50, CircleShape),
             ) {
                 Text(
                     text = character,

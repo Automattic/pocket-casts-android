@@ -77,7 +77,7 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark)
+            .background(TvColors.BackgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -90,7 +90,7 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_sign_in_title),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = TvTextStyles.WelcomeTitle,
             )
         }
@@ -112,7 +112,7 @@ private fun TvSignInError(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -156,7 +156,7 @@ private fun TvSignInContent(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark)
+            .background(TvColors.BackgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -166,7 +166,7 @@ private fun TvSignInContent(
         ) {
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = TvTextStyles.WelcomeTitle,
             )
             TvSignInQrContent(

@@ -64,8 +64,8 @@ private fun Header(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(LR.string.tv_create_account_modal_title),
-            color = Color.White,
-            style = TvTextStyles.ModalTitle,
+            color = TvColors.TextPrimary,
+            style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
             textAlign = TextAlign.Start,
         )
         Text(
@@ -112,7 +112,7 @@ private fun LoadingContent(modifier: Modifier = Modifier) {
             .focusRequester(focusRequester)
             .focusable(),
     ) {
-        LoadingView(color = Color.White)
+        LoadingView(color = TvColors.TextPrimary)
     }
 
     LaunchedEffect(Unit) {
