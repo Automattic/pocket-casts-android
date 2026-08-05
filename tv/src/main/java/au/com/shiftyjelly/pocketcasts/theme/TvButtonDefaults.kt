@@ -7,31 +7,32 @@ import androidx.tv.material3.ButtonBorder
 import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.IconButtonDefaults
+import androidx.tv.material3.MaterialTheme
 
 object TvButtonDefaults {
 
     @Composable
     fun filledButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = TvColors.BackgroundActive20,
-        contentColor = TvColors.TextPrimary,
-        focusedContainerColor = TvColors.BackgroundActive,
-        focusedContentColor = TvColors.TextPrimaryActive,
+        containerColor = MaterialTheme.tvColors.backgroundActive20,
+        contentColor = MaterialTheme.tvColors.textPrimary,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
+        focusedContentColor = MaterialTheme.tvColors.textPrimaryActive,
     )
 
     @Composable
     fun prominentButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = TvColors.BackgroundActive,
-        contentColor = TvColors.TextPrimaryActive,
-        focusedContainerColor = TvColors.BackgroundActive,
-        focusedContentColor = TvColors.TextPrimaryActive,
+        containerColor = MaterialTheme.tvColors.backgroundActive,
+        contentColor = MaterialTheme.tvColors.textPrimaryActive,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
+        focusedContentColor = MaterialTheme.tvColors.textPrimaryActive,
     )
 
     @Composable
     fun borderlessButtonColors(): ButtonColors = ButtonDefaults.colors(
         containerColor = Color.Transparent,
-        contentColor = TvColors.TextSecondary,
-        focusedContainerColor = TvColors.BackgroundActive.copy(alpha = 0.1f),
-        focusedContentColor = TvColors.TextPrimary,
+        contentColor = MaterialTheme.tvColors.textSecondary,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundActive.copy(alpha = 0.1f),
+        focusedContentColor = MaterialTheme.tvColors.textPrimary,
     )
 
     @Composable
@@ -41,10 +42,10 @@ object TvButtonDefaults {
     )
 
     @Composable
-    fun iconButtonColors(containerColor: Color = TvColors.BackgroundActive20) = IconButtonDefaults.colors(
+    fun iconButtonColors(containerColor: Color = MaterialTheme.tvColors.backgroundActive20) = IconButtonDefaults.colors(
         containerColor = containerColor,
-        contentColor = TvColors.TextPrimary,
-        focusedContainerColor = TvColors.BackgroundActive,
-        focusedContentColor = TvColors.TextPrimaryActive,
+        contentColor = MaterialTheme.tvColors.textPrimary,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
+        focusedContentColor = MaterialTheme.tvColors.textPrimaryActive,
     )
 }
