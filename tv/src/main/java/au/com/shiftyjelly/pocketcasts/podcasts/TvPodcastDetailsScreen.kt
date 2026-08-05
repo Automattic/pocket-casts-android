@@ -358,7 +358,7 @@ private fun AllEpisodesArchived(
     ) {
         Text(
             text = pluralStringResource(LR.plurals.tv_podcast_all_archived, episodeCount, episodeCount),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.tvTypography.caption1,
             color = MaterialTheme.tvColors.textSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 400.dp),

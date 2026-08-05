@@ -57,7 +57,7 @@ fun TvEmptyState(
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 400.dp),
