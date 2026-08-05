@@ -23,13 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 
 @Composable
@@ -81,8 +80,8 @@ fun TvFolderCard(
 
             Text(
                 text = folder.name,
-                style = TvTextStyles.Caption2.copy(textAlign = TextAlign.Center),
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.caption2.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textPrimary,
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis,
@@ -103,25 +102,23 @@ private const val TITLE_VERTICAL_PADDING_RATIO = 0.064f
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvFolderCardPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken).padding(32.dp)) {
-                TvFolderCard(
-                    folder = Folder(
-                        uuid = "folder",
-                        name = "Tech & Science",
-                        color = 3,
-                        addedDate = Date(0),
-                        sortPosition = 0,
-                        podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
-                        deleted = false,
-                        syncModified = 0,
-                    ),
-                    coverUrls = listOf("", ""),
-                    onClick = {},
-                    modifier = Modifier.size(160.dp),
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(32.dp)) {
+            TvFolderCard(
+                folder = Folder(
+                    uuid = "folder",
+                    name = "Tech & Science",
+                    color = 3,
+                    addedDate = Date(0),
+                    sortPosition = 0,
+                    podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                    deleted = false,
+                    syncModified = 0,
+                ),
+                coverUrls = listOf("", ""),
+                onClick = {},
+                modifier = Modifier.size(160.dp),
+            )
         }
     }
 }

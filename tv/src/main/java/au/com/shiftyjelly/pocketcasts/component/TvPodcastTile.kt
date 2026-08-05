@@ -11,9 +11,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import coil3.compose.AsyncImage
 
 @Composable
@@ -44,16 +43,14 @@ object TvPodcastTileDefaults {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPodcastTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
-                TvPodcastTile(
-                    artworkUrl = "",
-                    podcastTitle = "Sample Podcast",
-                    onClick = {},
-                    imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvPodcastTile(
+                artworkUrl = "",
+                podcastTitle = "Sample Podcast",
+                onClick = {},
+                imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
+            )
         }
     }
 }

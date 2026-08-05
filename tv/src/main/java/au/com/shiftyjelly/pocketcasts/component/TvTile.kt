@@ -23,9 +23,8 @@ import androidx.tv.material3.CardScale
 import androidx.tv.material3.CardShape
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 @Composable
 fun TvTile(
@@ -35,8 +34,8 @@ fun TvTile(
     scale: CardScale = CardDefaults.scale(focusedScale = 1.1f),
     shape: CardShape = CardDefaults.shape(),
     colors: CardColors = CardDefaults.colors(
-        containerColor = TvColors.BackgroundBase,
-        focusedContainerColor = TvColors.BackgroundOverlay,
+        containerColor = MaterialTheme.tvColors.backgroundBase,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
     ),
     border: CardBorder = CardDefaults.border(
         border = Border.None,
@@ -64,21 +63,19 @@ fun TvTile(
 @Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvTile(onClick = {}) {
-                Box(
-                    modifier = Modifier
-                        .size(160.dp, 100.dp)
-                        .background(TvColors.BackgroundBase)
-                        .padding(12.dp),
-                    contentAlignment = Alignment.BottomStart,
-                ) {
-                    Text(
-                        text = "Sample Tile",
-                        color = Color.White,
-                    )
-                }
+    TvTheme {
+        TvTile(onClick = {}) {
+            Box(
+                modifier = Modifier
+                    .size(160.dp, 100.dp)
+                    .background(MaterialTheme.tvColors.backgroundBase)
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomStart,
+            ) {
+                Text(
+                    text = "Sample Tile",
+                    color = Color.White,
+                )
             }
         }
     }
