@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 private val DefaultTvColorScheme = TvColorScheme()
 private val DefaultTvTypography = TvTypography()
 
-val LocalTvColorScheme = staticCompositionLocalOf { DefaultTvColorScheme }
-val LocalTvTypography = staticCompositionLocalOf { DefaultTvTypography }
+private val LocalTvColorScheme = staticCompositionLocalOf<TvColorScheme> { error("TvTheme is required") }
+private val LocalTvTypography = staticCompositionLocalOf<TvTypography> { error("TvTheme is required") }
 
 val MaterialTheme.tvColors: TvColorScheme
     @Composable

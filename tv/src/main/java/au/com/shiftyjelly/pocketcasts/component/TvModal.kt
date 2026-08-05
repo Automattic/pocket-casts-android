@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +66,11 @@ internal fun TvModalSurface(
     contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val containerColor = if (isTranslucent) {
+        MaterialTheme.tvColors.translucentOverlayContainer
+    } else {
+        MaterialTheme.tvColors.overlayContainer
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -74,9 +78,9 @@ internal fun TvModalSurface(
         modifier = modifier
             .width(width)
             .clip(ModalShape)
-            .background(if (isTranslucent) TranslucentContainerColor else TvOverlayContainerColor)
+            .background(containerColor)
             .background(HighlightBrush)
-            .border(1.dp, TvOverlayBorderColor, ModalShape)
+            .border(1.dp, MaterialTheme.tvColors.overlayBorder, ModalShape)
             .padding(contentPadding),
     )
 }
@@ -118,15 +122,6 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
 private val DefaultModalWidth = 400.dp
 private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
 private val ModalShape = RoundedCornerShape(28.dp)
-private val TranslucentContainerColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.6f)
-internal val TvOverlayContainerColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.94f)
-internal val TvOverlayBorderColor = Color.White.copy(alpha = 0.12f)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
         Color.White.copy(alpha = 0.08f),

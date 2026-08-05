@@ -79,8 +79,8 @@ internal fun TvDropdownMenuSurface(
         modifier = modifier
             .width(width)
             .clip(MenuShape)
-            .background(TvOverlayContainerColor)
-            .border(1.dp, TvOverlayBorderColor, MenuShape)
+            .background(MaterialTheme.tvColors.overlayContainer)
+            .border(1.dp, MaterialTheme.tvColors.overlayBorder, MenuShape)
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
         if (title != null) {

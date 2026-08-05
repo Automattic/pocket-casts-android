@@ -8,9 +8,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * The Figma type ramp for TV. Sizes are the Figma px values divided by 1.5 (the 1920x1080 → dp
- * convention), hence the fractional `sp`. Figma's SF Pro family is not ported (no such resource in
- * this module), so the tokens use the system default at [FontWeight] 510. The full ramp is defined
- * even where a step has no call site yet, so the palette stays complete.
+ * convention), hence the fractional `sp`.
  */
 @Immutable
 data class TvTypography(

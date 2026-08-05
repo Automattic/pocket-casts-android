@@ -103,8 +103,8 @@ private fun TvToastContent(
             .semantics { liveRegion = LiveRegionMode.Polite }
             .widthIn(max = ToastMaxWidth)
             .clip(ToastShape)
-            .background(TvOverlayContainerColor)
-            .border(1.dp, TvOverlayBorderColor, ToastShape)
+            .background(MaterialTheme.tvColors.overlayContainer)
+            .border(1.dp, MaterialTheme.tvColors.overlayBorder, ToastShape)
             .padding(horizontal = 30.dp, vertical = 20.dp),
     )
 }
