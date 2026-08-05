@@ -64,7 +64,7 @@ fun TvPlaylistCard(
         label = "PlaylistCardBackground",
     )
     val titleColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.TextPrimaryActive else Color.White,
+        targetValue = if (isFocused) TvColors.TextPrimaryActive else TvColors.TextPrimary,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardTitleColor",
     )

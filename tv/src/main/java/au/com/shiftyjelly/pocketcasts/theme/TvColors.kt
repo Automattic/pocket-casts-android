@@ -20,6 +20,7 @@ object TvColors {
     val BackgroundOverlay = Color(0xFF323538)
     val BackgroundActive = Color(0xFFFBFBFC)
     val BackgroundActive50 = Color(0x80FBFBFC)
+    val BackgroundActive20 = Color(0x33FBFBFC)
 }
 
 // Shared screen background so detail overlays fully occlude the content fading underneath them.

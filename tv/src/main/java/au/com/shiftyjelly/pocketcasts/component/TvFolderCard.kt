@@ -83,7 +83,7 @@ fun TvFolderCard(
             Text(
                 text = folder.name,
                 style = TvTextStyles.Caption2.copy(textAlign = TextAlign.Center),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis,

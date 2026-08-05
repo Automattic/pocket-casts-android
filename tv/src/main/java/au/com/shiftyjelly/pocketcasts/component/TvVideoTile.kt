@@ -126,7 +126,7 @@ fun TvVideoTile(
                                 Text(
                                     text = episodeTitle,
                                     style = TvTextStyles.VideoTileEpisodeTitle,
-                                    color = Color.White,
+                                    color = TvColors.TextPrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )

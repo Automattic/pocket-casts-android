@@ -119,7 +119,7 @@ fun TvFeaturedTile(
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
                             style = TvTextStyles.FeaturedTileSponsoredLabel,
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = TvColors.TextPrimary70,
                         )
                     }
 
@@ -128,7 +128,7 @@ fun TvFeaturedTile(
                     Text(
                         text = title,
                         style = TvTextStyles.FeaturedTileTitle,
-                        color = Color.White,
+                        color = TvColors.TextPrimary,
                     )
 
                     Spacer(modifier = Modifier.height(7.dp))
@@ -136,7 +136,7 @@ fun TvFeaturedTile(
                     Text(
                         text = description,
                         style = TvTextStyles.FeaturedTileDescription,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = TvColors.TextPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )

@@ -12,7 +12,7 @@ object TvButtonDefaults {
 
     @Composable
     fun filledButtonColors(): ButtonColors = ButtonDefaults.colors(
-        containerColor = TvColors.BackgroundActive50,
+        containerColor = TvColors.BackgroundActive20,
         contentColor = TvColors.TextPrimary,
         focusedContainerColor = TvColors.BackgroundActive,
         focusedContentColor = TvColors.TextPrimaryActive,
@@ -41,7 +41,7 @@ object TvButtonDefaults {
     )
 
     @Composable
-    fun iconButtonColors(containerColor: Color = TvColors.BackgroundActive50) = IconButtonDefaults.colors(
+    fun iconButtonColors(containerColor: Color = TvColors.BackgroundActive20) = IconButtonDefaults.colors(
         containerColor = containerColor,
         contentColor = TvColors.TextPrimary,
         focusedContainerColor = TvColors.BackgroundActive,
