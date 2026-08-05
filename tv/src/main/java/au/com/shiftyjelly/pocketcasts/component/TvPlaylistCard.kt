@@ -59,12 +59,12 @@ fun TvPlaylistCard(
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.LightGray else cardColor,
+        targetValue = if (isFocused) TvColors.BackgroundActive else cardColor,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardBackground",
     )
     val titleColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.Dark else Color.White,
+        targetValue = if (isFocused) TvColors.TextPrimaryActive else Color.White,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardTitleColor",
     )
@@ -106,7 +106,7 @@ fun TvPlaylistCard(
             ) {
                 Text(
                     text = title,
-                    style = TvTextStyles.PlaylistCardTitle,
+                    style = TvTextStyles.Headline,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -115,7 +115,7 @@ fun TvPlaylistCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(LR.string.smart_playlist),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                 }
@@ -123,7 +123,7 @@ fun TvPlaylistCard(
                 if (episodeCount != null) {
                     Text(
                         text = pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                 }
@@ -223,7 +223,7 @@ private fun PlaylistCover(
 private fun TvPlaylistCardPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark).padding(32.dp)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken).padding(32.dp)) {
                 TvPlaylistCard(
                     title = "New Releases",
                     isSmartPlaylist = true,

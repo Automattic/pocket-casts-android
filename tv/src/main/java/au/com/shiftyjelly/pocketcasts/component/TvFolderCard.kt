@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +82,7 @@ fun TvFolderCard(
 
             Text(
                 text = folder.name,
-                style = TvTextStyles.FolderCardTitle,
+                style = TvTextStyles.Caption2.copy(textAlign = TextAlign.Center),
                 color = Color.White,
                 maxLines = 1,
                 softWrap = false,
@@ -105,7 +106,7 @@ private const val TITLE_VERTICAL_PADDING_RATIO = 0.064f
 private fun TvFolderCardPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark).padding(32.dp)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken).padding(32.dp)) {
                 TvFolderCard(
                     folder = Folder(
                         uuid = "folder",

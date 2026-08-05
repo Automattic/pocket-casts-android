@@ -144,7 +144,7 @@ fun TvVideoTile(
 private fun TvVideoTilePreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvVideoTile(
                     thumbnailUrl = "",
                     podcastArtworkUrl = "",

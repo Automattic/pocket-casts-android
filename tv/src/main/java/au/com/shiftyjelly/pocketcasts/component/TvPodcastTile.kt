@@ -46,7 +46,7 @@ object TvPodcastTileDefaults {
 private fun TvPodcastTilePreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvPodcastTile(
                     artworkUrl = "",
                     podcastTitle = "Sample Podcast",

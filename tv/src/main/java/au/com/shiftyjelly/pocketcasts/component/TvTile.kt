@@ -35,8 +35,8 @@ fun TvTile(
     scale: CardScale = CardDefaults.scale(focusedScale = 1.1f),
     shape: CardShape = CardDefaults.shape(),
     colors: CardColors = CardDefaults.colors(
-        containerColor = TvColors.DarkGray,
-        focusedContainerColor = TvColors.Gray,
+        containerColor = TvColors.BackgroundBase,
+        focusedContainerColor = TvColors.BackgroundOverlay,
     ),
     border: CardBorder = CardDefaults.border(
         border = Border.None,
@@ -70,7 +70,7 @@ private fun TvTilePreview() {
                 Box(
                     modifier = Modifier
                         .size(160.dp, 100.dp)
-                        .background(TvColors.DarkGray)
+                        .background(TvColors.BackgroundBase)
                         .padding(12.dp),
                     contentAlignment = Alignment.BottomStart,
                 ) {
