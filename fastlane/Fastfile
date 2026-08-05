@@ -614,8 +614,12 @@ platform :android do
 
   # Build the application and instrumented tests, then run the tests in Firebase Test Lab
   #
+  # The task names are deliberately scoped to `app`. Unscoped `assembleDebug` / `assembleDebugAndroidTest`
+  # run in *every* project, which builds debug APKs for `automotive` / `tv` / `wear` and
+  # an `androidTest` variant for all modules — even though Firebase Test Lab below only ever
+  # consumes `app-debug.apk` and `app-debug-androidTest.apk`.
   lane :build_and_instrumented_test do
-    gradle(tasks: %w[assembleDebug assembleDebugAndroidTest])
+    gradle(tasks: %w[:app:assembleDebug :app:assembleDebugAndroidTest])
 
     # Run the instrumented tests in Firebase Test Lab
     firebase_login(
