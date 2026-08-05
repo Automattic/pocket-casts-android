@@ -83,7 +83,7 @@ private fun TvFolderDetailContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvFolderDetailUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+            is TvFolderDetailUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
 
             is TvFolderDetailUiState.Empty -> TvEmptyState(
                 title = stringResource(LR.string.podcasts_empty_folder),
@@ -129,7 +129,7 @@ private sealed interface TvFolderDetailUiState {
 private fun TvFolderDetailPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvFolderDetailContent(
                     folderName = "Tech & Science",
                     uiState = TvFolderDetailUiState.Loaded(

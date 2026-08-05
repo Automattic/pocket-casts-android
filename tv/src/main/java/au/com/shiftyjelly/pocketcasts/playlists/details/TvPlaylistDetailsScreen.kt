@@ -117,7 +117,7 @@ private fun TvPlaylistDetailsContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvPlaylistDetailsUiState.Loading, TvPlaylistDetailsUiState.NotFound -> {
-                LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+                LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
             }
 
             is TvPlaylistDetailsUiState.Loaded -> {
@@ -299,8 +299,8 @@ private fun NoEpisodes(
         ) {
             Text(
                 text = stringResource(LR.string.tv_playlist_empty_title),
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
+                style = TvTextStyles.Title3,
+                color = TvColors.TextPrimary,
                 textAlign = TextAlign.Center,
             )
             Text(
@@ -339,17 +339,17 @@ private fun PlaylistInfo(
                     Playlist.Type.Manual -> stringResource(LR.string.playlist)
                     Playlist.Type.Smart -> stringResource(LR.string.smart_playlist)
                 },
-                style = TvTextStyles.PlaylistCardCaption,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
             )
             Text(
                 text = playlist.title,
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
+                style = TvTextStyles.Title3,
+                color = TvColors.TextPrimary,
             )
             Text(
                 text = episodeSummaryText(episodes),
-                style = TvTextStyles.PlaylistCardCaption,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
             )
         }
