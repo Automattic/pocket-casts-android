@@ -35,7 +35,7 @@ fun TvEpisodeActionsModal(
     onShowEpisodeDetails: () -> Unit,
     modifier: Modifier = Modifier,
     onGoToPodcast: (() -> Unit)? = null,
-    viewModel: TvEpisodeActionsViewModel = hiltViewModel(),
+    actions: TvEpisodeActions = hiltViewModel<TvEpisodeActionsViewModel>(),
 ) {
     TvModal(
         onDismissRequest = onDismissRequest,
@@ -45,7 +45,7 @@ fun TvEpisodeActionsModal(
         TvEpisodeActionsModalContent(
             episode = episode,
             actionContext = actionContext,
-            actions = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,
+            actions = actions,
             onDismissRequest = onDismissRequest,
             onShowEpisodeDetails = onShowEpisodeDetails,
             onGoToPodcast = onGoToPodcast,
@@ -94,28 +94,28 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         onDismissRequest()
     }
 
-    val buttons = episodeActionButtons(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
+    val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
         when (button) {
-            EpisodeActionButton.Details -> episodeDetails to onShowEpisodeDetails
+            TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
 
-            EpisodeActionButton.GoToPodcast -> goToPodcast to {
+            TvEpisodeActionType.GoToPodcast -> goToPodcast to {
                 onGoToPodcast?.invoke()
                 onDismissRequest()
             }
 
-            EpisodeActionButton.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
+            TvEpisodeActionType.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
 
-            EpisodeActionButton.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
+            TvEpisodeActionType.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
 
-            EpisodeActionButton.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
+            TvEpisodeActionType.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
                 actions.removeFromUpNext(episode, source)
             }
 
-            EpisodeActionButton.TogglePlayed -> playedToggle to perform(playedToast) {
+            TvEpisodeActionType.TogglePlayed -> playedToggle to perform(playedToast) {
                 if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
             }
 
-            EpisodeActionButton.ToggleArchived -> archiveToggle to perform(archiveToast) {
+            TvEpisodeActionType.ToggleArchived -> archiveToggle to perform(archiveToast) {
                 if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
             }
         }
@@ -135,7 +135,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     )
 }
 
-internal enum class EpisodeActionButton {
+internal enum class TvEpisodeActionType {
     Details,
     GoToPodcast,
     PlayNext,
@@ -145,21 +145,21 @@ internal enum class EpisodeActionButton {
     ToggleArchived,
 }
 
-internal fun episodeActionButtons(
+internal fun tvEpisodeActionTypes(
     actionContext: TvEpisodeActionContext,
     showGoToPodcast: Boolean,
-): List<EpisodeActionButton> = buildList {
-    add(EpisodeActionButton.Details)
+): List<TvEpisodeActionType> = buildList {
+    add(TvEpisodeActionType.Details)
     if (showGoToPodcast) {
-        add(EpisodeActionButton.GoToPodcast)
+        add(TvEpisodeActionType.GoToPodcast)
     }
-    add(EpisodeActionButton.PlayNext)
-    add(EpisodeActionButton.PlayLast)
+    add(TvEpisodeActionType.PlayNext)
+    add(TvEpisodeActionType.PlayLast)
     if (actionContext == TvEpisodeActionContext.UpNext) {
-        add(EpisodeActionButton.RemoveFromUpNext)
+        add(TvEpisodeActionType.RemoveFromUpNext)
     } else {
-        add(EpisodeActionButton.TogglePlayed)
-        add(EpisodeActionButton.ToggleArchived)
+        add(TvEpisodeActionType.TogglePlayed)
+        add(TvEpisodeActionType.ToggleArchived)
     }
 }
 
