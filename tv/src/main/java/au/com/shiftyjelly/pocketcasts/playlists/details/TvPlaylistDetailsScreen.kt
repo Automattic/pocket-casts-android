@@ -112,7 +112,7 @@ private fun TvPlaylistDetailsContent(
                     horizontalArrangement = Arrangement.spacedBy(80.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 56.dp),
+                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
                 ) {
                     PlaylistInfo(
                         playlist = uiState.playlist,
