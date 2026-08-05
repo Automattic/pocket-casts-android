@@ -1,14 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -17,10 +20,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
@@ -112,7 +119,15 @@ private fun TvScaffoldContent(
     onSelectedTabFocus: () -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
-    Column(
+    val density = LocalDensity.current
+    var topBarHeight by remember { mutableStateOf(DEFAULT_TOP_BAR_HEIGHT) }
+    val contentTopPadding by animateDpAsState(
+        targetValue = if (isTopBarVisible) topBarHeight else 0.dp,
+        animationSpec = tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
+        label = "TvTopBarPadding",
+    )
+
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(
@@ -124,10 +139,23 @@ private fun TvScaffoldContent(
                 ),
             ),
     ) {
+        val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+        Crossfade(
+            targetState = currentTab,
+            animationSpec = tween(durationMillis = TAB_CONTENT_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
+            label = "TvTabContent",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = contentTopPadding),
+        ) { tab ->
+            tabContent(tab)
+        }
+
         AnimatedVisibility(
             visible = isTopBarVisible,
-            enter = fadeIn() + expandVertically(),
-            exit = shrinkVertically() + fadeOut(),
+            enter = fadeIn(tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
+            exit = fadeOut(tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
+            modifier = Modifier.align(Alignment.TopCenter),
         ) {
             TvTopBar(
                 tabs = tabs,
@@ -137,14 +165,21 @@ private fun TvScaffoldContent(
                 onProfileClick = onProfileClick,
                 autoFocusSelectedTab = autoFocusSelectedTab,
                 onSelectedTabFocus = onSelectedTabFocus,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged { size ->
+                        if (size.height > 0) {
+                            topBarHeight = with(density) { size.height.toDp() }
+                        }
+                    },
             )
-        }
-        Box(modifier = Modifier.weight(1f)) {
-            val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
-            tabContent(currentTab)
         }
     }
 }
+
+private const val TOP_BAR_ANIMATION_MILLIS = 300
+private const val TAB_CONTENT_ANIMATION_MILLIS = 300
+private val DEFAULT_TOP_BAR_HEIGHT = 82.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
