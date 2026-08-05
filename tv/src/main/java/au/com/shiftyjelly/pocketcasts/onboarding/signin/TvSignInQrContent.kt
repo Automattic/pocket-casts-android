@@ -102,7 +102,7 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
         Text(
             text = text,
             color = TvColors.TextPrimary,
-            style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
+            style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
         )
     }
 }

@@ -125,7 +125,7 @@ private fun TvSignInError(
             Text(
                 text = stringResource(LR.string.error_generic_message),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
+                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(

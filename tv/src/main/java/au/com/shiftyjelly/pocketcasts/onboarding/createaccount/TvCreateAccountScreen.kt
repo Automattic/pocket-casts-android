@@ -70,7 +70,7 @@ fun TvCreateAccountScreen(
             Text(
                 text = stringResource(LR.string.tv_create_account_subtitle),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
+                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Box(
@@ -88,7 +88,7 @@ fun TvCreateAccountScreen(
             Text(
                 text = stringResource(LR.string.tv_create_account_come_back),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
+                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
