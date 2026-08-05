@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
@@ -11,8 +12,11 @@ import androidx.tv.material3.darkColorScheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
-val LocalTvColorScheme = staticCompositionLocalOf { TvColorScheme() }
-val LocalTvTypography = staticCompositionLocalOf { TvTypography() }
+private val DefaultTvColorScheme = TvColorScheme()
+private val DefaultTvTypography = TvTypography()
+
+val LocalTvColorScheme = staticCompositionLocalOf { DefaultTvColorScheme }
+val LocalTvTypography = staticCompositionLocalOf { DefaultTvTypography }
 
 val MaterialTheme.tvColors: TvColorScheme
     @Composable
@@ -26,18 +30,20 @@ val MaterialTheme.tvTypography: TvTypography
 
 @Composable
 fun TvTheme(
-    colors: TvColorScheme = TvColorScheme(),
-    typography: TvTypography = TvTypography(),
+    colors: TvColorScheme = DefaultTvColorScheme,
+    typography: TvTypography = DefaultTvTypography,
     content: @Composable () -> Unit,
 ) {
+    val colorScheme = remember(colors) { colors.toMaterialColorScheme() }
+    val materialTypography = remember(typography) { typography.toMaterialTypography() }
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         CompositionLocalProvider(
             LocalTvColorScheme provides colors,
             LocalTvTypography provides typography,
         ) {
             MaterialTheme(
-                colorScheme = colors.toMaterialColorScheme(),
-                typography = typography.toMaterialTypography(),
+                colorScheme = colorScheme,
+                typography = materialTypography,
                 content = content,
             )
         }

@@ -53,7 +53,11 @@ fun TvEpisodeRow(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
-    val captionColor = if (isFocused) MaterialTheme.tvColors.textSecondaryActive else MaterialTheme.tvColors.textSecondary
+    val captionColor = if (isFocused) {
+        MaterialTheme.tvColors.textSecondaryActive
+    } else {
+        MaterialTheme.tvColors.textSecondary
+    }
 
     TvTile(
         onClick = onClick,

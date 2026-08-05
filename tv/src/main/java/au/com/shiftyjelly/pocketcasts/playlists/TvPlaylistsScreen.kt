@@ -154,7 +154,10 @@ private fun TvPlaylistsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvPlaylistsUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
+            is TvPlaylistsUiState.Loading -> LoadingView(
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.fillMaxSize(),
+            )
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
                 TvPlaylistsEmpty(

@@ -127,7 +127,10 @@ private fun TvYourPodcastsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvYourPodcastsUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
+            is TvYourPodcastsUiState.Loading -> LoadingView(
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.fillMaxSize(),
+            )
 
             is TvYourPodcastsUiState.Empty -> TvEmptyState(
                 title = stringResource(LR.string.tv_your_podcasts_empty_title),

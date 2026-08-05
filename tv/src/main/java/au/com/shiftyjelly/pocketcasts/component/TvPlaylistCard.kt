@@ -69,7 +69,11 @@ fun TvPlaylistCard(
         label = "PlaylistCardTitleColor",
     )
     val captionColor by animateColorAsState(
-        targetValue = if (isFocused) MaterialTheme.tvColors.textSecondaryActive else MaterialTheme.tvColors.textSecondary,
+        targetValue = if (isFocused) {
+            MaterialTheme.tvColors.textSecondaryActive
+        } else {
+            MaterialTheme.tvColors.textSecondary
+        },
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardCaptionColor",
     )

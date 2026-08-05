@@ -112,7 +112,11 @@ fun Modifier.tvTileButtonNavigation(
 
 @Composable
 fun tileButtonColors(isSelected: Boolean): ButtonColors = ButtonDefaults.colors(
-    containerColor = if (isSelected) MaterialTheme.tvColors.backgroundActive else MaterialTheme.tvColors.backgroundActive20,
+    containerColor = if (isSelected) {
+        MaterialTheme.tvColors.backgroundActive
+    } else {
+        MaterialTheme.tvColors.backgroundActive20
+    },
     contentColor = if (isSelected) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textSecondary,
     focusedContainerColor = MaterialTheme.tvColors.backgroundActive20,
     focusedContentColor = MaterialTheme.tvColors.textSecondary,
