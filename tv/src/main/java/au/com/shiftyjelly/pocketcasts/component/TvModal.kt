@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import java.util.function.Consumer
 
 @Composable
@@ -116,8 +118,14 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
 private val DefaultModalWidth = 400.dp
 private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
 private val ModalShape = RoundedCornerShape(28.dp)
-private val TranslucentContainerColor = TvColors.BackgroundSunken.copy(alpha = 0.6f)
-internal val TvOverlayContainerColor = TvColors.BackgroundSunken.copy(alpha = 0.94f)
+private val TranslucentContainerColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.6f)
+internal val TvOverlayContainerColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.94f)
 internal val TvOverlayBorderColor = Color.White.copy(alpha = 0.12f)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
