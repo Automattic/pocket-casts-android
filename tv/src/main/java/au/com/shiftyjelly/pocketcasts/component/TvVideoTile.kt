@@ -118,14 +118,14 @@ fun TvVideoTile(
                             Column {
                                 Text(
                                     text = podcastTitle,
-                                    style = TvTextStyles.VideoTilePodcastTitle,
+                                    style = TvTextStyles.Caption1,
                                     color = TvColors.TextSecondary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = episodeTitle,
-                                    style = TvTextStyles.VideoTileEpisodeTitle,
+                                    style = TvTextStyles.Caption1,
                                     color = TvColors.TextPrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,

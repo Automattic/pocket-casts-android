@@ -61,7 +61,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
     Text(
         text = stringResource(LR.string.tv_playlists_download_subtitle),
         color = TvColors.TextSecondary,
-        style = TvTextStyles.ModalBody,
+        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
     )
     Image(
         painter = rememberQrPainter(content = DOWNLOAD_URL, size = QrCodeSize),
@@ -75,7 +75,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
     Text(
         text = DOWNLOAD_URL_LABEL,
         color = TvColors.TextSecondary,
-        style = TvTextStyles.ModalBody,
+        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
     )
     Button(
         onClick = onDone,

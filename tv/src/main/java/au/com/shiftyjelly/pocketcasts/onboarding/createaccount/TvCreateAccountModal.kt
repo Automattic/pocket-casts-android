@@ -71,8 +71,7 @@ private fun Header(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(LR.string.tv_create_account_modal_subtitle),
             color = TvColors.TextSecondary,
-            style = TvTextStyles.ModalBody,
-            textAlign = TextAlign.Start,
+            style = TvTextStyles.Body,
         )
     }
 }
@@ -136,7 +135,7 @@ private fun ErrorContent(
         Text(
             text = stringResource(LR.string.error_generic_message),
             color = TvColors.TextSecondary,
-            style = TvTextStyles.SignInSubtitle,
+            style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(

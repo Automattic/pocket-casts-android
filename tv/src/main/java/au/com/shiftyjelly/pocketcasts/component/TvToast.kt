@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -97,7 +98,7 @@ private fun TvToastContent(
     Text(
         text = message,
         color = TvColors.TextPrimary,
-        style = TvTextStyles.ModalBody,
+        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
         modifier = modifier
             .semantics { liveRegion = LiveRegionMode.Polite }
             .widthIn(max = ToastMaxWidth)

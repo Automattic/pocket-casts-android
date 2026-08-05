@@ -185,7 +185,7 @@ private fun PodcastDescriptionPane(
         if (podcast.podcastDescription.isNotBlank()) {
             Text(
                 text = podcast.podcastDescription,
-                style = TvTextStyles.FeaturedTileDescription,
+                style = TvTextStyles.Body,
                 color = TvColors.TextPrimary,
             )
         }

@@ -22,6 +22,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,7 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(LR.string.tv_onboarding_sign_in_title),
                 color = TvColors.TextPrimary,
-                style = TvTextStyles.WelcomeTitle,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
         }
     }
@@ -124,7 +125,7 @@ private fun TvSignInError(
             Text(
                 text = stringResource(LR.string.error_generic_message),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.SignInSubtitle,
+                style = TvTextStyles.Title3.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
@@ -167,7 +168,7 @@ private fun TvSignInContent(
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
                 color = TvColors.TextPrimary,
-                style = TvTextStyles.WelcomeTitle,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
             TvSignInQrContent(
                 userCode = userCode,

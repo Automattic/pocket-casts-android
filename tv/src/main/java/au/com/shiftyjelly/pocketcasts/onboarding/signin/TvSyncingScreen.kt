@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -96,13 +97,13 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
                 color = TvColors.TextPrimary,
-                style = TvTextStyles.WelcomeTitle,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(40.dp))
             TvSyncingCoverRow(

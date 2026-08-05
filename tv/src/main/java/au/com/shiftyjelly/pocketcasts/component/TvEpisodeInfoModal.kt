@@ -181,14 +181,14 @@ private fun EpisodeDescriptionPane(
 
             is ShowNotes.Loaded -> Text(
                 text = remember(showNotes.html) { AnnotatedString.fromHtml(showNotes.html) },
-                style = TvTextStyles.FeaturedTileDescription,
+                style = TvTextStyles.Body,
                 color = TvColors.TextPrimary,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             is ShowNotes.Unavailable -> Text(
                 text = stringResource(LR.string.error_loading_show_notes),
-                style = TvTextStyles.FeaturedTileDescription,
+                style = TvTextStyles.Body,
                 color = TvColors.TextSecondary,
             )
         }

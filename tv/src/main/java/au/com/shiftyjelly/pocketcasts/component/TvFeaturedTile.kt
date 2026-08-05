@@ -118,7 +118,7 @@ fun TvFeaturedTile(
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TvTextStyles.FeaturedTileSponsoredLabel,
+                            style = TvTextStyles.Body,
                             color = TvColors.TextPrimary70,
                         )
                     }
@@ -127,7 +127,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = TvTextStyles.FeaturedTileTitle,
+                        style = TvTextStyles.Title2,
                         color = TvColors.TextPrimary,
                     )
 
@@ -135,7 +135,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = description,
-                        style = TvTextStyles.FeaturedTileDescription,
+                        style = TvTextStyles.Body,
                         color = TvColors.TextPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
