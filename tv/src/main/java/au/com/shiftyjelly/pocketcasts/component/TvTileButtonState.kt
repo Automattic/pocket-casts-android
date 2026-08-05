@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
@@ -112,8 +111,8 @@ fun Modifier.tvTileButtonNavigation(
 
 @Composable
 fun tileButtonColors(isSelected: Boolean): ButtonColors = ButtonDefaults.colors(
-    containerColor = if (isSelected) Color.White else TvColors.TextPrimary20,
-    contentColor = if (isSelected) Color.Black else TvColors.TextSecondary,
-    focusedContainerColor = TvColors.TextPrimary20,
+    containerColor = if (isSelected) TvColors.BackgroundActive else TvColors.BackgroundActive50,
+    contentColor = if (isSelected) TvColors.TextPrimaryActive else TvColors.TextSecondary,
+    focusedContainerColor = TvColors.BackgroundActive50,
     focusedContentColor = TvColors.TextSecondary,
 )

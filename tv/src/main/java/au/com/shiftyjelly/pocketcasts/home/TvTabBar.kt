@@ -129,7 +129,7 @@ fun TvTabBar(
                                     Text(
                                         text = stringResource(tab.labelRes),
                                         color = LocalContentColor.current,
-                                        style = TvTextStyles.TabLabel,
+                                        style = TvTextStyles.Caption1,
                                     )
                                 }
                             }
