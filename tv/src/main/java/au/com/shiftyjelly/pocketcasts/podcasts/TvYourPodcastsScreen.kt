@@ -31,16 +31,15 @@ import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -128,7 +127,7 @@ private fun TvYourPodcastsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvYourPodcastsUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
+            is TvYourPodcastsUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
 
             is TvYourPodcastsUiState.Empty -> TvEmptyState(
                 title = stringResource(LR.string.tv_your_podcasts_empty_title),
@@ -187,37 +186,35 @@ private const val FOLDER_COVER_COUNT = 4
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvYourPodcastsGridPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
-                TvYourPodcastsContent(
-                    uiState = TvYourPodcastsUiState.Loaded(
-                        items = buildList {
-                            add(
-                                FolderItem.Folder(
-                                    folder = Folder(
-                                        uuid = "folder",
-                                        name = "Tech & Science",
-                                        color = 3,
-                                        addedDate = Date(0),
-                                        sortPosition = 0,
-                                        podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
-                                        deleted = false,
-                                        syncModified = 0,
-                                    ),
-                                    podcasts = List(4) { index -> Podcast(uuid = "cover-$index") },
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvYourPodcastsContent(
+                uiState = TvYourPodcastsUiState.Loaded(
+                    items = buildList {
+                        add(
+                            FolderItem.Folder(
+                                folder = Folder(
+                                    uuid = "folder",
+                                    name = "Tech & Science",
+                                    color = 3,
+                                    addedDate = Date(0),
+                                    sortPosition = 0,
+                                    podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                                    deleted = false,
+                                    syncModified = 0,
                                 ),
-                            )
-                            repeat(11) { index ->
-                                add(FolderItem.Podcast(Podcast(uuid = "podcast-$index", title = "Podcast $index")))
-                            }
-                        },
-                    ),
-                    onNavigateToHome = {},
-                    onOpenFolder = {},
-                    onOpenPodcast = {},
-                )
-            }
+                                podcasts = List(4) { index -> Podcast(uuid = "cover-$index") },
+                            ),
+                        )
+                        repeat(11) { index ->
+                            add(FolderItem.Podcast(Podcast(uuid = "podcast-$index", title = "Podcast $index")))
+                        }
+                    },
+                ),
+                onNavigateToHome = {},
+                onOpenFolder = {},
+                onOpenPodcast = {},
+            )
         }
     }
 }
@@ -225,16 +222,14 @@ private fun TvYourPodcastsGridPreview() {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvYourPodcastsEmptyPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
-                TvYourPodcastsContent(
-                    uiState = TvYourPodcastsUiState.Empty,
-                    onNavigateToHome = {},
-                    onOpenFolder = {},
-                    onOpenPodcast = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvYourPodcastsContent(
+                uiState = TvYourPodcastsUiState.Empty,
+                onNavigateToHome = {},
+                onOpenFolder = {},
+                onOpenPodcast = {},
+            )
         }
     }
 }

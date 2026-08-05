@@ -22,12 +22,11 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -55,13 +54,13 @@ private fun ColumnScope.TvDownloadAppModalContent(
 
     Text(
         text = stringResource(LR.string.tv_playlists_download_title),
-        color = TvColors.TextPrimary,
-        style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
+        color = MaterialTheme.tvColors.textPrimary,
+        style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
     )
     Text(
         text = stringResource(LR.string.tv_playlists_download_subtitle),
-        color = TvColors.TextSecondary,
-        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+        color = MaterialTheme.tvColors.textSecondary,
+        style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
     )
     Image(
         painter = rememberQrPainter(content = DOWNLOAD_URL, size = QrCodeSize),
@@ -74,8 +73,8 @@ private fun ColumnScope.TvDownloadAppModalContent(
     )
     Text(
         text = DOWNLOAD_URL_LABEL,
-        color = TvColors.TextSecondary,
-        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+        color = MaterialTheme.tvColors.textSecondary,
+        style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
     )
     Button(
         onClick = onDone,
@@ -84,7 +83,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
             .padding(top = 16.dp)
             .focusRequester(focusRequester),
     ) {
-        Text(stringResource(LR.string.done), style = TvTextStyles.Caption1)
+        Text(stringResource(LR.string.done), style = MaterialTheme.tvTypography.caption1)
     }
 }
 
@@ -95,11 +94,9 @@ private val QrCodeSize = 144.dp
 @Preview
 @Composable
 private fun TvDownloadAppModalPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvModalSurface(width = 600.dp) {
-                TvDownloadAppModalContent(onDone = {})
-            }
+    TvTheme {
+        TvModalSurface(width = 600.dp) {
+            TvDownloadAppModalContent(onDone = {})
         }
     }
 }

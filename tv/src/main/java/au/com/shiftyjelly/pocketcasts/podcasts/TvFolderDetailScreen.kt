@@ -24,12 +24,11 @@ import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -82,7 +81,7 @@ private fun TvFolderDetailContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvFolderDetailUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
+            is TvFolderDetailUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
 
             is TvFolderDetailUiState.Empty -> TvEmptyState(
                 title = stringResource(LR.string.podcasts_empty_folder),
@@ -126,18 +125,16 @@ private sealed interface TvFolderDetailUiState {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvFolderDetailPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
-                TvFolderDetailContent(
-                    folderName = "Tech & Science",
-                    uiState = TvFolderDetailUiState.Loaded(
-                        podcasts = List(6) { index -> Podcast(uuid = "podcast-$index", title = "Podcast $index") },
-                    ),
-                    onOpenPodcast = {},
-                    onClose = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvFolderDetailContent(
+                folderName = "Tech & Science",
+                uiState = TvFolderDetailUiState.Loaded(
+                    podcasts = List(6) { index -> Podcast(uuid = "podcast-$index", title = "Podcast $index") },
+                ),
+                onOpenPodcast = {},
+                onClose = {},
+            )
         }
     }
 }

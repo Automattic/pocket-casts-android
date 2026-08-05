@@ -53,7 +53,6 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
@@ -64,10 +63,10 @@ import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountMo
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -119,7 +118,7 @@ private fun TvPodcastDetailsContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvPodcastDetailsUiState.Loading, TvPodcastDetailsUiState.NotFound -> {
-                LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
+                LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
             }
 
             is TvPodcastDetailsUiState.Loaded -> {
@@ -216,20 +215,20 @@ private fun PodcastInfo(
             if (podcast.author.isNotBlank()) {
                 Text(
                     text = podcast.author,
-                    style = TvTextStyles.Caption1,
-                    color = TvColors.TextSecondary,
+                    style = MaterialTheme.tvTypography.caption1,
+                    color = MaterialTheme.tvColors.textSecondary,
                 )
             }
             Text(
                 text = podcast.title,
-                style = TvTextStyles.Title3,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
             )
             if (podcast.podcastDescription.isNotBlank()) {
                 Text(
                     text = podcast.podcastDescription,
-                    style = TvTextStyles.Caption1,
-                    color = TvColors.TextSecondary,
+                    style = MaterialTheme.tvTypography.caption1,
+                    color = MaterialTheme.tvColors.textSecondary,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -282,8 +281,8 @@ private fun EpisodeList(
         ) {
             Text(
                 text = stringResource(LR.string.search_results_all_episodes),
-                style = TvTextStyles.Title3,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
                 modifier = Modifier.weight(1f),
             )
             TvArchivedFilterButton(
@@ -360,7 +359,7 @@ private fun AllEpisodesArchived(
         Text(
             text = pluralStringResource(LR.plurals.tv_podcast_all_archived, episodeCount, episodeCount),
             style = MaterialTheme.typography.bodyLarge,
-            color = TvColors.TextSecondary,
+            color = MaterialTheme.tvColors.textSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 400.dp),
         )
@@ -414,25 +413,23 @@ private fun TvPodcastDetailsContentPreview(
     podcast: Podcast,
     episodes: List<PodcastEpisode>,
 ) {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvPodcastDetailsContent(
-                uiState = TvPodcastDetailsUiState.Loaded(
-                    podcast = podcast,
-                    episodes = episodes,
-                    archivedEpisodeCount = 0,
-                    isShowingArchived = false,
-                    isLoggedIn = true,
-                ),
-                accountAuthState = MutableStateFlow(TvSignInUiState.Loading),
-                onToggleSubscribe = {},
-                onStartAccountAuth = {},
-                onStopAccountAuth = {},
-                onRetryAccountAuth = {},
-                onChangeSortType = {},
-                onToggleArchiveFilter = {},
-            )
-        }
+    TvTheme {
+        TvPodcastDetailsContent(
+            uiState = TvPodcastDetailsUiState.Loaded(
+                podcast = podcast,
+                episodes = episodes,
+                archivedEpisodeCount = 0,
+                isShowingArchived = false,
+                isLoggedIn = true,
+            ),
+            accountAuthState = MutableStateFlow(TvSignInUiState.Loading),
+            onToggleSubscribe = {},
+            onStartAccountAuth = {},
+            onStopAccountAuth = {},
+            onRetryAccountAuth = {},
+            onChangeSortType = {},
+            onToggleArchiveFilter = {},
+        )
     }
 }
 
