@@ -22,11 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 
 @Composable
 fun TvEmptyState(
@@ -51,15 +50,15 @@ fun TvEmptyState(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = title,
-                style = TvTextStyles.Title3,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
-                color = TvColors.TextSecondary,
+                color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 400.dp),
             )
@@ -70,7 +69,7 @@ fun TvEmptyState(
                     colors = TvButtonDefaults.filledButtonColors(),
                     modifier = if (autoFocusAction) Modifier.focusRequester(focusRequester) else Modifier,
                 ) {
-                    Text(actionLabel, style = TvTextStyles.Caption1)
+                    Text(actionLabel, style = MaterialTheme.tvTypography.caption1)
                 }
             }
         }
@@ -80,17 +79,15 @@ fun TvEmptyState(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvEmptyStatePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.fillMaxSize().background(TvColors.BackgroundSunken)) {
-                TvEmptyState(
-                    title = "Nothing here yet",
-                    subtitle = "Content will show up here once it's available.",
-                    actionLabel = "Get the app",
-                    onAction = {},
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvEmptyState(
+                title = "Nothing here yet",
+                subtitle = "Content will show up here once it's available.",
+                actionLabel = "Get the app",
+                onAction = {},
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }

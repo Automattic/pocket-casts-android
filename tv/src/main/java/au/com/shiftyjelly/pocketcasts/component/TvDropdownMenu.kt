@@ -34,11 +34,10 @@ import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -87,8 +86,8 @@ internal fun TvDropdownMenuSurface(
         if (title != null) {
             Text(
                 text = title,
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp),
             )
         }
@@ -116,9 +115,9 @@ fun TvDropdownMenuItem(
         onClick = onClick,
         colors = ButtonDefaults.colors(
             containerColor = Color.Transparent,
-            contentColor = TvColors.TextPrimary,
-            focusedContainerColor = TvColors.BackgroundActive,
-            focusedContentColor = TvColors.TextPrimaryActive,
+            contentColor = MaterialTheme.tvColors.textPrimary,
+            focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
+            focusedContentColor = MaterialTheme.tvColors.textPrimaryActive,
         ),
         border = TvButtonDefaults.borderlessButtonBorder(),
         modifier = modifier
@@ -148,20 +147,18 @@ private val MenuShape = RoundedCornerShape(20.dp)
 @Preview
 @Composable
 private fun TvDropdownMenuPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvDropdownMenuSurface(title = "Sort by") {
-                TvDropdownMenuItem(
-                    label = "Newest to oldest",
-                    isSelected = true,
-                    onClick = {},
-                )
-                TvDropdownMenuItem(
-                    label = "Oldest to newest",
-                    isSelected = false,
-                    onClick = {},
-                )
-            }
+    TvTheme {
+        TvDropdownMenuSurface(title = "Sort by") {
+            TvDropdownMenuItem(
+                label = "Newest to oldest",
+                isSelected = true,
+                onClick = {},
+            )
+            TvDropdownMenuItem(
+                label = "Oldest to newest",
+                isSelected = false,
+                onClick = {},
+            )
         }
     }
 }

@@ -18,9 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -45,7 +46,7 @@ fun TvArchivedFilterButton(
         ) {
             Text(
                 text = stringResource(if (isShowingArchived) LR.string.show_archived else LR.string.podcast_hide_archived),
-                style = TvTextStyles.Caption2,
+                style = MaterialTheme.tvTypography.caption2,
             )
             Icon(
                 painter = painterResource(IR.drawable.ic_chevron_small_up),
