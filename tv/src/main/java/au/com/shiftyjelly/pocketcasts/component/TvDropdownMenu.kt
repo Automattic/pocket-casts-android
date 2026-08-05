@@ -87,7 +87,7 @@ internal fun TvDropdownMenuSurface(
         if (title != null) {
             Text(
                 text = title,
-                style = TvTextStyles.PlaylistCardCaption,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp),
             )
@@ -116,9 +116,9 @@ fun TvDropdownMenuItem(
         onClick = onClick,
         colors = ButtonDefaults.colors(
             containerColor = Color.Transparent,
-            contentColor = Color.White,
-            focusedContainerColor = TvColors.LightGray,
-            focusedContentColor = TvColors.Dark,
+            contentColor = TvColors.TextPrimary,
+            focusedContainerColor = TvColors.BackgroundActive,
+            focusedContentColor = TvColors.TextPrimaryActive,
         ),
         border = TvButtonDefaults.borderlessButtonBorder(),
         modifier = modifier

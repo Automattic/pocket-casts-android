@@ -52,8 +52,8 @@ fun TvEmptyState(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = title,
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
+                style = TvTextStyles.Title3,
+                color = TvColors.TextPrimary,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -71,7 +71,7 @@ fun TvEmptyState(
                     colors = TvButtonDefaults.filledButtonColors(),
                     modifier = if (autoFocusAction) Modifier.focusRequester(focusRequester) else Modifier,
                 ) {
-                    Text(actionLabel, style = TvTextStyles.ModalButtonLabel)
+                    Text(actionLabel, style = TvTextStyles.Caption1)
                 }
             }
         }
@@ -83,7 +83,7 @@ fun TvEmptyState(
 private fun TvEmptyStatePreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.fillMaxSize().background(TvColors.Dark)) {
+            Box(modifier = Modifier.fillMaxSize().background(TvColors.BackgroundSunken)) {
                 TvEmptyState(
                     title = "Nothing here yet",
                     subtitle = "Content will show up here once it's available.",
