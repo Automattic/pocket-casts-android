@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,10 +38,15 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
+import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -53,6 +63,18 @@ fun TvNowPlayingScreen(
     viewModel: TvNowPlayingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+        return
+    }
 
     when (val state = uiState) {
         is TvNowPlayingUiState.Empty -> TvEmptyState(
@@ -68,6 +90,7 @@ fun TvNowPlayingScreen(
             onPlayPause = viewModel::playPause,
             onSkipBackward = viewModel::skipBackward,
             onSkipForward = viewModel::skipForward,
+            onOpenPodcast = { openedPodcastUuid = it },
             modifier = modifier,
         )
     }
@@ -79,8 +102,13 @@ private fun TvNowPlayingContent(
     onPlayPause: () -> Unit,
     onSkipBackward: () -> Unit,
     onSkipForward: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isActionsModalVisible by remember { mutableStateOf(false) }
+    var isDetailsModalVisible by remember { mutableStateOf(false) }
+    val episode = state.episode
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -126,8 +154,34 @@ private fun TvNowPlayingContent(
             onPlayPause = onPlayPause,
             onSkipBackward = onSkipBackward,
             onSkipForward = onSkipForward,
+            onOpenActions = if (episode is PodcastEpisode) {
+                { isActionsModalVisible = true }
+            } else {
+                null
+            },
             modifier = Modifier.fillMaxWidth(),
         )
+    }
+
+    if (episode is PodcastEpisode) {
+        if (isActionsModalVisible) {
+            TvEpisodeActionsModal(
+                episode = episode,
+                actionContext = TvEpisodeActionContext.NowPlaying,
+                onDismissRequest = { isActionsModalVisible = false },
+                onShowEpisodeDetails = {
+                    isDetailsModalVisible = true
+                    isActionsModalVisible = false
+                },
+                onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
+            )
+        }
+        if (isDetailsModalVisible) {
+            TvEpisodeInfoModal(
+                episode = episode,
+                onDismissRequest = { isDetailsModalVisible = false },
+            )
+        }
     }
 }
 
@@ -176,6 +230,7 @@ private fun PlayerControls(
     onPlayPause: () -> Unit,
     onSkipBackward: () -> Unit,
     onSkipForward: () -> Unit,
+    onOpenActions: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -198,6 +253,9 @@ private fun PlayerControls(
             contentDescription = stringResource(LR.string.skip_forward),
             onClick = onSkipForward,
         )
+        if (onOpenActions != null) {
+            TvMoreButton(onClick = onOpenActions)
+        }
     }
 }
 
@@ -278,6 +336,7 @@ private fun TvNowPlayingContentPreview() {
             onPlayPause = {},
             onSkipBackward = {},
             onSkipForward = {},
+            onOpenPodcast = {},
         )
     }
 }

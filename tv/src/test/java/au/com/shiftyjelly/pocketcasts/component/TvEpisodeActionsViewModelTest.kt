@@ -42,6 +42,13 @@ class TvEpisodeActionsViewModelTest {
     )
 
     @Test
+    fun `play starts playback of the episode`() = runTest {
+        viewModel().play(episode, SourceView.UP_NEXT)
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT) }
+    }
+
+    @Test
     fun `playNext adds episode to the top of the queue`() = runTest {
         viewModel().playNext(episode, SourceView.UP_NEXT)
 
