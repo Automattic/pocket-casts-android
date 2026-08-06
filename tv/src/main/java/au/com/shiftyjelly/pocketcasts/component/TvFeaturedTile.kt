@@ -118,7 +118,7 @@ fun TvFeaturedTile(
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TvTextStyles.Body,
+                            style = TvTextStyles.Caption2,
                             color = TvColors.TextPrimary70,
                         )
                     }

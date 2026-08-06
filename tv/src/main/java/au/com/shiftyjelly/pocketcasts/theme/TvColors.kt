@@ -3,6 +3,11 @@ package au.com.shiftyjelly.pocketcasts.theme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
+/**
+ * The Figma design-system colour tokens for TV. The full palette is defined even where a token has
+ * no call site yet, so it stays complete against Figma. `*Active` variants are the values used on
+ * the light active/focused surface.
+ */
 object TvColors {
     val TextPrimary = Color(0xFFFBFBFC)
     val TextSecondary = Color(0xFFB0B3B8)

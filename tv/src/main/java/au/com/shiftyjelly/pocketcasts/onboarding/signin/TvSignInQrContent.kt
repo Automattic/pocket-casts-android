@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
@@ -102,7 +101,7 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
         Text(
             text = text,
             color = TvColors.TextPrimary,
-            style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+            style = TvTextStyles.Body,
         )
     }
 }
