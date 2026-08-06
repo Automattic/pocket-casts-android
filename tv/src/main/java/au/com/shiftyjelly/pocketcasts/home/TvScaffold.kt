@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
@@ -78,6 +79,8 @@ fun TvScaffold(
                 is TvTab.UpNext -> Box(modifier = belowTopBar) {
                     TvUpNextScreen(onNavigateToHome = navigateToHome)
                 }
+
+                is TvTab.NowPlaying -> TvNowPlayingScreen()
 
                 else -> Box(modifier = belowTopBar) {
                     TvTabPlaceholder(tab = tab)
