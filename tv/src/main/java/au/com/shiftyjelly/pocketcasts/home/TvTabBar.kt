@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +47,19 @@ fun TvTabBar(
     selectedTabIndex: Int,
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    autoFocusSelectedTab: Boolean = true,
+    onSelectedTabFocus: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    val currentOnSelectedTabFocus by rememberUpdatedState(onSelectedTabFocus)
+    LaunchedEffect(autoFocusSelectedTab) {
+        if (autoFocusSelectedTab) {
+            runCatching { focusRequester.requestFocus() }
+            // Always report the request so the once-only flag flips even if the requester was
+            // detached, otherwise it would re-arm and retry on every re-entry.
+            currentOnSelectedTabFocus()
+        }
+    }
 
     Box(
         modifier = modifier

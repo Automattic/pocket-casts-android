@@ -50,6 +50,7 @@ fun <T> TvRow(
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
     itemSpacing: Dp = 16.dp,
     key: ((T) -> Any)? = null,
+    focusRequester: FocusRequester? = null,
     content: @Composable (T) -> Unit,
 ) {
     var hasFocus by remember { mutableStateOf(false) }
@@ -83,10 +84,11 @@ fun <T> TvRow(
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             modifier = Modifier
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
-                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                        runCatching { focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus() }
                     }
                 },
         ) {

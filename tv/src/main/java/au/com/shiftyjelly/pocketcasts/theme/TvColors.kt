@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 object TvColors {
@@ -15,3 +16,8 @@ object TvColors {
     val BgActive20 = Color(0x33FBFBFC)
     val Divider = Color(0xFF4A4D51)
 }
+
+// Shared screen background so detail overlays fully occlude the content fading underneath them.
+val TvScreenBackgroundBrush: Brush = Brush.horizontalGradient(
+    colors = listOf(TvColors.DarkGray, TvColors.Dark),
+)

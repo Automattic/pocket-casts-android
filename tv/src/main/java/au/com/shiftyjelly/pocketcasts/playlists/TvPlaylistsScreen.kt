@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -28,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +45,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
@@ -62,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,43 +76,45 @@ fun TvPlaylistsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
     var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
+    var restoreFocusTrigger by remember { mutableIntStateOf(0) }
 
-    val stateHolder = rememberSaveableStateHolder()
     val playlist = openedPlaylist
-    if (playlist != null) {
-        BackHandler {
-            openedPlaylist = null
-        }
-        stateHolder.SaveableStateProvider("details-${playlist.uuid}") {
-            TvPlaylistDetailsScreen(
-                playlistUuid = playlist.uuid,
-                playlistType = playlist.type,
-                onClose = { openedPlaylist = null },
-                modifier = modifier,
-            )
-        }
-    } else {
-        stateHolder.SaveableStateProvider("grid") {
-            TvPlaylistsContent(
-                uiState = uiState,
-                getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
-                getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
-                refreshArtworkUuids = viewModel::refreshArtworkUuids,
-                refreshEpisodeCount = viewModel::refreshEpisodeCount,
-                findPodcastTint = viewModel::findPodcastTint,
-                onCreatePlaylist = { isDownloadModalVisible = true },
-                onOpenPlaylist = { preview ->
-                    isDownloadModalVisible = false
-                    openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
-                },
-                modifier = modifier,
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+        TvPlaylistsContent(
+            uiState = uiState,
+            getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+            getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
+            refreshArtworkUuids = viewModel::refreshArtworkUuids,
+            refreshEpisodeCount = viewModel::refreshEpisodeCount,
+            findPodcastTint = viewModel::findPodcastTint,
+            onCreatePlaylist = { isDownloadModalVisible = true },
+            onOpenPlaylist = { preview ->
+                isDownloadModalVisible = false
+                openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(playlist != null),
+            restoreFocusTrigger = restoreFocusTrigger,
+        )
 
-            if (isDownloadModalVisible) {
-                TvDownloadAppModal(
-                    onDismissRequest = { isDownloadModalVisible = false },
-                )
-            }
+        if (isDownloadModalVisible) {
+            TvDownloadAppModal(
+                onDismissRequest = { isDownloadModalVisible = false },
+            )
+        }
+
+        TvDetailOverlay(
+            target = playlist,
+            onBack = { openedPlaylist = null },
+            onHide = { restoreFocusTrigger++ },
+        ) { openPlaylist ->
+            TvPlaylistDetailsScreen(
+                playlistUuid = openPlaylist.uuid,
+                playlistType = openPlaylist.type,
+                onClose = { openedPlaylist = null },
+            )
         }
     }
 }
@@ -138,6 +141,7 @@ private fun TvPlaylistsContent(
     onCreatePlaylist: () -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
         targetState = uiState,
@@ -169,6 +173,7 @@ private fun TvPlaylistsContent(
                     findPodcastTint = findPodcastTint,
                     onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier.fillMaxSize(),
+                    restoreFocusTrigger = restoreFocusTrigger,
                 )
             }
         }
@@ -185,6 +190,7 @@ private fun TvPlaylistsGrid(
     findPodcastTint: suspend (String) -> Int?,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     Column(modifier = modifier.padding(horizontal = 32.dp)) {
         Text(
@@ -195,6 +201,18 @@ private fun TvPlaylistsGrid(
         )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
+        val gridFocusRequester = remember { FocusRequester() }
+
+        var isInitialComposition by remember { mutableStateOf(true) }
+        LaunchedEffect(restoreFocusTrigger) {
+            // Only restore on an actual trigger change, not when a fresh grid mounts with a
+            // non-zero trigger inherited from a hoisted state holder.
+            if (isInitialComposition) {
+                isInitialComposition = false
+            } else {
+                runCatching { gridFocusRequester.requestFocus() }
+            }
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -202,6 +220,7 @@ private fun TvPlaylistsGrid(
             verticalArrangement = Arrangement.spacedBy(32.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier
+                .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
