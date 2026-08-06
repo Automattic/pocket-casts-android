@@ -284,6 +284,7 @@
     <string name="tv_episode_unarchived">Unarchived</string>
     <string name="tv_episode_will_play_next">Will play next</string>
     <string name="tv_episode_will_play_last">Will play last</string>
+    <string name="tv_episode_removed_from_up_next">Removed from Up Next</string>
     <string name="tv_up_next_empty_title">Nothing queued up</string>
     <string name="tv_up_next_empty_subtitle">Add episodes to Up Next and they’ll play in order, back to back</string>
     <string name="tv_up_next_empty_action_title">Add episodes</string>

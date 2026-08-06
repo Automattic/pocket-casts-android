@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.details
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +20,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -40,10 +40,12 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
+import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
@@ -53,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
@@ -62,8 +65,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
-import kotlinx.coroutines.flow.first
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -78,6 +79,7 @@ fun TvPlaylistDetailsScreen(
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPlaylistDetailsUiState.NotFound) {
@@ -85,12 +87,23 @@ fun TvPlaylistDetailsScreen(
         }
     }
 
-    TvPlaylistDetailsContent(
-        uiState = uiState,
-        onChangeSortType = viewModel::changeSortType,
-        onToggleArchiveFilter = viewModel::toggleArchiveFilter,
-        modifier = modifier,
-    )
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+    } else {
+        TvPlaylistDetailsContent(
+            uiState = uiState,
+            onChangeSortType = viewModel::changeSortType,
+            onToggleArchiveFilter = viewModel::toggleArchiveFilter,
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
@@ -98,6 +111,7 @@ private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -130,6 +144,7 @@ private fun TvPlaylistDetailsContent(
                             uiState = uiState,
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
+                            onOpenPodcast = onOpenPodcast,
                             playAllFocusRequester = playAllFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
@@ -145,6 +160,7 @@ private fun SortableEpisodeList(
     uiState: TvPlaylistDetailsUiState.Loaded,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -155,23 +171,6 @@ private fun SortableEpisodeList(
         if (sortType != lastSortType) {
             lastSortType = sortType
             listState.scrollToItem(0)
-        }
-    }
-    val firstEpisodeFocusRequester = remember { FocusRequester() }
-    val initialFocusIndex = remember {
-        if (uiState.episodes.isEmpty()) {
-            0
-        } else {
-            Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }.coerceIn(0, uiState.episodes.lastIndex)
-        }
-    }
-    var hasRequestedInitialFocus by remember { mutableStateOf(uiState.episodes.isEmpty()) }
-    LaunchedEffect(uiState.episodes.isNotEmpty()) {
-        if (uiState.episodes.isNotEmpty() && !hasRequestedInitialFocus) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialFocusIndex } }.first { it }
-            runCatching { firstEpisodeFocusRequester.requestFocus() }
-                .onFailure { Timber.e(it, "Failed to focus the first visible playlist episode") }
-            hasRequestedInitialFocus = true
         }
     }
     Column(modifier = modifier) {
@@ -197,9 +196,8 @@ private fun SortableEpisodeList(
         if (uiState.episodes.isNotEmpty()) {
             EpisodeList(
                 episodes = uiState.episodes,
+                onOpenPodcast = onOpenPodcast,
                 playAllFocusRequester = playAllFocusRequester,
-                firstEpisodeFocusRequester = firstEpisodeFocusRequester,
-                initialFocusIndex = initialFocusIndex,
                 listState = listState,
                 modifier = Modifier.weight(1f),
             )
@@ -234,14 +232,14 @@ private fun AllEpisodesArchived(
 @Composable
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
+    onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
-    firstEpisodeFocusRequester: FocusRequester,
-    initialFocusIndex: Int,
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
@@ -257,8 +255,11 @@ private fun EpisodeList(
                 episode = episode,
                 dateFormatter = dateFormatter,
                 onClick = {},
-                onOpenActions = { actionsEpisode = episode },
-                episodeFocusRequester = firstEpisodeFocusRequester.takeIf { index == initialFocusIndex },
+                onOpenActions = {
+                    focus.watchForRemoval(episodes, index)
+                    actionsEpisode = episode
+                },
+                episodeFocusRequester = focus.requesterFor(episode.uuid),
                 leftFocusRequester = playAllFocusRequester,
             )
         }
@@ -266,11 +267,13 @@ private fun EpisodeList(
     actionsEpisode?.let { episode ->
         TvEpisodeActionsModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.Playlist,
             onDismissRequest = { actionsEpisode = null },
             onShowEpisodeDetails = {
                 detailsEpisode = episode
                 actionsEpisode = null
             },
+            onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
         )
     }
     detailsEpisode?.let { episode ->
@@ -394,6 +397,7 @@ private fun TvPlaylistDetailsPreview() {
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
+                onOpenPodcast = {},
             )
         }
     }
@@ -426,6 +430,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
                 ),
                 onChangeSortType = {},
                 onToggleArchiveFilter = {},
+                onOpenPodcast = {},
             )
         }
     }

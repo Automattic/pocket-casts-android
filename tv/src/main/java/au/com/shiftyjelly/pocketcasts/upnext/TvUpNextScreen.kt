@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.upnext
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,14 +38,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
@@ -57,22 +63,35 @@ fun TvUpNextScreen(
     viewModel: TvUpNextViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.onShown()
     }
 
-    TvUpNextContent(
-        uiState = uiState,
-        onNavigateToHome = onNavigateToHome,
-        modifier = modifier,
-    )
+    val podcastUuid = openedPodcastUuid
+    if (podcastUuid != null) {
+        BackHandler { openedPodcastUuid = null }
+        TvPodcastDetailsScreen(
+            podcastUuid = podcastUuid,
+            onClose = { openedPodcastUuid = null },
+            modifier = modifier,
+        )
+    } else {
+        TvUpNextContent(
+            uiState = uiState,
+            onNavigateToHome = onNavigateToHome,
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
 private fun TvUpNextContent(
     uiState: TvUpNextUiState,
     onNavigateToHome: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -89,7 +108,10 @@ private fun TvUpNextContent(
             }
 
             is TvUpNextUiState.Loaded -> {
-                UpNextList(episodes = uiState.episodes)
+                UpNextList(
+                    episodes = uiState.episodes,
+                    onOpenPodcast = onOpenPodcast,
+                )
             }
         }
     }
@@ -98,10 +120,13 @@ private fun TvUpNextContent(
 @Composable
 private fun UpNextList(
     episodes: List<PodcastEpisode>,
+    onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+    val listState = rememberLazyListState()
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = false)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
@@ -114,19 +139,24 @@ private fun UpNextList(
         UpNextHeader(episodes = episodes)
         Spacer(Modifier.height(24.dp))
         LazyColumn(
+            state = listState,
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.weight(1f),
         ) {
-            items(
+            itemsIndexed(
                 items = episodes,
-                key = { episode -> episode.uuid },
-            ) { episode ->
+                key = { _, episode -> episode.uuid },
+            ) { index, episode ->
                 TvEpisodeListItem(
                     episode = episode,
                     dateFormatter = dateFormatter,
                     onClick = {},
-                    onOpenActions = { actionsEpisode = episode },
+                    onOpenActions = {
+                        focus.watchForRemoval(episodes, index)
+                        actionsEpisode = episode
+                    },
+                    episodeFocusRequester = focus.requesterFor(episode.uuid),
                 )
             }
         }
@@ -135,11 +165,13 @@ private fun UpNextList(
     actionsEpisode?.let { episode ->
         TvEpisodeActionsModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.UpNext,
             onDismissRequest = { actionsEpisode = null },
             onShowEpisodeDetails = {
                 detailsEpisode = episode
                 actionsEpisode = null
             },
+            onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
         )
     }
     detailsEpisode?.let { episode ->
@@ -239,6 +271,7 @@ private fun TvUpNextLoadedPreview() {
                         },
                     ),
                     onNavigateToHome = {},
+                    onOpenPodcast = {},
                 )
             }
         }
@@ -254,6 +287,7 @@ private fun TvUpNextEmptyPreview() {
                 TvUpNextContent(
                     uiState = TvUpNextUiState.Empty,
                     onNavigateToHome = {},
+                    onOpenPodcast = {},
                 )
             }
         }

@@ -82,7 +82,7 @@ internal fun TvDropdownMenuSurface(
             .clip(MenuShape)
             .background(TvOverlayContainerColor)
             .border(1.dp, TvOverlayBorderColor, MenuShape)
-            .padding(12.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
         if (title != null) {
             Text(
@@ -142,7 +142,7 @@ fun TvDropdownMenuItem(
     }
 }
 
-private val DefaultMenuWidth = 240.dp
+private val DefaultMenuWidth = 256.dp
 private val MenuShape = RoundedCornerShape(20.dp)
 
 @Preview
